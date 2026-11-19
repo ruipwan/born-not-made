@@ -198,6 +198,19 @@
    "kind": "conversation"
   },
   {
+   "id": "stanford-robotics",
+   "kind": "conversation",
+   "who": "A robotics PhD student at Stanford",
+   "role": "founded a company and ran it for years before returning to Stanford for a PhD",
+   "when": "2026",
+   "stance": "affirms",
+   "themes": [
+    "why we love robots",
+    "vision"
+   ],
+   "said": "Robots today fold laundry, sew clothes and do small chores, and that work has worn away the love people once had for robots. As children we loved giant heroes like Ultraman, figures with a philosophy and a meaning behind them. Even as an art project, this work has that kind of vision."
+  },
+  {
    "id": "steve-mann",
    "who": "Steve Mann",
    "role": "MIT Media Lab alumnus",
