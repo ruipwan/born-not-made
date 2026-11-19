@@ -108,7 +108,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 <header class="top"><div class="bar">
   <a class="brand" href="#work">Born, Not Made</a>
   <nav class="tabs" aria-label="Sections">
-    <a href="#work" data-g="work">The Work</a><a href="#ideas" data-g="think">Think</a><a href="#prototypes" data-g="make">Make</a><a href="#conversations" data-g="talk" class="voices">Talk</a>
+    <a href="#work" data-g="work">The Work</a><a href="#ideas" data-g="think">Think</a><a href="#prototypes" data-g="make">Make</a><a href="#simulator" data-g="sim">Simulator</a><a href="#conversations" data-g="talk" class="voices">Talk</a>
   </nav>
 </div><nav class="sub" id="subnav" aria-label="Pages in this section"></nav></header>
 <main>
@@ -438,7 +438,8 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 const GROUPS = [
   { g: "work", label: "The Work", tabs: [["work", "The Work"]] },
   { g: "think", label: "Think", tabs: [["ideas", "Ideas", "questions the work raises"], ["culture", "Culture", "stories, screens and art"]] },
-  { g: "make", label: "Make", tabs: [["prototypes", "Prototypes", "versions one to three"], ["build", "Build", "every part, with sources"], ["simulator", "Simulator", "the printing process"], ["society", "Society", "reproduction at scale"], ["process", "Process", "how the work changed"]] },
+  { g: "make", label: "Make", tabs: [["prototypes", "Prototypes", "versions one to three"], ["build", "Build", "every part, with sources"], ["society", "Society", "reproduction at scale"], ["process", "Process", "how the work changed"]] },
+  { g: "sim", label: "Simulator", tabs: [["simulator", "Simulator"]] },
   { g: "talk", label: "Talk", tabs: [["conversations", "Conversations", "one to one"], ["voices", "Voices", "open to everyone"]] }];
 const TABS = GROUPS.flatMap((x) => x.tabs.map((t) => t[0]));
 const ALIAS = { trunk: "work", branches: "ideas", questions: "ideas", early: "prototypes", log: "process", think: "ideas", make: "prototypes", talk: "conversations" };
