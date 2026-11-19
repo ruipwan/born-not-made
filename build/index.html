@@ -52,9 +52,9 @@ select { font: 12.5px "Inter", sans-serif; padding: 4px 6px; border: 1px solid v
 .doc section:first-child { border-top: 0; }
 .doc h2 { font: 400 32px/1.1 var(--serif); margin: 0 0 6px; letter-spacing: -.01em; }
 .doc .sub { color: var(--muted); margin: 0 0 16px; max-width: 72ch; }
-.lanes { width: 100%; height: 600px; display: block; background: #fff; border: 1px solid var(--line); border-radius: 8px; }
+.lanes { width: 100%; height: 760px; display: block; background: #fff; border: 1px solid var(--line); border-radius: 8px; }
 .ctlgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px 22px; margin: 14px 0; }
-.results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 10px; }
+.results { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 10px; }
 .res { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: #fff; font-size: 13px; }
 .res b { display: block; font: 500 17px var(--serif); }
 .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px; align-items: start; }
@@ -103,8 +103,8 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
 
 <div class="doc">
   <section id="birth">
-    <h2>Birth, three ways at once</h2>
-    <p class="sub">The same baby leaves through the same soft canal, pushed three different ways. Rings are pleats; they open once they pass the throat. Inside pressure pushes a body toward the side where it is wider, so a baby that inflates while it is pushed helps its own birth.</p>
+    <h2>Birth, four ways at once</h2>
+    <p class="sub">The same bellows baby leaves through the same soft sleeve, pushed four ways. The baby grows only in length while air fills the bellows, so inflating while being pushed helps the birth. Numbers come from the physics check; friction is still to be measured.</p>
     <canvas class="lanes" id="lanes"></canvas>
     <div class="ctlgrid">
       <div class="ctl"><label for="bPw">Womb pulse</label><input type="range" id="bPw" min="0" max="2000" step="10" value="600"><output></output></div>
@@ -281,7 +281,7 @@ function deformBelly() {
   const b = +$("#belly").value, L = +$("#pleatL").value / 1000, A0 = +$("#pleatA").value / 1000;
   const p = bellyMesh.geometry.attributes.position.array, P0 = skinBase;
   let zt = -1, x0 = 9, x1 = -9; for (let i = 0; i < P0.length; i += 3) { zt = Math.max(zt, P0[i + 2]); x0 = Math.min(x0, P0[i]); x1 = Math.max(x1, P0[i]); }
-  const s = 0.88 + 0.20 * b, A = A0 * (1 - b);
+  const s = 0.95 + 0.093 * b, A = A0 * (1 - b);   // rise limited to the air pumped in: about 34 mm (physics check)
   for (let i = 0; i < P0.length; i += 3) {
     const x = P0[i], z = P0[i + 2]; p[i] = x; p[i + 1] = P0[i + 1]; if (z <= Z0) { p[i + 2] = z; continue; }
     const h = (z - Z0) / (zt - Z0); let ex = clamp((x - x0 - 0.03) / 0.20, 0, 1) * clamp((x1 - 0.13 - x) / 0.14, 0, 1); ex = ss(ex);
@@ -299,11 +299,11 @@ function babyGeometry(o) {
   // rings along the axis; peaks on the envelope, valleys pulled in; Yoshimura offsets every other ring, Kresling twists
   const N = o.n, m = o.pattern === "bellows" ? 48 : o.m, f = o.f;
   const L = lerp(o.lFold, o.lDep, ss(f)), Rp = o.dDep / 2, rings = 2 * N + 1;
-  const valley = lerp(0.58, 0.9, ss(f));
+  const valley = o.pattern === "bellows" ? lerp(BP.riF / BP.ro, BP.riD / BP.ro, ss(f)) : lerp(0.58, 0.9, ss(f));
   const pos = [], idx = [];
   for (let k = 0; k <= rings + 1; k++) {
     const u = k / (rings + 1), zeta = u * L - L / 2;
-    let env = Math.pow(Math.max(0, 1 - Math.pow(2 * u - 1, 2)), 0.42);     // rounded ends
+    let env = o.pattern === "bellows" ? 1 : Math.pow(Math.max(0, 1 - Math.pow(2 * u - 1, 2)), 0.42);     // bellows: flat caps; others rounded
     if (k === 0 || k === rings + 1) env = 0;
     const isValley = k % 2 === 0 && k > 0 && k < rings + 1;
     const r = Rp * env * (isValley ? valley : 1);
@@ -426,83 +426,89 @@ function renderPrecision() {
 /* ====================================================================== birth, three ways */
 const lanes = $("#lanes"), lg = lanes.getContext("2d");
 const METHODS = [
-  { key: "womb", name: "Womb pressure pulses", note: "air above the gel pulses like contractions" },
-  { key: "evert", name: "Everting liner", note: "a soft tube turns inside out and carries the baby, no sliding at the wall" },
-  { key: "arm", name: "Arm push only", note: "the arm pushes with its payload limit" }];
-const BP = { n: 12, pitch: 0.032, rFold: 0.13, rDep: 0.2, mass: 8, tau: 7, period: 9, armF: 4.9, kRing: 1800, damp: 420 };
+  { key: "womb", name: "Womb pressure pulses", note: "air above the gel pulses like contractions and pushes on the sealed section" },
+  { key: "grow", name: "Its own growth", note: "the tail stays on the needle; the bellows lengthens and pushes the nose out" },
+  { key: "evert", name: "Everting liner", note: "a soft tube in the canal turns inside out and carries the baby, so the wall does not slide on the baby" },
+  { key: "arm", name: "Arm push only", note: "the DexArm pushes with what its 500 g payload allows" }];
+// numbers from data/physics.json when present (bellows baby, sleeve, friction, areas, pump)
+const BP = { n: 6, pf: 0.009, pd: 0.064, ro: 0.105, riF: 0.055, riD: 0.069, Aseal: 0.0346, Aeff: 0.0237, Q: 5e-5, c: 1000, armF: 4.9, kappa: 25000, mass: 1.7, climb: 1.2 };
 bindOut("bPw", (v) => v + " Pa"); bindOut("bPb", (v) => v + " Pa"); bindOut("bMu", (v) => v.toFixed(2)); bindOut("bRt", (v) => v + " mm"); bindOut("bTy", (v) => v + " Pa");
-function canalR(s, rt) { // s: metres along the canal axis, throat at 0; funnel inside, flared lips outside
-  if (s < -0.14) return 0.21; if (s < 0) return lerp(rt, 0.21, ss(-s / 0.14)); if (s < 0.06) return rt; if (s < 0.15) return lerp(rt, 0.24, ss((s - 0.06) / 0.09)); return 0.24;
+function canalR(s, rt) { // metres along the canal axis; throat (the soft sleeve) from 0 to 0.08; funnel inside, open water outside
+  if (s < -0.16) return 0.2; if (s < 0) return lerp(rt, 0.2, ss(-s / 0.16)); if (s < 0.08) return rt; if (s < 0.16) return lerp(rt, 0.22, ss((s - 0.08) / 0.08)); return 0.22;
 }
 let SIM = null;
 function simReset() {
   const g = { pw: +$("#bPw").value, pb: +$("#bPb").value, mu: +$("#bMu").value, rt: +$("#bRt").value / 1000, ty: +$("#bTy").value, inf: $("#bInf").checked };
-  SIM = { t: 0, g, runs: METHODS.map((m) => ({ m, X: -0.05, v: 0, f: new Array(BP.n).fill(0), born: null, stuck: 0, Fmax: 0, hist: [] })) };
+  const L0 = BP.n * BP.pf;
+  SIM = { t: 0, g, runs: METHODS.map((m) => ({ m, B: -0.06 - L0, L: L0, v: 0, born: null, stuck: 0, Fmax: 0, hist: [], held: m.key === "grow" })) };
 }
+function contactN(r, g) { let N = 0; const k = 40; for (let i = 0; i <= k; i++) { const s = r.B + r.L * i / k, ov = BP.ro - canalR(s, g.rt); if (ov > 0) N += BP.kappa * ov * (r.L / k); } return N; }
+function outsideVol(r) { const x0 = Math.max(r.B, 0.16), x1 = r.B + r.L; return x1 > x0 ? Math.PI * BP.ro * BP.ro * (x1 - x0) * 0.85 : 0; }
 function simStep(dt) {
-  const g = SIM.g; SIM.t += dt; const sl = Math.sin(21 * Math.PI / 180);
-  const pulse = Math.pow(Math.max(0, Math.sin(2 * Math.PI * SIM.t / BP.period)), 4);
+  const g = SIM.g; SIM.t += dt; const sl = Math.sin(20.8 * Math.PI / 180), Lmax = BP.n * BP.pd;
+  const pulse = Math.pow(Math.max(0, Math.sin(2 * Math.PI * SIM.t / 9)), 4), pw = 100 + g.pw * pulse;
   for (const r of SIM.runs) {
     if (r.born != null) continue;
-    let N = 0, Fb = 0, Fgel = 0, Aout = 0, Ain = 0;
-    for (let i = 0; i < BP.n; i++) {
-      const s = r.X - i * BP.pitch, rc = canalR(s, g.rt);
-      if (s > (g.inf ? 0.03 : 0.15)) r.f[i] = Math.min(1, r.f[i] + dt / BP.tau);                     // a pleat opens once it is through
-      const rfree = lerp(BP.rFold, BP.rDep, r.f[i]), rr = Math.min(rfree, rc);
-      N += BP.kRing * Math.max(0, rfree - rc) * (1 + g.pb / 1000);                                    // wall squeeze on the ring, stiffer when pressurised
-      const A = Math.PI * rr * rr; if (s > 0.03) Aout = Math.max(Aout, A); else Ain = Math.max(Ain, A);
-      if (s > 0.03) Fb += 1000 * 9.81 * A * BP.pitch * r.f[i] * 0.5 * sl;                              // air in the opened pleats lifts it up the 21 degree canal
-      if (s < -0.14) Fgel += g.ty * 2 * Math.PI * BP.rFold * BP.pitch;                                 // shearing the gel around the pleats still inside
-    }
-    const Fp = g.pb * Math.max(0, Aout - Ain);                                                        // inside pressure pushes toward the wider side
-    let drive = Fp + Fb, mu = g.mu;
-    if (r.m.key === "womb") drive += (100 + g.pw * pulse) * Math.PI * 0.2 * 0.2;                       // pulses act on the womb side of the baby
-    if (r.m.key === "evert") { drive += (100 + 0.5 * g.pw) * Math.PI * (g.rt * 0.9) ** 2; mu = g.mu * 0.1; } // the liner rolls; the wall does not slide on the baby
+    const growing = (r.m.key === "grow" || g.inf) && r.L < Lmax && r.B + r.L > -0.12;            // inflation starts once the nose is in the funnel
+    if (growing) r.L = Math.min(Lmax, r.L + BP.Q / BP.Aeff * dt * clamp(g.pb / 1000, 0.2, 1.5));
+    if (r.held && r.L >= Lmax - 1e-4) r.held = false;                                                // fully grown: the tail lets go of the needle
+    const N = contactN(r, g), Fb = 1000 * 9.81 * outsideVol(r) * sl, Fgel = r.B < -0.16 ? g.ty * 2 * Math.PI * BP.ro * Math.min(r.L, -0.16 - r.B) : 0;
+    let drive = Fb, mu = r.v > 1e-4 ? g.mu * 0.67 : g.mu;
+    if (r.m.key === "womb") drive += pw * BP.Aseal;
+    if (r.m.key === "evert") { drive += (0.5 * g.pw + 100) * Math.PI * g.rt * g.rt + 6; mu *= 0.1; }
     if (r.m.key === "arm") drive += BP.armF;
-    const resist = mu * N + Fgel + 3.4 * sl;
+    const resist = mu * N + Fgel + BP.climb;
+    if (r.held) {                       // growth pushes the nose; the back stays on the needle
+      const Fg = g.pb * BP.Aeff * 0.93; r.Fmax = Math.max(r.Fmax, Fg);
+      if (Fg < resist) { r.L = Math.max(BP.n * BP.pf, r.L - BP.Q / BP.Aeff * dt); r.stuck += dt; } else r.stuck = 0;
+      if (!r.hist.length || SIM.t - r.hist[r.hist.length - 1][0] > 0.25) r.hist.push([SIM.t, Fg, resist]);
+      continue;
+    }
     if (r.v < 1e-4 && drive < resist) { r.v = 0; r.stuck += dt; }
-    else { const a = (drive - resist - BP.damp * r.v) / BP.mass; r.v = Math.max(0, r.v + a * dt); r.X += r.v * dt; if (r.v > 1e-3) r.stuck = 0; }
+    else { r.v = Math.max(0, (drive - resist) / BP.c); r.B += r.v * dt; if (r.v > 1e-3) r.stuck = 0; }   // overdamped: water and gel drag set the speed
     r.Fmax = Math.max(r.Fmax, drive);
-    if (r.X - (BP.n - 1) * BP.pitch > 0.17) r.born = SIM.t;
+    if (r.B > 0.17) r.born = SIM.t;
     if (!r.hist.length || SIM.t - r.hist[r.hist.length - 1][0] > 0.25) r.hist.push([SIM.t, drive, resist]);
   }
 }
 function drawLanes() {
   const W = lanes.clientWidth, H = lanes.clientHeight, dpr = Math.min(2, devicePixelRatio || 1); if (lanes.width !== Math.round(W * dpr)) { lanes.width = W * dpr; lanes.height = H * dpr; }
-  lg.setTransform(dpr, 0, 0, dpr, 0, 0); lg.clearRect(0, 0, W, H); const lh = H / 3, wide = W > 760;
-  const dx0 = wide ? W * 0.2 : 8, dw = wide ? W * 0.5 : W - 16, sc = Math.min(dw / 1.0, lh / 0.56);
+  lg.setTransform(dpr, 0, 0, dpr, 0, 0); lg.clearRect(0, 0, W, H); const nL = SIM.runs.length, lh = H / nL, wide = W > 760;
+  const dx0 = wide ? W * 0.2 : 8, dw = wide ? W * 0.52 : W - 16, sc = Math.min(dw / 1.15, lh / 0.5);
   SIM.runs.forEach((r, li) => {
-    const top = li * lh, y0 = top + lh / 2 + 8, x0 = dx0 + 0.42 * sc, X = (s) => x0 + s * sc;
+    const top = li * lh, y0 = top + lh / 2 + 6, x0 = dx0 + 0.55 * sc, X = (s) => x0 + s * sc;
     lg.fillStyle = "#e6f0f9"; lg.fillRect(dx0, top, X(0) - dx0, lh); lg.fillStyle = "#f7fafc"; lg.fillRect(X(0), top, dx0 + dw - X(0), lh);
     lg.fillStyle = "#2f6fa8"; lg.font = "11px JetBrains Mono, monospace"; lg.fillText("womb, gel", dx0 + 6, top + lh - 8); lg.fillText("water", X(0.3), top + lh - 8);
     lg.strokeStyle = "#7d8792"; lg.lineWidth = 1.6;
-    for (const sg of [-1, 1]) { lg.beginPath(); for (let s = -0.42; s <= 0.58; s += 0.005) { const yy = y0 + sg * canalR(s, SIM.g.rt) * sc; s <= -0.42 ? lg.moveTo(X(s), yy) : lg.lineTo(X(s), yy); } lg.stroke(); }
-    for (let i = BP.n - 1; i >= 0; i--) {
-      const s = r.X - i * BP.pitch, rr = Math.min(lerp(BP.rFold, BP.rDep, r.f[i]), canalR(s, SIM.g.rt));
-      lg.fillStyle = i % 2 ? "rgba(239,230,212,0.96)" : "rgba(226,212,186,0.96)"; lg.strokeStyle = "#8a6f45"; lg.lineWidth = 1;
-      lg.beginPath(); lg.ellipse(X(s), y0, Math.max(2, BP.pitch * sc * 0.6), rr * sc, 0, 0, 7); lg.fill(); lg.stroke();
-    }
+    for (const sg of [-1, 1]) { lg.beginPath(); for (let s = -0.55; s <= 0.6; s += 0.005) { const yy = y0 + sg * canalR(s, SIM.g.rt) * sc; s <= -0.55 ? lg.moveTo(X(s), yy) : lg.lineTo(X(s), yy); } lg.stroke(); }
+    // the bellows: inner crests at pleat joints, outer crests mid pleat, squeezed by the canal
+    const p = r.L / BP.n, fr = clamp((p - BP.pf) / (BP.pd - BP.pf), 0, 1), ri = lerp(BP.riF, BP.riD, fr), pts = [];
+    for (let k = 0; k <= BP.n; k++) { const s = r.B + k * p; pts.push([s, Math.min(ri, canalR(s, SIM.g.rt))]); if (k < BP.n) { const sm = s + p / 2; pts.push([sm, Math.min(BP.ro, canalR(sm, SIM.g.rt))]); } }
+    lg.fillStyle = "rgba(239,230,212,0.96)"; lg.strokeStyle = "#8a6f45"; lg.lineWidth = 1.2; lg.beginPath();
+    pts.forEach(([s, rr], j) => (j ? lg.lineTo(X(s), y0 - rr * sc) : lg.moveTo(X(s), y0 - rr * sc)));
+    for (let j = pts.length - 1; j >= 0; j--) lg.lineTo(X(pts[j][0]), y0 + pts[j][1] * sc); lg.closePath(); lg.fill(); lg.stroke();
+    if (r.held) { lg.strokeStyle = "#15171a"; lg.lineWidth = 2; lg.beginPath(); lg.moveTo(X(r.B) - 30, y0); lg.lineTo(X(r.B) + 6, y0); lg.stroke(); }
     lg.fillStyle = "#15171a"; lg.font = "600 13px Inter, sans-serif"; lg.fillText(r.m.name, 10, top + 20);
     lg.fillStyle = "#5c636c"; lg.font = "11.5px Inter, sans-serif";
     const words = r.m.note.split(" "); let line = "", ly = top + 37; const maxw = wide ? W * 0.18 : W - 20;
     for (const w of words) { if (lg.measureText(line + w).width > maxw) { lg.fillText(line, 10, ly); ly += 15; line = ""; } line += w + " "; } lg.fillText(line, 10, ly);
-    const st = r.born != null ? `born at ${r.born.toFixed(0)} s` : r.stuck > 12 ? "stuck at the throat" : `${SIM.t.toFixed(0)} s`;
-    lg.fillStyle = r.born != null ? "#2f7a4f" : r.stuck > 12 ? "#a83a2f" : "#5c636c"; lg.font = "500 12px JetBrains Mono, monospace"; lg.fillText(st, 10, top + lh - 12);
-    if (wide && r.hist.length > 1) {   // push against resistance over time
-      const gx = W * 0.73, gw = W * 0.25, gy = top + 18, gh = lh - 40, tmax = Math.max(30, SIM.t), fmax = Math.max(20, ...r.hist.map((h) => Math.max(h[1], h[2])));
-      lg.strokeStyle = "#dcd9d1"; lg.strokeRect(gx, gy, gw, gh);
+    const st = r.born != null ? `born at ${r.born.toFixed(0)} s` : r.stuck > 20 ? "stuck at the sleeve" : `${SIM.t.toFixed(0)} s · ${Math.round(r.L * 1000)} mm long`;
+    lg.fillStyle = r.born != null ? "#2f7a4f" : r.stuck > 20 ? "#a83a2f" : "#5c636c"; lg.font = "500 12px JetBrains Mono, monospace"; lg.fillText(st, 10, top + lh - 12);
+    if (wide && r.hist.length > 1) {
+      const gx = W * 0.75, gw = W * 0.23, gy = top + 16, gh = lh - 34, tmax = Math.max(60, SIM.t), fmax = Math.max(20, ...r.hist.map((h) => Math.max(h[1], h[2])));
+      lg.strokeStyle = "#dcd9d1"; lg.lineWidth = 1; lg.strokeRect(gx, gy, gw, gh);
       for (const [k, col] of [[1, "#2f6fa8"], [2, "#a83a2f"]]) { lg.strokeStyle = col; lg.lineWidth = 1.3; lg.beginPath(); r.hist.forEach((h, j) => { const px = gx + h[0] / tmax * gw, py = gy + gh - h[k] / fmax * gh; j ? lg.lineTo(px, py) : lg.moveTo(px, py); }); lg.stroke(); }
       lg.font = "10.5px JetBrains Mono, monospace"; lg.fillStyle = "#2f6fa8"; lg.fillText("push", gx + 4, gy + 12); lg.fillStyle = "#a83a2f"; lg.fillText("resistance", gx + 44, gy + 12); lg.fillStyle = "#5c636c"; lg.fillText(fmax.toFixed(0) + " N", gx + gw - 44, gy + 12);
     }
     lg.strokeStyle = "#dcd9d1"; lg.lineWidth = 1; lg.beginPath(); lg.moveTo(0, top + lh); lg.lineTo(W, top + lh); lg.stroke();
   });
-  $("#bRes").innerHTML = SIM.runs.map((r) => `<div class="res"><b>${esc(r.m.name)}</b>${r.born != null ? `Born in ${r.born.toFixed(0)} s` : r.stuck > 12 ? "Does not pass the throat" : "Running"} · peak push ${r.Fmax.toFixed(0)} N</div>`).join("");
+  $("#bRes").innerHTML = SIM.runs.map((r) => `<div class="res"><b>${esc(r.m.name)}</b>${r.born != null ? `Born in ${r.born.toFixed(0)} s` : r.stuck > 20 ? "Does not pass the sleeve" : "Running"} · peak push ${r.Fmax.toFixed(0)} N</div>`).join("");
 }
 let running = true, lastT = performance.now();
 function simLoop(now) {
   const dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
-  if (running && SIM) for (let i = 0; i < 12; i++) simStep(dt / 4 * 3);
-  if (SIM) drawLanes(); if (SIM && (SIM.t > 180 || SIM.runs.every((r) => r.born != null || r.stuck > 12))) running = false;
+  if (running && SIM) for (let i = 0; i < 40; i++) simStep(dt / 2);
+  if (SIM) drawLanes(); if (SIM && (SIM.t > 400 || SIM.runs.every((r) => r.born != null || r.stuck > 20))) running = false;
   requestAnimationFrame(simLoop);
 }
 $("#bRun").onclick = () => { running = !running; $("#bRun").classList.toggle("on", running); $("#bRun").textContent = running ? "Pause" : "Run"; };
@@ -550,11 +556,19 @@ function renderSources() {
   $("#srcList").innerHTML = [...seen].map(([u, l]) => `<li>${esc(l)}: <a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a></li>`).join("");
 }
 function applyPhysDefaults() {
-  const bp = (PHYS.birth && PHYS.birth.params) || {}; const setV = (id, v) => { if (v == null || isNaN(+v)) return; const el = $("#" + id); el.value = v; el.dispatchEvent(new Event("input")); };
-  setV("bMu", bp.mu); setV("bTy", bp.tau_y_pa); setV("bPw", bp.womb_pulse_pa); setV("bPb", bp.baby_pressure_pa); if (bp.throat_radius_m) setV("bRt", bp.throat_radius_m * 1000);
-  const fp = (PHYS.fold && PHYS.fold.params) || {}; const pat = String(PHYS.fold && PHYS.fold.recommended || "").toLowerCase();
+  const num = (v) => { const x = parseFloat(v); return isNaN(x) ? null : x; };
+  const setV = (id, v) => { if (v == null || isNaN(+v)) return; const el = $("#" + id); el.value = v; el.dispatchEvent(new Event("input")); };
+  const bp = (PHYS.birth && PHYS.birth.params) || {}, fp = (PHYS.fold && PHYS.fold.params) || {};
+  if (num(fp.pleats)) BP.n = num(fp.pleats); if (num(fp.pitch_folded_mm)) BP.pf = num(fp.pitch_folded_mm) / 1000;
+  if (num(fp.deployed_L_mm) && BP.n) BP.pd = num(fp.deployed_L_mm) / 1000 / BP.n;
+  if (num(fp.outer_crest_r_mm)) BP.ro = num(fp.outer_crest_r_mm) / 1000; if (num(fp.inner_crest_r_mm_printed)) BP.riF = num(fp.inner_crest_r_mm_printed) / 1000; if (num(fp.inner_crest_r_mm_deployed)) BP.riD = num(fp.inner_crest_r_mm_deployed) / 1000;
+  if (num(bp.A_seal_m2)) BP.Aseal = num(bp.A_seal_m2); if (num(bp.A_eff_m2)) BP.Aeff = num(bp.A_eff_m2); if (num(bp.Q_pump_L_min)) BP.Q = num(bp.Q_pump_L_min) / 60000; if (num(bp.c_N_s_per_m)) BP.c = num(bp.c_N_s_per_m);
+  setV("bMu", num(bp.mu_s)); setV("bTy", num(bp.tau_y_Pa)); if (bp.sleeve && num(bp.sleeve.r_s0_m)) setV("bRt", Math.round(num(bp.sleeve.r_s0_m) * 1000));
+  setV("bPb", num(bp.p_set_kPa) ? num(bp.p_set_kPa) * 1000 : null); setV("bPw", 1000);
+  const pat = String(PHYS.fold && PHYS.fold.recommended || "").toLowerCase();
   for (const k of ["kresling", "yoshimura", "bellows"]) if (pat.includes(k)) { $("#pattern").value = k; break; }
-  setV("nPleat", fp.pleat_count); setV("mSide", fp.sides); setV("dDep", fp.deployed_diameter_mm); setV("lDep", fp.deployed_length_mm); setV("lFold", fp.folded_length_mm);
+  setV("nPleat", num(fp.pleats)); setV("dDep", num(fp.deployed_D_mm)); setV("lDep", num(fp.deployed_L_mm)); setV("lFold", num(fp.folded_L_mm));
+  if (pat.includes("bellows")) $("#foldNote").textContent = "Collapsed bellows: printed flat with a 3 mm gel gap between flanks, then air lengthens it while the diameter stays. A tether stops it at full length.";
   if (DATA.mother_segments && DATA.mother_segments.count) setV("segs", DATA.mother_segments.count);
 }
 

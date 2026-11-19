@@ -247,7 +247,7 @@
   "date": "2026-10-13",
   "stage": "design",
   "title": "Vertical layout, folded baby",
-  "text": "Sketches move the materials and the arm to the top to save printing space, and consider shape change (4D printing) and segmented growth. The baby's surface is printed folded so it can unfold later. EPON with EPIKURE needs 24 h plus heat.",
+  "text": "Sketches move the materials and the arm to the top to save printing space, and consider shape change (4D printing) and segmented growth. The baby's surface is printed folded so the surface can unfold later. EPON with EPIKURE needs 24 h plus heat.",
   "decision": "Test a fast curing silicone (Ecoflex Fast) first; it also checks the gel. Shape change comes later.",
   "media": [
    "media/1013_folded_sketch.jpg",
