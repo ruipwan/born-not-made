@@ -40,6 +40,7 @@ aside { border-left: 1px solid var(--line); background: var(--paper); display: f
 .card .role { color: var(--muted); margin: 0 0 8px; }
 .card table, table.t { width: 100%; border-collapse: collapse; font-size: 12.5px; }
 .card td, table.t td, table.t th { padding: 4px 6px; border-bottom: 1px solid #232325; vertical-align: top; text-align: left; }
+@media (max-width: 700px) { table.t { display: block; overflow-x: auto; max-width: 100%; } }
 table.t th { font: 500 11px var(--mono); color: var(--muted); text-transform: uppercase; }
 .card td:first-child { color: var(--muted); width: 42%; }
 .src { margin: 8px 0 0; padding-left: 16px; font-size: 12.5px; } .src li { margin: 2px 0; overflow-wrap: anywhere; }
@@ -125,13 +126,13 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
     <p class="sub">A bead of silicone leaves the nozzle and stays where it is put, because the gel only flows where the nozzle cuts it. These are the numbers that decide wall, layer and pleat gap.</p>
     <div class="two">
       <div>
-        <div class="ctl"><label for="pD">Nozzle inner dia.</label><input type="range" id="pD" min="0.4" max="4" step="0.05" value="1.6"><output></output></div>
-        <div class="ctl"><label for="pQ">Flow</label><input type="range" id="pQ" min="2" max="200" step="1" value="30"><output></output></div>
-        <div class="ctl"><label for="pV">Travel speed</label><input type="range" id="pV" min="2" max="100" step="1" value="15"><output></output></div>
+        <div class="ctl"><label for="pD">Nozzle inner dia.</label><input type="range" id="pD" min="0.4" max="4" step="0.05" value="1.55"><output></output></div>
+        <div class="ctl"><label for="pQ">Flow</label><input type="range" id="pQ" min="2" max="200" step="1" value="36"><output></output></div>
+        <div class="ctl"><label for="pV">Travel speed</label><input type="range" id="pV" min="2" max="100" step="1" value="20"><output></output></div>
         <div class="ctl"><label for="pTy">Gel yield stress</label><input type="range" id="pTy" min="1" max="200" step="1" value="30"><output></output></div>
         <div class="ctl"><label for="pDr">Density gap</label><input type="range" id="pDr" min="0" max="300" step="5" value="80"><output></output></div>
         <div class="ctl"><label for="pRep">Arm repeatability</label><input type="range" id="pRep" min="0.01" max="2" step="0.01" value="0.05"><output></output></div>
-        <div class="ctl"><label for="pVol">Silicone per baby</label><input type="range" id="pVol" min="0.2" max="10" step="0.1" value="4.4"><output></output></div>
+        <div class="ctl"><label for="pVol">Silicone per baby</label><input type="range" id="pVol" min="0.2" max="10" step="0.01" value="0.67"><output></output></div>
         <div class="kv" id="pOut"></div>
       </div>
       <div><canvas id="bead" aria-label="Cross section of printed beads"></canvas><p class="hint">Cross section of a wall and a pleat gap, to scale. Grey bars are the arm's error.</p></div>
@@ -523,7 +524,7 @@ for (const id of ["bPw", "bPb", "bMu", "bRt", "bTy", "bInf"]) $("#" + id).addEve
 
 /* ====================================================================== print physics */
 const bead = $("#bead"), bg = bead.getContext("2d");
-bindOut("pD", (v) => v.toFixed(2) + " mm"); bindOut("pQ", (v) => v + " mm³/s"); bindOut("pV", (v) => v + " mm/s"); bindOut("pTy", (v) => v + " Pa"); bindOut("pDr", (v) => v + " kg/m³"); bindOut("pRep", (v) => "±" + v.toFixed(2) + " mm"); bindOut("pVol", (v) => v.toFixed(1) + " L");
+bindOut("pD", (v) => v.toFixed(2) + " mm"); bindOut("pQ", (v) => v + " mm³/s"); bindOut("pV", (v) => v + " mm/s"); bindOut("pTy", (v) => v + " Pa"); bindOut("pDr", (v) => v + " kg/m³"); bindOut("pRep", (v) => "±" + v.toFixed(2) + " mm"); bindOut("pVol", (v) => v.toFixed(2) + " L");
 function printCalc() {
   const d = +$("#pD").value, Q = +$("#pQ").value, v = +$("#pV").value, ty = +$("#pTy").value, dr = +$("#pDr").value, rep = +$("#pRep").value, V = +$("#pVol").value;
   const db = 2 * Math.sqrt(Q / (Math.PI * v)), h = 0.8 * db, hold = ty / Math.max(1e-9, dr * 9.81 * db / 1000), err = rep + 0.1 * db, gap = db + 2 * err, hours = (V * 1e6) / Q / 3600;

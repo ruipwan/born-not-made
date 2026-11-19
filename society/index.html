@@ -4,11 +4,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 /* A population of mother and baby robots in water. Births depend on relations; memory is inherited with drift; the water feeds only so many. */
-:root { --bg: #070a0e; --panel: #10151c; --line: #1d2530; --fg: #e4e9ef; --muted: #8b97a6; --gel: #9fcdf0; --warm: #f0c48a; --mono: "JetBrains Mono", ui-monospace, monospace; color-scheme: dark; }
+:root { --bg: #0c0c0d; --panel: #141415; --line: #2a2a2c; --fg: #ecebe6; --muted: #9b9a94; --gel: #9fcdf0; --warm: #f0c48a; --mono: "JetBrains Mono", ui-monospace, monospace; color-scheme: dark; }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--fg); font: 13px/1.5 "Inter", system-ui, sans-serif; }
 .wrap { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 10px; padding: 10px max(10px, env(safe-area-inset-left, 0px)); min-height: 100vh; }
-.stage { position: relative; background: #05080b; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; min-height: 520px; }
+.stage { position: relative; background: #0c0c0d; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; min-height: 520px; }
 #c { width: 100%; height: 100%; display: block; cursor: crosshair; }
 .hud { position: absolute; left: 12px; top: 10px; font: 12px var(--mono); color: var(--muted); pointer-events: none; line-height: 1.6; }
 .hud b { color: var(--fg); font-weight: 500; }
@@ -19,9 +19,9 @@ aside { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .ctl output { font: 11px var(--mono); color: var(--muted); text-align: right; }
 input[type=range] { width: 100%; accent-color: var(--gel); }
 .row { display: flex; gap: 6px; flex-wrap: wrap; }
-button { font: 12px "Inter", sans-serif; color: var(--fg); background: #1b2430; border: 1px solid #2a3544; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
-button:hover { background: #243042; } button.on { background: #27466b; border-color: #3b6ea8; }
-input[type=text] { flex: 1; min-width: 0; background: #0a0e13; color: var(--fg); border: 1px solid #2a3544; border-radius: 6px; padding: 6px 8px; font: 12px "Inter", sans-serif; }
+button { font: 12px "Inter", sans-serif; color: var(--fg); background: #1c1c1e; border: 1px solid #2a2a2c; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+button:hover { background: #262628; } button.on { background: #27466b; border-color: #3b6ea8; }
+input[type=text] { flex: 1; min-width: 0; background: #0c0c0d; color: var(--fg); border: 1px solid #2a2a2c; border-radius: 6px; padding: 6px 8px; font: 12px "Inter", sans-serif; }
 canvas.spark { width: 100%; height: 46px; display: block; }
 .kv { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 2px 8px; font-size: 12px; }
 .kv dt { color: var(--muted); } .kv dd { margin: 0; overflow-wrap: anywhere; }
@@ -53,7 +53,7 @@ canvas.spark { width: 100%; height: 46px; display: block; }
     <div class="card"><h3>Selected</h3><div id="insp" class="legend">Click a robot in the water.</div></div>
   </aside>
 </div>
-<a href="../" style="position:fixed;right:10px;bottom:10px;font:12px Inter,sans-serif;color:#9fcdf0;background:#10151c;padding:4px 9px;border-radius:6px;text-decoration:none;border:1px solid #1d2530">Born, Not Made home</a>
+<a href="../" style="position:fixed;right:10px;bottom:10px;font:12px Inter,sans-serif;color:#9fcdf0;background:#141415;padding:4px 9px;border-radius:6px;text-decoration:none;border:1px solid #2a2a2c">Born, Not Made home</a>
 <script>
 "use strict";
 const $ = (s) => document.querySelector(s);
@@ -131,14 +131,14 @@ function sample() {
 function spark(id, data, col) {
   const c = $(id), x = c.getContext("2d"), w = c.clientWidth, h = c.clientHeight; c.width = w * DPR; c.height = h * DPR; x.setTransform(DPR, 0, 0, DPR, 0, 0);
   if (data.length < 2) return; const mx = Math.max(...data) || 1;
-  x.strokeStyle = "#1d2530"; x.beginPath(); x.moveTo(0, h - 0.5); x.lineTo(w, h - 0.5); x.stroke();
+  x.strokeStyle = "#2a2a2c"; x.beginPath(); x.moveTo(0, h - 0.5); x.lineTo(w, h - 0.5); x.stroke();
   x.fillStyle = col + "22"; x.strokeStyle = col; x.lineWidth = 1.5; x.beginPath();
   data.forEach((v, i) => { const px = i / (data.length - 1) * w, py = h - 3 - (v / mx) * (h - 8); i ? x.lineTo(px, py) : x.moveTo(px, py); }); x.stroke();
   x.lineTo(w, h); x.lineTo(0, h); x.closePath(); x.fill();
   x.fillStyle = col; x.font = "11px JetBrains Mono, monospace"; x.textAlign = "right"; x.fillText((data[data.length - 1]).toFixed(data[data.length - 1] < 10 ? 2 : 0), w - 2, 12);
 }
 function draw() {
-  g.fillStyle = "#05080b"; g.fillRect(0, 0, W, H);
+  g.fillStyle = "#0c0c0d"; g.fillRect(0, 0, W, H);
   const live = robots.filter((r) => !r.dead);
   g.lineWidth = 1;
   for (let i = 0; i < live.length; i++) for (let j = i + 1; j < live.length; j++) {

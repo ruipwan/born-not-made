@@ -164,7 +164,7 @@
    ],
    [
     "Self folding",
-    "The printed folded shape is the rest state, so venting refolds the baby by itself (programmable folding, Hawkes et al. 2010)."
+    "The printed folded shape is the rest state, so venting refolds the baby without help (programmable folding, Hawkes et al. 2010)."
    ]
   ],
   "sources": [
@@ -322,7 +322,7 @@
    ],
    [
     "Self folding",
-    "Printed rest state = folded belly, so venting returns it to folded by itself."
+    "Printed rest state = folded belly, so venting returns the belly to folded without help."
    ]
   ],
   "sources": [
@@ -382,7 +382,7 @@
    [
     "breakout",
     "rho_gel g V_air > F_hold",
-    "Air volume that frees the folded baby; it then rises to the gel surface."
+    "Air volume that frees the folded baby; the baby then rises to the gel surface."
    ],
    [
     "crest stretch",
@@ -447,7 +447,7 @@
    [
     "womb gas",
     "dp_w/dt = (Q_in - A_seal v - dV_belly/dt) / C_gas, C_gas = V_air/p_0",
-    "Womb pressure once the belly is at its stop. Below the stop p_w stays at the belly open pressure."
+    "Womb pressure once the belly is at the stop. Below the stop p_w stays at the belly open pressure."
    ],
    [
     "slip per pulse",
@@ -676,12 +676,12 @@
    [
     "baby leaving",
     "9.3 L leaves over the push; ends 0.9 L below the start (about 4 mm)",
-    "The baby takes its volume and 0.9 L of trapped gel out; gel level drops 2.7 mm per birth."
+    "Each birth removes the baby volume and 0.9 L of trapped gel out; gel level drops 2.7 mm per birth."
    ],
    [
     "venting after birth",
     "back to printed rest shape",
-    "The folded print is the rest state, so the belly refolds by itself."
+    "The folded print is the rest state, so the belly refolds without help."
    ],
    [
     "arm coming in",
@@ -752,7 +752,7 @@
   [
    "Baby growth ratchet (tail on needle)",
    "works",
-   "Bellows growth pushes the nose with about 20 N at 1 kPa; tether stops it at 385 mm.",
+   "Bellows growth pushes the nose with about 20 N at 1 kPa; tether stops growth at 385 mm.",
    "https://pmc.ncbi.nlm.nih.gov/articles/PMC5740677"
   ],
   [
