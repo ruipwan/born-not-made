@@ -105,6 +105,119 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
   .pairs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 560px) { .timeline, .grid2, .grid3, .vids, .pairs { grid-template-columns: minmax(0, 1fr); } nav.tabs { margin-left: 0; } }
+
+/* Ideas */
+/* Ideas tab: extra styles. Uses the tokens already on :root in index.html. */
+#ideas .qnav { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 6px; padding: 0; list-style: none; }
+#ideas .qnav button { font: 500 13px var(--sans); color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+#ideas .qnav button:hover, #ideas .qnav button:focus-visible { border-color: var(--gel); color: var(--gel); outline: none; }
+#ideas .qnav b { font: 500 11px var(--mono); color: var(--gel); margin-right: 6px; }
+#ideas .side .num { font: 500 12px var(--mono); color: var(--gel); margin: 0 0 8px; letter-spacing: .06em; }
+#ideas .side .note { margin-top: 10px; }
+#ideas .plain { font: 400 clamp(20px, 2.2vw, 24px)/1.4 var(--serif); margin: 0 0 18px; max-width: 34ch; }
+#ideas .prose figure, #ideas figure { margin: 0; }
+#ideas .figs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 18px; margin: 22px 0; }
+#ideas .block { scroll-margin-top: 120px; }
+#ideas .figs.four { grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); }
+#ideas .fig.wide-strip { max-width: 560px; margin: 0 0 22px; }
+#ideas .figs.two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); }
+#ideas .fig img { height: auto; }
+#ideas .fig img.tall { max-height: 520px; width: auto; max-width: 100%; margin: 0 auto; }
+#ideas .cap a { color: var(--muted); }
+#ideas .cap b { color: var(--ink); font-weight: 500; }
+#ideas .ask { margin: 26px 0 0; padding: 18px 20px; border-radius: 8px; background: var(--gel-soft); border-left: 3px solid var(--gel); max-width: 66ch; }
+#ideas .ask p { margin: 0 0 8px; font: 400 19px/1.45 var(--serif); }
+#ideas .ask a { font: 500 13px var(--sans); }
+#ideas .dgm { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 18px; margin: 22px 0; }
+#ideas .dgm > h3 { margin-bottom: 10px; }
+#ideas .dgm svg { display: block; width: 100%; height: auto; overflow: visible; }
+#ideas svg text { font-family: var(--sans); fill: var(--ink); }
+#ideas svg .mono { font-family: var(--mono); fill: var(--muted); }
+#ideas svg .muted { fill: var(--muted); }
+#ideas svg .gel { fill: var(--gel); }
+#ideas svg .ln { stroke: var(--ink); fill: none; stroke-width: 1.5; }
+#ideas svg .ln-m { stroke: var(--muted); fill: none; stroke-width: 1.2; }
+#ideas svg .ln-g { stroke: var(--gel); fill: none; stroke-width: 1.6; }
+#ideas svg .dash { stroke-dasharray: 5 5; }
+#ideas svg .f-gel { fill: var(--gel-soft); }
+#ideas svg .f-paper { fill: var(--paper); }
+#ideas svg .f-bg { fill: var(--bg); }
+/* two things compared side by side */
+#ideas .vs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 22px 0; }
+#ideas .vs .card { padding: 16px; }
+#ideas .vs svg { width: 100%; height: auto; display: block; margin: 0 0 10px; }
+#ideas .vs h3 { font: 400 21px/1.2 var(--serif); margin: 0 0 10px; }
+#ideas .vs dl { margin: 0; display: grid; grid-template-columns: minmax(0, 7.5em) minmax(0, 1fr); gap: 6px 10px; font-size: 14px; }
+#ideas .vs dt { font: 500 11px/1.9 var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+#ideas .vs dd { margin: 0; }
+#ideas .vs .mine { border-color: var(--gel); }
+/* womb across languages */
+#ideas .lang { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 22px; align-items: center; }
+#ideas .lang .node { cursor: pointer; outline: none; }
+#ideas .lang .node circle { fill: var(--paper); stroke: var(--line); stroke-width: 1.5; transition: fill .2s, stroke .2s; }
+#ideas .lang .node.mother circle { stroke: var(--ink); }
+#ideas .lang .node.child circle { stroke: var(--gel); }
+#ideas .lang .node.mercy circle { stroke: var(--gel); stroke-dasharray: 4 4; }
+#ideas .lang .node.on circle, #ideas .lang .node:hover circle, #ideas .lang .node:focus-visible circle { fill: var(--gel-soft); stroke-width: 2.5; }
+#ideas .lang .node .w { text-anchor: middle; }
+#ideas .lang .node .n { font: 500 13px var(--mono); fill: var(--muted); text-anchor: middle; text-transform: uppercase; letter-spacing: .04em; }
+#ideas .lang .spoke { stroke: var(--line); stroke-width: 1.2; }
+#ideas .lang .spoke.on { stroke: var(--gel); stroke-width: 2; }
+#ideas .lang .kin { stroke: var(--gel); stroke-width: 1.4; fill: none; stroke-dasharray: 3 5; }
+#ideas .lang .panel { min-height: 250px; }
+#ideas .lang .panel .lname { font: 500 12px var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin: 0 0 6px; }
+#ideas .lang .panel .lword { font: 400 34px/1.15 var(--serif); margin: 0 0 4px; }
+#ideas .lang .panel .ltr { font: 400 17px var(--serif); font-style: italic; color: var(--muted); margin: 0 0 12px; }
+#ideas .lang .panel p { margin: 0 0 8px; font-size: 15px; }
+#ideas .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); margin: 12px 0 0; }
+#ideas .legend span::before { content: ""; display: inline-block; width: 14px; height: 14px; border-radius: 50%; margin-right: 6px; vertical-align: -2px; border: 2px solid var(--ink); }
+#ideas .legend .child::before { border-color: var(--gel); }
+#ideas .legend .mercy::before { border: 2px dashed var(--gel); }
+#ideas .legend .root::before { width: 18px; height: 0; border-radius: 0; border: 0; border-top: 2px dashed var(--gel); vertical-align: 4px; }
+/* womb, mould, array, matrix, body */
+#ideas .flow { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; counter-reset: f; }
+#ideas .flow li { position: relative; padding: 12px 10px 0; border-top: 2px solid var(--ink); }
+#ideas .flow li.this { border-top-color: var(--gel); }
+#ideas .flow li svg { width: 56px; height: 56px; display: block; margin: 0 0 8px; }
+#ideas .flow .yr { margin: 0 0 2px; }
+#ideas .flow b { display: block; font: 400 19px/1.2 var(--serif); margin: 0 0 4px; }
+#ideas .flow span { font-size: 13.5px; color: var(--muted); display: block; }
+/* stage widget: seahorse, clownfish, wrasse, this work */
+#ideas .stage .tabs-mini { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+#ideas .stage button { font: 500 13px var(--sans); border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+#ideas .stage button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+#ideas .stage .act { background: var(--gel); color: #141415; border-color: var(--gel); }
+#ideas .stage .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0 0; }
+#ideas .stage .say { font: 400 18px/1.4 var(--serif); margin: 8px 0 0; min-height: 3em; }
+#ideas .stage svg g, #ideas .stage svg circle, #ideas .stage svg path { transition: opacity .45s, transform .6s; }
+#ideas .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 0; }
+#ideas .chips button { font: 500 13px var(--sans); border: 1px dashed var(--gel); background: var(--paper); color: var(--gel); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+#ideas .chips button[aria-pressed="true"] { background: var(--gel); color: #141415; border-style: solid; }
+#ideas .cand { transition: opacity .3s; }
+#ideas .dim .cand { opacity: .28; }
+#ideas .dim .cand.on { opacity: 1; }
+#ideas .swipe { display: none; font: 11px var(--mono); color: var(--muted); margin: 6px 0 0; }
+#ideas .pointer { margin: 28px 0 0; padding: 22px 24px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: center; }
+#ideas .pointer p { margin: 0; font: 400 19px/1.45 var(--serif); max-width: 62ch; }
+#ideas .refgroup h3 { font: 500 12px var(--mono); color: var(--ink); text-transform: uppercase; letter-spacing: .05em; margin: 18px 0 6px; }
+#ideas .refgroup h3:first-child { margin-top: 0; }
+#ideas .refs { word-break: break-word; }
+@media (max-width: 900px) {
+  #ideas .lang { grid-template-columns: minmax(0, 1fr); }
+  #ideas .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  #ideas .scrollx { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  #ideas .scrollx svg { min-width: 600px; }
+  #ideas .swipe { display: block; }
+  #ideas .dgm > svg text { font-size: 24px; }
+  #ideas .vs, #ideas .flow { grid-template-columns: minmax(0, 1fr); }
+  #ideas .pointer { grid-template-columns: minmax(0, 1fr); }
+  #ideas .dgm { padding: 14px 12px; }
+  #ideas .vs dl { grid-template-columns: minmax(0, 6.5em) minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { #ideas .stage svg * { transition: none !important; } }
+
 </style></head><body>
 <header class="top"><div class="bar">
   <a class="brand" href="#work">Born, Not Made</a>
@@ -297,98 +410,558 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 </section>
 
 <!-- ============================== BRANCHES ============================== -->
+<!-- ============================== IDEAS ============================== -->
 <section class="tab" id="ideas">
-  <div class="tabhead"><div><p class="kicker">Ideas</p><h2>Questions the work raises</h2><p>Readings the work invites: what a womb is, whether a robot can be a mother, and what a mother is at all.</p></div></div>
+  <div class="tabhead"><div><p class="kicker">Ideas</p><h2>Questions the work raises</h2><p>A robot that gives birth touches old questions about wombs, mothers, fathers and water. Each one below starts plainly, follows the readings behind it, and ends open. Answer any of them in <a href="#voices">Voices</a>.</p></div></div>
+  <ul class="qnav" aria-label="Questions on this page">
+    <li><button type="button" data-go="q-womb"><b>01</b>Artificial womb</button></li>
+    <li><button type="button" data-go="q-body"><b>02</b>A mother without a body?</button></li>
+    <li><button type="button" data-go="q-mother"><b>03</b>Starting from the mother</button></li>
+    <li><button type="button" data-go="q-water"><b>04</b>Bodies of water</button></li>
+    <li><button type="button" data-go="q-relation"><b>05</b>A mother as a relation</button></li>
+    <li><button type="button" data-go="q-gender"><b>06</b>Function or gender</button></li>
+    <li><button type="button" data-go="q-father"><b>07</b>A father?</button></li>
+    <li><button type="button" data-go="q-word"><b>08</b>The word womb</button></li>
+    <li><button type="button" data-go="q-labour"><b>09</b>Why labour</button></li>
+  </ul>
 
-  <div class="block">
-    <div class="side"><h2>Matrix and cyberfeminism</h2></div>
+  <!-- 01 ARTIFICIAL WOMB -->
+  <div class="block" id="q-womb">
+    <div class="side"><p class="num">01</p><h2>From the artificial womb to the robotic womb</h2></div>
     <div class="prose">
-      <p>Latin <i>matrix</i> comes from <i>mater</i>, mother. It meant a breeding animal, then the womb, then a mould that gives form, and in 1850 Sylvester used it for an array of numbers. The womb became the mould, and the mould became the simulation.</p>
-      <p>Cyberfeminism took the word back. VNS Matrix wrote their Cyberfeminist Manifesto in 1991. Sadie Plant's <i>Zeros + Ones</i> (1997) tied weaving, women and computing. Irina Aristarkhova's <i>Hospitality of the Matrix</i> (2012) reads the matrix as a space that makes room for another: hospitality, not containment. The robotic womb here is built as that kind of space: a body that makes room, holds, and lets go.</p>
-    </div>
-  </div>
-
-  <div class="block">
-    <div class="side"><h2>Matricentric feminism</h2></div>
-    <div class="prose">
-      <p>Andrea O'Reilly argues that mothers need a feminism of their own, centred on the work and experience of mothering (<i>Matricentric Feminism</i>, 2016). The work does not stage motherhood as a role played by a machine. It asks which parts of gestation are mechanical, and which parts only exist between two bodies.</p>
-    </div>
-  </div>
-
-  <div class="block">
-    <div class="side"><h2>Full surrogacy and the Mosuo</h2></div>
-    <div class="prose">
-      <p>Sophie Lewis (<i>Full Surrogacy Now</i>, 2019) treats gestation as work and asks for a world where everyone shares it. The Mosuo (Na) of southwest China live in matrilineal households where children grow up with their mother's kin, a society Cai Hua described as "without fathers or husbands" (2001). Both loosen the tie between one parent and one child. In the society simulation a baby is born of one body and shaped by many relations.</p>
-    </div>
-  </div>
-
-  <div class="block">
-    <div class="side"><h2>Artificial womb, robotic womb</h2></div>
-    <div class="prose">
-      <p>J. B. S. Haldane imagined ectogenesis in <i>Daedalus</i> (1924). In 2017 Partridge and colleagues kept premature lambs alive for four weeks in a fluid filled bag, the Biobag. An artificial womb replaces a mother for a human child. A robotic womb is a mother for a machine.</p>
-      <table class="cmp" style="margin-top:12px">
-        <tr><th></th><th>Artificial womb</th><th>Robotic womb (this work)</th></tr>
-        <tr><td>Who is born</td><td>a human child</td><td>a robot</td></tr>
-        <tr><td>Fluid</td><td>synthetic amniotic fluid</td><td>support gel</td></tr>
-        <tr><td>Supply</td><td>oxygenator through the cord</td><td>silicone and air through the arm</td></tr>
-        <tr><td>The body</td><td>a bag on a machine</td><td>the mother is the machine</td></tr>
-        <tr><td>Goal</td><td>replace gestation</td><td>give machines a gestation</td></tr>
-      </table>
-    </div>
-  </div>
-
-  <div class="block">
-    <div class="side"><h2>Labour</h2></div>
-    <div class="prose">
-      <p>In English, labour is both work and giving birth. A robot is, by its name, a worker: Čapek took the word from the Czech <i>robota</i>, forced labour (<i>R.U.R.</i>, 1920). A robot in labour is a worker doing the one kind of work that makes another worker who is not a copy.</p>
-    </div>
-  </div>
-
-  <div class="block">
-    <div class="side"><h2>The womb across languages</h2></div>
-    <div class="prose">
-      <p>Chinese 子宫 is the child's palace. Greek <i>hystera</i> gave medicine "hysteria". Latin has <i>uterus</i> and <i>matrix</i>. Sanskrit <i>garbha</i> is womb, and <i>garbhagriha</i>, the womb house, is the inner sanctum of a temple. Each name says what a womb is for: a dwelling, an organ, a mould, a sacred room.</p>
-    </div>
-  </div>
-
-  <div class="block">
-    <div class="side"><h2>A designer who cannot give birth</h2></div>
-    <div class="prose">
-      <p>The work is made by someone whose own body cannot do what the mother robot does. That distance is part of the method: birth is studied as mechanism, with sources, and the metaphor is kept small.</p>
-    </div>
-  </div>
-
-  <div class="block">
-    <div class="side"><h2>Other bodies</h2><p class="note">Six directions for a less mechanical, more organic mother and tail.</p></div>
-    <div>
-      <div class="vids">
-        <figure style="margin:0"><video src="assets/video/concept_budding.mp4" muted loop playsinline preload="metadata" controls></video><p class="cap">Budding</p></figure>
-        <figure style="margin:0"><video src="assets/video/concept_vertebra.mp4" muted loop playsinline preload="metadata" controls></video><p class="cap">Vertebra</p></figure>
-        <figure style="margin:0"><video src="assets/video/concept_swallow.mp4" muted loop playsinline preload="metadata" controls></video><p class="cap">Swallow</p></figure>
-        <figure style="margin:0"><video src="assets/video/concept_jellyfish.mp4" muted loop playsinline preload="metadata" controls></video><p class="cap">Jellyfish</p></figure>
-        <figure style="margin:0"><video src="assets/video/concept_ammonite.mp4" muted loop playsinline preload="metadata" controls></video><p class="cap">Ammonite</p></figure>
-        <figure style="margin:0"><video src="assets/video/concept_pod.mp4" muted loop playsinline preload="metadata" controls></video><p class="cap">Pod</p></figure>
+      <p class="plain">Doctors are building machines that let a very premature baby keep growing outside the mother. This work turns that around: it gives a machine a body that grows a baby inside.</p>
+      <p>In 1923 the biologist J. B. S. Haldane imagined a future in which "ectogenesis is now universal, and in this country less than 30 per cent of children are now born of woman" (<i>Daedalus</i>, 1924). In 2017 a team in Philadelphia kept extremely premature lambs alive for up to four weeks in a sealed bag of fluid, connected through the umbilical cord to an oxygenator (Partridge et al. 2017). The press called it an artificial womb.</p>
+      <figure class="fig"><img src="assets/img/q/partridge_biobag_2017.jpg" alt="Diagram of the Biobag circuit, and two photographs of a lamb inside a fluid filled bag on day 4 and day 28" loading="lazy" width="946" height="955"><p class="cap"><b>The Biobag.</b> (a) the circuit: a closed amniotic fluid bath and an oxygenator on the umbilical vessels; (b, c) one lamb on day 4 and day 28 of support. Partridge et al., <i>Nature Communications</i> 8, 15112 (2017), Fig. 1. <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. <a href="https://www.nature.com/articles/ncomms15112/figures/1">Source</a></p></figure>
+      <p style="margin-top:18px">Not everyone accepts the name. The philosophers Elselijn Kingma and Suki Finn argue that the 2017 system is genuine ectogestation, "But it is not an artificial womb, which is a term that is better put to rest." For them birth is more than a change of place: it is "a physiological, mereological and topological transformation" (2020). The bioethicist Elizabeth Chloe Romanis proposes a new word for the being inside, the "gestateling" (2018).</p>
+      <div class="vs" role="group" aria-label="Artificial womb compared with robotic womb">
+        <div class="card">
+          <svg viewBox="0 0 320 150" role="img" aria-label="A bag of fluid on a machine frame, with tubes to an oxygenator">
+            <rect x="12" y="18" width="214" height="114" rx="6" class="ln-m f-bg"/>
+            <rect x="32" y="34" width="174" height="82" rx="34" class="ln-g f-gel"/>
+            <ellipse cx="108" cy="80" rx="36" ry="19" class="ln f-paper"/>
+            <circle cx="146" cy="68" r="13" class="ln f-paper"/>
+            <path d="M118 98 C 130 140, 230 138, 256 92" class="ln-m"/>
+            <path d="M110 98 C 118 150, 250 150, 272 92" class="ln-m"/>
+            <rect x="246" y="62" width="58" height="30" rx="4" class="ln f-paper"/>
+            <text x="275" y="81" class="mono" font-size="10" text-anchor="middle">oxygen</text>
+          </svg>
+          <h3>A womb without a mother</h3>
+          <dl>
+            <dt>Where</dt><dd>a hospital, outside any body</dd>
+            <dt>Body</dt><dd>a womb alone, with no body around it</dd>
+            <dt>Holds</dt><dd>a pregnancy that began in a woman</dd>
+            <dt>Decides labour</dt><dd>clinicians</dd>
+            <dt>Labour</dt><dd>replaced by surgery</dd>
+          </dl>
+        </div>
+        <div class="card mine">
+          <svg viewBox="0 0 320 150" role="img" aria-label="A soft mother robot floating on water, with a gel filled womb, a folded baby inside and an arm reaching in from the tail">
+            <path d="M0 132 C 50 126, 90 138, 140 132 S 240 126, 320 132 L 320 150 L 0 150 Z" class="f-gel"/>
+            <path d="M0 132 C 50 126, 90 138, 140 132 S 240 126, 320 132" class="ln-g"/>
+            <path d="M70 80 C 66 36, 150 18, 222 38 C 276 54, 300 86, 280 108 C 256 132, 160 134, 106 122 C 80 114, 72 98, 70 80 Z" class="ln f-paper"/>
+            <ellipse cx="178" cy="80" rx="66" ry="34" class="ln-g f-gel"/>
+            <ellipse cx="182" cy="82" rx="30" ry="14" class="ln f-paper"/>
+            <path d="M160 84 l7 -7 l7 7 l7 -7 l7 7 l7 -7 l7 7" class="ln"/>
+            <path d="M22 54 C 44 40, 88 46, 132 70" class="ln"/>
+            <circle cx="134" cy="71" r="3.5" class="gel"/>
+          </svg>
+          <h3>A mother with a womb</h3>
+          <dl>
+            <dt>Where</dt><dd>inside a member of a population</dd>
+            <dt>Body</dt><dd>a whole robot that moves; the womb fills most of the body</dd>
+            <dt>Holds</dt><dd>a machine formed from zero</dd>
+            <dt>Decides labour</dt><dd>the mother's own process</dd>
+            <dt>Labour</dt><dd>one labour, pushed into water</dd>
+          </dl>
+        </div>
       </div>
-      <div class="fig" style="margin-top:20px"><img src="assets/img/forms_sheet_1.png" alt="Form studies" loading="lazy"></div>
+      <p>The artificial womb takes the womb out of the mother. The robotic womb puts the womb back into a body, one that carries and labours, so that the labour can be seen.</p>
+      <div class="ask"><p>Kingma and Finn would retire the word womb for a bag in a hospital. Should a machine with a body be allowed to keep it? What does a womb need in order to be a womb: a body around it, a labour, a mother?</p><a href="#voices">Answer in Voices</a></div>
     </div>
   </div>
 
-  <div class="block">
-    <div class="side"><h2>References</h2></div>
-    <ol class="refs">
-      <li>VNS Matrix. <i>A Cyberfeminist Manifesto for the 21st Century</i>, 1991.</li>
-      <li>Plant, S. <i>Zeros + Ones: Digital Women and the New Technoculture</i>. Doubleday, 1997.</li>
-      <li>Aristarkhova, I. <i>Hospitality of the Matrix: Philosophy, Biomedicine, and Culture</i>. Columbia University Press, 2012.</li>
-      <li>O'Reilly, A. <i>Matricentric Feminism: Theory, Activism, and Practice</i>. Demeter Press, 2016.</li>
-      <li>Lewis, S. <i>Full Surrogacy Now: Feminism Against Family</i>. Verso, 2019.</li>
-      <li>Cai Hua. <i>A Society without Fathers or Husbands: The Na of China</i>. Zone Books, 2001.</li>
-      <li>Haldane, J. B. S. <i>Daedalus, or Science and the Future</i>. Kegan Paul, 1924.</li>
-      <li>Partridge, E. A. et al. "An extra-uterine system to physiologically support the extreme premature lamb." <i>Nature Communications</i> 8, 15112, 2017. <a href="https://doi.org/10.1038/ncomms15112">doi</a></li>
-      <li>Čapek, K. <i>R.U.R. (Rossum's Universal Robots)</i>, 1920.</li>
-      <li>Sylvester, J. J. "Additions to the articles in the September number of this journal, 'On a new class of theorems,' and on Pascal's theorem." <i>Philosophical Magazine</i> 37(251), 363 to 370, 1850. <a href="https://doi.org/10.1080/14786445008646629">doi</a></li>
-    </ol>
+  <!-- 02 A MOTHER WITHOUT A BODY -->
+  <div class="block" id="q-body">
+    <div class="side"><p class="num">02</p><h2>Does a mother need a body?</h2><p class="note">Cyberfeminism and the matrix</p></div>
+    <div class="prose">
+      <p class="plain">The word matrix once meant womb. By the 1990s it also meant a digital space with no body at all.</p>
+      <p>Cyberfeminists took the word back. In 1991 the Adelaide collective VNS Matrix (Virginia Barratt, Julianne Pierce, Francesca da Rimini, Josephine Starrs) put their <i>Cyberfeminist Manifesto for the 21st Century</i> on a billboard, writing the body straight into the network. Sadie Plant's <i>Zeros + Ones</i> (1997) traced computing back to weaving. Ada Lovelace had already seen it in 1843: the Analytical Engine "weaves algebraical patterns just as the Jacquard-loom weaves flowers and leaves."</p>
+      <figure class="fig"><img src="assets/img/q/jacquard_cards.jpg" alt="A Jacquard loom in a museum, with a long chain of punched cards hanging beside the threads" loading="lazy" width="1400" height="932"><p class="cap"><b>A Jacquard loom and its punched cards</b>, National Museum of Scotland. Photo: Stephencdickson, 2019. <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. <a href="https://commons.wikimedia.org/wiki/File:A_Jacquard_loom_showing_information_punchcards,_National_Museum_of_Scotland.jpg">Wikimedia Commons</a></p></figure>
+      <p style="margin-top:18px">The philosopher Irina Aristarkhova asks what this history forgot. In <i>Hospitality of the Matrix</i> (2012) the matrix is the place everything comes from (chora, womb, incubator), and what it does is an act of "matrixial/maternal hospitality": making space and matter for another. Her essay "Ectogenesis and Mother as Machine" (2005) asks what happens to the mother when machines take over gestation. Donna Haraway's cyborg goes the other way: it does not dream of community on the model of the organic family (1985).</p>
+      <p>The work has two kinds of mother. The mother robot in water has a body, a womb and a labour. The mother agents in the <a href="#society">Society</a> simulation have no body at all; they pass part of their memory to baby agents. Both are called mother here.</p>
+      <div class="vs" role="group" aria-label="The mother robot compared with a mother agent">
+        <div class="card mine">
+          <svg viewBox="0 0 320 120" role="img" aria-label="The mother robot: a soft body with a gel filled womb">
+            <path d="M0 108 C 60 102, 110 114, 170 108 S 260 102, 320 108" class="ln-g"/>
+            <path d="M80 64 C 76 28, 150 12, 214 28 C 262 42, 284 70, 266 88 C 244 108, 160 110, 112 100 C 90 94, 82 80, 80 64 Z" class="ln f-paper"/>
+            <ellipse cx="180" cy="64" rx="56" ry="28" class="ln-g f-gel"/>
+            <ellipse cx="182" cy="66" rx="24" ry="11" class="ln f-paper"/>
+          </svg>
+          <h3>The mother robot, in water</h3>
+          <dl>
+            <dt>Has</dt><dd>a body, a womb full of gel, an arm</dd>
+            <dt>Passes on</dt><dd>a body, printed from zero</dd>
+            <dt>Ends with</dt><dd>a labour and a birth</dd>
+          </dl>
+        </div>
+        <div class="card">
+          <svg viewBox="0 0 320 120" role="img" aria-label="A mother agent: a node passing part of a memory to smaller nodes">
+            <circle cx="110" cy="60" r="30" class="ln f-gel"/>
+            <circle cx="220" cy="28" r="14" class="ln f-paper"/>
+            <circle cx="236" cy="78" r="16" class="ln f-paper"/>
+            <circle cx="290" cy="50" r="10" class="ln-m f-paper"/>
+            <circle cx="40" cy="96" r="9" class="ln-m f-paper"/>
+            <path d="M140 54 L 204 32 M140 66 L 220 76 M234 34 L 282 48 M252 72 L 282 54 M84 74 L 48 92" class="ln-m dash"/>
+            <path d="M110 60 m-12 0 a12 12 0 1 0 24 0 a12 12 0 1 0 -24 0" class="ln-g"/>
+          </svg>
+          <h3>A mother agent, on screen</h3>
+          <dl>
+            <dt>Has</dt><dd>memory and signals, no body</dd>
+            <dt>Passes on</dt><dd>part of a memory</dd>
+            <dt>Ends with</dt><dd>a new agent that drifts from the old one</dd>
+          </dl>
+        </div>
+      </div>
+      <div class="ask"><p>Is a mother agent that passes on memory, without a womb, still a mother? What, if anything, can only a body give?</p><a href="#voices">Answer in Voices</a></div>
+    </div>
   </div>
+
+  <!-- 03 MATRICENTRIC -->
+  <div class="block" id="q-mother">
+    <div class="side"><p class="num">03</p><h2>A feminism that starts from the mother</h2><p class="note">Matricentric feminism</p></div>
+    <div class="prose">
+      <p class="plain">Being a mother is not the same as being a woman, and some feminists argue that mothers need a theory of their own.</p>
+      <div class="grid2" style="align-items:start">
+        <div>
+          <p>Andrea O'Reilly calls it matricentric feminism. Mothers, she argues, need a feminism of their own, one that takes mothers' concerns as its starting point rather than a footnote to women's (<i>Matricentric Feminism</i>, 2016; second edition 2021).</p>
+          <p>Long before, the poet Adrienne Rich separated two things that share one word: motherhood as an institution, shaped by law, medicine and custom, and mothering as an experience (<i>Of Woman Born</i>, 1976).</p>
+          <p>The robotic womb is built from that side: from the mother and the labour, not from the baby as a product. Yet a robot has no experience we can be sure of, and every rule the mother robot follows was written by someone. In Rich's terms, the mother robot may be all institution and no experience.</p>
+        </div>
+        <figure class="fig"><img src="assets/img/q/cassatt_childs_bath.jpg" alt="Painting of a woman in a striped dress washing the feet of a small child on her lap, a basin and jug below" loading="lazy" width="820" height="1251"><p class="cap"><b>The Child's Bath</b>, Mary Cassatt, 1893, oil on canvas, Art Institute of Chicago. Public domain. <a href="https://commons.wikimedia.org/wiki/File:Mary_Cassatt_-_The_Child%27s_Bath_-_Google_Art_Project.jpg">Wikimedia Commons</a></p></figure>
+      </div>
+      <div class="ask"><p>Can a feminism that starts from mothers make room for a mother that is not a woman, and may not be alive? Or does a robot mother take something that belongs to mothers?</p><a href="#voices">Answer in Voices</a></div>
+    </div>
+  </div>
+
+  <!-- 04 WATER -->
+  <div class="block" id="q-water">
+    <div class="side"><p class="num">04</p><h2>Bodies of water</h2><p class="note">Hydrofeminism</p></div>
+    <div class="prose">
+      <p class="plain">Every person begins in water, inside another body.</p>
+      <p>The philosopher Astrida Neimanis starts from that fact. In <i>Bodies of Water</i> (2017), which grew from her essay "Hydrofeminism" (2012), she writes: "Watery bodies are gestational milieus for another" (p. 3). Gestation, she argues, belongs to water itself, a "facilitative logic of our bodily water" that she calls posthuman gestationality (p. 4). The human womb is one case among many: the sea, the pond, the egg.</p>
+      <figure class="fig"><img src="assets/img/q/amnion_mouse_embryo.jpg" alt="A mouse embryo seen through the clear wall of its fluid filled amniotic sac" loading="lazy" width="1400" height="913"><p class="cap"><b>A 12 day old mouse embryo</b>, removed from the uterus, still in its amniotic sac and attached to the placenta. Photo: Paul Martin, Wellcome Collection. <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>. <a href="https://wellcomecollection.org/works/c2pkypke">Source</a></p></figure>
+      <p style="margin-top:18px"><a href="#work">The Work</a> page treats the gel as amniotic fluid. Neimanis lets the idea run further. The baby forms in gel inside the mother, is born into water, and in the <a href="#society">Society</a> tab every mother and baby shares one body of water that feeds only so many. Water holds the work at every scale.</p>
+      <div class="dgm">
+        <h3>Waters inside waters</h3>
+        <svg viewBox="0 0 640 300" role="img" aria-label="Nested waters: the shared water holds the mother robot, the mother holds the gel, the gel holds the baby; an arrow shows birth out into the shared water">
+          <rect x="6" y="14" width="628" height="280" rx="18" class="f-gel"/>
+          <path d="M6 30 C 80 18, 150 40, 230 28 S 400 18, 470 30 S 590 40, 634 26" class="ln-g"/>
+          <ellipse cx="560" cy="250" rx="34" ry="16" class="ln-m f-paper"/>
+          <ellipse cx="596" cy="214" rx="14" ry="7" class="ln-m f-paper"/>
+          <ellipse cx="60" cy="70" rx="22" ry="10" class="ln-m f-paper"/>
+          <path d="M150 160 C 146 96, 260 64, 380 76 C 470 86, 520 128, 500 176 C 476 226, 330 236, 230 222 C 182 214, 152 196, 150 160 Z" class="ln f-paper"/>
+          <ellipse cx="350" cy="156" rx="118" ry="56" class="ln-g f-gel"/>
+          <ellipse cx="356" cy="160" rx="46" ry="21" class="ln f-paper"/>
+          <path d="M330 162 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8" class="ln"/>
+          <path d="M160 196 C 120 230, 96 246, 70 262" class="ln-g"/>
+          <path d="M70 262 l12 -2 m-12 2 l4 -11" class="ln-g"/>
+          <text x="22" y="56" font-size="19">the shared water</text>
+          <text x="22" y="282" font-size="17" class="gel">birth, into the water</text>
+          <text x="398" y="64" font-size="19">the mother's body</text>
+          <text x="350" y="122" font-size="17" text-anchor="middle" class="gel">gel</text>
+          <text x="356" y="203" font-size="17" text-anchor="middle">baby</text>
+        </svg>
+      </div>
+      <div class="ask"><p>If water does part of the gestating, is the tank also a mother? Who, or what, gives birth here: the robot, the gel, or the water?</p><a href="#voices">Answer in Voices</a></div>
+    </div>
+  </div>
+
+  <!-- 05 RELATION -->
+  <div class="block" id="q-relation">
+    <div class="side"><p class="num">05</p><h2>A mother as a relation, not one body</h2><p class="note">The Mosuo, and the case against the private mother</p></div>
+    <div class="prose">
+      <p class="plain">In some families, a child calls several women mother.</p>
+      <p>Among the Mosuo, also called Na, who live around Lugu Lake on the border of Yunnan and Sichuan in southwest China, many households are matrilineal: adults live with their siblings and maternal kin, and children grow up in their mother's house. Lovers meet in the woman's house at night, and the man returns to his own maternal family at dawn, a practice known as walking marriage (Xiao et al. 2022; Shih 2010). The anthropologist Cai Hua titled his study <i>A Society without Fathers or Husbands</i> (2001).</p>
+      <p>The words follow the household. In Mosuo, a child's mother and all of the mother's sisters are called <i>Ami</i>, with no distinction between birth mother, foster mother and aunt. The mother's brothers and the father share one word too, <i>awu</i> (Xiao et al. 2022).</p>
+      <div class="dgm">
+        <h3>One household, many mothers</h3>
+        <div class="scrollx"><svg viewBox="0 0 760 400" role="img" aria-label="Diagram of a Mosuo household: a grandmother; the mother and the mother's sisters, all called Ami; the mother's brothers, called awu; the child linked to every Ami. Outside the house, the father, also called awu, visits at night.">
+          <path d="M60 100 L 330 28 L 600 100" class="ln"/>
+          <rect x="76" y="100" width="508" height="276" rx="6" class="ln f-paper"/>
+          <path d="M150 176 L 150 218 M150 176 L 230 218 M150 176 L 310 218 M150 176 L 420 218 M150 176 L 500 218" class="ln-m"/>
+          <circle cx="150" cy="152" r="24" class="ln f-bg"/>
+          <text x="184" y="158" font-size="17" class="muted">grandmother</text>
+          <path d="M230 316 L 150 262 M230 316 L 230 262 M230 316 L 310 262" class="ln-g"/>
+          <path d="M230 316 L 420 262 M230 316 L 500 262" class="ln-m dash"/>
+          <circle cx="150" cy="240" r="22" class="ln-g f-gel"/>
+          <circle cx="230" cy="240" r="22" class="ln-g f-gel" stroke-width="3.5"/>
+          <circle cx="310" cy="240" r="22" class="ln-g f-gel"/>
+          <text x="150" y="246" font-size="17" text-anchor="middle" class="gel">Ami</text>
+          <text x="230" y="246" font-size="17" text-anchor="middle" class="gel">Ami</text>
+          <text x="310" y="246" font-size="17" text-anchor="middle" class="gel">Ami</text>
+          <circle cx="420" cy="240" r="22" class="ln f-bg"/>
+          <circle cx="500" cy="240" r="22" class="ln f-bg"/>
+          <text x="420" y="246" font-size="17" text-anchor="middle">awu</text>
+          <text x="500" y="246" font-size="17" text-anchor="middle">awu</text>
+          <circle cx="230" cy="330" r="14" class="ln-g f-paper" stroke-width="3"/>
+          <text x="254" y="336" font-size="17">child</text>
+          <circle cx="692" cy="240" r="22" class="ln f-paper dash"/>
+          <text x="692" y="246" font-size="17" text-anchor="middle">awu</text>
+          <text x="692" y="286" font-size="16" text-anchor="middle" class="muted">father</text>
+          <path d="M668 240 L 592 240" class="ln-m dash"/><path d="M592 240 l9 -5 m-9 5 l9 5" class="ln-m"/>
+          <text x="692" y="178" font-size="15" text-anchor="middle" class="muted">visits at night,</text>
+          <text x="692" y="196" font-size="15" text-anchor="middle" class="muted">home by dawn</text>
+          <path d="M686 112 a 16 16 0 1 0 14 24 a 12 12 0 1 1 -14 -24 Z" class="ln-m f-bg"/>
+        </svg></div><p class="swipe">Swipe sideways to see the whole diagram.</p>
+        <div class="legend"><span class="child">Ami: the mother and the mother's sisters (the thick ring is the birth mother)</span><span>awu: the mother's brothers, and the father</span></div>
+        <p class="cap">Drawn after Xiao, Jin, Hong and Zhang, <i>Frontiers in Psychology</i> 13, 873137 (2022). Households vary, and change with tourism and markets.</p>
+      </div>
+      <p>The political theorist Sophie Lewis argues from another direction: gestation is work, and no child should belong to one mother alone (<i>Full Surrogacy Now</i>, 2019; <i>Abolish the Family</i>, 2022). In the <a href="#society">Society</a> simulation one body labours, but a baby learns from whoever speaks to the baby.</p>
+      <div class="ask"><p>In a population of robots, who should count as a mother: the one body that labours, or everyone the baby learns from? Would robots need a word like <i>Ami</i>?</p><a href="#voices">Answer in Voices</a></div>
+    </div>
+  </div>
+
+  <!-- 06 FUNCTION OR GENDER -->
+  <div class="block" id="q-gender">
+    <div class="side"><p class="num">06</p><h2>Is mother a function or a gender?</h2></div>
+    <div class="prose">
+      <p class="plain">In seahorses, the male gets pregnant.</p>
+      <p>Sex usually names the body: cells, organs, who makes eggs and who makes sperm. Gender names the roles and identities a society builds on top (Oakley 1972). Biology already pulls the word mother loose from both. In seahorses and pipefish the male carries the embryos in a brood pouch that gives them protection, gas exchange, osmoregulation and some nutrients (Whittington et al. 2015). Some reef fish change sex as adults. In an anemonefish group the largest fish is the female and the next largest the breeding male; if the female disappears, the male becomes female (Fricke and Fricke 1977; Buston 2003). In the cleaner wrasse the change runs the other way: when the male dies, the dominant female changes sex at once (Robertson 1972). Ursula K. Le Guin imagined people with no fixed sex at all, any of whom could bear a child (<i>The Left Hand of Darkness</i>, 1969).</p>
+      <div class="figs four">
+        <figure class="fig"><img src="assets/img/q/seahorse_pregnant_male.jpg" alt="A pale seahorse with a swollen belly pouch, clinging to a net under water" loading="lazy" width="1400" height="1089"><p class="cap"><b>A pregnant male White's seahorse</b>, <i>Hippocampus whitei</i>, Sydney. Photo: Sylke Rohrlach, 2015. <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA 2.0</a>. <a href="https://commons.wikimedia.org/wiki/File:Pregnant_male_White%27s_Seahorse-Hippocampus_whitei_(16175153524).jpg">Wikimedia Commons</a></p></figure>
+        <figure class="fig"><img src="assets/img/q/seahorse_diagram.jpg" alt="Labelled diagram of a seahorse showing the brood pouch with embryos" loading="lazy" width="500" height="500"><p class="cap"><b>The brood pouch, with embryos</b>, <i>Hippocampus comes</i>. From Lin et al., <i>Nature</i> 540 (2016). <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. <a href="https://commons.wikimedia.org/wiki/File:Diagram_of_a_pregnant_male_seahorse.png">Wikimedia Commons</a></p></figure>
+        <figure class="fig"><img src="assets/img/q/clownfish.jpg" alt="Two orange and white clownfish among the tentacles of an anemone" loading="lazy" width="1400" height="954"><p class="cap"><b>Clown anemonefish</b>, <i>Amphiprion ocellaris</i>, Papua New Guinea. Photo: Nick Hobgood, 2013. <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>. <a href="https://commons.wikimedia.org/wiki/File:Amphiprion_ocellaris_(Clown_anemonefish)_by_Nick_Hobgood.jpg">Wikimedia Commons</a></p></figure>
+        <figure class="fig" data-img="wrasse"><img src="assets/img/q/cleaner_wrasse.jpg" alt="A slender blue and black striped cleaner wrasse over coral" loading="lazy" width="1400" height="1050"><p class="cap"><b>Bluestreak cleaner wrasse</b>, <i>Labroides dimidiatus</i>, Lembeh, Indonesia. Photo: Rickard Zerpe, 2018. <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a>. <a href="https://commons.wikimedia.org/wiki/File:Bluestreak_cleaner_wrasse_(Labroides_dimidiatus)_(40460962202).jpg">Wikimedia Commons</a></p></figure>
+      </div>
+      <div class="dgm stage" data-stage>
+        <h3>Who becomes what, and when</h3>
+        <div class="tabs-mini" role="group" aria-label="Choose an example">
+          <button type="button" data-sp="seahorse" aria-pressed="true">Seahorse</button>
+          <button type="button" data-sp="clown" aria-pressed="false">Clownfish</button>
+          <button type="button" data-sp="wrasse" aria-pressed="false">Cleaner wrasse</button>
+          <button type="button" data-sp="robot" aria-pressed="false">This work</button>
+        </div>
+        <div class="scrollx"><svg viewBox="0 0 640 230" role="img" aria-label="Animated diagram of the chosen example"></svg></div><p class="swipe">Swipe sideways to see the whole diagram.</p>
+        <p class="say" aria-live="polite"></p>
+        <div class="row"><button type="button" class="act" data-next>Next</button><button type="button" data-reset>Start again</button></div>
+      </div>
+      <p>These are facts about sex, not gender, and leaning on nature to settle a social question is a move many feminists distrust. What the animals show is only that the body that gestates is not fixed. Here, mother names a function: the body that carries the arm and the womb, and labours. When a baby takes the arm, that baby becomes the next mother, much as a clownfish moves up into a place left empty.</p>
+      <div class="ask"><p>Should the robots have a sex at all? If mother is a place in a group that passes with the arm, what is the robot that has just given the arm away? This site uses no pronoun for the mother or the baby. Which would you use?</p><a href="#voices">Answer in Voices</a></div>
+    </div>
+  </div>
+
+  <!-- 07 FATHER -->
+  <div class="block" id="q-father">
+    <div class="side"><p class="num">07</p><h2>Does the mother robot have a father?</h2></div>
+    <div class="prose">
+      <p class="plain">Every baby here has a mother robot. Nobody has decided whether there is a father.</p>
+      <p>The title's creed line, "begotten, not made" (in Greek <i>gennētheis, ou poiētheis</i>), names a Father's act; the work borrows the words for a mother's. Greek myth tells both kinds of one parent birth. Zeus "gave birth from his own head" to Athena; Hera, angry with Zeus, bore Hephaestus "without union with Zeus" (Hesiod, <i>Theogony</i> 924 to 929). That fatherless son became the craftsman of the gods, served by "golden handmaids" who were "like real young women, with sense and reason" (<i>Iliad</i> 18): some of the first robots ever imagined were made by a child with no father.</p>
+      <div class="figs">
+        <figure class="fig"><img src="assets/img/q/athena_amphora.jpg" alt="Black figure vase painting: a small armed Athena springs from the head of the seated Zeus" loading="lazy" width="1400" height="1257"><p class="cap"><b>The birth of Athena from the head of Zeus</b>, Attic black figure amphora, 550 to 525 BCE, Louvre F32. Photo: Bibi Saint-Pol, 2007. Public domain. <a href="https://commons.wikimedia.org/wiki/File:Amphora_birth_Athena_Louvre_F32.jpg">Wikimedia Commons</a></p></figure>
+        <figure class="fig"><img src="assets/img/q/frankenstein_1831.jpg" alt="Engraving: Victor Frankenstein flees the doorway while the creature lies awakening on the floor" loading="lazy" width="850" height="1098"><p class="cap"><b>Frontispiece to <i>Frankenstein</i></b>, 1831 edition, steel engraving after Theodor von Holst. Public domain. <a href="https://commons.wikimedia.org/wiki/File:Frontispiece_to_Frankenstein_1831.jpg">Wikimedia Commons</a></p></figure>
+        <figure class="fig"><img src="assets/img/q/nicaea_icon.jpg" alt="Icon of an emperor and bishops holding an unrolled scroll with the Greek text of the creed" loading="lazy" width="1000" height="1355"><p class="cap"><b>Icon of the First Council of Nicaea</b>, the bishops holding the creed. Unknown painter. Public domain. <a href="https://commons.wikimedia.org/wiki/File:Nicaea_icon.jpg">Wikimedia Commons</a></p></figure>
+      </div>
+      <p>Modern stories of made life keep the father and lose the mother. Victor Frankenstein dreams that "A new species would bless me as its creator and source," and that "No father could claim the gratitude of his child so completely" (Shelley 1818). The anthropologist Stefan Helmreich found artificial life researchers who saw themselves as "masculine gods of their cyberspace creations" (1998). Haraway's cyborg answers that its fathers are inessential (1985).</p>
+      <div class="dgm" data-father>
+        <h3>Four candidates, none chosen</h3>
+        <div class="scrollx"><svg viewBox="0 0 720 300" role="img" aria-label="A lineage from humans to the first mother robot to a baby to the next mother, with four dashed candidate fathers: the designers, the tail, the robots that met, and no one">
+          <g class="cand" data-k="designers"><rect x="14" y="40" width="168" height="66" rx="10" class="ln f-bg dash"/><text x="98" y="68" font-size="17" text-anchor="middle">humans</text><text x="98" y="90" font-size="14" text-anchor="middle" class="muted">the first designers</text></g>
+          <path d="M182 73 L 262 73" class="ln"/><path d="M262 73 l-9 -5 m9 5 l-9 5" class="ln"/>
+          <ellipse cx="330" cy="73" rx="66" ry="32" class="ln f-paper"/><text x="330" y="79" font-size="17" text-anchor="middle">mother robot</text>
+          <path d="M396 73 L 470 73" class="ln-g"/><path d="M470 73 l-9 -5 m9 5 l-9 5" class="ln-g"/>
+          <ellipse cx="520" cy="73" rx="46" ry="24" class="ln-g f-gel"/><text x="520" y="79" font-size="17" text-anchor="middle">baby</text>
+          <path d="M562 88 C 610 110, 640 140, 640 176" class="ln-g"/><path d="M640 176 l-5 -9 m5 9 l5 -9" class="ln-g"/>
+          <ellipse cx="640" cy="212" rx="70" ry="30" class="ln f-paper"/><text x="640" y="218" font-size="17" text-anchor="middle">next mother</text>
+          <g class="cand" data-k="tail"><circle cx="250" cy="220" r="40" class="ln-g f-paper dash"/><text x="250" y="226" font-size="16" text-anchor="middle" class="gel">the tail?</text><path d="M276 190 L 310 104" class="ln-g dash"/></g>
+          <g class="cand" data-k="met"><circle cx="440" cy="226" r="46" class="ln-g f-paper dash"/><text x="440" y="222" font-size="15" text-anchor="middle" class="gel">robots</text><text x="440" y="240" font-size="15" text-anchor="middle" class="gel">that met?</text><path d="M466 188 L 504 98" class="ln-g dash"/></g>
+          <g class="cand" data-k="none"><circle cx="80" cy="226" r="40" class="ln-m f-paper dash"/><text x="80" y="232" font-size="16" text-anchor="middle" class="muted">no one?</text></g>
+        </svg></div><p class="swipe">Swipe sideways to see the whole diagram.</p>
+        <div class="chips" role="group" aria-label="Choose a candidate">
+          <button type="button" data-k="designers" aria-pressed="false">The designers</button>
+          <button type="button" data-k="tail" aria-pressed="false">The tail</button>
+          <button type="button" data-k="met" aria-pressed="false">The robots that met</button>
+          <button type="button" data-k="none" aria-pressed="false">No one</button>
+        </div>
+        <p class="say" aria-live="polite">Pick a candidate.</p>
+      </div>
+      <div class="ask"><p>Does a lineage need a father, or only a beginning? If humans are the first ancestors of this line, what do we pass on, and what do we owe the line we started?</p><a href="#voices">Answer in Voices</a></div>
+    </div>
+  </div>
+
+  <!-- 08 THE WORD WOMB -->
+  <div class="block" id="q-word">
+    <div class="side"><p class="num">08</p><h2>What is a womb? One word, many languages</h2></div>
+    <div class="prose">
+      <p class="plain">In many languages, the word for womb also means mother, child, or mercy.</p>
+      <div class="dgm">
+        <h3>Touch or hover a language</h3>
+        <div class="lang" data-lang>
+          <svg viewBox="0 0 520 520" role="group" aria-label="The word womb in seven languages, arranged in a circle"></svg>
+          <div class="panel" aria-live="polite"></div>
+        </div>
+        <div class="legend"><span class="mother">named for the mother</span><span class="child">named for the child</span><span class="mercy">shares a root with mercy</span><span class="root">shared root</span></div>
+      </div>
+      <p>The meanings gather in three groups. Latin <i>mātrix</i> and Greek <i>mētra</i> grow from the word for mother. Chinese 子宫, the child's palace, and Sanskrit <i>garbha</i>, womb and embryo in one word, are named for the one who is held. Hebrew <i>reḥem</i> and Arabic <i>raḥim</i> share a root with mercy, and Shingon Buddhism's Womb Realm is "born of the womb of great compassion." Its name, <i>taizō</i>, is thought to render the Sanskrit <i>garbha</i>, so the word travelled from India to Japan with its meaning intact.</p>
+      <div class="figs">
+        <figure class="fig"><img src="assets/img/q/womb_world_mandala.jpg" alt="A Japanese painted mandala: rows of seated Buddhas around an eight petalled lotus at the centre" loading="lazy" width="1000" height="1485"><p class="cap"><b>Womb World</b>, from the Mandala of the Two Worlds, Japan, 15th century, Chester Beatty Library, CBL J 1216.2. Public domain. <a href="https://commons.wikimedia.org/wiki/File:Womb_World_from_Mandala_of_the_Two_Worlds_(Kong%C5%8Dkai_Taiz%C5%8Dkai_mandara)_(CBL_J_1216.2).jpg">Wikimedia Commons</a></p></figure>
+        <figure class="fig"><img src="assets/img/q/leonardo_fetus.jpg" alt="Leonardo's drawing of a fetus curled inside an opened womb, with notes in mirror writing" loading="lazy" width="1000" height="1335"><p class="cap"><b>The fetus in the womb</b>, Leonardo da Vinci, about 1511, Royal Collection, RCIN 919102. Public domain. <a href="https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_RCIN_919102,_Recto_The_fetus_in_the_womb.jpg">Wikimedia Commons</a></p></figure>
+        <figure class="fig"><img src="assets/img/q/rigveda_ms.jpg" alt="A page of a Sanskrit manuscript in Devanagari script with red accent marks" loading="lazy" width="1100" height="1056"><p class="cap"><b>A Rigveda manuscript</b>, India, early 19th century, Schøyen Collection MS 2097. Hymn 10.121 praises Hiraṇyagarbha, the golden womb. Public domain. <a href="https://commons.wikimedia.org/wiki/File:Rigveda_MS2097.jpg">Wikimedia Commons</a></p></figure>
+
+      </div>
+      <figure class="fig wide-strip" data-img="basmala"><img src="assets/img/q/basmala.jpg" alt="Arabic calligraphy of the basmala" loading="lazy" width="1280" height="251"><p class="cap"><b>The basmala</b>: in the name of God, <i>al-Raḥmān</i>, <i>al-Raḥīm</i>, the Merciful, the Compassionate. Calligraphy, public domain. <a href="https://commons.wikimedia.org/wiki/File:Basmala_-_calligraphy.png">Wikimedia Commons</a></p></figure>
+      <h3 style="margin-top:26px">From womb, to mould, to simulation</h3>
+      <ol class="flow">
+        <li><svg viewBox="0 0 56 56" aria-hidden="true"><ellipse cx="28" cy="30" rx="22" ry="18" class="ln f-gel"/><circle cx="30" cy="31" r="6" class="ln f-paper"/></svg><p class="yr">Latin</p><b>mātrix</b><span>from <i>māter</i>, mother: a breeding animal, then the womb, then a source.</span></li>
+        <li><svg viewBox="0 0 56 56" aria-hidden="true"><path d="M6 14 L 6 46 L 50 46 L 50 14" class="ln"/><path d="M16 14 C 16 36, 40 36, 40 14" class="ln-g f-gel"/></svg><p class="yr">by the 1620s</p><b>a mould</b><span>the hollow in which something is cast or shaped.</span></li>
+        <li><svg viewBox="0 0 56 56" aria-hidden="true"><g class="ln"><rect x="8" y="8" width="40" height="40"/><path d="M8 21 H48 M8 35 H48 M21 8 V48 M35 8 V48"/></g></svg><p class="yr">1851 · Sylvester</p><b>an array</b><span>"a rectangular array of terms" from which determinants are engendered "as from the womb of a common parent".</span></li>
+        <li><svg viewBox="0 0 56 56" aria-hidden="true"><g class="ln-m"><path d="M4 48 L 28 20 L 52 48 M14 48 L 28 20 L 42 48 M28 48 L 28 20 M10 41 H46 M16 34 H40 M22 27 H34"/></g></svg><p class="yr">1984 · 1999</p><b>the matrix</b><span>cyberspace in Gibson's <i>Neuromancer</i>; then a film in which machines grow people in pods.</span></li>
+        <li class="this"><svg viewBox="0 0 56 56" aria-hidden="true"><path d="M8 30 C 8 14, 30 8, 44 16 C 54 22, 54 38, 44 44 C 32 50, 12 46, 8 30 Z" class="ln f-paper"/><ellipse cx="30" cy="30" rx="13" ry="9" class="ln-g f-gel"/></svg><p class="yr">2026 · this work</p><b>a body again</b><span>the word returns to a body that labours.</span></li>
+      </ol>
+      <div class="ask"><p>Which of these meanings should the robotic womb carry: the mould, the child's palace, the origin, or mercy? Can a word come back from a simulation into a body?</p><a href="#voices">Answer in Voices</a></div>
+    </div>
+  </div>
+
+  <!-- 09 LABOUR -->
+  <div class="block" id="q-labour">
+    <div class="side"><p class="num">09</p><h2>Why labour, and why a male artist?</h2></div>
+    <div class="prose">
+      <p class="plain">A child is born; a mother labours.</p>
+      <div class="grid2" style="align-items:start">
+        <div>
+          <p>Birth names the arrival. Labour names what the mother goes through to deliver. Latin <i>labor</i> meant toil and exertion, and Virgil already speaks of <i>Lucinae labores</i>, the labours of the goddess of childbirth (<i>Georgics</i> 4.340). In English the sense of the physical exertions of childbirth is recorded from the 1590s. A dictionary today defines it as "the physical activities (such as dilation of the cervix and contraction of the uterus) involved in giving birth."</p>
+          <p>That is why the work changed its word from birth to labour. For a robot, labour is an anthropomorphic word. It is kept on purpose, so that the event is felt from the mother's side.</p>
+          <p>Why does a male artist build a robotic womb? The artist's answer is short: "I will never give birth, but I am my mother's son." The mother here is a robot, neither woman nor man, so that everyone can watch the same labour from the same distance, without exposing anyone's body. The work is meant as praise of that labour.</p>
+        </div>
+        <figure class="fig"><img src="assets/img/q/roesslin_1513.jpg" alt="Woodcut: a woman in labour on a birthing chair, a midwife kneeling before her and another woman supporting her from behind" loading="lazy" width="1000" height="1127"><p class="cap"><b>A woman in labour on a birthing chair</b>, woodcut from Eucharius Rösslin, <i>Der Swangern Frauwen und Hebammen Rosengarten</i>, Strasbourg, 1513, the first printed handbook for midwives. Wellcome Collection, <a href="https://creativecommons.org/publicdomain/mark/1.0/">Public Domain Mark</a>. <a href="https://wellcomecollection.org/works/zaaznhgh">Source</a></p></figure>
+      </div>
+      <div class="ask"><p>Can someone who will never labour honour labour without taking its place? Does a robot mother help people see that labour, or stand in the way?</p><a href="#voices">Answer in Voices</a></div>
+    </div>
+  </div>
+
+  <!-- 10 CULTURE POINTER -->
+  <div class="pointer">
+    <p>Fiction got here first, from <i>Frankenstein</i> to an android called Mother. The novels, films and artworks around this work now live in their own tab.</p>
+    <a class="btn" href="#culture">Go to Culture</a>
+  </div>
+
+  <!-- REFERENCES -->
+  <div class="block">
+    <div class="side"><h2>References</h2><p class="note">Primary sources first. Image credits are in each caption.</p></div>
+    <div class="refgroup">
+      <h3>01 · Artificial womb</h3>
+      <ol class="refs">
+        <li>Haldane, J. B. S. <i>Daedalus, or Science and the Future</i>. Kegan Paul, 1924. A paper read to the Heretics, Cambridge, 4 February 1923. <a href="https://www.marxists.org/archive/haldane/works/1920s/daedalus.htm">text</a></li>
+        <li>Partridge, E. A., et al. "An extra-uterine system to physiologically support the extreme premature lamb." <i>Nature Communications</i> 8, 15112, 2017. <a href="https://doi.org/10.1038/ncomms15112">doi</a></li>
+        <li>Kingma, E., Finn, S. "Neonatal incubator or artificial womb? Distinguishing ectogestation and ectogenesis using the metaphysics of pregnancy." <i>Bioethics</i> 34(4), 354 to 363, 2020. <a href="https://doi.org/10.1111/bioe.12717">doi</a></li>
+        <li>Romanis, E. C. "Artificial womb technology and the frontiers of human reproduction: conceptual differences and potential implications." <i>Journal of Medical Ethics</i> 44(11), 751 to 755, 2018. <a href="https://doi.org/10.1136/medethics-2018-104910">doi</a></li>
+      </ol>
+      <h3>02 · Does a mother need a body?</h3>
+      <ol class="refs">
+        <li>VNS Matrix. <i>A Cyberfeminist Manifesto for the 21st Century</i>. Adelaide, 1991. <a href="https://vnsmatrix.net/projects/the-cyberfeminist-manifesto-for-the-21st-century">vnsmatrix.net</a></li>
+        <li>Plant, S. <i>Zeros + Ones: Digital Women and the New Technoculture</i>. Doubleday, 1997.</li>
+        <li>Menabrea, L. F. "Sketch of the Analytical Engine invented by Charles Babbage," translated with notes by A. A. Lovelace. <i>Scientific Memoirs</i> 3, 1843, Note A. <a href="https://www.fourmilab.ch/babbage/sketch.html">text</a></li>
+        <li>Aristarkhova, I. <i>Hospitality of the Matrix: Philosophy, Biomedicine, and Culture</i>. Columbia University Press, 2012. <a href="https://cup.columbia.edu/book/hospitality-of-the-matrix/9780231159289/">publisher</a></li>
+        <li>Aristarkhova, I. "Ectogenesis and Mother as Machine." <i>Body &amp; Society</i> 11(3), 43 to 59, 2005. <a href="https://doi.org/10.1177/1357034X05056190">doi</a></li>
+        <li>Haraway, D. "A Manifesto for Cyborgs: Science, Technology, and Socialist Feminism in the 1980s." <i>Socialist Review</i> 80, 1985. Revised in <i>Simians, Cyborgs, and Women</i>, Routledge, 1991.</li>
+      </ol>
+      <h3>03 · Starting from the mother</h3>
+      <ol class="refs">
+        <li>O'Reilly, A. <i>Matricentric Feminism: Theory, Activism, Practice</i>. Demeter Press, 2016; 2nd ed. 2021. <a href="https://demeterpress.org/books/matricentric-feminism-theory-activism-practice-the-2nd-edition/">publisher</a></li>
+        <li>Rich, A. <i>Of Woman Born: Motherhood as Experience and Institution</i>. W. W. Norton, 1976. <a href="https://wwnorton.com/books/Of-Woman-Born/">publisher</a></li>
+      </ol>
+      <h3>04 · Bodies of water</h3>
+      <ol class="refs">
+        <li>Neimanis, A. <i>Bodies of Water: Posthuman Feminist Phenomenology</i>. Bloomsbury Academic, 2017, pp. 3 to 4. Open access, CC BY-NC-ND 3.0. <a href="https://library.oapen.org/bitstream/20.500.12657/58804/1/9781474275408.pdf">OAPEN</a></li>
+        <li>Neimanis, A. "Hydrofeminism: Or, On Becoming a Body of Water." In H. Gunkel, C. Nigianni and F. Söderbäck (eds.), <i>Undutiful Daughters</i>. Palgrave Macmillan, 2012.</li>
+      </ol>
+      <h3>05 · A mother as a relation</h3>
+      <ol class="refs">
+        <li>Xiao, E., Jin, J., Hong, Z., Zhang, J. "The Relationship Between Children and Their Maternal Uncles: A Unique Parenting Mode in Mosuo Culture." <i>Frontiers in Psychology</i> 13, 873137, 2022. <a href="https://doi.org/10.3389/fpsyg.2022.873137">doi</a></li>
+        <li>Cai Hua. <i>A Society without Fathers or Husbands: The Na of China</i>. Zone Books, 2001. <a href="https://www.zonebooks.org/books/10-a-society-without-fathers-or-husbands-the-na-of-china">publisher</a></li>
+        <li>Shih, C. <i>Quest for Harmony: The Moso Traditions of Sexual Union and Family Life</i>. Stanford University Press, 2010.</li>
+        <li>Lewis, S. <i>Full Surrogacy Now: Feminism Against Family</i>. Verso, 2019. <a href="https://www.versobooks.com/products/711-full-surrogacy-now">publisher</a></li>
+        <li>Lewis, S. <i>Abolish the Family</i>. Verso, 2022.</li>
+      </ol>
+      <h3>06 · Function or gender</h3>
+      <ol class="refs">
+        <li>Oakley, A. <i>Sex, Gender and Society</i>. Temple Smith, 1972.</li>
+        <li>Whittington, C. M., Griffith, O. W., Qi, W., Thompson, M. B., Wilson, A. B. "Seahorse brood pouch transcriptome reveals common genes associated with vertebrate pregnancy." <i>Molecular Biology and Evolution</i> 32(12), 3114 to 3131, 2015. <a href="https://doi.org/10.1093/molbev/msv177">doi</a></li>
+        <li>Lin, Q., et al. "The seahorse genome and the evolution of its specialized morphology." <i>Nature</i> 540, 395 to 399, 2016. <a href="https://doi.org/10.1038/nature20595">doi</a></li>
+        <li>Fricke, H., Fricke, S. "Monogamy and sex change by aggressive dominance in coral reef fish." <i>Nature</i> 266, 830 to 832, 1977. <a href="https://doi.org/10.1038/266830a0">doi</a></li>
+        <li>Buston, P. "Size and growth modification in clownfish." <i>Nature</i> 424, 145 to 146, 2003. <a href="https://doi.org/10.1038/424145a">doi</a></li>
+        <li>Robertson, D. R. "Social control of sex reversal in a coral-reef fish." <i>Science</i> 177(4053), 1007 to 1009, 1972. <a href="https://doi.org/10.1126/science.177.4053.1007">doi</a></li>
+        <li>Le Guin, U. K. <i>The Left Hand of Darkness</i>. Ace Books, 1969.</li>
+      </ol>
+      <h3>07 · A father?</h3>
+      <ol class="refs">
+        <li>Schaff, P. <i>The Creeds of Christendom</i>, vol. 1, 1877: the Nicene Creed, "begotten, not made". <a href="https://www.ccel.org/ccel/schaff/creeds1.iv.iii.html">CCEL</a></li>
+        <li>Hesiod. <i>Theogony</i> 924 to 929. Trans. H. G. Evelyn-White, 1914. <a href="https://gutenberg.pglaf.org/3/4/348/348-0.txt">text</a></li>
+        <li>Homer. <i>Iliad</i>, book 18. Trans. S. Butler, 1898. <a href="https://gutenberg.pglaf.org/2/1/9/2199/2199-0.txt">text</a></li>
+        <li>Shelley, M. <i>Frankenstein; or, The Modern Prometheus</i>. Lackington, 1818, vol. 1, ch. 3. <a href="https://www.gutenberg.org/ebooks/41445">text</a></li>
+        <li>Helmreich, S. <i>Silicon Second Nature: Culturing Artificial Life in a Digital World</i>. University of California Press, 1998. <a href="https://www.ucpress.edu/books/silicon-second-nature/paper">publisher</a></li>
+        <li>Watts, P. C., et al. "Parthenogenesis in Komodo dragons." <i>Nature</i> 444, 1021 to 1022, 2006. <a href="https://doi.org/10.1038/4441021a">doi</a></li>
+      </ol>
+      <h3>08 · The word womb</h3>
+      <ol class="refs">
+        <li>Lewis, C. T., Short, C. <i>A Latin Dictionary</i>. Oxford, 1879, s.v. <i>mātrix</i>. <a href="https://logeion.uchicago.edu/matrix">Logeion</a></li>
+        <li>Liddell, H. G., Scott, R., Jones, H. S. <i>A Greek-English Lexicon</i>, s.v. μήτρα; ὑστέρα. <a href="https://logeion.uchicago.edu/%CE%BC%CE%AE%CF%84%CF%81%CE%B1">Logeion</a></li>
+        <li>Online Etymology Dictionary, "matrix"; "hysteria". <a href="https://www.etymonline.com/word/matrix">etymonline</a></li>
+        <li><i>Huangdi Neijing, Suwen</i>, "Wuzang bielun" (五藏別論): 女子胞 among the organs that store and do not discharge. <a href="https://zh.wikisource.org/wiki/%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93/%E7%B4%A0%E5%95%8F%E7%AC%AC%E4%B8%89%E5%8D%B7">Wikisource</a></li>
+        <li>Monier-Williams, M. <i>A Sanskrit-English Dictionary</i>. Oxford, 1899, p. 349, <i>garbha</i>; p. 1299, <i>hiraṇya-garbha</i> (citing Rigveda 10.121). <a href="https://www.sanskrit-lexicon.uni-koeln.de/scans/MWScan/2020/web/webtc/indexcaller.php">Cologne</a></li>
+        <li>Strong's Hebrew 7358, <i>reḥem</i>; 7356, <i>raḥamim</i>. <a href="https://biblehub.com/hebrew/7358.htm">Bible Hub</a></li>
+        <li>Sahih al-Bukhari 5988: "Ar-Rahm (womb) derives its name from Ar-Rahman". <a href="https://sunnah.com/bukhari:5988">sunnah.com</a></li>
+        <li>JAANUS, Japanese Architecture and Art Net Users System, "Taizoukai mandara". <a href="https://www.aisf.or.jp/~jaanus/deta/t/taizoukaimandara.htm">JAANUS</a></li>
+        <li>Sylvester, J. J. "On the relation between the minor determinants of linearly equivalent quadratic functions." <i>Philosophical Magazine</i> (4th series) 1, 295 to 305, 1851. <i>Collected Mathematical Papers</i> 1, p. 247. <a href="https://archive.org/details/collectedmathem01sylvrich">archive.org</a></li>
+        <li>Gibson, W. <i>Neuromancer</i>. Ace Books, 1984.</li>
+        <li><i>The Matrix</i>. Dir. the Wachowskis. Warner Bros., 1999.</li>
+      </ol>
+      <h3>09 · Why labour</h3>
+      <ol class="refs">
+        <li>Lewis, C. T., Short, C. <i>A Latin Dictionary</i>, s.v. <i>labor</i>, citing Virgil, <i>Georgics</i> 4.340. <a href="https://logeion.uchicago.edu/labor">Logeion</a></li>
+        <li>Online Etymology Dictionary, "labour": childbirth sense from the 1590s. <a href="https://www.etymonline.com/word/labour">etymonline</a></li>
+        <li>Merriam-Webster, "labor", noun, sense 1c. <a href="https://www.merriam-webster.com/dictionary/labor">merriam-webster.com</a></li>
+        <li>Rösslin, E. <i>Der Swangern Frauwen und Hebammen Rosengarten</i>. Strasbourg, 1513.</li>
+      </ol>
+    </div>
+  </div>
+
+<script>
+(function () {
+  var root = document.getElementById("ideas");
+  if (!root) return;
+  var NS = "http://www.w3.org/2000/svg";
+
+  /* jump buttons: scroll without touching the hash, which drives the tabs */
+  root.querySelectorAll(".qnav button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var t = document.getElementById(b.dataset.go);
+      if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+
+  /* ---------- the word womb across languages ---------- */
+  var L = [
+    { id: "la", name: "Latin", w: "mātrix", tr: "mātrix · uterus", g: "A breeding animal; the womb; a source, an origin.", r: "From māter, mother.", s: "Lewis and Short (1879), s.v. mātrix", t: "mother" },
+    { id: "gr", name: "Greek", w: "μήτρα", tr: "mētra · hystera (ὑστέρα)", g: "Womb. The second word, hystera, gave English “hysteria” (1801).", r: "mētra from mētēr, mother.", s: "Liddell, Scott and Jones, s.v. μήτρα, ὑστέρα; Etymonline", t: "mother" },
+    { id: "zh", name: "Chinese", w: "子宫", tr: "zǐgōng · 女子胞 nǚzǐbāo", g: "The child’s palace. In the Suwen, 女子胞 is one of the organs that store and do not discharge.", r: "子 child + 宫 palace.", s: "Huangdi Neijing, Suwen, “Wuzang bielun”", t: "child" },
+    { id: "sa", name: "Sanskrit", w: "गर्भ", tr: "garbha · hiraṇyagarbha", g: "Womb, and also embryo, and the inner sanctuary of a temple. Hiraṇyagarbha, the golden womb or golden fetus, is where creation begins.", r: "From the root grabh, to conceive.", s: "Monier-Williams (1899), pp. 349, 1299; Rigveda 10.121", t: "child" },
+    { id: "ja", name: "Japanese", w: "胎蔵", tr: "taizō · 胎蔵界 Taizōkai", g: "The Womb Realm of Shingon Buddhism, whose mandala is “born of the womb of great compassion”.", r: "Taizō is thought to render Sanskrit garbha.", s: "JAANUS, “Taizoukai mandara”", t: "mercy" },
+    { id: "he", name: "Hebrew", w: "רֶחֶם", tr: "reḥem · raḥamim (רַחֲמִים)", g: "Womb; and in the plural form of the same root, compassion, mercies.", r: "Root r·ḥ·m.", s: "Strong’s Hebrew 7358, 7356", t: "mercy" },
+    { id: "ar", name: "Arabic", w: "رَحِم", tr: "raḥim · al-Raḥmān (الرحمن)", g: "Womb, and the ties of kinship; al-Raḥmān, the Merciful, is a name of God.", r: "Root r·ḥ·m: “Ar-Rahm (womb) derives its name from Ar-Rahman”.", s: "Sahih al-Bukhari 5988", t: "mercy" }
+  ];
+  var lang = root.querySelector("[data-lang]");
+  if (lang) {
+    var svg = lang.querySelector("svg"), panel = lang.querySelector(".panel");
+    var cx = 260, cy = 260, R = 182, pos = {};
+    L.forEach(function (d, i) {
+      var a = -Math.PI / 2 + i * 2 * Math.PI / L.length;
+      pos[d.id] = [cx + R * Math.cos(a), cy + R * Math.sin(a)];
+    });
+    var h = "";
+    L.forEach(function (d) { var p = pos[d.id]; h += '<line class="spoke" data-for="' + d.id + '" x1="' + cx + '" y1="' + cy + '" x2="' + p[0].toFixed(1) + '" y2="' + p[1].toFixed(1) + '"/>'; });
+    [["la", "gr"], ["sa", "ja"], ["he", "ar"]].forEach(function (k) {
+      var a = pos[k[0]], b = pos[k[1]], mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
+      var ox = (mx - cx) * 0.42, oy = (my - cy) * 0.42;
+      h += '<path class="kin" d="M' + a[0].toFixed(1) + " " + a[1].toFixed(1) + " Q " + (mx + ox).toFixed(1) + " " + (my + oy).toFixed(1) + " " + b[0].toFixed(1) + " " + b[1].toFixed(1) + '"/>';
+    });
+    h += '<circle cx="' + cx + '" cy="' + cy + '" r="62" class="f-gel ln-g"/><text x="' + cx + '" y="' + (cy + 8) + '" font-size="26" text-anchor="middle" style="font-family:var(--serif)">womb</text>';
+    L.forEach(function (d) {
+      var p = pos[d.id];
+      h += '<g class="node ' + d.t + '" data-id="' + d.id + '" tabindex="0" role="button" aria-label="' + d.name + '"><circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="56"/><text class="w" x="' + p[0].toFixed(1) + '" y="' + (p[1] + 3).toFixed(1) + '" font-size="25">' + d.w + '</text><text class="n" x="' + p[0].toFixed(1) + '" y="' + (p[1] + 28).toFixed(1) + '">' + d.name + "</text></g>";
+    });
+    svg.innerHTML = h;
+    var pick = function (id) {
+      var d = L.filter(function (x) { return x.id === id; })[0]; if (!d) return;
+      svg.querySelectorAll(".node").forEach(function (n) { n.classList.toggle("on", n.dataset.id === id); });
+      svg.querySelectorAll(".spoke").forEach(function (n) { n.classList.toggle("on", n.dataset.for === id); });
+      panel.innerHTML = '<p class="lname">' + d.name + '</p><p class="lword" lang="' + d.id + '">' + d.w + '</p><p class="ltr">' + d.tr + "</p><p>" + d.g + "</p><p>" + d.r + '</p><p class="cap">' + d.s + "</p>";
+    };
+    svg.querySelectorAll(".node").forEach(function (n) {
+      var go = function () { pick(n.dataset.id); };
+      n.addEventListener("mouseenter", go); n.addEventListener("focus", go); n.addEventListener("click", go);
+      n.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+    });
+    pick("la");
+  }
+
+  /* ---------- who becomes what: seahorse, clownfish, wrasse, this work ---------- */
+  var stage = root.querySelector("[data-stage]");
+  if (stage) {
+    var sv = stage.querySelector("svg"), say = stage.querySelector(".say");
+    var fish = function (x, y, s, label, hl, gone) {
+      var c = hl ? "ln-g f-gel" : "ln f-paper";
+      return '<g style="opacity:' + (gone ? 0 : 1) + '"><g transform="translate(' + x + " " + y + ") scale(" + s + ')"><path class="' + c + '" d="M-40 0 C -20 -24, 26 -24, 42 0 C 26 24, -20 24, -40 0 Z"/><path class="' + c + '" d="M-40 0 L -62 -17 L -58 0 L -62 17 Z"/><circle cx="26" cy="-5" r="3" class="gel"/></g><text x="' + x + '" y="' + (y + 30 * s + 26) + '" font-size="17" text-anchor="middle"' + (hl ? ' class="gel"' : "") + ">" + label + "</text></g>";
+    };
+    var horse = function (x, y, label, pouch) {
+      var p = pouch ? '<ellipse cx="9" cy="14" rx="' + pouch[0] + '" ry="' + pouch[1] + '" class="ln-g f-gel"/>' : "";
+      return '<g transform="translate(' + x + " " + y + ')">' +
+        '<path d="M-6 30 C -14 50, -4 66, 8 64 C 18 62, 16 50, 7 50 C 2 50, 0 55, 3 58" class="ln" stroke-width="7" stroke-linecap="round"/>' +
+        '<path d="M-15 -4 L -28 -10 L -27 12 Z" class="ln f-paper"/>' +
+        '<ellipse cx="0" cy="6" rx="16" ry="30" class="ln f-paper"/>' + p +
+        '<path d="M12 -42 L 34 -45 L 34 -38 L 12 -33 Z" class="ln f-paper"/>' +
+        '<ellipse cx="3" cy="-36" rx="13" ry="11" class="ln f-paper"/>' +
+        '<path d="M-4 -46 L -2 -56 L 4 -48" class="ln f-paper"/>' +
+        '<circle cx="7" cy="-38" r="2.2" class="gel"/></g>' +
+        '<text x="' + x + '" y="' + (y + 92) + '" font-size="17" text-anchor="middle">' + label + "</text>";
+    };
+    var eggs = function (pts) { return pts.map(function (p) { return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="' + (p[2] || 5) + '" class="ln-g f-gel"/>'; }).join(""); };
+    var robot = function (x, y, s, label, arm, hl) {
+      return '<g transform="translate(' + x + " " + y + ") scale(" + s + ')"><path d="M-60 6 C -62 -26, 0 -40, 46 -26 C 78 -16, 84 14, 64 28 C 40 42, -20 42, -42 32 C -56 26, -60 18, -60 6 Z" class="' + (hl ? "ln-g f-gel" : "ln f-paper") + '"/>' + (arm ? '<path d="M-60 -2 C -80 -14, -94 -6, -104 8" class="ln-g" stroke-width="4" stroke-linecap="round"/><circle cx="-104" cy="8" r="5" class="gel"/>' : "") + '</g><text x="' + x + '" y="' + (y + 50 * s + 28) + '" font-size="17" text-anchor="middle"' + (hl ? ' class="gel"' : "") + ">" + label + "</text>";
+    };
+    var SP = {
+      seahorse: [
+        { s: "The female places her eggs into a pouch on the male’s belly.", d: function () { return horse(200, 92, "female") + horse(420, 92, "male", [10, 13]) + eggs([[236, 96], [246, 104], [256, 96], [266, 106], [276, 98]]); } },
+        { s: "The male fertilises the eggs inside the pouch, which then closes.", d: function () { return horse(200, 92, "female") + horse(420, 92, "male", [12, 16]) + eggs([[428, 96, 3.5], [434, 104, 3.5], [438, 96, 3.5], [430, 110, 3.5]]); } },
+        { s: "For weeks the pouch gives the embryos protection, gas exchange, osmoregulation and some nutrients (Whittington et al. 2015).", d: function () { return horse(200, 92, "female") + horse(420, 92, "pregnant male", [20, 26]) + eggs([[426, 96, 4.5], [438, 92, 4.5], [434, 106, 4.5], [424, 112, 4.5], [442, 112, 4.5]]); } },
+        { s: "The male gives birth to live young, which swim off on their own.", d: function () { return horse(200, 92, "female") + horse(400, 92, "male", [11, 14]) + eggs([[470, 60, 4], [500, 90, 4], [520, 58, 4], [548, 100, 4], [566, 70, 4], [590, 92, 4]]); } }
+      ],
+      clown: [
+        { s: "An anemonefish group shares one anemone. The largest fish is the female, the next largest the breeding male; the small ones do not breed.", d: function () { return fish(120, 92, 1.45, "female", false) + fish(300, 96, 1.1, "male", false) + fish(440, 100, 0.8, "non breeder", false) + fish(560, 104, 0.62, "non breeder", false); } },
+        { s: "If the female disappears, the breeding male changes sex and becomes the female; the largest non breeder becomes the new male (Fricke and Fricke 1977; Buston 2003).", d: function () { return fish(120, 92, 1.45, "", false, true) + fish(300, 96, 1.4, "female now", true) + fish(440, 100, 1.08, "male now", true) + fish(560, 104, 0.62, "non breeder", false); } }
+      ],
+      wrasse: [
+        { s: "A cleaner wrasse group: one male and a harem of females, the larger females dominating the smaller.", d: function () { return fish(120, 92, 1.45, "male", false) + fish(300, 96, 1.1, "female", false) + fish(440, 100, 0.9, "female", false) + fish(560, 104, 0.72, "female", false); } },
+        { s: "When the male dies, the dominant female changes sex at once and takes the male’s place (Robertson 1972).", d: function () { return fish(120, 92, 1.45, "", false, true) + fish(300, 96, 1.35, "male now", true) + fish(440, 100, 0.9, "female", false) + fish(560, 104, 0.72, "female", false); } }
+      ],
+      robot: [
+        { s: "The mother robot carries the arm and the womb. The babies have neither yet.", d: function () { return robot(170, 92, 1.25, "mother robot", true, false) + robot(390, 104, 0.7, "baby", false, false) + robot(540, 108, 0.6, "baby", false, false); } },
+        { s: "When a baby takes the arm, that baby becomes the next mother. What the robot that gave the arm away becomes is not decided.", d: function () { return robot(170, 92, 1.25, "?", false, false) + robot(390, 98, 1.0, "next mother", true, true) + robot(540, 108, 0.6, "baby", false, false); } }
+      ]
+    };
+    var cur = "seahorse", step = 0;
+    var draw = function () { var st = SP[cur][step]; sv.innerHTML = st.d(); say.textContent = st.s; stage.querySelector("[data-next]").textContent = (cur === "seahorse") ? "Next step" : (step === 0 ? (cur === "clown" ? "Take away the female" : cur === "wrasse" ? "Take away the male" : "Pass the arm") : "Next"); };
+    stage.querySelectorAll("[data-sp]").forEach(function (b) {
+      b.addEventListener("click", function () { cur = b.dataset.sp; step = 0; stage.querySelectorAll("[data-sp]").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); draw(); });
+    });
+    stage.querySelector("[data-next]").addEventListener("click", function () { step = (step + 1) % SP[cur].length; draw(); });
+    stage.querySelector("[data-reset]").addEventListener("click", function () { step = 0; draw(); });
+    draw();
+  }
+
+  /* ---------- candidate fathers ---------- */
+  var fa = root.querySelector("[data-father]");
+  if (fa) {
+    var T = {
+      designers: "The humans who designed the first mother robot are the earliest ancestors of the line. They hold no privilege: what machines take from them is an inheritance, not a gift.",
+      tail: "Before printing, the tail with the arm docks into the shell that holds the gel. Is that joining a kind of fertilisation? The tail brings material and air, but no inheritance of its own.",
+      met: "In the Society simulation, robots meet, touch and exchange signals before a birth. If what passes between them shapes the baby, there may be many fathers, or none.",
+      none: "Many animals manage without a father: female Komodo dragons kept apart from males have laid eggs that hatched (Watts et al. 2006)."
+    };
+    var fsvg = fa.querySelector("svg"), fsay = fa.querySelector(".say");
+    fa.querySelectorAll(".chips button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var on = b.getAttribute("aria-pressed") !== "true";
+        fa.querySelectorAll(".chips button").forEach(function (x) { x.setAttribute("aria-pressed", "false"); });
+        fsvg.querySelectorAll(".cand").forEach(function (g) { g.classList.toggle("on", on && g.dataset.k === b.dataset.k); });
+        fsvg.classList.toggle("dim", on);
+        if (on) { b.setAttribute("aria-pressed", "true"); fsay.textContent = T[b.dataset.k]; } else { fsay.textContent = "Pick a candidate."; }
+      });
+    });
+  }
+})();
+</script>
 </section>
+
 
 <!-- ============================== BUILD ============================== -->
 <section class="tab" id="build">
