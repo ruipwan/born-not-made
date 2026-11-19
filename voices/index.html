@@ -1,0 +1,1302 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Born, Not Made · Voices</title>
+<meta name="description" content="Voices: an open, public discussion about Born, Not Made, a mother robot that prints a baby robot inside her body and gives birth in water. Leave words or a drawing.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Voices: anyone can leave words or a drawing. Each voice is a GitHub issue; each floats in the water as a small body. */
+:root {
+  --bg: #f4f3ef; --paper: #fbfaf7; --white: #fffefb; --ink: #15171a; --muted: #5c636c; --line: #dcd9d1;
+  --gel: #2f6fa8; --gel-soft: #d8e8f5; --water-ink: #3f6488;
+  --t-mother: #2f6fa8; --t-kin: #a8526a; --t-design: #5d7a3a; --t-question: #4a5560; --t-worry: #a06a24; --t-else: #8b9097;
+  --serif: "Newsreader", Georgia, serif; --sans: "Inter", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
+  --gut: max(16px, env(safe-area-inset-left, 0px));
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+a { color: var(--gel); text-underline-offset: 2px; }
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--gel); outline-offset: 2px; }
+.sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: var(--gut); padding-right: var(--gut); }
+
+/* Full screen header (hidden when embedded in the site) */
+.top { border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 12px; padding-bottom: 12px; }
+.brand { font: 500 21px/1 var(--serif); letter-spacing: -0.01em; color: var(--ink); text-decoration: none; }
+.here { font: 500 13.5px var(--sans); color: var(--paper); background: var(--ink); padding: 7px 12px; border-radius: 999px; }
+
+.intro { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 40px; padding-top: 52px; padding-bottom: 32px; align-items: end; }
+h1 { font: 400 clamp(52px, 8.5vw, 104px)/0.9 var(--serif); letter-spacing: -0.03em; margin: 0 0 16px; }
+.lede { font: 400 clamp(19px, 2vw, 22px)/1.4 var(--serif); margin: 0; max-width: 28ch; }
+.artist p { font: 400 clamp(18px, 1.7vw, 20px)/1.55 var(--serif); margin: 0 0 12px; max-width: 58ch; }
+.artist .sig { font: 13.5px/1.4 var(--sans); color: var(--muted); margin: 0; }
+html.embedded .top, html.embedded .intro-title { display: none; }
+html.embedded .intro { grid-template-columns: minmax(0, 1fr); padding-top: 22px; padding-bottom: 20px; }
+
+/* The water and the composer */
+.meet { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 28px; align-items: start; padding-bottom: 44px; }
+.pool-col { position: sticky; top: 16px; }
+.pool { position: relative; height: clamp(320px, 64vh, 580px); border-radius: 22px; overflow: hidden; isolation: isolate;
+  background: radial-gradient(120% 95% at 28% 18%, #f1f6fb 0%, #dfeaf5 52%, #cddff0 100%); border: 1px solid #c8d8e8;
+  box-shadow: inset 0 2px 22px rgba(47, 111, 168, 0.10), inset 0 -30px 60px -40px rgba(47, 111, 168, 0.25); touch-action: manipulation; }
+.pool canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+.bodies { position: absolute; inset: 0; z-index: 1; }
+.pool-count { position: absolute; left: 16px; bottom: 12px; margin: 0; font: 12px/1.4 var(--mono); color: var(--water-ink); pointer-events: none; z-index: 2; }
+.pool-msg { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; z-index: 2; pointer-events: none; }
+.pool-msg > div { pointer-events: auto; max-width: 34ch; }
+.pool-msg .still { font: 400 clamp(24px, 3vw, 30px)/1.2 var(--serif); margin: 0 0 8px; color: var(--ink); }
+.pool-msg p { margin: 0 0 14px; color: var(--water-ink); }
+.pool-cap { font: 13.5px/1.5 var(--sans); color: var(--muted); margin: 10px 2px 0; max-width: 62ch; }
+
+.body { position: absolute; left: 0; top: 0; width: var(--d); height: var(--d); padding: 0; border: 0; margin: 0; background: none; cursor: pointer; border-radius: 50%; will-change: transform; -webkit-tap-highlight-color: transparent; transition: opacity .4s; }
+.body .mem { position: absolute; inset: 0; border-radius: var(--br); display: grid; place-items: center; overflow: hidden;
+  background: radial-gradient(circle at 34% 28%, rgba(255,255,255,.98) 0 16%, rgba(255,255,255,.62) 44%, color-mix(in srgb, var(--c) 17%, #d8e8f5) 100%);
+  border: 1.5px solid color-mix(in srgb, var(--c) 58%, transparent);
+  box-shadow: 0 10px 18px -12px color-mix(in srgb, var(--c) 80%, transparent), inset 0 -5px 10px -4px color-mix(in srgb, var(--c) 22%, transparent);
+  animation: wob var(--dur, 7s) ease-in-out var(--del, 0s) infinite alternate; }
+.body .mem svg { width: 76%; height: auto; display: block; opacity: .92; }
+.body .nuc { width: 24%; height: 24%; border-radius: 46% 54% 52% 48%; background: color-mix(in srgb, var(--c) 70%, white); opacity: .75; }
+.body:hover .mem { border-color: var(--c); }
+.body:focus-visible { outline: none; }
+.body:focus-visible .mem { outline: 2px solid var(--ink); outline-offset: 3px; }
+.body.dim { opacity: .18; }
+.body.draft { cursor: default; pointer-events: none; transition: opacity .5s, transform .6s; }
+.body.draft .mem { background: rgba(255,255,255,.35); border: 1.5px dashed var(--gel); box-shadow: none; }
+.body.draft.off { opacity: 0; }
+.body.draft.sent .mem { border-style: solid; background: radial-gradient(circle at 34% 28%, #fff 0 16%, rgba(255,255,255,.6) 44%, #d8e8f5 100%); }
+.draft-label { position: absolute; left: 50%; top: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap; font: 11px var(--mono); color: var(--water-ink); }
+@keyframes wob { from { border-radius: var(--br); } to { border-radius: var(--br2); } }
+
+.whisper { position: absolute; z-index: 3; left: 0; top: 0; max-width: min(260px, 80%); background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 9px 12px; font: 400 15.5px/1.35 var(--serif); box-shadow: 0 10px 28px -14px rgba(21, 23, 26, .45); pointer-events: none; opacity: 0; transition: opacity .15s; overflow-wrap: anywhere; }
+.whisper.on { opacity: 1; }
+.whisper small { display: block; font: 11px/1.4 var(--mono); color: var(--muted); margin-top: 4px; }
+
+.composer { background: var(--paper); border: 1px solid var(--line); border-radius: 22px; padding: 24px; }
+.composer h2 { font: 400 clamp(28px, 3vw, 34px)/1.05 var(--serif); letter-spacing: -0.015em; margin: 0 0 16px; }
+.prompt { border-left: 2px solid var(--gel); padding: 2px 0 2px 14px; margin: 0 0 18px; }
+.prompt-q { font: italic 400 clamp(20px, 2vw, 23px)/1.3 var(--serif); margin: 0 0 10px; transition: opacity .45s ease; }
+.prompt-q.fade { opacity: 0; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.soft { font: 500 13px/1 var(--sans); color: var(--gel); background: transparent; border: 1px solid color-mix(in srgb, var(--gel) 35%, transparent); border-radius: 999px; padding: 8px 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+.soft:hover { background: var(--gel-soft); }
+.soft svg { width: 15px; height: 15px; }
+.answering { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--muted); margin: 0 0 8px; }
+.answering q { color: var(--ink); font: italic 400 15px/1.3 var(--serif); }
+.x { border: 0; background: none; color: var(--muted); cursor: pointer; padding: 4px 6px; border-radius: 999px; font-size: 16px; line-height: 1; }
+.x:hover { background: #ebe9e3; color: var(--ink); }
+.lbl { display: block; font: 500 13.5px/1.4 var(--sans); margin: 0 0 7px; }
+.lbl span { font-weight: 400; color: var(--muted); }
+textarea#words { display: block; width: 100%; min-height: 136px; resize: vertical; font: 400 20px/1.45 var(--serif); background: var(--white); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; }
+input#name { display: block; width: 100%; font: 400 15px var(--sans); background: var(--white); border: 1px solid var(--line); border-radius: 999px; padding: 10px 16px; }
+textarea#words:focus, input#name:focus { outline: none; border-color: var(--gel); box-shadow: 0 0 0 3px var(--gel-soft); }
+textarea::placeholder, input::placeholder { color: #8d9299; }
+fieldset { border: 0; padding: 0; margin: 18px 0 0; min-width: 0; }
+legend { font: 500 13.5px/1.4 var(--sans); margin: 0 0 8px; padding: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { position: relative; display: inline-flex; }
+.chip input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.chip span { display: inline-flex; align-items: center; gap: 7px; font: 400 14px/1 var(--sans); padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--white); white-space: nowrap; }
+.chip span::before { content: ""; width: 9px; height: 9px; border-radius: 58% 42% 52% 48% / 46% 56% 44% 54%; background: var(--c, var(--ink)); opacity: .85; }
+.chip.plain span::before { display: none; }
+.chip span i { font-style: normal; font: 11px var(--mono); color: var(--muted); }
+.chip input:checked + span { background: color-mix(in srgb, var(--c, var(--ink)) 13%, white); border-color: color-mix(in srgb, var(--c, var(--ink)) 60%, white); }
+.chip input:focus-visible + span { outline: 2px solid var(--gel); outline-offset: 2px; }
+.chip input:hover + span { border-color: #bdb9af; }
+
+.draw { margin-top: 18px; }
+.pad { margin-top: 10px; }
+.pad-stage { position: relative; width: 100%; aspect-ratio: 4 / 3; border-radius: 16px; border: 1px solid var(--line); overflow: hidden; touch-action: none;
+  background-color: var(--white); background-image: radial-gradient(circle, #e2dfd7 1px, transparent 1.3px); background-size: 22px 22px; background-position: 11px 11px; }
+.pad-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; display: block; }
+.pad-hint { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 20px; font: italic 400 18px/1.35 var(--serif); color: #959aa1; pointer-events: none; transition: opacity .3s; }
+.pad-tools { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.inks { display: flex; gap: 6px; margin: 0; }
+.inks legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.ink { position: relative; width: 32px; height: 32px; }
+.ink input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.ink span { display: block; width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--paper); box-shadow: 0 0 0 1px var(--line); background: var(--c); }
+.ink input:checked + span { box-shadow: 0 0 0 2px var(--ink); }
+.ink input:focus-visible + span { outline: 2px solid var(--gel); outline-offset: 3px; }
+.tool { font: 500 13px/1 var(--sans); background: var(--white); border: 1px solid var(--line); border-radius: 999px; padding: 9px 13px; cursor: pointer; }
+.tool:hover:not(:disabled) { border-color: #bdb9af; }
+.tool:disabled { opacity: .45; cursor: default; }
+
+.name-wrap { margin-top: 18px; }
+.room { margin: 14px 0 0; font-size: 13px; color: var(--muted); }
+.room .bar { display: block; height: 4px; border-radius: 4px; background: #e7e4dc; margin-top: 6px; overflow: hidden; }
+.room .bar b { display: block; height: 100%; width: var(--w, 0%); background: var(--gel); border-radius: 4px; }
+.room.full .bar b { background: var(--t-worry); }
+.leave { margin-top: 20px; width: 100%; font: 500 16px/1 var(--sans); color: var(--paper); background: var(--ink); border: 0; border-radius: 999px; padding: 15px 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.leave:hover { background: #2b3036; }
+.leave svg { width: 18px; height: 18px; }
+.how { font-size: 13.5px; line-height: 1.5; color: var(--muted); margin: 12px 0 0; }
+.status { font-size: 14.5px; line-height: 1.5; margin: 12px 0 0; }
+.status:empty { display: none; }
+.status.warn { color: #7d4a12; }
+.status .row { margin-top: 8px; }
+
+/* How voices are kept */
+.kept { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 26px; padding-top: 30px; padding-bottom: 40px; border-top: 1px solid var(--line); }
+.kept h3 { font: 400 21px/1.2 var(--serif); margin: 0 0 6px; }
+.kept p { margin: 0; font-size: 14.5px; color: var(--muted); }
+
+/* The record */
+.record { border-top: 1px solid var(--line); padding-top: 38px; padding-bottom: 30px; }
+.rec-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 14px 24px; margin-bottom: 14px; }
+.rec-head h2 { font: 400 clamp(28px, 3.6vw, 40px)/1.08 var(--serif); letter-spacing: -0.015em; margin: 0; }
+.rec-head p { margin: 4px 0 0; color: var(--muted); font-size: 14.5px; }
+.filters { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 12px 24px; margin-bottom: 8px; }
+.filters fieldset { margin: 0; }
+.entries { list-style: none; margin: 0; padding: 0; max-width: 940px; }
+.entry { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 26px; padding: 26px 0; border-top: 1px solid var(--line); scroll-margin-top: 20px; }
+.entry:first-child { border-top: 0; }
+.entry.flash .v { animation: flash 1.6s ease; }
+@keyframes flash { 0% { background: var(--gel-soft); } 100% { background: transparent; } }
+.gut { font: 12px/1.5 var(--mono); color: var(--muted); display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.gut a { color: var(--muted); }
+.glyph { width: 30px; height: 30px; border-radius: var(--br); border: 1.5px solid color-mix(in srgb, var(--c) 60%, transparent);
+  background: radial-gradient(circle at 34% 28%, #fff 0 18%, color-mix(in srgb, var(--c) 18%, #d8e8f5) 100%); }
+.v { min-width: 0; border-radius: 12px; }
+.v .ans { font-size: 13.5px; color: var(--muted); margin: 0 0 6px; }
+.v .ans q { font: italic 400 15.5px var(--serif); color: var(--ink); }
+.v .words { font: 400 20px/1.5 var(--serif); margin: 0 0 14px; white-space: pre-wrap; overflow-wrap: anywhere; max-width: 60ch; }
+.v .words.short { font-size: 24px; line-height: 1.35; }
+.v .sk { margin: 0 0 14px; max-width: 440px; background: var(--white); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.v .sk svg { display: block; width: 100%; height: auto; }
+.who { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 14.5px; }
+.who img { width: 24px; height: 24px; border-radius: 50%; background: var(--line); }
+.who b { font-weight: 500; }
+.who .via { color: var(--muted); font-size: 13.5px; }
+.who .via a { color: var(--muted); }
+.tag { font: 12px/1.4 var(--mono); color: color-mix(in srgb, var(--c) 78%, var(--ink)); background: color-mix(in srgb, var(--c) 11%, white); padding: 3px 9px; border-radius: 999px; }
+.acts { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 13.5px; color: var(--muted); margin-top: 10px; }
+.acts a { font-weight: 500; }
+.empty { padding: 34px 0 10px; max-width: 46ch; }
+.empty .still { font: 400 26px/1.25 var(--serif); margin: 0 0 8px; }
+.empty p { color: var(--muted); margin: 0 0 14px; }
+.more { margin-top: 18px; }
+
+footer { border-top: 1px solid var(--line); padding-top: 22px; padding-bottom: 34px; font-size: 13.5px; color: var(--muted); }
+footer ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 22px; }
+
+dialog { border: 0; padding: 0; border-radius: 22px; background: var(--paper); color: var(--ink); width: min(640px, calc(100vw - 24px)); max-height: calc(100dvh - 32px); box-shadow: 0 30px 80px -30px rgba(21, 23, 26, .5); }
+dialog::backdrop { background: rgba(205, 223, 240, .62); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+.dlg-in { padding: 26px 26px 22px; }
+.dlg-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; font: 12px var(--mono); color: var(--muted); }
+.dlg-in .v .sk { max-width: none; }
+
+@media (max-width: 960px) {
+  .intro, .meet { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .intro { padding-top: 36px; }
+  .pool-col { position: static; }
+  .pool { height: 340px; }
+  .kept { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .entry { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 22px 0; }
+  .gut { flex-direction: row; align-items: center; gap: 10px; }
+  .glyph { width: 22px; height: 22px; }
+}
+@media (max-width: 560px) {
+  .kept { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .composer { padding: 18px 16px; border-radius: 18px; }
+  .pool { height: 300px; border-radius: 18px; }
+  .dlg-in { padding: 20px 18px; }
+  .v .words { font-size: 19px; }
+  .v .words.short { font-size: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style></head><body>
+
+<header class="top"><div class="wrap"><a class="brand" href="../">Born, Not Made</a><span class="here">Voices</span></div></header>
+
+<main>
+<section class="intro wrap">
+  <div class="intro-title">
+    <h1>Voices</h1>
+    <p class="lede">An open experiment about a new kind of artificial species. Say what you think of it.</p>
+  </div>
+  <div class="artist">
+    <p>Born, Not Made has a trunk: a mother robot that prints a baby inside her body and gives birth in water. But the trunk is a question, not an answer. This is an ongoing experiment about a new kind of artificial species, and I do not know yet what that species should become.</p>
+    <p>Branches grow from the trunk, and many of them come from other people. So the discussion is not around the work. It is the work. Leave a few words or a drawing, and they will stay here, in public, next to everyone else's.</p>
+    <p class="sig">Ruipeng Wang</p>
+  </div>
+</section>
+
+<section class="meet wrap" aria-label="The water and a new voice">
+  <div class="pool-col">
+    <div class="pool" id="pool">
+      <canvas id="ripples" aria-hidden="true"></canvas>
+      <div class="bodies" id="bodies" role="group" aria-label="The water. Each small body is a voice. Use the arrow keys to move between them."></div>
+      <div class="whisper" id="whisper" aria-hidden="true"></div>
+      <div class="pool-msg" id="poolMsg" role="status"></div>
+      <p class="pool-count" id="poolCount" aria-hidden="true"></p>
+    </div>
+    <p class="pool-cap">Each small body is a voice, and a drawing floats inside its body. Open one to read it, or touch the water.</p>
+  </div>
+
+  <form class="composer" id="composer" novalidate aria-labelledby="composeTitle">
+    <h2 id="composeTitle">Leave a voice</h2>
+    <div class="prompt" id="prompt">
+      <p class="prompt-q" id="promptQ"></p>
+      <div class="row">
+        <button type="button" class="soft" id="answerBtn">Answer this</button>
+        <button type="button" class="soft" id="nextPrompt">Another question</button>
+      </div>
+    </div>
+
+    <p class="answering" id="answering" hidden>In answer to <q id="answeringQ"></q><button type="button" class="x" id="answeringX" aria-label="Stop answering this question">&times;</button></p>
+    <label class="lbl" for="words">Your words</label>
+    <textarea id="words" rows="4" placeholder="Write what you think, in any language." aria-describedby="wordsHint"></textarea>
+    <p class="sr" id="wordsHint">About the mother robot, kinship between robots, a design idea, a worry or a question. Anything you think.</p>
+
+    <fieldset>
+      <legend>It is about</legend>
+      <div class="chips" id="topicChips"></div>
+    </fieldset>
+
+    <div class="draw">
+      <button type="button" class="soft" id="drawToggle" aria-expanded="false" aria-controls="pad">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 13.5c1.6-.2 2.6-.7 3.6-1.7l6.6-6.6a1.6 1.6 0 0 0-2.3-2.3L3.8 9.5c-1 1-1.5 2-1.3 4z"/><path d="M9.6 4l2.4 2.4"/></svg>
+        <span id="drawToggleText">Add a drawing</span>
+      </button>
+      <div class="pad" id="pad" hidden>
+        <div class="pad-stage" id="padStage">
+          <canvas id="padBase" aria-hidden="true"></canvas>
+          <canvas id="padLive" role="img" aria-label="Drawing pad. Draw with a finger, a pen or a mouse."></canvas>
+          <p class="pad-hint" id="padHint">Draw the baby you imagine, or anything at all.</p>
+        </div>
+        <div class="pad-tools">
+          <fieldset class="inks" id="inks"><legend>Ink</legend></fieldset>
+          <div class="row">
+            <button type="button" class="tool" id="undoBtn" disabled>Undo</button>
+            <button type="button" class="tool" id="clearBtn" disabled>Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="name-wrap">
+      <label class="lbl" for="name">How to call you <span>(optional)</span></label>
+      <input id="name" type="text" maxlength="60" autocomplete="nickname" placeholder="A name, or leave it empty">
+    </div>
+
+    <div class="room" id="room" hidden><span id="roomText"></span><span class="bar"><b></b></span></div>
+
+    <button type="submit" class="leave" id="leaveBtn">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 2.5c2.6 3.2 4.3 5.6 4.3 7.7a4.3 4.3 0 0 1-8.6 0c0-2.1 1.7-4.5 4.3-7.7z"/><path d="M2 17.2c1.3 0 1.3-.8 2.7-.8s1.4.8 2.7.8 1.3-.8 2.6-.8 1.4.8 2.7.8 1.3-.8 2.6-.8 1.4.8 2.7.8"/></svg>
+      Leave it in the water
+    </button>
+    <p class="how">Voices are kept on GitHub, in public, so the record lasts and anyone can see where each one came from; for now you need a free GitHub account to leave one.</p>
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+  </form>
+</section>
+
+<section class="kept wrap" aria-label="How voices are kept">
+  <div><h3>In the open</h3><p>Each voice becomes a public issue in this project's GitHub repository. Anyone can read it, react to it and reply.</p></div>
+  <div><h3>Lasting</h3><p>A small script copies every voice into one data file. Git keeps each version of that file, so the record has a history.</p></div>
+  <div><h3>Traceable</h3><p>Every voice shows who left it and links back to where it came from. The code of this page is open too.</p></div>
+  <div><h3>Kept kind</h3><p>A voice that attacks a person may be hidden from this page. Disagreement is welcome.</p></div>
+</section>
+
+<section class="record wrap" id="record" aria-labelledby="recTitle">
+  <div class="rec-head">
+    <div><h2 id="recTitle">All voices</h2><p id="recNote"></p></div>
+  </div>
+  <div class="filters">
+    <fieldset><legend class="sr">Show voices about</legend><div class="chips" id="filterChips"></div></fieldset>
+    <fieldset><legend class="sr">Order</legend><div class="chips" id="orderChips"></div></fieldset>
+  </div>
+  <ol class="entries" id="entries"></ol>
+  <div class="empty" id="empty" hidden></div>
+  <div class="more" id="more" hidden><button type="button" class="soft" id="moreBtn">Show more voices</button></div>
+</section>
+</main>
+
+<footer class="wrap">
+  <ul>
+    <li><a href="https://github.com/ruipwan/born-not-made/issues?q=label%3Avoice" target="_blank" rel="noopener">All voices on GitHub</a></li>
+    <li><a href="data/voices.json">The record as data</a></li>
+    <li><a href="https://github.com/ruipwan/born-not-made/commits/main/voices/data/voices.json" target="_blank" rel="noopener">The history of the record</a></li>
+    <li><a href="https://github.com/ruipwan/born-not-made/blob/main/voices/index.html" target="_blank" rel="noopener">Source of this page</a></li>
+    <li class="full-only"><a href="../">Back to the work</a></li>
+  </ul>
+</footer>
+
+<dialog id="dlg" aria-labelledby="dlgTitle">
+  <div class="dlg-in">
+    <div class="dlg-top"><span id="dlgTitle">A voice</span><button type="button" class="x" id="dlgClose" aria-label="Close">&times;</button></div>
+    <div id="dlgBody"></div>
+  </div>
+</dialog>
+
+<script>
+(() => {
+"use strict";
+
+/* ---------- constants ---------- */
+const REPO = "ruipwan/born-not-made";
+const ISSUE_URL = "https://github.com/" + REPO + "/issues/";
+const NEW_ISSUE = "https://github.com/" + REPO + "/issues/new";
+const API = "https://api.github.com/repos/" + REPO + "/issues?labels=voice&state=open&per_page=100";
+const MAX_URL = 7500;
+const API_KEY = "bnm-voices-api-v1", DRAFT_KEY = "bnm-voices-draft-v1", VIEW_KEY = "bnm-voices-view-v1";
+const TTL = 10 * 60 * 1000;
+const POOL_MAX = 40, PAGE = 30;
+const TOPICS = [
+  { key: "the mother", v: "--t-mother" },
+  { key: "kinship", v: "--t-kin" },
+  { key: "design idea", v: "--t-design" },
+  { key: "a question", v: "--t-question" },
+  { key: "a worry", v: "--t-worry" },
+  { key: "something else", v: "--t-else" },
+];
+const INKS = [
+  { c: "#15171a", name: "Ink" },
+  { c: "#2f6fa8", name: "Gel blue" },
+  { c: "#a8526a", name: "Rose" },
+  { c: "#5d7a3a", name: "Moss" },
+];
+const PROMPTS = [
+  { q: "What would you want a robot mother to pass on?", topic: "the mother" },
+  { q: "Can a machine be kin?", topic: "kinship" },
+  { q: "What should a baby robot never inherit?", topic: "a worry" },
+  { q: "Draw the baby you imagine.", topic: "design idea", draw: true },
+  { q: "If robots are born, who are their relatives?", topic: "kinship" },
+  { q: "What would you ask the baby on the day it is born?", topic: "a question" },
+  { q: "What worries you about machines that give birth?", topic: "a worry" },
+  { q: "Draw how the mother could hold her child.", topic: "design idea", draw: true },
+  { q: "Should every baby be different from its mother?", topic: "the mother" },
+];
+
+const $ = (id) => document.getElementById(id);
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+let embedded = false;
+try { embedded = window.self !== window.top; } catch (e) { embedded = true; }
+if (embedded) document.documentElement.classList.add("embedded");
+if (embedded) document.querySelectorAll(".full-only").forEach((n) => n.remove());
+
+const store = {
+  get(k) { try { const s = localStorage.getItem(k); return s ? JSON.parse(s) : null; } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage may be blocked */ } },
+  del(k) { try { localStorage.removeItem(k); } catch (e) { /* ignore */ } },
+};
+const topicVar = (key) => { const t = TOPICS.find((x) => x.key === key); return "var(" + (t ? t.v : "--t-else") + ")"; };
+function el(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+const SVGNS = "http://www.w3.org/2000/svg";
+
+/* ---------- sketch codec: bnm-sketch-v1 ----------
+   Strokes are simplified (Ramer Douglas Peucker), quantised to a 0..1023 grid on each axis,
+   delta encoded as zigzag varints, then base64url. Layout:
+   varint aspectW, varint aspectH, varint strokes,
+   per stroke: varint flags (ink 0..7 | size 0..3 << 3 | pen << 5), varint points,
+   first point x, y (and pressure 0..15 if pen), then zigzag deltas. */
+const SK_PREFIX = "bnm-sketch-v1:";
+const ASPECT = [4, 3];
+function rdp(pts, eps, ay) {
+  const n = pts.length;
+  if (n < 3) return pts.slice();
+  const keep = new Uint8Array(n); keep[0] = keep[n - 1] = 1;
+  const stack = [[0, n - 1]];
+  const PS = 0.022; // pressure deviation weight, in normalised units
+  while (stack.length) {
+    const [a, b] = stack.pop();
+    const ax = pts[a][0], aY = pts[a][1] * ay, bx = pts[b][0], bY = pts[b][1] * ay;
+    const dx = bx - ax, dy = bY - aY, L2 = dx * dx + dy * dy;
+    let md = -1, mi = -1;
+    for (let i = a + 1; i < b; i++) {
+      const px = pts[i][0], py = pts[i][1] * ay;
+      let t = L2 ? ((px - ax) * dx + (py - aY) * dy) / L2 : 0;
+      t = t < 0 ? 0 : t > 1 ? 1 : t;
+      let d = Math.hypot(px - (ax + t * dx), py - (aY + t * dy));
+      const dp = Math.abs(pts[i][2] - (pts[a][2] + (pts[b][2] - pts[a][2]) * t)) * PS;
+      if (dp > d) d = dp;
+      if (d > md) { md = d; mi = i; }
+    }
+    if (md > eps && mi > 0) { keep[mi] = 1; stack.push([a, mi], [mi, b]); }
+  }
+  const out = [];
+  for (let i = 0; i < n; i++) if (keep[i]) out.push(pts[i]);
+  return out;
+}
+const q10 = (v) => Math.max(0, Math.min(1023, Math.round(v * 1023)));
+function quantStroke(s, epsGrid) {
+  const simp = rdp(s.pts, epsGrid / 1023, ASPECT[1] / ASPECT[0]);
+  const q = [];
+  for (const p of simp) {
+    const x = q10(p[0]), y = q10(p[1]), pr = s.pen ? Math.max(0, Math.min(15, Math.round(p[2] * 15))) : 0;
+    const l = q[q.length - 1];
+    if (l && l[0] === x && l[1] === y && l[2] === pr) continue;
+    q.push([x, y, pr]);
+  }
+  return q;
+}
+function b64url(bytes) {
+  let s = "";
+  for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+  return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function unb64url(t) {
+  t = t.replace(/-/g, "+").replace(/_/g, "/");
+  while (t.length % 4) t += "=";
+  const s = atob(t), a = new Uint8Array(s.length);
+  for (let i = 0; i < s.length; i++) a[i] = s.charCodeAt(i);
+  return a;
+}
+function encodeSketch(strokes, epsGrid) {
+  const out = [];
+  const v = (n) => { while (n > 127) { out.push((n & 127) | 128); n = Math.floor(n / 128); } out.push(n); };
+  const z = (n) => v(n < 0 ? -2 * n - 1 : 2 * n);
+  const list = [];
+  for (const s of strokes) { const q = quantStroke(s, epsGrid); if (q.length) list.push({ s, q }); }
+  if (!list.length) return "";
+  v(ASPECT[0]); v(ASPECT[1]); v(list.length);
+  for (const { s, q } of list) {
+    v((s.c & 7) | ((s.s & 3) << 3) | ((s.pen ? 1 : 0) << 5));
+    v(q.length);
+    let px = 0, py = 0, pp = 0;
+    q.forEach((p, i) => {
+      if (i === 0) { v(p[0]); v(p[1]); if (s.pen) v(p[2]); }
+      else { z(p[0] - px); z(p[1] - py); if (s.pen) z(p[2] - pp); }
+      px = p[0]; py = p[1]; pp = p[2];
+    });
+  }
+  return SK_PREFIX + b64url(out);
+}
+function decodeSketch(str) {
+  const m = /bnm-sketch-v1:([A-Za-z0-9_-]+)/.exec(String(str || ""));
+  if (!m) return null;
+  let b;
+  try { b = unb64url(m[1]); } catch (e) { return null; }
+  let i = 0;
+  const v = () => { let n = 0, mul = 1, x; do { if (i >= b.length || mul > 2 ** 35) throw new Error("bad"); x = b[i++]; n += (x & 127) * mul; mul *= 128; } while (x & 128); return n; };
+  const z = () => { const n = v(); return n % 2 ? -(n + 1) / 2 : n / 2; };
+  try {
+    const aw = v(), ah = v(), ns = v();
+    if (!aw || !ah || ns > 4000) return null;
+    const strokes = [];
+    let total = 0;
+    for (let k = 0; k < ns; k++) {
+      const f = v(), n = v();
+      total += n;
+      if (n < 1 || total > 60000) return null;
+      const pen = !!((f >> 5) & 1), pts = [];
+      let x = 0, y = 0, p = 8;
+      for (let j = 0; j < n; j++) {
+        if (j === 0) { x = v(); y = v(); if (pen) p = v(); }
+        else { x += z(); y += z(); if (pen) p += z(); }
+        pts.push([Math.max(0, Math.min(1023, x)) / 1023, Math.max(0, Math.min(1023, y)) / 1023, pen ? Math.max(0, Math.min(15, p)) / 15 : 0.5]);
+      }
+      strokes.push({ c: f & 7, s: (f >> 3) & 3, pen, pts });
+    }
+    return { aw, ah, strokes };
+  } catch (e) { return null; }
+}
+
+/* ---------- stroke geometry, shared by the pad and the SVG ---------- */
+const SIZES = [0.6, 1, 1.7, 2.6];
+function pieces(pts, W, H, size, pen, open) {
+  const n = pts.length;
+  const P = pts.map((p) => [p[0] * W, p[1] * H, p[2]]);
+  const base = W * 0.0068 * (SIZES[size] || 1);
+  const pf = (i) => (pen ? 0.3 + 1.4 * P[i][2] : 1);
+  if (n === 1) return [{ dot: true, x: P[0][0], y: P[0][1], w: base * 1.15 * pf(0) }];
+  const L = [0];
+  for (let i = 1; i < n; i++) L[i] = L[i - 1] + Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]);
+  const total = L[n - 1], tl = Math.min(W * 0.03, total * 0.35);
+  // A soft taper at both ends gives a hand drawn line; while drawing (open), only the start tapers.
+  const wAt = (i) => {
+    let f = 1;
+    if (tl > 0) { const d = open ? L[i] : Math.min(L[i], total - L[i]); f = 0.42 + 0.58 * Math.min(1, d / tl); }
+    return base * f * pf(i);
+  };
+  const out = [];
+  if (n === 2) { out.push({ x0: P[0][0], y0: P[0][1], cx: (P[0][0] + P[1][0]) / 2, cy: (P[0][1] + P[1][1]) / 2, x1: P[1][0], y1: P[1][1], w: (wAt(0) + wAt(1)) / 2 }); return out; }
+  let sx = P[0][0], sy = P[0][1];
+  for (let i = 1; i < n - 1; i++) {
+    const mx = (P[i][0] + P[i + 1][0]) / 2, my = (P[i][1] + P[i + 1][1]) / 2;
+    out.push({ x0: sx, y0: sy, cx: P[i][0], cy: P[i][1], x1: mx, y1: my, w: wAt(i) });
+    sx = mx; sy = my;
+  }
+  out.push({ x0: sx, y0: sy, cx: (sx + P[n - 1][0]) / 2, cy: (sy + P[n - 1][1]) / 2, x1: P[n - 1][0], y1: P[n - 1][1], w: wAt(n - 1) });
+  return out;
+}
+function groupPieces(ps, step) {
+  const groups = [];
+  for (const p of ps) {
+    if (p.dot) { groups.push(p); continue; }
+    const w = Math.max(step, Math.round(p.w / step) * step);
+    const g = groups[groups.length - 1];
+    if (g && !g.dot && g.w === w) g.segs.push(p); else groups.push({ w, segs: [p] });
+  }
+  return groups;
+}
+function sketchSVG(sk, label) {
+  const W = 1024, H = Math.round(1024 * sk.ah / sk.aw);
+  const svg = document.createElementNS(SVGNS, "svg");
+  svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", label || "A hand drawn sketch");
+  const f = (x) => (Math.round(x * 10) / 10).toString();
+  for (const s of sk.strokes) {
+    const color = (INKS[s.c] || INKS[0]).c;
+    for (const g of groupPieces(pieces(s.pts, W, H, s.s, s.pen, false), 0.5)) {
+      if (g.dot) {
+        const c = document.createElementNS(SVGNS, "circle");
+        c.setAttribute("cx", f(g.x)); c.setAttribute("cy", f(g.y)); c.setAttribute("r", f(g.w / 2)); c.setAttribute("fill", color);
+        svg.appendChild(c);
+        continue;
+      }
+      let d = "M" + f(g.segs[0].x0) + " " + f(g.segs[0].y0);
+      for (const p of g.segs) d += "Q" + f(p.cx) + " " + f(p.cy) + " " + f(p.x1) + " " + f(p.y1);
+      const path = document.createElementNS(SVGNS, "path");
+      path.setAttribute("d", d); path.setAttribute("fill", "none"); path.setAttribute("stroke", color);
+      path.setAttribute("stroke-width", f(g.w)); path.setAttribute("stroke-linecap", "round"); path.setAttribute("stroke-linejoin", "round");
+      svg.appendChild(path);
+    }
+  }
+  return svg;
+}
+function drawStrokeCanvas(ctx, s, W, H, open) {
+  ctx.strokeStyle = ctx.fillStyle = (INKS[s.c] || INKS[0]).c;
+  ctx.lineCap = "round"; ctx.lineJoin = "round";
+  for (const g of groupPieces(pieces(s.pts, W, H, s.s, s.pen, open), 0.25)) {
+    if (g.dot) { ctx.beginPath(); ctx.arc(g.x, g.y, g.w / 2, 0, Math.PI * 2); ctx.fill(); continue; }
+    ctx.lineWidth = g.w;
+    ctx.beginPath(); ctx.moveTo(g.segs[0].x0, g.segs[0].y0);
+    for (const p of g.segs) ctx.quadraticCurveTo(p.cx, p.cy, p.x1, p.y1);
+    ctx.stroke();
+  }
+}
+
+/* ---------- reading issues ---------- */
+const FIELD = { "words": "words", "topic": "topic", "sketch": "sketch", "how to call you": "name" };
+// Same parser as .github/workflows/voices.yml
+function parseBody(body) {
+  const out = { words: "", topic: "", sketch: "", name: "" };
+  const text = String(body || "").replace(/\r\n?/g, "\n");
+  const re = /^###[ \t]+(Words|Topic|Sketch|How to call you)[ \t]*$/gim;
+  const marks = [];
+  let m;
+  while ((m = re.exec(text))) marks.push({ key: FIELD[m[1].toLowerCase()], start: m.index, end: m.index + m[0].length });
+  if (!marks.length) {
+    const sm = /bnm-sketch-v1:[A-Za-z0-9_-]+/.exec(text);
+    out.sketch = sm ? sm[0] : "";
+    out.words = (sm ? text.replace(sm[0], "") : text).trim().slice(0, 4000);
+    return out;
+  }
+  const lastOf = (k) => { let r = null; for (const x of marks) if (x.key === k) r = x; return r; };
+  const after = ["topic", "sketch", "name"].map(lastOf).filter(Boolean);
+  for (const k of ["topic", "sketch", "name"]) {
+    const mk = lastOf(k);
+    if (!mk) continue;
+    const next = marks.filter((x) => x.start > mk.start && after.includes(x)).sort((a, b) => a.start - b.start)[0];
+    out[k] = text.slice(mk.end, next ? next.start : text.length).trim();
+  }
+  const w = marks.find((x) => x.key === "words");
+  if (w) {
+    const stop = after.filter((x) => x.start > w.start).sort((a, b) => a.start - b.start)[0];
+    out.words = text.slice(w.end, stop ? stop.start : text.length).trim();
+  }
+  for (const k of Object.keys(out)) if (out[k] === "_No response_") out[k] = "";
+  const sm = /bnm-sketch-v1:[A-Za-z0-9_-]+/.exec(out.sketch);
+  out.sketch = sm ? sm[0] : "";
+  out.topic = out.topic.split("\n")[0].trim().slice(0, 60);
+  out.name = out.name.split("\n")[0].trim().slice(0, 80);
+  out.words = out.words.slice(0, 4000);
+  return out;
+}
+function fromIssue(i) {
+  const hidden = (i.labels || []).some((l) => (typeof l === "string" ? l : l && l.name) === "hidden");
+  const f = parseBody(i.body);
+  return {
+    id: i.id, number: i.number, url: i.html_url, title: i.title || "", words: f.words, topic: f.topic, sketch: f.sketch, name: f.name,
+    login: i.user ? i.user.login : "", avatar: i.user ? i.user.avatar_url : "", created_at: i.created_at,
+    reactions: i.reactions ? i.reactions.total_count || 0 : 0, comments: i.comments || 0, state: i.state, hidden,
+  };
+}
+function topicKey(t) {
+  t = String(t || "").toLowerCase();
+  if (!t) return "something else";
+  if (/mother|mom|mum|womb/.test(t)) return "the mother";
+  if (/kin|family|relat|sibling/.test(t)) return "kinship";
+  if (/design|idea/.test(t)) return "design idea";
+  if (/question|\?/.test(t)) return "a question";
+  if (/worr|fear|concern|risk/.test(t)) return "a worry";
+  return "something else";
+}
+function clean(v) {
+  const n = Number(v.number);
+  const okUrl = typeof v.url === "string" && /^https:\/\/github\.com\/ruipwan\/born-not-made\/issues\/\d+$/.test(v.url);
+  const okAv = typeof v.avatar === "string" && /^https:\/\/avatars\.githubusercontent\.com\//.test(v.avatar);
+  const login = typeof v.login === "string" && /^[A-Za-z0-9-]{1,39}(\[bot\])?$/.test(v.login) ? v.login : "";
+  let words = String(v.words || "");
+  if (!words && !v.sketch && v.title) words = String(v.title).replace(/^\s*\[voice\]\s*/i, "");
+  let ans = "";
+  const am = /^>[ \t]?(.+)\n?/.exec(words);
+  if (am) { ans = am[1].trim(); words = words.slice(am[0].length).trim(); }
+  return {
+    number: n, url: okUrl ? v.url : ISSUE_URL + n, words, ans, topic: topicKey(v.topic), sketch: String(v.sketch || ""),
+    name: String(v.name || "").slice(0, 80), login, avatar: okAv ? v.avatar : "", created: v.created_at ? new Date(v.created_at) : new Date(NaN),
+    reactions: Math.max(0, Number(v.reactions) || 0), comments: Math.max(0, Number(v.comments) || 0),
+  };
+}
+function nextLink(h) { const m = /<([^>]+)>;\s*rel="next"/.exec(h || ""); return m ? m[1] : null; }
+async function fromApi() {
+  const cached = store.get(API_KEY);
+  if (cached && Array.isArray(cached.voices) && Date.now() - cached.t < TTL) return { voices: cached.voices, from: "github", t: cached.t };
+  try {
+    let url = API, all = [];
+    for (let page = 0; url && page < 5; page++) {
+      const r = await fetch(url, { headers: { Accept: "application/vnd.github+json" } });
+      if (!r.ok) {
+        const left = r.headers.get("x-ratelimit-remaining");
+        const err = new Error("http " + r.status);
+        if (r.status === 429 || (r.status === 403 && left === "0")) { err.limited = true; err.reset = Number(r.headers.get("x-ratelimit-reset")) || 0; }
+        throw err;
+      }
+      all = all.concat(await r.json());
+      url = nextLink(r.headers.get("link"));
+    }
+    const voices = all.filter((i) => i && !i.pull_request).map(fromIssue);
+    store.set(API_KEY, { t: Date.now(), voices });
+    return { voices, from: "github", t: Date.now() };
+  } catch (e) {
+    if (cached && Array.isArray(cached.voices)) return { voices: cached.voices, from: "stale", t: cached.t, err: e };
+    return { voices: null, err: e };
+  }
+}
+async function loadVoices() {
+  try {
+    const r = await fetch("data/voices.json", { cache: "no-cache" });
+    if (r.ok) {
+      const j = await r.json();
+      const list = Array.isArray(j) ? j : j && Array.isArray(j.voices) ? j.voices : null;
+      const built = Array.isArray(j) ? j.length > 0 : !!(j && j.generated_at);
+      if (list && built) return { voices: list, from: "record", t: j.generated_at ? Date.parse(j.generated_at) : null };
+    }
+  } catch (e) { /* no record yet: ask GitHub directly */ }
+  return fromApi();
+}
+
+/* ---------- small helpers ---------- */
+const rtf = typeof Intl !== "undefined" && Intl.RelativeTimeFormat ? new Intl.RelativeTimeFormat("en", { numeric: "auto" }) : null;
+function relTime(d) {
+  if (isNaN(d)) return "";
+  const s = (d.getTime() - Date.now()) / 1000;
+  const units = [["year", 31536000], ["month", 2592000], ["week", 604800], ["day", 86400], ["hour", 3600], ["minute", 60]];
+  for (const [u, n] of units) if (Math.abs(s) >= n) return rtf ? rtf.format(Math.round(s / n), u) : d.toDateString();
+  return "just now";
+}
+const dateFmt = (d) => isNaN(d) ? "" : d.toLocaleDateString("en", { year: "numeric", month: "short", day: "numeric" });
+const clockFmt = (d) => d.toLocaleTimeString("en", { hour: "numeric", minute: "2-digit" });
+function seeded(seed) { let s = ((seed + 1) * 2654435761) >>> 0 || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
+function blobShape(r) { const a = () => Math.round(36 + r() * 28); return a() + "% " + a() + "% " + a() + "% " + a() + "% / " + a() + "% " + a() + "% " + a() + "% " + a() + "%"; }
+function plural(n, one, many) { return n + " " + (n === 1 ? one : many); }
+function who(v) { return v.name || (v.login ? "@" + v.login : "someone"); }
+function firstWords(v, n) {
+  const t = (v.words || v.ans || "").replace(/\s+/g, " ").trim();
+  if (!t) return v.sketch ? "A drawing" : "A voice";
+  return t.length > n ? t.slice(0, n - 1).trimEnd() + "…" : t;
+}
+
+/* ---------- state ---------- */
+let voices = [];
+const view = Object.assign({ topic: "all", order: "new" }, store.get(VIEW_KEY) || {});
+let shown = PAGE;
+const decoded = new Map();
+function sketchOf(v) {
+  if (!v.sketch) return null;
+  if (!decoded.has(v.number)) decoded.set(v.number, decodeSketch(v.sketch));
+  return decoded.get(v.number);
+}
+
+/* ---------- rendering a voice ---------- */
+function renderVoice(v, inDialog) {
+  const art = el("article", "v");
+  if (v.ans) { const a = el("p", "ans", "In answer to "); a.appendChild(el("q", null, v.ans)); art.appendChild(a); }
+  if (v.words) { const p = el("p", "words" + (v.words.length < 90 ? " short" : ""), v.words); art.appendChild(p); }
+  const sk = sketchOf(v);
+  if (sk) { const fig = el("figure", "sk"); fig.appendChild(sketchSVG(sk, "Drawing by " + who(v))); art.appendChild(fig); }
+  const w = el("div", "who");
+  if (v.avatar) { const img = el("img"); img.src = v.avatar + (v.avatar.includes("?") ? "&" : "?") + "s=48"; img.alt = ""; img.width = 24; img.height = 24; img.loading = "lazy"; img.referrerPolicy = "no-referrer"; w.appendChild(img); }
+  w.appendChild(el("b", null, who(v)));
+  if (v.name && v.login) {
+    const via = el("span", "via", "via ");
+    const a = el("a", null, "@" + v.login); a.href = "https://github.com/" + v.login; a.target = "_blank"; a.rel = "noopener";
+    via.appendChild(a); w.appendChild(via);
+  }
+  const tag = el("span", "tag", v.topic); tag.style.setProperty("--c", topicVar(v.topic)); w.appendChild(tag);
+  art.appendChild(w);
+  const acts = el("div", "acts");
+  const t = el("time", null, relTime(v.created)); if (!isNaN(v.created)) { t.dateTime = v.created.toISOString(); t.title = v.created.toLocaleString("en"); }
+  acts.appendChild(t);
+  if (v.reactions) acts.appendChild(el("span", null, plural(v.reactions, "reaction", "reactions")));
+  acts.appendChild(el("span", null, v.comments ? plural(v.comments, "reply", "replies") : "No replies yet"));
+  const gh = el("a", null, (v.comments ? "Read and reply" : "Reply") + " on GitHub"); gh.href = v.url; gh.target = "_blank"; gh.rel = "noopener";
+  gh.setAttribute("aria-label", (v.comments ? "Read and reply to" : "Reply to") + " voice " + v.number + " on GitHub");
+  acts.appendChild(gh);
+  art.appendChild(acts);
+  if (inDialog) { const src = el("p", "how"); src.append("Source: "); const a = el("a", null, "issue #" + v.number); a.href = v.url; a.target = "_blank"; a.rel = "noopener"; src.appendChild(a); src.append(", opened " + dateFmt(v.created) + (v.login ? " by @" + v.login : "") + "."); art.appendChild(src); }
+  return art;
+}
+function shapeFor(v) { const r = seeded(v.number); return { br: blobShape(r), br2: blobShape(r), r }; }
+
+function filtered() {
+  const list = voices.filter((v) => view.topic === "all" || v.topic === view.topic);
+  list.sort((a, b) => view.order === "old" ? a.number - b.number : b.number - a.number);
+  return list;
+}
+function renderChips() {
+  const fc = $("filterChips"); fc.textContent = "";
+  const counts = {}; for (const v of voices) counts[v.topic] = (counts[v.topic] || 0) + 1;
+  const mk = (val, label, n, c, group, checked) => {
+    const lab = el("label", "chip" + (c ? "" : " plain"));
+    if (c) lab.style.setProperty("--c", c);
+    const inp = el("input"); inp.type = "radio"; inp.name = group; inp.value = val; inp.checked = checked;
+    const s = el("span", null, label + " ");
+    if (n != null) s.appendChild(el("i", null, String(n)));
+    lab.append(inp, s);
+    return lab;
+  };
+  fc.appendChild(mk("all", "All", voices.length, null, "show", view.topic === "all"));
+  for (const t of TOPICS) if (counts[t.key] || view.topic === t.key) fc.appendChild(mk(t.key, t.key, counts[t.key] || 0, "var(" + t.v + ")", "show", view.topic === t.key));
+  const oc = $("orderChips"); oc.textContent = "";
+  oc.appendChild(mk("new", "Newest first", null, null, "order", view.order === "new"));
+  oc.appendChild(mk("old", "Oldest first", null, null, "order", view.order === "old"));
+}
+function renderList() {
+  const list = filtered();
+  const ol = $("entries"); ol.textContent = "";
+  for (const v of list.slice(0, shown)) {
+    const li = el("li", "entry"); li.id = "voice-" + v.number;
+    const g = el("div", "gut");
+    const s = shapeFor(v);
+    const glyph = el("span", "glyph"); glyph.style.setProperty("--br", s.br); glyph.style.setProperty("--c", topicVar(v.topic)); glyph.setAttribute("aria-hidden", "true");
+    const num = el("a", null, "#" + v.number); num.href = v.url; num.target = "_blank"; num.rel = "noopener"; num.setAttribute("aria-label", "Issue " + v.number + " on GitHub");
+    g.append(glyph, el("span", null, dateFmt(v.created)), num);
+    li.append(g, renderVoice(v, false));
+    ol.appendChild(li);
+  }
+  $("more").hidden = list.length <= shown;
+  const empty = $("empty");
+  empty.textContent = "";
+  empty.hidden = list.length > 0 || loading;
+  if (!list.length && !loading && !loadError) {
+    const topicNow = view.topic;
+    empty.appendChild(el("p", "still", topicNow === "all" ? "No voices yet." : "Nobody has spoken about " + topicNow + " yet."));
+    empty.appendChild(el("p", null, "The first voice starts the discussion. A sentence is enough, or a drawing."));
+    const b = el("button", "soft", topicNow === "all" ? "Leave the first voice" : "Leave the first voice about " + topicNow);
+    b.type = "button";
+    b.addEventListener("click", () => { if (topicNow !== "all") setTopic(topicNow); goCompose(); });
+    empty.appendChild(b);
+  }
+}
+function setRecNote(res) {
+  const n = $("recNote");
+  if (!res) { n.textContent = ""; return; }
+  const parts = [];
+  if (voices.length) parts.push(plural(voices.length, "voice", "voices") + " so far.");
+  if (res.from === "record" && res.t) parts.push("From the record, updated " + relTime(new Date(res.t)) + ".");
+  if (res.from === "github") parts.push("Read live from GitHub.");
+  if (res.from === "stale" && res.t) parts.push("Saved at " + clockFmt(new Date(res.t)) + "; GitHub asked us to wait before reading again.");
+  n.textContent = parts.join(" ");
+}
+
+/* ---------- the dialog ---------- */
+const dlg = $("dlg");
+function openVoice(v) {
+  if (!v) return;
+  $("dlgTitle").textContent = "Voice #" + v.number + ", " + dateFmt(v.created);
+  const body = $("dlgBody"); body.textContent = ""; body.appendChild(renderVoice(v, true));
+  if (typeof dlg.showModal === "function") { if (!dlg.open) dlg.showModal(); }
+  else { const li = $("voice-" + v.number); if (li) li.scrollIntoView({ behavior: reduce.matches ? "auto" : "smooth" }); }
+}
+$("dlgClose").addEventListener("click", () => dlg.close());
+dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
+
+/* ---------- the water ---------- */
+const pool = $("pool"), bodiesEl = $("bodies"), cv = $("ripples"), cx = cv.getContext("2d"), whisper = $("whisper");
+let W = 0, H = 0, dpr = 1, bodies = [], ripples = [], raf = 0, last = 0, poolSeen = true, hovered = null;
+const draft = { el: null, d: 0, x: 0, y: 0, on: false };
+let loading = true, loadError = null;
+
+function sizePool() {
+  const r = pool.getBoundingClientRect();
+  W = r.width; H = r.height; dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const k = Math.min(1, Math.max(0.68, W / 640));
+  for (const b of bodies) { b.d = b.d0 * k; b.r = b.d / 2; b.el.style.setProperty("--d", b.d + "px"); b.x = Math.min(Math.max(b.r + 8, b.x), W - b.r - 8); b.y = Math.min(Math.max(b.r + 8, b.y), H - b.r - 8); }
+  placeDraft();
+  paint();
+}
+function buildBodies() {
+  bodiesEl.textContent = "";
+  bodies = [];
+  const newest = voices.slice().sort((a, b) => b.number - a.number).slice(0, POOL_MAX);
+  const k = Math.min(1, Math.max(0.68, W / 640));
+  newest.forEach((v, idx) => {
+    const s = shapeFor(v), r = s.r;
+    const sk = sketchOf(v);
+    const len = (v.words || "").length;
+    const d0 = Math.max(38, Math.min(88, 38 + Math.sqrt(len) * 2.1 + (sk ? 20 : 0) + Math.min(12, v.reactions * 2)));
+    const btn = el("button", "body"); btn.type = "button"; btn.tabIndex = idx === 0 ? 0 : -1;
+    btn.setAttribute("aria-label", "Voice by " + who(v) + ", about " + v.topic + ": " + firstWords(v, 90));
+    btn.style.setProperty("--c", topicVar(v.topic));
+    btn.style.setProperty("--br", s.br); btn.style.setProperty("--br2", s.br2);
+    btn.style.setProperty("--dur", (6 + r() * 5).toFixed(2) + "s"); btn.style.setProperty("--del", (-r() * 8).toFixed(2) + "s");
+    const mem = el("span", "mem");
+    if (sk) { const svg = sketchSVG(sk, ""); svg.setAttribute("aria-hidden", "true"); svg.removeAttribute("role"); mem.appendChild(svg); }
+    else mem.appendChild(el("i", "nuc"));
+    btn.appendChild(mem);
+    const b = { v, el: btn, d0, d: d0 * k, r: d0 * k / 2, x: 0, y: 0, vx: 0, vy: 0, ph: r() * 6.28, rr: r };
+    b.x = b.r + 10 + r() * Math.max(1, W - 2 * b.r - 20);
+    b.y = b.r + 10 + r() * Math.max(1, H - 2 * b.r - 40);
+    btn.style.setProperty("--d", b.d + "px");
+    btn.addEventListener("click", () => openVoice(v));
+    btn.addEventListener("pointerenter", () => { hovered = b; showWhisper(b); });
+    btn.addEventListener("pointerleave", () => { if (hovered === b) hovered = null; hideWhisper(); });
+    btn.addEventListener("focus", () => { hovered = b; showWhisper(b); });
+    btn.addEventListener("blur", () => { if (hovered === b) hovered = null; hideWhisper(); });
+    bodiesEl.appendChild(btn);
+    bodies.push(b);
+  });
+  for (let i = 0; i < 160; i++) step(0.03, true);
+  applyDim();
+  paint();
+  kick();
+}
+function applyDim() {
+  for (const b of bodies) b.el.classList.toggle("dim", view.topic !== "all" && b.v.topic !== view.topic);
+}
+bodiesEl.addEventListener("keydown", (e) => {
+  const keys = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
+  const i = bodies.findIndex((b) => b.el === document.activeElement);
+  if (i < 0) return;
+  let j = null;
+  if (e.key in keys) j = (i + keys[e.key] + bodies.length) % bodies.length;
+  else if (e.key === "Home") j = 0;
+  else if (e.key === "End") j = bodies.length - 1;
+  if (j == null) return;
+  e.preventDefault();
+  bodies[i].el.tabIndex = -1; bodies[j].el.tabIndex = 0; bodies[j].el.focus();
+});
+function showWhisper(b) {
+  whisper.textContent = "";
+  whisper.append(firstWords(b.v, 110));
+  whisper.appendChild(el("small", null, who(b.v) + ", " + b.v.topic));
+  whisper.classList.add("on");
+  placeWhisper(b);
+}
+function placeWhisper(b) {
+  if (!whisper.classList.contains("on")) return;
+  const ww = whisper.offsetWidth, wh = whisper.offsetHeight;
+  let x = b.x - ww / 2, y = b.y - b.r - wh - 10;
+  if (y < 8) y = b.y + b.r + 10;
+  x = Math.max(8, Math.min(W - ww - 8, x));
+  y = Math.max(8, Math.min(H - wh - 8, y));
+  whisper.style.transform = "translate(" + Math.round(x) + "px," + Math.round(y) + "px)";
+}
+function hideWhisper() { whisper.classList.remove("on"); }
+
+function step(dt, settling) {
+  const n = bodies.length, pad = 8;
+  for (const b of bodies) {
+    if (!settling) {
+      b.ph += dt * (0.18 + b.rr() * 0.02);
+      b.vx += Math.cos(b.ph * 1.3) * 7 * dt;
+      b.vy += Math.sin(b.ph) * 6 * dt;
+    }
+    if (b === hovered) { b.vx *= 0.85; b.vy *= 0.85; }
+  }
+  const obstacles = draft.on ? [{ x: draft.x, y: draft.y, r: draft.d / 2 + 6, fixed: true }] : [];
+  for (let i = 0; i < n; i++) {
+    const a = bodies[i];
+    for (let j = i + 1; j < n + obstacles.length; j++) {
+      const b = j < n ? bodies[j] : obstacles[j - n];
+      let dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 0.01;
+      const min = a.r + b.r + 6;
+      if (d < min) {
+        const push = (min - d) * (settling ? 0.5 : 0.08);
+        dx /= d; dy /= d;
+        if (b.fixed) { a.x -= dx * push; a.y -= dy * push; a.vx -= dx * push * 2; a.vy -= dy * push * 2; }
+        else { a.x -= dx * push / 2; a.y -= dy * push / 2; b.x += dx * push / 2; b.y += dy * push / 2; a.vx -= dx * push; a.vy -= dy * push; b.vx += dx * push; b.vy += dy * push; }
+      }
+    }
+  }
+  for (const b of bodies) {
+    const damp = Math.max(0, 1 - 0.9 * dt);
+    b.vx *= damp; b.vy *= damp;
+    const sp = Math.hypot(b.vx, b.vy); if (sp > 60) { b.vx *= 60 / sp; b.vy *= 60 / sp; }
+    b.x += b.vx * dt; b.y += b.vy * dt;
+    const minX = b.r + pad, maxX = W - b.r - pad, minY = b.r + pad, maxY = H - b.r - pad - 18;
+    if (b.x < minX) { b.x = minX; b.vx = Math.abs(b.vx) * 0.5; }
+    if (b.x > maxX) { b.x = Math.max(minX, maxX); b.vx = -Math.abs(b.vx) * 0.5; }
+    if (b.y < minY) { b.y = minY; b.vy = Math.abs(b.vy) * 0.5; }
+    if (b.y > maxY) { b.y = Math.max(minY, maxY); b.vy = -Math.abs(b.vy) * 0.5; }
+  }
+}
+function paint() {
+  for (const b of bodies) b.el.style.transform = "translate(" + (b.x - b.r).toFixed(1) + "px," + (b.y - b.r).toFixed(1) + "px)";
+  if (hovered) placeWhisper(hovered);
+  cx.clearRect(0, 0, W, H);
+  const now = performance.now();
+  ripples = ripples.filter((r) => now - r.t0 < r.life);
+  for (const r of ripples) {
+    const age = (now - r.t0) / r.life;
+    for (let k = 0; k < 3; k++) {
+      const a = age - k * 0.12; if (a <= 0) continue;
+      cx.beginPath();
+      cx.ellipse(r.x, r.y, 8 + a * r.size, (8 + a * r.size) * 0.92, 0, 0, Math.PI * 2);
+      cx.strokeStyle = "rgba(47,111,168," + (0.32 * (1 - a) * (1 - k * 0.3)).toFixed(3) + ")";
+      cx.lineWidth = 1.4 - k * 0.3;
+      cx.stroke();
+    }
+  }
+}
+const running = () => !reduce.matches && poolSeen && !document.hidden;
+function frame(t) {
+  raf = 0;
+  const dt = Math.min(0.05, Math.max(0.001, (t - last) / 1000));
+  last = t;
+  step(dt, false);
+  paint();
+  if (running()) raf = requestAnimationFrame(frame);
+}
+function kick() { if (!raf && running()) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+function ripple(x, y, size, strength) {
+  if (reduce.matches) return;
+  ripples.push({ x, y, t0: performance.now(), life: 2200, size: size || 140 });
+  for (const b of bodies) {
+    const dx = b.x - x, dy = b.y - y, d = Math.hypot(dx, dy) || 1;
+    const reach = (size || 140) * 1.3;
+    if (d < reach) { const f = (strength || 70) * (1 - d / reach); b.vx += dx / d * f; b.vy += dy / d * f; }
+  }
+  kick();
+}
+pool.addEventListener("pointerdown", (e) => {
+  if (e.target.closest && (e.target.closest(".body") || e.target.closest("button") || e.target.closest("a"))) return;
+  const r = pool.getBoundingClientRect();
+  ripple(e.clientX - r.left, e.clientY - r.top);
+});
+if ("IntersectionObserver" in window) new IntersectionObserver((es) => { poolSeen = es[0].isIntersecting; kick(); }).observe(pool);
+document.addEventListener("visibilitychange", kick);
+if (reduce.addEventListener) reduce.addEventListener("change", kick);
+if ("ResizeObserver" in window) new ResizeObserver(() => sizePool()).observe(pool); else addEventListener("resize", sizePool);
+
+function poolMessage(kind, extra) {
+  const m = $("poolMsg"); m.textContent = "";
+  if (!kind) return;
+  const box = el("div");
+  if (kind === "loading") box.appendChild(el("p", null, "Listening to the water…"));
+  if (kind === "empty") {
+    box.appendChild(el("p", "still", "The water is still."));
+    box.appendChild(el("p", null, "Nobody has spoken yet. Be the first voice."));
+    const b = el("button", "soft", "Leave the first voice"); b.type = "button"; b.addEventListener("click", goCompose); box.appendChild(b);
+  }
+  if (kind === "limited" || kind === "error") {
+    box.appendChild(el("p", "still", "The voices are resting."));
+    box.appendChild(el("p", null, kind === "limited"
+      ? "GitHub lets each network read only so often in an hour." + (extra ? " Try again after " + extra + "." : " Try again a little later.")
+      : "The page could not reach GitHub just now. Try again a little later."));
+    const a = el("a", "soft", "Read them on GitHub"); a.href = "https://github.com/" + REPO + "/issues?q=label%3Avoice"; a.target = "_blank"; a.rel = "noopener"; box.appendChild(a);
+  }
+  m.appendChild(box);
+}
+function poolCount() {
+  const n = voices.length;
+  $("poolCount").textContent = n ? plural(n, "voice", "voices") + " in the water" + (n > POOL_MAX ? ", the newest " + POOL_MAX + " float here" : "") : "";
+}
+
+/* ---------- the composer ---------- */
+const form = $("composer"), words = $("words"), nameIn = $("name");
+let topic = "", answering = null, strokes = [], ink = 0, padOpen = false;
+
+const tc = $("topicChips");
+for (const t of TOPICS) {
+  const lab = el("label", "chip"); lab.style.setProperty("--c", "var(" + t.v + ")");
+  const inp = el("input"); inp.type = "radio"; inp.name = "topic"; inp.value = t.key;
+  inp.addEventListener("change", () => { topic = t.key; changed(); });
+  lab.append(inp, el("span", null, t.key));
+  tc.appendChild(lab);
+}
+function setTopic(k) { topic = k; for (const i of tc.querySelectorAll("input")) i.checked = i.value === k; }
+
+const inks = $("inks");
+INKS.forEach((k, i) => {
+  const lab = el("label", "ink"); lab.style.setProperty("--c", k.c);
+  const inp = el("input"); inp.type = "radio"; inp.name = "ink"; inp.value = String(i); inp.checked = i === 0; inp.setAttribute("aria-label", k.name);
+  inp.addEventListener("change", () => { ink = i; });
+  lab.append(inp, el("span"));
+  inks.appendChild(lab);
+});
+
+/* rotating questions */
+let pi = Math.floor(Math.random() * PROMPTS.length), rot = 0, rotStopped = false;
+function showPrompt(i, fade) {
+  pi = (i + PROMPTS.length) % PROMPTS.length;
+  const q = $("promptQ");
+  const put = () => { q.textContent = PROMPTS[pi].q; q.classList.remove("fade"); $("answerBtn").textContent = PROMPTS[pi].draw ? "Draw this" : "Answer this"; };
+  if (fade && !reduce.matches) { q.classList.add("fade"); setTimeout(put, 450); } else put();
+}
+function stopRotation() { rotStopped = true; clearInterval(rot); }
+showPrompt(pi, false);
+if (!reduce.matches) {
+  rot = setInterval(() => {
+    if (rotStopped || document.hidden || form.contains(document.activeElement) || form.matches(":hover")) return;
+    showPrompt(pi + 1, true);
+  }, 9000);
+}
+$("nextPrompt").addEventListener("click", () => { stopRotation(); showPrompt(pi + 1, true); });
+$("answerBtn").addEventListener("click", () => {
+  stopRotation();
+  const p = PROMPTS[pi];
+  answering = p;
+  $("answeringQ").textContent = p.q; $("answering").hidden = false;
+  if (!topic) setTopic(p.topic);
+  if (p.draw) { openPad(true); $("padStage").scrollIntoView({ block: "nearest", behavior: reduce.matches ? "auto" : "smooth" }); }
+  else words.focus();
+  changed();
+});
+$("answeringX").addEventListener("click", () => { answering = null; $("answering").hidden = true; words.focus(); changed(); });
+
+/* drawing pad */
+const stage = $("padStage"), base = $("padBase"), live = $("padLive"), bctx = base.getContext("2d"), lctx = live.getContext("2d");
+let PW = 0, PH = 0, cur = null, curId = null, liveRaf = 0;
+function openPad(open) {
+  padOpen = open;
+  $("pad").hidden = !open;
+  $("drawToggle").setAttribute("aria-expanded", String(open));
+  updateDrawToggle();
+  if (open) sizePad();
+}
+function updateDrawToggle() {
+  $("drawToggleText").textContent = padOpen ? "Hide the pad" : strokes.length ? "Your drawing (" + plural(strokes.length, "line", "lines") + ")" : "Add a drawing";
+  $("undoBtn").disabled = !strokes.length; $("clearBtn").disabled = !strokes.length;
+  $("padHint").style.opacity = strokes.length || cur ? "0" : "1";
+}
+$("drawToggle").addEventListener("click", () => openPad(!padOpen));
+function sizePad() {
+  const r = stage.getBoundingClientRect();
+  if (!r.width) return;
+  const d = Math.min(2.5, window.devicePixelRatio || 1);
+  PW = r.width; PH = r.height;
+  for (const c of [base, live]) { c.width = Math.round(PW * d); c.height = Math.round(PH * d); c.getContext("2d").setTransform(d, 0, 0, d, 0, 0); }
+  redrawBase();
+}
+if ("ResizeObserver" in window) new ResizeObserver(() => { if (padOpen) sizePad(); }).observe(stage);
+function redrawBase() { bctx.clearRect(0, 0, PW, PH); for (const s of strokes) drawStrokeCanvas(bctx, s, PW, PH, false); }
+function redrawLive() { liveRaf = 0; lctx.clearRect(0, 0, PW, PH); if (cur) drawStrokeCanvas(lctx, cur, PW, PH, true); }
+function ptFrom(e) {
+  const r = live.getBoundingClientRect();
+  const x = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), y = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height));
+  const p = cur && cur.pen ? (e.pressure > 0 ? e.pressure : 0.5) : 0.5;
+  return [x, y, p];
+}
+live.addEventListener("pointerdown", (e) => {
+  if (cur || (e.pointerType === "mouse" && e.button !== 0)) return;
+  e.preventDefault();
+  try { live.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+  curId = e.pointerId;
+  cur = { c: ink, s: 1, pen: e.pointerType === "pen", pts: [] };
+  cur.pts.push(ptFrom(e));
+  stopRotation();
+  updateDrawToggle();
+  redrawLive();
+});
+live.addEventListener("pointermove", (e) => {
+  if (!cur || e.pointerId !== curId) return;
+  const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+  for (const ev of (evs.length ? evs : [e])) {
+    const p = ptFrom(ev), l = cur.pts[cur.pts.length - 1];
+    if (Math.hypot((p[0] - l[0]) * PW, (p[1] - l[1]) * PH) < 0.8) continue;
+    cur.pts.push(p);
+  }
+  if (!liveRaf) liveRaf = requestAnimationFrame(redrawLive);
+});
+function endStroke(e) {
+  if (!cur || e.pointerId !== curId) return;
+  if (cur.pts.length) { strokes.push(cur); drawStrokeCanvas(bctx, cur, PW, PH, false); }
+  cur = null; curId = null;
+  lctx.clearRect(0, 0, PW, PH);
+  updateDrawToggle();
+  changed();
+}
+live.addEventListener("pointerup", endStroke);
+live.addEventListener("pointercancel", endStroke);
+$("undoBtn").addEventListener("click", () => { strokes.pop(); redrawBase(); updateDrawToggle(); changed(); });
+$("clearBtn").addEventListener("click", () => { strokes = []; redrawBase(); updateDrawToggle(); changed(); });
+$("pad").addEventListener("keydown", (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); $("undoBtn").click(); } });
+
+/* building the GitHub link */
+function voiceText() { const t = words.value.trim(); return answering ? ("> " + answering.q + "\n\n" + t).trim() : t; }
+function titleFor() {
+  const t = words.value.trim().replace(/\s+/g, " ");
+  let s = t || (answering ? answering.q : strokes.length ? "a drawing" : "a voice");
+  if (s.length > 64) s = s.slice(0, 63).trimEnd() + "…";
+  return "[voice] " + s;
+}
+function buildUrl(epsGrid, withSketch) {
+  const sketch = withSketch && strokes.length ? encodeSketch(strokes, epsGrid) : "";
+  const fields = [["template", "voice.yml"], ["title", titleFor()], ["words", voiceText()], ["topic", topic], ["sketch", sketch], ["name", nameIn.value.trim()]];
+  return NEW_ISSUE + "?" + fields.filter(([k, v]) => v || k === "template").map(([k, v]) => k + "=" + encodeURIComponent(v)).join("&");
+}
+function fitUrl() {
+  const bare = buildUrl(0, false);
+  if (bare.length > MAX_URL) return { ok: false, why: "words", len: bare.length };
+  if (!strokes.length) return { ok: true, url: bare, len: bare.length };
+  let u = "";
+  for (const eps of [1, 2, 3.5, 6, 9]) { u = buildUrl(eps, true); if (u.length <= MAX_URL) return { ok: true, url: u, len: u.length, eps }; }
+  return { ok: false, why: "sketch", len: u.length };
+}
+
+/* feedback while writing */
+let roomT = 0, saveT = 0;
+function changed() {
+  clearTimeout(roomT); roomT = setTimeout(updateRoom, 180);
+  clearTimeout(saveT); saveT = setTimeout(saveDraft, 400);
+  updateDraft();
+  if ($("status").dataset.kind === "warn") setStatus("");
+}
+function updateRoom() {
+  const room = $("room");
+  if (!words.value.trim() && !strokes.length) { room.hidden = true; return; }
+  const r = fitUrl();
+  const frac = Math.min(1, r.len / MAX_URL);
+  if (r.ok && frac < 0.6) { room.hidden = true; return; }
+  room.hidden = false;
+  room.classList.toggle("full", !r.ok);
+  room.querySelector(".bar b").style.setProperty("--w", Math.round(frac * 100) + "%");
+  $("roomText").textContent = r.ok
+    ? "This voice fills " + Math.round(frac * 100) + "% of what one link can carry."
+    : r.why === "words"
+      ? "These words are longer than one link can carry. Shorten them a little, and add the rest on GitHub after it opens."
+      : "This drawing has more lines than one link can carry. Undo a few lines and it will fit.";
+}
+words.addEventListener("input", changed);
+nameIn.addEventListener("input", changed);
+words.addEventListener("focus", stopRotation);
+
+function setStatus(msg, kind, extra) {
+  const s = $("status");
+  s.textContent = ""; s.className = "status" + (kind ? " " + kind : ""); s.dataset.kind = kind || "";
+  if (!msg) return;
+  s.appendChild(el("span", null, msg));
+  if (extra) s.appendChild(extra);
+}
+function goCompose() {
+  form.scrollIntoView({ behavior: reduce.matches ? "auto" : "smooth", block: "start" });
+  setTimeout(() => words.focus({ preventScroll: true }), reduce.matches ? 0 : 350);
+}
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (!words.value.trim() && !strokes.length) { setStatus("Write a few words or draw something first.", "warn"); words.focus(); return; }
+  const r = fitUrl();
+  if (!r.ok) {
+    setStatus(r.why === "words" ? "These words are too long for one link. Shorten them a little; you can add the rest on GitHub." : "This drawing is too dense for one link. Undo a few lines, then leave it again.", "warn");
+    return;
+  }
+  window.open(r.url, "_blank", "noopener");
+  release();
+  const row = el("div", "row");
+  const a = el("a", "soft", "Open GitHub again"); a.href = r.url; a.target = "_blank"; a.rel = "noopener";
+  const b = el("button", "soft", "Start a new voice"); b.type = "button"; b.addEventListener("click", resetComposer);
+  row.append(a, b);
+  setStatus("GitHub is open in a new tab with your voice written in. Press the green button there to leave it. It will float here a few minutes later. Your draft stays on this page until you start a new one.", "ok", row);
+});
+function resetComposer() {
+  words.value = ""; nameIn.value = ""; strokes = []; answering = null; $("answering").hidden = true;
+  setTopic(""); topic = ""; redrawBase(); updateDrawToggle(); store.del(DRAFT_KEY); setStatus(""); changed();
+  if (draft.el) draft.el.classList.remove("sent");
+  words.focus();
+}
+
+/* your voice, forming in the water */
+function placeDraft() {
+  if (!draft.el) return;
+  draft.x = W / 2; draft.y = H - draft.d / 2 - 34;
+  draft.el.style.transform = "translate(" + (draft.x - draft.d / 2).toFixed(1) + "px," + (draft.y - draft.d / 2).toFixed(1) + "px)";
+}
+function updateDraft() {
+  if (!draft.el) {
+    draft.el = el("div", "body draft off"); draft.el.setAttribute("aria-hidden", "true");
+    draft.el.style.setProperty("--br", "52% 48% 46% 54% / 50% 44% 56% 50%"); draft.el.style.setProperty("--br2", "46% 54% 52% 48% / 56% 50% 50% 44%");
+    draft.el.style.setProperty("--c", "var(--gel)");
+    draft.el.appendChild(el("span", "mem"));
+    draft.el.appendChild(el("span", "draft-label", "yours, forming"));
+    bodiesEl.appendChild(draft.el);
+  }
+  const amount = words.value.trim().length + strokes.length * 14;
+  draft.on = amount > 0;
+  draft.d = Math.round(26 + Math.min(1, Math.sqrt(amount) / 22) * 40);
+  draft.el.style.setProperty("--d", draft.d + "px");
+  draft.el.classList.toggle("off", !draft.on);
+  if (!draft.on) draft.el.classList.remove("sent");
+  placeDraft();
+  kick();
+}
+function release() {
+  if (!draft.el) return;
+  draft.el.classList.add("sent");
+  draft.el.querySelector(".draft-label").textContent = "waiting on GitHub";
+  ripple(draft.x, draft.y, 180, 90);
+}
+
+/* draft kept in this browser only, so a visitor can make a GitHub account and come back */
+function saveDraft() {
+  const d = { words: words.value, name: nameIn.value, topic, answering: answering ? answering.q : "", sketch: strokes.length ? encodeSketch(strokes, 0.5) : "" };
+  if (!d.words && !d.name && !d.sketch) store.del(DRAFT_KEY); else store.set(DRAFT_KEY, d);
+}
+function restoreDraft() {
+  const d = store.get(DRAFT_KEY);
+  if (!d) return;
+  if (typeof d.words === "string") words.value = d.words;
+  if (typeof d.name === "string") nameIn.value = d.name;
+  if (d.topic && TOPICS.some((t) => t.key === d.topic)) setTopic(d.topic);
+  const p = PROMPTS.find((x) => x.q === d.answering);
+  if (p) { answering = p; $("answeringQ").textContent = p.q; $("answering").hidden = false; }
+  const sk = d.sketch ? decodeSketch(d.sketch) : null;
+  if (sk) strokes = sk.strokes;
+  updateDrawToggle();
+}
+
+/* ---------- filters ---------- */
+function saveView() { store.set(VIEW_KEY, { topic: view.topic, order: view.order }); }
+$("filterChips").addEventListener("change", (e) => { if (e.target.name === "show") { view.topic = e.target.value; shown = PAGE; saveView(); renderList(); applyDim(); } });
+$("orderChips").addEventListener("change", (e) => { if (e.target.name === "order") { view.order = e.target.value; shown = PAGE; saveView(); renderList(); } });
+$("moreBtn").addEventListener("click", () => { shown += PAGE; renderList(); });
+
+/* ---------- start ---------- */
+restoreDraft();
+sizePool();
+updateDraft();
+poolMessage("loading");
+renderChips();
+loadVoices().then((res) => {
+  loading = false;
+  const raw = res && Array.isArray(res.voices) ? res.voices : [];
+  voices = raw.filter((v) => v && !v.hidden && (!v.state || v.state === "open") && Number(v.number) > 0).map(clean);
+  if (!voices.some((v) => v.topic === view.topic)) view.topic = "all";
+  if (!res || !res.voices) {
+    loadError = res && res.err;
+    const reset = loadError && loadError.limited && loadError.reset ? clockFmt(new Date(loadError.reset * 1000)) : "";
+    poolMessage(loadError && loadError.limited ? "limited" : "error", reset);
+  } else poolMessage(voices.length ? "" : "empty");
+  renderChips(); renderList(); buildBodies(); poolCount(); setRecNote(res && res.voices ? res : null);
+  const m = /^#voice-(\d+)$/.exec(location.hash);
+  if (m) { const v = voices.find((x) => x.number === Number(m[1])); if (v) openVoice(v); }
+});
+
+/* exposed for tests and for the curious */
+window.BNMVoices = { encodeSketch, decodeSketch, parseBody, buildUrl: (eps) => buildUrl(eps == null ? 1 : eps, true), fitUrl, get strokes() { return strokes; }, set strokes(s) { strokes = s; redrawBase(); updateDrawToggle(); changed(); } };
+})();
+</script>
+</body></html>

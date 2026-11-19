@@ -1,0 +1,140 @@
+name: Voices
+
+# Copies every issue labeled "voice" into voices/data/voices.json and commits it when it changes.
+# The git history of that file is the lasting record of the discussion.
+
+on:
+  issues:
+    types: [opened, edited, closed, reopened, labeled, unlabeled, deleted]
+  issue_comment:
+    types: [created]
+  schedule:
+    - cron: "17 6 * * *" # once a day, to refresh reaction counts (reactions send no event)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: read
+
+concurrency:
+  group: voices-record
+  cancel-in-progress: false
+
+jobs:
+  record:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'schedule' ||
+      github.event.action == 'unlabeled' ||
+      contains(github.event.issue.labels.*.name, 'voice')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build voices.json
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            const path = "voices/data/voices.json";
+
+            // Same parser as voices/index.html. Issue forms write "### <label>" headings.
+            const LABELS = { "words": "words", "topic": "topic", "sketch": "sketch", "how to call you": "name" };
+            function parseBody(body) {
+              const out = { words: "", topic: "", sketch: "", name: "" };
+              const text = String(body || "").replace(/\r\n?/g, "\n");
+              const re = /^###[ \t]+(Words|Topic|Sketch|How to call you)[ \t]*$/gim;
+              const marks = [];
+              let m;
+              while ((m = re.exec(text))) marks.push({ key: LABELS[m[1].toLowerCase()], start: m.index, end: m.index + m[0].length });
+              if (!marks.length) {
+                const sm = /bnm-sketch-v1:[A-Za-z0-9_-]+/.exec(text);
+                out.sketch = sm ? sm[0] : "";
+                out.words = (sm ? text.replace(sm[0], "") : text).trim().slice(0, 4000);
+                return out;
+              }
+              // Words run from the first "Words" heading to the last heading of the fields after it,
+              // so a "###" line typed inside the words does not cut them short.
+              const lastOf = (k) => { let r = null; for (const x of marks) if (x.key === k) r = x; return r; };
+              const after = ["topic", "sketch", "name"].map(lastOf).filter(Boolean);
+              for (const k of ["topic", "sketch", "name"]) {
+                const mk = lastOf(k);
+                if (!mk) continue;
+                const next = marks.filter((x) => x.start > mk.start && after.includes(x)).sort((a, b) => a.start - b.start)[0];
+                out[k] = text.slice(mk.end, next ? next.start : text.length).trim();
+              }
+              const w = marks.find((x) => x.key === "words");
+              if (w) {
+                const stop = after.filter((x) => x.start > w.start).sort((a, b) => a.start - b.start)[0];
+                out.words = text.slice(w.end, stop ? stop.start : text.length).trim();
+              }
+              for (const k of Object.keys(out)) if (out[k] === "_No response_") out[k] = "";
+              const sm = /bnm-sketch-v1:[A-Za-z0-9_-]+/.exec(out.sketch);
+              out.sketch = sm ? sm[0] : "";
+              out.topic = out.topic.split("\n")[0].trim().slice(0, 60);
+              out.name = out.name.split("\n")[0].trim().slice(0, 80);
+              out.words = out.words.slice(0, 4000);
+              return out;
+            }
+
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: "voice",
+              state: "all",
+              per_page: 100,
+            });
+
+            const voices = issues
+              .filter((i) => !i.pull_request)
+              .map((i) => {
+                const hidden = (i.labels || []).some((l) => (typeof l === "string" ? l : l.name) === "hidden");
+                const f = hidden ? { words: "", topic: "", sketch: "", name: "" } : parseBody(i.body);
+                return {
+                  id: i.id,
+                  number: i.number,
+                  url: i.html_url,
+                  title: hidden ? "" : i.title,
+                  words: f.words,
+                  topic: f.topic,
+                  sketch: f.sketch,
+                  name: f.name,
+                  login: i.user ? i.user.login : "",
+                  avatar: i.user ? i.user.avatar_url : "",
+                  created_at: i.created_at,
+                  reactions: i.reactions ? i.reactions.total_count : 0,
+                  comments: i.comments || 0,
+                  state: i.state,
+                  hidden,
+                };
+              })
+              .sort((a, b) => a.number - b.number);
+
+            let old = null;
+            try { old = JSON.parse(fs.readFileSync(path, "utf8")); } catch (e) { old = null; }
+            const oldVoices = old && Array.isArray(old.voices) ? old.voices : null;
+            if (old && old.generated_at && JSON.stringify(oldVoices) === JSON.stringify(voices)) {
+              core.info(`No change: ${voices.length} voices.`);
+              return;
+            }
+            const out = {
+              generated_at: new Date().toISOString(),
+              repo: `${context.repo.owner}/${context.repo.repo}`,
+              voices,
+            };
+            fs.mkdirSync("voices/data", { recursive: true });
+            fs.writeFileSync(path, JSON.stringify(out, null, 2) + "\n");
+            core.info(`Wrote ${voices.length} voices.`);
+
+      - name: Commit if changed
+        run: |
+          git add voices/data/voices.json
+          if git diff --cached --quiet; then
+            echo "voices.json unchanged"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Voices: update the record"
+          git pull --rebase --autostash
+          git push

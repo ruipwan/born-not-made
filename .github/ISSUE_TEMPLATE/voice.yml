@@ -1,0 +1,42 @@
+name: Voice
+description: Leave what you think about Born, Not Made. It will float on the Voices page of the site.
+title: "[voice] "
+labels: [voice]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Born, Not Made is an open experiment about a new kind of artificial species: a mother robot prints a baby robot inside her body, in gel, and gives birth in water. The discussion is part of the work.
+
+        This voice is public. It stays in this repository as a lasting record and appears on https://ruipwan.github.io/born-not-made/voices/ with a link back here. Anyone can reply below it.
+  - type: textarea
+    id: words
+    attributes:
+      label: Words
+      description: What you think. Any language is welcome.
+      placeholder: About the mother, kinship between robots, a design idea, a worry, a question...
+    validations:
+      required: false
+  - type: input
+    id: topic
+    attributes:
+      label: Topic
+      description: "One of: the mother, kinship, design idea, a question, a worry, something else."
+      placeholder: kinship
+    validations:
+      required: false
+  - type: textarea
+    id: sketch
+    attributes:
+      label: Sketch
+      description: Filled in by the site when you draw. It is your drawing, written as data. Please leave it as it is; the site draws it again from this line.
+      render: text
+    validations:
+      required: false
+  - type: input
+    id: name
+    attributes:
+      label: How to call you
+      description: Optional. A name to show with your voice. If you leave it empty, your GitHub name is shown.
+    validations:
+      required: false
