@@ -207,9 +207,9 @@ textarea, input[type=text] { width: 100%; box-sizing: border-box; background: va
 <section class="doc">
   <h2>How the mother reads a signal</h2>
   <p class="io">input: a voice or text signal · output: a baby robot, its G-code, its memory and its relations</p>
-  <p>The scene is the restored Blender model of the DexArm mother: the clear egg body, the docked tail, and the real DexArm links posed by the same parallelogram kinematics as the Blender file. A signal does not design the baby. The mother reads it against her memory, and the baby's body comes from three sources mixed together: what she inherited, what she remembers, and what the signal shifts. A small random drift is added, so no two births are the same.</p>
+  <p>The scene is the restored Blender model of the DexArm mother: the clear egg body, the docked tail, and the real DexArm links posed by the same parallelogram kinematics as the Blender file. A signal does not design the baby. The mother reads the signal against its own memory, and the baby's body comes from three sources mixed together: what the mother inherited, what the mother remembers, and what the signal shifts. A small random drift is added, so no two births are the same.</p>
   <p>The baby is printed folded, layer by layer, in the gel, which works like amniotic fluid. The arm works like an umbilical cord. Halfway through, the arm places a core (battery, pump and chip) inside the body, so the baby can move after birth. After printing, the baby breathes in air through its valve. The gel cannot be compressed, so the mother's folded belly opens as the baby grows. That swelling is a visible sign of the process and also vents the womb. The folds spring back to push the baby out through the canal, and the belly slowly settles again. The gel stays inside.</p>
-  <p>After birth, a relation forms between robots. It is measured from shared memory, body likeness and time spent near each other. Any baby can be made the next mother; she carries part of her mother's memory forward.</p>
+  <p>After birth, a relation forms between robots. It is measured from shared memory, body likeness and time spent near each other. Any baby can be made the next mother; it carries part of its mother's memory forward.</p>
   <h4>Agent architecture</h4>
   <pre class="mermaid">
 flowchart LR
@@ -832,12 +832,12 @@ async function readSignal(text, useAgent) {
   };
   if (!useAgent || !sampleApi) return local();
   try {
-    const prompt = `You are the reading layer of a mother robot in an art installation called Born, Not Made. The mother prints soft baby robots inside her body, in gel, and gives birth in water. A person sent her a signal. She does not obey it and does not design from it: she reads it against her memory, and it shifts what she generates. Robots here have relations with each other, nothing more; never describe looking after, helping or serving.
+    const prompt = `You are the reading layer of a mother robot in an art installation called Born, Not Made. The mother prints soft baby robots inside its body, in gel, and gives birth in water. A person sent the mother a signal. The mother does not obey the signal and does not design from it: the mother reads it against its memory, and the signal shifts what the mother generates. Robots here have relations with each other, nothing more; never describe looking after, helping or serving. Never call the mother or a baby he or she; write the mother, the baby, it or its.
 Mother memory (trace, weight 0 to 1):
 ${mem}
 Signal: "${text.slice(0, 400)}"
 Return only JSON with these keys:
-{"heard": "the signal in at most 8 words", "reading": "one plain sentence on what the mother takes from it, in her own terms (water, pressure, light, rhythm, distance)", "trace": "a memory trace to keep, 2 to 5 words", "say": "one short first person sentence the mother says aloud", "bias": {"length":0..1,"girth":0..1,"rings":0..1,"ribs":0..1,"flat":0..1,"bulge":0..1,"hue":0..1,"motion":0..1,"tempo":0..1}}
+{"heard": "the signal in at most 8 words", "reading": "one plain sentence on what the mother takes from it, in its own terms (water, pressure, light, rhythm, distance)", "trace": "a memory trace to keep, 2 to 5 words", "say": "one short first person sentence the mother says aloud", "bias": {"length":0..1,"girth":0..1,"rings":0..1,"ribs":0..1,"flat":0..1,"bulge":0..1,"hue":0..1,"motion":0..1,"tempo":0..1}}
 The bias values are tendencies for the body (hue 0 red, 0.33 green, 0.6 blue; motion 0 undulate, 0.5 pulse, 1 roll), not a design.`;
     const j = await sampleApi.json(prompt, { modelTier: "quick", cache: false });
     if (!j || typeof j !== "object" || !j.bias) throw new Error("no json");
@@ -1007,22 +1007,22 @@ function renderProps() {
   $("#selLbl").textContent = sb ? sb.name : "Mother " + mother.name;
   if (tab === "signal") {
     const busy = job && job.stage !== "born";
-    el.innerHTML = `<div class="pnl"><h3>Send a signal</h3><p>Speak or type to the mother. She reads it against her memory; it shifts the next body but does not design it.</p>
+    el.innerHTML = `<div class="pnl"><h3>Send a signal</h3><p>Speak or type to the mother. The mother reads the signal against its memory; the signal shifts the next body but does not design it.</p>
       <textarea id="sig" rows="3" placeholder="for example: a slow tide under the ice">${esc(draft)}</textarea>
       <div class="brow"><button class="btn" id="mic" ${dictApi ? "" : "hidden"}>${micOn ? "Stop listening" : "Speak"}</button><button class="btn on" id="send" ${busy ? "disabled" : ""}>Send signal</button>
       <button class="btn" id="voice" ${ttsApi ? "" : "hidden"} aria-pressed="${voiceOn}">${voiceOn ? "Voice on" : "Voice off"}</button></div>
       <p class="lbl">${dictApi ? "" : "Speech input is not available in this browser; typing works. "}${sampleApi ? "Signals are read by Claude." : "Signals are read by the local reader."}</p></div>
       ${job && job.reading ? `<div class="pnl"><h3>Last reading ${job.example ? "(example)" : ""}</h3><dl class="kv"><dt>heard</dt><dd>${esc(job.reading.heard)}</dd><dt>reading</dt><dd>${esc(job.reading.reading)}</dd><dt>kept as</dt><dd>“${esc(job.reading.trace)}”</dd><dt>mother says</dt><dd>${esc(job.reading.say || "")}</dd><dt>read by</dt><dd>${job.reading.by}</dd></dl></div>` : ""}
-      <div class="pnl"><h3>Next mother</h3><p>Select a born baby in the Outliner, then let her carry the memory forward.</p><button class="btn" id="mkMother" ${sb && sb.free ? "" : "disabled"}>${sb && sb.free ? "Make " + sb.name + " the next mother" : "Select a born baby"}</button></div>`;
+      <div class="pnl"><h3>Next mother</h3><p>Select a born baby in the Outliner, then make it the next mother to carry the memory forward.</p><button class="btn" id="mkMother" ${sb && sb.free ? "" : "disabled"}>${sb && sb.free ? "Make " + sb.name + " the next mother" : "Select a born baby"}</button></div>`;
   } else if (tab === "memory") {
     const mem = sb ? sb.memory : mother.memory;
-    el.innerHTML = `<div class="pnl"><h3>${sb ? sb.name + " memory" : "Mother " + mother.name + " memory"}</h3><p>${sb ? "Inherited from " + sb.motherName + ", with drift, plus her own birth." : "Traces weigh what she generates. New signals add traces; older ones fade a little each birth."}</p>
+    el.innerHTML = `<div class="pnl"><h3>${sb ? sb.name + " memory" : "Mother " + mother.name + " memory"}</h3><p>${sb ? "Inherited from " + sb.motherName + ", with drift, plus its own birth." : "Traces weigh what the mother generates. New signals add traces; older ones fade a little each birth."}</p>
       ${mem.map((m, i) => `<div class="trace"><span>${esc(m.text)}<span class="tag">${m.src}</span></span><span class="bar"><span style="width:${Math.round(m.w * 100)}%"></span></span>${sb ? "<span></span>" : `<button class="x" data-del="${i}" aria-label="forget">×</button>`}</div>`).join("")}
       ${sb ? "" : `<div class="brow"><input type="text" id="addMem" placeholder="add a trace"><button class="btn" id="addBtn">Add</button></div>`}</div>`;
   } else if (tab === "genome") {
     const g = sb ? sb.genome : mother.genome, pr = sb && sb.parts;
     el.innerHTML = `<div class="pnl"><h3>${sb ? sb.name + " genome" : "Mother " + mother.name + " genome"}</h3>
-      <p>${sb ? "Each value is mixed from four sources. No value was set by hand." : "What she passes on. Babies mix it with memory, the signal and drift."}</p>
+      <p>${sb ? "Each value is mixed from four sources. No value was set by hand." : "What the mother passes on. Babies mix it with memory, the signal and drift."}</p>
       ${pr ? `<div class="legend"><span><i style="background:#8a8f99"></i>mother</span><span><i style="background:#9fcdf0"></i>memory</span><span><i style="background:#ffaf29"></i>signal</span><span><i style="background:#e05d5d"></i>drift</span></div>` : ""}
       ${GENES.map(([k, l, f], i) => { const p = pr ? pr[i] : null; const tot = p ? p.reduce((a, b) => a + b, 0) || 1 : 1;
         return `<div class="gene"><span class="lbl">${l}</span>${p ? `<span class="gbar">${["#8a8f99", "#9fcdf0", "#ffaf29", "#e05d5d"].map((c, j) => `<span style="width:${(100 * p[j] / tot).toFixed(1)}%;background:${c}"></span>`).join("")}</span>` : `<span class="gbar"><span style="width:${Math.round(g[i] * 100)}%;background:#8a8f99"></span></span>`}<span>${f(g[i])}</span></div>`; }).join("")}</div>
@@ -1052,7 +1052,7 @@ function makeNextMother() {
   const prev = mother.name; mother = { name: "M" + (mother.gen + 1) + "·" + b.name, gen: mother.gen + 1, memory: b.memory.map((m) => ({ ...m, src: m.src === "birth" ? "own birth" : "carried" })), genome: b.genome.slice() };
   const skinIt = SHADE.items.find((it) => it.obj === skin);
   for (const m of [skinIt.mat, skinIt.clay]) m.uniforms.tint.value.copy(colorOf(b.spec)).lerp(new THREE.Color(1, 1, 1), 0.55);
-  log(`${b.name} becomes the next mother. She carries ${mother.memory.length} traces from ${prev}.`, "a");
+  log(`${b.name} becomes the next mother. It carries ${mother.memory.length} traces from ${prev}.`, "a");
   $("#genLbl").textContent = "generation M" + mother.gen; selected = "mother"; renderAll();
 }
 function renderCode(n, cur) {
