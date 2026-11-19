@@ -176,11 +176,11 @@ html.org-js .rv.in { opacity: 1; transform: none; }
 .org-voices .chip input:focus-visible + span { outline-offset: 4px; border-radius: 6px !important; }
 
 /* real actions: soft rounded fills, no borders */
-.btn, #ideas .stage .act, .soft, .tool, .lbar button, .leave, .home, .vid button span.pill {
+.org-doc .btn, #ideas .stage .act, .soft, .tool, .lbar button, .leave, .home, .vid button span.pill {
   font: 400 15px var(--sans) !important; color: var(--ink) !important; background: var(--soft2) !important; border: 0 !important; border-radius: 999px !important;
   padding: 10px 20px !important; text-decoration: none; transition: background .4s var(--ease), color .3s, box-shadow .4s;
 }
-.btn:hover, #ideas .stage .act:hover, .soft:hover, .tool:hover:not(:disabled), .lbar button:hover, .leave:hover, .home:hover { background: rgba(156, 200, 236, .16) !important; box-shadow: 0 0 34px -6px rgba(156, 200, 236, .3); color: var(--ink) !important; }
+.org-doc .btn:hover, #ideas .stage .act:hover, .soft:hover, .tool:hover:not(:disabled), .lbar button:hover, .leave:hover, .home:hover { background: rgba(156, 200, 236, .16) !important; box-shadow: 0 0 34px -6px rgba(156, 200, 236, .3); color: var(--ink) !important; }
 .open .btn { background: rgba(156, 200, 236, .14) !important; color: var(--ink) !important; }
 .leave { background: rgba(156, 200, 236, .15) !important; font-size: 16.5px !important; padding: 15px 24px !important; }
 a.btn, a.home { background-image: none !important; }
@@ -352,7 +352,7 @@ aside { background: rgba(255, 255, 255, .025) !important; border-left: 0 !import
 .pill { background: rgba(14, 14, 15, .78) !important; border: 0 !important; backdrop-filter: blur(10px); }
 .ptabs { border-bottom: 0 !important; gap: 4px; padding: 10px 12px 2px; }
 .ptabs button { font: 400 14.5px var(--sans) !important; color: var(--muted) !important; background: linear-gradient(var(--warm), var(--warm)) 50% 100% / 0 1px no-repeat !important; border: 0 !important; border-radius: 0 !important; padding: 9px 4px !important; transition: color .3s, background-size .5s var(--ease); }
-.ptabs button.on, .ptabs button.on:hover { color: var(--ink) !important; background: linear-gradient(var(--warm), var(--warm)) 50% 100% / 60% 1px no-repeat !important; box-shadow: none !important; }
+body:not(.org-doc) .ptabs button.on, body:not(.org-doc) .ptabs button.on:hover { color: var(--ink) !important; background: linear-gradient(var(--warm), var(--warm)) 50% 100% / 60% 1px no-repeat !important; box-shadow: none !important; }
 .ptabs button:hover { background-color: transparent !important; }
 body:not(.org-doc) .row { border-radius: 14px !important; }
 body:not(.org-doc) .row.sel { background: var(--gel-soft) !important; }
@@ -381,7 +381,7 @@ body:not(.org-doc) select { border: 0 !important; border-radius: 12px !important
 input[type=range] { accent-color: var(--gel); }
 
 /* simulator */
-.app { gap: 10px; }
+.app:has(> .area) { gap: 10px; }
 .area { background: rgba(255, 255, 255, .03) !important; border: 0 !important; border-radius: 22px !important; }
 .ahead { background: transparent !important; border-bottom: 0 !important; min-height: 38px; flex-wrap: nowrap; font-size: 12.5px !important; padding: 0 14px !important; }
 .top.area { background: transparent !important; }
@@ -456,6 +456,6 @@ input[type=text] { color: var(--ink); }
 .org-log header.head { padding: 56px 0 28px; }
 .org-voices h1 { font-size: clamp(54px, 8vw, 100px); }
 @media (max-width: 700px) { .bar { padding-top: 12px !important; padding-bottom: 8px !important; gap: 10px !important; } nav.sub { padding-bottom: 4px !important; } }
-@media (min-width: 981px) { .app { grid-template-rows: 40px minmax(380px, calc(100vh - 376px)) 214px 84px !important; } }
+@media (min-width: 981px) { .app:has(> .area) { grid-template-rows: 40px minmax(360px, calc(100vh - 392px)) 214px 100px !important; } }
 .tl .ctl { align-self: center; } .tl .ctl .btn { padding: 6px 14px; }
 html { overflow-x: clip; }
