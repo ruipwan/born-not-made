@@ -84,7 +84,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 <header class="top"><div class="bar">
   <a class="brand" href="#trunk">Born, Not Made</a>
   <nav class="tabs" aria-label="Sections">
-    <a href="#trunk">Trunk</a><a href="#branches">Branches</a><a href="#early" hidden>Early</a><a href="#build">Build</a><a href="#simulator">Simulator</a><a href="#society">Society</a><a href="#log">Log</a><a href="#voices" class="voices">Voices</a>
+    <a href="#trunk">Trunk</a><a href="#branches">Branches</a><a href="#early">Early</a><a href="#build">Build</a><a href="#simulator">Simulator</a><a href="#society">Society</a><a href="#log">Log</a><a href="#voices" class="voices">Voices</a>
   </nav>
 </div></header>
 <main>
@@ -349,8 +349,8 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 
 <!-- ============================== EARLY ============================== -->
 <section class="tab" id="early">
-  <div class="tabhead"><div><p class="kicker">Early versions</p><h2>Before the womb printed</h2><p>The first and second versions, how they worked and what each one taught.</p></div><a class="btn" href="early/" target="_blank" rel="noopener">Open full screen</a></div>
-  <div class="fullframe" style="background:#f4f3ef"><iframe data-src="early/" title="Early versions"></iframe></div>
+  <div class="tabhead"><div><p class="kicker">Early versions</p><h2>Before the womb printed</h2><p>The first and second versions in full, and the third as the bridge to printing: how each worked and what each taught.</p></div><a class="btn" href="early/" target="_blank" rel="noopener">Open full screen</a></div>
+  <iframe id="earlyFrame" data-src="early/" title="Early versions" style="display:block;width:100%;height:85vh;border:0;margin-top:20px"></iframe>
 </section>
 
 <!-- ============================== LOG ============================== -->
@@ -382,6 +382,7 @@ function show() {
   document.querySelectorAll("section.tab:not(.on) video").forEach((v) => v.pause());
   window.scrollTo({ top: 0 });
 }
+addEventListener("message", (e) => { const f = document.getElementById("earlyFrame"); if (f && e.origin === location.origin && e.data && e.data.bnm === "early-height") f.style.height = e.data.h + "px"; });
 addEventListener("hashchange", show); show();
 </script>
 </body></html>
