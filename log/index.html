@@ -3,10 +3,10 @@
 <title>Making Log</title>
 <meta name="description" content="Born, Not Made: the making log. Discussions, design options, decisions and reversals, prototypes, tests, renders and shows, in order.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 /* Born, Not Made: making log. Same paper, ink and gel blue as the main site. */
-:root { --bg: #f4f3ef; --paper: #fbfaf7; --ink: #15171a; --muted: #5c636c; --line: #dcd9d1; --gel: #2f6fa8; --gel-soft: #d8e8f5; --stone: #e6e4de; --serif: "Newsreader", Georgia, serif; --sans: "Inter", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace; color-scheme: light; }
+:root { --bg: #0c0c0d; --paper: #141415; --ink: #ecebe6; --muted: #9b9a94; --line: #2a2a2c; --gel: #9cc8ec; --gel-soft: #15283a; --stone: #1c1c1e; --serif: "Cormorant Garamond", Georgia, serif; --sans: "Inter", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace; color-scheme: dark; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
@@ -74,7 +74,7 @@ li.ev[data-stage="site"] .dot { border-style: dashed; border-color: var(--gel); 
 .meta time { font: 500 12.5px var(--mono); color: var(--gel); }
 .stage { font: 500 10.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); }
 .s-prototype { background: var(--ink); border-color: var(--ink); color: var(--paper); }
-.s-design { background: var(--gel); border-color: var(--gel); color: #fff; }
+.s-design { background: var(--gel); border-color: var(--gel); color: #141415; }
 .s-test { background: var(--gel-soft); border-color: var(--gel-soft); color: #1d4f7d; }
 .s-render { background: var(--stone); border-color: var(--stone); color: var(--ink); }
 .s-show { border-color: var(--gel); color: var(--gel); }
@@ -87,8 +87,8 @@ li.ev[data-stage="site"] .dot { border-style: dashed; border-color: var(--gel); 
 .thnote b { color: var(--gel); font-weight: 600; }
 .media { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 4px 0 12px; max-width: 760px; }
 .media.one { grid-template-columns: minmax(0, 1fr); max-width: 620px; }
-.media button { display: block; padding: 0; border: 1px solid var(--line); border-radius: 6px; background: #fff; overflow: hidden; cursor: zoom-in; width: 100%; }
-.media img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: contain; background: #fff; }
+.media button { display: block; padding: 0; border: 1px solid var(--line); border-radius: 6px; background: #141415; overflow: hidden; cursor: zoom-in; width: 100%; }
+.media img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: contain; background: #141415; }
 .media.one img { aspect-ratio: 16 / 9; }
 .links { list-style: none; margin: 0 0 10px; padding: 0; display: flex; gap: 6px 16px; flex-wrap: wrap; font-size: 14px; }
 .links a::after { content: " ↗"; font-size: 12px; }
@@ -102,7 +102,7 @@ footer p { margin: 0 0 6px; max-width: 90ch; }
 dialog { border: 0; padding: 0; background: transparent; max-width: min(1200px, 96vw); width: 100%; }
 dialog::backdrop { background: rgba(21, 23, 26, .82); }
 .lbox { background: var(--paper); border-radius: 8px; overflow: hidden; display: grid; }
-.lbox img { display: block; width: 100%; max-height: 78vh; object-fit: contain; background: #fff; }
+.lbox img { display: block; width: 100%; max-height: 78vh; object-fit: contain; background: #141415; }
 .lbar { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-top: 1px solid var(--line); flex-wrap: wrap; }
 .lbar p { margin: 0; flex: 1 1 220px; font-size: 14px; min-width: 0; }
 .lbar button { border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 6px 12px; cursor: pointer; font-size: 13.5px; }

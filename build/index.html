@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Born, Not Made · Build</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 /* Build: a parametric white model of the whole system. Every part links to its spec and its source. Data lives in data/*.json. */
-:root { --bg: #f4f3ef; --paper: #fbfaf7; --ink: #15171a; --muted: #5c636c; --line: #dcd9d1; --gel: #2f6fa8; --gel-soft: #d8e8f5; --ok: #2f7a4f; --warn: #a8701f; --bad: #a83a2f; --mono: "JetBrains Mono", ui-monospace, monospace; --serif: "Newsreader", Georgia, serif; color-scheme: light; }
+:root { --bg: #0c0c0d; --paper: #141415; --ink: #ecebe6; --muted: #9b9a94; --line: #2a2a2c; --gel: #9cc8ec; --gel-soft: #15283a; --ok: #2f7a4f; --warn: #a8701f; --bad: #a83a2f; --mono: "JetBrains Mono", ui-monospace, monospace; --serif: "Cormorant Garamond", Georgia, serif; color-scheme: dark; }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 "Inter", system-ui, sans-serif; }
 a { color: var(--gel); }
@@ -15,7 +15,7 @@ a { color: var(--gel); }
 .viewbar > * { pointer-events: auto; }
 .pill { background: color-mix(in srgb, var(--paper) 92%, transparent); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; display: flex; gap: 8px; align-items: center; font-size: 12.5px; }
 button { font: 500 12.5px "Inter", sans-serif; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
-button:hover { border-color: #b9b5ab; } button.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:hover { border-color: #4a4a4d; } button.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 input[type=range] { accent-color: var(--gel); }
 .legend { position: absolute; left: 12px; top: 12px; display: flex; gap: 10px; flex-wrap: wrap; font: 11.5px var(--mono); color: var(--muted); pointer-events: none; }
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; border: 1px solid #0002; }
@@ -31,34 +31,34 @@ aside { border-left: 1px solid var(--line); background: var(--paper); display: f
 .sum { font: 12px var(--mono); color: var(--muted); margin: 0 0 10px; }
 .grp { font: 600 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 14px 0 4px; }
 .row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; align-items: center; }
-.row:hover { background: #f0eee8; } .row.sel { background: var(--gel-soft); }
+.row:hover { background: #1d1d1f; } .row.sel { background: var(--gel-soft); }
 .row .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .badge { font: 500 10.5px var(--mono); padding: 2px 6px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
 .badge.works { color: var(--ok); border-color: #b5d6c2; } .badge.test { color: var(--warn); border-color: #e3cfa9; } .badge.open { color: var(--bad); border-color: #e3b9b3; }
-.card { border: 1px solid var(--line); border-radius: 8px; padding: 12px; margin: 0 0 12px; background: #fff; }
+.card { border: 1px solid var(--line); border-radius: 8px; padding: 12px; margin: 0 0 12px; background: #141415; }
 .card h3 { margin: 0 0 2px; font: 500 20px/1.2 var(--serif); }
 .card .role { color: var(--muted); margin: 0 0 8px; }
 .card table, table.t { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-.card td, table.t td, table.t th { padding: 4px 6px; border-bottom: 1px solid #eeebe4; vertical-align: top; text-align: left; }
+.card td, table.t td, table.t th { padding: 4px 6px; border-bottom: 1px solid #232325; vertical-align: top; text-align: left; }
 table.t th { font: 500 11px var(--mono); color: var(--muted); text-transform: uppercase; }
 .card td:first-child { color: var(--muted); width: 42%; }
 .src { margin: 8px 0 0; padding-left: 16px; font-size: 12.5px; } .src li { margin: 2px 0; overflow-wrap: anywhere; }
 .ctl { display: grid; grid-template-columns: 116px minmax(0, 1fr) 76px; gap: 8px; align-items: center; margin: 6px 0; font-size: 12.5px; }
 .ctl output { font: 11.5px var(--mono); color: var(--muted); text-align: right; }
-select { font: 12.5px "Inter", sans-serif; padding: 4px 6px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+select { font: 12.5px "Inter", sans-serif; padding: 4px 6px; border: 1px solid var(--line); border-radius: 6px; background: #141415; }
 .hint { font-size: 12px; color: var(--muted); margin: 4px 0 10px; }
 .doc { max-width: 1180px; margin: 0 auto; padding: 24px max(16px, env(safe-area-inset-left, 0px)) 80px; }
 .doc section { padding: 34px 0; border-top: 1px solid var(--line); }
 .doc section:first-child { border-top: 0; }
 .doc h2 { font: 400 32px/1.1 var(--serif); margin: 0 0 6px; letter-spacing: -.01em; }
 .doc .sub { color: var(--muted); margin: 0 0 16px; max-width: 72ch; }
-.lanes { width: 100%; height: 760px; display: block; background: #fff; border: 1px solid var(--line); border-radius: 8px; }
+.lanes { width: 100%; height: 760px; display: block; background: #141415; border: 1px solid var(--line); border-radius: 8px; }
 .ctlgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px 22px; margin: 14px 0; }
 .results { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 10px; }
-.res { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: #fff; font-size: 13px; }
+.res { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: #141415; font-size: 13px; }
 .res b { display: block; font: 500 17px var(--serif); }
 .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px; align-items: start; }
-#bead { width: 100%; height: 260px; display: block; background: #fff; border: 1px solid var(--line); border-radius: 8px; }
+#bead { width: 100%; height: 260px; display: block; background: #141415; border: 1px solid var(--line); border-radius: 8px; }
 .kv { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; font-size: 13px; margin-top: 10px; }
 .kv span:nth-child(odd) { color: var(--muted); } .kv span:nth-child(even) { font: 12.5px var(--mono); text-align: right; }
 ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch; }
@@ -68,7 +68,7 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
 <div class="app">
   <section class="view">
     <canvas id="gl" aria-label="Parametric white model of the mother, tail, arm and baby"></canvas>
-    <div class="legend"><span><i style="background:#d5d8dc"></i>bought</span><span><i style="background:#f6f5f1"></i>printed rigid</span><span><i style="background:#efe6d4"></i>silicone, printed in gel</span><span><i style="background:#cfe2f3"></i>gel</span><span><i style="background:#ffffff;border-style:dashed"></i>clear hull</span></div>
+    <div class="legend"><span><i style="background:#d5d8dc"></i>bought</span><span><i style="background:#f6f5f1"></i>printed rigid</span><span><i style="background:#efe6d4"></i>silicone, printed in gel</span><span><i style="background:#cfe2f3"></i>gel</span><span><i style="background:#141415;border-style:dashed"></i>clear hull</span></div>
     <div class="dims" id="dims"></div>
     <div class="tip" id="tip"></div>
     <div class="loading" id="loading">Loading the model…</div>
@@ -118,7 +118,7 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
     <div class="results" id="bRes"></div>
   </section>
 
-  <section id="fem"><h2>Birth, simulated properly</h2><p class="sub">An axisymmetric finite element model of the pressurised bellows, the soft sleeve, friction, the pump and the womb pulses, validated against the neo-Hookean balloon curve. The lanes above are a sketch; these are the numbers.</p><video src="media/birth_sim.mp4" poster="media/birth_sim_poster.png" controls muted playsinline style="width:100%;border:1px solid var(--line);border-radius:8px;background:#fff"></video><div id="femDoc" style="margin-top:16px"></div></section>
+  <section id="fem"><h2>Birth, simulated properly</h2><p class="sub">An axisymmetric finite element model of the pressurised bellows, the soft sleeve, friction, the pump and the womb pulses, validated against the neo-Hookean balloon curve. The lanes above are a sketch; these are the numbers.</p><video src="media/birth_sim.mp4" poster="media/birth_sim_poster.png" controls muted playsinline style="width:100%;border:1px solid var(--line);border-radius:8px;background:#141415"></video><div id="femDoc" style="margin-top:16px"></div></section>
   <section id="bench"><h2>Bench tests</h2><p class="sub">Seven measurements turn the model's assumptions into facts. Enter a result to check it against the design window. Results stay in this browser.</p><div id="benchDoc"></div></section>
   <section id="print">
     <h2>Printing in gel</h2>
@@ -141,11 +141,11 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
   <section id="fold"><h2>Why this fold</h2><div id="foldDoc"><p class="pend">Waiting for the physics check.</p></div></section>
   <section id="swell"><h2>Why the mother swells</h2><p class="sub">No swelling for its own sake. Each movement of the belly has a mechanical cause.</p><div id="swellDoc"><p class="pend">Waiting for the physics check.</p></div></section>
   <section id="push"><h2>Ways to push</h2><div id="pushDoc"><p class="pend">Waiting for the physics check.</p></div></section>
-  <section id="v2"><h2>Design v2: seven problems, seven decisions</h2><p class="sub">The checks above found problems; this revision resolves each with a number, a source, a remaining risk and a bench test.</p><img src="media/design_v2.png" alt="Mechanical design v2, docked pair, labelled" style="width:100%;border:1px solid var(--line);border-radius:8px;background:#fff"><div id="v2Doc" style="margin-top:16px"></div></section>
+  <section id="v2"><h2>Design v2: seven problems, seven decisions</h2><p class="sub">The checks above found problems; this revision resolves each with a number, a source, a remaining risk and a bench test.</p><img src="media/design_v2.png" alt="Mechanical design v2, docked pair, labelled" style="width:100%;border:1px solid var(--line);border-radius:8px;background:#141415"><div id="v2Doc" style="margin-top:16px"></div></section>
   <section id="dock"><h2>Docking and entry</h2><div id="dockDoc"><p class="pend">Waiting for the physics check.</p></div></section>
   <section id="sources"><h2>Sources</h2><p class="sub">Every part and number above, with its primary source. Code and data: <a href="https://github.com/ruipwan/born-not-made/tree/main/build">build/ on GitHub</a>.</p><ol class="src" id="srcList"></ol></section>
 </div>
-<a href="../" style="position:fixed;right:10px;bottom:10px;font:12px Inter,sans-serif;color:#2f6fa8;background:#fbfaf7;padding:4px 9px;border-radius:6px;text-decoration:none;border:1px solid #dcd9d1;z-index:5">Born, Not Made home</a>
+<a href="../" style="position:fixed;right:10px;bottom:10px;font:12px Inter,sans-serif;color:#9cc8ec;background:#141415;padding:4px 9px;border-radius:6px;text-decoration:none;border:1px solid #2a2a2c;z-index:5">Born, Not Made home</a>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
@@ -165,7 +165,7 @@ const cv = $("#gl");
 const R = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 R.setPixelRatio(Math.min(2, devicePixelRatio || 1)); R.localClippingEnabled = true; R.outputEncoding = THREE.sRGBEncoding;
 R.shadowMap.enabled = true; R.shadowMap.type = THREE.PCFSoftShadowMap;
-const scene = new THREE.Scene(); scene.background = new THREE.Color(0xe7e6e1);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0c0c0d);
 const cam = new THREE.PerspectiveCamera(30, 1, 0.01, 60);
 const ctl = new THREE.OrbitControls(cam, cv); ctl.enableDamping = true;
 const HOME = { pos: [1.55, 0.95, 2.05], tgt: [-0.12, -0.02, 0] };
@@ -175,17 +175,17 @@ scene.add(new THREE.HemisphereLight(0xffffff, 0xd9d5cc, 0.9));
 const sun = new THREE.DirectionalLight(0xffffff, 0.7); sun.position.set(1.2, 3.2, 1.6); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
 Object.assign(sun.shadow.camera, { left: -1.8, right: 1.8, top: 1.8, bottom: -1.8, near: 0.5, far: 9 }); sun.shadow.bias = -0.0005; scene.add(sun);
 const fill = new THREE.DirectionalLight(0xffffff, 0.25); fill.position.set(-2, 1, -1.5); scene.add(fill);
-const ground = new THREE.Mesh(new THREE.PlaneGeometry(14, 14), new THREE.ShadowMaterial({ opacity: 0.1 })); ground.rotation.x = -Math.PI / 2; ground.position.y = -0.66; ground.receiveShadow = true; scene.add(ground);
-const grid = new THREE.GridHelper(8, 80, 0xd2cfc7, 0xe2dfd8); grid.position.y = -0.659; scene.add(grid);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(14, 14), new THREE.ShadowMaterial({ opacity: 0.35 })); ground.rotation.x = -Math.PI / 2; ground.position.y = -0.66; ground.receiveShadow = true; scene.add(ground);
+const grid = new THREE.GridHelper(8, 80, 0x0e0e10, 0x070708); grid.position.y = -0.659; scene.add(grid);
 const root = new THREE.Group(); root.rotation.x = -Math.PI / 2; scene.add(root);   // Blender frame: metres, Z up, X toward the canal
 const COL = { bought: 0xd5d8dc, rigid: 0xf6f5f1, silicone: 0xefe6d4, gel: 0xcfe2f3 };
 function mat(kind, extra = {}) {
-  if (kind === "glass") return new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.12, transparent: true, opacity: 0.14, depthWrite: false, side: THREE.DoubleSide, ...extra });
+  if (kind === "glass") return new THREE.MeshStandardMaterial({ color: 0xbcd4ea, roughness: 0.12, transparent: true, opacity: 0.12, depthWrite: false, side: THREE.DoubleSide, ...extra });
   if (kind === "gel") return new THREE.MeshStandardMaterial({ color: COL.gel, roughness: 0.25, transparent: true, opacity: 0.35, depthWrite: false, side: THREE.DoubleSide, ...extra });
   if (kind === "silicone") return new THREE.MeshStandardMaterial({ color: COL.silicone, roughness: 0.55, transparent: true, opacity: 0.82, side: THREE.DoubleSide, ...extra });
   return new THREE.MeshStandardMaterial({ color: COL[kind] || COL.rigid, roughness: 0.8, metalness: kind === "bought" ? 0.08 : 0, side: THREE.DoubleSide, ...extra });
 }
-const EDGE_C = 0x2c2f34;
+const EDGE_C = 0x3a3e44;
 function addEdges(mesh, ang = 30, op = 0.45) {
   const e = new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry, ang), new THREE.LineBasicMaterial({ color: EDGE_C, transparent: true, opacity: op }));
   e.raycast = () => {}; e.material.clippingPlanes = mesh.material.clippingPlanes; mesh.add(e); return e;
@@ -483,8 +483,8 @@ function drawLanes() {
   const dx0 = wide ? W * 0.2 : 8, dw = wide ? W * 0.52 : W - 16, sc = Math.min(dw / 1.15, lh / 0.5);
   SIM.runs.forEach((r, li) => {
     const top = li * lh, y0 = top + lh / 2 + 6, x0 = dx0 + 0.55 * sc, X = (s) => x0 + s * sc;
-    lg.fillStyle = "#e6f0f9"; lg.fillRect(dx0, top, X(0) - dx0, lh); lg.fillStyle = "#f7fafc"; lg.fillRect(X(0), top, dx0 + dw - X(0), lh);
-    lg.fillStyle = "#2f6fa8"; lg.font = "11px JetBrains Mono, monospace"; lg.fillText("womb, gel", dx0 + 6, top + lh - 8); lg.fillText("water", X(0.3), top + lh - 8);
+    lg.fillStyle = "#101c28"; lg.fillRect(dx0, top, X(0) - dx0, lh); lg.fillStyle = "#0f1418"; lg.fillRect(X(0), top, dx0 + dw - X(0), lh);
+    lg.fillStyle = "#9cc8ec"; lg.font = "11px JetBrains Mono, monospace"; lg.fillText("womb, gel", dx0 + 6, top + lh - 8); lg.fillText("water", X(0.3), top + lh - 8);
     lg.strokeStyle = "#7d8792"; lg.lineWidth = 1.6;
     for (const sg of [-1, 1]) { lg.beginPath(); for (let s = -0.55; s <= 0.6; s += 0.005) { const yy = y0 + sg * canalR(s, SIM.g.rt) * sc; s <= -0.55 ? lg.moveTo(X(s), yy) : lg.lineTo(X(s), yy); } lg.stroke(); }
     // the bellows: inner crests at pleat joints, outer crests mid pleat, squeezed by the canal
@@ -493,20 +493,20 @@ function drawLanes() {
     lg.fillStyle = "rgba(239,230,212,0.96)"; lg.strokeStyle = "#8a6f45"; lg.lineWidth = 1.2; lg.beginPath();
     pts.forEach(([s, rr], j) => (j ? lg.lineTo(X(s), y0 - rr * sc) : lg.moveTo(X(s), y0 - rr * sc)));
     for (let j = pts.length - 1; j >= 0; j--) lg.lineTo(X(pts[j][0]), y0 + pts[j][1] * sc); lg.closePath(); lg.fill(); lg.stroke();
-    if (r.held) { lg.strokeStyle = "#15171a"; lg.lineWidth = 2; lg.beginPath(); lg.moveTo(X(r.B) - 30, y0); lg.lineTo(X(r.B) + 6, y0); lg.stroke(); }
-    lg.fillStyle = "#15171a"; lg.font = "600 13px Inter, sans-serif"; lg.fillText(r.m.name, 10, top + 20);
-    lg.fillStyle = "#5c636c"; lg.font = "11.5px Inter, sans-serif";
+    if (r.held) { lg.strokeStyle = "#ecebe6"; lg.lineWidth = 2; lg.beginPath(); lg.moveTo(X(r.B) - 30, y0); lg.lineTo(X(r.B) + 6, y0); lg.stroke(); }
+    lg.fillStyle = "#ecebe6"; lg.font = "600 13px Inter, sans-serif"; lg.fillText(r.m.name, 10, top + 20);
+    lg.fillStyle = "#9b9a94"; lg.font = "11.5px Inter, sans-serif";
     const words = r.m.note.split(" "); let line = "", ly = top + 37; const maxw = wide ? W * 0.18 : W - 20;
     for (const w of words) { if (lg.measureText(line + w).width > maxw) { lg.fillText(line, 10, ly); ly += 15; line = ""; } line += w + " "; } lg.fillText(line, 10, ly);
     const st = r.born != null ? `born at ${r.born.toFixed(0)} s` : r.stuck > 20 ? "stuck at the sleeve" : `${SIM.t.toFixed(0)} s · ${Math.round(r.L * 1000)} mm long`;
-    lg.fillStyle = r.born != null ? "#2f7a4f" : r.stuck > 20 ? "#a83a2f" : "#5c636c"; lg.font = "500 12px JetBrains Mono, monospace"; lg.fillText(st, 10, top + lh - 12);
+    lg.fillStyle = r.born != null ? "#2f7a4f" : r.stuck > 20 ? "#a83a2f" : "#9b9a94"; lg.font = "500 12px JetBrains Mono, monospace"; lg.fillText(st, 10, top + lh - 12);
     if (wide && r.hist.length > 1) {
       const gx = W * 0.75, gw = W * 0.23, gy = top + 16, gh = lh - 34, tmax = Math.max(60, SIM.t), fmax = Math.max(20, ...r.hist.map((h) => Math.max(h[1], h[2])));
-      lg.strokeStyle = "#dcd9d1"; lg.lineWidth = 1; lg.strokeRect(gx, gy, gw, gh);
-      for (const [k, col] of [[1, "#2f6fa8"], [2, "#a83a2f"]]) { lg.strokeStyle = col; lg.lineWidth = 1.3; lg.beginPath(); r.hist.forEach((h, j) => { const px = gx + h[0] / tmax * gw, py = gy + gh - h[k] / fmax * gh; j ? lg.lineTo(px, py) : lg.moveTo(px, py); }); lg.stroke(); }
-      lg.font = "10.5px JetBrains Mono, monospace"; lg.fillStyle = "#2f6fa8"; lg.fillText("push", gx + 4, gy + 12); lg.fillStyle = "#a83a2f"; lg.fillText("resistance", gx + 44, gy + 12); lg.fillStyle = "#5c636c"; lg.fillText(fmax.toFixed(0) + " N", gx + gw - 44, gy + 12);
+      lg.strokeStyle = "#2a2a2c"; lg.lineWidth = 1; lg.strokeRect(gx, gy, gw, gh);
+      for (const [k, col] of [[1, "#9cc8ec"], [2, "#a83a2f"]]) { lg.strokeStyle = col; lg.lineWidth = 1.3; lg.beginPath(); r.hist.forEach((h, j) => { const px = gx + h[0] / tmax * gw, py = gy + gh - h[k] / fmax * gh; j ? lg.lineTo(px, py) : lg.moveTo(px, py); }); lg.stroke(); }
+      lg.font = "10.5px JetBrains Mono, monospace"; lg.fillStyle = "#9cc8ec"; lg.fillText("push", gx + 4, gy + 12); lg.fillStyle = "#a83a2f"; lg.fillText("resistance", gx + 44, gy + 12); lg.fillStyle = "#9b9a94"; lg.fillText(fmax.toFixed(0) + " N", gx + gw - 44, gy + 12);
     }
-    lg.strokeStyle = "#dcd9d1"; lg.lineWidth = 1; lg.beginPath(); lg.moveTo(0, top + lh); lg.lineTo(W, top + lh); lg.stroke();
+    lg.strokeStyle = "#2a2a2c"; lg.lineWidth = 1; lg.beginPath(); lg.moveTo(0, top + lh); lg.lineTo(W, top + lh); lg.stroke();
   });
   $("#bRes").innerHTML = SIM.runs.map((r) => `<div class="res"><b>${esc(r.m.name)}</b>${r.born != null ? `Born in ${r.born.toFixed(0)} s` : r.stuck > 20 ? "Does not pass the sleeve" : "Running"} · peak push ${r.Fmax.toFixed(0)} N</div>`).join("");
 }
@@ -530,16 +530,16 @@ function printCalc() {
   const rows = [["Bead diameter", db.toFixed(2) + " mm"], ["Layer height (0.8 × bead)", h.toFixed(2) + " mm"], ["Single bead wall", db.toFixed(2) + " mm"], ["Wall error (arm + 10% bead)", "±" + err.toFixed(2) + " mm"], ["Pleat gap so pleats do not fuse", "≥ " + gap.toFixed(2) + " mm"], ["Gel hold ratio τ / (Δρ g d)", hold > 999 ? "> 999" : hold.toFixed(1)], ["Holds the bead", hold > 1 ? "yes, with margin" : hold > 0.15 ? "borderline" : "no, it sinks"], ["Bead vs nozzle", db < 0.6 * d ? "thinner than nozzle: stretched" : db > 1.6 * d ? "much wider: bulging" : "matched"], ["Print time per baby", hours.toFixed(1) + " h"]];
   $("#pOut").innerHTML = rows.map((r) => `<span>${esc(r[0])}</span><span>${esc(r[1])}</span>`).join("");
   const W = bead.clientWidth, H = bead.clientHeight, dpr = Math.min(2, devicePixelRatio || 1); bead.width = W * dpr; bead.height = H * dpr; bg.setTransform(dpr, 0, 0, dpr, 0, 0);
-  bg.fillStyle = "#eef5fb"; bg.fillRect(0, 0, W, H); const sc = Math.min(W / (4 * db + 2 * gap + 8), H / (6 * h + 6)), cx = W / 2, by = H - 16;
-  bg.font = "11px JetBrains Mono, monospace"; bg.fillStyle = "#5c636c"; bg.fillText("gel", 10, 16);
+  bg.fillStyle = "#0f1820"; bg.fillRect(0, 0, W, H); const sc = Math.min(W / (4 * db + 2 * gap + 8), H / (6 * h + 6)), cx = W / 2, by = H - 16;
+  bg.font = "11px JetBrains Mono, monospace"; bg.fillStyle = "#9b9a94"; bg.fillText("gel", 10, 16);
   for (const side of [-1, 1]) for (let k = 0; k < 6; k++) {
     const x = cx + side * (gap / 2 + db / 2) * sc, y = by - (k * h + db / 2) * sc;
     bg.fillStyle = "#efe6d4"; bg.strokeStyle = "#8a6f45"; bg.beginPath(); bg.ellipse(x, y, db / 2 * sc, db / 2 * sc * 0.9, 0, 0, 7); bg.fill(); bg.stroke();
     bg.fillStyle = "rgba(92,99,108,0.25)"; bg.fillRect(x - (db / 2 + rep) * sc, y - 1, 2 * rep * sc + db * sc, 2);
   }
-  bg.strokeStyle = "#2f6fa8"; bg.beginPath(); bg.moveTo(cx - gap / 2 * sc, 24); bg.lineTo(cx - gap / 2 * sc, by); bg.moveTo(cx + gap / 2 * sc, 24); bg.lineTo(cx + gap / 2 * sc, by); bg.stroke();
-  bg.fillStyle = "#2f6fa8"; bg.fillText(`gap ${gap.toFixed(2)} mm`, cx - 38, 20);
-  bg.fillStyle = "#5c636c"; bg.fillText(`bead ${db.toFixed(2)} mm, layer ${h.toFixed(2)} mm`, 10, H - 4);
+  bg.strokeStyle = "#9cc8ec"; bg.beginPath(); bg.moveTo(cx - gap / 2 * sc, 24); bg.lineTo(cx - gap / 2 * sc, by); bg.moveTo(cx + gap / 2 * sc, 24); bg.lineTo(cx + gap / 2 * sc, by); bg.stroke();
+  bg.fillStyle = "#9cc8ec"; bg.fillText(`gap ${gap.toFixed(2)} mm`, cx - 38, 20);
+  bg.fillStyle = "#9b9a94"; bg.fillText(`bead ${db.toFixed(2)} mm, layer ${h.toFixed(2)} mm`, 10, H - 4);
 }
 for (const id of ["pD", "pQ", "pV", "pTy", "pDr", "pRep", "pVol"]) $("#" + id).addEventListener("input", printCalc);
 
