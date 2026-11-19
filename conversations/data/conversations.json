@@ -1,123 +1,210 @@
 {
-  "note": "One to one conversations the artist had about the work. Each entry paraphrases the other person; the artist's replies are left out. Add new entries at the top.",
-  "entries": [
-    {
-      "id": "social-algorithms",
-      "who": "A researcher in social algorithms",
-      "role": "",
-      "when": "2026-11",
-      "stance": "suggests",
-      "themes": ["trunk", "artificial life"],
-      "said": "The work needs a trunk, one line that everything else hangs from. Artificial life is close enough to the project to be that trunk."
-    },
-    {
-      "id": "vis-researcher",
-      "who": "A senior researcher based in New York",
-      "role": "met at IEEE VIS 2026",
-      "when": "2026-11",
-      "stance": "affirms",
-      "themes": ["touch", "mother and child"],
-      "said": "Touch is the point to hold on to. Between people, and above all between a mother and a child, touch is the first bond. At the end of the talk she said she is a mother too, and asked for a hug."
-    },
-    {
-      "id": "steve-mann",
-      "who": "Steve Mann",
-      "role": "MIT Media Lab alumnus",
-      "when": "2026-11",
-      "stance": "questions",
-      "themes": ["parent or mother", "father", "society", "next generation"],
-      "said": "Why not call it parent and baby rather than mother and baby? Is the work a small model of human society? Can the baby have a next generation of the baby's own? And is there a father?"
-    },
-    {
-      "id": "blaise",
-      "who": "Blaise Agüera y Arcas",
-      "role": "Google",
-      "when": "2026-10-13",
-      "stance": "questions",
-      "themes": ["next generation", "art and engineering"],
-      "said": "As it stands the work is neither artistic enough nor hard core enough as engineering. And once the baby is born with no arm, how could the baby bear a next generation? Without an arm the baby cannot reproduce.",
-      "led_to": "The arm and the printed shell became separate parts, so a born baby can be fitted with an arm by assembly and bear the next one."
-    },
-    {
-      "id": "zach",
-      "who": "Zach Lieberman",
-      "role": "artist, MIT Media Lab",
-      "when": "2026-10",
-      "stance": "questions",
-      "themes": ["body and screen"],
-      "said": "The digital part and the physical part are only loosely tied. The simulation and the robot need a stronger technical link between them. He sent an example of how such a link can work."
-    },
-    {
-      "id": "pad",
-      "who": "A researcher",
-      "role": "",
-      "when": "2026",
-      "stance": "doubts",
-      "themes": ["the word birth"],
-      "said": "Do you really understand what birth is? Birth may be too big a word, and using it for AI or a robot may be a misuse of it."
-    },
-    {
-      "id": "kent",
-      "who": "Kent Larson",
-      "role": "City Science, MIT Media Lab",
-      "when": "2026",
-      "stance": "suggests",
-      "themes": ["awareness", "AI"],
-      "said": "Not a warning to be careful with AI, but a reminder to be aware of the problem. Being aware is what matters, and that is enough."
-    },
-    {
-      "id": "cynthia",
-      "who": "Cynthia Breazeal",
-      "role": "Personal Robots, MIT Media Lab",
-      "when": "2026",
-      "stance": "affirms",
-      "themes": ["artificial life"],
-      "said": "In a first conversation: the work is directly related to artificial life. Reach out to Melanie Mitchell at the Santa Fe Institute."
-    },
-    {
-      "id": "personal-robots",
-      "who": "A researcher in the Personal Robots group",
-      "role": "MIT Media Lab",
-      "when": "2026",
-      "stance": "suggests",
-      "themes": ["natural interaction", "Jibo"],
-      "said": "Why was Jibo so loved? Its small shifts of expression and motion feel so natural that people forget how hard they were to make. Interaction with a robot works when it is smooth enough to go unnoticed."
-    },
-    {
-      "id": "la-alumnus",
-      "who": "An MIT graduate of more than 30 years ago",
-      "role": "met at a hackathon in Los Angeles",
-      "when": "2026",
-      "stance": "affirms",
-      "themes": ["fear of AI", "lovable"],
-      "said": "Many people are afraid of AI. A small, lovable robot body changes that. A robot mother raising a baby shows AI as gentle, even lovable, and then people may stop being afraid."
-    },
-    {
-      "id": "act",
-      "who": "A friend at MIT ACT",
-      "role": "Art, Culture and Technology",
-      "when": "2026",
-      "stance": "suggests",
-      "themes": ["cyberfeminism", "male artist"],
-      "said": "The first to point to cyberfeminism as a reading of the work. Also asked why a male artist is drawn to this question."
-    },
-    {
-      "id": "ars",
-      "who": "A visitor met at Ars Electronica",
-      "role": "Linz, 2026",
-      "when": "2026-09",
-      "stance": "questions",
-      "themes": ["caution"],
-      "said": "The question is interesting, but approach it with caution."
-    },
-    {
-      "id": "anna",
-      "who": "A friend in the MIT MDes program",
-      "role": "",
-      "when": "2026",
-      "stance": "affirms",
-      "themes": ["the idea"],
-      "said": "The idea is sexy."
-    }
-  ]
+ "note": "One to one conversations the artist had about the work, oldest first. Each entry paraphrases the other person; the artist's replies are left out, except a short note on what changed.",
+ "entries": [
+  {
+   "id": "liam-young",
+   "who": "Liam Young",
+   "role": "speculative architect and director, the artist's first teacher at SCI-Arc",
+   "when": "SCI-Arc",
+   "stance": "suggests",
+   "themes": [
+    "digital life",
+    "Tamagotchi",
+    "first spark"
+   ],
+   "said": "The first conversation. Think of the Tamagotchi, the small Japanese digital pet that lives only as long as it is fed, a little at a time. A creature can be digital and still be alive to the person looking after it. He pointed to artists who stage digital creatures, among them an exhibition called Beings, where soft bodies walk forward together like a herd of imagined animals.",
+   "led_to": "From there the artist followed Lenia, a smooth Game of Life, into artificial life, and later showed the work at the ALIFE 2026 workshop and art gallery."
+  },
+  {
+   "id": "behnaz",
+   "who": "Behnaz Farahi",
+   "role": "the artist's advisor, MIT Media Lab",
+   "when": "2026",
+   "stance": "affirms",
+   "themes": [
+    "speculative design",
+    "next generation in nature"
+   ],
+   "said": "Read the project early on as speculative design. The topics it touches and the questions it asks are worth discussing. Look at how other organisms in the living world make their next generation, and keep gathering examples."
+  },
+  {
+   "id": "rebecca-xu",
+   "who": "Rebecca Xu",
+   "role": "chair, ACM SIGGRAPH Digital Arts Committee",
+   "when": "2026",
+   "stance": "suggests",
+   "themes": [
+    "生命",
+    "机器人",
+    "robotic womb"
+   ],
+   "said": "Look at the Chinese word for life, 生命. 生 is birth and being alive; 命 is the state, the rules and the conditions that keep a life going. Even 机器 (machine) and 机器人 (machine with the character for person) differ a little. Together they found the phrase robotic womb for the subtitle and defined it in simple words."
+  },
+  {
+   "id": "siggraph-artist",
+   "who": "An artist with a background in marine biology",
+   "role": "shown in the SIGGRAPH 2026 Art Gallery with two talking robots worn on the shoulders",
+   "when": "2026-07",
+   "stance": "suggests",
+   "themes": [
+    "sea creatures",
+    "sex and gender"
+   ],
+   "said": "Some sea creatures have no fixed sex. She was the first to raise this, and it opened the question of whether a mother is a sex, a gender or a role."
+  },
+  {
+   "id": "ars",
+   "who": "A visitor met at Ars Electronica",
+   "role": "Linz, 2026",
+   "when": "2026-09",
+   "stance": "questions",
+   "themes": [
+    "caution"
+   ],
+   "said": "The question is interesting, but approach it with caution."
+  },
+  {
+   "id": "zach",
+   "who": "Zach Lieberman",
+   "role": "artist, MIT Media Lab",
+   "when": "2026-10",
+   "stance": "questions",
+   "themes": [
+    "body and screen"
+   ],
+   "said": "The digital part and the physical part are only loosely tied. The simulation and the robot need a stronger technical link between them. He sent an example of how such a link can work."
+  },
+  {
+   "id": "blaise",
+   "who": "Blaise Agüera y Arcas",
+   "role": "Google",
+   "when": "2026-10-13",
+   "stance": "questions",
+   "themes": [
+    "next generation",
+    "art and engineering"
+   ],
+   "said": "As it stands the work is neither artistic enough nor hard core enough as engineering. And once the baby is born with no arm, how could the baby bear a next generation? Without an arm the baby cannot reproduce.",
+   "led_to": "The arm and the printed shell became separate parts, so a born baby can be fitted with an arm by assembly and bear the next one."
+  },
+  {
+   "id": "cynthia",
+   "who": "Cynthia Breazeal",
+   "role": "Personal Robots, MIT Media Lab",
+   "when": "2026",
+   "stance": "affirms",
+   "themes": [
+    "artificial life"
+   ],
+   "said": "In a first conversation: the work is directly related to artificial life. Reach out to Melanie Mitchell at the Santa Fe Institute."
+  },
+  {
+   "id": "kent",
+   "who": "Kent Larson",
+   "role": "City Science, MIT Media Lab",
+   "when": "2026",
+   "stance": "suggests",
+   "themes": [
+    "awareness",
+    "AI"
+   ],
+   "said": "Not a warning to be careful with AI, but a reminder to be aware of the problem. Being aware is what matters, and that is enough."
+  },
+  {
+   "id": "personal-robots",
+   "who": "A researcher in the Personal Robots group",
+   "role": "MIT Media Lab",
+   "when": "2026",
+   "stance": "suggests",
+   "themes": [
+    "natural interaction",
+    "Jibo"
+   ],
+   "said": "Why was Jibo so loved? Its small shifts of expression and motion feel so natural that people forget how hard they were to make. Interaction with a robot works when it is smooth enough to go unnoticed."
+  },
+  {
+   "id": "la-alumnus",
+   "who": "An MIT graduate of more than 30 years ago",
+   "role": "met at the World in Action hackathon, Los Angeles",
+   "when": "2026",
+   "stance": "affirms",
+   "themes": [
+    "fear of AI",
+    "lovable"
+   ],
+   "said": "Many people are afraid of AI. A small, lovable robot body changes that. A robot mother raising a baby shows AI as gentle, even lovable, and then people may stop being afraid."
+  },
+  {
+   "id": "act",
+   "who": "A friend at MIT ACT",
+   "role": "Art, Culture and Technology",
+   "when": "2026",
+   "stance": "suggests",
+   "themes": [
+    "cyberfeminism",
+    "male artist"
+   ],
+   "said": "The first to point to cyberfeminism as a reading of the work. Also asked why a male artist is drawn to this question."
+  },
+  {
+   "id": "anna",
+   "who": "A friend in the MIT MDes program",
+   "role": "",
+   "when": "2026",
+   "stance": "affirms",
+   "themes": [
+    "the idea"
+   ],
+   "said": "The idea is sexy."
+  },
+  {
+   "id": "pad",
+   "who": "A researcher",
+   "role": "",
+   "when": "2026",
+   "stance": "doubts",
+   "themes": [
+    "the word birth"
+   ],
+   "said": "Do you really understand what birth is? Birth may be too big a word, and using it for AI or a robot may be a misuse of it."
+  },
+  {
+   "id": "social-algorithms",
+   "who": "A researcher in social algorithms",
+   "role": "",
+   "when": "2026-11",
+   "stance": "suggests",
+   "themes": [
+    "trunk",
+    "artificial life"
+   ],
+   "said": "The work needs a trunk, one line that everything else hangs from. Artificial life is close enough to the project to be that trunk."
+  },
+  {
+   "id": "steve-mann",
+   "who": "Steve Mann",
+   "role": "MIT Media Lab alumnus",
+   "when": "2026-11",
+   "stance": "questions",
+   "themes": [
+    "parent or mother",
+    "father",
+    "society",
+    "next generation"
+   ],
+   "said": "Why not call it parent and baby rather than mother and baby? Is the work a small model of human society? Can the baby have a next generation of the baby's own? And is there a father?"
+  },
+  {
+   "id": "vis-researcher",
+   "who": "A senior researcher based in New York",
+   "role": "met at IEEE VIS 2026",
+   "when": "2026-11",
+   "stance": "affirms",
+   "themes": [
+    "touch",
+    "mother and child"
+   ],
+   "said": "Touch is the point to hold on to. Between people, and above all between a mother and a child, touch is the first bond. At the end of the talk she said she is a mother too, and asked for a hug."
+  }
+ ]
 }

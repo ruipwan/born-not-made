@@ -359,14 +359,19 @@ function render(m) {
   svg.setAttribute("width", L.W); svg.setAttribute("height", L.H);
   const id = m.id, d = m.data;
   const defs = el("defs", null, svg);
-  m.gRings = el("g", { class: "bnm-rings", "aria-hidden": "true" }, svg);
+  // rings fade out softly toward the edges instead of being cut by them
+  const fade = el("radialGradient", { id: id + "-rf", cx: 0.5, cy: 0.5, r: 0.5 }, defs);
+  [[0, 1], [0.7, 1], [1, 0]].forEach(([o, op]) => el("stop", { offset: o, "stop-color": "#fff", "stop-opacity": op }, fade));
+  const mask = el("mask", { id: id + "-rm", maskUnits: "userSpaceOnUse", x: 0, y: 0, width: L.W, height: L.H }, defs);
+  el("rect", { x: 0, y: 0, width: L.W, height: L.H, fill: "url(#" + id + "-rf)" }, mask);
+  m.gRings = el("g", { class: "bnm-rings", "aria-hidden": "true", mask: "url(#" + id + "-rm)" }, svg);
   const gBr = el("g", { class: "bnm-branches" }, svg);
   const gTrunk = el("g", { class: "bnm-trunk" }, svg);
   const here = currentTab();
   const cultureLive = d ? d.culture : !!document.getElementById("culture");
 
   /* branches */
-  m.br = [];
+  m.br = []; m.labels = [];
   for (const R of L.br) {
     const b = R.b, coming = b.tab === "culture" && !cultureLive;
     const g = el("g", { class: "bnm-br" + (coming ? " bnm-coming" : "") + (here === b.tab ? " bnm-here" : ""), "data-tab": b.tab }, gBr);
@@ -379,6 +384,8 @@ function render(m) {
     const lab = el("text", { class: "bnm-label", x: ax.toFixed(1), y: (b.side > 0 ? ay - off : ay + off + L.labelPx * 0.72).toFixed(1), "text-anchor": "middle", "font-size": L.labelPx }, g);
     lab.textContent = b.label.toUpperCase();
     if (coming) { const t = el("tspan", { class: "bnm-soon", dx: "0.6em" }, lab); t.textContent = "COMING"; }
+    const lw = ((b.label.length + (coming ? 7.6 : 0)) * 0.74 * L.labelPx) / 2, ly = +lab.getAttribute("y");
+    m.labels.push({ tab: b.tab, cx: ax, cy: ly - L.labelPx * 0.36, hw: lw + 3, hh: L.labelPx * 0.5 + 3 });
     if (!coming) {
       g.addEventListener("click", () => { location.hash = b.tab; });
       g.addEventListener("pointerenter", () => { svg.classList.add("bnm-has-hot"); g.classList.add("bnm-hot"); });
@@ -432,7 +439,7 @@ function fillWords(m) {
     while (ib > ia && !ok(ib)) ib--;
     const sa = c.ss[ia], sb = c.ss[ib];
     if (B.R.b.voices && (!terms || !terms.length)) {   // no voices yet: a quiet invitation under the label instead of words
-      const b = B.R.b, lab = B.g.querySelector(".bnm-label"), px = L.fs[0] + 2.5, text = d.voicesOk ? "leave a voice" : "voices";
+      const b = B.R.b, lab = B.g.querySelector(".bnm-label"), px = L.fs[0] + 2.5, text = "leave a voice";
       const wd = measure(text, "italic 400 " + px + "px " + cssVar("--serif", "Georgia, serif"));
       const ax = clamp((c.x0 + c.x1) / 2, L.xL + wd / 2 + 2, L.xR - wd / 2 - 2), ly = +lab.getAttribute("y");
       const t = el("text", { class: "bnm-w bnm-invite", x: ax.toFixed(1), y: (b.side < 0 ? ly + px + 5 : ly - L.labelPx - 6).toFixed(1), "text-anchor": "middle", "font-size": px.toFixed(1) }, B.words);
@@ -526,6 +533,14 @@ function step(m, dt) {
     for (const w of c.words) {
       let o = w.t.op * m.alpha * sstep(c.sa, c.sa + c.F, w.s) * (1 - sstep(c.sb - c.F, c.sb, w.s));
       for (const x of c.cross) { const dd = Math.abs(w.s - x); o *= sstep(w.t.wd / 2 + 2, w.t.wd / 2 + 30, dd); }
+      if (o > 0.01) {   // and where the word would pass under another branch's label
+        const [px, py] = c.B.R.c.at(w.s);
+        for (const lb of m.labels) {
+          if (lb.tab === c.B.R.b.tab) continue;
+          const dd = Math.hypot(Math.max(0, Math.abs(px - lb.cx) - lb.hw), Math.max(0, Math.abs(py - lb.cy) - lb.hh));
+          o *= sstep(0, 18, dd - w.t.wd / 2);
+        }
+      }
       const so = w.s.toFixed(2); w.tps[0].setAttribute("startOffset", so); w.tps[1].setAttribute("startOffset", so);
       w.el.setAttribute("opacity", o.toFixed(3));
     }

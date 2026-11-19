@@ -87,6 +87,7 @@
 #ideas .cand { transition: opacity .3s; }
 #ideas .dim .cand { opacity: .28; }
 #ideas .dim .cand.on { opacity: 1; }
+#ideas .swipe { display: none; font: 11px var(--mono); color: var(--muted); margin: 6px 0 0; }
 #ideas .pointer { margin: 28px 0 0; padding: 22px 24px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: center; }
 #ideas .pointer p { margin: 0; font: 400 19px/1.45 var(--serif); max-width: 62ch; }
 #ideas .refgroup h3 { font: 500 12px var(--mono); color: var(--ink); text-transform: uppercase; letter-spacing: .05em; margin: 18px 0 6px; }
@@ -97,6 +98,10 @@
   #ideas .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 560px) {
+  #ideas .scrollx { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  #ideas .scrollx svg { min-width: 600px; }
+  #ideas .swipe { display: block; }
+  #ideas .dgm > svg text { font-size: 24px; }
   #ideas .vs, #ideas .flow { grid-template-columns: minmax(0, 1fr); }
   #ideas .pointer { grid-template-columns: minmax(0, 1fr); }
   #ideas .dgm { padding: 14px 12px; }
