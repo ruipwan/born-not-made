@@ -85,8 +85,8 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
       <div class="ctl"><label for="belly">Belly inflation</label><input type="range" id="belly" min="0" max="1" step="0.01" value="0.3"><output></output></div>
       <div class="ctl"><label for="pleatL">Pleat spacing</label><input type="range" id="pleatL" min="30" max="100" step="1" value="58"><output></output></div>
       <div class="ctl"><label for="pleatA">Pleat depth</label><input type="range" id="pleatA" min="0" max="30" step="1" value="16"><output></output></div>
-      <div class="ctl"><label for="segs">Hull pieces</label><input type="range" id="segs" min="2" max="10" step="1" value="6"><output></output></div>
-      <p class="hint">The upper skin is printed silicone origami. Pleats open when the womb is pressurised and fold back, sagging a little, when it vents.</p>
+      <div class="ctl"><label for="segs">Hull gores</label><input type="range" id="segs" min="3" max="10" step="1" value="6"><output></output></div>
+      <p class="hint">The clear lower hull is a keel cap plus gores, small enough for a desktop resin printer, joined by flanges over a silicone cord. The upper skin is printed silicone origami. Pleats open when the womb is pressurised and fold back, sagging a little, when it vents.</p>
       <p class="grp">Baby</p>
       <div class="ctl"><label for="pattern">Fold pattern</label><select id="pattern"><option value="bellows">Bellows</option><option value="yoshimura">Yoshimura</option><option value="kresling">Kresling</option></select><span></span></div>
       <div class="ctl"><label for="fold">Deployed</label><input type="range" id="fold" min="0" max="1" step="0.01" value="0"><output></output></div>
@@ -245,28 +245,30 @@ function buildGel(geo) {
   for (let i = 0; i < p.length; i += 3) { p[i] *= 0.985; p[i + 1] *= 0.985; p[i + 2] = Math.min(p[i + 2], META.gelZ) * 0.99; }
   g.computeVertexNormals(); const m = new THREE.Mesh(g, mat("gel")); m.renderOrder = 3; addMesh(PART.gel, m, 0);
 }
-function buildHull() {
-  for (const s of hullSlices) { PART.hull.g.remove(s.group); const i = clipped.indexOf(s.mesh); if (i >= 0) clipped.splice(i, 1); }
+function buildHull() {   // lower hull printed as a keel cap plus N gores (orange slices around the vertical axis), per the parts list
+  for (const sl of hullSlices) { PART.hull.g.remove(sl.group); const i = clipped.indexOf(sl.mesh); if (i >= 0) clipped.splice(i, 1); }
   hullSlices = []; PART.hull.meshes = [];
-  const n = +$("#segs").value, P0 = skinBase; let x0 = 9, x1 = -9, zc = 0, c = 0;
-  for (let i = 0; i < P0.length; i += 3) { x0 = Math.min(x0, P0[i]); x1 = Math.max(x1, P0[i]); if (P0[i + 2] < Z0) { zc += P0[i + 2]; c++; } }
-  zc /= Math.max(1, c);
-  for (let k = 0; k < n; k++) {
-    const a = x0 + (x1 - x0) * k / n - (k === 0 ? 0.01 : 0), b = x0 + (x1 - x0) * (k + 1) / n + (k === n - 1 ? 0.01 : 0);
-    const grp = new THREE.Group(); grp.userData.dir = [((k + 0.5) / n - 0.5) * 0.36, 0, -0.2]; PART.hull.g.add(grp);
-    const m = new THREE.Mesh(skinGeo, mat("glass")); m.userData.part = "hull"; m.renderOrder = 4; grp.add(m); PART.hull.meshes.push(m);
-    clipMesh(m, [new THREE.Plane(new THREE.Vector3(1, 0, 0), -a), new THREE.Plane(new THREE.Vector3(-1, 0, 0), b), new THREE.Plane(new THREE.Vector3(0, 0, -1), Z0)]);
-    for (const xs of [a, b]) {     // the seam where two printed pieces meet: real section of the mesh at x = xs
-      if (xs < x0 + 0.02 || xs > x1 - 0.02) continue;
-      const pts = []; for (let i = 0; i < P0.length; i += 3) if (Math.abs(P0[i] - xs) < 0.006 && P0[i + 2] < Z0 + 0.002) pts.push([P0[i + 1], P0[i + 2]]);
-      if (pts.length < 6) continue;
-      pts.sort((u, v) => Math.atan2(u[1] - zc, u[0]) - Math.atan2(v[1] - zc, v[0]));
-      const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts.map(([y, z]) => new THREE.Vector3(xs, y, z))), new THREE.LineBasicMaterial({ color: 0x2f6fa8, transparent: true, opacity: 0.8 }));
-      line.raycast = () => {}; grp.add(line);
-    }
+  const n = +$("#segs").value, P0 = skinBase, ZK = -0.274; let x0 = 9, x1 = -9;
+  for (let i = 0; i < P0.length; i += 3) { x0 = Math.min(x0, P0[i]); x1 = Math.max(x1, P0[i]); }
+  const xc = (x0 + x1) / 2, V = (x, y, z) => new THREE.Vector3(x, y, z);
+  const addPiece = (planes, dir, seams) => {
+    const grp = new THREE.Group(); grp.userData.dir = dir; PART.hull.g.add(grp);
+    const m = new THREE.Mesh(skinGeo, mat("glass")); m.userData.part = "hull"; m.renderOrder = 4; grp.add(m); PART.hull.meshes.push(m); clipMesh(m, planes);
+    for (const pts of seams) { if (pts.length < 4) continue; const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0x2f6fa8, transparent: true, opacity: 0.85 })); line.raycast = () => {}; grp.add(line); }
     hullSlices.push({ group: grp, mesh: m });
+  };
+  // keel cap: everything below ZK
+  const ring = []; for (let i = 0; i < P0.length; i += 3) if (Math.abs(P0[i + 2] - ZK) < 0.005) ring.push([P0[i], P0[i + 1], P0[i + 2]]);
+  ring.sort((u, v) => Math.atan2(u[1], u[0] - xc) - Math.atan2(v[1], v[0] - xc));
+  addPiece([new THREE.Plane(V(0, 0, -1), ZK)], [0, 0, -0.34], [ring.map((q) => V(...q))]);
+  for (let k = 0; k < n; k++) {
+    const t0 = (k / n) * 2 * Math.PI, t1 = ((k + 1) / n) * 2 * Math.PI, tm = (t0 + t1) / 2;
+    const n0 = V(-Math.sin(t0), Math.cos(t0), 0), n1 = V(Math.sin(t1), -Math.cos(t1), 0);       // wedge between the two meridian planes through the axis
+    const pl = (nv) => new THREE.Plane(nv, -nv.x * xc);
+    const meridian = []; for (let i = 0; i < P0.length; i += 3) { const dx = P0[i] - xc, dy = P0[i + 1], z = P0[i + 2]; if (z > Z0 || z < ZK) continue; const d = -Math.sin(t0) * dx + Math.cos(t0) * dy, along = Math.cos(t0) * dx + Math.sin(t0) * dy; if (Math.abs(d) < 0.006 && along > 0) meridian.push([P0[i], P0[i + 1], z]); }
+    meridian.sort((u, v) => u[2] - v[2]);
+    addPiece([pl(n0), pl(n1), new THREE.Plane(V(0, 0, -1), Z0), new THREE.Plane(V(0, 0, 1), -ZK)], [Math.cos(tm) * 0.26, Math.sin(tm) * 0.26, -0.16], [meridian.map((q) => V(...q))]);
   }
-  // outline of the whole hull, faint
   const e = new THREE.LineSegments(new THREE.EdgesGeometry(skinGeo, 50), new THREE.LineBasicMaterial({ color: EDGE_C, transparent: true, opacity: 0.28 }));
   e.raycast = () => {}; hullSlices[0].group.add(e); clipMesh(e, [new THREE.Plane(new THREE.Vector3(0, 0, -1), Z0)]);
   layout();
@@ -403,14 +405,15 @@ for (const id of ["pattern", "fold", "nPleat", "mSide", "dDep", "lDep", "lFold"]
 /* ====================================================================== parts list */
 const LINK = {};
 const RULES = [[/dexarm/i, "dexarm"], [/three.?way|3.?way|3\/2|diverter/i, "valve3"], [/needle|inflation valve|ball valve/i, "needle"], [/duckbill|lip|check valve/i, "duckbill"], [/canal|sleeve/i, "canal"], [/belly|origami|pleat|upper skin/i, "belly"], [/magnet/i, "magnets"], [/pogo|o.?ring|gasket|seal|cone|guide pin|latch/i, "tailring"], [/rail|linear guide|mgn|keel/i, "rails"], [/boom|carriage|belt|lead ?screw|stepper|telescop/i, "boom"], [/tail (shell|hull|body)|tail$/i, "tail"], [/nozzle|mixer|cartridge|syringe|tool|dispens|extru/i, "tool"], [/capsule|mcu|esp32|xiao|imu|baby (battery|pump|electronics)|micro ?pump/i, "capsule"], [/gel|carbopol|carbomer|neutrali/i, "gel"], [/baby|silicone|ecoflex|dragon ?skin|elastomer/i, "baby"], [/pump|blower|compressor/i, "pump"], [/relief|regulator|pressure sensor|transducer/i, "psensor"], [/battery|lipo|li.?ion/i, "battery"], [/controller|raspberry|arduino|board|driver/i, "ctrl"], [/thruster|propeller/i, "thrusters"], [/tray|magazine/i, "tray"], [/front plate|nose/i, "front"], [/bore|rear wall|hoop|ring/i, "bore"], [/hull|shell|egg|mother body|segment|petg|acrylic/i, "hull"]];
-function linkOf(c) { if (c.part && PART[c.part]) return c.part; const s = `${c.id} ${c.name} ${c.group}`; const r = RULES.find(([re]) => re.test(s)); return r ? r[1] : null; }
+const PARTMAP = { hull_lower: "hull", hull_seam_seal: "hull", rear_wall: "bore", bore_hoop: "bore", front_plate: "front", belly_skin: "belly", gel_tray: "gel", rear_door: "bore", canal_sleeve: "canal", canal_lips: "duckbill", tail_shell: "tail", rails: "rails", boom_drive: "boom", dexarm: "dexarm", tail_battery: "battery", controller: "ctrl", thrusters: "thrusters", trim: "tail", brackets: "tail", cartridge: "tool", cartridge_drive: "tool", static_mixer: "tool", three_way_valve: "valve3", valve_servo: "valve3", needle: "tool", air_pump: "pump", vent_valve: "pump", pressure_sensor: "psensor", support_gel: "gel", naoh: "gel", print_silicone: "baby", clear_silicone: "belly", fast_silicone: "baby", dock_magnets: "magnets", pogo_pins: "tailring", dock_seal: "tailring", dock_cone: "tailring", baby_body: "baby", needle_valve: "needle", baby_mcu: "capsule", baby_battery: "capsule", baby_pump: "capsule", capsule_shell: "capsule", mother_node: "ctrl", mother_battery: "battery" };
+function linkOf(c) { if (PARTMAP[c.id] && PART[PARTMAP[c.id]]) return PARTMAP[c.id]; if (c.part && PART[c.part]) return c.part; const s = `${c.id} ${c.name} ${c.group}`; const r = RULES.find(([re]) => re.test(s)); return r ? r[1] : null; }
 const BADGE = { works: ["works", "works"], "works after bench test": ["test", "bench test"], open: ["open", "open"] };
 function renderTree() {
   const comps = DATA.components || []; for (const c of comps) LINK[c.id] = linkOf(c);
   const cost = comps.reduce((a, c) => a + (+c.cost_usd || 0) * (+c.qty || 1), 0), mass = comps.reduce((a, c) => a + (+c.mass_g || 0) * (+c.qty || 1), 0);
   $("#bomSum").textContent = comps.length ? `${comps.length} parts · about $${Math.round(cost).toLocaleString("en-US")} · about ${(mass / 1000).toFixed(1)} kg · click a part or a row` : "Parts list not loaded.";
   const groups = {}; for (const c of comps) (groups[c.group] = groups[c.group] || []).push(c);
-  $("#tree").innerHTML = Object.entries(groups).map(([g, cs]) => `<p class="grp">${esc(g)}</p>` + cs.map((c) => { const b = BADGE[c.verdict] || ["", c.verdict || ""]; return `<div class="row" data-id="${esc(c.id)}" tabindex="0"><span class="nm">${esc(c.name)}${c.qty > 1 ? " ×" + esc(c.qty) : ""}</span><span class="badge ${b[0]}">${esc(b[1])}</span></div>`; }).join("")).join("");
+  $("#tree").innerHTML = Object.entries(groups).map(([g, cs]) => `<p class="grp">${esc(g)}</p>` + cs.map((c) => { const b = BADGE[c.verdict] || ["", c.verdict || ""]; return `<div class="row" data-id="${esc(c.id)}" tabindex="0"><span class="nm">${esc(c.name)}${c.qty > 1 ? " ×" + esc(c.qty) : ""}${c.owned ? " <span class=\"badge\">owned</span>" : ""}</span><span class="badge ${b[0]}">${esc(b[1])}</span></div>`; }).join("")).join("");
   $$(".row").forEach((r) => { const go = () => { const c = comps.find((x) => x.id === r.dataset.id); showCard(c, LINK[c.id]); selectPart(LINK[c.id], false); $$(".row").forEach((x) => x.classList.toggle("sel", x === r)); }; r.onclick = go; r.onkeydown = (e) => { if (e.key === "Enter") go(); }; });
 }
 function showCard(c, k) {
@@ -569,7 +572,6 @@ function applyPhysDefaults() {
   for (const k of ["kresling", "yoshimura", "bellows"]) if (pat.includes(k)) { $("#pattern").value = k; break; }
   setV("nPleat", num(fp.pleats)); setV("dDep", num(fp.deployed_D_mm)); setV("lDep", num(fp.deployed_L_mm)); setV("lFold", num(fp.folded_L_mm));
   if (pat.includes("bellows")) $("#foldNote").textContent = "Collapsed bellows: printed flat with a 3 mm gel gap between flanks, then air lengthens it while the diameter stays. A tether stops it at full length.";
-  if (DATA.mother_segments && DATA.mother_segments.count) setV("segs", DATA.mother_segments.count);
 }
 
 /* ====================================================================== start */
