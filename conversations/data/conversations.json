@@ -12,7 +12,7 @@
     "Tamagotchi",
     "first spark"
    ],
-   "said": "The first conversation. Think of the Tamagotchi, the small Japanese digital pet that lives only as long as it is fed, a little at a time. A creature can be digital and still feel alive to the person who feeds it. He pointed to artists who stage digital creatures, among them an exhibition called Beings, where soft bodies walk forward together like a herd of imagined animals.",
+   "said": "The first conversation. Think of the Tamagotchi, the small Japanese digital pet that lives only as long as it is fed, a little at a time. A creature can be digital and still feel alive to the person who feeds it. He pointed to artists who stage digital creatures, among them Universal Everything’s exhibition Beings at ACMI, Melbourne (2024), where a procession of soft creatures walks forward like a herd of imagined animals.",
    "led_to": "From there the artist followed Lenia, a smooth Game of Life, into artificial life, and later showed the work at the ALIFE 2026 workshop and art gallery.",
    "kind": "conversation"
   },
@@ -45,8 +45,8 @@
   },
   {
    "id": "siggraph-artist",
-   "who": "An artist with a background in biology",
-   "role": "shown in the SIGGRAPH 2026 Art Gallery, Los Angeles, with two arguing AI voices worn on the shoulders",
+   "who": "Avital Meshi",
+   "role": "artist, Stuck in the Middle, SIGGRAPH 2026 Art Gallery, Los Angeles",
    "when": "2026-07",
    "stance": "suggests",
    "themes": [
@@ -110,8 +110,8 @@
   {
    "id": "city-science-instructor",
    "kind": "conversation",
-   "who": "An instructor of the City Science class",
-   "role": "MAS.552, MIT Media Lab, Fall 2026",
+   "who": "A guest instructor of the City Science class",
+   "role": "Inspiring Futures (MAS.552), MIT Media Lab, Fall 2026",
    "when": "2026-10",
    "stance": "suggests",
    "themes": [
@@ -175,7 +175,7 @@
   },
   {
    "id": "anna",
-   "who": "A friend in the MIT MDes program",
+   "who": "A friend in the Harvard GSD MDes program",
    "role": "",
    "when": "2026",
    "stance": "affirms",
@@ -311,7 +311,7 @@
    "id": "kexin-wang",
    "kind": "collaborator",
    "who": "Kexin Wang",
-   "role": "MIT CSAIL",
+   "role": "HCI Engineering Group, MIT CSAIL",
    "when": "2026",
    "stance": "suggests",
    "themes": [
@@ -320,7 +320,7 @@
    ],
    "contributed": [
     "Joined the project early.",
-    "Proposed an early printing rig that the team used for a while.",
+    "Proposed an early continuous printing rig, a belt printer bought on Taobao, that the team used for a while.",
     "Travelled to Changzhou, China, to visit factories and examine a robot arm made to be built into other machines, close to the project's own idea of an arm inside a body."
    ],
    "said": ""

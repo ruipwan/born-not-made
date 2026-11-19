@@ -1,0 +1,2025 @@
+{
+ "components": [
+  {
+   "id": "hull_lower",
+   "group": "mother",
+   "name": "Lower hull, 7 clear SLA pieces",
+   "role": "keeps water out below the belly seam",
+   "how": "One keel cap and six gores, cut at z = -0.274 m. Inward flanges are screwed together over a silicone cord seal.",
+   "specs": [
+    [
+     "Printer",
+     "Formlabs Form 4L, 353 x 196 x 350 mm"
+    ],
+    [
+     "Material",
+     "Clear Resin V5"
+    ],
+    [
+     "Light transmission",
+     "85% at 2 mm"
+    ],
+    [
+     "Water uptake",
+     "0.9% weight gain in 24 h"
+    ],
+    [
+     "Wall",
+     "4 mm"
+    ],
+    [
+     "Area",
+     "0.61 m2 (computed)"
+    ],
+    [
+     "Top edge",
+     "z = -0.060 m"
+    ]
+   ],
+   "make": "print rigid",
+   "qty": 7,
+   "mass_g": 2860,
+   "cost_usd": 490,
+   "sources": [
+    {
+     "label": "Formlabs Form 4L store page (build volume)",
+     "url": "https://formlabs.com/store/3d-printers/form-4l/"
+    },
+    {
+     "label": "Formlabs Clear Resin V5 TDS",
+     "url": "https://formlabs.com/tds/clear-resin-v5-tds"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Join two gore pieces, sink the seam 300 mm for 48 h, check for drops.",
+   "owned": false
+  },
+  {
+   "id": "hull_seam_seal",
+   "group": "mother",
+   "name": "Seam seal: silicone cord, A4 screws, epoxy",
+   "role": "seals every flange joint of the clear shell",
+   "how": "Removable seams: 2.5 mm silicone cord in a printed groove, M3 A4 screws at 30 mm. Permanent seams: DP100 Plus Clear.",
+   "specs": [
+    [
+     "Epoxy work life",
+     "2 to 5 min"
+    ],
+    [
+     "Epoxy on acrylic",
+     "1.7 MPa overlap shear"
+    ],
+    [
+     "Epoxy after 500 h water",
+     "11.5 MPa on aluminium"
+    ],
+    [
+     "Cured look",
+     "clear, may yellow"
+    ],
+    [
+     "Groove size",
+     "from Parker Section IV, not read yet"
+    ]
+   ],
+   "make": "buy",
+   "qty": 1,
+   "mass_g": 150,
+   "cost_usd": 60,
+   "sources": [
+    {
+     "label": "3M Scotch-Weld DP100 Plus Clear TDS",
+     "url": "https://multimedia.3m.com/mws/media/2522968O/3m-scotch-weld-epoxy-adhesive-dp100-plus-clear.pdf"
+    },
+    {
+     "label": "Parker O-Ring Handbook ORD 5700",
+     "url": "https://www.parker.com/content/dam/Parker-com/Literature/O-Ring-Division-Literature/ORD-5700.pdf"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Bond two Clear V5 coupons with DP100 Plus, soak 7 days, pull by hand.",
+   "owned": false
+  },
+  {
+   "id": "rear_wall",
+   "group": "mother",
+   "name": "Rear wall, 2 clear halves",
+   "role": "frames the rear bore below and above water",
+   "how": "The rear cap aft of x = -0.325 m, split left and right. Halves bond with DP100 Plus and screw to the hoop and gores.",
+   "specs": [
+    [
+     "Piece size",
+     "about 189 x 320 x 58 mm each"
+    ],
+    [
+     "Material",
+     "Clear Resin V5"
+    ],
+    [
+     "Wall",
+     "4 mm"
+    ]
+   ],
+   "make": "print rigid",
+   "qty": 2,
+   "mass_g": 700,
+   "cost_usd": 120,
+   "sources": [
+    {
+     "label": "Formlabs Form 4L store page (build volume)",
+     "url": "https://formlabs.com/store/3d-printers/form-4l/"
+    },
+    {
+     "label": "Formlabs Clear Resin V5 TDS",
+     "url": "https://formlabs.com/tds/clear-resin-v5-tds"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Check both halves fit the Form 4L in the slicer.",
+   "owned": false
+  },
+  {
+   "id": "bore_hoop",
+   "group": "mother",
+   "name": "Rear bore hoop with steel pads",
+   "role": "dock face; holds 3 steel pads for the tail",
+   "how": "A flat ring at the rear bore. Three 4 mm iron pads sit flush in the face for the electropermanent magnets.",
+   "specs": [
+    [
+     "Bore",
+     "D 250 mm"
+    ],
+    [
+     "Outer",
+     "D 300 mm"
+    ],
+    [
+     "Depth",
+     "20 mm"
+    ],
+    [
+     "Pads",
+     "3 x 4 mm iron, 40 x 40 mm"
+    ],
+    [
+     "Material",
+     "Clear Resin V5"
+    ]
+   ],
+   "make": "print rigid",
+   "qty": 1,
+   "mass_g": 450,
+   "cost_usd": 60,
+   "sources": [
+    {
+     "label": "Formlabs Form 4L store page (build volume)",
+     "url": "https://formlabs.com/store/3d-printers/form-4l/"
+    },
+    {
+     "label": "Zubax FluxGrip FG40 reference manual",
+     "url": "https://fluxgrip.zubax.com/chapters/hardware/fg40.html"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Lay the hoop flat on a surface plate; flatness under 0.3 mm.",
+   "owned": false
+  },
+  {
+   "id": "front_plate",
+   "group": "mother",
+   "name": "Front plate with canal ring, 2 clear halves",
+   "role": "holds the birth canal at 21 deg",
+   "how": "A clear frame across the nose. The canal ring clamps the sleeve and the lips. Halves bond with DP100 Plus.",
+   "specs": [
+    [
+     "Canal axis",
+     "tilted 20.8 deg up"
+    ],
+    [
+     "Canal centre",
+     "x 0.302, z 0.081 m"
+    ],
+    [
+     "Canal radius",
+     "0.152 m outer"
+    ],
+    [
+     "Material",
+     "Clear Resin V5"
+    ]
+   ],
+   "make": "print rigid",
+   "qty": 2,
+   "mass_g": 800,
+   "cost_usd": 140,
+   "sources": [
+    {
+     "label": "Formlabs Form 4L store page (build volume)",
+     "url": "https://formlabs.com/store/3d-printers/form-4l/"
+    },
+    {
+     "label": "Formlabs Clear Resin V5 TDS",
+     "url": "https://formlabs.com/tds/clear-resin-v5-tds"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Clamp a sleeve offcut in the ring and pull 50 N.",
+   "owned": false
+  },
+  {
+   "id": "belly_skin",
+   "group": "mother",
+   "name": "Belly origami skin, SORTA-Clear 18",
+   "role": "upper skin; pleats open as the womb fills",
+   "how": "Cast clear silicone with 5 concentric elliptical pleats, pitch 58 mm, depth 16 mm, clamped to the hull rim by a printed ring. Pressure opens the pleats; venting lets them sag.",
+   "specs": [
+    [
+     "Silicone",
+     "SORTA-Clear 18, Shore 18A"
+    ],
+    [
+     "Elongation",
+     "about 545%"
+    ],
+    [
+     "Tear",
+     "about 80 pli"
+    ],
+    [
+     "Mix",
+     "100A:10B by weight"
+    ],
+    [
+     "Cure",
+     "about 24 h"
+    ],
+    [
+     "Skin",
+     "2 mm, about 0.9 m2 flat x 1.6 for pleats"
+    ]
+   ],
+   "make": "cast",
+   "qty": 1,
+   "mass_g": 3100,
+   "cost_usd": 300,
+   "sources": [
+    {
+     "label": "Smooth-On SORTA-Clear 18",
+     "url": "https://www.smooth-on.com/products/sorta-clear-18/"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Cast one pleat strip, pressure to 0.5 kPa, measure rise and sag.",
+   "owned": false
+  },
+  {
+   "id": "gel_tray",
+   "group": "mother",
+   "name": "Gel pool tray, 4 clear quarters",
+   "role": "holds the support gel over the keel",
+   "how": "An elliptic tray with vertical walls to z = -0.235 m, then a floor that follows the hull. Quarters bond with DP100 Plus.",
+   "specs": [
+    [
+     "Rim",
+     "470 x 450 mm inner"
+    ],
+    [
+     "Gel surface",
+     "z = -0.124 m"
+    ],
+    [
+     "Gel depth",
+     "about 160 mm at centre"
+    ],
+    [
+     "Gel volume",
+     "about 24 L (computed)"
+    ],
+    [
+     "Round print",
+     "up to D 390 mm"
+    ],
+    [
+     "Material",
+     "Clear Resin V5"
+    ]
+   ],
+   "make": "print rigid",
+   "qty": 4,
+   "mass_g": 900,
+   "cost_usd": 160,
+   "sources": [
+    {
+     "label": "Formlabs Form 4L store page (build volume)",
+     "url": "https://formlabs.com/store/3d-printers/form-4l/"
+    },
+    {
+     "label": "Formlabs Clear Resin V5 TDS",
+     "url": "https://formlabs.com/tds/clear-resin-v5-tds"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Fill with water 24 h before the first gel.",
+   "owned": false
+  },
+  {
+   "id": "rear_door",
+   "group": "mother",
+   "name": "Passive petal door, cast silicone",
+   "role": "closes the rear bore when no tail is docked",
+   "how": "Four silicone petals meet in the bore. The tail cone pushes them open; elastic and womb pressure close them.",
+   "specs": [
+    [
+     "Silicone",
+     "SORTA-Clear 18"
+    ],
+    [
+     "Petals",
+     "4, about 4 mm thick"
+    ],
+    [
+     "Must hold",
+     "1 kPa inside, water outside at the lower lip"
+    ]
+   ],
+   "make": "cast",
+   "qty": 1,
+   "mass_g": 250,
+   "cost_usd": 30,
+   "sources": [
+    {
+     "label": "Smooth-On SORTA-Clear 18",
+     "url": "https://www.smooth-on.com/products/sorta-clear-18/"
+    }
+   ],
+   "verdict": "open",
+   "test": "Cast a half scale door, push the cone through, count the force.",
+   "owned": false
+  },
+  {
+   "id": "canal_sleeve",
+   "group": "canal",
+   "name": "Birth canal soft sleeve, Ecoflex 00-30",
+   "role": "soft passage the baby is pushed through",
+   "how": "A thin cast tube tucked inside the canal ring. The baby, pushed and inflated, turns the sleeve out.",
+   "specs": [
+    [
+     "Silicone",
+     "Ecoflex 00-30, Shore 00-30"
+    ],
+    [
+     "Elongation",
+     "900%"
+    ],
+    [
+     "Viscosity",
+     "3,000 cps"
+    ],
+    [
+     "Pot life / cure",
+     "45 min / 4 h"
+    ],
+    [
+     "Size",
+     "bore about D 280, 3 mm wall"
+    ]
+   ],
+   "make": "cast",
+   "qty": 1,
+   "mass_g": 500,
+   "cost_usd": 70,
+   "sources": [
+    {
+     "label": "Smooth-On Ecoflex 00-30",
+     "url": "https://www.smooth-on.com/products/ecoflex-00-30/"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Pull a 250 mm ball through a sleeve sample; log the force.",
+   "owned": false
+  },
+  {
+   "id": "canal_lips",
+   "group": "canal",
+   "name": "Duckbill lips, SORTA-Clear 18",
+   "role": "keeps womb air in; opens only to the baby",
+   "how": "Four cast lips pressed shut by their own preload. The baby forces them apart; they close again after.",
+   "specs": [
+    [
+     "Silicone",
+     "SORTA-Clear 18, Shore 18A"
+    ],
+    [
+     "Lips",
+     "4, 3 to 4 mm"
+    ],
+    [
+     "Crack pressure target",
+     "over 1 kPa"
+    ],
+    [
+     "Canal low point",
+     "about 50 mm above water"
+    ]
+   ],
+   "make": "cast",
+   "qty": 1,
+   "mass_g": 300,
+   "cost_usd": 40,
+   "sources": [
+    {
+     "label": "Smooth-On SORTA-Clear 18",
+     "url": "https://www.smooth-on.com/products/sorta-clear-18/"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Seal the lips on a jar, raise to 1.2 kPa, check for bubbles.",
+   "owned": false
+  },
+  {
+   "id": "tail_shell",
+   "group": "tail",
+   "name": "Tail shell with dock cone, one PETG print",
+   "role": "dry hull for arm, power, pump and thrusters",
+   "how": "One large FDM print, 5 perimeters, outside sealed with an epoxy coat. The mouth carries the lead in cone.",
+   "specs": [
+    [
+     "Printer",
+     "Elegoo OrangeStorm Giga, 800 x 800 x 1000 mm"
+    ],
+    [
+     "Length",
+     "588 mm"
+    ],
+    [
+     "Mouth",
+     "D 424 mm"
+    ],
+    [
+     "Wall",
+     "4 mm"
+    ],
+    [
+     "Filament",
+     "PETG (not confirmed for this printer)"
+    ]
+   ],
+   "make": "print rigid",
+   "qty": 1,
+   "mass_g": 3300,
+   "cost_usd": 90,
+   "sources": [
+    {
+     "label": "Elegoo OrangeStorm Giga",
+     "url": "https://elegoo.com/products/orangestorm-giga"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Sink the empty shell with ballast 24 h; weigh any water inside.",
+   "owned": false
+  },
+  {
+   "id": "rails",
+   "group": "tail",
+   "name": "HIWIN MGN12H rails and carriage",
+   "role": "carry the arm forward into the womb",
+   "how": "Two parallel rails on the tail keel, two blocks each, under a 6 mm aluminium plate. A 200 mm boom plate holds the arm base.",
+   "specs": [
+    [
+     "Rail",
+     "MGN12, width 12 mm, 0.65 kg/m"
+    ],
+    [
+     "Block",
+     "MGN12H, length 45.4 mm, 54 g"
+    ],
+    [
+     "C / C0",
+     "3.72 / 5.88 kN"
+    ],
+    [
+     "Static moments MR / MP / MY",
+     "38.22 / 36.26 / 36.26 N m"
+    ],
+    [
+     "Length",
+     "2 x 500 mm, stroke 400 mm"
+    ],
+    [
+     "Material",
+     "stainless option M"
+    ]
+   ],
+   "make": "buy",
+   "qty": 2,
+   "mass_g": 1300,
+   "cost_usd": 240,
+   "sources": [
+    {
+     "label": "HIWIN MG series catalog (HIWIN document, hosted by distributor Motion)",
+     "url": "https://s3.amazonaws.com/www.motionusa.com/hiwin/2025/MG%20Series-2025.pdf"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Extend fully with the arm on; dial gauge sag at the arm base under 0.3 mm.",
+   "owned": false
+  },
+  {
+   "id": "boom_drive",
+   "group": "tail",
+   "name": "Boom drive: NEMA 17 and GT2 belt",
+   "role": "moves the carriage once, then holds",
+   "how": "One stepper drives a closed GT2 6 mm belt along the rails. The boom extends once and holds still while printing.",
+   "specs": [
+    [
+     "Motor",
+     "17HS19-2004S1, 59 Ncm, 2.0 A, 1.8 deg"
+    ],
+    [
+     "Motor mass",
+     "390 g"
+    ],
+    [
+     "Stroke",
+     "400 mm"
+    ],
+    [
+     "Belt",
+     "GT2 2 mm pitch, 6 mm (generic)"
+    ]
+   ],
+   "make": "buy",
+   "qty": 1,
+   "mass_g": 500,
+   "cost_usd": 35,
+   "sources": [
+    {
+     "label": "StepperOnline 17HS19-2004S1",
+     "url": "https://www.omc-stepperonline.com/nema-17-bipolar-59ncm-84oz-in-2a-42x48mm-4-wires-w-1m-cable-connector-17hs19-2004s1"
+    }
+   ],
+   "verdict": "works",
+   "test": "",
+   "owned": false
+  },
+  {
+   "id": "dexarm",
+   "group": "tail",
+   "name": "Rotrics DexArm, Starter Kit",
+   "role": "prints and places inside the womb",
+   "how": "A four axis desktop arm on the boom plate. Marlin G-code over USB from the Pi.",
+   "specs": [
+    [
+     "Repeatability",
+     "0.05 mm"
+    ],
+    [
+     "Max reach",
+     "380 mm"
+    ],
+    [
+     "Payload",
+     "500 g max (400 g pneumatic)"
+    ],
+    [
+     "3D work area",
+     "more than 220 x 220 x 270 mm"
+    ],
+    [
+     "Weight",
+     "2.4 kg"
+    ],
+    [
+     "Power",
+     "DC 12 V 7 A"
+    ],
+    [
+     "Joints",
+     "base +/-110, J1 0 to 110, J2 0 to 85, J3 +/-360 deg"
+    ]
+   ],
+   "make": "buy",
+   "qty": 1,
+   "mass_g": 2400,
+   "cost_usd": 799,
+   "sources": [
+    {
+     "label": "Rotrics DexArm tech spec",
+     "url": "https://rotrics.com/pages/dexarm-spec"
+    },
+    {
+     "label": "Rotrics DexArm product page",
+     "url": "https://www.rotrics.com/products/dexarm"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Print a 100 mm square in gel 10 times; measure spread of corners.",
+   "owned": true
+  },
+  {
+   "id": "tail_battery",
+   "group": "tail",
+   "name": "Blue Robotics 14.8 V 18 Ah battery",
+   "role": "powers arm, pump, thrusters and controller",
+   "how": "One 4S6P Li-ion tube. A 14.8 to 12 V converter feeds the DexArm; a 5 V supply feeds the Pi.",
+   "specs": [
+    [
+     "Voltage",
+     "14.8 V nominal"
+    ],
+    [
+     "Capacity",
+     "18.0 Ah, 266.4 Wh"
+    ],
+    [
+     "Max continuous",
+     "60 A"
+    ],
+    [
+     "Size",
+     "D 74.2 x 146 mm"
+    ],
+    [
+     "Mass",
+     "1152 g"
+    ]
+   ],
+   "make": "buy",
+   "qty": 1,
+   "mass_g": 1152,
+   "cost_usd": 450,
+   "sources": [
+    {
+     "label": "Blue Robotics 14.8 V 18 Ah battery BR-100842",
+     "url": "https://bluerobotics.com/store/comm-control-power/powersupplies-batteries/battery-li-4s-18ah/"
+    }
+   ],
+   "verdict": "works",
+   "test": "",
+   "owned": false
+  },
+  {
+   "id": "controller",
+   "group": "electronics",
+   "name": "Raspberry Pi 5 and BTT SKR Pico",
+   "role": "runs the job; drives steppers, pump, valves",
+   "how": "The Pi sends G-code to the DexArm and runs Klipper. The SKR Pico drives the boom and cartridge steppers.",
+   "specs": [
+    [
+     "Pi 5",
+     "BCM2712, 4 x A76 2.4 GHz, 5 V 5 A USB-C"
+    ],
+    [
+     "SKR Pico",
+     "RP2040, TMC2209 in UART mode, 12/24 V"
+    ],
+    [
+     "SKR size",
+     "85 x 56 mm"
+    ]
+   ],
+   "make": "buy",
+   "qty": 1,
+   "mass_g": 150,
+   "cost_usd": 130,
+   "sources": [
+    {
+     "label": "Raspberry Pi 5",
+     "url": "https://www.raspberrypi.com/products/raspberry-pi-5/"
+    },
+    {
+     "label": "BIGTREETECH SKR Pico wiki",
+     "url": "https://global.bttwiki.com/SKR%20Pico.html"
+    }
+   ],
+   "verdict": "works",
+   "test": "",
+   "owned": false
+  },
+  {
+   "id": "thrusters",
+   "group": "tail",
+   "name": "Blue Robotics T200 thrusters",
+   "role": "move the tail to the baby and dock",
+   "how": "Two thrusters low on the tail. Run at low throttle for a slow, quiet approach.",
+   "specs": [
+    [
+     "Thrust 12 V",
+     "3.71 kgf forward, 2.92 kgf reverse"
+    ],
+    [
+     "Thrust 16 V",
+     "5.25 kgf forward"
+    ],
+    [
+     "Power 16 V",
+     "390 W max"
+    ],
+    [
+     "Mass",
+     "427 g in air, 239 g in water"
+    ]
+   ],
+   "make": "buy",
+   "qty": 2,
+   "mass_g": 854,
+   "cost_usd": 480,
+   "sources": [
+    {
+     "label": "Blue Robotics T200 thruster",
+     "url": "https://bluerobotics.com/store/thrusters/t100-t200-thrusters/t200-thruster-r2-rp/"
+    }
+   ],
+   "verdict": "works",
+   "test": "",
+   "owned": false
+  },
+  {
+   "id": "trim",
+   "group": "tail",
+   "name": "Trim foam and stainless ballast",
+   "role": "set the tail to dock height and level",
+   "how": "Target tail mass about 10 kg so the tail axis rides at the mother's bore axis. Add foam if heavy, ballast if light.",
+   "specs": [
+    [
+     "Foam",
+     "LAST-A-FOAM R-3318, 288 kg/m3, net lift 488 g per piece"
+    ],
+    [
+     "Ballast",
+     "AISI 316, 191 g in air, 165 g in water"
+    ],
+    [
+     "Target",
+     "tail about 10 kg (computed)"
+    ]
+   ],
+   "make": "buy",
+   "qty": 4,
+   "mass_g": 800,
+   "cost_usd": 130,
+   "sources": [
+    {
+     "label": "Blue Robotics R-3318 machined foam BR-100099",
+     "url": "https://bluerobotics.com/?p=20043"
+    },
+    {
+     "label": "Blue Robotics stainless ballast 200 g BR-101039",
+     "url": "https://bluerobotics.com/?p=28583"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Float the loaded tail beside the mother; match axis heights within 5 mm.",
+   "owned": false
+  },
+  {
+   "id": "brackets",
+   "group": "tail",
+   "name": "Small brackets, PETG",
+   "role": "mounts for servos, pump, cartridge, pogo block",
+   "how": "Printed on the owned Flashforge Adventurer 5M, 0.6 mm nozzle, PETG.",
+   "specs": [
+    [
+     "Printer",
+     "Flashforge Adventurer 5M, 220 x 220 x 220 mm"
+    ],
+    [
+     "Material",
+     "PETG"
+    ]
+   ],
+   "make": "print rigid",
+   "qty": 10,
+   "mass_g": 300,
+   "cost_usd": 20,
+   "sources": [
+    {
+     "label": "Flashforge Adventurer 5M",
+     "url": "https://www.flashforge.com/products/adventurer-5m-3d-printer"
+    }
+   ],
+   "verdict": "works",
+   "test": "",
+   "owned": false
+  },
+  {
+   "id": "cartridge",
+   "group": "tool",
+   "name": "medmix MIXPAC 400 ml 1:1 cartridge",
+   "role": "stores silicone A and B for one baby",
+   "how": "Side by side cartridge on the boom plate, filled with FX-Pro A and B. One plunger pushes both sides at 1:1.",
+   "specs": [
+    [
+     "Model",
+     "AF 400-01-10-01 (112410), PP, self venting"
+    ],
+    [
+     "Ratio",
+     "1:1"
+    ],
+    [
+     "Usable",
+     "about 400 ml mixed"
+    ],
+    [
+     "Mixers",
+     "MFH, MFQ"
+    ]
+   ],
+   "make": "buy",
+   "qty": 4,
+   "mass_g": 450,
+   "cost_usd": 60,
+   "sources": [
+    {
+     "label": "medmix MIXPAC Systems for Adhesives brochure (medmix document, hosted by Ellsworth)",
+     "url": "https://www.ellsworth.com:443/globalassets/literature-library/manufacturer/medmix/medmix-brochure-mixpac-systems-for-adhesives.pdf"
+    },
+    {
+     "label": "Nordson EFD side by side 2K cartridges",
+     "url": "https://www.nordson.com/products/efd-products/side-x-side-two-component-cartridges"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Fill by hand, push 10 ml, weigh A and B outputs for 1:1.",
+   "owned": false
+  },
+  {
+   "id": "cartridge_drive",
+   "group": "tool",
+   "name": "StepperOnline NEMA 23 lead screw plunger",
+   "role": "pushes the cartridge plungers slowly and evenly",
+   "how": "An external lead screw stepper pushes a printed yoke on both pistons. Slow, steady flow sets the bead.",
+   "specs": [
+    [
+     "Model",
+     "23E26S2504GG-250RS"
+    ],
+    [
+     "Lead",
+     "2.54 mm per turn"
+    ],
+    [
+     "Thrust",
+     "540 N minimum at 300 pps"
+    ],
+    [
+     "Stroke",
+     "250 mm"
+    ],
+    [
+     "Mass",
+     "958 g"
+    ]
+   ],
+   "make": "buy",
+   "qty": 1,
+   "mass_g": 958,
+   "cost_usd": 118,
+   "sources": [
+    {
+     "label": "StepperOnline 23E26S2504GG-250RS",
+     "url": "https://www.omc-stepperonline.com/nema-23-external-66mm-stack-2-5a-lead-2-54mm-0-1-length-250mm-23e26s2504gg-250rs"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Push FX-Pro through needle at 5 mm/s bead speed; log motor current.",
+   "owned": false
+  },
+  {
+   "id": "static_mixer",
+   "group": "tool",
+   "name": "medmix MIXPAC MFQ 05-16L static mixer",
+   "role": "mixes A and B on the way out",
+   "how": "Disposable quadro mixer on the cartridge. A short 3 mm line carries mixed silicone to the head.",
+   "specs": [
+    [
+     "Elements",
+     "16"
+    ],
+    [
+     "Inner diameter",
+     "5.3 mm"
+    ],
+    [
+     "Outlet",
+     "Luer slip"
+    ],
+    [
+     "Line to head",
+     "0.5 m x 3 mm ID"
+    ],
+    [
+     "Residence",
+     "about 6 min at 1.1 ml/min (computed)"
+    ]
+   ],
+   "make": "buy",
+   "qty": 20,
+   "mass_g": 5,
+   "cost_usd": 40,
+   "sources": [
+    {
+     "label": "medmix MIXPAC Systems for Adhesives brochure (medmix document, hosted by Ellsworth)",
+     "url": "https://www.ellsworth.com:443/globalassets/literature-library/manufacturer/medmix/medmix-brochure-mixpac-systems-for-adhesives.pdf"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Run 15 min, stop 8 min, restart; mixer must not block.",
+   "owned": false
+  },
+  {
+   "id": "three_way_valve",
+   "group": "tool",
+   "name": "B. Braun three way stopcock",
+   "role": "switches the needle from silicone to air",
+   "how": "A Luer stopcock at the head, turned by a servo. Silicone and air never share a line upstream.",
+   "specs": [
+    [
+     "Model",
+     "D300, REF 456003"
+    ],
+    [
+     "Ports",
+     "2 female Luer lock, 1 Spin-Lock"
+    ],
+    [
+     "Priming volume",
+     "0.26 ml"
+    ],
+    [
+     "Use",
+     "single use; swap with each mixer"
+    ]
+   ],
+   "make": "buy",
+   "qty": 10,
+   "mass_g": 5,
+   "cost_usd": 15,
+   "sources": [
+    {
+     "label": "B. Braun three way stopcock D300, REF 456003",
+     "url": "https://www.bbraunusa.com/en/products/b0/three-way-stopcockwithspin-lock.html"
+    },
+    {
+     "label": "Artist's Weekly Updates deck (S8 design, gel tests)",
+     "url": "https://docs.google.com/presentation/d/1fTm_oDPefzafITs2w75gJIZ8zdXcw0acMDKE9GcqqMM"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Turn the lever with the servo 200 times under 2 bar.",
+   "owned": false
+  },
+  {
+   "id": "valve_servo",
+   "group": "tool",
+   "name": "Feetech STS3215 servo (from owned SO-ARM101)",
+   "role": "turns the stopcock lever",
+   "how": "One bus servo taken from the owned SO-ARM101, on a printed bracket at the head.",
+   "specs": [
+    [
+     "Stall torque",
+     "16.5 kg cm at 6 V (7.4 V version)"
+    ],
+    [
+     "Bus",
+     "SO-ARM101 motor control board (owned)"
+    ]
+   ],
+   "make": "buy",
+   "qty": 1,
+   "mass_g": 55,
+   "cost_usd": 0,
+   "sources": [
+    {
+     "label": "SO-ARM100/101 official repo (STS3215 servo)",
+     "url": "https://github.com/TheRobotStudio/SO-ARM100"
+    }
+   ],
+   "verdict": "works",
+   "test": "",
+   "owned": true
+  },
+  {
+   "id": "needle",
+   "group": "tool",
+   "name": "14G x 102 mm blunt needle",
+   "role": "prints the bead, carries the capsule, inflates the baby",
+   "how": "One long Luer needle. Silicone first; then air through the same needle into the capsule's valve.",
+   "specs": [
+    [
+     "Gauge",
+     "14G"
+    ],
+    [
+     "ID / OD",
+     "1.54 / 1.83 mm"
+    ],
+    [
+     "Length",
+     "102 mm (artist's S8 drawing)"
+    ],
+    [
+     "Reach below gel",
+     "58 mm needed (scene)"
+    ],
+    [
+     "Pressure drop",
+     "about 1.2 bar at 5 mm/s, 2.5 bar at 10 mm/s (computed, FX-Pro)"
+    ]
+   ],
+   "make": "buy",
+   "qty": 10,
+   "mass_g": 10,
+   "cost_usd": 30,
+   "sources": [
+    {
+     "label": "Nordson EFD general purpose tips (gauge chart)",
+     "url": "https://www.nordson.com/products/efd-products/general-purpose-dispense-tips"
+    },
+    {
+     "label": "Artist's Weekly Updates deck (S8 design, gel tests)",
+     "url": "https://docs.google.com/presentation/d/1fTm_oDPefzafITs2w75gJIZ8zdXcw0acMDKE9GcqqMM"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Check bead width from this needle in gel at 5 mm/s.",
+   "owned": false
+  },
+  {
+   "id": "air_pump",
+   "group": "tool",
+   "name": "KNF NMP830 diaphragm pump",
+   "role": "blows air; can also suck gel back",
+   "how": "Brushless diaphragm pump in the tail. Outlet feeds the stopcock air port; inlet can draw gel back through the needle.",
+   "specs": [
+    [
+     "Model",
+     "NMP830.1.2KPDC-BI4"
+    ],
+    [
+     "Flow",
+     "5.6 l/min free"
+    ],
+    [
+     "Max pressure",
+     "1.5 bar rel"
+    ],
+    [
+     "Vacuum",
+     "230 mbar abs"
+    ],
+    [
+     "Supply",
+     "12 or 24 V DC, 1.10 A at 12 V"
+    ],
+    [
+     "Mass",
+     "254 g"
+    ]
+   ],
+   "make": "buy",
+   "qty": 1,
+   "mass_g": 254,
+   "cost_usd": 250,
+   "sources": [
+    {
+     "label": "KNF NMP830 datasheet",
+     "url": "https://knf.com/fileadmin/Global_files/Downloads/Product_OEM_Process/Datasheets/DB_NMP830.X_EN_28112023.pdf"
+    }
+   ],
+   "verdict": "works",
+   "test": "",
+   "owned": false
+  },
+  {
+   "id": "vent_valve",
+   "group": "tool",
+   "name": "Clippard EV-2-12 vent valve",
+   "role": "relief: vents womb air above the set point",
+   "how": "Opened by the controller when the BMP390 reads over 1 kPa. A dip tube 100 mm under water is the passive backup.",
+   "specs": [
+    [
+     "Type",
+     "2 way normally closed"
+    ],
+    [
+     "Coil",
+     "12 VDC, 0.67 W"
+    ],
+    [
+     "Max",
+     "105 psi"
+    ],
+    [
+     "Flow",
+     "17 l/min at 100 psig"
+    ],
+    [
+     "Backup",
+     "100 mm water column = 0.98 kPa"
+    ]
+   ],
+   "make": "buy",
+   "qty": 1,
+   "mass_g": 77,
+   "cost_usd": 40,
+   "sources": [
+    {
+     "label": "Clippard EV-2-12",
+     "url": "https://www.clippard.com/part/EV-2-12"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Pump the joined air space; check vent opens at 1.0 kPa.",
+   "owned": false
+  },
+  {
+   "id": "pressure_sensor",
+   "group": "electronics",
+   "name": "Bosch BMP390 pressure sensors",
+   "role": "measure womb, ambient and baby air pressure",
+   "how": "Gauge pressure = womb sensor minus ambient sensor. A third sensor sits in the baby capsule.",
+   "specs": [
+    [
+     "Range",
+     "300 to 1250 hPa"
+    ],
+    [
+     "Relative accuracy",
+     "+/-0.03 hPa (3 Pa)"
+    ],
+    [
+     "Noise",
+     "0.02 Pa RMS"
+    ],
+    [
+     "Bus",
+     "I2C, SPI"
+    ],
+    [
+     "Size",
+     "2.0 x 2.0 x 0.75 mm"
+    ]
+   ],
+   "make": "buy",
+   "qty": 3,
+   "mass_g": 6,
+   "cost_usd": 30,
+   "sources": [
+    {
+     "label": "Bosch Sensortec BMP390",
+     "url": "https://www.bosch-sensortec.com/products/environmental-sensors/pressure-sensors/bmp390/"
+    }
+   ],
+   "verdict": "works",
+   "test": "",
+   "owned": false
+  },
+  {
+   "id": "support_gel",
+   "group": "fluid",
+   "name": "Support gel: Carbomer 940, 1% w/v",
+   "role": "holds the liquid silicone while the silicone cures",
+   "how": "1 g Carbomer 940 per 100 ml DI water, neutralised with 1 M NaOH, rested sealed about one day.",
+   "specs": [
+    [
+     "Grade",
+     "Carbopol / Carbomer 940"
+    ],
+    [
+     "Strength",
+     "1% w/v (EpoMemory; Mr.Di recipe)"
+    ],
+    [
+     "Lubrizol use level",
+     "0.2 to 1.0 wt%"
+    ],
+    [
+     "Hinton 2016",
+     "Carbopol 940 at 1.2% w/v"
+    ],
+    [
+     "RLP 2017",
+     "Carbomer 940 at 0.5% w/v, NaOH to pH 7"
+    ],
+    [
+     "Batch",
+     "about 24 L, 240 g powder"
+    ],
+    [
+     "Yield stress",
+     "not measured; organogel at 3 to 4 Pa holds silicone (O'Bryan)"
+    ]
+   ],
+   "make": "buy",
+   "qty": 1,
+   "mass_g": 24000,
+   "cost_usd": 60,
+   "sources": [
+    {
+     "label": "Lubrizol Carbopol 940 polymer",
+     "url": "https://www.lubrizol.com/Personal-Care/Products/Product-Finder/Products-Data/Carbopol-940-polymer"
+    },
+    {
+     "label": "Zhong et al. 2023, EpoMemory, doi 10.1145/3544548.3580638 (NSF PAR full text)",
+     "url": "https://par.nsf.gov/servlets/purl/10432202"
+    },
+    {
+     "label": "Hinton et al. 2016, doi 10.1021/acsbiomaterials.6b00170 (Europe PMC full text)",
+     "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5059754/fullTextXML"
+    },
+    {
+     "label": "Hajash et al. 2017, Large Scale Rapid Liquid Printing, doi 10.1089/3dp.2017.0037 (MIT DSpace)",
+     "url": "https://dspace.mit.edu/bitstream/handle/1721.1/122801/3dp.2017.0037.pdf?sequence=2"
+    },
+    {
+     "label": "Baby Robots Material Fabrication Updates (gel recipe)",
+     "url": "https://docs.google.com/presentation/d/1gDGtGLfvkKU6tBiIV1BffReg0fe-eCJgThqy-QIFMio"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Drop dyed water and an air bubble; both stay, needle track closes.",
+   "owned": true
+  },
+  {
+   "id": "naoh",
+   "group": "fluid",
+   "name": "Neutraliser: 1 M NaOH",
+   "role": "opens the Carbopol chains so the gel holds",
+   "how": "Add by syringe after the powder is fully wetted and bubbles have risen.",
+   "specs": [
+    [
+     "Dose",
+     "0.832 ml 1 M NaOH per 100 ml of 1% gel"
+    ],
+    [
+     "Same ratio as Hinton",
+     "0.1 ml 10 M per 100 ml of 1.2%"
+    ],
+    [
+     "For 24 L",
+     "about 200 ml 1 M"
+    ],
+    [
+     "Release",
+     "salt water liquefies Carbopol (artist protocol)"
+    ]
+   ],
+   "make": "buy",
+   "qty": 1,
+   "mass_g": 0,
+   "cost_usd": 10,
+   "sources": [
+    {
+     "label": "Hinton et al. 2016, doi 10.1021/acsbiomaterials.6b00170 (Europe PMC full text)",
+     "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5059754/fullTextXML"
+    },
+    {
+     "label": "Baby Robots Material Fabrication Updates (gel recipe)",
+     "url": "https://docs.google.com/presentation/d/1gDGtGLfvkKU6tBiIV1BffReg0fe-eCJgThqy-QIFMio"
+    }
+   ],
+   "verdict": "works",
+   "test": "",
+   "owned": true
+  },
+  {
+   "id": "print_silicone",
+   "group": "fluid",
+   "name": "Print silicone: Dragon Skin FX-Pro",
+   "role": "the baby's printed skin",
+   "how": "Platinum silicone, 1:1. Printed into the gel through the mixer and needle. Tested by the team in gel on 14 Oct.",
+   "specs": [
+    [
+     "Viscosity",
+     "18,000 cps"
+    ],
+    [
+     "Pot life",
+     "12 min"
+    ],
+    [
+     "Cure",
+     "40 min"
+    ],
+    [
+     "Shore",
+     "2A"
+    ],
+    [
+     "Elongation",
+     "763%"
+    ],
+    [
+     "Tensile",
+     "288 psi"
+    ],
+    [
+     "Density",
+     "1.062 g/cc"
+    ],
+    [
+     "Mix",
+     "1A:1B by volume"
+    ]
+   ],
+   "make": "buy",
+   "qty": 2,
+   "mass_g": 0,
+   "cost_usd": 140,
+   "sources": [
+    {
+     "label": "Smooth-On Dragon Skin FX-Pro",
+     "url": "https://www.smooth-on.com/products/dragon-skin-fx-pro/"
+    },
+    {
+     "label": "Artist's Weekly Updates deck (S8 design, gel tests)",
+     "url": "https://docs.google.com/presentation/d/1fTm_oDPefzafITs2w75gJIZ8zdXcw0acMDKE9GcqqMM"
+    },
+    {
+     "label": "Hinton et al. 2016, doi 10.1021/acsbiomaterials.6b00170 (Europe PMC full text)",
+     "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5059754/fullTextXML"
+    },
+    {
+     "label": "O'Bryan et al. 2017, doi 10.1126/sciadv.1602800 (NSF PAR full text)",
+     "url": "https://par.nsf.gov/servlets/purl/10085332"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Print two touching beads in gel; after cure peel them apart by hand.",
+   "owned": true
+  },
+  {
+   "id": "clear_silicone",
+   "group": "fluid",
+   "name": "Cast silicone: SORTA-Clear 18",
+   "role": "clear silicone for belly, lips, door and seal",
+   "how": "Cast in printed moulds. Mix by weight, degas, cure about 24 h. Trial kit in hand; about 4 kg more needed.",
+   "specs": [
+    [
+     "Mix",
+     "100A:10B by weight"
+    ],
+    [
+     "Viscosity",
+     "about 21,000 cps"
+    ],
+    [
+     "Pot life",
+     "about 60 min"
+    ],
+    [
+     "Cure",
+     "about 24 h"
+    ],
+    [
+     "Shore",
+     "18A"
+    ],
+    [
+     "Elongation",
+     "about 545%"
+    ],
+    [
+     "Look",
+     "water clear translucent"
+    ]
+   ],
+   "make": "buy",
+   "qty": 1,
+   "mass_g": 0,
+   "cost_usd": 400,
+   "sources": [
+    {
+     "label": "Smooth-On SORTA-Clear 18",
+     "url": "https://www.smooth-on.com/products/sorta-clear-18/"
+    },
+    {
+     "label": "Artist's Weekly Updates deck (S8 design, gel tests)",
+     "url": "https://docs.google.com/presentation/d/1fTm_oDPefzafITs2w75gJIZ8zdXcw0acMDKE9GcqqMM"
+    }
+   ],
+   "verdict": "works",
+   "test": "",
+   "owned": true
+  },
+  {
+   "id": "fast_silicone",
+   "group": "fluid",
+   "name": "Patch silicone: Ecoflex 00-35 FAST",
+   "role": "quick seals at the capsule and tube stubs",
+   "how": "Brushed on by hand where a fast seal is needed. Too fast for the static mixer.",
+   "specs": [
+    [
+     "Pot life",
+     "about 2.5 min"
+    ],
+    [
+     "Cure",
+     "about 5 min"
+    ],
+    [
+     "Viscosity",
+     "3,500 cps"
+    ],
+    [
+     "Shore",
+     "00-35"
+    ],
+    [
+     "Elongation",
+     "900%"
+    ]
+   ],
+   "make": "buy",
+   "qty": 1,
+   "mass_g": 0,
+   "cost_usd": 0,
+   "sources": [
+    {
+     "label": "Smooth-On Ecoflex 00-35 (FAST data)",
+     "url": "https://www.smooth-on.com/products/ecoflex-00-35/"
+    }
+   ],
+   "verdict": "works",
+   "test": "",
+   "owned": true
+  },
+  {
+   "id": "dock_magnets",
+   "group": "dock",
+   "name": "Zubax FluxGrip FG401MA electropermanent magnets",
+   "role": "hold the tail on the hoop; release on command",
+   "how": "Three units in the tail rim press on the iron pads of the bore hoop. A short pulse switches hold on or off.",
+   "specs": [
+    [
+     "Hold",
+     "250 N each on 4 mm iron, full contact"
+    ],
+    [
+     "Mass",
+     "72 g"
+    ],
+    [
+     "Size",
+     "4 x 4 x 2 cm"
+    ],
+    [
+     "Supply",
+     "4.5 to 30 V"
+    ],
+    [
+     "Switch energy",
+     "about 4 J"
+    ],
+    [
+     "Idle",
+     "50 mW"
+    ],
+    [
+     "Control",
+     "RC PWM on A models"
+    ],
+    [
+     "Need",
+     "about 300 N design load (physics notes)"
+    ]
+   ],
+   "make": "buy",
+   "qty": 3,
+   "mass_g": 216,
+   "cost_usd": 690,
+   "sources": [
+    {
+     "label": "Zubax FluxGrip FG40 reference manual",
+     "url": "https://fluxgrip.zubax.com/chapters/hardware/fg40.html"
+    },
+    {
+     "label": "Zubax FluxGrip FG40 shop page",
+     "url": "https://shop.zubax.com/products/zubax-epm"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Hold the tail on the hoop with 1 kPa inside; pull with a spring scale.",
+   "owned": false
+  },
+  {
+   "id": "pogo_pins",
+   "group": "dock",
+   "name": "Mill-Max 0906 spring pins",
+   "role": "charge the mother node and carry serial data",
+   "how": "Four pins on the top of the tail rim meet gold pads on the hoop, above the waterline.",
+   "specs": [
+    [
+     "Part",
+     "0906-2-15-20-75-14-11-0"
+    ],
+    [
+     "Stroke",
+     "1.40 mm"
+    ],
+    [
+     "Force",
+     "60 g at mid stroke"
+    ],
+    [
+     "Current",
+     "6.5 A (30 C rise)"
+    ],
+    [
+     "Life",
+     "100,000 to 1,000,000 cycles"
+    ]
+   ],
+   "make": "buy",
+   "qty": 4,
+   "mass_g": 2,
+   "cost_usd": 12,
+   "sources": [
+    {
+     "label": "Mill-Max 0906-2-15-20-75-14-11-0 datasheet",
+     "url": "https://www.mill-max.com/products/datasheet/0906-2-15-20-75-14-11-0"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Dock 50 times; check contact on all pins.",
+   "owned": false
+  },
+  {
+   "id": "dock_seal",
+   "group": "dock",
+   "name": "Dock face seal, SORTA-Clear 18",
+   "role": "seals tail rim to hoop, partly below water",
+   "how": "A cast D ring on the tail rim inside the magnet circle. Compresses to a hard stop when the magnets touch.",
+   "specs": [
+    [
+     "Silicone",
+     "SORTA-Clear 18, Shore 18A"
+    ],
+    [
+     "Section",
+     "D 6 mm, 25% squeeze"
+    ],
+    [
+     "Seal circle",
+     "about D 276 mm"
+    ]
+   ],
+   "make": "cast",
+   "qty": 1,
+   "mass_g": 60,
+   "cost_usd": 10,
+   "sources": [
+    {
+     "label": "Smooth-On SORTA-Clear 18",
+     "url": "https://www.smooth-on.com/products/sorta-clear-18/"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Dock in water, pressure to 1 kPa, watch for bubbles 1 h.",
+   "owned": false
+  },
+  {
+   "id": "dock_cone",
+   "group": "dock",
+   "name": "Lead in cone on the tail mouth",
+   "role": "guides the tail onto the bore",
+   "how": "Part of the tail shell print. The cone also pushes the petal door open.",
+   "specs": [
+    [
+     "Half angle",
+     "35 to 40 deg"
+    ],
+    [
+     "Depth",
+     "30 mm"
+    ],
+    [
+     "Capture",
+     "about 21 to 25 mm (physics notes)"
+    ]
+   ],
+   "make": "print rigid",
+   "qty": 1,
+   "mass_g": 300,
+   "cost_usd": 0,
+   "sources": [
+    {
+     "label": "Elegoo OrangeStorm Giga",
+     "url": "https://elegoo.com/products/orangestorm-giga"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Approach at 20 mm offset; cone must centre the tail.",
+   "owned": false
+  },
+  {
+   "id": "baby_body",
+   "group": "baby",
+   "name": "Baby skin, printed FX-Pro",
+   "role": "folded body that inflates and is born",
+   "how": "Printed folded in the gel around the capsule. The capsule's valve boss stays open to the outside.",
+   "specs": [
+    [
+     "Silicone",
+     "Dragon Skin FX-Pro"
+    ],
+    [
+     "Wall",
+     "1 bead about 1.6 mm, caps 2 beads about 3 mm"
+    ],
+    [
+     "Silicone use",
+     "about 0.5 to 0.65 L"
+    ],
+    [
+     "Print zone",
+     "390 x 387 x 42 mm (scene)"
+    ]
+   ],
+   "make": "print silicone in gel",
+   "qty": 1,
+   "mass_g": 680,
+   "cost_usd": 50,
+   "sources": [
+    {
+     "label": "Smooth-On Dragon Skin FX-Pro",
+     "url": "https://www.smooth-on.com/products/dragon-skin-fx-pro/"
+    },
+    {
+     "label": "Hajash et al. 2017, Large Scale Rapid Liquid Printing, doi 10.1089/3dp.2017.0037 (MIT DSpace)",
+     "url": "https://dspace.mit.edu/bitstream/handle/1721.1/122801/3dp.2017.0037.pdf?sequence=2"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Print a 100 mm closed pleat test, inflate to 1 kPa in water.",
+   "owned": false
+  },
+  {
+   "id": "needle_valve",
+   "group": "baby",
+   "name": "Ball needle valve core",
+   "role": "only opening of the capsule; holds the baby's air",
+   "how": "A rubber valve core like a basketball valve, set in the capsule boss. The 14G needle enters to inflate.",
+   "specs": [
+    [
+     "Needle range",
+     "D 1.5 to 2.5 mm, length 24 to 38 mm (patent)"
+    ],
+    [
+     "14G OD",
+     "1.83 mm, inside range"
+    ],
+    [
+     "Core mass",
+     "about 0.9 to 1.3 g"
+    ],
+    [
+     "Material",
+     "natural or butyl rubber"
+    ]
+   ],
+   "make": "buy",
+   "qty": 2,
+   "mass_g": 2,
+   "cost_usd": 5,
+   "sources": [
+    {
+     "label": "US8579744B2, inflation valve core for sports balls",
+     "url": "https://patents.google.com/patent/US8579744B2/en"
+    },
+    {
+     "label": "Artist's Weekly Updates deck (S8 design, gel tests)",
+     "url": "https://docs.google.com/presentation/d/1fTm_oDPefzafITs2w75gJIZ8zdXcw0acMDKE9GcqqMM"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Insert the needle 50 times; valve must hold 2 kPa after.",
+   "owned": false
+  },
+  {
+   "id": "baby_mcu",
+   "group": "baby",
+   "name": "CodeCell C6 Drive",
+   "role": "brain of the baby: radio, IMU, motor driver",
+   "how": "ESP32-C6 board with a BNO085 9 axis IMU and two H bridges. Runs the pump and reports pressure by BLE.",
+   "specs": [
+    [
+     "MCU",
+     "ESP32-C6, Wi-Fi 6, BLE 5"
+    ],
+    [
+     "IMU",
+     "BNO085 9 axis with fusion"
+    ],
+    [
+     "Drivers",
+     "2 H bridges, 1.5 A one, 750 mA each two"
+    ],
+    [
+     "Charger",
+     "about 90 mA"
+    ],
+    [
+     "Size",
+     "22.5 x 18.5 x 9.4 mm, 3.7 g"
+    ]
+   ],
+   "make": "buy",
+   "qty": 1,
+   "mass_g": 4,
+   "cost_usd": 35,
+   "sources": [
+    {
+     "label": "microbots CodeCell C6 Drive",
+     "url": "https://microbots.io/products/codecell-c6-drive"
+    }
+   ],
+   "verdict": "works",
+   "test": "",
+   "owned": false
+  },
+  {
+   "id": "baby_battery",
+   "group": "baby",
+   "name": "1S LiPo 3000 mAh, JST 1.25 (same as owned)",
+   "role": "powers the capsule",
+   "how": "Same cell type the artist bought. Charge fully before sealing; the CodeCell charger is slow.",
+   "specs": [
+    [
+     "Cell",
+     "3.7 V 3000 mAh, JST 1.25"
+    ],
+    [
+     "Charge time",
+     "about 33 h at 90 mA (computed)"
+    ],
+    [
+     "Primary source",
+     "none found; Amazon listing only"
+    ]
+   ],
+   "make": "buy",
+   "qty": 1,
+   "mass_g": 55,
+   "cost_usd": 15,
+   "sources": [
+    {
+     "label": "microbots CodeCell C6 Drive",
+     "url": "https://microbots.io/products/codecell-c6-drive"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Run pump and radio from full; log hours to cutoff.",
+   "owned": false
+  },
+  {
+   "id": "baby_pump",
+   "group": "baby",
+   "name": "AITIAO 3 to 5 V micro submersible pump (owned)",
+   "role": "water jet for the baby to swim",
+   "how": "Sits in the wet bay under the capsule. Inlet and outlet tubes pass through the skin.",
+   "specs": [
+    [
+     "Voltage",
+     "3 to 4.5 V"
+    ],
+    [
+     "Current",
+     "0.18 A"
+    ],
+    [
+     "Flow",
+     "about 100 L/h"
+    ],
+    [
+     "Size",
+     "42.6 x 23.9 x 22.7 mm"
+    ],
+    [
+     "Data",
+     "reseller page for the same pump class"
+    ]
+   ],
+   "make": "buy",
+   "qty": 1,
+   "mass_g": 30,
+   "cost_usd": 0,
+   "sources": [
+    {
+     "label": "Core Electronics mini submersible pump (reseller, no primary exists)",
+     "url": "https://core-electronics.com.au/mute-sounds-mini-submersible-pump-dc-3v-5v.html"
+    }
+   ],
+   "verdict": "open",
+   "test": "Run the pump in a sealed bay under 100 mm water 2 h.",
+   "owned": true
+  },
+  {
+   "id": "capsule_shell",
+   "group": "baby",
+   "name": "Electronics capsule shell",
+   "role": "dry home for board, cell and sensor",
+   "how": "Two clear halves with a face O ring and 4 screws. The valve boss and a side port lead air into the baby.",
+   "specs": [
+    [
+     "Material",
+     "Clear Resin V5"
+    ],
+    [
+     "Size",
+     "about 30 x 50 x 80 mm"
+    ],
+    [
+     "Seal",
+     "silicone cord O ring, then Ecoflex 00-35 FAST over the seam"
+    ],
+    [
+     "Placing",
+     "carried on the needle, set into the gel"
+    ]
+   ],
+   "make": "print rigid",
+   "qty": 1,
+   "mass_g": 45,
+   "cost_usd": 10,
+   "sources": [
+    {
+     "label": "Formlabs Clear Resin V5 TDS",
+     "url": "https://formlabs.com/tds/clear-resin-v5-tds"
+    },
+    {
+     "label": "Smooth-On Ecoflex 00-35 (FAST data)",
+     "url": "https://www.smooth-on.com/products/ecoflex-00-35/"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Sink the closed capsule 300 mm for 24 h; weigh for water.",
+   "owned": false
+  },
+  {
+   "id": "mother_node",
+   "group": "electronics",
+   "name": "Mother node: CodeCell C6 Drive (owned)",
+   "role": "senses waves and motion of the mother",
+   "how": "A sealed node in the bilge beside the tray. The IMU reads the mother's rocking; BLE talks to tail and baby.",
+   "specs": [
+    [
+     "IMU",
+     "BNO085 9 axis"
+    ],
+    [
+     "Radio",
+     "BLE 5, Wi-Fi 6"
+    ],
+    [
+     "Charging",
+     "through the pogo pins"
+    ]
+   ],
+   "make": "buy",
+   "qty": 1,
+   "mass_g": 4,
+   "cost_usd": 0,
+   "sources": [
+    {
+     "label": "microbots CodeCell C6 Drive",
+     "url": "https://microbots.io/products/codecell-c6-drive"
+    }
+   ],
+   "verdict": "works",
+   "test": "",
+   "owned": true
+  },
+  {
+   "id": "mother_battery",
+   "group": "electronics",
+   "name": "ETWOWUP 3.7 V 3000 mAh LiPo (owned)",
+   "role": "powers the mother node",
+   "how": "Charged from the tail through the pogo pins while docked.",
+   "specs": [
+    [
+     "Cell",
+     "1S, 3000 mAh, JST 1.25"
+    ],
+    [
+     "Primary source",
+     "none found; Amazon listing only"
+    ]
+   ],
+   "make": "buy",
+   "qty": 1,
+   "mass_g": 55,
+   "cost_usd": 0,
+   "sources": [
+    {
+     "label": "microbots CodeCell C6 Drive",
+     "url": "https://microbots.io/products/codecell-c6-drive"
+    }
+   ],
+   "verdict": "works",
+   "test": "",
+   "owned": true
+  }
+ ],
+ "precision": [
+  [
+   "DexArm repeatability",
+   "0.05 mm",
+   "https://rotrics.com/pages/dexarm-spec"
+  ],
+  [
+   "DexArm stated precision",
+   "precise to 100 micron (0.1 mm)",
+   "https://www.rotrics.com/products/dexarm"
+  ],
+  [
+   "DexArm reach, payload",
+   "380 mm, 500 g",
+   "https://rotrics.com/pages/dexarm-spec"
+  ],
+  [
+   "Boom rail",
+   "MGN12H, MP 36.26 N m per block; sag target under 0.3 mm",
+   "https://s3.amazonaws.com/www.motionusa.com/hiwin/2025/MG%20Series-2025.pdf"
+  ],
+  [
+   "Nozzle",
+   "14G, ID 1.54 mm, OD 1.83 mm",
+   "https://www.nordson.com/products/efd-products/general-purpose-dispense-tips"
+  ],
+  [
+   "Bead size, RLP",
+   "1.07 mm nozzle gave 1.14 mm wide x 1.02 mm high",
+   "https://dspace.mit.edu/bitstream/handle/1721.1/122801/3dp.2017.0037.pdf?sequence=2"
+  ],
+  [
+   "Bead width, ours",
+   "about 1.6 mm from 1.54 mm ID (scaled from RLP)",
+   "https://dspace.mit.edu/bitstream/handle/1721.1/122801/3dp.2017.0037.pdf?sequence=2"
+  ],
+  [
+   "Layer height",
+   "1.2 mm planned (about 0.8 x bead height)",
+   "https://dspace.mit.edu/bitstream/handle/1721.1/122801/3dp.2017.0037.pdf?sequence=2"
+  ],
+  [
+   "Wall thickness",
+   "1.6 mm one bead; about 3 mm two beads",
+   "https://dspace.mit.edu/bitstream/handle/1721.1/122801/3dp.2017.0037.pdf?sequence=2"
+  ],
+  [
+   "Filament diameter error, PDMS in Carbopol",
+   "within 10% of target",
+   "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5059754/fullTextXML"
+  ],
+  [
+   "Print speed",
+   "5 mm/s planned; Hinton 20 mm/s; RLP up to 50 mm/s",
+   "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5059754/fullTextXML"
+  ],
+  [
+   "Robot path error cited by RLP",
+   "about 0.5 mm average, mid sized robots",
+   "https://dspace.mit.edu/bitstream/handle/1721.1/122801/3dp.2017.0037.pdf?sequence=2"
+  ],
+  [
+   "RLP distortion",
+   "teardrop section grows with nozzle; concave underside from gel buoyancy",
+   "https://dspace.mit.edu/bitstream/handle/1721.1/122801/3dp.2017.0037.pdf?sequence=2"
+  ],
+  [
+   "Water based support limit",
+   "interfacial tension limits silicone precision and bead adhesion",
+   "https://par.nsf.gov/servlets/purl/10085332"
+  ],
+  [
+   "Best case, oil organogel",
+   "80 um stable features; 3 to 4 Pa yield",
+   "https://par.nsf.gov/servlets/purl/10085332"
+  ],
+  [
+   "Gel bubbles",
+   "bubbles hurt accuracy; sealed rest about 1 day clears them",
+   "https://docs.google.com/presentation/d/1fTm_oDPefzafITs2w75gJIZ8zdXcw0acMDKE9GcqqMM"
+  ],
+  [
+   "Expected error, this build",
+   "about +/-1 mm over 390 mm, +/-0.3 mm on wall (estimate, not measured)",
+   "https://dspace.mit.edu/bitstream/handle/1721.1/122801/3dp.2017.0037.pdf?sequence=2"
+  ]
+ ],
+ "mother_segments": {
+  "count": 11,
+  "printer": "Formlabs Form 4L",
+  "build_volume_mm": [
+   353,
+   196,
+   350
+  ],
+  "material": "Formlabs Clear Resin V5",
+  "joints": "Inward 12 mm flanges. Removable seams: 2.5 mm silicone cord in a groove, M3 A4 screws at 30 mm. Permanent seams (rear and front halves): 3M DP100 Plus Clear. Belly skin clamped by a printed ring.",
+  "notes": "7 lower hull pieces (keel cap below z = -0.274 m plus 6 gores to z = -0.060 m), 2 rear wall halves, 2 front plate halves. Also Clear V5: 1 bore hoop and 4 gel tray quarters. Fit found by a bounding box search; confirm every piece in the slicer. Clear V5 gains 0.9% in 24 h in water."
+ }
+}

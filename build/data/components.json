@@ -104,8 +104,8 @@
    "id": "rear_wall",
    "group": "mother",
    "name": "Rear wall, 2 clear halves",
-   "role": "frames the rear bore below and above water",
-   "how": "The rear cap aft of x = -0.325 m, split left and right. Halves bond with DP100 Plus and screw to the hoop and gores.",
+   "role": "frames the rear bore above water; carries the lead in recess and the dock pads",
+   "how": "The rear cap aft of x = -0.325 m, split left and right. The face holds a 37.5 deg recess around the bore and 3 flush steel pads. Halves bond with DP100 Plus and screw to the bore ring and gores.",
    "specs": [
     [
      "Piece size",
@@ -117,13 +117,21 @@
     ],
     [
      "Wall",
-     "4 mm"
+     "4 mm, 34 mm at the recess"
+    ],
+    [
+     "Recess",
+     "30 mm deep, D 310 to D 264"
+    ],
+    [
+     "Pads",
+     "3 pockets 40 x 40 x 4 mm at r 185, 90/210/330 deg"
     ]
    ],
    "make": "print rigid",
    "qty": 2,
-   "mass_g": 700,
-   "cost_usd": 120,
+   "mass_g": 900,
+   "cost_usd": 140,
    "sources": [
     {
      "label": "Formlabs Form 4L store page (build volume)",
@@ -136,30 +144,27 @@
    ],
    "verdict": "works after bench test",
    "test": "Check both halves fit the Form 4L in the slicer.",
-   "owned": false
+   "owned": false,
+   "changed_in_v2": "v2: carries the 30 mm lead in recess and the 3 steel pads; the bore now sits above water."
   },
   {
    "id": "bore_hoop",
    "group": "mother",
-   "name": "Rear bore hoop with steel pads",
-   "role": "dock face; holds 3 steel pads for the tail",
-   "how": "A flat ring at the rear bore. Three 4 mm iron pads sit flush in the face for the electropermanent magnets.",
+   "name": "Bore ring D 250 with petal seat",
+   "role": "clear bore for the arm; seat for the petal hinge and the dock seal",
+   "how": "A ring at the bottom of the recess: 7 mm shoulder from D 264 to the D 250 bore. The tail collar lip seals on the shoulder; the petal hinge ring screws behind it.",
    "specs": [
     [
      "Bore",
-     "D 250 mm"
+     "D 250 mm (arm passage pose needs R 113.7)"
     ],
     [
-     "Outer",
-     "D 300 mm"
+     "Shoulder",
+     "D 264 to D 250"
     ],
     [
      "Depth",
-     "20 mm"
-    ],
-    [
-     "Pads",
-     "3 x 4 mm iron, 40 x 40 mm"
+     "12 mm"
     ],
     [
      "Material",
@@ -168,7 +173,7 @@
    ],
    "make": "print rigid",
    "qty": 1,
-   "mass_g": 450,
+   "mass_g": 400,
    "cost_usd": 60,
    "sources": [
     {
@@ -176,13 +181,14 @@
      "url": "https://formlabs.com/store/3d-printers/form-4l/"
     },
     {
-     "label": "Zubax FluxGrip FG40 reference manual",
-     "url": "https://fluxgrip.zubax.com/chapters/hardware/fg40.html"
+     "label": "Formlabs Clear Resin V5 TDS",
+     "url": "https://formlabs.com/tds/clear-resin-v5-tds"
     }
    ],
    "verdict": "works after bench test",
-   "test": "Lay the hoop flat on a surface plate; flatness under 0.3 mm.",
-   "owned": false
+   "test": "Pass the DexArm in the passage pose through the ring 20 times; smallest gap 7 mm or more.",
+   "owned": false,
+   "changed_in_v2": "v2: becomes the bore ring at the bottom of the lead in recess; pads move to the rear wall face."
   },
   {
    "id": "front_plate",
@@ -231,36 +237,40 @@
    "group": "mother",
    "name": "Belly origami skin, SORTA-Clear 18",
    "role": "upper skin; pleats open as the womb fills",
-   "how": "Cast clear silicone with 5 concentric elliptical pleats, pitch 58 mm, depth 16 mm, clamped to the hull rim by a printed ring. Pressure opens the pleats; venting lets them sag.",
+   "how": "Cast clear silicone with 5 concentric elliptical pleats around the crown, clamped to the hull rim by a printed ring. 24 clear nylon cords in the skin along meridians go straight at 10 L and stop the rise.",
    "specs": [
     [
      "Silicone",
      "SORTA-Clear 18, Shore 18A"
     ],
     [
-     "Elongation",
-     "about 545%"
+     "Pleats",
+     "5, pitch 45 mm, depth 14 mm at the sides, 9 mm at the ends"
     ],
     [
-     "Tear",
-     "about 80 pli"
+     "Zone",
+     "0.29 m2 above z 0.164, aft limit x -0.30"
     ],
     [
-     "Mix",
-     "100A:10B by weight"
+     "Wall",
+     "2 mm"
     ],
     [
-     "Cure",
-     "about 24 h"
+     "Stop",
+     "24 x 0.5 mm clear nylon, cut to the 10 L meridian"
     ],
     [
-     "Skin",
-     "2 mm, about 0.9 m2 flat x 1.6 for pleats"
+     "Rise",
+     "6.1 mm per L; 51 mm for 8.35 L; 61 mm at the 10 L stop"
+    ],
+    [
+     "Cord load",
+     "18 N at 1 kPa"
     ]
    ],
    "make": "cast",
    "qty": 1,
-   "mass_g": 3100,
+   "mass_g": 3150,
    "cost_usd": 300,
    "sources": [
     {
@@ -269,19 +279,20 @@
     }
    ],
    "verdict": "works after bench test",
-   "test": "Cast one pleat strip, pressure to 0.5 kPa, measure rise and sag.",
-   "owned": false
+   "test": "Pleat strip with 3 cords on a pressure box to 2 kPa; then the full belly at 2 to 10 L, measure crown rise.",
+   "owned": false,
+   "changed_in_v2": "v2: pleat sizes from the belly geometry; 24 nylon cords cast in as the 10 L stop."
   },
   {
    "id": "gel_tray",
    "group": "mother",
-   "name": "Gel pool tray, 4 clear quarters",
+   "name": "Gel pool tray, round, 4 clear quarters",
    "role": "holds the support gel over the keel",
-   "how": "An elliptic tray with vertical walls to z = -0.235 m, then a floor that follows the hull. Quarters bond with DP100 Plus.",
+   "how": "A round tray with vertical walls down to the hull, centred under the print. The front quarter is notched where the chute enters. Quarters bond with DP100 Plus.",
    "specs": [
     [
-     "Rim",
-     "470 x 450 mm inner"
+     "Inner",
+     "D 410 mm, centre x -0.040 m"
     ],
     [
      "Gel surface",
@@ -293,11 +304,7 @@
     ],
     [
      "Gel volume",
-     "about 24 L (computed)"
-    ],
-    [
-     "Round print",
-     "up to D 390 mm"
+     "about 18 L (computed)"
     ],
     [
      "Material",
@@ -306,7 +313,7 @@
    ],
    "make": "print rigid",
    "qty": 4,
-   "mass_g": 900,
+   "mass_g": 700,
    "cost_usd": 160,
    "sources": [
     {
@@ -320,14 +327,66 @@
    ],
    "verdict": "works after bench test",
    "test": "Fill with water 24 h before the first gel.",
-   "owned": false
+   "owned": false,
+   "changed_in_v2": "v2: round D 410 on the print centre x -0.040; 18 L; front quarter notched for the chute."
+  },
+  {
+   "id": "chute",
+   "group": "mother",
+   "name": "Birth chute, one clear print",
+   "role": "carries the floating baby from the gel up to the canal",
+   "how": "A ribbed trough on the canal bottom line at 20.8 deg, from 30 mm under the gel surface to the canal low point. Fixed to the tray front quarter and the front plate.",
+   "specs": [
+    [
+     "Angle",
+     "20.8 deg (canal axis)"
+    ],
+    [
+     "Length",
+     "294 mm"
+    ],
+    [
+     "Width",
+     "220 mm inside, 30 mm walls"
+    ],
+    [
+     "Foot / top",
+     "x 0.077 z -0.154 / x 0.352 z -0.050 m"
+    ],
+    [
+     "Surface",
+     "2 mm ribs along the slope, 10 mm pitch"
+    ],
+    [
+     "Material",
+     "Clear Resin V5"
+    ]
+   ],
+   "make": "print rigid",
+   "qty": 1,
+   "mass_g": 250,
+   "cost_usd": 50,
+   "sources": [
+    {
+     "label": "Formlabs Form 4L store page (build volume)",
+     "url": "https://formlabs.com/store/3d-printers/form-4l/"
+    },
+    {
+     "label": "Formlabs Clear Resin V5 TDS",
+     "url": "https://formlabs.com/tds/clear-resin-v5-tds"
+    }
+   ],
+   "verdict": "works after bench test",
+   "test": "Pull a 1.7 kg silicone dummy up a chute strip at 20.8 deg, wet with gel and dry.",
+   "owned": false,
+   "changed_in_v2": "new in v2"
   },
   {
    "id": "rear_door",
    "group": "mother",
-   "name": "Passive petal door, cast silicone",
+   "name": "Petal door, 6 cast silicone petals",
    "role": "closes the rear bore when no tail is docked",
-   "how": "Four silicone petals meet in the bore. The tail cone pushes them open; elastic and womb pressure close them.",
+   "how": "Six petals hinged on a ring at D 256 behind the bore shoulder. One drawstring on an N20 gear motor (mother node H bridge) pulls them open to 135 deg into the womb; the cast shape closes them. The dock seal holds the womb while docked, so the door never holds pressure.",
    "specs": [
     [
      "Silicone",
@@ -335,26 +394,39 @@
     ],
     [
      "Petals",
-     "4, about 4 mm thick"
+     "6, about 3 mm thick"
+    ],
+    [
+     "Open angle",
+     "135 deg (45 deg flared cone)"
+    ],
+    [
+     "Clear when open",
+     "outside R 125"
+    ],
+    [
+     "Actuator",
+     "N20 gear motor, 6 line drawstring"
     ],
     [
      "Must hold",
-     "1 kPa inside, water outside at the lower lip"
+     "splash only; bore 20 mm above water"
     ]
    ],
    "make": "cast",
    "qty": 1,
-   "mass_g": 250,
-   "cost_usd": 30,
+   "mass_g": 350,
+   "cost_usd": 45,
    "sources": [
     {
      "label": "Smooth-On SORTA-Clear 18",
      "url": "https://www.smooth-on.com/products/sorta-clear-18/"
     }
    ],
-   "verdict": "open",
-   "test": "Cast a half scale door, push the cone through, count the force.",
-   "owned": false
+   "verdict": "works after bench test",
+   "test": "Open and close 200 times; open petals must stay outside D 250.",
+   "owned": false,
+   "changed_in_v2": "v2: actuated petals opening to 135 deg out of the bore; splash guard only, holds no pressure."
   },
   {
    "id": "canal_sleeve",
@@ -419,7 +491,7 @@
     ],
     [
      "Canal low point",
-     "about 50 mm above water"
+     "80 to 98 mm above water"
     ]
    ],
    "make": "cast",
@@ -434,14 +506,15 @@
    ],
    "verdict": "works after bench test",
    "test": "Seal the lips on a jar, raise to 1.2 kPa, check for bubbles.",
-   "owned": false
+   "owned": false,
+   "changed_in_v2": "v2: canal low point 80 to 98 mm above the v2 waterline."
   },
   {
    "id": "tail_shell",
    "group": "tail",
-   "name": "Tail shell with dock cone, one PETG print",
+   "name": "Tail shell, gourd form, one PETG print",
    "role": "dry hull for arm, power, pump and thrusters",
-   "how": "One large FDM print, 5 perimeters, outside sealed with an epoxy coat. The mouth carries the lead in cone.",
+   "how": "One large FDM print, outside sealed with epoxy. Same mouth as the mother rear face, then wider and lower behind the seam; bottom level with the mother keel. Heavy parts sit low in the belly.",
    "specs": [
     [
      "Printer",
@@ -449,15 +522,23 @@
     ],
     [
      "Length",
-     "588 mm"
+     "600 mm"
     ],
     [
      "Mouth",
      "D 424 mm"
     ],
     [
+     "Max",
+     "D 466 at x_t -0.22, centre 50 mm lower"
+    ],
+    [
+     "Bottom",
+     "z -0.283 m"
+    ],
+    [
      "Wall",
-     "4 mm"
+     "3 mm"
     ],
     [
      "Filament",
@@ -466,7 +547,7 @@
    ],
    "make": "print rigid",
    "qty": 1,
-   "mass_g": 3300,
+   "mass_g": 3080,
    "cost_usd": 90,
    "sources": [
     {
@@ -475,15 +556,16 @@
     }
    ],
    "verdict": "works after bench test",
-   "test": "Sink the empty shell with ballast 24 h; weigh any water inside.",
-   "owned": false
+   "test": "Float the tail with all parts: axis 145 mm above water within 5 mm; heel 10 deg by hand; the tail must return upright.",
+   "owned": false,
+   "changed_in_v2": "v2: gourd form so the tail floats level at dock height (old form floated 2.4 kg there)."
   },
   {
    "id": "rails",
    "group": "tail",
    "name": "HIWIN MGN12H rails and carriage",
    "role": "carry the arm forward into the womb",
-   "how": "Two parallel rails on the tail keel, two blocks each, under a 6 mm aluminium plate. A 200 mm boom plate holds the arm base.",
+   "how": "Two parallel rails on a keel beam in the tail belly, two blocks each, under a 280 x 120 x 6 mm boom plate. The DexArm base sits 70 mm ahead of the front blocks.",
    "specs": [
     [
      "Rail",
@@ -503,7 +585,11 @@
     ],
     [
      "Length",
-     "2 x 500 mm, stroke 400 mm"
+     "2 x 500 mm (20 holes, E 12.5), x_t -0.530 to -0.030, level"
+    ],
+    [
+     "Stroke",
+     "370 mm; home base x_t -0.327; stations x_t -0.040, +0.040"
     ],
     [
      "Material",
@@ -512,7 +598,7 @@
    ],
    "make": "buy",
    "qty": 2,
-   "mass_g": 1300,
+   "mass_g": 1320,
    "cost_usd": 240,
    "sources": [
     {
@@ -522,14 +608,15 @@
    ],
    "verdict": "works after bench test",
    "test": "Extend fully with the arm on; dial gauge sag at the arm base under 0.3 mm.",
-   "owned": false
+   "owned": false,
+   "changed_in_v2": "v2: 500 mm rails level, x_t -0.530 to -0.030; stroke 370 mm; two print stations."
   },
   {
    "id": "boom_drive",
    "group": "tail",
    "name": "Boom drive: NEMA 17 and GT2 belt",
    "role": "moves the carriage once, then holds",
-   "how": "One stepper drives a closed GT2 6 mm belt along the rails. The boom extends once and holds still while printing.",
+   "how": "One stepper at the front end drives a closed GT2 belt to a rear idler. The boom moves to a station and holds while the arm prints; two stations per layer.",
    "specs": [
     [
      "Motor",
@@ -541,11 +628,15 @@
     ],
     [
      "Stroke",
-     "400 mm"
+     "370 mm"
     ],
     [
      "Belt",
      "GT2 2 mm pitch, 6 mm (generic)"
+    ],
+    [
+     "Station repeat",
+     "0.1 mm or better (to test)"
     ]
    ],
    "make": "buy",
@@ -558,9 +649,10 @@
      "url": "https://www.omc-stepperonline.com/nema-17-bipolar-59ncm-84oz-in-2a-42x48mm-4-wires-w-1m-cable-connector-17hs19-2004s1"
     }
    ],
-   "verdict": "works",
-   "test": "",
-   "owned": false
+   "verdict": "works after bench test",
+   "test": "Move between stations 50 times; dial gauge repeat within 0.1 mm.",
+   "owned": false,
+   "changed_in_v2": "v2: stroke 370 mm; motor at the front end; steps between two print stations."
   },
   {
    "id": "dexarm",
@@ -596,6 +688,18 @@
     [
      "Joints",
      "base +/-110, J1 0 to 110, J2 0 to 85, J3 +/-360 deg"
+    ],
+    [
+     "Passage pose",
+     "upper arm 70, forearm 60 deg (film convention), head needle up: R 113.7 mm"
+    ],
+    [
+     "Reach at 160 mm below base",
+     "269 to 397 mm forward"
+    ],
+    [
+     "Print stations",
+     "base centre x_t -0.040 and +0.040"
     ]
    ],
    "make": "buy",
@@ -614,7 +718,8 @@
    ],
    "verdict": "works after bench test",
    "test": "Print a 100 mm square in gel 10 times; measure spread of corners.",
-   "owned": true
+   "owned": true,
+   "changed_in_v2": "v2: passage pose, print stations and reach band added."
   },
   {
    "id": "tail_battery",
@@ -718,6 +823,10 @@
     [
      "Mass",
      "427 g in air, 239 g in water"
+    ],
+    [
+     "Mount",
+     "gourd sides at x_t -0.40, z -0.22"
     ]
    ],
    "make": "buy",
@@ -732,37 +841,38 @@
    ],
    "verdict": "works",
    "test": "",
-   "owned": false
+   "owned": false,
+   "changed_in_v2": "v2: mounted on the gourd sides, about 75 mm under water."
   },
   {
    "id": "trim",
    "group": "tail",
-   "name": "Trim foam and stainless ballast",
-   "role": "set the tail to dock height and level",
-   "how": "Target tail mass about 10 kg so the tail axis rides at the mother's bore axis. Add foam if heavy, ballast if light.",
+   "name": "Trim ballast, stainless, mother and tail",
+   "role": "set both bodies level at the design waterline",
+   "how": "Mother: 1.5 kg in the bilge at x -0.26. Tail: 1.4 kg low at x_t -0.36. Add or remove 191 g pieces to hold the hatch axis 145 mm above water.",
    "specs": [
-    [
-     "Foam",
-     "LAST-A-FOAM R-3318, 288 kg/m3, net lift 488 g per piece"
-    ],
     [
      "Ballast",
      "AISI 316, 191 g in air, 165 g in water"
     ],
     [
+     "Mother",
+     "1.46 kg at x -0.26 m"
+    ],
+    [
+     "Tail",
+     "1.44 kg at x_t -0.36 m"
+    ],
+    [
      "Target",
-     "tail about 10 kg (computed)"
+     "hatch axis 145 mm above water, level (computed)"
     ]
    ],
    "make": "buy",
-   "qty": 4,
-   "mass_g": 800,
-   "cost_usd": 130,
+   "qty": 16,
+   "mass_g": 2900,
+   "cost_usd": 224,
    "sources": [
-    {
-     "label": "Blue Robotics R-3318 machined foam BR-100099",
-     "url": "https://bluerobotics.com/?p=20043"
-    },
     {
      "label": "Blue Robotics stainless ballast 200 g BR-101039",
      "url": "https://bluerobotics.com/?p=28583"
@@ -770,7 +880,8 @@
    ],
    "verdict": "works after bench test",
    "test": "Float the loaded tail beside the mother; match axis heights within 5 mm.",
-   "owned": false
+   "owned": false,
+   "changed_in_v2": "v2: foam dropped (inside a dry hull foam adds no lift); stainless ballast in both bodies."
   },
   {
    "id": "brackets",
@@ -805,63 +916,68 @@
   {
    "id": "cartridge",
    "group": "tool",
-   "name": "medmix MIXPAC 400 ml 1:1 cartridge",
+   "name": "Nordson EFD 600 ml 1:1 side by side cartridge",
    "role": "stores silicone A and B for one baby",
-   "how": "Side by side cartridge on the boom plate, filled with FX-Pro A and B. One plunger pushes both sides at 1:1.",
+   "how": "Fixed in the tail belly under the rails with the mixer at its outlet. One plunger yoke pushes both sides at 1:1. A 1.0 m mixed line runs in the drag chain to the head.",
    "specs": [
     [
-     "Model",
-     "AF 400-01-10-01 (112410), PP, self venting"
+     "Usable",
+     "630 ml"
     ],
     [
      "Ratio",
      "1:1"
     ],
     [
-     "Usable",
-     "about 400 ml mixed"
+     "Need per baby",
+     "666 ml with waste: baby silicone 0.61 L or less, else change at a cap layer"
+    ],
+    [
+     "Piston area",
+     "not published; measure"
     ],
     [
      "Mixers",
-     "MFH, MFQ"
+     "MFQ 05-16L"
     ]
    ],
    "make": "buy",
    "qty": 4,
-   "mass_g": 450,
+   "mass_g": 600,
    "cost_usd": 60,
    "sources": [
     {
-     "label": "medmix MIXPAC Systems for Adhesives brochure (medmix document, hosted by Ellsworth)",
-     "url": "https://www.ellsworth.com:443/globalassets/literature-library/manufacturer/medmix/medmix-brochure-mixpac-systems-for-adhesives.pdf"
-    },
-    {
      "label": "Nordson EFD side by side 2K cartridges",
      "url": "https://www.nordson.com/products/efd-products/side-x-side-two-component-cartridges"
+    },
+    {
+     "label": "medmix MIXPAC Systems for Adhesives brochure (medmix document, hosted by Ellsworth)",
+     "url": "https://www.ellsworth.com:443/globalassets/literature-library/manufacturer/medmix/medmix-brochure-mixpac-systems-for-adhesives.pdf"
     }
    ],
    "verdict": "works after bench test",
    "test": "Fill by hand, push 10 ml, weigh A and B outputs for 1:1.",
-   "owned": false
+   "owned": false,
+   "changed_in_v2": "v2: one 600 ml cartridge per baby, fixed in the tail belly, not on the boom."
   },
   {
    "id": "cartridge_drive",
    "group": "tool",
-   "name": "StepperOnline NEMA 23 lead screw plunger",
+   "name": "StepperOnline NEMA 23 lead screw plunger, 1.5875 mm lead",
    "role": "pushes the cartridge plungers slowly and evenly",
    "how": "An external lead screw stepper pushes a printed yoke on both pistons. Slow, steady flow sets the bead.",
    "specs": [
     [
      "Model",
-     "23E26S2504GG-250RS"
+     "23E26S2504KG-250RS"
     ],
     [
      "Lead",
-     "2.54 mm per turn"
+     "1.5875 mm per turn"
     ],
     [
      "Thrust",
-     "540 N minimum at 300 pps"
+     "750 N minimum at 300 pps"
     ],
     [
      "Stroke",
@@ -870,6 +986,10 @@
     [
      "Mass",
      "958 g"
+    ],
+    [
+     "Load at 20 mm/s",
+     "389 to 517 N (computed)"
     ]
    ],
    "make": "buy",
@@ -878,20 +998,21 @@
    "cost_usd": 118,
    "sources": [
     {
-     "label": "StepperOnline 23E26S2504GG-250RS",
-     "url": "https://www.omc-stepperonline.com/nema-23-external-66mm-stack-2-5a-lead-2-54mm-0-1-length-250mm-23e26s2504gg-250rs"
+     "label": "StepperOnline 23E26S2504KG (250 mm version listed)",
+     "url": "https://www.omc-stepperonline.com/nema-23-external-66mm-stack-2-5a-lead-1-5875mm-0-0625-length-150mm-23e26s2504kg-150rs"
     }
    ],
    "verdict": "works after bench test",
-   "test": "Push FX-Pro through needle at 5 mm/s bead speed; log motor current.",
-   "owned": false
+   "test": "Push DS10 NV through the full line at 15, 20, 25 mm/s bead speed; log motor current.",
+   "owned": false,
+   "changed_in_v2": "v2: 1.5875 mm lead version, 750 N, for margin at 20 mm/s."
   },
   {
    "id": "static_mixer",
    "group": "tool",
    "name": "medmix MIXPAC MFQ 05-16L static mixer",
    "role": "mixes A and B on the way out",
-   "how": "Disposable quadro mixer on the cartridge. A short 3 mm line carries mixed silicone to the head.",
+   "how": "Disposable quadro mixer on the cartridge in the tail belly. A 1.0 m x 4 mm line in the drag chain carries mixed silicone to the head.",
    "specs": [
     [
      "Elements",
@@ -907,11 +1028,11 @@
     ],
     [
      "Line to head",
-     "0.5 m x 3 mm ID"
+     "1.0 m x 4 mm ID"
     ],
     [
      "Residence",
-     "about 6 min at 1.1 ml/min (computed)"
+     "about 7 min at 2.24 ml/min (computed)"
     ]
    ],
    "make": "buy",
@@ -926,7 +1047,8 @@
    ],
    "verdict": "works after bench test",
    "test": "Run 15 min, stop 8 min, restart; mixer must not block.",
-   "owned": false
+   "owned": false,
+   "changed_in_v2": "v2: mixer at the fixed cartridge; 1.0 m x 4 mm line."
   },
   {
    "id": "three_way_valve",
@@ -973,9 +1095,9 @@
   {
    "id": "valve_servo",
    "group": "tool",
-   "name": "Feetech STS3215 servo (from owned SO-ARM101)",
-   "role": "turns the stopcock lever",
-   "how": "One bus servo taken from the owned SO-ARM101, on a printed bracket at the head.",
+   "name": "Feetech STS3215 servos (from owned SO-ARM101)",
+   "role": "turns the stopcock lever; tilts the head",
+   "how": "Two bus servos from the owned SO-ARM101: one turns the stopcock, one tilts the head so the needle points up while the arm passes the hatch.",
    "specs": [
     [
      "Stall torque",
@@ -987,8 +1109,8 @@
     ]
    ],
    "make": "buy",
-   "qty": 1,
-   "mass_g": 55,
+   "qty": 2,
+   "mass_g": 110,
    "cost_usd": 0,
    "sources": [
     {
@@ -998,34 +1120,35 @@
    ],
    "verdict": "works",
    "test": "",
-   "owned": true
+   "owned": true,
+   "changed_in_v2": "v2: second servo tilts the head needle up for the hatch passage."
   },
   {
    "id": "needle",
    "group": "tool",
-   "name": "14G x 102 mm blunt needle",
+   "name": "Stepped needle: 12G Luer body, 14G tip",
    "role": "prints the bead, carries the capsule, inflates the baby",
-   "how": "One long Luer needle. Silicone first; then air through the same needle into the capsule's valve.",
+   "how": "A 12G blunt Luer needle (custom 95 mm) with a 14G stainless cannula bonded 10 mm into the tip and 20 mm exposed. Silicone first; then air through the same needle into the capsule valve.",
    "specs": [
     [
-     "Gauge",
-     "14G"
+     "Body",
+     "12G, ID 2.16 / OD 2.77 mm, 95 mm, Luer lock"
     ],
     [
-     "ID / OD",
-     "1.54 / 1.83 mm"
+     "Tip",
+     "14G, ID 1.54 / OD 1.83 mm, 20 mm exposed"
     ],
     [
-     "Length",
-     "102 mm (artist's S8 drawing)"
+     "Bond",
+     "DP100 Plus Clear"
     ],
     [
-     "Reach below gel",
-     "58 mm needed (scene)"
+     "Reach below hub",
+     "115 mm"
     ],
     [
      "Pressure drop",
-     "about 1.2 bar at 5 mm/s, 2.5 bar at 10 mm/s (computed, FX-Pro)"
+     "0.88 bar at 20 mm/s (computed, DS10 NV)"
     ]
    ],
    "make": "buy",
@@ -1034,24 +1157,29 @@
    "cost_usd": 30,
    "sources": [
     {
+     "label": "PVA G series dispense needles (12G, custom to 4 in)",
+     "url": "https://www.pva.net/wp-content/uploads/2022/12/G-Series-Dispense-Needles-12.22.pdf"
+    },
+    {
      "label": "Nordson EFD general purpose tips (gauge chart)",
      "url": "https://www.nordson.com/products/efd-products/general-purpose-dispense-tips"
     },
     {
-     "label": "Artist's Weekly Updates deck (S8 design, gel tests)",
-     "url": "https://docs.google.com/presentation/d/1fTm_oDPefzafITs2w75gJIZ8zdXcw0acMDKE9GcqqMM"
+     "label": "Hamilton needle gauge chart",
+     "url": "https://www.hamiltoncompany.com/knowledge-base/article/needle-gauge-chart"
     }
    ],
    "verdict": "works after bench test",
-   "test": "Check bead width from this needle in gel at 5 mm/s.",
-   "owned": false
+   "test": "Push 10 ml through at 20 mm/s equivalent; check the joint for leaks at 2 bar.",
+   "owned": false,
+   "changed_in_v2": "v2: stepped needle cuts the drop to 0.88 bar at 20 mm/s with the same 14G bead."
   },
   {
    "id": "air_pump",
    "group": "tool",
    "name": "KNF NMP830 diaphragm pump",
    "role": "blows air; can also suck gel back",
-   "how": "Brushless diaphragm pump in the tail. Outlet feeds the stopcock air port; inlet can draw gel back through the needle.",
+   "how": "Brushless diaphragm pump in the tail. Inlet through a snorkel on the tail top (outside air); outlet to the stopcock air port. Air drawn from the womb would give no belly rise.",
    "specs": [
     [
      "Model",
@@ -1090,7 +1218,8 @@
    ],
    "verdict": "works",
    "test": "",
-   "owned": false
+   "owned": false,
+   "changed_in_v2": "v2: inlet through a snorkel to outside air, so the belly rises one for one."
   },
   {
    "id": "vent_valve",
@@ -1205,7 +1334,7 @@
     ],
     [
      "Batch",
-     "about 24 L, 240 g powder"
+     "about 18 L, 180 g powder"
     ],
     [
      "Yield stress",
@@ -1214,7 +1343,7 @@
    ],
    "make": "buy",
    "qty": 1,
-   "mass_g": 24000,
+   "mass_g": 18000,
    "cost_usd": 60,
    "sources": [
     {
@@ -1240,7 +1369,8 @@
    ],
    "verdict": "works after bench test",
    "test": "Drop dyed water and an air bubble; both stay, needle track closes.",
-   "owned": true
+   "owned": true,
+   "changed_in_v2": "v2: 18 L batch."
   },
   {
    "id": "naoh",
@@ -1258,8 +1388,8 @@
      "0.1 ml 10 M per 100 ml of 1.2%"
     ],
     [
-     "For 24 L",
-     "about 200 ml 1 M"
+     "For 18 L",
+     "about 150 ml 1 M"
     ],
     [
      "Release",
@@ -1282,46 +1412,55 @@
    ],
    "verdict": "works",
    "test": "",
-   "owned": true
+   "owned": true,
+   "changed_in_v2": "v2: dose for 18 L."
   },
   {
    "id": "print_silicone",
    "group": "fluid",
-   "name": "Print silicone: Dragon Skin FX-Pro",
+   "name": "Print silicone: Dragon Skin 10 NV",
    "role": "the baby's printed skin",
-   "how": "Platinum silicone, 1:1. Printed into the gel through the mixer and needle. Tested by the team in gel on 14 Oct.",
+   "how": "Platinum silicone, 1:1. Printed into the gel through the mixer and the stepped needle at 20 mm/s.",
    "specs": [
     [
      "Viscosity",
-     "18,000 cps"
+     "6,000 cps"
     ],
     [
      "Pot life",
-     "12 min"
+     "15 min"
     ],
     [
      "Cure",
-     "40 min"
+     "75 min"
     ],
     [
      "Shore",
-     "2A"
+     "10A"
     ],
     [
      "Elongation",
-     "763%"
+     "663%"
     ],
     [
      "Tensile",
-     "288 psi"
+     "400 psi"
+    ],
+    [
+     "100% modulus",
+     "27 psi"
+    ],
+    [
+     "Tear",
+     "90 pli"
     ],
     [
      "Density",
-     "1.062 g/cc"
+     "1.07 g/cc"
     ],
     [
      "Mix",
-     "1A:1B by volume"
+     "1A:1B by weight or volume"
     ]
    ],
    "make": "buy",
@@ -1330,8 +1469,8 @@
    "cost_usd": 140,
    "sources": [
     {
-     "label": "Smooth-On Dragon Skin FX-Pro",
-     "url": "https://www.smooth-on.com/products/dragon-skin-fx-pro/"
+     "label": "Smooth-On Dragon Skin 10 NV technical bulletin",
+     "url": "https://www.smooth-on.com/tb/files/DRAGON_SKIN_10_NV_TB.pdf"
     },
     {
      "label": "Artist's Weekly Updates deck (S8 design, gel tests)",
@@ -1348,7 +1487,8 @@
    ],
    "verdict": "works after bench test",
    "test": "Print two touching beads in gel; after cure peel them apart by hand.",
-   "owned": true
+   "owned": false,
+   "changed_in_v2": "v2: Dragon Skin 10 NV (6,000 cps) replaces FX-Pro (18,000 cps); same material as the fold model."
   },
   {
    "id": "clear_silicone",
@@ -1482,8 +1622,16 @@
      "RC PWM on A models"
     ],
     [
-     "Need",
-     "about 300 N design load (physics notes)"
+     "Layout",
+     "r 185 mm at 90, 210, 330 deg"
+    ],
+    [
+     "Pads",
+     "40 x 40 x 4 mm low carbon steel, nickel plated"
+    ],
+    [
+     "Worst load",
+     "72 N per unit (2 kPa + growth + 7.7 N m)"
     ]
    ],
    "make": "buy",
@@ -1502,7 +1650,8 @@
    ],
    "verdict": "works after bench test",
    "test": "Hold the tail on the hoop with 1 kPa inside; pull with a spring scale.",
-   "owned": false
+   "owned": false,
+   "changed_in_v2": "v2: layout fixed at r 185 (90, 210, 330 deg), all above water; worst load 72 N per unit."
   },
   {
    "id": "pogo_pins",
@@ -1549,26 +1698,34 @@
   {
    "id": "dock_seal",
    "group": "dock",
-   "name": "Dock face seal, SORTA-Clear 18",
-   "role": "seals tail rim to hoop, partly below water",
-   "how": "A cast D ring on the tail rim inside the magnet circle. Compresses to a hard stop when the magnets touch.",
+   "name": "Dock lip seal, SORTA-Clear 18",
+   "role": "seals the collar tip to the bore shoulder, above water",
+   "how": "A cast lip on the collar tip leans 30 deg outward and bends 2 to 3 mm on the shoulder. Womb pressure presses the lip down.",
    "specs": [
     [
      "Silicone",
      "SORTA-Clear 18, Shore 18A"
     ],
     [
-     "Section",
-     "D 6 mm, 25% squeeze"
+     "Lip",
+     "1.5 mm thick, 6 mm tall"
     ],
     [
      "Seal circle",
-     "about D 276 mm"
+     "mean D 257 mm"
+    ],
+    [
+     "Pressure load",
+     "52 N at 1 kPa, 104 N at 2 kPa"
+    ],
+    [
+     "Above water",
+     "16 to 20 mm"
     ]
    ],
    "make": "cast",
    "qty": 1,
-   "mass_g": 60,
+   "mass_g": 30,
    "cost_usd": 10,
    "sources": [
     {
@@ -1578,33 +1735,50 @@
    ],
    "verdict": "works after bench test",
    "test": "Dock in water, pressure to 1 kPa, watch for bubbles 1 h.",
-   "owned": false
+   "owned": false,
+   "changed_in_v2": "v2: lip seal on the collar tip at D 257 instead of a D ring at D 276."
   },
   {
    "id": "dock_cone",
    "group": "dock",
-   "name": "Lead in cone on the tail mouth",
-   "role": "guides the tail onto the bore",
-   "how": "Part of the tail shell print. The cone also pushes the petal door open.",
+   "name": "Lead in: recess in the mother, collar on the tail",
+   "role": "guides the tail onto the bore; carries the lip seal",
+   "how": "A 28 mm collar on the tail mouth enters the 30 mm recess in the mother. Flat faces meet first; the cone only centres. No long nose.",
    "specs": [
     [
      "Half angle",
-     "35 to 40 deg"
+     "37.5 deg"
     ],
     [
-     "Depth",
-     "30 mm"
+     "Recess",
+     "30 deep, D 310 to D 264"
+    ],
+    [
+     "Collar",
+     "28 tall, D 308 to D 265, bore D 250"
+    ],
+    [
+     "Play at seat",
+     "1 mm radial"
     ],
     [
      "Capture",
-     "about 21 to 25 mm (physics notes)"
+     "23 mm"
+    ],
+    [
+     "No wedging",
+     "for friction mu below 1.3"
     ]
    ],
    "make": "print rigid",
    "qty": 1,
-   "mass_g": 300,
+   "mass_g": 350,
    "cost_usd": 0,
    "sources": [
+    {
+     "label": "Hennessey 1982, Compliant part mating and minimum energy chamfer design (MIT MS thesis)",
+     "url": "https://core.ac.uk/download/4398847.pdf"
+    },
     {
      "label": "Elegoo OrangeStorm Giga",
      "url": "https://elegoo.com/products/orangestorm-giga"
@@ -1612,7 +1786,8 @@
    ],
    "verdict": "works after bench test",
    "test": "Approach at 20 mm offset; cone must centre the tail.",
-   "owned": false
+   "owned": false,
+   "changed_in_v2": "v2: female recess in the mother and a short collar on the tail instead of a cone on the tail mouth."
   },
   {
    "id": "baby_body",
@@ -1623,7 +1798,7 @@
    "specs": [
     [
      "Silicone",
-     "Dragon Skin FX-Pro"
+     "Dragon Skin 10 NV"
     ],
     [
      "Wall",
@@ -1631,11 +1806,11 @@
     ],
     [
      "Silicone use",
-     "about 0.5 to 0.65 L"
+     "0.61 L or less (one 630 ml cartridge)"
     ],
     [
      "Print zone",
-     "390 x 387 x 42 mm (scene)"
+     "D 210 at x -0.040 m, from two boom stations"
     ]
    ],
    "make": "print silicone in gel",
@@ -1654,7 +1829,8 @@
    ],
    "verdict": "works after bench test",
    "test": "Print a 100 mm closed pleat test, inflate to 1 kPa in water.",
-   "owned": false
+   "owned": false,
+   "changed_in_v2": "v2: DS10 NV, print disc at x -0.040, two boom stations, volume cap for one cartridge."
   },
   {
    "id": "needle_valve",
@@ -1946,7 +2122,7 @@
   ],
   [
    "Nozzle",
-   "14G, ID 1.54 mm, OD 1.83 mm",
+   "stepped: 12G body, 14G tip ID 1.54 mm, OD 1.83 mm (v2)",
    "https://www.nordson.com/products/efd-products/general-purpose-dispense-tips"
   ],
   [
@@ -1976,7 +2152,7 @@
   ],
   [
    "Print speed",
-   "5 mm/s planned; Hinton 20 mm/s; RLP up to 50 mm/s",
+   "20 mm/s planned (v2); Hinton 20 mm/s; RLP up to 50 mm/s",
    "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5059754/fullTextXML"
   ],
   [
@@ -2020,6 +2196,7 @@
   ],
   "material": "Formlabs Clear Resin V5",
   "joints": "Inward 12 mm flanges. Removable seams: 2.5 mm silicone cord in a groove, M3 A4 screws at 30 mm. Permanent seams (rear and front halves): 3M DP100 Plus Clear. Belly skin clamped by a printed ring.",
-  "notes": "7 lower hull pieces (keel cap below z = -0.274 m plus 6 gores to z = -0.060 m), 2 rear wall halves, 2 front plate halves. Also Clear V5: 1 bore hoop and 4 gel tray quarters. Fit found by a bounding box search; confirm every piece in the slicer. Clear V5 gains 0.9% in 24 h in water."
+  "notes": "7 lower hull pieces (keel cap below z = -0.274 m plus 6 gores to z = -0.060 m), 2 rear wall halves, 2 front plate halves. Also Clear V5: 1 bore hoop and 4 gel tray quarters. Fit found by a bounding box search; confirm every piece in the slicer. Clear V5 gains 0.9% in 24 h in water.",
+  "changed_in_v2": "Plus one chute print. The bore hoop becomes the bore ring; the recess and pads sit in the rear wall halves; the tray is round D 410."
  }
 }
