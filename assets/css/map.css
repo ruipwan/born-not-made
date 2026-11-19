@@ -1,0 +1,101 @@
+/* Born, Not Made: the living map. Paper, ink, and gel blue as the only colour. */
+.bnm-map {
+  --bnm-bg: var(--bg, #f4f3ef);
+  --bnm-ink: var(--ink, #15171a);
+  --bnm-muted: var(--muted, #5c636c);
+  --bnm-gel: var(--gel, #2f6fa8);
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: 380px;
+  margin: 18px 0 0;
+  overflow: hidden;
+  color: var(--bnm-ink);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.bnm-map[data-mode="strip"] { height: 120px; margin: 14px 0 0; }
+@media (max-width: 639px) { .bnm-map:not([data-mode="strip"]) { height: 300px; } }
+.bnm-map svg { display: block; width: 100%; height: 100%; overflow: hidden; }
+
+/* trunk */
+.bnm-trunkline { fill: none; stroke-width: 1.6; stroke-linecap: round; }
+.bnm-phrase {
+  font-family: var(--serif, "Newsreader", Georgia, serif);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  fill: var(--bnm-ink);
+  paint-order: stroke;
+  stroke: var(--bnm-bg);
+  stroke-width: 14px;
+  stroke-linejoin: round;
+  cursor: pointer;
+}
+.bnm-phrase.bnm-main { font-weight: 500; letter-spacing: -0.015em; }
+.bnm-phrase.bnm-faint { font-style: italic; fill: var(--bnm-muted); opacity: 0.42; }
+.bnm-trunk.bnm-here .bnm-phrase:not(.bnm-faint) { fill: var(--bnm-gel); }
+
+/* branches */
+.bnm-br { transition: opacity 0.5s ease; }
+.bnm-line { fill: none; stroke: var(--bnm-gel); stroke-width: 1.1; stroke-linecap: round; opacity: 0.48; transition: opacity 0.4s ease, stroke-width 0.4s ease; }
+.bnm-coming .bnm-line { stroke-dasharray: 1.5 6; opacity: 0.42; }
+.bnm-hit { fill: none; stroke: transparent; stroke-width: 18px; pointer-events: stroke; cursor: pointer; }
+.bnm-w {
+  font-family: var(--mono, "JetBrains Mono", ui-monospace, monospace);
+  font-weight: 400;
+  fill: var(--bnm-ink);
+  paint-order: stroke;
+  stroke: var(--bnm-bg);
+  stroke-width: 6px;
+  stroke-linejoin: round;
+  cursor: pointer;
+  transition: fill 0.4s ease;
+}
+.bnm-invite { font-family: var(--serif, "Newsreader", Georgia, serif); font-style: italic; fill: var(--bnm-muted); }
+.bnm-label {
+  font-family: var(--mono, "JetBrains Mono", ui-monospace, monospace);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  fill: var(--bnm-muted);
+  paint-order: stroke;
+  stroke: var(--bnm-bg);
+  stroke-width: 6px;
+  stroke-linejoin: round;
+  cursor: pointer;
+  transition: fill 0.4s ease;
+}
+.bnm-soon { fill-opacity: 0.55; letter-spacing: 0.1em; }
+.bnm-coming .bnm-label { cursor: default; fill-opacity: 0.8; }
+
+/* hover and the tab you are on */
+.bnm-svg.bnm-has-hot .bnm-br:not(.bnm-hot) { opacity: 0.3; }
+.bnm-br.bnm-hot .bnm-line, .bnm-br.bnm-here .bnm-line { opacity: 1; stroke-width: 1.6; }
+.bnm-br.bnm-hot .bnm-w:not(.bnm-invite), .bnm-br.bnm-hot .bnm-label, .bnm-br.bnm-here .bnm-label { fill: var(--bnm-gel); }
+
+/* rings from "born is a relation" */
+.bnm-ring { fill: none; stroke: var(--bnm-gel); stroke-width: 1; }
+
+/* links for screen readers and keyboards; shown when a link has focus */
+.bnm-sr {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.bnm-sr:focus-within {
+  left: 0; right: 0; bottom: 0;
+  width: auto; height: auto;
+  clip-path: none;
+  white-space: normal;
+  background: var(--bnm-bg);
+  padding: 6px 0;
+}
+.bnm-sr ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; font: 12px/1.5 var(--mono, "JetBrains Mono", monospace); }
+.bnm-sr a { color: var(--bnm-gel); }
+
+@media (prefers-reduced-motion: reduce) {
+  .bnm-br, .bnm-line, .bnm-w, .bnm-label { transition: none; }
+}
