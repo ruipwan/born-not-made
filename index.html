@@ -19,7 +19,28 @@ nav.tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
 nav.tabs a { font: 500 13.5px var(--sans); color: var(--muted); text-decoration: none; padding: 7px 12px; border-radius: 999px; }
 nav.tabs a:hover { color: var(--ink); background: #ebe9e3; }
 nav.tabs a[aria-current="page"] { color: var(--paper); background: var(--ink); }
-nav.tabs .sep { width: 1px; background: var(--line); margin: 6px 6px; }
+nav.sub { max-width: 1180px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-left, 0px)); display: flex; gap: 2px; flex-wrap: wrap; align-items: center; }
+nav.sub:empty { display: none; }
+nav.sub .gl { font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-right: 10px; }
+nav.sub a { font: 500 13px var(--sans); color: var(--muted); text-decoration: none; padding: 8px 10px 9px; border-bottom: 2px solid transparent; }
+nav.sub a:hover { color: var(--ink); }
+nav.sub a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--ink); }
+nav.sub a .d { font: 400 12px var(--sans); color: var(--muted); margin-left: 6px; }
+@media (max-width: 700px) { nav.sub a .d { display: none; } }
+.conv-q { display: flex; gap: 10px; overflow-x: auto; padding: 4px 0 14px; scroll-snap-type: x mandatory; }
+.conv-q p { flex: 0 0 min(340px, 80%); scroll-snap-align: start; margin: 0; padding: 16px 18px; border-radius: 10px; background: var(--gel-soft); font: 400 18px/1.35 var(--serif); }
+.conv-q p span { display: block; margin-top: 8px; font: 12px var(--mono); color: var(--muted); }
+.conv-f { display: flex; gap: 6px; flex-wrap: wrap; margin: 18px 0 16px; }
+.conv-f button { font: 500 12.5px var(--sans); background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+.conv-f button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.conv-list { columns: 2 340px; column-gap: 22px; }
+.conv { break-inside: avoid; margin: 0 0 22px; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; border-left: 4px solid var(--line); }
+.conv[data-stance="affirms"] { border-left-color: #6fa58a; } .conv[data-stance="suggests"] { border-left-color: var(--gel); } .conv[data-stance="questions"] { border-left-color: #c9a25f; } .conv[data-stance="doubts"] { border-left-color: #b8574b; }
+.conv h3 { font: 500 20px/1.2 var(--serif); margin: 0; }
+.conv .meta { font: 12px var(--mono); color: var(--muted); margin: 4px 0 10px; }
+.conv .said { font: 400 17px/1.5 var(--serif); margin: 0 0 10px; }
+.conv .led { font-size: 14px; color: var(--muted); margin: 0 0 10px; padding-left: 12px; border-left: 2px solid var(--gel-soft); }
+.conv .tags span { display: inline-block; font: 11px var(--mono); color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; margin: 0 4px 4px 0; }
 nav.tabs a.voices { color: var(--gel); border: 1px solid #b9d3ea; margin-left: 6px; }
 nav.tabs a.voices::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--gel); margin-right: 7px; vertical-align: 1px; animation: breathe 3.2s ease-in-out infinite; }
 nav.tabs a.voices[aria-current="page"] { background: var(--gel); color: #fff; border-color: var(--gel); }
@@ -31,7 +52,7 @@ nav.tabs a.voices[aria-current="page"]::before { background: #fff; }
 .open .btn { background: var(--gel); }
 @media (max-width: 700px) { .open { grid-template-columns: minmax(0, 1fr); } }
 main { max-width: 1180px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-left, 0px)) 80px; }
-section.tab { display: none; } section.tab.on { display: block; }
+section.tab { display: none; scroll-margin-top: 160px; } section.tab.on { display: block; }
 .hero { padding: 56px 0 28px; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 40px; align-items: end; }
 .kicker { font: 500 12px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; }
 h1 { font: 400 clamp(44px, 7vw, 88px)/0.95 var(--serif); letter-spacing: -0.025em; margin: 0 0 18px; }
@@ -85,9 +106,9 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 <header class="top"><div class="bar">
   <a class="brand" href="#work">Born, Not Made</a>
   <nav class="tabs" aria-label="Sections">
-    <a href="#work">The Work</a><a href="#ideas">Ideas</a><a href="#culture" hidden>Culture</a><span class="sep" aria-hidden="true"></span><a href="#prototypes">Prototypes</a><a href="#build">Build</a><a href="#simulator">Simulator</a><a href="#society">Society</a><a href="#process">Process</a><a href="#voices" class="voices">Voices</a>
+    <a href="#work" data-g="work">The Work</a><a href="#ideas" data-g="think">Think</a><a href="#prototypes" data-g="make">Make</a><a href="#conversations" data-g="talk" class="voices">Talk</a>
   </nav>
-</div></header>
+</div><nav class="sub" id="subnav" aria-label="Pages in this section"></nav></header>
 <main>
 
 <!-- ============================== TRUNK ============================== -->
@@ -361,8 +382,17 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 </section>
 
 <!-- ============================== VOICES ============================== -->
+<section class="tab" id="conversations">
+  <div class="tabhead"><div><p class="kicker">Talk</p><h2>Conversations</h2><p>A documentary in text: one to one talks about the work with researchers, artists and friends. Each entry paraphrases what the other person said; the artist's replies are left out. Some agree, some doubt, and all of it shaped the work.</p></div></div>
+  <p class="kicker" style="margin-top:22px">Questions people asked</p>
+  <div class="conv-q" id="convQ"></div>
+  <div class="conv-f" id="convF" role="group" aria-label="Filter conversations"></div>
+  <div class="conv-list" id="convList"><p class="note">Loading conversations…</p></div>
+  <p class="note">Talked with the artist about the work and want an entry named, corrected or removed? Say so in <a href="#voices">Voices</a>.</p>
+</section>
+
 <section class="tab" id="voices">
-  <div class="tabhead"><div><p class="kicker">Voices</p><h2>An open experiment, in many voices</h2><p>Anyone can leave words or a drawing about the mother, kinship between robots, a design idea, a worry or a question. Every voice stays public, with a link to where it came from.</p></div><a class="btn" href="voices/" target="_blank" rel="noopener">Open full screen</a></div>
+  <div class="tabhead"><div><p class="kicker">Talk</p><h2>Voices: an open experiment</h2><p>Anyone can leave words or a drawing about the mother, kinship between robots, a design idea, a worry or a question. Every voice stays public, with a link to where it came from.</p></div><a class="btn" href="voices/" target="_blank" rel="noopener">Open full screen</a></div>
   <div class="fullframe" style="background:#f4f3ef;height:min(88vh,960px)"><iframe data-src="voices/" title="Voices: an open discussion"></iframe></div>
 </section>
 
@@ -374,17 +404,41 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 </main>
 <footer>Born, Not Made · Ruipeng Wang · MIT Media Lab · <a href="https://github.com/ruipwan/born-not-made">source on GitHub</a></footer>
 <script>
-const TABS = ["work", "ideas", "culture", "prototypes", "build", "simulator", "society", "process", "voices"];
-const ALIAS = { trunk: "work", branches: "ideas", questions: "ideas", early: "prototypes", log: "process" };
+const GROUPS = [
+  { g: "work", label: "The Work", tabs: [["work", "The Work"]] },
+  { g: "think", label: "Think", tabs: [["ideas", "Ideas", "questions the work raises"], ["culture", "Culture", "stories, screens and art"]] },
+  { g: "make", label: "Make", tabs: [["prototypes", "Prototypes", "versions one to three"], ["build", "Build", "every part, with sources"], ["simulator", "Simulator", "the printing process"], ["society", "Society", "reproduction at scale"], ["process", "Process", "how the work changed"]] },
+  { g: "talk", label: "Talk", tabs: [["conversations", "Conversations", "one to one"], ["voices", "Voices", "open to everyone"]] }];
+const TABS = GROUPS.flatMap((x) => x.tabs.map((t) => t[0]));
+const ALIAS = { trunk: "work", branches: "ideas", questions: "ideas", early: "prototypes", log: "process", think: "ideas", make: "prototypes", talk: "conversations" };
 if (ALIAS[location.hash.slice(1)]) history.replaceState(null, "", "#" + ALIAS[location.hash.slice(1)]);
+const esc = (x) => String(x ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 function show() {
   const h = ALIAS[location.hash.slice(1)] || location.hash.slice(1); const id = TABS.includes(h) && document.getElementById(h) ? h : "work";
   for (const t of TABS) { const el = document.getElementById(t); if (el) el.classList.toggle("on", t === id); }
-  document.querySelectorAll("nav.tabs a").forEach((a) => { if (a.getAttribute("href") !== "#" + id) a.removeAttribute("aria-current"); else a.setAttribute("aria-current", "page"); });
+  const grp = GROUPS.find((x) => x.tabs.some((t) => t[0] === id));
+  document.querySelectorAll("nav.tabs a").forEach((a) => { if (a.dataset.g === grp.g) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  const live = grp.tabs.filter((t) => document.getElementById(t[0]));
+  document.getElementById("subnav").innerHTML = live.length > 1 ? `<span class="gl">${esc(grp.label)}</span>` + live.map((t) => `<a href="#${t[0]}"${t[0] === id ? ' aria-current="page"' : ""}>${esc(t[1])}<span class="d">${esc(t[2] || "")}</span></a>`).join("") : "";
   const f = document.querySelector("#" + id + " iframe[data-src]"); if (f && !f.src) f.src = f.dataset.src;
   document.querySelectorAll("section.tab:not(.on) video").forEach((v) => v.pause());
-  window.scrollTo({ top: 0 });
+  if (id === "conversations") loadConversations();
+  window.scrollTo({ top: 0 }); requestAnimationFrame(() => window.scrollTo({ top: 0 }));
 }
+/* conversations: data in conversations/data/conversations.json */
+let CONV = null, convFilter = "all";
+const STANCE = { all: "All", affirms: "Affirms", suggests: "Suggests", questions: "Questions", doubts: "Doubts" };
+function fmtWhen(w) { const m = /^(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?$/.exec(w || ""); if (!m) return w || ""; const mon = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]; return (m[3] ? +m[3] + " " : "") + (m[2] ? mon[+m[2]] + " " : "") + m[1]; }
+function renderConversations() {
+  const E = CONV.entries || [];
+  const qs = []; for (const e of E) for (const q of (e.said.match(/[^.?!]*\?/g) || [])) qs.push([q.trim(), e.who]);
+  document.getElementById("convQ").innerHTML = qs.map(([q, w]) => `<p>${esc(q)}<span>${esc(w)}</span></p>`).join("");
+  document.getElementById("convF").innerHTML = Object.entries(STANCE).map(([k, v]) => `<button type="button" data-k="${k}" aria-pressed="${k === convFilter}">${v}${k === "all" ? "" : " · " + E.filter((e) => e.stance === k).length}</button>`).join("");
+  document.querySelectorAll("#convF button").forEach((b) => (b.onclick = () => { convFilter = b.dataset.k; renderConversations(); }));
+  const list = E.filter((e) => convFilter === "all" || e.stance === convFilter);
+  document.getElementById("convList").innerHTML = list.map((e) => `<article class="conv" data-stance="${esc(e.stance)}"><h3>${esc(e.who)}</h3><p class="meta">${esc([e.role, fmtWhen(e.when), STANCE[e.stance] || e.stance].filter(Boolean).join(" · "))}</p><p class="said">${esc(e.said)}</p>${e.led_to ? `<p class="led">What changed: ${esc(e.led_to)}</p>` : ""}<p class="tags">${(e.themes || []).map((t) => `<span>${esc(t)}</span>`).join("")}</p></article>`).join("");
+}
+async function loadConversations() { if (CONV) return; try { CONV = await (await fetch("conversations/data/conversations.json", { cache: "no-cache" })).json(); renderConversations(); } catch (e) { document.getElementById("convList").innerHTML = '<p class="note">Conversations could not load.</p>'; } }
 addEventListener("message", (e) => { const f = document.getElementById("earlyFrame"); if (f && e.origin === location.origin && e.data && e.data.bnm === "early-height") f.style.height = e.data.h + "px"; });
 addEventListener("hashchange", show); show();
 </script>
