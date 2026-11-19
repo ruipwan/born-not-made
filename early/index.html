@@ -86,12 +86,15 @@ p.next b { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing
 .cmp td.inside { color: var(--gel); font-weight: 500; }
 .vid { position: relative; aspect-ratio: 16 / 9; background: #0b0d10; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); margin-top: 18px; }
 .vid img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .82; border: 0; border-radius: 0; }
-.vid.contain img { object-fit: contain; }
 .vid button { position: absolute; inset: 0; width: 100%; border: 0; background: transparent; cursor: pointer; display: flex; align-items: flex-end; justify-content: flex-start; padding: 14px; color: #fff; font: 500 13px var(--sans); text-align: left; }
 .vid button span.pill { display: inline-flex; align-items: center; gap: 10px; background: rgba(21, 23, 26, .82); padding: 9px 14px 9px 11px; border-radius: 999px; }
 .vid button span.tri { width: 0; height: 0; border-left: 11px solid #fff; border-top: 7px solid transparent; border-bottom: 7px solid transparent; }
 .vid button:hover span.pill { background: var(--gel); }
 .vid iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.vid.compact { aspect-ratio: auto; background: transparent; border: 0; overflow: visible; }
+.vid.compact button { position: static; padding: 0; color: var(--paper); }
+.vid.compact button span.pill { background: var(--ink); line-height: 1.35; }
+.vid.compact.playing { aspect-ratio: 16 / 9; background: #0b0d10; border: 1px solid var(--line); overflow: hidden; }
 .end { padding: 40px 0 8px; border-top: 1px solid var(--line); }
 .end p { margin: 0; font: 400 clamp(21px, 2.4vw, 27px)/1.35 var(--serif); }
 .refs { font-size: 13px; color: var(--muted); padding-left: 18px; margin: 0; }
@@ -224,7 +227,7 @@ html.embedded.auto .side .stick { position: static; }
       <tbody>
         <tr><th scope="row">Controller</th><td>Seeed Studio XIAO ESP32S3, one in each body. <a class="src" href="https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/">Seeed wiki</a></td></tr>
         <tr><th scope="row">Motor driver</th><td>DRV8833 dual H bridge board, 1.5 A per channel, one in each body. The mother uses channel A for the bag pump and channel B for the swim pump. PWM 30 kHz, 8 bit. <a class="src" href="https://www.ti.com/product/DRV8833">TI datasheet</a> <a class="src" href="https://www.amazon.com/dp/B07FZY8GX2">board used</a></td></tr>
-        <tr><th scope="row">Pumps</th><td>Mini DC water pumps: two in the mother, one in the baby. Picked after quieter or weaker pumps failed to move a body. <a class="src" href="https://www.amazon.com/dp/B0B6HQ4637">pump used</a></td></tr>
+        <tr><th scope="row">Pumps</th><td>Mini DC water pumps: two in the mother, one in the baby. Other pumps tried were too noisy or too weak to move a body. <a class="src" href="https://www.amazon.com/dp/B0B6HQ4637">pump used</a></td></tr>
         <tr><th scope="row">Water muscle</th><td>TPU inflatable bag, filled with water. The tube is pushed straight into the bag's neck, one size larger, and seals by tension. No glue, no fitting.</td></tr>
         <tr><th scope="row">Mother power</th><td>3.7 V LiPo 800 mAh for the XIAO and WiFi. Two 3.7 V LiPo 400 mAh in series (7.4 V) for the pumps. Firmware caps pump PWM at 195 of 255, about 6 V, to protect the 6 V motors.</td></tr>
         <tr><th scope="row">Baby power</th><td>One small LiPo for pump and XIAO, with a charging port. Pump PWM levels 150, 185, 220, 255.</td></tr>
@@ -329,9 +332,8 @@ html.embedded.auto .side .stick { position: static; }
       <li><b>The making stayed outside.</b> The baby was still made by people and placed inside. The mother delivered a body it never formed.</li>
     </ul>
 
-    <div class="vid contain" data-vimeo="https://player.vimeo.com/video/1202399561?h=7ac02ffdc8&amp;dnt=1&amp;autoplay=1" data-title="Born, Not Made, film, June 2026">
-      <img src="../assets/img/prototype2_photo.jpg" width="1600" height="576" alt="" loading="lazy">
-      <button type="button" aria-label="Play video: Born, Not Made film, June 2026, 2 minutes 30 seconds, from Vimeo"><span class="pill"><span class="tri" aria-hidden="true"></span>Film, June 2026 · 2 min 30 s · Vimeo</span></button>
+    <div class="vid compact" data-vimeo="https://player.vimeo.com/video/1202399561?h=7ac02ffdc8&amp;dnt=1&amp;autoplay=1" data-title="Born, Not Made, film, June 2026">
+      <button type="button" aria-label="Play video: Born, Not Made film, June 2026, 2 minutes 30 seconds, from Vimeo"><span class="pill"><span class="tri" aria-hidden="true"></span>Watch the second version: film, June 2026 · 2 min 30 s · Vimeo</span></button>
     </div>
 
     <div class="taught">
@@ -447,6 +449,7 @@ html.embedded.auto .side .stick { position: static; }
       f.allow = "autoplay; fullscreen; picture-in-picture";
       f.setAttribute("allowfullscreen", "");
       box.innerHTML = "";
+      box.classList.add("playing");
       box.appendChild(f);
       f.focus();
     });
