@@ -1,0 +1,335 @@
+[
+ {
+  "item": "Epoxy resin, print ink part 1",
+  "model": "Hexion EPON 828",
+  "qty": null,
+  "price": "",
+  "link": "https://www.hisco.com/Brands/Hexion/Catalog/All/828-34345",
+  "status": "unknown",
+  "slide": 10
+ },
+ {
+  "item": "Crosslinker, print ink part 2",
+  "model": "Westlake EPIKURE 3380",
+  "qty": null,
+  "price": "distributor quote: $200 per quart, $300 per gallon, $450 per 5 gallons, US ground shipping included (slide 35)",
+  "link": "https://www.westlakeepoxy.com/en-us/product/epikuretm-curing-agent-3380",
+  "status": "to buy",
+  "slide": 10
+ },
+ {
+  "item": "Gel base powder",
+  "model": "Carbopol (Carbomer) 940",
+  "qty": null,
+  "price": "",
+  "link": "https://www.amazon.com/dp/B0FV96GMQ7",
+  "status": "bought",
+  "slide": 10
+ },
+ {
+  "item": "Sodium hydroxide 10 M, to neutralize the Carbopol",
+  "model": "Thermo Fisher J63736.AE",
+  "qty": null,
+  "price": "",
+  "link": "https://www.thermofisher.com/order/catalog/product/J63736.AE",
+  "status": "unknown",
+  "slide": 10
+ },
+ {
+  "item": "Sodium hydroxide 1 M",
+  "model": "1.0 M NaOH solution, 1 L",
+  "qty": null,
+  "price": "",
+  "link": "https://www.amazon.com/dp/B0754JLMQ7",
+  "status": "unknown",
+  "slide": 10
+ },
+ {
+  "item": "Deionized water",
+  "model": "Chemwell Type II, 1 gallon",
+  "qty": null,
+  "price": "",
+  "link": "https://www.amazon.com/dp/B0F4LH8KG9",
+  "status": "bought",
+  "slide": 10
+ },
+ {
+  "item": "Nitrile gloves",
+  "model": "",
+  "qty": null,
+  "price": "",
+  "link": "",
+  "status": "unknown",
+  "slide": 10
+ },
+ {
+  "item": "Chemical goggles",
+  "model": "",
+  "qty": null,
+  "price": "",
+  "link": "",
+  "status": "unknown",
+  "slide": 10
+ },
+ {
+  "item": "Protective mask",
+  "model": "",
+  "qty": null,
+  "price": "",
+  "link": "",
+  "status": "unknown",
+  "slide": 10
+ },
+ {
+  "item": "Direct ink writing printer (or a DIY syringe setup instead)",
+  "model": "Hyrel System 30M",
+  "qty": null,
+  "price": "",
+  "link": "https://www.hyrel3d.com/portfolio/system-30m/",
+  "status": "unknown",
+  "slide": 10
+ },
+ {
+  "item": "Waste bottle",
+  "model": "",
+  "qty": null,
+  "price": "",
+  "link": "https://www.amazon.com/dp/B0HF35KC7W",
+  "status": "unknown",
+  "slide": 10
+ },
+ {
+  "item": "Funnel",
+  "model": "Winco PF-8",
+  "qty": null,
+  "price": "",
+  "link": "https://www.amazon.com/dp/B00166GWZE",
+  "status": "unknown",
+  "slide": 10
+ },
+ {
+  "item": "Beaker",
+  "model": "Labvida borosilicate beaker",
+  "qty": null,
+  "price": "",
+  "link": "https://www.amazon.com/dp/B085FWB3LV",
+  "status": "bought",
+  "slide": 10
+ },
+ {
+  "item": "Glass stirring rod",
+  "model": "McAjnsu borosilicate rod",
+  "qty": null,
+  "price": "",
+  "link": "https://www.amazon.com/dp/B0FV2W9KPB",
+  "status": "unknown",
+  "slide": 10
+ },
+ {
+  "item": "Magnetic stirrer or hotplate with stirrer",
+  "model": "",
+  "qty": null,
+  "price": "",
+  "link": "https://www.amazon.com/s?k=hotplate+with+stir",
+  "status": "unknown",
+  "slide": 10
+ },
+ {
+  "item": "Silicone for molding",
+  "model": "Smooth-On Ecoflex 00-10",
+  "qty": null,
+  "price": "",
+  "link": "https://www.amazon.com/dp/B06XPN1HVH",
+  "status": "unknown",
+  "slide": 10
+ },
+ {
+  "item": "Silicone for molding",
+  "model": "Smooth-On Ecoflex 00-30",
+  "qty": null,
+  "price": "",
+  "link": "https://www.amazon.com/dp/B00CA5VY3U",
+  "status": "unknown",
+  "slide": 10
+ },
+ {
+  "item": "Silicone for molding",
+  "model": "Smooth-On Ecoflex 00-45 Near Clear",
+  "qty": null,
+  "price": "",
+  "link": "https://www.amazon.com/dp/B09M8Y9PTV",
+  "status": "unknown",
+  "slide": 10
+ },
+ {
+  "item": "Silicone glue",
+  "model": "",
+  "qty": null,
+  "price": "",
+  "link": "https://www.ebay.com/itm/335063216480",
+  "status": "unknown",
+  "slide": 10
+ },
+ {
+  "item": "Distilled water",
+  "model": "Pure Life, 1 gallon",
+  "qty": null,
+  "price": "",
+  "link": "https://www.amazon.com/dp/B0BFK1C5LB",
+  "status": "unknown",
+  "slide": 10
+ },
+ {
+  "item": "Clear silicone kit",
+  "model": "Smooth-On SORTA-Clear 18",
+  "qty": null,
+  "price": "",
+  "link": "",
+  "status": "bought",
+  "slide": 48
+ },
+ {
+  "item": "Syringe and dispensing accessories",
+  "model": "",
+  "qty": null,
+  "price": "",
+  "link": "",
+  "status": "bought",
+  "slide": 48
+ },
+ {
+  "item": "3D printer",
+  "model": "Flashforge Adventurer 5M",
+  "qty": 1,
+  "price": "",
+  "link": "",
+  "status": "bought",
+  "slide": 44
+ },
+ {
+  "item": "Robot arm, assembled",
+  "model": "Hiwonder SO-ARM101 (LeRobot)",
+  "qty": 1,
+  "price": "$419.99 (order screenshot)",
+  "link": "https://wiki.hiwonder.com/projects/LeRobot/en/latest/docs/1_SO_ARM101_Open_Source_6_Axis_Robotic_Arm_User_Manual.html",
+  "status": "bought",
+  "slide": 44
+ },
+ {
+  "item": "Beakers, containers, syringes and needles",
+  "model": "Amazon order of 24 Sep",
+  "qty": null,
+  "price": "",
+  "link": "",
+  "status": "bought",
+  "slide": 43
+ },
+ {
+  "item": "Face shield",
+  "model": "",
+  "qty": 1,
+  "price": "",
+  "link": "",
+  "status": "bought",
+  "slide": 42
+ },
+ {
+  "item": "Overhead stirrer",
+  "model": "VOEDOR",
+  "qty": null,
+  "price": "",
+  "link": "https://a.co/d/035Fs0GO",
+  "status": "unknown",
+  "slide": 40
+ },
+ {
+  "item": "Overhead stirrer",
+  "model": "Pxolerig 100W",
+  "qty": null,
+  "price": "",
+  "link": "https://a.co/d/06S5GQA2",
+  "status": "unknown",
+  "slide": 40
+ },
+ {
+  "item": "Fast curing silicone",
+  "model": "Smooth-On Ecoflex 00-35 Fast (5 min)",
+  "qty": null,
+  "price": "",
+  "link": "",
+  "status": "unknown",
+  "slide": 9
+ },
+ {
+  "item": "Fast curing silicone",
+  "model": "Smooth-On Dragon Skin FX-Pro (40 min)",
+  "qty": null,
+  "price": "",
+  "link": "",
+  "status": "unknown",
+  "slide": 9
+ },
+ {
+  "item": "AB two part glue cartridges (AB 1:1)",
+  "model": "",
+  "qty": null,
+  "price": "",
+  "link": "",
+  "status": "to buy",
+  "slide": 12
+ },
+ {
+  "item": "Three way valve syringe with needle set",
+  "model": "",
+  "qty": null,
+  "price": "",
+  "link": "https://e.tb.cn/h.j11xss0qOHPOfVp",
+  "status": "to buy",
+  "slide": 18
+ },
+ {
+  "item": "Multi way connectors",
+  "model": "",
+  "qty": null,
+  "price": "",
+  "link": "",
+  "status": "to buy",
+  "slide": 12
+ },
+ {
+  "item": "Plastic and steel double ended needles",
+  "model": "",
+  "qty": null,
+  "price": "",
+  "link": "",
+  "status": "to buy",
+  "slide": 12
+ },
+ {
+  "item": "Continuous syringe",
+  "model": "5 mL",
+  "qty": null,
+  "price": "",
+  "link": "https://a.co/d/0bQC0OwP",
+  "status": "to buy",
+  "slide": 18
+ },
+ {
+  "item": "Rubber air nozzles, valve cores",
+  "model": "",
+  "qty": null,
+  "price": "",
+  "link": "https://e.tb.cn/h.j1cnJMCMPXF1HM4",
+  "status": "to buy",
+  "slide": 18
+ },
+ {
+  "item": "Rubber stoppers",
+  "model": "",
+  "qty": null,
+  "price": "",
+  "link": "",
+  "status": "to buy",
+  "slide": 17
+ }
+]

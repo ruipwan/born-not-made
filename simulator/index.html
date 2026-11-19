@@ -9,7 +9,7 @@
   --win: #232323; --region: #2b2b2b; --header: #303030; --panel: #383838; --field: #1d1d1d; --line: #161616;
   --fg: #e3e3e3; --muted: #9a9a9a; --dim: #6f6f6f;
   --sel: #4772b3; --active: #ffaf29; --gel: #9fcdf0; --ok: #7fb069; --warn: #e0a33a;
-  --vp-solid: #3d3d3d; --vp-water: #05080c;
+  --vp-solid: #3d3d3d; --vp-water: #05080c; --vp-clay: #e7e6e1;
   --ui: "Inter", "Segoe UI", system-ui, sans-serif; --mono: "JetBrains Mono", "DejaVu Sans Mono", ui-monospace, monospace;
   color-scheme: dark;
 }
@@ -32,10 +32,22 @@ body { font: 12px/1.45 var(--ui); padding-block: 0; }
 .chip i { width: 7px; height: 7px; border-radius: 50%; background: var(--dim); }
 .chip.live i { background: var(--ok); }
 .view { grid-area: view; position: relative; }
-#vp { position: relative; flex: 1; min-height: 0; background: var(--vp-solid); }
+#vp { position: relative; flex: 1; min-height: 0; background: var(--vp-clay); }
 #vp > canvas.gl { display: block; width: 100%; height: 100%; }
 .ov { position: absolute; left: 10px; top: 8px; color: #dcdcdc; font-size: 11.5px; text-shadow: 0 1px 2px #0008; pointer-events: none; line-height: 1.5; }
 .ov .stage { color: var(--active); }
+#vp[data-shade="solid"] .ov { color: #2c2c2c; text-shadow: 0 1px 0 #ffffffa0; }
+#vp[data-shade="solid"] .ov .stage { color: #a45400; }
+/* viewport shading switch, drawn like Blender's radio buttons */
+.shgrp { display: inline-flex; flex: none; }
+.shgrp .btn { display: inline-flex; align-items: center; gap: 5px; border-radius: 0; margin-left: -1px; }
+.shgrp .btn:first-child { border-radius: 3px 0 0 3px; margin-left: 0; }
+.shgrp .btn:last-child { border-radius: 0 3px 3px 0; }
+.shi { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.shi.solid { background: #ecebe6; box-shadow: inset 0 0 0 1px #1a1a1a; }
+.shi.mat { background: radial-gradient(circle at 35% 30%, #ffffff, #8d939c 55%, #34383e); }
+.shi.water { background: radial-gradient(circle at 35% 30%, #d4ebfa, #3c6f99 60%, #0c1c2c); }
+@media (max-width: 560px) { .view .ahead .opt { display: none; } }
 #gizmo { position: absolute; right: 8px; top: 8px; width: 74px; height: 74px; pointer-events: none; }
 .vbtns { position: absolute; right: 8px; top: 88px; display: flex; flex-direction: column; gap: 3px; }
 .vbtns button, .btn { font: 11px var(--ui); color: var(--fg); background: #545454; border: 1px solid #262626; border-radius: 3px; padding: 3px 8px; cursor: pointer; }
@@ -129,12 +141,15 @@ textarea, input[type=text] { width: 100%; box-sizing: border-box; background: va
   </div>
 
   <section class="area view" aria-label="3D Viewport">
-    <div class="ahead"><b>3D Viewport</b><span>Object Mode</span><span class="sp"></span>
-      <span>Shading</span>
-      <button class="btn on" id="shSolid" aria-pressed="true">Solid</button>
-      <button class="btn" id="shWater" aria-pressed="false">Water</button>
+    <div class="ahead"><b>3D Viewport</b><span class="opt">Object Mode</span><span class="sp"></span>
+      <span class="opt">Shading</span>
+      <div class="shgrp" role="group" aria-label="Viewport shading">
+        <button class="btn on" id="shSolid" data-shade="solid" aria-pressed="true" title="Solid: white clay, outlines and soft shadow"><i class="shi solid" aria-hidden="true"></i>Solid</button>
+        <button class="btn" id="shMat" data-shade="material" aria-pressed="false" title="Material: the colours from the Blender file"><i class="shi mat" aria-hidden="true"></i>Material</button>
+        <button class="btn" id="shWater" data-shade="water" aria-pressed="false" title="Water: the mother in dark water"><i class="shi water" aria-hidden="true"></i>Water</button>
+      </div>
     </div>
-    <div id="vp">
+    <div id="vp" data-shade="solid">
       <div class="ov" id="ov">User Perspective<br>(<span id="ovFrame">0</span>) Scene | <span id="ovObj">Mother M1</span><br><span class="stage" id="ovStage">loading the Blender scene</span></div>
       <canvas id="gizmo" width="148" height="148" aria-hidden="true"></canvas>
       <div class="vbtns">
@@ -361,17 +376,29 @@ function initThree() {
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
   renderer.outputEncoding = THREE.sRGBEncoding; renderer.localClippingEnabled = true;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.domElement.className = 'gl'; host.prepend(renderer.domElement);
-  const scene = new THREE.Scene(); scene.background = new THREE.Color(0x3d3d3d);
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(CLAY.bg);
   const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 50);
   camera.position.set(1.35, 0.7, 2.25);
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.target.set(0.05, 0.0, 0.0); controls.enableDamping = true; controls.dampingFactor = 0.12; controls.update();
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x50525a, 0.85));
+  // Material and Water shading: the original lights
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x50525a, 0.85); scene.add(hemi);
   const key = new THREE.DirectionalLight(0xffffff, 0.75); key.position.set(1.5, 2.5, 2.0); scene.add(key);
   const fill = new THREE.DirectionalLight(0xffffff, 0.25); fill.position.set(-2, 0.5, -1.5); scene.add(fill);
+  // Solid shading: soft studio light plus one key that casts a soft shadow on the floor
+  const cHemi = new THREE.HemisphereLight(0xffffff, 0xaeaba3, 0.6);
+  const cKey = new THREE.DirectionalLight(0xffffff, 0.58); cKey.position.set(0.9, 3.2, 1.4);
+  cKey.shadow.mapSize.set(1024, 1024); cKey.shadow.bias = -0.0008; cKey.shadow.normalBias = 0.004;
+  Object.assign(cKey.shadow.camera, { left: -2.3, right: 2.3, top: 2.3, bottom: -2.3, near: 0.5, far: 7 });
+  const cFill = new THREE.DirectionalLight(0xffffff, 0.2); cFill.position.set(-2, 0.8, -1.2);
+  scene.add(cHemi, cKey, cFill);
   const root = new THREE.Group(); root.rotation.x = -Math.PI / 2; scene.add(root);   // Blender Z-up inside root
   const grid = new THREE.GridHelper(6, 60, 0x575757, 0x474747); grid.position.y = -0.62; scene.add(grid);
+  const clayGrid = new THREE.GridHelper(6, 60, 0xbebcb5, 0xd0cec7); clayGrid.position.y = -0.62; scene.add(clayGrid);
+  const shadowPlane = new THREE.Mesh(new THREE.PlaneGeometry(8, 8), new THREE.ShadowMaterial({ color: 0x2d2a24, opacity: 0.2, depthWrite: false }));
+  shadowPlane.rotation.x = -Math.PI / 2; shadowPlane.position.y = -0.6195; shadowPlane.receiveShadow = true; scene.add(shadowPlane);
   const axX = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-3, -0.619, 0), new THREE.Vector3(3, -0.619, 0)]), new THREE.LineBasicMaterial({ color: 0x9b3a3a }));
   const axY = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, -0.619, -3), new THREE.Vector3(0, -0.619, 3)]), new THREE.LineBasicMaterial({ color: 0x5f8a2b }));
   scene.add(axX, axY);
@@ -380,21 +407,108 @@ function initThree() {
   for (let i = 0; i < N; i++) { pp[3 * i] = (r() - 0.5) * 5; pp[3 * i + 1] = (r() - 0.5) * 2.4; pp[3 * i + 2] = (r() - 0.5) * 4; }
   const specks = new THREE.Points(new THREE.BufferGeometry().setAttribute("position", new THREE.BufferAttribute(pp, 3)), new THREE.PointsMaterial({ color: 0x9fb6c8, size: 0.006, transparent: true, opacity: 0.55 }));
   specks.visible = false; scene.add(specks);
-  three = { renderer, scene, camera, controls, root, grid, axes: [axX, axY], specks, host };
+  three = { renderer, scene, camera, controls, root, grid, clayGrid, shadowPlane, axes: [axX, axY], specks, host,
+    matLights: [hemi, key, fill], clayLights: [cHemi, cKey, cFill], clayKey: cKey };
   const ro = new ResizeObserver(resize); ro.observe(host); resize();
+  setShading(SHADE.mode);
 }
 function resize() {
   const { renderer, camera, host } = three; const w = host.clientWidth, h = host.clientHeight; if (!w || !h) return;
   renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+  renderer.getDrawingBufferSize(INK.res.value); INK.dpr.value = renderer.getPixelRatio();
 }
-function setShading(water) {
-  const { scene, grid, axes, specks } = three;
-  scene.background = new THREE.Color(water ? 0x05080c : 0x3d3d3d); scene.fog = water ? new THREE.Fog(0x05080c, 2.0, 5.5) : null;
-  grid.visible = !water; axes.forEach((a) => (a.visible = !water)); specks.visible = water;
-  $("#vp").style.background = water ? "var(--vp-water)" : "var(--vp-solid)";
-  $("#shSolid").classList.toggle("on", !water); $("#shWater").classList.toggle("on", water);
-  $("#shSolid").setAttribute("aria-pressed", String(!water)); $("#shWater").setAttribute("aria-pressed", String(water));
+
+/* ---------------- viewport shading: Solid (white clay), Material, Water ---------------- */
+const CLAY = { bg: 0xe7e6e1, printed: 0xf3f2ee, bought: 0xd9d9d5, metal: 0xc6c6c3, silicone: 0xefe6d4, gel: 0xa9d2f2,
+  ink: 0x2a2c30, path: 0x2f6fa8, bead: 0xf07316, sel: 0xf5a524 };
+const SHADE = { mode: "solid", items: [] };
+const INK = { res: { value: new THREE.Vector2(1, 1) }, dpr: { value: 1 } };   // shared by every outline and dot shader
+function regShade(obj, mat, clay, extra = {}) { const it = { obj, mat, clay, ...extra }; SHADE.items.push(it); applyShade(it); return it; }
+function applyShade(it) {
+  const solid = SHADE.mode === "solid";
+  if (it.clay) it.obj.material = solid ? it.clay : it.mat;
+  if (it.edges) { const s = solid ? it.edgeClay : it.edgeMat; it.edges.visible = !!s; if (s) { it.edges.material.color.setHex(s[0]); it.edges.material.opacity = s[1]; } }
+  if (it.hull) it.hull.visible = solid;
 }
+function setShading(mode) {
+  SHADE.mode = mode; const water = mode === "water", solid = mode === "solid";
+  const { scene, grid, clayGrid, shadowPlane, axes, specks } = three;
+  scene.background = new THREE.Color(water ? 0x05080c : solid ? CLAY.bg : 0x3d3d3d); scene.fog = water ? new THREE.Fog(0x05080c, 2.0, 5.5) : null;
+  grid.visible = !water && !solid; clayGrid.visible = solid; shadowPlane.visible = solid; specks.visible = water;
+  axes.forEach((a, i) => { a.visible = !water; a.material.color.setHex(solid ? [0xcf6a64, 0x86a956][i] : [0x9b3a3a, 0x5f8a2b][i]); });
+  three.matLights.forEach((l) => (l.visible = !solid)); three.clayLights.forEach((l) => (l.visible = solid)); three.clayKey.castShadow = solid;
+  $("#vp").style.background = water ? "var(--vp-water)" : solid ? "var(--vp-clay)" : "var(--vp-solid)"; $("#vp").dataset.shade = mode;
+  document.querySelectorAll("[data-shade]").forEach((b) => { if (!b.dataset.shade || b.id === "vp") return; const on = b.dataset.shade === mode; b.classList.toggle("on", on); b.setAttribute("aria-pressed", String(on)); });
+  SHADE.items.forEach(applyShade);
+  if (bubbles) bubbles.material.color.setHex(solid ? 0x7ea7c9 : 0xdbe9f5);
+}
+
+/* matte clay, lit by the Solid lights */
+function clayMat(hex, opacity = 1, side = THREE.FrontSide) {
+  const m = new THREE.MeshLambertMaterial({ color: new THREE.Color(hex).convertSRGBToLinear(), side });
+  if (opacity < 1) { m.transparent = true; m.opacity = opacity; m.depthWrite = false; }
+  return m;
+}
+/* outline of constant screen width: the back faces pushed out along their normals (an inverted hull) */
+function inkHull(hex, px, sign = 1, side = THREE.BackSide, after = false) {
+  const m = new THREE.MeshBasicMaterial({ color: hex, side });
+  m.userData.uW = { value: px }; m.userData.uS = { value: sign };
+  if (after) { m.transparent = true; m.depthWrite = false; }        // drawn after a see through body, so only the rim shows
+  m.onBeforeCompile = (sh) => {
+    sh.uniforms.uW = m.userData.uW; sh.uniforms.uS = m.userData.uS; sh.uniforms.uRes = INK.res; sh.uniforms.uDpr = INK.dpr;
+    sh.vertexShader = "uniform float uW; uniform float uS; uniform vec2 uRes; uniform float uDpr;\n" + sh.vertexShader.replace("#include <project_vertex>",
+      "#include <project_vertex>\n{ vec4 cn = projectionMatrix * vec4(normalize(normalMatrix * normal) * uS, 0.0); float l = length(cn.xy); if (l > 1e-6) gl_Position.xy += cn.xy / l * (2.0 * uW * uDpr / uRes) * gl_Position.w; }");
+  };
+  m.customProgramCacheKey = () => "inkhull";
+  return m;
+}
+function addHull(mesh, mat) { const h = new THREE.Mesh(mesh.geometry, mat); h.visible = false; h.renderOrder = mesh.renderOrder; h.raycast = () => {}; mesh.add(h); return h; }
+/* see through hull for Solid: nearly clear, a faint ink rim; on the belly, rings across the body that turn gel blue where it stretches */
+function clayShellMat(rings, base = 0.035, rim = 0.42) {
+  return new THREE.ShaderMaterial({
+    defines: rings ? { RINGS: "" } : {},
+    uniforms: { tint: { value: new THREE.Color(1, 1, 1) }, ink: { value: new THREE.Color(0x3a3f47) }, hi: { value: new THREE.Color(CLAY.path) }, base: { value: base }, rim: { value: rim }, gap: { value: 0.04 } },
+    vertexShader: `varying vec3 vN; varying vec3 vV; varying vec3 vP; varying float vS;
+#ifdef RINGS
+attribute vec3 rest;
+#endif
+void main(){ vP = position; vS = 0.0;
+#ifdef RINGS
+  vS = clamp(length(position - rest) / 0.03, 0.0, 1.0);
+#endif
+  vec4 mv = modelViewMatrix * vec4(position, 1.0); vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }`,
+    fragmentShader: `uniform vec3 tint; uniform vec3 ink; uniform vec3 hi; uniform float base; uniform float rim; uniform float gap;
+varying vec3 vN; varying vec3 vV; varying vec3 vP; varying float vS;
+void main(){ float f = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 3.0);
+  vec3 c = mix(vec3(0.975, 0.97, 0.955) * tint, ink, clamp(f * 1.3, 0.0, 1.0)); float a = base + rim * f;
+#ifdef RINGS
+  float q = vP.x / gap; float w = max(fwidth(q), 1e-4); float l = 1.0 - clamp(abs(fract(q - 0.5) - 0.5) / w, 0.0, 1.0);
+  float la = l * (0.09 + 0.6 * vS); c = mix(c, mix(ink, hi, vS), clamp(la / max(a + la, 1e-3), 0.0, 1.0)); a += la;
+  a += 0.06 * vS;
+#endif
+  gl_FragColor = vec4(c, clamp(a, 0.0, 1.0)); }`,
+    transparent: true, depthWrite: false, side: THREE.DoubleSide, extensions: { derivatives: true },
+  });
+}
+/* round screen sized dots: the toolpath, the fresh bead and the nozzle tip in Solid */
+function dotMat() {
+  return new THREE.ShaderMaterial({
+    uniforms: { uDpr: INK.dpr, ring: { value: new THREE.Color(CLAY.ink) } },
+    vertexShader: "attribute float size; attribute vec3 tone; uniform float uDpr; varying vec3 vC; varying float vR; void main(){ vC = tone; vR = size; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); gl_PointSize = size * uDpr; }",
+    fragmentShader: "uniform vec3 ring; varying vec3 vC; varying float vR; void main(){ vec2 c = gl_PointCoord * 2.0 - 1.0; float r = length(c); if (r > 1.0) discard; float e = 1.0 - 4.0 / max(vR, 1.0); vec3 col = (vR >= 9.0 && r > e) ? ring : vC; gl_FragColor = vec4(col, 1.0 - smoothstep(0.8, 1.0, r)); }",
+    transparent: true, depthTest: false, depthWrite: false,
+  });
+}
+function clayKind(nm, g, col) {
+  if (nm === "W_B0_Skin" || nm === "W_T1_TailShell") return "hull";
+  if (/^W_B0_Canal(Funnel|BellBands|Tube|TubeDash|SoftSleeve)$/.test(nm)) return "silicone";
+  if (col[3] < 0.2 || nm === "W_B0_MotherLid") return "clear";
+  if (g === "arm" || g === "tool") return "bought";
+  if (/(Magnets|TrayRods|LowRod|BoomTube|BoomTubeEnd)$/.test(nm)) return "metal";
+  if (col[3] < 0.98) return "semi";
+  return "printed";
+}
+const HULL_PART = inkHull(CLAY.ink, 1.0);
 
 /* fresnel shell material (reads like Blender's see-through shell with outline) */
 function shellMat(rgb, base, rim) {
@@ -432,19 +546,33 @@ async function loadScene() {
     o.removeFromParent(); o.position.set(0, 0, 0); o.rotation.set(0, 0, 0); o.scale.set(1, 1, 1);
     o.geometry.computeVertexNormals();
     if (nm === "W_B0_SkinInner") { parts[nm] = o; continue; }
+    let edges = null;
     if (nm === "W_B0_Skin" || nm === "W_T1_TailShell") o.material = shellMat(col, 0.06, 0.62);
-    else { o.material = solidMat(col); if (col[3] > 0.9) addEdges(o, 32, g === "arm" ? 0.35 : 0.5); }
+    else { o.material = solidMat(col); if (col[3] > 0.9) edges = addEdges(o, 32, g === "arm" ? 0.35 : 0.5); }
     o.renderOrder = col[3] < 0.98 ? 2 : 1;
     if (g === "arm" || g === "tool") o.matrixAutoUpdate = false;
     three.root.add(o); parts[nm] = o; groups[g].push(o);
+    // the Solid look of this part
+    const kind = clayKind(nm, g, col), ink = CLAY.ink;
+    const clay = kind === "hull" ? clayShellMat(nm === "W_B0_Skin") : kind === "clear" ? clayShellMat(false, 0.02, 0.3)
+      : kind === "silicone" ? clayMat(CLAY.silicone, 0.62, THREE.DoubleSide) : kind === "semi" ? clayMat(CLAY.printed, 0.85)
+      : clayMat(CLAY[kind]);
+    if (!edges && nm !== "W_B0_Skin") edges = addEdges(o, 32, 0);
+    const edgeClay = { printed: [ink, 0.55], bought: [ink, 0.42], metal: [ink, 0.5], semi: [ink, 0.45], silicone: [ink, 0.3], clear: [ink, 0.2], hull: [ink, 0.14] }[kind];
+    const solidPart = kind === "printed" || kind === "bought" || kind === "metal";
+    o.castShadow = solidPart || kind === "semi" || kind === "silicone";
+    regShade(o, o.material, clay, { edges, edgeMat: col[3] > 0.9 && kind !== "hull" ? [0x141414, g === "arm" ? 0.35 : 0.5] : null, edgeClay, hull: solidPart ? addHull(o, HULL_PART) : null });
   }
   skin = parts["W_B0_Skin"]; skinBase = skin.geometry.attributes.position.array.slice();
+  // the belly at rest (folded, no breath): the Solid rings measure the stretch from here
+  deformBelly(0, 0); skin.geometry.setAttribute("rest", new THREE.BufferAttribute(skin.geometry.attributes.position.array.slice(), 3));
   // gel: the inner skin with everything above the gel surface flattened onto it
   const gi = parts["W_B0_SkinInner"].geometry.clone(), p = gi.attributes.position.array;
   for (let i = 0; i < p.length; i += 3) { p[i] *= 0.985; p[i + 1] *= 0.985; p[i + 2] = Math.min(p[i + 2], META.gelZ) * 0.99; }
   gi.computeVertexNormals();
   gelMesh = new THREE.Mesh(gi, new THREE.MeshStandardMaterial({ color: new THREE.Color(0x9fcdf0).convertSRGBToLinear(), transparent: true, opacity: 0.22, roughness: 0.2, depthWrite: false, side: THREE.DoubleSide }));
   gelMesh.renderOrder = 3; three.root.add(gelMesh); groups.gel.push(gelMesh);
+  regShade(gelMesh, gelMesh.material, clayMat(CLAY.gel, 0.3, THREE.DoubleSide));
   // tray (where the core waits) and the canal throat, measured from the meshes
   parts["W_T1_TrayCups"].geometry.computeBoundingBox(); const tb = parts["W_T1_TrayCups"].geometry.boundingBox;
   tray = [(tb.min.x + tb.max.x) / 2, (tb.min.y + tb.max.y) / 2, tb.max.z + 0.004];
@@ -506,7 +634,12 @@ function buildCore() {
   const bat = new THREE.Mesh(new THREE.BoxGeometry(0.034, 0.022, 0.012), dark);
   const pump = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.026, 16), mid); pump.rotation.z = Math.PI / 2; pump.position.set(0, 0, 0.012);
   const chip = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.018, 0.002), cu); chip.position.set(0, 0, -0.008);
-  core.add(bat, pump, chip); [bat, pump].forEach((m) => addEdges(m, 30, 0.6));
+  core.add(bat, pump, chip);
+  // bought parts: a little grey in Solid, with outlines
+  for (const [m, matM, hex] of [[bat, dark, 0xb9bab6], [pump, mid, 0xcfd0cc], [chip, cu, 0xd9c4a6]]) {
+    m.castShadow = true; const e = m === chip ? null : addEdges(m, 30, 0.6);
+    regShade(m, matM, clayMat(hex), { edges: e, edgeMat: e ? [0x141414, 0.6] : null, edgeClay: e ? [CLAY.ink, 0.7] : null, hull: addHull(m, HULL_PART) });
+  }
   three.root.add(core);
 }
 function coreInTray() { if (core.parent !== three.root) buildCore(); core.position.set(tray[0], tray[1], tray[2] + 0.008); core.rotation.set(0, 0, 0); core.visible = true; }
@@ -521,9 +654,18 @@ function makeBabyMesh(spec) {
   const mat = new THREE.MeshStandardMaterial({ color: col.clone().convertSRGBToLinear(), roughness: 0.55, transparent: true, opacity: 0.82, side: THREE.DoubleSide, emissive: 0x000000 });
   const mesh = new THREE.Mesh(geo, mat); mesh.renderOrder = 4;
   const ringMat = new THREE.MeshStandardMaterial({ color: col.clone().offsetHSL(0, 0.05, -0.22).convertSRGBToLinear(), roughness: 0.5 });
+  // Solid: printed silicone, warm and a little see through; the rings keep a pale hint of the baby's colour
+  const smat = new THREE.MeshLambertMaterial({ color: new THREE.Color(CLAY.silicone).lerp(col, 0.1).convertSRGBToLinear(), transparent: true, opacity: 0.9, side: THREE.DoubleSide });
+  const sringMat = clayMat(new THREE.Color().setHSL(spec.hue, 0.4, 0.64).getHex());
+  const hullMat = inkHull(CLAY.ink, 1.3, -1, THREE.FrontSide, true);     // the body's normals face inward
+  const ringHullMat = inkHull(CLAY.ink, 1.0);
+  for (const m of [mat, ringMat, smat, sringMat]) m.clipShadows = true;
+  const hull = addHull(mesh, hullMat); hull.renderOrder = 5;
   const rings = [];
-  for (let k = 0; k < spec.rings; k++) { const ring = new THREE.Mesh(new THREE.TorusGeometry(1, 0.07, 8, 40), ringMat); ring.rotation.y = Math.PI / 2; ring.userData.u = spec.rings === 1 ? 0.04 : 0.04 + 0.92 * k / (spec.rings - 1); mesh.add(ring); rings.push(ring); }
-  return { mesh, rings, mat, ringMat };
+  for (let k = 0; k < spec.rings; k++) { const ring = new THREE.Mesh(new THREE.TorusGeometry(1, 0.07, 8, 40), ringMat); ring.rotation.y = Math.PI / 2; ring.userData.u = spec.rings === 1 ? 0.04 : 0.04 + 0.92 * k / (spec.rings - 1); mesh.add(ring); rings.push(ring);
+    ring.castShadow = true; regShade(ring, ringMat, sringMat, { hull: addHull(ring, ringHullMat) }); }
+  mesh.castShadow = true; regShade(mesh, mat, smat, { hull });
+  return { mesh, rings, mat, ringMat, smat, sringMat, hullMat, ringHullMat };
 }
 // radius at axial u (0 tail .. 1 head), for inflation f (0 printed folded .. 1 full)
 function shapeBaby(b, f, time) {
@@ -616,7 +758,7 @@ function writeGcode(b) {
 let bubbles = null, relLines = null, layerLine = null, layerPts = [];
 function buildBubbles() {
   const n = 120, p = new Float32Array(n * 3).fill(99);
-  bubbles = new THREE.Points(new THREE.BufferGeometry().setAttribute("position", new THREE.BufferAttribute(p, 3)), new THREE.PointsMaterial({ color: 0xdbe9f5, size: 0.007, transparent: true, opacity: 0.8 }));
+  bubbles = new THREE.Points(new THREE.BufferGeometry().setAttribute("position", new THREE.BufferAttribute(p, 3)), new THREE.PointsMaterial({ color: SHADE.mode === "solid" ? 0x7ea7c9 : 0xdbe9f5, size: 0.007, transparent: true, opacity: 0.8 }));
   bubbles.userData = { life: new Float32Array(n).fill(0), i: 0 }; three.root.add(bubbles);
 }
 function emitBubble(at, spread) {
@@ -638,15 +780,46 @@ function buildLayerLine() {
   const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(200 * 3), 3)); g.setDrawRange(0, 0);
   layerLine = new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0xffffff })); layerLine.frustumCulled = false; three.root.add(layerLine);
   const tipDot = new THREE.Mesh(new THREE.SphereGeometry(0.004, 12, 8), new THREE.MeshBasicMaterial({ color: 0xffd27a })); three.root.add(tipDot); three.tipDot = tipDot;
+  // Solid: the toolpath as a gel blue line of round dots, the fresh bead in orange, the nozzle tip as a ringed dot
+  const n = 2400, dg = new THREE.BufferGeometry();
+  dg.setAttribute("position", new THREE.BufferAttribute(new Float32Array(n * 3), 3)); dg.setAttribute("tone", new THREE.BufferAttribute(new Float32Array(n * 3), 3)); dg.setAttribute("size", new THREE.BufferAttribute(new Float32Array(n), 1)); dg.setDrawRange(0, 0);
+  pathDots = new THREE.Points(dg, dotMat()); pathDots.frustumCulled = false; pathDots.renderOrder = 9; three.root.add(pathDots);
+  const tg = new THREE.BufferGeometry(); tg.setAttribute("position", new THREE.BufferAttribute(new Float32Array(3), 3)); tg.setAttribute("tone", new THREE.BufferAttribute(new Float32Array(new THREE.Color(0xffb02e).toArray()), 3)); tg.setAttribute("size", new THREE.BufferAttribute(new Float32Array([13]), 1));
+  tipMark = new THREE.Points(tg, dotMat()); tipMark.frustumCulled = false; tipMark.renderOrder = 10; tipMark.visible = false; three.root.add(tipMark);
+}
+let pathDots = null, tipMark = null;
+const C_PATH = new THREE.Color(CLAY.path), C_BEAD = new THREE.Color(CLAY.bead), C_TMP = new THREE.Color();
+function updatePathDots(show, tp) {
+  const g = pathDots.geometry; tipMark.visible = show;
+  if (!show) { g.setDrawRange(0, 0); return; }
+  tipMark.geometry.attributes.position.array.set(tp); tipMark.geometry.attributes.position.needsUpdate = true;
+  const pts = layerPts.length ? layerPts.concat([tp]) : [];
+  if (pts.length < 2) { g.setDrawRange(0, 0); return; }
+  const P = g.attributes.position.array, T = g.attributes.tone.array, S = g.attributes.size.array, max = S.length;
+  let total = 0; for (let i = 1; i < pts.length; i++) total += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1], pts[i][2] - pts[i - 1][2]);
+  const camD = three.camera.position.distanceTo(new THREE.Vector3(tp[0], tp[2], -tp[1]));
+  const step = Math.max(clamp(camD * 0.0009, 0.0003, 0.004), total / (max - 4)), BEAD = 0.028;
+  let s = 0, next = 0, n = 0;
+  for (let i = 1; i < pts.length && n < max; i++) {
+    const a = pts[i - 1], b = pts[i], L = Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]);
+    while (next < s + L && n < max) {
+      const t = L > 0 ? (next - s) / L : 0, k = clamp(1 - (total - next) / BEAD, 0, 1);
+      P[3 * n] = a[0] + (b[0] - a[0]) * t; P[3 * n + 1] = a[1] + (b[1] - a[1]) * t; P[3 * n + 2] = a[2] + (b[2] - a[2]) * t;
+      C_TMP.copy(C_PATH).lerp(C_BEAD, k); T[3 * n] = C_TMP.r; T[3 * n + 1] = C_TMP.g; T[3 * n + 2] = C_TMP.b;
+      S[n] = 3 + 4 * k * k; n++; next += step;
+    }
+    s += L;
+  }
+  g.setDrawRange(0, n); for (const k of ["position", "tone", "size"]) g.attributes[k].needsUpdate = true;
 }
 
 /* ---------------- robots ---------------- */
 function newBaby(genome, memory, name, parts_) {
-  const spec = bodySpec(genome); const { mesh, rings, mat, ringMat } = makeBabyMesh(spec);
-  const b = { id: "b" + (++babyCount), name, genome, parts: parts_, memory, spec, mesh, rings, mat, ringMat, free: false, near: {}, pos: new THREE.Vector3(), vel: new THREE.Vector3(), age: 0, gen: mother.gen + 1, motherName: mother.name };
+  const spec = bodySpec(genome); const { mesh, rings, mat, ringMat, smat, sringMat, hullMat, ringHullMat } = makeBabyMesh(spec);
+  const b = { id: "b" + (++babyCount), name, genome, parts: parts_, memory, spec, mesh, rings, mat, ringMat, smat, sringMat, hullMat, ringHullMat, free: false, near: {}, pos: new THREE.Vector3(), vel: new THREE.Vector3(), age: 0, gen: mother.gen + 1, motherName: mother.name };
   three.root.add(mesh); robots.push(b); return b;
 }
-function setClip(b, on) { for (const m of [b.mat, b.ringMat]) { m.clippingPlanes = on ? [clipPlane] : []; m.needsUpdate = true; } }
+function setClip(b, on) { for (const m of [b.mat, b.ringMat, b.smat, b.sringMat, b.hullMat, b.ringHullMat]) { m.clippingPlanes = on ? [clipPlane] : []; m.needsUpdate = true; } }
 function placeFree(b, at, dir) { b.free = true; b.pos.set(...at); b.vel.set(...dir).multiplyScalar(0.08); setClip(b, false); shapeBaby(b, 1, 0); }
 
 /* ---------------- birth pipeline ---------------- */
@@ -802,7 +975,10 @@ function stepRobots(dt, time) {
   for (let i = 0; i < nodes.length; i++) for (let j = i + 1; j < nodes.length; j++) {
     const r = relationOf(nodes[i], nodes[j]).r; if (r < 0.33 || n >= 120) continue;
     const a = nodes[i].pos, c = nodes[j].pos; pos.set([a.x, a.y, a.z, c.x, c.y, c.z], 6 * n);
-    const k = clamp((r - 0.33) / 0.4, 0, 1); const v = 0.25 + 0.7 * k; col.set([0.62 * v, 0.80 * v, 0.94 * v, 0.62 * v, 0.80 * v, 0.94 * v], 6 * n); n++;
+    const k = clamp((r - 0.33) / 0.4, 0, 1); const v = 0.25 + 0.7 * k;
+    if (SHADE.mode === "solid") { const q = [lerp(0.66, 0.18, k), lerp(0.72, 0.44, k), lerp(0.78, 0.66, k)]; col.set([...q, ...q], 6 * n); }   // pale grey blue to gel blue on the light floor
+    else col.set([0.62 * v, 0.80 * v, 0.94 * v, 0.62 * v, 0.80 * v, 0.94 * v], 6 * n);
+    n++;
   }
   relLines.geometry.setDrawRange(0, n * 2); relLines.geometry.attributes.position.needsUpdate = true; relLines.geometry.attributes.color.needsUpdate = true;
 }
@@ -874,13 +1050,14 @@ function bindProps() {
 function makeNextMother() {
   const b = robots.find((x) => x.id === selected); if (!b || !b.free) return;
   const prev = mother.name; mother = { name: "M" + (mother.gen + 1) + "·" + b.name, gen: mother.gen + 1, memory: b.memory.map((m) => ({ ...m, src: m.src === "birth" ? "own birth" : "carried" })), genome: b.genome.slice() };
-  skin.material.uniforms.tint.value.copy(colorOf(b.spec)).lerp(new THREE.Color(1, 1, 1), 0.55);
+  const skinIt = SHADE.items.find((it) => it.obj === skin);
+  for (const m of [skinIt.mat, skinIt.clay]) m.uniforms.tint.value.copy(colorOf(b.spec)).lerp(new THREE.Color(1, 1, 1), 0.55);
   log(`${b.name} becomes the next mother. She carries ${mother.memory.length} traces from ${prev}.`, "a");
   $("#genLbl").textContent = "generation M" + mother.gen; selected = "mother"; renderAll();
 }
 function renderCode(n, cur) {
   const gc = job && job.gc; const el = $("#code"); if (!gc) { el.innerHTML = `<div><span class="ln"></span><span class="empty">G-code appears here when the mother writes it.</span></div>`; return; }
-  const total = n, c = cur < 0 ? total - 1 : cur; const lines = Math.max(8, Math.floor(el.clientHeight / 17) - 1);
+  const total = n, c = cur < 0 ? total - 1 : Math.min(cur, total - 1); const lines = Math.max(8, Math.floor(el.clientHeight / 17) - 1);
   const start = clamp(c - Math.floor(lines / 2), 0, Math.max(0, total - lines));
   let h = ""; for (let i = start; i < Math.min(total, start + lines); i++) {
     const t = gc.lines[i], cls = t.startsWith(";") ? "cm" : t.startsWith("G0") ? "g0" : t.startsWith("G1") ? "g1" : "mc";
@@ -944,13 +1121,14 @@ function setView(v) {
   three.follow = v === "nozzle";
   const tgt = new THREE.Vector3(0.05, 0, 0);
   if (v === "front") c.position.set(-0.15, 0.05, 2.4); else if (v === "side") c.position.set(2.6, 0.05, 0.0); else if (v === "top") c.position.set(-0.149, 2.6, 0.001); else c.position.set(1.35, 0.7, 2.25);
+  if (v === "nozzle" && K) { const tp = K.tip(...armQ); tgt.set(tp[0], tp[2], -tp[1]); c.position.copy(tgt).add(new THREE.Vector3(0.3, 0.26, 0.5)); }   // come close to the nozzle and follow it
   ctl.target.copy(tgt); ctl.update();
 }
 function drawGizmo() {
   const cv = $("#gizmo"), g = cv.getContext("2d"), q = three.camera.quaternion.clone().invert(); g.clearRect(0, 0, 148, 148);
   const ax = [["X", new THREE.Vector3(1, 0, 0), "#e2554f"], ["Y", new THREE.Vector3(0, 0, -1), "#8ac43b"], ["Z", new THREE.Vector3(0, 1, 0), "#4f8ae2"]];
   const pts = ax.map(([n, v, c]) => [n, v.clone().applyQuaternion(q), c]).sort((a, b) => a[1].z - b[1].z);
-  g.fillStyle = "#ffffff10"; g.beginPath(); g.arc(74, 74, 64, 0, 7); g.fill();
+  g.fillStyle = SHADE.mode === "solid" ? "#00000012" : "#ffffff10"; g.beginPath(); g.arc(74, 74, 64, 0, 7); g.fill();
   for (const [n, v, c] of pts) { const x = 74 + v.x * 46, y = 74 - v.y * 46; g.strokeStyle = c; g.lineWidth = 4; g.beginPath(); g.moveTo(74, 74); g.lineTo(x, y); g.stroke(); g.fillStyle = c; g.beginPath(); g.arc(x, y, 13, 0, 7); g.fill(); g.fillStyle = "#151515"; g.font = "600 15px Inter, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(n, x, y + 1); }
 }
 
@@ -963,8 +1141,10 @@ function loop(now) {
     stepJob(dt, simT); stepRobots(dt, simT); stepBubbles(dt);
     deformBelly(bellyNow, simT);
     const pts = layerLine.geometry.attributes.position.array; layerPts.forEach((p, i) => pts.set(p, 3 * i)); layerLine.geometry.setDrawRange(0, layerPts.length); layerLine.geometry.attributes.position.needsUpdate = true;
-    const tp = K.tip(...armQ); three.tipDot.position.set(...tp); three.tipDot.visible = !!(job && job.stage === "printing");
-    if (three.follow) { three.controls.target.lerp(new THREE.Vector3(tp[0], tp[2], -tp[1]), 0.1); }
+    const tp = K.tip(...armQ); three.tipDot.position.set(...tp); const printingNow = !!(job && job.stage === "printing"), solid = SHADE.mode === "solid";
+    three.tipDot.visible = printingNow && !solid; layerLine.visible = !solid; updatePathDots(printingNow && solid, tp);
+    for (const b of robots) { const on = b.id === selected && !(printingNow && b === job.baby); b.hullMat.color.setHex(on ? CLAY.sel : CLAY.ink); b.hullMat.userData.uW.value = on ? 2.2 : 1.3; }   // orange marks the selection, except while the bead is the orange thing to read
+    if (three.follow) { const c = three.controls.target.clone(); three.controls.target.lerp(new THREE.Vector3(tp[0], tp[2], -tp[1]), 0.1); three.camera.position.add(c.sub(three.controls.target).negate()); }
     const segs = document.querySelectorAll(".seg.on .fill"); if (segs[0]) segs[0].style.width = (100 * clamp(stageProgress(), 0, 1)).toFixed(1) + "%";
     $("#tlClock").textContent = fmtT(simT); $("#ovFrame").textContent = Math.floor(simT * 24);
     if (frame % 30 === 0 && tab === "relation" && dt > 0) renderProps();
@@ -978,7 +1158,7 @@ function bindUI() {
   document.querySelectorAll("[data-speed]").forEach((b) => (b.onclick = () => { SPEED.v = +b.dataset.speed; document.querySelectorAll("[data-speed]").forEach((x) => x.classList.toggle("on", x === b)); }));
   document.querySelectorAll("[data-view]").forEach((b) => (b.onclick = () => setView(b.dataset.view)));
   document.querySelectorAll("[data-tab]").forEach((b) => (b.onclick = () => { tab = b.dataset.tab; document.querySelectorAll("[data-tab]").forEach((x) => x.setAttribute("aria-selected", String(x === b))); renderProps(); }));
-  $("#shSolid").onclick = () => setShading(false); $("#shWater").onclick = () => setShading(true);
+  document.querySelectorAll(".shgrp [data-shade]").forEach((b) => (b.onclick = () => setShading(b.dataset.shade)));
   $("#outliner").addEventListener("click", (e) => {
     const eye = e.target.closest("[data-eye]"); if (eye) { setVis(eye.dataset.eye, !vis[eye.dataset.eye]); renderOutliner(); return; }
     const r = e.target.closest("[data-sel]"); if (r) { selected = r.dataset.sel; robots.forEach((b) => b.mat.emissive.setHex(b.id === selected ? 0x332200 : 0)); renderOutliner(); renderProps(); }

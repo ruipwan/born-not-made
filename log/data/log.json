@@ -1,0 +1,727 @@
+[
+ {
+  "date": "2025-12",
+  "stage": "prototype",
+  "title": "First prototype: a rigid shell",
+  "text": "The project starts as a How to Make (Almost) Anything final project, The Birth of Robots. A parent robot in a floating shell carries a ready made baby robot, and a flat inflatable filled with water pushes the baby out. The month comes from the course page, not from a dated note.",
+  "decision": "Water, not air, fills the inflatable: air was too weak. Resin shells failed and heavier shells sank, so the shell is printed in foaming filament that floats.",
+  "media": [
+   "media/2025_prototype1.jpg",
+   "media/2025_prototype1_diagram.jpg"
+  ],
+  "links": [
+   {
+    "label": "HTMAA 2025 final project page",
+    "url": "https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html"
+   }
+  ],
+  "threads": {
+   "push": "A water filled inflatable, the first water muscle, pushes a ready made baby out."
+  }
+ },
+ {
+  "date": "2026-04",
+  "stage": "show",
+  "title": "Hard Mode hackathon prize",
+  "text": "At Hard Mode, MIT's AI and hardware hackathon, the project runs under the name Life 3.0. The jury creates a Special Visionary Prize for it.",
+  "media": [],
+  "links": []
+ },
+ {
+  "date": "2026-08",
+  "stage": "show",
+  "title": "ALIFE 2026, Waterloo",
+  "text": "Shown in the ALIFE 2026 art gallery as an exhibition finalist, and presented in a 7 minute talk at the Artificial Life in the Wild workshop. The display is a 3D printed resin model in a water tank, a looping video and a monitor.",
+  "media": [],
+  "links": []
+ },
+ {
+  "date": "2026-08-27",
+  "stage": "idea",
+  "title": "Kickoff: off the shelf first",
+  "text": "A hardware group forms with Di Wu (Northwestern) on materials, Kexin Wang (MIT CSAIL) on arm control and Vera Yu Wu. Ruipeng asks for a first round equipment list.",
+  "decision": "Buy off the shelf parts first; custom parts come later.",
+  "media": [],
+  "links": []
+ },
+ {
+  "date": "2026-08-29",
+  "stage": "design",
+  "title": "Material purchase list",
+  "text": "Di Wu's list follows the EpoMemory paper (CHI 2023): a print ink of EPON 828 resin and EPIKURE 3380 crosslinker, a support gel of Carbopol 940 neutralized with NaOH in deionized water, safety gear, lab tools and Ecoflex silicone.",
+  "decision": "Print inside a gel bath, so the baby needs no supports.",
+  "media": [],
+  "links": [
+   {
+    "label": "EpoMemory, CHI 2023",
+    "url": "https://dl.acm.org/doi/10.1145/3544548.3580638"
+   }
+  ],
+  "threads": {
+   "gel": "Carbopol 940 gel, neutralized with NaOH, as the support bath; epoxy ink."
+  }
+ },
+ {
+  "date": "2026-08-30",
+  "stage": "design",
+  "title": "Printer or syringe extruder",
+  "text": "Printers compared: Ultimaker 2, Bambu A1 mini, TRONXY, Flashforge Adventurer 5M and a used 3 axis machine. Syringe extruders compared: an MG996R servo syringe and a Funssor paste kit. Deionized water, syringe parts and SORTA-Clear 18 silicone arrive by 2 Sep.",
+  "decision": "A Flashforge Adventurer 5M is bought; it arrives on 17 Sep.",
+  "media": [],
+  "links": [
+   {
+    "label": "Reference paper, ACM 10.1145/3411764.3445097",
+    "url": "https://dl.acm.org/doi/10.1145/3411764.3445097"
+   }
+  ]
+ },
+ {
+  "date": "2026-09-17",
+  "stage": "design",
+  "title": "Stage or arm",
+  "text": "With the printer in, the group weighs XYZ stages against desktop arms: UFACTORY xArm 7 and Lite 6, myCobot 280 and the open source SO-101. Arms are hard to run on a battery. Kexin Wang: printing with an arm is like a silkworm spinning a cocoon.",
+  "decision": "An arm, not a stage. The mother should stay unplugged, with the arm enclosed in the body, or the whole thing reads as an appliance.",
+  "media": [],
+  "links": [],
+  "threads": {
+   "arm": "An arm, not an XYZ stage, and the arm sits inside the body."
+  }
+ },
+ {
+  "date": "2026-09-21",
+  "stage": "prototype",
+  "title": "SO-ARM101 bought",
+  "text": "A Hiwonder SO-ARM101, the assembled LeRobot arm, is ordered on 20 to 21 Sep and unboxed on 22 Sep.",
+  "decision": "Next step from Di Wu: put a motor on the syringe.",
+  "media": [],
+  "links": [
+   {
+    "label": "Hiwonder SO-ARM101 manual",
+    "url": "https://wiki.hiwonder.com/projects/LeRobot/en/latest/docs/1_SO_ARM101_Open_Source_6_Axis_Robotic_Arm_User_Manual.html"
+   }
+  ],
+  "threads": {
+   "arm": "Hiwonder SO-ARM101, a 6 axis open source arm."
+  }
+ },
+ {
+  "date": "2026-09-22",
+  "stage": "show",
+  "title": "Accepted to NeurIPS 2026 Creative AI",
+  "text": "Born, Not Made is accepted to the NeurIPS 2026 Creative AI Track. Di Wu joins as an author on later submissions.",
+  "media": [],
+  "links": []
+ },
+ {
+  "date": "2026-09-24",
+  "stage": "test",
+  "title": "First arm test",
+  "text": "The SO-ARM101 moves for the first time. Di Wu names the crosslinker, EPIKURE 3380, and asks Westlake Epoxy for a quote. Beakers, containers and syringes are ordered.",
+  "decision": "Validate the gel first; it does not depend on the crosslinker.",
+  "media": [],
+  "links": [
+   {
+    "label": "EPIKURE 3380, Westlake Epoxy",
+    "url": "https://www.westlakeepoxy.com/en-us/product/epikuretm-curing-agent-3380"
+   }
+  ],
+  "threads": {
+   "gel": "Gel tests go first, before any resin."
+  }
+ },
+ {
+  "date": "2026-09-28",
+  "stage": "idea",
+  "title": "Thesis abstract",
+  "text": "Shared for feedback: Born, Not Made: Robots That Fabricate and Give Birth to Their Offspring. The baby is printed inside the mother by an arm with syringe extrusion and born in water; a visitor's touch speeds the labour; an Unreal Engine simulation runs the society.",
+  "decision": "Feedback on 29 Sep: write more on the technical innovations and on how the work could inspire robot fabrication.",
+  "media": [],
+  "links": []
+ },
+ {
+  "date": "2026-10",
+  "stage": "prototype",
+  "title": "Second prototype: a soft, clear body",
+  "text": "Mother and baby become soft and clear, and each carries a small chip, a battery and a water pump. The tank photo was shared on 12 Oct; the build month is not in the sources.",
+  "decision": "Still a ready made baby, put in by hand. The next step is to make the baby inside the mother.",
+  "media": [
+   "media/1012_prototype2_tank.jpg",
+   "media/2026_prototype2_diagram.jpg"
+  ],
+  "links": [],
+  "threads": {
+   "push": "An internal water muscle pushes the baby; mother and baby each carry a pump."
+  }
+ },
+ {
+  "date": "2026-10-04",
+  "stage": "test",
+  "title": "First gel batch",
+  "text": "Di Wu and Ruipeng write a 200 mL test protocol: mix, neutralize, rest and print in the same cup. The first batch clumps, needs long magnetic stirring and comes out cloudy; it sets at 22:21. Its amounts came from an AI chat and were wrong.",
+  "decision": "Test the gel alone; resin and crosslinker wait.",
+  "media": [],
+  "links": [],
+  "threads": {
+   "gel": "First batch: clumps, cloudy, wrong amounts from an AI chat."
+  }
+ },
+ {
+  "date": "2026-10-05",
+  "stage": "test",
+  "title": "Neutralize by the paper",
+  "text": "Carbopol is an acidic polymer. Without NaOH its chains do not extend, the yield stress stays low and a print sinks or collapses. Di Wu: do not blindly trust GPT with materials; practice matters most.",
+  "decision": "From 5 Oct the ratio follows the paper: 1 g Carbomer 940 in 100 mL deionized water with 0.832 mL of 1 M NaOH, then vacuum degassing and rest.",
+  "media": [],
+  "links": [],
+  "threads": {
+   "gel": "Ratio from the paper: 0.832 mL of 1 M NaOH per gram of Carbomer 940."
+  }
+ },
+ {
+  "date": "2026-10-07",
+  "stage": "test",
+  "title": "The gel works",
+  "text": "Remade in the lab with NaOH and vacuum degassing, the gel comes out clear and holds its shape. The pump is slow and bubbles remain. A distributor quotes EPIKURE 3380 from $200 per quart.",
+  "decision": "Two ways to deal with bubbles: a stronger pump, or a slightly thinner gel.",
+  "media": [],
+  "links": [],
+  "threads": {
+   "gel": "Clear and holds its shape; bubbles remain."
+  }
+ },
+ {
+  "date": "2026-10-09",
+  "stage": "idea",
+  "title": "Born is not replicated",
+  "text": "After reading the replicator account in Blaise Agüera y Arcas's What Is Intelligence?, Ruipeng holds that a replicator and a born body are not the same. Offspring that can only make simpler things mean little.",
+  "decision": "Ask whether the baby could gestate too, revisiting the position that offspring are sterile.",
+  "media": [],
+  "links": [
+   {
+    "label": "What Is Intelligence?",
+    "url": "https://whatisintelligence.antikythera.org/"
+   }
+  ],
+  "threads": {
+   "lineage": "Question raised: could the baby gestate too?"
+  }
+ },
+ {
+  "date": "2026-10-12",
+  "stage": "design",
+  "title": "Birth diagram: gestation, flush and seal, birth",
+  "text": "A side wall arm is the umbilical cord: it feeds silicone and places the electronic core in the gel bath, the amniotic fluid. A three lumen umbilical of silicone, saline and suction flushes the gel and seals the funnel hole. The water muscle swells and pushes the fetus to a rear opening that opens slowly, triggered by heartbeat coupling.",
+  "decision": "Replaced on 15 Oct by a folded shell that is inflated.",
+  "media": [
+   "media/1012_birth_diagram.jpg"
+  ],
+  "links": [],
+  "threads": {
+   "arm": "Arm on the side wall, read as the umbilical cord.",
+   "push": "The water muscle swells and pushes the fetus to the rear.",
+   "opening": "A rear opening that opens slowly at birth, triggered by heartbeat coupling."
+  }
+ },
+ {
+  "date": "2026-10-12",
+  "stage": "site",
+  "title": "Born, Not Made lab website",
+  "text": "Experiments on a small society of artificial lives. The society inside the mother runs live, and touching the water can help a birth. Live counts show lives in the water, births per minute, average lifespan, dialogue turns and the deepest generation.",
+  "decision": "A note for the site: avoid an AI look.",
+  "media": [],
+  "links": []
+ },
+ {
+  "date": "2026-10-13",
+  "stage": "idea",
+  "title": "Feedback: take one side to the extreme",
+  "text": "In a short call, Blaise Agüera y Arcas suggests pushing at least one of art or technology to the extreme. Two questions follow: the baby has no arm or syringe, so how could the baby bear a next generation, and could the arm itself be printed?",
+  "decision": "Run material experiments and system design in parallel.",
+  "media": [],
+  "links": [],
+  "threads": {
+   "lineage": "The baby has no arm, so how could the baby bear the next one?"
+  }
+ },
+ {
+  "date": "2026-10-13",
+  "stage": "design",
+  "title": "Vertical layout, folded baby",
+  "text": "Sketches move the materials and the arm to the top to save printing space, and consider shape change (4D printing) and segmented growth. The baby's surface is printed folded so it can unfold later. Di Wu: EPON with EPIKURE needs 24 h plus heat.",
+  "decision": "Test a fast curing silicone (Ecoflex Fast) first; it also checks the gel. Shape change comes later.",
+  "media": [
+   "media/1013_folded_sketch.jpg",
+   "media/1013_folded_unfolded.jpg"
+  ],
+  "links": [],
+  "threads": {
+   "arm": "Arm and materials move to the top of the body.",
+   "inflation": "The baby is printed folded, to unfold after birth.",
+   "gel": "Print material switches from epoxy to fast curing silicone."
+  }
+ },
+ {
+  "date": "2026-10-14",
+  "stage": "test",
+  "title": "First silicone print in gel",
+  "text": "Sealed and left for a day, the gel loses almost all its bubbles: its own weight pushes them out. The first silicone injected into the gel prints and stays suspended. Silicone that sets in 5 minutes is too fast and 30 minutes is slow.",
+  "decision": "Aim for a silicone that sets in about 10 minutes, and check the gel every 12 hours to find the shortest rest. Add shape change, so the result does not read as plain Rapid Liquid Printing.",
+  "media": [],
+  "links": [
+   {
+    "label": "First print in gel, video",
+    "url": "https://drive.google.com/file/d/1jH1xqi_G-yIH9yQR79T77lY0z6bkesVg/view"
+   }
+  ],
+  "threads": {
+   "gel": "A day of rest removes the bubbles; silicone prints and stays suspended."
+  }
+ },
+ {
+  "date": "2026-10-14",
+  "stage": "design",
+  "title": "Six schemes for generations",
+  "text": "Six birth schemes are drawn and reviewed. Only one can be built and shown daily now: a baby printed folded in Dragon Skin 10 around a placed core, which grows by taking in water from Ø56 x 145 mm to about Ø114 x 90 mm. Lineages shrink: unfolding gives 4 to 8 times the volume, but staying the same size needs about 39 times.",
+  "decision": "A one day detour the same day: cast rubber around an inflated balloon and drop the arm. Reversed on 15 Oct; printing comes back.",
+  "media": [],
+  "links": [],
+  "threads": {
+   "inflation": "Grow by taking in water: 4 to 8 times the volume at most.",
+   "lineage": "A single body lineage shrinks each generation."
+  }
+ },
+ {
+  "date": "2026-10-15",
+  "stage": "design",
+  "title": "Folded shell, then inflate",
+  "text": "A Media Lab installation art instructor suggests printing the shell full of folds and inflating it to push the baby out. The folds leave very little liquid inside the shell, so the gel inside can be ignored.",
+  "decision": "The arm pushes while air is blown in. This replaces the water muscle diagram of 12 Oct.",
+  "media": [],
+  "links": [],
+  "threads": {
+   "push": "The arm pushes while air is blown in; the water muscle goes.",
+   "inflation": "Print the shell full of folds, then inflate it."
+  }
+ },
+ {
+  "date": "2026-10-15",
+  "stage": "idea",
+  "title": "A roadmap in stages",
+  "text": "After pushing a baby out, and a test where visitor and mother act together, the plan runs in steps: a liquid printer inside the mother that prints the shell around the electronics; shape memory printing so the baby grows; a printing module the baby docks into after birth; a simple 4 axis arm inside the mother, so assembly happens in the body.",
+  "decision": "Each stage answers the objection the last one draws.",
+  "media": [],
+  "links": [],
+  "threads": {
+   "lineage": "Plan: a printing module the baby docks into after birth."
+  }
+ },
+ {
+  "date": "2026-10-16",
+  "stage": "prototype",
+  "title": "Parts for the print head",
+  "text": "After the Friday meeting Kexin Wang and Di Wu source parts: AB two part cartridges, three way valve syringes, multi way connectors, double ended needles, continuous syringes, rubber valve cores and stoppers.",
+  "media": [],
+  "links": [],
+  "threads": {
+   "valve": "Three way valve syringes and rubber valve cores are sourced."
+  }
+ },
+ {
+  "date": "2026-10-17",
+  "stage": "idea",
+  "title": "Conductive ink and glow",
+  "text": "Kexin Wang proposes printing a conductive gel ink, for touch interaction; Di Wu sees two routes, a gel that conducts or a gel binder with micron metal powder. On 18 Oct: phosphor for a glow in the dark, or hidden LEDs with a water soluble UV reactive dye, so the mother's body reacts during printing or birth.",
+  "decision": "Kept as open directions.",
+  "media": [],
+  "links": []
+ },
+ {
+  "date": "2026-10-18",
+  "stage": "idea",
+  "title": "Mother names a function",
+  "text": "No pronouns for the mother or the baby: which pronoun fits stays a question of the work. The working sentence, set on 19 Oct: mother names a function rather than a gender, the body that labours and delivers.",
+  "media": [],
+  "links": []
+ },
+ {
+  "date": "2026-10-21",
+  "stage": "design",
+  "title": "S8: Print, then breathe",
+  "text": "A core of PCB, battery and motor is set by hand in the liquid gel. The SO-ARM101 hangs upside down at the top and prints a folded silicone shell through a static mixer, a three way valve and a 14G needle. The valve turns to air: the same needle sucks the inner gel back, then blows the folds open while the arm pushes the baby through passive duckbill lips.",
+  "decision": "Design locked as S8, drawn in Rhino 8 with a mother about 1 m long. One valve, turned by the gripper servo. The gel stays in the mother and is reused.",
+  "media": [
+   "media/1021_s8_render.jpg"
+  ],
+  "links": [],
+  "threads": {
+   "arm": "SO-ARM101 hangs upside down at the top of the mother.",
+   "valve": "One three way valve on the needle, turned by the gripper servo; a rubber needle valve is the core's only opening.",
+   "opening": "Passive duckbill lips, pushed open only from inside.",
+   "inflation": "Suck the inner gel back, then blow the folds open.",
+   "push": "Blow while the arm pushes."
+  }
+ },
+ {
+  "date": "2026-10-28",
+  "stage": "idea",
+  "title": "The baby can become a mother",
+  "text": "The arm can be built in, so a baby can become the next mother, and a baby need not be smaller than the mother. No origami is needed: soft folded silicone with wrinkles inflates after birth and grows to about the mother's size. The birth opening should open like petals, with no visible seams when closed.",
+  "decision": "Reverses the earlier position that offspring are sterile.",
+  "media": [],
+  "links": [],
+  "threads": {
+   "lineage": "Offspring become fertile.",
+   "inflation": "Plain wrinkled silicone that grows to about the mother's size.",
+   "opening": "Open like petals, with no seams when closed."
+  }
+ },
+ {
+  "date": "2026-10-28",
+  "stage": "design",
+  "title": "v5: the whole sequence",
+  "text": "The v5 sheet runs in six steps: the core goes in through the opening, the arm prints the folded skin, docks and blows, the arm pushes while it blows at birth, the baby fills out beside the mother, and with supply in, the baby prints the next.",
+  "decision": "v5 becomes the reference design. The arm switches between printing and the air pump through a syringe adapter.",
+  "media": [
+   "media/1028_v5_sequence.jpg"
+  ],
+  "links": [],
+  "threads": {
+   "lineage": "With supply in, the baby prints the next.",
+   "push": "The arm pushes while it blows."
+  }
+ },
+ {
+  "date": "2026-10-30",
+  "stage": "idea",
+  "title": "The whole offspring forms inside",
+  "text": "The core claim: the whole offspring forms inside the parent and needs no help once born. Each part needs the others: buoyancy lets the baby use a small motor, the gel holds sealed electronics without supports, and the arm inflates the baby and pushes at the same time.",
+  "decision": "Call it a new and challenging direction, not a first.",
+  "media": [],
+  "links": []
+ },
+ {
+  "date": "2026-10-31",
+  "stage": "idea",
+  "title": "A robotic womb",
+  "text": "The mother's body is called a robotic womb: the gel is its amniotic fluid and the arm its umbilical cord. The arm's air tube and pump inflate the baby inside the body, so the baby grows in the womb and keeps expanding after birth. A camera records the printing.",
+  "decision": "Inflation starts inside the womb, not only after birth.",
+  "media": [],
+  "links": [],
+  "threads": {
+   "inflation": "Inflation starts inside the womb."
+  }
+ },
+ {
+  "date": "2026-11-01",
+  "stage": "design",
+  "title": "A printing module at the back",
+  "text": "The print module is drawn in detail: a Z fold arm on a two stage boom, a stop and a birth hose, in a module docked at the back of the mother. The push at birth may now come from the arm instead of the water muscle; still undecided.",
+  "media": [
+   "media/1101_print_module.jpg"
+  ],
+  "links": [],
+  "threads": {
+   "tail": "Arm, boom and supplies move into a module docked at the back.",
+   "push": "The push may come from the arm instead of the water muscle."
+  }
+ },
+ {
+  "date": "2026-11-04",
+  "stage": "render",
+  "title": "R23: the SO-ARM101 film",
+  "text": "A full cycle film with the SO-ARM101: the tail docks to the mother's ring, a boom carries the arm through the bore, and the arm prints the baby in the gel and places ring parts. Close ups show the lid: a roller on the boom lifts it to 88 degrees, and baby pressure holds it shut with no power. Dated by annotated screenshots of 4 to 5 Nov.",
+  "media": [
+   "media/1104_r23_so101.jpg",
+   "media/1104_r23_lid.jpg"
+  ],
+  "links": [],
+  "threads": {
+   "arm": "R23 film: the SO-ARM101 rides in on a boom.",
+   "opening": "A lid lifted by a roller on the boom; baby pressure holds it shut."
+  }
+ },
+ {
+  "date": "2026-11-05",
+  "stage": "design",
+  "title": "Print and assemble in one cycle",
+  "text": "Ten steps: the tail comes in, docks by magnets, the gel goes in, magnets are set in the gel, the arm prints the baby, blows and pushes, the birth, full size, a new tail, and the baby becomes a mother.",
+  "decision": "Printing and placing happen in one cycle: print the soft body, place the made parts, print over them.",
+  "media": [
+   "media/1105_print_assemble_cycle.jpg"
+  ],
+  "links": [],
+  "threads": {
+   "tail": "A new tail docks to the baby.",
+   "lineage": "The baby becomes a mother."
+  }
+ },
+ {
+  "date": "2026-11-06",
+  "stage": "design",
+  "title": "ECO62, then DexArm",
+  "text": "The SO-ARM101 is too wobbly for printing, and the arm should also place parts in the gel. A RealMan ECO62 is picked first; later the same day the choice flips to a 4 axis Rotrics DexArm, simpler and cheaper, ordered to test.",
+  "decision": "Occam's razor: try the 4 axis DexArm.",
+  "media": [],
+  "links": [],
+  "threads": {
+   "arm": "SO-ARM101 too wobbly; a 4 axis DexArm is ordered to test."
+  }
+ },
+ {
+  "date": "2026-11-09",
+  "stage": "render",
+  "title": "R24: the DexArm film",
+  "text": "The design is tried with both arms in parallel. R24 is the DexArm version of the full cycle film.",
+  "media": [
+   "media/1109_r24_dexarm.jpg"
+  ],
+  "links": [],
+  "threads": {
+   "arm": "R24 film with the 4 axis DexArm."
+  }
+ },
+ {
+  "date": "2026-11-09",
+  "stage": "render",
+  "title": "R25: rebuilt around the ECO62",
+  "text": "After seeing both, the whole system is redesigned around the ECO62. The arm weighs 3.6 kg and carries 2 kg, and it forces larger shells: the R25 body is scaled 1.25 times. In the film a second tail swims in and docks to the baby.",
+  "decision": "Rebuild around the ECO62, 1.25 times larger.",
+  "media": [
+   "media/1109_r25_eco62.jpg",
+   "media/1109_r25_next_mother.jpg"
+  ],
+  "links": [
+   {
+    "label": "RealMan ECO62 parameters",
+    "url": "https://develop.realman-robotics.com/en/robot/robotParameter/ECO62OntologyParameters/"
+   }
+  ],
+  "threads": {
+   "arm": "R25: rebuilt around the RealMan ECO62, body 1.25 times larger.",
+   "tail": "In R25 a second tail swims in and docks to the baby."
+  }
+ },
+ {
+  "date": "2026-11-09",
+  "stage": "idea",
+  "title": "Where do tails come from?",
+  "text": "The tail carries the arm, boom, valve, pumps, battery and thrusters, and nothing says where the second one was made. Seven answers are laid out: factory tails, a tail that builds a tail, a twin born in the womb, one tail passed from mother to child, a nest of worker tails, a soft tail born whole, and tails salvaged from the dead.",
+  "decision": "The note recommends passing one tail from mother to child. The choice is to try the twin: the womb bears the tail too, at least its shell. Half born, half made.",
+  "media": [],
+  "links": [],
+  "threads": {
+   "tail": "Seven origins weighed; the womb will bear the tail's body too."
+  }
+ },
+ {
+  "date": "2026-11-09",
+  "stage": "show",
+  "title": "VISAP 2026, Boston",
+  "text": "Shown in the IEEE VIS Arts Program, 9 to 13 Nov. Visitors no longer reach into the water: a hand resting on a copper strip along the tank's top edge is the touch.",
+  "media": [],
+  "links": []
+ },
+ {
+  "date": "2026-11",
+  "stage": "design",
+  "title": "Half born, half made",
+  "text": "The womb can bear the tail's whole silicone body, skin, ribs, bags and hoses, printed collapsed, inflated and born second. The arm, boom, motors, battery and electronics stay a made core that slides in after birth. Drawn after the 9 Nov choice; the exact day is not in the sources.",
+  "decision": "Fold the tail body as a bellows stack, born second on the same gel bed. The 195 mm gel depth, not the womb length, is the limit.",
+  "media": [
+   "media/11_tail_half_born.jpg",
+   "media/11_tail_size_options.jpg"
+  ],
+  "links": [],
+  "threads": {
+   "tail": "Tail body born as a collapsed bellows; the made core slides in after birth."
+  }
+ },
+ {
+  "date": "2026-11",
+  "stage": "show",
+  "title": "Amplification, MIT Met Warehouse",
+  "text": "Shown in Amplification, an exhibition at MIT Met Warehouse in Boston, in November 2026. The exact dates are not in the sources.",
+  "media": [],
+  "links": []
+ },
+ {
+  "date": "2026-11-14",
+  "stage": "idea",
+  "title": "Less mechanical, more alive",
+  "text": "The film reads as too mechanical. The new brief: breathing, a small swelling inside the body like gestation; a dock that opens like petals, several leaves together, not a lid; a tail that keeps one whole shape with the body and does not read as phallic. The arm, the printing and how the ring is made all stay.",
+  "decision": "Studies in Blender: breathing, petal docks and five dock schemes. A physics review fails the first three petal versions on actuation and sealing.",
+  "media": [
+   "media/1114_petal_dock.jpg"
+  ],
+  "links": [],
+  "threads": {
+   "opening": "Petals, not a lid.",
+   "belly": "The body breathes: a small swelling, like gestation."
+  }
+ },
+ {
+  "date": "2026-11-15",
+  "stage": "design",
+  "title": "Simplification audit",
+  "text": "The mechanism has grown to 76 parts and 21 actuators. An independent audit draws three simpler variants: trimmed (46 parts), one ring (21) and bare (15). Two straws, one for silicone and one for air, replace the three way valve and its purge, and the door lips can act as the valve.",
+  "decision": "Recommended: one ring, a printed ring around one laid washer chain, lips as the door and a 600 mm tail. The rule: the simpler the system, the more robust.",
+  "media": [
+   "media/1115_simplify_variants.jpg"
+  ],
+  "links": [],
+  "threads": {
+   "valve": "Two straws replace the three way valve; the lips act as the valve.",
+   "opening": "A duckbill of printed lips is the door.",
+   "tail": "Audit: the tail could drop from 1050 to 600 mm."
+  }
+ },
+ {
+  "date": "2026-11-16",
+  "stage": "design",
+  "title": "Shorter tail, spring door",
+  "text": "The lost Blender scenes of R23, R24 and R25 are rebuilt from the films. Measuring the R25 tail finds bugs: the boom pokes 108 mm out of the rear cap, the folded arm cannot pass the 280 mm bore, and the lid's needle valve sits on the boom's centre line.",
+  "decision": "Tail shortened from 1050 to 944 mm, with an over centre spring hinge that the arm nudges open; the needle valve moves 70 mm to the side. An independent check had failed the first two door options.",
+  "media": [
+   "media/1116_spring_door.jpg"
+  ],
+  "links": [],
+  "threads": {
+   "tail": "1050 to 944 mm.",
+   "opening": "An over centre spring door, nudged open by the arm.",
+   "valve": "The lid's needle valve moves 70 mm off the boom line."
+  }
+ },
+ {
+  "date": "2026-11-16",
+  "stage": "design",
+  "title": "R26: two changes only",
+  "text": "R26 keeps the R25 scene and changes two things. A 4 stage boom lets the tail drop from about 1050 to 730 mm. One clear lid with no motor and no sensor is opened by the docking itself: a striker in the tail ring turns a heel on the lid.",
+  "decision": "The docking opens the door. The lid swing plus one boom stage sets the 730 mm floor.",
+  "media": [
+   "media/1116_r26_compare.jpg"
+  ],
+  "links": [],
+  "threads": {
+   "tail": "R26: 730 mm with a 4 stage boom.",
+   "opening": "The docking itself opens the lid; no motor."
+  }
+ },
+ {
+  "date": "2026-11-16",
+  "stage": "idea",
+  "title": "Title: Born, Not Made again",
+  "text": "On 1 Nov the title became Robotic Womb, in praise of the robot mother's labour. On 16 Nov the main title returns to Born, Not Made, with the subtitle A Speculative Prototype of a Mother Robot Giving Birth to a Baby Robot.",
+  "decision": "Prototype, not design: the work is being built, not only imagined.",
+  "media": [],
+  "links": []
+ },
+ {
+  "date": "2026-11-17",
+  "stage": "design",
+  "title": "Hedgehog baby",
+  "text": "The toothed lantern baby could not leave through the canal. From a sketch, the new baby is a soft core with 12 lobes printed open. Vacuum curls the lobes into a bud about 201 mm across to pass the 280 mm canal; outside, the valve vents and the lobes bloom in about 1.5 s.",
+  "decision": "The open shape is the rest shape. Folding is done by vacuum, not by printing folded.",
+  "media": [
+   "media/1117_hedgehog_baby.jpg"
+  ],
+  "links": [],
+  "threads": {
+   "inflation": "Lobes printed open, curled by vacuum, bloom outside.",
+   "valve": "A check valve holds the vacuum through birth."
+  }
+ },
+ {
+  "date": "2026-11-17",
+  "stage": "design",
+  "title": "Six organic directions",
+  "text": "Six less mechanical forms for mother and tail, each with a drawing and a loop: budding, a vertebra spine, a fish swallowing a fish, a jellyfish, ammonite chambers and a seed pod. Fourteen topology variations sit on three sheets.",
+  "decision": "In every direction the child shares the parent's grammar but not the parent's numbers: relation, not copy.",
+  "media": [
+   "media/1117_organic_forms.jpg"
+  ],
+  "links": []
+ },
+ {
+  "date": "2026-11-17",
+  "stage": "render",
+  "title": "Relation animation",
+  "text": "Babies of different forms and colours stay near the mother. One takes the arm and becomes the next mother. A second version follows on 18 Nov.",
+  "media": [
+   "media/1117_relation.jpg"
+  ],
+  "links": [],
+  "threads": {
+   "lineage": "One baby takes the arm and becomes the next mother."
+  }
+ },
+ {
+  "date": "2026-11-18",
+  "stage": "design",
+  "title": "The body as a pregnancy",
+  "text": "The mother's upper belly should change like a pregnancy. Three directions: rigid origami panels that click between three stable shapes, like trimesters; an air jacket of ribs that lifts and breathes; a soft skin with a hidden thread net and five muscle bands.",
+  "media": [
+   "media/1118_belly_origami.jpg",
+   "media/1118_belly_air_jacket.jpg"
+  ],
+  "links": [],
+  "threads": {
+   "belly": "Three options: origami panels, an air jacket, a skin with threads and muscle bands."
+  }
+ },
+ {
+  "date": "2026-11-18",
+  "stage": "idea",
+  "title": "Waves and frequency",
+  "text": "Mother and baby, and the mother and the surrounding water, are to communicate through waves and frequency, in the installation and in the simulation. Stefan Helmreich's A Book of Waves is a strong influence.",
+  "media": [],
+  "links": []
+ },
+ {
+  "date": "2026-11-18",
+  "stage": "design",
+  "title": "Fold belly",
+  "text": "The upper skin is printed silicone origami. The womb is closed and full of gel, so when the baby inflates the pleats open and the belly rises. Pressure pulses push the baby down the canal; after birth the womb vents, the pleats fold back and the skin sags a little.",
+  "decision": "The swelling is how a closed body makes room, pushes and lets go. The gel stays inside after birth.",
+  "media": [
+   "media/1118_fold_belly.jpg"
+  ],
+  "links": [],
+  "threads": {
+   "belly": "Fold belly: a printed origami skin rises as the baby inflates.",
+   "push": "Pressure pulses in the closed womb push the baby down the canal.",
+   "inflation": "The baby inflates inside the closed womb, and the belly makes room."
+  }
+ },
+ {
+  "date": "2026-11-19",
+  "stage": "idea",
+  "title": "Relation",
+  "text": "The word for what forms between the robots is relation. Not looking after, which implies dependency, and not collaboration. Before, machines had no relations with each other; robots relating to robots is where a robot society begins.",
+  "decision": "Birth is a metaphor for that beginning; the mother and child image is kept modest.",
+  "media": [],
+  "links": []
+ },
+ {
+  "date": "2026-11-19",
+  "stage": "site",
+  "title": "Web console and this site",
+  "text": "The project site goes up: Trunk, Branches, a Build teardown, a Simulator console modelled on Blender, where a spoken or typed signal becomes G-code, a print, an inflation and a birth, and a Society model of many mothers and babies in one body of water. This Log joins them.",
+  "media": [
+   "media/1119_console.jpg"
+  ],
+  "links": [
+   {
+    "label": "Source on GitHub",
+    "url": "https://github.com/ruipwan/born-not-made"
+   }
+  ]
+ },
+ {
+  "date": "2026-12",
+  "stage": "show",
+  "title": "NeurIPS 2026, Sydney",
+  "text": "The Creative AI Track at NeurIPS 2026 in Sydney, 6 to 12 Dec, with a travel award granted on 15 Oct that covers registration and hotel. Upcoming at the time of writing.",
+  "media": [],
+  "links": []
+ }
+]
