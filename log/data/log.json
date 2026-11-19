@@ -39,7 +39,7 @@
   "date": "2026-08-27",
   "stage": "idea",
   "title": "Kickoff: off the shelf first",
-  "text": "A hardware group forms with Di Wu (Northwestern) on materials, Kexin Wang (MIT CSAIL) on arm control and Vera Yu Wu. Ruipeng asks for a first round equipment list.",
+  "text": "A hardware group forms with collaborators from Northwestern University and MIT CSAIL, on materials and arm control. Ruipeng asks for a first round equipment list.",
   "decision": "Buy off the shelf parts first; custom parts come later.",
   "media": [],
   "links": []
@@ -48,7 +48,7 @@
   "date": "2026-08-29",
   "stage": "design",
   "title": "Material purchase list",
-  "text": "Di Wu's list follows the EpoMemory paper (CHI 2023): a print ink of EPON 828 resin and EPIKURE 3380 crosslinker, a support gel of Carbopol 940 neutralized with NaOH in deionized water, safety gear, lab tools and Ecoflex silicone.",
+  "text": "The materials list follows the EpoMemory paper (CHI 2023): a print ink of EPON 828 resin and EPIKURE 3380 crosslinker, a support gel of Carbopol 940 neutralized with NaOH in deionized water, safety gear, lab tools and Ecoflex silicone.",
   "decision": "Print inside a gel bath, so the baby needs no supports.",
   "media": [],
   "links": [
@@ -79,7 +79,7 @@
   "date": "2026-09-17",
   "stage": "design",
   "title": "Stage or arm",
-  "text": "With the printer in, the group weighs XYZ stages against desktop arms: UFACTORY xArm 7 and Lite 6, myCobot 280 and the open source SO-101. Arms are hard to run on a battery. Kexin Wang: printing with an arm is like a silkworm spinning a cocoon.",
+  "text": "With the printer in, the group weighs XYZ stages against desktop arms: UFACTORY xArm 7 and Lite 6, myCobot 280 and the open source SO-101. Arms are hard to run on a battery. An image from the group: printing with an arm is like a silkworm spinning a cocoon.",
   "decision": "An arm, not a stage. The mother should stay unplugged, with the arm enclosed in the body, or the whole thing reads as an appliance.",
   "media": [],
   "links": [],
@@ -92,7 +92,7 @@
   "stage": "prototype",
   "title": "SO-ARM101 bought",
   "text": "A Hiwonder SO-ARM101, the assembled LeRobot arm, is ordered on 20 to 21 Sep and unboxed on 22 Sep.",
-  "decision": "Next step from Di Wu: put a motor on the syringe.",
+  "decision": "Next step: put a motor on the syringe.",
   "media": [],
   "links": [
    {
@@ -108,7 +108,7 @@
   "date": "2026-09-22",
   "stage": "show",
   "title": "Accepted to NeurIPS 2026 Creative AI",
-  "text": "Born, Not Made is accepted to the NeurIPS 2026 Creative AI Track. Di Wu joins as an author on later submissions.",
+  "text": "Born, Not Made is accepted to the NeurIPS 2026 Creative AI Track.",
   "media": [],
   "links": []
  },
@@ -116,7 +116,7 @@
   "date": "2026-09-24",
   "stage": "test",
   "title": "First arm test",
-  "text": "The SO-ARM101 moves for the first time. Di Wu names the crosslinker, EPIKURE 3380, and asks Westlake Epoxy for a quote. Beakers, containers and syringes are ordered.",
+  "text": "The SO-ARM101 moves for the first time. The crosslinker is chosen: EPIKURE 3380. Beakers, containers and syringes are ordered.",
   "decision": "Validate the gel first; it does not depend on the crosslinker.",
   "media": [],
   "links": [
@@ -157,7 +157,7 @@
   "date": "2026-10-04",
   "stage": "test",
   "title": "First gel batch",
-  "text": "Di Wu and Ruipeng write a 200 mL test protocol: mix, neutralize, rest and print in the same cup. The first batch clumps, needs long magnetic stirring and comes out cloudy; it sets at 22:21. Its amounts came from an AI chat and were wrong.",
+  "text": "The team writes a 200 mL test protocol: mix, neutralize, rest and print in the same cup. The first batch clumps, needs long magnetic stirring and comes out cloudy; it sets at 22:21. Its amounts came from an AI chat and were wrong.",
   "decision": "Test the gel alone; resin and crosslinker wait.",
   "media": [],
   "links": [],
@@ -169,7 +169,7 @@
   "date": "2026-10-05",
   "stage": "test",
   "title": "Neutralize by the paper",
-  "text": "Carbopol is an acidic polymer. Without NaOH its chains do not extend, the yield stress stays low and a print sinks or collapses. Di Wu: do not blindly trust GPT with materials; practice matters most.",
+  "text": "Carbopol is an acidic polymer. Without NaOH its chains do not extend, the yield stress stays low and a print sinks or collapses. Lesson: do not trust a chatbot with material ratios; test them.",
   "decision": "From 5 Oct the ratio follows the paper: 1 g Carbomer 940 in 100 mL deionized water with 0.832 mL of 1 M NaOH, then vacuum degassing and rest.",
   "media": [],
   "links": [],
@@ -235,7 +235,7 @@
   "date": "2026-10-13",
   "stage": "idea",
   "title": "Feedback: take one side to the extreme",
-  "text": "In a short call, Blaise Agüera y Arcas suggests pushing at least one of art or technology to the extreme. Two questions follow: the baby has no arm or syringe, so how could the baby bear a next generation, and could the arm itself be printed?",
+  "text": "Feedback from a short call: push at least one of art or technology to the extreme. Two questions follow: the baby has no arm or syringe, so how could the baby bear a next generation, and could the arm itself be printed?",
   "decision": "Run material experiments and system design in parallel.",
   "media": [],
   "links": [],
@@ -247,7 +247,7 @@
   "date": "2026-10-13",
   "stage": "design",
   "title": "Vertical layout, folded baby",
-  "text": "Sketches move the materials and the arm to the top to save printing space, and consider shape change (4D printing) and segmented growth. The baby's surface is printed folded so it can unfold later. Di Wu: EPON with EPIKURE needs 24 h plus heat.",
+  "text": "Sketches move the materials and the arm to the top to save printing space, and consider shape change (4D printing) and segmented growth. The baby's surface is printed folded so it can unfold later. EPON with EPIKURE needs 24 h plus heat.",
   "decision": "Test a fast curing silicone (Ecoflex Fast) first; it also checks the gel. Shape change comes later.",
   "media": [
    "media/1013_folded_sketch.jpg",
@@ -319,7 +319,7 @@
   "date": "2026-10-16",
   "stage": "prototype",
   "title": "Parts for the print head",
-  "text": "After the Friday meeting Kexin Wang and Di Wu source parts: AB two part cartridges, three way valve syringes, multi way connectors, double ended needles, continuous syringes, rubber valve cores and stoppers.",
+  "text": "After the Friday meeting the team sources parts: AB two part cartridges, three way valve syringes, multi way connectors, double ended needles, continuous syringes, rubber valve cores and stoppers.",
   "media": [],
   "links": [],
   "threads": {
@@ -330,7 +330,7 @@
   "date": "2026-10-17",
   "stage": "idea",
   "title": "Conductive ink and glow",
-  "text": "Kexin Wang proposes printing a conductive gel ink, for touch interaction; Di Wu sees two routes, a gel that conducts or a gel binder with micron metal powder. On 18 Oct: phosphor for a glow in the dark, or hidden LEDs with a water soluble UV reactive dye, so the mother's body reacts during printing or birth.",
+  "text": "A proposal: print a conductive gel ink, for touch interaction. Two routes: a gel that conducts or a gel binder with micron metal powder. On 18 Oct: phosphor for a glow in the dark, or hidden LEDs with a water soluble UV reactive dye, so the mother's body reacts during printing or birth.",
   "decision": "Kept as open directions.",
   "media": [],
   "links": []
