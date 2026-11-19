@@ -1,0 +1,234 @@
+{
+ "cases": [
+  {
+   "name": "(a) womb pulses only, sleeve r 90 (task)",
+   "push": "womb pulses only",
+   "passes": false,
+   "time_s": null,
+   "peak_force_N": 0.0,
+   "peak_strain": 0.529,
+   "notes": "does not pass: pulses cannot start a birth. Pressed 2 mm into the cone, the soft cone springs the nose back off; with no sealing contact the womb pressure acts all round the baby (zero net push), balloons the closed sleeve and squeezes the baby up to 1.7 kPa, past the bulging limit of the bellows near 1.5 kPa. Womb peak 1.00 kPa; baby peak 1.67 kPa; peak womb push on the seal 0.0 N, sleeve resistance -0.0 N; strain baby 30 % (break 663 %), sleeve 53 % (break 900 %); belly rise 63 mm max"
+  },
+  {
+   "name": "(b) own growth, tail on the heel stop, sleeve r 90 (task)",
+   "push": "own growth, tail on the heel stop",
+   "passes": false,
+   "time_s": null,
+   "peak_force_N": 10.6,
+   "peak_strain": 0.322,
+   "notes": "does not pass: growth lifts the nose 74 mm up the chute (at the ring plate after 87 s, baby at 0.34 kPa), seals the nose in the sleeve, then the strap ring stops growth with the nose dome at s +163 mm, short of the exit; tail stays on the heel. Womb peak 0.13 kPa; baby peak 1.00 kPa; peak heel reaction 10.6 N; strain baby 32 % (break 663 %), sleeve 6 % (break 900 %); belly rise 50 mm max"
+  },
+  {
+   "name": "(c) growth, then womb pulses, sleeve r 90 (task)",
+   "push": "growth, then womb pulses",
+   "passes": true,
+   "time_s": 483.0,
+   "peak_force_N": 16.4,
+   "peak_strain": 0.437,
+   "notes": "solver stopped at 307 s (sleeve end folding over a crest) with the tail at -203 mm, still advancing 58 mm in the last 30 s; exit time 483 s is extrapolated. Womb peak 0.54 kPa, slips start at up to 0.53 kPa; baby peak 1.30 kPa; peak womb push on the seal 16.4 N, sleeve resistance 20.2 N; strain baby 44 % (break 663 %), sleeve 25 % (break 900 %); belly rise 62 mm max"
+  },
+  {
+   "name": "(d) growth, then womb pulses with an everting liner (Y 0.2 kPa), sleeve r 90 (task)",
+   "push": "growth, then womb pulses with an everting liner (Y 0.2 kPa)",
+   "passes": true,
+   "time_s": 464.0,
+   "peak_force_N": 8.5,
+   "peak_strain": 0.397,
+   "notes": "solver stopped at 284 s (sleeve end folding over a crest) with the tail at -232 mm, still advancing 61 mm in the last 30 s; exit time 464 s is extrapolated. Womb peak 0.48 kPa, slips start at up to 0.48 kPa; baby peak 1.25 kPa; peak womb push on the seal 8.5 N, sleeve resistance 475.9 N; strain baby 40 % (break 663 %), sleeve 21 % (break 900 %); belly rise 62 mm max"
+  },
+  {
+   "name": "(a) womb pulses only, sleeve r 80 (tighter)",
+   "push": "womb pulses only",
+   "passes": false,
+   "time_s": null,
+   "peak_force_N": 0.0,
+   "peak_strain": 0.524,
+   "notes": "does not pass: pulses cannot start a birth. Pressed 2 mm into the cone, the soft cone springs the nose back off; with no sealing contact the womb pressure acts all round the baby (zero net push), balloons the closed sleeve and squeezes the baby up to 1.7 kPa, past the bulging limit of the bellows near 1.5 kPa. Womb peak 1.00 kPa; baby peak 1.67 kPa; peak womb push on the seal 0.0 N, sleeve resistance -0.0 N; strain baby 30 % (break 663 %), sleeve 52 % (break 900 %); belly rise 63 mm max"
+  },
+  {
+   "name": "(b) own growth, tail on the heel stop, sleeve r 80 (tighter)",
+   "push": "own growth, tail on the heel stop",
+   "passes": false,
+   "time_s": null,
+   "peak_force_N": 16.1,
+   "peak_strain": 0.306,
+   "notes": "does not pass: growth lifts the nose 74 mm up the chute (at the ring plate after 87 s, baby at 0.34 kPa), seals the nose in the sleeve, then the strap ring stops growth with the nose dome at s +161 mm, short of the exit; tail stays on the heel. Womb peak 0.13 kPa; baby peak 1.00 kPa; peak heel reaction 16.1 N; strain baby 31 % (break 663 %), sleeve 15 % (break 900 %); belly rise 51 mm max"
+  },
+  {
+   "name": "(c) growth, then womb pulses, sleeve r 80 (tighter)",
+   "push": "growth, then womb pulses",
+   "passes": true,
+   "time_s": 417.0,
+   "peak_force_N": 22.1,
+   "peak_strain": 0.484,
+   "notes": "born at 417 s. Womb peak 0.72 kPa, slips start at up to 0.73 kPa; baby peak 1.37 kPa; peak womb push on the seal 22.1 N, sleeve resistance 11.4 N; strain baby 48 % (break 663 %), sleeve 34 % (break 900 %); belly rise 62 mm max"
+  },
+  {
+   "name": "(d) growth, then womb pulses with an everting liner (Y 0.2 kPa), sleeve r 80 (tighter)",
+   "push": "growth, then womb pulses with an everting liner (Y 0.2 kPa)",
+   "passes": true,
+   "time_s": 415.0,
+   "peak_force_N": 13.4,
+   "peak_strain": 0.449,
+   "notes": "born at 415 s. Womb peak 0.64 kPa, slips start at up to 0.65 kPa; baby peak 1.30 kPa; peak womb push on the seal 13.4 N, sleeve resistance 7.9 N; strain baby 45 % (break 663 %), sleeve 30 % (break 900 %); belly rise 62 mm max"
+  },
+  {
+   "name": "(c) sleeve r 85",
+   "push": "growth, then womb pulses",
+   "passes": true,
+   "time_s": 417.0,
+   "peak_force_N": 18.4,
+   "peak_strain": 0.468,
+   "notes": "solver stopped at 297 s (sleeve end folding over a crest) with the tail at -196 mm, still advancing 83 mm in the last 30 s; exit time 417 s is extrapolated. Womb peak 0.61 kPa, slips start at up to 0.61 kPa; baby peak 1.30 kPa; peak womb push on the seal 18.4 N, sleeve resistance 8.2 N; strain baby 47 % (break 663 %), sleeve 30 % (break 900 %); belly rise 62 mm max"
+  },
+  {
+   "name": "(c) sleeve r 80, softer Ecoflex 00-10",
+   "push": "growth, then womb pulses",
+   "passes": true,
+   "time_s": 416.0,
+   "peak_force_N": 19.0,
+   "peak_strain": 0.462,
+   "notes": "born at 416 s. Womb peak 0.64 kPa, slips start at up to 0.64 kPa; baby peak 1.32 kPa; peak womb push on the seal 19.0 N, sleeve resistance 10.4 N; strain baby 46 % (break 663 %), sleeve 39 % (break 900 %); belly rise 62 mm max"
+  },
+  {
+   "name": "(c) sleeve r 80, 2 mm wall",
+   "push": "growth, then womb pulses",
+   "passes": true,
+   "time_s": 445.0,
+   "peak_force_N": 18.7,
+   "peak_strain": 0.452,
+   "notes": "solver stopped at 340 s (sleeve end folding over a crest) with the tail at -119 mm, still advancing 72 mm in the last 30 s; exit time 445 s is extrapolated. Womb peak 0.60 kPa, slips start at up to 0.60 kPa; baby peak 1.30 kPa; peak womb push on the seal 18.7 N, sleeve resistance 7.0 N; strain baby 45 % (break 663 %), sleeve 44 % (break 900 %); belly rise 62 mm max"
+  },
+  {
+   "name": "(c) sleeve r 80, lubricated (mu 0.2)",
+   "push": "growth, then womb pulses",
+   "passes": true,
+   "time_s": 426.0,
+   "peak_force_N": 15.7,
+   "peak_strain": 0.443,
+   "notes": "born at 426 s. Womb peak 0.53 kPa, slips start at up to 0.54 kPa; baby peak 1.22 kPa; peak womb push on the seal 15.7 N, sleeve resistance 8.8 N; strain baby 44 % (break 663 %), sleeve 28 % (break 900 %); belly rise 62 mm max"
+  }
+ ],
+ "sweep": {
+  "mu": [
+   0.2,
+   0.4,
+   0.6,
+   0.8
+  ],
+  "tau_y": [
+   10,
+   25,
+   50,
+   75,
+   100
+  ],
+  "pass_grid": [
+   [
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   [
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   [
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   [
+    false,
+    false,
+    false,
+    false,
+    false
+   ]
+  ],
+  "notes": "rows are mu_s (mu_k = 2/3 mu_s), columns tau_y in Pa; passage from the FE with the r 80 sleeve, breakout at the present 58 mm print depth with the arm lifting 4.9 N (sphere hold model)"
+ },
+ "belly": {
+  "rise_mm": 62.0,
+  "pressure_kPa_peak": 0.72,
+  "notes": "Closed womb 148 L plus 68 L of docked tail air (2.1 L/kPa), pump air from outside through the snorkel. Print silicone lifts the belly 8 mm; growth air (about 8.4 L) lifts the belly to about 51 mm; the first contraction fills the belly to the 10 L cord stop (62 mm) and only then womb pressure rises, to 0.72 kPa at the slips. Each slip lets the baby take womb volume out, so womb pressure drops 0.1 to 0.25 kPa and the pump refills: the saw tooth is the contraction rhythm. When the baby is out the baby volume (about 11 L) has left the womb, the belly falls back to the folded rest (0 mm) and womb pressure to zero. Rise is 6.1 mm per litre (design v2)."
+ },
+ "window": "Passes with sleeve friction mu_s up to about 0.6 (womb slips at 0.54, 0.63, 0.73 kPa for mu 0.2, 0.4, 0.6; at 0.8 the womb needs 0.94 kPa and stalls), a sleeve of r 80 to 90 mm, contractions of 0.7 to 1.0 kPa and baby pressure kept under 1.4 kPa; the gel yield stress does not touch the passage but sets breakout: with the print 58 mm under the gel surface buoyancy alone frees the baby only below about 21 Pa (42 Pa with a 4.9 N lift from the arm), and a bed 120 mm under the surface raises that to about 119 Pa.",
+ "sources": [
+  [
+   "Smooth-On Dragon Skin 10 NV technical bulletin (100 % modulus 27 psi, elongation 663 %)",
+   "https://www.smooth-on.com/tb/files/DRAGON_SKIN_10_NV_TB.pdf"
+  ],
+  [
+   "Smooth-On Ecoflex series technical bulletin (00-30: 100 % modulus 10 psi, elongation 900 %; 00-10: 8 psi)",
+   "https://www.smooth-on.com/tb/files/ECOFLEX_SERIES_TB.pdf"
+  ],
+  [
+   "Smooth-On Dragon Skin FX-Pro technical bulletin (100 % modulus 37.8 psi, elongation 763 %)",
+   "https://www.smooth-on.com/tb/files/DRAGON_SKIN_FX_PRO_TB.pdf"
+  ],
+  [
+   "Mooney 1940, A theory of large elastic deformation, J Appl Phys 11:582, doi:10.1063/1.1712836",
+   "https://doi.org/10.1063/1.1712836"
+  ],
+  [
+   "Rivlin 1948, Large elastic deformations of isotropic materials IV, Phil Trans R Soc A 241:379, doi:10.1098/rsta.1948.0024",
+   "https://doi.org/10.1098/rsta.1948.0024"
+  ],
+  [
+   "Adkins and Rivlin 1952, Large elastic deformations of isotropic materials IX: thin shells, Phil Trans R Soc A 244:505, doi:10.1098/rsta.1952.0013",
+   "https://doi.org/10.1098/rsta.1952.0013"
+  ],
+  [
+   "Pipkin 1986, The relaxed energy density for isotropic elastic membranes, IMA J Appl Math 36:85, doi:10.1093/imamat/36.1.85",
+   "https://doi.org/10.1093/imamat/36.1.85"
+  ],
+  [
+   "Hawkes, Blumenschein, Greer, Okamura 2017, A soft robot that navigates its environment through growth, Science Robotics 2:eaan3028 (growth rate = phi (P - Y)^n)",
+   "https://escholarship.org/content/qt3nx45751/qt3nx45751.pdf"
+  ],
+  [
+   "Beris, Tsamopoulos, Armstrong, Brown 1985, Creeping motion of a sphere through a Bingham plastic, J Fluid Mech 158:219, doi:10.1017/S0022112085002622",
+   "https://doi.org/10.1017/S0022112085002622"
+  ],
+  [
+   "Tabuteau, Coussot, de Bruyn 2007, Drag force on a sphere in steady motion through a yield-stress fluid, J Rheol 51:125 (critical Y = 0.145)",
+   "https://physics.uwo.ca/~debruyn/pdfs/j_rheol_2007.pdf"
+  ],
+  [
+   "Eason and Shield 1960, The plastic indentation of a semi-infinite solid by a perfectly rough circular punch, ZAMP 11, doi:10.1007/BF01591800 (N_c 6.05; original not opened)",
+   "https://doi.org/10.1007/BF01591800"
+  ],
+  [
+   "Covey and Stanmore 1981, Use of the parallel-plate plastometer for the characterisation of viscous fluids with a yield stress, J Non-Newt Fluid Mech 8:249, doi:10.1016/0377-0257(81)80024-5",
+   "https://doi.org/10.1016/0377-0257(81)80024-5"
+  ],
+  [
+   "O'Bryan et al. 2017, Self-assembled micro-organogels for 3D printing silicone structures, Science Advances 3:e1602800",
+   "https://par.nsf.gov/servlets/purl/10085332"
+  ],
+  [
+   "Yakubov, Branfield, Bongaerts, Stokes 2015, Tribology of particle suspensions in rolling-sliding soft contacts, Biotribology 3:1 (PDMS on PDMS, wet: about 0.2)",
+   "https://core.ac.uk/download/43380511.pdf"
+  ],
+  [
+   "KNF NMP830 datasheet (5.6 L/min free flow, 1.5 bar)",
+   "https://knf.com/fileadmin/Global_files/Downloads/Product_OEM_Process/Datasheets/DB_NMP830.X_EN_28112023.pdf"
+  ],
+  [
+   "Rotrics DexArm datasheet (payload 500 g)",
+   "https://www.mybotshop.de/Datasheet/Datasheet_DexArm_MakerKit.pdf"
+  ],
+  [
+   "Design revision v2 (chute, belly, gas compliance)",
+   "file:///home/claude/born-not-made/build/data/design_v2.json"
+  ]
+ ]
+}

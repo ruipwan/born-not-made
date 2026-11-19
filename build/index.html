@@ -118,6 +118,7 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
     <div class="results" id="bRes"></div>
   </section>
 
+  <section id="fem"><h2>Birth, simulated properly</h2><p class="sub">An axisymmetric finite element model of the pressurised bellows, the soft sleeve, friction, the pump and the womb pulses, validated against the neo-Hookean balloon curve. The lanes above are a sketch; these are the numbers.</p><video src="media/birth_sim.mp4" poster="media/birth_sim_poster.png" controls muted playsinline style="width:100%;border:1px solid var(--line);border-radius:8px;background:#fff"></video><div id="femDoc" style="margin-top:16px"></div></section>
   <section id="print">
     <h2>Printing in gel</h2>
     <p class="sub">A bead of silicone leaves the nozzle and stays where it is put, because the gel only flows where the nozzle cuts it. These are the numbers that decide wall, layer and pleat gap.</p>
@@ -579,10 +580,14 @@ async function renderV2() {
   const V = await getJSON("data/design_v2.json"); if (!V) return;
   $("#v2Doc").innerHTML = `<table class="t"><tr><th>Problem</th><th>Decision</th><th>Risk</th><th>Bench test</th><th></th></tr>${(V.decisions || []).map((d) => `<tr><td>${esc(d.problem)}</td><td>${esc(d.decision)}</td><td>${esc(d.risk)}</td><td>${esc(d.test)}</td><td>${(d.sources || []).map((x) => `<a href="${esc(safeUrl(x[1]))}" target="_blank" rel="noopener">${esc(x[0])}</a>`).join("<br>")}</td></tr>`).join("")}</table>`;
 }
+async function renderFem() {
+  const F = await getJSON("data/birth_sim.json"); if (!F) return;
+  $("#femDoc").innerHTML = `<table class="t"><tr><th>Case</th><th>Passes</th><th>Time</th><th>Peak force</th><th>Notes</th></tr>${(F.cases || []).map((c) => `<tr><td>${esc(c.name)}</td><td>${c.passes ? "yes" : "no"}</td><td>${c.time_s != null ? esc(c.time_s) + " s" : ""}</td><td>${c.peak_force_N != null ? esc(c.peak_force_N) + " N" : ""}</td><td>${esc(c.notes)}</td></tr>`).join("")}</table><p style="margin-top:12px"><b>Safe window.</b> ${esc(F.window || "")}</p><p class="hint">${(F.sources || []).map((x) => `<a href="${esc(safeUrl(x[1]))}" target="_blank" rel="noopener">${esc(x[0])}</a>`).join(" · ")}</p>`;
+}
 /* ====================================================================== start */
 (async () => {
   DATA = (await getJSON("data/components.json")) || DATA; PHYS = (await getJSON("data/physics.json")) || {};
-  renderTree(); renderPrecision(); renderV2(); renderPhysics(); renderSources(); applyPhysDefaults();
+  renderTree(); renderPrecision(); renderV2(); renderFem(); renderPhysics(); renderSources(); applyPhysDefaults();
   simReset(); requestAnimationFrame(simLoop); printCalc();
   try { await loadModel(); $("#loading").remove(); size(); frame(); } catch (e) { $("#loading").textContent = "The 3D model could not load here. The parts list still works."; console.error(e); }
 })();
