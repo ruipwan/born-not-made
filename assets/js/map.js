@@ -328,7 +328,7 @@ function layout(m) {
   const xL = pad, xR = W - pad;
   const anchors = [[0, xL], [0.15, byKey.not.x], [0.45, byKey.born.x], [0.78, byKey.rel.x], [1, xR]];
   const X = (u) => { for (let i = 1; i < anchors.length; i++) if (u <= anchors[i][0]) { const [u0, a0] = anchors[i - 1], [u1, a1] = anchors[i]; return a0 + ((a1 - a0) * (u - u0)) / (u1 - u0); } return xR; };
-  const AU = yT - (strip ? 15 : phone ? 24 : 30);
+  const AU = (yT - (strip ? 15 : phone ? 24 : 30)) * (phone && !strip ? 0.74 : 1);   // phones: branches stacked tighter, so the arcs stay readable
   const br = BRANCHES.map((b) => ({ b, c: curve(b, X(b.u0), X(b.u1), yT, b.a * AU), cross: [] }));
   for (let i = 0; i < br.length; i++) for (let j = i + 1; j < br.length; j++) {   // where two branches on one side cross
     const A = br[i], B = br[j];
@@ -344,8 +344,8 @@ function layout(m) {
   const rel = byKey.rel;
   m.L = { W, H, yT, strip, phone, P, byKey, br, X, xL, xR,
     rc: [rel.x, yT], r0: 6, rv: strip ? 11 : phone ? 9 : 15, rmax: strip ? W * 0.42 : phone ? W * 1.05 : Math.min(W * 0.78, 1000), rop: strip ? 0.15 : 0.18,
-    fs: phone ? [9, 12] : W < 900 ? [9.5, 13] : [10, 14.5], v: phone ? 6 : 8.5, minOff: phone ? 20 : 30, F: phone ? 26 : 40,
-    budget: phone ? 12 : 24, slope: Math.tan((40 * Math.PI) / 180), labelPx: strip ? (phone ? 8.5 : 9.5) : phone ? 9 : 10 };
+    fs: phone ? [10, 12.5] : W < 900 ? [9.5, 13] : [10, 14.5], v: phone ? 6 : 8.5, minOff: phone ? 17 : 30, F: phone ? 22 : 40,
+    budget: phone ? 12 : 24, slope: Math.tan(((phone ? 50 : 40) * Math.PI) / 180), labelPx: strip ? (phone ? 8.5 : 9.5) : phone ? 9 : 10 };
 }
 
 /* render: rebuild the SVG for the current layout and data */
@@ -431,15 +431,16 @@ function fillWords(m) {
     while (ia < ib && !ok(ia)) ia++;
     while (ib > ia && !ok(ib)) ib--;
     const sa = c.ss[ia], sb = c.ss[ib];
-    if (sb - sa < 60) continue;
-    if (B.R.b.voices && (!terms || !terms.length)) {   // no voices yet: a quiet invitation inside the arc instead of words
-      const b = B.R.b, ax = (c.x0 + c.x1) / 2, ay = L.yT - b.side * c.A * 0.62;
-      const t = el("text", { class: "bnm-w bnm-invite", x: ax.toFixed(1), y: ay.toFixed(1), dy: "0.34em", "text-anchor": "middle", "font-size": (L.fs[0] + 2.5).toFixed(1) }, B.words);
-      t.textContent = d.voicesOk ? "leave a voice" : "voices";
+    if (B.R.b.voices && (!terms || !terms.length)) {   // no voices yet: a quiet invitation under the label instead of words
+      const b = B.R.b, lab = B.g.querySelector(".bnm-label"), px = L.fs[0] + 2.5, text = d.voicesOk ? "leave a voice" : "voices";
+      const wd = measure(text, "italic 400 " + px + "px " + cssVar("--serif", "Georgia, serif"));
+      const ax = clamp((c.x0 + c.x1) / 2, L.xL + wd / 2 + 2, L.xR - wd / 2 - 2), ly = +lab.getAttribute("y");
+      const t = el("text", { class: "bnm-w bnm-invite", x: ax.toFixed(1), y: (b.side < 0 ? ly + px + 5 : ly - L.labelPx - 6).toFixed(1), "text-anchor": "middle", "font-size": px.toFixed(1) }, B.words);
+      t.textContent = text;
       m.conv.push({ still: t, words: [] });
       continue;
     }
-    if (!terms || !terms.length) continue;
+    if (sb - sa < 50 || !terms || !terms.length) continue;
     live.push({ B, terms, sa, sb, len: sb - sa });
   }
   // how many words each branch shows: by the room it has, 3 to 7 (fewer on phones), within one budget
@@ -476,12 +477,17 @@ function fillWords(m) {
 function peek(conv) { let best = null; for (const t of conv.terms) if (!conv.on.has(t.key) && (!best || t.pass < best.pass)) best = t; return best; }
 function take(conv, t) { conv.on.add(t.key); t.pass += 1 / t.weight; }
 function spawn(m, conv, t, s) {
-  const B = conv.B;
-  const text = el("text", { class: "bnm-w", dy: "0.34em", "text-anchor": "middle", "font-size": t.size.toFixed(2), opacity: 0, "data-count": t.c }, B.words);
-  const tp = el("textPath", { href: "#" + B.pid, startOffset: s.toFixed(2) }, text);
-  tp.setAttributeNS(XL, "xlink:href", "#" + B.pid);
-  tp.textContent = t.w;
-  conv.words.push({ t, s, el: text, tp });   // words[0] leads; the newest is last
+  // a halo copy under the ink copy: on a curve each glyph is painted on its own, so a stroke on the ink would cover its neighbour
+  const B = conv.B, g = el("g", { class: "bnm-wg", opacity: 0 }, B.words), tps = [];
+  for (const cls of ["bnm-halo", "bnm-w"]) {
+    const text = el("text", { class: cls, dy: "0.34em", "text-anchor": "middle", "font-size": t.size.toFixed(2) }, g);
+    if (cls === "bnm-w") text.setAttribute("data-count", t.c);
+    const tp = el("textPath", { href: "#" + B.pid, startOffset: s.toFixed(2) }, text);
+    tp.setAttributeNS(XL, "xlink:href", "#" + B.pid);
+    tp.textContent = t.w;
+    tps.push(tp);
+  }
+  conv.words.push({ t, s, el: g, tps });   // words[0] leads; the newest is last
 }
 
 /* ------------------------------------------------------------------ motion */
@@ -520,7 +526,7 @@ function step(m, dt) {
     for (const w of c.words) {
       let o = w.t.op * m.alpha * sstep(c.sa, c.sa + c.F, w.s) * (1 - sstep(c.sb - c.F, c.sb, w.s));
       for (const x of c.cross) { const dd = Math.abs(w.s - x); o *= sstep(w.t.wd / 2 + 2, w.t.wd / 2 + 30, dd); }
-      w.tp.setAttribute("startOffset", w.s.toFixed(2));
+      const so = w.s.toFixed(2); w.tps[0].setAttribute("startOffset", so); w.tps[1].setAttribute("startOffset", so);
       w.el.setAttribute("opacity", o.toFixed(3));
     }
   }

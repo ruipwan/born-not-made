@@ -42,18 +42,15 @@
 .bnm-line { fill: none; stroke: var(--bnm-gel); stroke-width: 1.1; stroke-linecap: round; opacity: 0.48; transition: opacity 0.4s ease, stroke-width 0.4s ease; }
 .bnm-coming .bnm-line { stroke-dasharray: 1.5 6; opacity: 0.42; }
 .bnm-hit { fill: none; stroke: transparent; stroke-width: 18px; pointer-events: stroke; cursor: pointer; }
-.bnm-w {
+.bnm-w, .bnm-halo {
   font-family: var(--mono, "JetBrains Mono", ui-monospace, monospace);
   font-weight: 400;
-  fill: var(--bnm-ink);
-  paint-order: stroke;
-  stroke: var(--bnm-bg);
-  stroke-width: 6px;
-  stroke-linejoin: round;
   cursor: pointer;
-  transition: fill 0.4s ease;
 }
-.bnm-invite { font-family: var(--serif, "Newsreader", Georgia, serif); font-style: italic; fill: var(--bnm-muted); }
+.bnm-w { fill: var(--bnm-ink); transition: fill 0.4s ease; }
+.bnm-halo { fill: none; stroke: var(--bnm-bg); stroke-width: 6px; stroke-linejoin: round; }
+.bnm-invite { font-family: var(--serif, "Newsreader", Georgia, serif); font-style: italic; fill: var(--bnm-muted); paint-order: stroke; stroke: var(--bnm-bg); stroke-width: 6px; stroke-linejoin: round; }
+@media (max-width: 639px) { .bnm-halo { stroke-width: 5px; } }
 .bnm-label {
   font-family: var(--mono, "JetBrains Mono", ui-monospace, monospace);
   font-weight: 500;
