@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Born, Not Made · Society</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* A population of mother and baby robots in water. Births depend on relations; memory is inherited with drift; the water feeds only so many. */
+:root { --bg: #070a0e; --panel: #10151c; --line: #1d2530; --fg: #e4e9ef; --muted: #8b97a6; --gel: #9fcdf0; --warm: #f0c48a; --mono: "JetBrains Mono", ui-monospace, monospace; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--fg); font: 13px/1.5 "Inter", system-ui, sans-serif; }
+.wrap { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 10px; padding: 10px max(10px, env(safe-area-inset-left, 0px)); min-height: 100vh; }
+.stage { position: relative; background: #05080b; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; min-height: 520px; }
+#c { width: 100%; height: 100%; display: block; cursor: crosshair; }
+.hud { position: absolute; left: 12px; top: 10px; font: 12px var(--mono); color: var(--muted); pointer-events: none; line-height: 1.6; }
+.hud b { color: var(--fg); font-weight: 500; }
+aside { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.card h3 { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.ctl { display: grid; grid-template-columns: 96px minmax(0, 1fr) 40px; align-items: center; gap: 8px; font-size: 12px; }
+.ctl output { font: 11px var(--mono); color: var(--muted); text-align: right; }
+input[type=range] { width: 100%; accent-color: var(--gel); }
+.row { display: flex; gap: 6px; flex-wrap: wrap; }
+button { font: 12px "Inter", sans-serif; color: var(--fg); background: #1b2430; border: 1px solid #2a3544; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+button:hover { background: #243042; } button.on { background: #27466b; border-color: #3b6ea8; }
+input[type=text] { flex: 1; min-width: 0; background: #0a0e13; color: var(--fg); border: 1px solid #2a3544; border-radius: 6px; padding: 6px 8px; font: 12px "Inter", sans-serif; }
+canvas.spark { width: 100%; height: 46px; display: block; }
+.kv { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 2px 8px; font-size: 12px; }
+.kv dt { color: var(--muted); } .kv dd { margin: 0; overflow-wrap: anywhere; }
+.legend { font-size: 11.5px; color: var(--muted); }
+.legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin: 0 4px 0 0; vertical-align: -1px; }
+@media (max-width: 900px) { .wrap { grid-template-columns: minmax(0, 1fr); } .stage { height: 62vh; } }
+</style></head><body>
+<div class="wrap">
+  <div class="stage"><canvas id="c" aria-label="population of mother and baby robots"></canvas>
+    <div class="hud" id="hud"></div></div>
+  <aside>
+    <div class="card"><h3>Run</h3>
+      <div class="row"><button id="run" class="on">Pause</button><button id="reset">Reset</button><button data-sp="1" class="on">1×</button><button data-sp="3">3×</button><button data-sp="8">8×</button></div>
+      <p class="legend"><span><i style="background:#cfd8e3"></i>mother, swells while carrying</span> <span><i style="background:#9fcdf0"></i>baby</span> <span><i style="background:#3b5f80"></i>relation</span></p></div>
+    <div class="card"><h3>Conditions</h3>
+      <div class="ctl"><label for="inh">Inheritance</label><input type="range" id="inh" min="0" max="1" step="0.01" value="0.7"><output id="inhO"></output></div>
+      <div class="ctl"><label for="drift">Drift</label><input type="range" id="drift" min="0" max="0.5" step="0.01" value="0.12"><output id="driftO"></output></div>
+      <div class="ctl"><label for="rel">Relations to bear</label><input type="range" id="rel" min="0" max="5" step="1" value="2"><output id="relO"></output></div>
+      <div class="ctl"><label for="cap">Water feeds</label><input type="range" id="cap" min="20" max="220" step="5" value="90"><output id="capO"></output></div>
+      <div class="ctl"><label for="gest">Gestation</label><input type="range" id="gest" min="4" max="40" step="1" value="14"><output id="gestO"></output></div>
+    </div>
+    <div class="card"><h3>Send a signal into the water</h3>
+      <div class="row"><input type="text" id="sig" placeholder="a word or a phrase" maxlength="40"><button id="send">Send</button></div>
+      <p class="legend">Births that happen soon after carry it as a memory trace. Watch how far it travels through the generations.</p></div>
+    <div class="card"><h3>Population</h3><canvas class="spark" id="sp1"></canvas>
+      <h3>Body diversity</h3><canvas class="spark" id="sp2"></canvas>
+      <h3>Relations per robot</h3><canvas class="spark" id="sp3"></canvas>
+      <h3>Seed memory still carried</h3><canvas class="spark" id="sp4"></canvas></div>
+    <div class="card"><h3>Selected</h3><div id="insp" class="legend">Click a robot in the water.</div></div>
+  </aside>
+</div>
+<a href="../" style="position:fixed;right:10px;bottom:10px;font:12px Inter,sans-serif;color:#9fcdf0;background:#10151c;padding:4px 9px;border-radius:6px;text-decoration:none;border:1px solid #1d2530">Born, Not Made home</a>
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const cv = $("#c"), g = cv.getContext("2d");
+let W = 800, H = 600, DPR = 1;
+function resize() { const r = cv.getBoundingClientRect(); DPR = Math.min(2, devicePixelRatio || 1); W = r.width; H = r.height; cv.width = W * DPR; cv.height = H * DPR; g.setTransform(DPR, 0, 0, DPR, 0, 0); }
+new ResizeObserver(resize).observe(cv); resize();
+const P = {}; for (const id of ["inh", "drift", "rel", "cap", "gest"]) { const el = $("#" + id), o = $("#" + id + "O"); const up = () => { P[id] = +el.value; o.textContent = el.value; }; el.oninput = up; up(); }
+const rnd = Math.random, clamp = (x, a, b) => Math.max(a, Math.min(b, x)), lerp = (a, b, t) => a + (b - a) * t;
+const SEED = ["slow tide", "three pulses", "an open ring", "light above", "the low pump"];
+const LEX = ["salt", "current", "fold", "glass", "echo", "shadow", "warmth", "valve", "pressure", "silt", "hum", "drift"];
+let robots = [], ripples = [], nextId = 1, simT = 0, speed = 1, running = true, broadcast = null, selected = null;
+const hist = { pop: [], div: [], rel: [], seed: [] };
+function makeRobot(x, y, genome, memory, gen, mom) {
+  return { id: nextId++, x, y, vx: (rnd() - 0.5) * 20, vy: (rnd() - 0.5) * 20, genome, memory, gen, mom, age: 0, energy: 1, carrying: 0, adult: false, near: new Map(), dead: 0, rel: 0 };
+}
+function reset() {
+  robots = []; ripples = []; nextId = 1; simT = 0; for (const k in hist) hist[k] = [];
+  for (let i = 0; i < 14; i++) {
+    const gnm = Array.from({ length: 5 }, () => rnd());
+    const r = makeRobot(W * (0.2 + 0.6 * rnd()), H * (0.2 + 0.6 * rnd()), gnm, SEED.map((t) => ({ t, w: 0.5 + 0.5 * rnd() })), 0, 0);
+    r.adult = true; r.age = 20 + 20 * rnd(); robots.push(r);
+  }
+}
+function overlap(a, b) { let n = 0, d = 0; const m = new Map(a.map((x) => [x.t, x.w])); const keys = new Set([...m.keys(), ...b.map((x) => x.t)]); const mb = new Map(b.map((x) => [x.t, x.w])); for (const k of keys) { const x = m.get(k) || 0, y = mb.get(k) || 0; n += Math.min(x, y); d += Math.max(x, y); } return d ? n / d : 0; }
+function like(a, b) { let s = 0; for (let i = 0; i < 5; i++) s += (a[i] - b[i]) ** 2; return 1 - Math.sqrt(s / 5); }
+function relation(a, b) { const near = Math.min(1, (a.near.get(b.id) || 0) / 8); return 0.5 * overlap(a.memory, b.memory) + 0.3 * like(a.genome, b.genome) + 0.2 * near; }
+function birth(m) {
+  const memV = m.memory.reduce((acc, x) => acc + x.w * ((x.t.length * 37) % 100) / 100, 0) / Math.max(1, m.memory.reduce((a, x) => a + x.w, 0));
+  const genome = m.genome.map((v, i) => clamp(v * 0.75 + (i === 0 ? memV : v) * 0.25 + (rnd() - 0.5) * 2 * P.drift, 0, 1));
+  genome[0] = ((genome[0] % 1) + 1) % 1;
+  const mem = [];
+  for (const x of m.memory) if (rnd() < x.w * P.inh) { let t = x.t; if (rnd() < P.drift) { const ws = t.split(" "); ws[Math.floor(rnd() * ws.length)] = LEX[Math.floor(rnd() * LEX.length)]; t = ws.join(" "); } mem.push({ t, w: x.w * 0.85 }); }
+  if (broadcast && simT - broadcast.t < 25) mem.push({ t: broadcast.text, w: 0.9 });
+  const a = rnd() * Math.PI * 2, kid = makeRobot(m.x + Math.cos(a) * 18, m.y + Math.sin(a) * 18, genome, mem.slice(0, 7), m.gen + 1, m.id);
+  kid.vx = Math.cos(a) * 30; kid.vy = Math.sin(a) * 30; robots.push(kid); ripples.push({ x: kid.x, y: kid.y, r: 4, a: 0.7 });
+  m.energy -= 0.45; m.carrying = 0;
+}
+function step(dt) {
+  simT += dt; const live = robots.filter((r) => !r.dead); const N = live.length;
+  const share = clamp(P.cap / Math.max(1, N), 0, 3);                 // water per robot
+  for (const r of live) {
+    r.age += dt; const s = 0.6 + 0.4 * r.genome[2];
+    let ax = (Math.sin(simT * 0.3 + r.id) * 6), ay = (Math.cos(simT * 0.27 + r.id * 1.7) * 6);
+    let rc = 0;
+    for (const o of live) {
+      if (o === r) continue; const dx = o.x - r.x, dy = o.y - r.y, d = Math.hypot(dx, dy) || 1;
+      if (d < 80) { r.near.set(o.id, (r.near.get(o.id) || 0) + dt); }
+      if (d < 26) { ax -= dx / d * 60; ay -= dy / d * 60; continue; }
+      if (d < 260) { const rel = relation(r, o); if (rel > 0.42) { rc++; ax += dx / d * 14 * rel; ay += dy / d * 14 * rel; } }
+    }
+    r.rel = rc;
+    if (r.x < 30) ax += 40; if (r.x > W - 30) ax -= 40; if (r.y < 30) ay += 40; if (r.y > H - 30) ay -= 40;
+    r.vx = (r.vx + ax * dt) * (1 - dt * 0.6); r.vy = (r.vy + ay * dt) * (1 - dt * 0.6);
+    const v = Math.hypot(r.vx, r.vy), max = 18 + 22 * r.genome[4]; if (v > max) { r.vx *= max / v; r.vy *= max / v; }
+    r.x += r.vx * dt; r.y += r.vy * dt;
+    r.energy = clamp(r.energy + dt * (0.05 * share - 0.045 * s), -1, 1.5);
+    if (!r.adult && r.age > 18) r.adult = true;
+    if (r.adult && !r.carrying && r.energy > 0.8 && rc >= P.rel && rnd() < dt * 0.06) r.carrying = 0.0001;   // a mother forms among relations
+    if (r.carrying) { r.carrying += dt / P.gest; if (r.carrying >= 1) birth(r); }
+    if (r.energy < -0.5 || r.age > 120 + 60 * r.genome[3]) r.dead = 0.0001;
+  }
+  for (const r of robots) if (r.dead) r.dead += dt;
+  robots = robots.filter((r) => !r.dead || r.dead < 2.5);
+  for (const p of ripples) { p.r += dt * 40; p.a -= dt * 0.35; } ripples = ripples.filter((p) => p.a > 0);
+}
+function sample() {
+  const live = robots.filter((r) => !r.dead); if (!live.length) return;
+  const mean = [0, 0, 0, 0, 0]; live.forEach((r) => r.genome.forEach((v, i) => (mean[i] += v / live.length)));
+  let vr = 0; live.forEach((r) => r.genome.forEach((v, i) => (vr += (v - mean[i]) ** 2 / live.length)));
+  const seed = live.reduce((a, r) => a + r.memory.filter((m) => SEED.includes(m.t)).length / SEED.length, 0) / live.length;
+  const push = (k, v) => { hist[k].push(v); if (hist[k].length > 240) hist[k].shift(); };
+  push("pop", live.length); push("div", Math.sqrt(vr)); push("rel", live.reduce((a, r) => a + r.rel, 0) / live.length); push("seed", seed);
+}
+function spark(id, data, col) {
+  const c = $(id), x = c.getContext("2d"), w = c.clientWidth, h = c.clientHeight; c.width = w * DPR; c.height = h * DPR; x.setTransform(DPR, 0, 0, DPR, 0, 0);
+  if (data.length < 2) return; const mx = Math.max(...data) || 1;
+  x.strokeStyle = "#1d2530"; x.beginPath(); x.moveTo(0, h - 0.5); x.lineTo(w, h - 0.5); x.stroke();
+  x.fillStyle = col + "22"; x.strokeStyle = col; x.lineWidth = 1.5; x.beginPath();
+  data.forEach((v, i) => { const px = i / (data.length - 1) * w, py = h - 3 - (v / mx) * (h - 8); i ? x.lineTo(px, py) : x.moveTo(px, py); }); x.stroke();
+  x.lineTo(w, h); x.lineTo(0, h); x.closePath(); x.fill();
+  x.fillStyle = col; x.font = "11px JetBrains Mono, monospace"; x.textAlign = "right"; x.fillText((data[data.length - 1]).toFixed(data[data.length - 1] < 10 ? 2 : 0), w - 2, 12);
+}
+function draw() {
+  g.fillStyle = "#05080b"; g.fillRect(0, 0, W, H);
+  const live = robots.filter((r) => !r.dead);
+  g.lineWidth = 1;
+  for (let i = 0; i < live.length; i++) for (let j = i + 1; j < live.length; j++) {
+    const a = live[i], b = live[j]; const d = Math.hypot(a.x - b.x, a.y - b.y); if (d > 260) continue; const r = relation(a, b); if (r < 0.42) continue;
+    g.strokeStyle = `rgba(110,160,205,${((r - 0.42) * 1.6).toFixed(3)})`; g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke();
+  }
+  for (const p of ripples) { g.strokeStyle = `rgba(190,220,240,${p.a.toFixed(3)})`; g.beginPath(); g.arc(p.x, p.y, p.r, 0, 7); g.stroke(); }
+  for (const r of robots) {
+    const fade = r.dead ? Math.max(0, 1 - r.dead / 2.5) : 1, grow = r.adult ? 1 : 0.45 + 0.55 * r.age / 18;
+    const ang = Math.atan2(r.vy, r.vx), L = (16 + 12 * r.genome[1]) * grow, R = (7 + 5 * r.genome[2]) * grow * (1 + 0.55 * (r.carrying || 0));
+    g.save(); g.translate(r.x, r.y); g.rotate(ang); g.globalAlpha = fade;
+    const hue = Math.round(r.genome[0] * 360), wob = Math.sin(simT * (2 + 3 * r.genome[4]) + r.id) * 0.12;
+    g.fillStyle = r.adult ? `hsla(${hue},28%,82%,0.16)` : `hsla(${hue},55%,74%,0.75)`;
+    g.strokeStyle = r.adult ? `hsla(${hue},25%,85%,0.85)` : `hsla(${hue},55%,82%,1)`; g.lineWidth = r === selected ? 2.2 : 1.1;
+    g.beginPath(); g.ellipse(0, 0, L, R * (1 + wob), 0, 0, 7); g.fill(); g.stroke();
+    const rings = 1 + Math.round(r.genome[3] * 3);
+    for (let k = 0; k < rings; k++) { const u = rings === 1 ? 0.6 : -0.7 + 1.4 * k / (rings - 1); g.beginPath(); g.ellipse(u * L * 0.8, 0, 1.4, R * Math.sqrt(1 - (u * 0.8) ** 2) * (1 + wob), 0, 0, 7); g.stroke(); }
+    if (r.carrying) { g.fillStyle = "rgba(159,205,240,0.55)"; g.beginPath(); g.ellipse(0, 0, L * 0.45 * r.carrying + 2, R * 0.55 * r.carrying + 1.5, 0, 0, 7); g.fill(); }
+    g.restore(); g.globalAlpha = 1;
+  }
+  const gens = live.reduce((m, r) => Math.max(m, r.gen), 0), carrying = live.filter((r) => r.carrying).length;
+  $("#hud").innerHTML = `t <b>${simT.toFixed(0)}</b> s · robots <b>${live.length}</b> · carrying <b>${carrying}</b> · generation <b>${gens}</b>${broadcast && simT - broadcast.t < 25 ? ` · signal in the water: <b>${broadcast.text}</b>` : ""}`;
+}
+function inspect() {
+  const r = selected; if (!r || r.dead) { $("#insp").textContent = "Click a robot in the water."; return; }
+  $("#insp").innerHTML = `<dl class="kv"><dt>robot</dt><dd>#${r.id}, generation ${r.gen}${r.mom ? ", from #" + r.mom : ", seed"}</dd><dt>stage</dt><dd>${r.carrying ? "carrying, " + Math.round(r.carrying * 100) + "%" : r.adult ? "adult" : "young"}</dd><dt>relations</dt><dd>${r.rel}</dd><dt>energy</dt><dd>${r.energy.toFixed(2)}</dd><dt>memory</dt><dd>${r.memory.map((m) => m.t + " (" + m.w.toFixed(2) + ")").join(", ") || "none"}</dd></dl>`;
+}
+let last = performance.now(), acc = 0;
+function loop(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (running) for (let i = 0; i < speed; i++) step(dt);
+  acc += dt * (running ? speed : 0); if (acc > 0.5) { acc = 0; sample(); spark("#sp1", hist.pop, "#9fcdf0"); spark("#sp2", hist.div, "#f0c48a"); spark("#sp3", hist.rel, "#8fb8e0"); spark("#sp4", hist.seed, "#cfd8e3"); inspect(); }
+  draw(); requestAnimationFrame(loop);
+}
+$("#run").onclick = () => { running = !running; $("#run").textContent = running ? "Pause" : "Run"; $("#run").classList.toggle("on", running); };
+$("#reset").onclick = reset;
+document.querySelectorAll("[data-sp]").forEach((b) => (b.onclick = () => { speed = +b.dataset.sp; document.querySelectorAll("[data-sp]").forEach((x) => x.classList.toggle("on", x === b)); }));
+$("#send").onclick = () => { const t = $("#sig").value.trim().toLowerCase().slice(0, 40); if (!t) return; broadcast = { text: t, t: simT }; $("#sig").value = ""; ripples.push({ x: W / 2, y: H / 2, r: 10, a: 0.9 }); };
+cv.addEventListener("click", (e) => { const b = cv.getBoundingClientRect(), x = e.clientX - b.left, y = e.clientY - b.top; let best = null, bd = 30; for (const r of robots) { const d = Math.hypot(r.x - x, r.y - y); if (d < bd && !r.dead) { bd = d; best = r; } } selected = best; inspect(); });
+setTimeout(() => { reset(); requestAnimationFrame(loop); }, 50);
+</script>
+</body></html>

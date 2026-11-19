@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Born, Not Made</title>
+<meta name="description" content="A mother robot prints a baby robot inside its body, in gel, and gives birth in water. Soft robotics meets artificial life, under the umbrella of reproduction.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Born, Not Made: project site. Paper white like the white clay model; gel blue as the only colour. */
+:root { --bg: #f4f3ef; --paper: #fbfaf7; --ink: #15171a; --muted: #5c636c; --line: #dcd9d1; --gel: #2f6fa8; --gel-soft: #d8e8f5; --serif: "Newsreader", Georgia, serif; --sans: "Inter", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace; color-scheme: light; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.62 var(--sans); -webkit-font-smoothing: antialiased; }
+a { color: var(--gel); text-underline-offset: 2px; }
+img, video, iframe { display: block; max-width: 100%; }
+header.top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.bar { max-width: 1180px; margin: 0 auto; padding: 10px max(16px, env(safe-area-inset-left, 0px)); display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.brand { font: 500 21px/1 var(--serif); letter-spacing: -0.01em; color: var(--ink); text-decoration: none; white-space: nowrap; }
+nav.tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
+nav.tabs a { font: 500 13.5px var(--sans); color: var(--muted); text-decoration: none; padding: 7px 12px; border-radius: 999px; }
+nav.tabs a:hover { color: var(--ink); background: #ebe9e3; }
+nav.tabs a[aria-current="page"] { color: var(--paper); background: var(--ink); }
+main { max-width: 1180px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-left, 0px)) 80px; }
+section.tab { display: none; } section.tab.on { display: block; }
+.hero { padding: 56px 0 28px; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 40px; align-items: end; }
+.kicker { font: 500 12px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; }
+h1 { font: 400 clamp(44px, 7vw, 88px)/0.95 var(--serif); letter-spacing: -0.025em; margin: 0 0 18px; }
+h2 { font: 400 clamp(28px, 3.6vw, 40px)/1.08 var(--serif); letter-spacing: -0.015em; margin: 0 0 14px; }
+h3 { font: 600 15px/1.35 var(--sans); margin: 0 0 6px; }
+.lede { font: 400 clamp(19px, 2vw, 23px)/1.42 var(--serif); margin: 0 0 18px; max-width: 34ch; }
+.credit { font-size: 14px; color: var(--muted); margin: 0; }
+.frame { position: relative; aspect-ratio: 16 / 9; background: #e6e4de; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); }
+.frame iframe, .frame video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; object-fit: cover; }
+.cap { font: 12px/1.5 var(--mono); color: var(--muted); margin: 8px 0 0; }
+.block { padding: 56px 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 40px; }
+.block > .side h2 { position: sticky; top: 76px; }
+.prose p { margin: 0 0 14px; max-width: 64ch; }
+.prose p.big { font: 400 21px/1.45 var(--serif); }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.card { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 18px; }
+.card p { margin: 0 0 10px; font-size: 15px; } .card p:last-child { margin: 0; }
+.fig img { width: 100%; border-radius: 6px; border: 1px solid var(--line); background: #fff; }
+.timeline { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+.timeline .fig img { aspect-ratio: 4 / 3; object-fit: cover; }
+.yr { font: 500 12px var(--mono); color: var(--gel); margin: 10px 0 2px; }
+.timeline .this .yr { color: var(--ink); }
+.pairs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+.pair { border-top: 2px solid var(--ink); padding-top: 10px; }
+.pair b { display: block; font: 400 19px/1.2 var(--serif); margin-bottom: 4px; }
+.pair span { font-size: 14px; color: var(--muted); }
+.refs { font-size: 13px; color: var(--muted); padding-left: 18px; }
+.refs li { margin: 0 0 6px; }
+.venues li { margin: 0 0 8px; }
+.note { font-size: 14px; color: var(--muted); }
+.fullframe { margin: 24px 0 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #0b0e12; height: min(82vh, 860px); }
+.fullframe iframe { width: 100%; height: 100%; border: 0; }
+.tabhead { padding: 44px 0 8px; display: flex; justify-content: space-between; align-items: end; gap: 20px; flex-wrap: wrap; }
+.tabhead p { margin: 0; max-width: 70ch; color: var(--muted); }
+.btn { display: inline-block; font: 500 13.5px var(--sans); color: var(--paper); background: var(--ink); text-decoration: none; padding: 8px 14px; border-radius: 999px; }
+table.cmp { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+table.cmp th, table.cmp td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.cmp th { font: 500 12px var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.vids { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.vids video { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 6px; background: #ddd; }
+footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-area-inset-left, 0px)); text-align: center; font-size: 13px; color: var(--muted); }
+@media (max-width: 900px) {
+  .hero, .block { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .block > .side h2 { position: static; }
+  .timeline, .grid3, .vids { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pairs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) { .timeline, .grid2, .grid3, .vids, .pairs { grid-template-columns: minmax(0, 1fr); } nav.tabs { margin-left: 0; } }
+</style></head><body>
+<header class="top"><div class="bar">
+  <a class="brand" href="#trunk">Born, Not Made</a>
+  <nav class="tabs" aria-label="Sections">
+    <a href="#trunk">Trunk</a><a href="#branches">Branches</a><a href="#build" hidden>Build</a><a href="#simulator">Simulator</a><a href="#society">Society</a>
+  </nav>
+</div></header>
+<main>
+
+<!-- ============================== TRUNK ============================== -->
+<section class="tab" id="trunk">
+  <div class="hero">
+    <div>
+      <p class="kicker">MAS thesis · MIT Media Lab · 2026</p>
+      <h1>Born,<br>Not Made</h1>
+      <p class="lede">A mother robot prints a baby robot inside its body, in gel, and gives birth in water.</p>
+      <p class="credit">Ruipeng Wang, second year MAS student, MIT Media Lab.<br>Thesis committee: Behnaz Farahi, Cynthia Breazeal, Neil Gershenfeld.</p>
+    </div>
+    <div>
+      <div class="frame"><iframe src="https://drive.google.com/file/d/1ecxk0uEEKis7chZShfqGONlnMfaAXYqI/preview" allow="autoplay; fullscreen" loading="lazy" title="Born, Not Made, film"></iframe></div>
+      <p class="cap">Film. The tail docks, the arm prints, the baby is born.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="side"><h2>Soft robotics meets artificial life</h2></div>
+    <div class="prose">
+      <p class="big">The main branch of this work sits where two fields meet. Artificial life has asked how a machine can make another machine. Soft robotics has given machines bodies that can be printed, filled and inflated. Here the second is placed under the umbrella of the first: soft robotics in the service of reproduction.</p>
+      <p>Since von Neumann, artificial life has studied reproduction as copying, mostly on screens. Robots have bodies, but they are assembled outside any parent. Bringing the two together turns an old question around: from how machines relate to us, to what happens between them, beginning with a mother and a child.</p>
+      <p>The title borrows a phrase from the Nicene Creed, "begotten, not made", and an echo of Blade Runner 2049, where a replicant born from another body is the event that breaks the order of things.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="side"><h2>From copy to relation</h2></div>
+    <div class="prose">
+      <div class="grid2">
+        <div class="card"><h3>In one body: kinship</h3><p>A copy is the same as its maker. A child is part of the mother, and then separate. The baby forms whole inside the mother's body and leaves through birth.</p></div>
+        <div class="card"><h3>In a species: relation and inheritance</h3><p>One body gives birth; many shape the child. Mother agents pass part of their memory to baby agents. Across generations the population keeps what works and drifts from what was designed.</p></div>
+      </div>
+      <p style="margin-top:18px" class="note">Kingma asks whether a fetus is a part of its mother (Mind, 2019). Hrdy argues that human young are raised by many, not by one (Mothers and Others, 2009). The work takes both as design rules.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="side"><h2>Where this work stands</h2><p class="note">Other robots already make robots. None of them makes the baby inside a parent, and none gives birth.</p></div>
+    <div class="timeline">
+      <div class="fig"><img src="assets/img/von_neumann_1948.jpg" alt="von Neumann universal constructor diagram" loading="lazy"><p class="yr">1948 · von Neumann</p><p class="note">A machine gathers floating parts and builds another machine like itself.</p></div>
+      <div class="fig"><img src="assets/img/game_of_life_1970.gif" alt="Game of Life glider gun" loading="lazy"><p class="yr">1970 · Conway</p><p class="note">Simple rules on a grid; a glider gun keeps producing gliders.</p></div>
+      <div class="fig"><img src="assets/img/sims_galapagos_1997.jpg" alt="Karl Sims, Galápagos installation" loading="lazy"><p class="yr">1997 · Sims, Galápagos</p><p class="note">Viewers choose which virtual organisms survive, mate and mutate, on screens.</p></div>
+      <div class="fig"><img src="assets/img/iida_2015.jpg" alt="Iida mother robot" loading="lazy"><p class="yr">2015 · Iida, Cambridge</p><p class="note">A mother robot arm glues cube children together, outside any body.</p></div>
+      <div class="fig"><img src="assets/img/eiben_robot_baby_2017.jpg" alt="Eiben robot baby" loading="lazy"><p class="yr">2017 · Eiben, Robot Baby</p><p class="note">Two robots mate; the child is printed and assembled by hand, outside the parents.</p></div>
+      <div class="fig"><img src="assets/img/horibe_2021.jpg" alt="Horibe soft robots regrowing" loading="lazy"><p class="yr">2021 · Horibe, Walker, Risi</p><p class="note">Soft robots grow cell by cell and regrow damaged parts, in simulation.</p></div>
+      <div class="fig"><img src="assets/img/cba_voxel_2022.jpg" alt="MIT CBA voxel robots" loading="lazy"><p class="yr">2022 · MIT CBA</p><p class="note">Voxel robots build more robots from parts fed in.</p></div>
+      <div class="fig this"><img src="assets/img/this_work_2026.jpg" alt="Born, Not Made" loading="lazy"><p class="yr">2026 · This work</p><p class="note">A robot mother prints the baby inside the body, in gel, then gives birth in water.</p></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="side"><h2>Why it prints</h2></div>
+    <div class="prose">
+      <div class="grid2">
+        <div class="card"><h3>From zero, inside</h3><p>A body is not delivered finished. It forms from almost nothing, slowly, inside another body. So the mother does not push out a ready made baby, as the first prototype did. It prints the baby from zero, inside itself.</p></div>
+        <div class="card"><h3>In liquid</h3><p>Amniotic fluid lets the fetus grow unimpeded and cushions it while it forms. In embedded printing a gel bath does the same for a soft print: it holds the body up while it takes shape.</p></div>
+      </div>
+      <p class="big" style="margin-top:20px">The gel is the robotic womb's amniotic fluid. The baby forms held in it, and is born out of it.</p>
+      <div class="frame" style="margin-top:8px"><iframe src="https://drive.google.com/file/d/1jH1xqi_G-yIH9yQR79T77lY0z6bkesVg/preview" allow="autoplay; fullscreen" loading="lazy" title="First print in gel"></iframe></div>
+      <p class="cap">First print in gel, October 2026.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="side"><h2>Three prototypes, toward a womb that prints</h2></div>
+    <div>
+      <div class="grid3">
+        <div class="fig"><img src="assets/img/prototype1_photo.jpg" alt="First prototype" loading="lazy"><p class="yr">First</p><p class="note">A rigid shell. A water muscle and a pump push a ready made baby out.</p><img src="assets/img/prototype1_diagram.jpg" alt="First prototype diagram" loading="lazy" style="margin-top:10px"></div>
+        <div class="fig"><img src="assets/img/prototype2_photo.jpg" alt="Second prototype" loading="lazy"><p class="yr">Second</p><p class="note">A soft, clear body. Mother and baby each carry a chip, a battery and a water pump.</p><img src="assets/img/prototype2_diagram.jpg" alt="Second prototype diagram" loading="lazy" style="margin-top:10px"></div>
+        <div class="fig"><img src="assets/img/prototype3_render.jpg" alt="Third prototype" loading="lazy"><p class="yr">Third</p><p class="note">An arm with a syringe goes inside the mother. The baby is made inside, not put in.</p></div>
+      </div>
+      <div class="fig" style="margin-top:26px"><img src="assets/img/print_assemble_cycle.jpg" alt="Print and assemble cycle" loading="lazy"><p class="cap">Print and assemble in one cycle: print the soft body, place the made parts, print over them.</p></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="side"><h2>One birth, step by step</h2></div>
+    <div class="prose">
+      <div class="frame"><video src="assets/video/dexarm_black.mp4" controls muted playsinline preload="metadata"></video></div>
+      <p class="cap">The DexArm version, rendered from the Blender model.</p>
+      <div class="pairs" style="margin-top:22px">
+        <div class="pair"><b>Gel</b><span>amniotic fluid. It holds the soft print while it cures.</span></div>
+        <div class="pair"><b>Arm</b><span>umbilical cord. Material and air reach the baby through it.</span></div>
+        <div class="pair"><b>Belly</b><span>the womb swells and vents. Its movement is a vital sign.</span></div>
+        <div class="pair"><b>Birth</b><span>printed folded, inflated while pushed out. No two are the same.</span></div>
+        <div class="pair"><b>Inside</b><span>electronics are placed in the body, so the baby can move.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="side"><h2>The body changes too</h2></div>
+    <div class="prose">
+      <div class="frame"><video src="assets/video/fold_belly.mp4" controls muted playsinline preload="metadata"></video></div>
+      <div class="fig" style="margin-top:14px"><img src="assets/img/fold_belly_stages.png" alt="Belly stages" loading="lazy"></div>
+      <p style="margin-top:16px">The upper skin is printed silicone origami. The womb is closed and full of gel, so when the baby inflates its volume has to go somewhere: the pleats open and the belly rises. Pressure pulses then push the baby down the canal. After birth the womb vents, the pleats fold back and the skin sags a little under gravity. The swelling is not decoration. It is how a closed body makes room, pushes, and lets go.</p>
+      <p class="note">Full mechanism, parts and sources: <a href="#build" hidden>Build</a>.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="side"><h2>Not a copy</h2></div>
+    <div class="prose">
+      <div class="frame"><video src="assets/video/relation.mp4" controls muted playsinline preload="metadata"></video></div>
+      <p class="cap">Babies of different forms and colours stay near the mother. One takes the arm and becomes the next mother.</p>
+      <p style="margin-top:16px">A copy repeats its maker. Each birth here is generated from the mother's memory, the signals she receives and chance, so every baby differs. What links them is relation: shared memory, likeness of body and time spent near each other. The <a href="#society">Society</a> tab runs this at the scale of a population.</p>
+      <div class="fig" style="margin-top:14px"><img src="assets/img/simulation_diagram.jpg" alt="Simulation diagram" loading="lazy"></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="side"><h2>Shown at</h2></div>
+    <ul class="venues">
+      <li><b>ALIFE 2026</b>, Waterloo, August 2026. Art gallery and the Artificial Life in the Wild / Agent Ethology workshop.</li>
+      <li><b>VISAP 2026</b>, IEEE VIS Arts Program, November 2026.</li>
+      <li><b>Amplification</b>, exhibition at MIT Met Warehouse, Boston, November 2026.</li>
+      <li><b>NeurIPS 2026</b>, Creative AI, Sydney, December 2026, with a travel award.</li>
+      <li><b>Hard Mode</b>, MIT's AI and hardware hackathon, April 2026. The jury created a Special Visionary Prize for this project.</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <div class="side"><h2>References</h2></div>
+    <ol class="refs">
+      <li>von Neumann, J. <i>Theory of Self-Reproducing Automata</i>, ed. A. W. Burks. University of Illinois Press, 1966.</li>
+      <li>Gardner, M. "Mathematical Games." <i>Scientific American</i> 223(4), 1970. <a href="https://doi.org/10.1038/scientificamerican1070-120">doi</a></li>
+      <li>Sims, K. <i>Galápagos</i>, 1997. <a href="https://www.karlsims.com/galapagos/">karlsims.com</a></li>
+      <li>Zykov, V. et al. "Self-reproducing machines." <i>Nature</i> 435, 163 to 164, 2005. <a href="https://doi.org/10.1038/435163a">doi</a></li>
+      <li>Brodbeck, L., Hauser, S., Iida, F. "Morphological evolution of physical robots through model-free phenotype development." <i>PLOS ONE</i> 10(6), e0128444, 2015. <a href="https://doi.org/10.1371/journal.pone.0128444">doi</a></li>
+      <li>Jelisavcic, M. et al. "Real-World Evolution of Robot Morphologies: A Proof of Concept." <i>Artificial Life</i> 23(2), 2017. <a href="https://doi.org/10.1162/ARTL_a_00231">doi</a></li>
+      <li>Horibe, K., Walker, K., Risi, S. "Regenerating Soft Robots through Neural Cellular Automata." 2021. <a href="https://arxiv.org/abs/2102.02579">arXiv</a></li>
+      <li>Abdel-Rahman, A. et al. "Self-replicating hierarchical modular robotic swarms." <i>Communications Engineering</i> 1, 35, 2022. <a href="https://doi.org/10.1038/s44172-022-00034-3">doi</a></li>
+      <li>Kingma, E. "Were You a Part of Your Mother?" <i>Mind</i> 128(511), 609 to 646, 2019.</li>
+      <li>Hrdy, S. B. <i>Mothers and Others: The Evolutionary Origins of Mutual Understanding</i>. Belknap Press, 2009.</li>
+      <li>Fitzsimmons, E. D., Bajaj, T. "Embryology, Amniotic Fluid." <i>StatPearls</i>, 2023. <a href="https://www.ncbi.nlm.nih.gov/books/NBK541089/">NCBI</a></li>
+      <li>Hajash, K. et al. "Large-Scale Rapid Liquid Printing." <i>3D Printing and Additive Manufacturing</i> 4(3), 2017. <a href="https://doi.org/10.1089/3dp.2017.0037">doi</a></li>
+      <li>Hinton, T. J. et al. "3D Printing PDMS Elastomer in a Hydrophilic Support Bath via Freeform Reversible Embedding." <i>ACS Biomaterials Science &amp; Engineering</i> 2(10), 2016. <a href="https://doi.org/10.1021/acsbiomaterials.6b00170">doi</a></li>
+      <li>O'Bryan, C. S. et al. "Self-assembled micro-organogels for 3D printing silicone structures." <i>Science Advances</i> 3(5), 2017. <a href="https://doi.org/10.1126/sciadv.1602800">doi</a></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================== BRANCHES ============================== -->
+<section class="tab" id="branches">
+  <div class="tabhead"><div><p class="kicker">Side branches</p><h2>Discussions that grow off the trunk</h2><p>Each branch is a reading the work invites. None of them is the work's thesis; together they explain its vocabulary.</p></div></div>
+
+  <div class="block">
+    <div class="side"><h2>Matrix and cyberfeminism</h2></div>
+    <div class="prose">
+      <p>Latin <i>matrix</i> comes from <i>mater</i>, mother. It meant a breeding animal, then the womb, then a mould that gives form, and in 1850 Sylvester used it for an array of numbers. The womb became the mould, and the mould became the simulation.</p>
+      <p>Cyberfeminism took the word back. VNS Matrix wrote their Cyberfeminist Manifesto in 1991. Sadie Plant's <i>Zeros + Ones</i> (1997) tied weaving, women and computing. Anna Aristarkhova's <i>Hospitality of the Matrix</i> (2012) reads the matrix as a space that makes room for another: hospitality, not containment. The robotic womb here is built as that kind of space: a body that makes room, holds, and lets go.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="side"><h2>Matricentric feminism</h2></div>
+    <div class="prose">
+      <p>Andrea O'Reilly argues that mothers need a feminism of their own, centred on the work and experience of mothering (<i>Matricentric Feminism</i>, 2016). The work does not stage motherhood as a role played by a machine. It asks which parts of gestation are mechanical, and which parts only exist between two bodies.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="side"><h2>Full surrogacy and the Mosuo</h2></div>
+    <div class="prose">
+      <p>Sophie Lewis (<i>Full Surrogacy Now</i>, 2019) treats gestation as work and asks for a world where everyone shares it. The Mosuo (Na) of southwest China live in matrilineal households where children grow up with their mother's kin, a society Cai Hua described as "without fathers or husbands" (2001). Both loosen the tie between one parent and one child. In the society simulation a baby is born of one body and shaped by many relations.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="side"><h2>Artificial womb, robotic womb</h2></div>
+    <div class="prose">
+      <p>J. B. S. Haldane imagined ectogenesis in <i>Daedalus</i> (1924). In 2017 Partridge and colleagues kept premature lambs alive for four weeks in a fluid filled bag, the Biobag. An artificial womb replaces a mother for a human child. A robotic womb is a mother for a machine.</p>
+      <table class="cmp" style="margin-top:12px">
+        <tr><th></th><th>Artificial womb</th><th>Robotic womb (this work)</th></tr>
+        <tr><td>Who is born</td><td>a human child</td><td>a robot</td></tr>
+        <tr><td>Fluid</td><td>synthetic amniotic fluid</td><td>support gel</td></tr>
+        <tr><td>Supply</td><td>oxygenator through the cord</td><td>silicone and air through the arm</td></tr>
+        <tr><td>The body</td><td>a bag on a machine</td><td>the mother is the machine</td></tr>
+        <tr><td>Goal</td><td>replace gestation</td><td>give machines a gestation</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="side"><h2>Labour</h2></div>
+    <div class="prose">
+      <p>In English, labour is both work and giving birth. A robot is, by its name, a worker: Čapek took the word from the Czech <i>robota</i>, forced labour (<i>R.U.R.</i>, 1920). A robot in labour is a worker doing the one kind of work that makes another worker who is not a copy.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="side"><h2>The womb across languages</h2></div>
+    <div class="prose">
+      <p>Chinese 子宫 is the child's palace. Greek <i>hystera</i> gave medicine "hysteria". Latin has <i>uterus</i> and <i>matrix</i>. Sanskrit <i>garbha</i> is womb and also the inner sanctum of a temple. Each name says what a womb is for: a dwelling, an organ, a mould, a sacred room.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="side"><h2>A designer who cannot give birth</h2></div>
+    <div class="prose">
+      <p>The work is made by someone whose own body cannot do what the mother robot does. That distance is part of the method: birth is studied as mechanism, with sources, and the metaphor is kept small.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="side"><h2>Other bodies</h2><p class="note">Six directions for a less mechanical, more organic mother and tail.</p></div>
+    <div>
+      <div class="vids">
+        <figure style="margin:0"><video src="assets/video/concept_budding.mp4" muted loop playsinline preload="metadata" controls></video><p class="cap">Budding</p></figure>
+        <figure style="margin:0"><video src="assets/video/concept_vertebra.mp4" muted loop playsinline preload="metadata" controls></video><p class="cap">Vertebra</p></figure>
+        <figure style="margin:0"><video src="assets/video/concept_swallow.mp4" muted loop playsinline preload="metadata" controls></video><p class="cap">Swallow</p></figure>
+        <figure style="margin:0"><video src="assets/video/concept_jellyfish.mp4" muted loop playsinline preload="metadata" controls></video><p class="cap">Jellyfish</p></figure>
+        <figure style="margin:0"><video src="assets/video/concept_ammonite.mp4" muted loop playsinline preload="metadata" controls></video><p class="cap">Ammonite</p></figure>
+        <figure style="margin:0"><video src="assets/video/concept_pod.mp4" muted loop playsinline preload="metadata" controls></video><p class="cap">Pod</p></figure>
+      </div>
+      <div class="fig" style="margin-top:20px"><img src="assets/img/forms_sheet_1.png" alt="Form studies" loading="lazy"></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="side"><h2>References</h2></div>
+    <ol class="refs">
+      <li>VNS Matrix. <i>A Cyberfeminist Manifesto for the 21st Century</i>, 1991.</li>
+      <li>Plant, S. <i>Zeros + Ones: Digital Women and the New Technoculture</i>. Doubleday, 1997.</li>
+      <li>Aristarkhova, I. <i>Hospitality of the Matrix: Philosophy, Biomedicine, and Culture</i>. Columbia University Press, 2012.</li>
+      <li>O'Reilly, A. <i>Matricentric Feminism: Theory, Activism, and Practice</i>. Demeter Press, 2016.</li>
+      <li>Lewis, S. <i>Full Surrogacy Now: Feminism Against Family</i>. Verso, 2019.</li>
+      <li>Cai Hua. <i>A Society without Fathers or Husbands: The Na of China</i>. Zone Books, 2001.</li>
+      <li>Haldane, J. B. S. <i>Daedalus, or Science and the Future</i>. Kegan Paul, 1924.</li>
+      <li>Partridge, E. A. et al. "An extra-uterine system to physiologically support the extreme premature lamb." <i>Nature Communications</i> 8, 15112, 2017. <a href="https://doi.org/10.1038/ncomms15112">doi</a></li>
+      <li>Čapek, K. <i>R.U.R. (Rossum's Universal Robots)</i>, 1920.</li>
+      <li>Sylvester, J. J. "Additions to the articles in the September number of this journal..." <i>Philosophical Magazine</i> 37, 1850.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================== BUILD ============================== -->
+<section class="tab" id="build">
+  <div class="tabhead"><div><p class="kicker">Build</p><h2>Every part, taken apart</h2><p>A parametric white model of the mother, tail, arm and baby. Explode it, pick a part, read its spec, its tolerance and its source. Change the folds and run the birth.</p></div><a class="btn" href="build/" target="_blank" rel="noopener">Open full screen</a></div>
+  <div class="fullframe" style="background:#f4f3ef"><iframe data-src="build/" title="Build: parametric teardown"></iframe></div>
+</section>
+
+<!-- ============================== SIMULATOR ============================== -->
+<section class="tab" id="simulator">
+  <div class="tabhead"><div><p class="kicker">Simulator</p><h2>The printing process</h2><p>A console modelled on Blender. Speak or type a signal; the mother reads it with her memory, writes G-code, prints the baby in the gel, inflates it and gives birth. Every birth is different.</p></div><a class="btn" href="simulator/" target="_blank" rel="noopener">Open full screen</a></div>
+  <div class="fullframe"><iframe data-src="simulator/" title="Printing simulator" allow="microphone"></iframe></div>
+</section>
+
+<!-- ============================== SOCIETY ============================== -->
+<section class="tab" id="society">
+  <div class="tabhead"><div><p class="kicker">Society</p><h2>When reproduction runs at scale</h2><p>Many mothers and babies share one body of water. A robot bears only when it has enough relations and energy. Memory passes on with drift. The water feeds only so many. Send a signal and follow how far it travels.</p></div><a class="btn" href="society/" target="_blank" rel="noopener">Open full screen</a></div>
+  <div class="fullframe"><iframe data-src="society/" title="Society simulation"></iframe></div>
+</section>
+</main>
+<footer>Born, Not Made · Ruipeng Wang · MIT Media Lab · <a href="https://github.com/ruipwan/born-not-made">source on GitHub</a></footer>
+<script>
+const TABS = ["trunk", "branches", "build", "simulator", "society"];
+function show() {
+  const id = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "trunk";
+  for (const t of TABS) document.getElementById(t).classList.toggle("on", t === id);
+  document.querySelectorAll("nav.tabs a").forEach((a) => { if (a.getAttribute("href") !== "#" + id) a.removeAttribute("aria-current"); else a.setAttribute("aria-current", "page"); });
+  const f = document.querySelector("#" + id + " iframe[data-src]"); if (f && !f.src) f.src = f.dataset.src;
+  document.querySelectorAll("section.tab:not(.on) video").forEach((v) => v.pause());
+  window.scrollTo({ top: 0 });
+}
+addEventListener("hashchange", show); show();
+</script>
+</body></html>
