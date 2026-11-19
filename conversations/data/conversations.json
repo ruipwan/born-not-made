@@ -1,5 +1,5 @@
 {
- "note": "One to one conversations the artist had about the work, oldest first. Each entry paraphrases the other person; the artist's replies are left out, except a short note on what changed.",
+ "note": "Conversations the artist had about the work, oldest first, plus collaborators. Each entry paraphrases the other person; the artist's replies are left out, except a short note on what changed or, where asked, the answer in progress.",
  "entries": [
   {
    "id": "liam-young",
@@ -13,7 +13,8 @@
     "first spark"
    ],
    "said": "The first conversation. Think of the Tamagotchi, the small Japanese digital pet that lives only as long as it is fed, a little at a time. A creature can be digital and still feel alive to the person who feeds it. He pointed to artists who stage digital creatures, among them an exhibition called Beings, where soft bodies walk forward together like a herd of imagined animals.",
-   "led_to": "From there the artist followed Lenia, a smooth Game of Life, into artificial life, and later showed the work at the ALIFE 2026 workshop and art gallery."
+   "led_to": "From there the artist followed Lenia, a smooth Game of Life, into artificial life, and later showed the work at the ALIFE 2026 workshop and art gallery.",
+   "kind": "conversation"
   },
   {
    "id": "behnaz",
@@ -25,7 +26,8 @@
     "speculative design",
     "next generation in nature"
    ],
-   "said": "Read the project early on as speculative design. The topics it touches and the questions it asks are worth discussing. Look at how other organisms in the living world make their next generation, and keep gathering examples."
+   "said": "Read the project early on as speculative design. The topics it touches and the questions it asks are worth discussing. Look at how other organisms in the living world make their next generation, and keep gathering examples.",
+   "kind": "conversation"
   },
   {
    "id": "rebecca-xu",
@@ -38,7 +40,8 @@
     "机器人",
     "robotic womb"
    ],
-   "said": "Look at the Chinese word for life, 生命. 生 is birth and being alive; 命 is the state, the rules and the conditions that keep a life going. Even 机器 (machine) and 机器人 (machine with the character for person) differ a little. Together they found the phrase robotic womb for the subtitle and defined it in simple words."
+   "said": "Look at the Chinese word for life, 生命. 生 is birth and being alive; 命 is the state, the rules and the conditions that keep a life going. Even 机器 (machine) and 机器人 (machine with the character for person) differ a little. Together they found the phrase robotic womb for the subtitle and defined it in simple words.",
+   "kind": "conversation"
   },
   {
    "id": "siggraph-artist",
@@ -50,7 +53,8 @@
     "sea creatures",
     "sex and gender"
    ],
-   "said": "Some sea creatures have no fixed sex. She was the first to raise this, and it opened the question of whether a mother is a sex, a gender or a role."
+   "said": "Some sea creatures have no fixed sex. She was the first to raise this, and it opened the question of whether a mother is a sex, a gender or a role.",
+   "kind": "conversation"
   },
   {
    "id": "ars",
@@ -61,7 +65,8 @@
    "themes": [
     "caution"
    ],
-   "said": "The question is interesting, but approach it with caution."
+   "said": "The question is interesting, but approach it with caution.",
+   "kind": "conversation"
   },
   {
    "id": "zach",
@@ -72,7 +77,8 @@
    "themes": [
     "body and screen"
    ],
-   "said": "The digital part and the physical part are only loosely tied. The simulation and the robot need a stronger technical link between them. He sent an example of how such a link can work."
+   "said": "The digital part and the physical part are only loosely tied. The simulation and the robot need a stronger technical link between them. He sent an example of how such a link can work.",
+   "kind": "conversation"
   },
   {
    "id": "blaise",
@@ -85,18 +91,22 @@
     "art and engineering"
    ],
    "said": "As it stands the work is neither artistic enough nor hard core enough as engineering. And once the baby is born with no arm, how could the baby bear a next generation? Without an arm the baby cannot reproduce.",
-   "led_to": "The arm and the printed shell became separate parts, so a born baby can be fitted with an arm by assembly and bear the next one."
+   "led_to": "The arm and the printed shell became separate parts, so a born baby can be fitted with an arm by assembly and bear the next one.",
+   "kind": "conversation"
   },
   {
    "id": "cynthia",
    "who": "Cynthia Breazeal",
    "role": "Personal Robots, MIT Media Lab",
    "when": "2026",
-   "stance": "affirms",
+   "stance": "questions",
    "themes": [
-    "artificial life"
+    "artificial life",
+    "a body, not only a simulation"
    ],
-   "said": "In a first conversation: the work is directly related to artificial life. Reach out to Melanie Mitchell at the Santa Fe Institute."
+   "said": "In a first conversation: the work is directly related to artificial life; reach out to Melanie Mitchell at the Santa Fe Institute. Then the question a thesis defense will ask: why does the work need a physical body? Why is a simulation not enough?",
+   "kind": "conversation",
+   "answer": "Touch is one answer: a body reaches past the screen and answers the hand directly. The other: only a body shares our time and space. In the physical world the robot stands where other animals stand, as one species among others, close to equal."
   },
   {
    "id": "kent",
@@ -108,7 +118,8 @@
     "awareness",
     "AI"
    ],
-   "said": "Not a warning to be careful with AI, but a reminder to be aware of the problem. Being aware is what matters, and that is enough."
+   "said": "Not a warning to be careful with AI, but a reminder to be aware of the problem. Being aware is what matters, and that is enough.",
+   "kind": "conversation"
   },
   {
    "id": "personal-robots",
@@ -120,7 +131,8 @@
     "natural interaction",
     "Jibo"
    ],
-   "said": "Why was Jibo so loved? Its small shifts of expression and motion feel so natural that people forget how hard they were to make. Interaction with a robot works when it is smooth enough to go unnoticed."
+   "said": "Why was Jibo so loved? Its small shifts of expression and motion feel so natural that people forget how hard they were to make. Interaction with a robot works when it is smooth enough to go unnoticed.",
+   "kind": "conversation"
   },
   {
    "id": "la-alumnus",
@@ -132,7 +144,8 @@
     "fear of AI",
     "lovable"
    ],
-   "said": "Many people are afraid of AI. A small, lovable robot body changes that. A robot mother raising a baby shows AI as gentle, even lovable, and then people may stop being afraid."
+   "said": "Many people are afraid of AI. A small, lovable robot body changes that. A robot mother raising a baby shows AI as gentle, even lovable, and then people may stop being afraid.",
+   "kind": "conversation"
   },
   {
    "id": "act",
@@ -144,7 +157,8 @@
     "cyberfeminism",
     "male artist"
    ],
-   "said": "The first to point to cyberfeminism as a reading of the work. Also asked why a male artist is drawn to this question."
+   "said": "The first to point to cyberfeminism as a reading of the work. Also asked why a male artist is drawn to this question.",
+   "kind": "conversation"
   },
   {
    "id": "anna",
@@ -155,7 +169,8 @@
    "themes": [
     "the idea"
    ],
-   "said": "The idea is sexy."
+   "said": "The idea is sexy.",
+   "kind": "conversation"
   },
   {
    "id": "pad",
@@ -166,7 +181,8 @@
    "themes": [
     "the word birth"
    ],
-   "said": "Do you really understand what birth is? Birth may be too big a word, and using it for AI or a robot may be a misuse of it."
+   "said": "Do you really understand what birth is? Birth may be too big a word, and using it for AI or a robot may be a misuse of it.",
+   "kind": "conversation"
   },
   {
    "id": "social-algorithms",
@@ -178,7 +194,8 @@
     "trunk",
     "artificial life"
    ],
-   "said": "The work needs a trunk, one line that everything else hangs from. Artificial life is close enough to the project to be that trunk."
+   "said": "The work needs a trunk, one line that everything else hangs from. Artificial life is close enough to the project to be that trunk.",
+   "kind": "conversation"
   },
   {
    "id": "steve-mann",
@@ -192,7 +209,8 @@
     "society",
     "next generation"
    ],
-   "said": "Why not call it parent and baby rather than mother and baby? Is the work a small model of human society? Can the baby have a next generation of the baby's own? And is there a father?"
+   "said": "Why not call it parent and baby rather than mother and baby? Is the work a small model of human society? Can the baby have a next generation of the baby's own? And is there a father?",
+   "kind": "conversation"
   },
   {
    "id": "vis-researcher",
@@ -202,9 +220,49 @@
    "stance": "affirms",
    "themes": [
     "touch",
-    "mother and child"
+    "mother and child",
+    "a large tank"
    ],
-   "said": "Touch is the point to hold on to. Between people, and above all between a mother and a child, touch is the first bond. At the end of the talk she said she is a mother too, and asked for a hug."
+   "said": "Touch is the point to hold on to. Between people, and above all between a mother and a child, touch is the first bond. If the tank were very large, with one robot bearing the next and that one bearing the next, many interesting things could emerge. At the end of the talk she said she is a mother too, and asked for a hug.",
+   "kind": "conversation"
+  },
+  {
+   "id": "mark-feldmeier",
+   "kind": "collaborator",
+   "who": "Mark Feldmeier",
+   "role": "Responsive Environments, MIT Media Lab; independent study advisor",
+   "when": "2026",
+   "stance": "suggests",
+   "themes": [
+    "birth",
+    "floating",
+    "touch",
+    "interaction"
+   ],
+   "contributed": [
+    "The way the baby is born: the arm pushes while the baby inflates.",
+    "Floating: made large enough, the body is carried by the water, since water can bear a great deal of weight.",
+    "Touch sensing by capacitance, so a hand on the robot is felt: a very simple principle that works."
+   ],
+   "said": "Kept asking why the work is made this way, and what kind of interaction would feel natural. Many ways of interacting were tried before settling on the plainest one: touch the body directly. A hand on the mother feels the pump drawing water little by little, a faint pulse, as if the body were alive. Touch cannot be replaced."
+  },
+  {
+   "id": "vera-wu",
+   "kind": "collaborator",
+   "who": "Vera Wu",
+   "role": "friend and collaborator, Boston",
+   "when": "2026",
+   "stance": "affirms",
+   "themes": [
+    "writing",
+    "group relations",
+    "a large installation"
+   ],
+   "contributed": [
+    "One of the first to hear the idea and find it worth pursuing.",
+    "Much of the writing work around the project."
+   ],
+   "said": "Explored what kind of group the robots form and what state the group is in. As a large installation, one robot bears the next and that one bears the next, and the relations between them become the work."
   }
  ]
 }

@@ -40,6 +40,8 @@ nav.sub a .d { font: 400 12px var(--sans); color: var(--muted); margin-left: 6px
 .conv .meta { font: 12px var(--mono); color: var(--muted); margin: 4px 0 10px; }
 .conv .said { font: 400 17px/1.5 var(--serif); margin: 0 0 10px; }
 .conv .led { font-size: 14px; color: var(--muted); margin: 0 0 10px; padding-left: 12px; border-left: 2px solid var(--gel-soft); }
+.conv .ans { font-size: 14.5px; margin: 0 0 10px; padding: 10px 12px; border-radius: 8px; background: var(--gel-soft); }
+.conv ul.contrib { margin: 0 0 10px; padding-left: 18px; font-size: 14.5px; } .conv ul.contrib li { margin: 0 0 4px; }
 .conv .tags span { display: inline-block; font: 11px var(--mono); color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; margin: 0 4px 4px 0; }
 nav.tabs a.voices { color: var(--gel); border: 1px solid #b9d3ea; margin-left: 6px; }
 nav.tabs a.voices::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--gel); margin-right: 7px; vertical-align: 1px; animation: breathe 3.2s ease-in-out infinite; }
@@ -384,7 +386,8 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 <!-- ============================== VOICES ============================== -->
 <section class="tab" id="conversations">
   <div class="tabhead"><div><p class="kicker">Talk</p><h2>Conversations</h2><p>A documentary in text: one to one talks about the work with researchers, artists and friends. Each entry paraphrases what the other person said; the artist's replies are left out. It begins with the first teacher who planted the idea. Some agree, some doubt, and all of it shaped the work.</p></div></div>
-  <p class="kicker" style="margin-top:22px">Questions people asked</p>
+  <div class="conv-f" id="convKind" role="tablist" aria-label="Conversations or collaborators" style="margin-top:22px"></div>
+  <p class="kicker" id="convQh" style="margin-top:14px">Questions people asked</p>
   <div class="conv-q" id="convQ"></div>
   <div class="conv-f" id="convF" role="group" aria-label="Filter conversations"></div>
   <div class="conv-list" id="convList"><p class="note">Loading conversations…</p></div>
@@ -426,17 +429,19 @@ function show() {
   window.scrollTo({ top: 0 }); requestAnimationFrame(() => window.scrollTo({ top: 0 }));
 }
 /* conversations: data in conversations/data/conversations.json */
-let CONV = null, convFilter = "all";
+let CONV = null, convFilter = "all", convKind = "conversation";
 const STANCE = { all: "All", affirms: "Affirms", suggests: "Suggests", questions: "Questions", doubts: "Doubts" };
 function fmtWhen(w) { const m = /^(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?$/.exec(w || ""); if (!m) return w || ""; const mon = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]; return (m[3] ? +m[3] + " " : "") + (m[2] ? mon[+m[2]] + " " : "") + m[1]; }
 function renderConversations() {
-  const E = CONV.entries || [];
+  const ALL = CONV.entries || [], E = ALL.filter((e) => (e.kind || "conversation") === convKind);
+  document.getElementById("convKind").innerHTML = [["conversation", "Conversations"], ["collaborator", "Collaborators"]].map(([k, v]) => `<button type="button" role="tab" data-k="${k}" aria-pressed="${k === convKind}" aria-selected="${k === convKind}">${v} · ${ALL.filter((e) => (e.kind || "conversation") === k).length}</button>`).join("");
+  document.querySelectorAll("#convKind button").forEach((b) => (b.onclick = () => { convKind = b.dataset.k; convFilter = "all"; renderConversations(); }));
   const qs = []; for (const e of E) for (const q of (e.said.match(/[^.?!]*\?/g) || [])) qs.push([q.trim(), e.who]);
-  document.getElementById("convQ").innerHTML = qs.map(([q, w]) => `<p>${esc(q)}<span>${esc(w)}</span></p>`).join("");
+  document.getElementById("convQh").hidden = !qs.length; document.getElementById("convQ").innerHTML = qs.map(([q, w]) => `<p>${esc(q)}<span>${esc(w)}</span></p>`).join("");
   document.getElementById("convF").innerHTML = Object.entries(STANCE).map(([k, v]) => `<button type="button" data-k="${k}" aria-pressed="${k === convFilter}">${v}${k === "all" ? "" : " · " + E.filter((e) => e.stance === k).length}</button>`).join("");
   document.querySelectorAll("#convF button").forEach((b) => (b.onclick = () => { convFilter = b.dataset.k; renderConversations(); }));
   const list = E.filter((e) => convFilter === "all" || e.stance === convFilter);
-  document.getElementById("convList").innerHTML = list.map((e) => `<article class="conv" data-stance="${esc(e.stance)}"><h3>${esc(e.who)}</h3><p class="meta">${esc([e.role, fmtWhen(e.when), STANCE[e.stance] || e.stance].filter(Boolean).join(" · "))}</p><p class="said">${esc(e.said)}</p>${e.led_to ? `<p class="led">What changed: ${esc(e.led_to)}</p>` : ""}<p class="tags">${(e.themes || []).map((t) => `<span>${esc(t)}</span>`).join("")}</p></article>`).join("");
+  document.getElementById("convList").innerHTML = list.map((e) => `<article class="conv" data-stance="${esc(e.stance)}"><h3>${esc(e.who)}</h3><p class="meta">${esc([e.role, fmtWhen(e.when), STANCE[e.stance] || e.stance].filter(Boolean).join(" · "))}</p>${e.contributed ? `<ul class="contrib">${e.contributed.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>` : ""}<p class="said">${esc(e.said)}</p>${e.answer ? `<p class="ans">Answer in progress: ${esc(e.answer)}</p>` : ""}${e.led_to ? `<p class="led">What changed: ${esc(e.led_to)}</p>` : ""}<p class="tags">${(e.themes || []).map((t) => `<span>${esc(t)}</span>`).join("")}</p></article>`).join("");
 }
 async function loadConversations() { if (CONV) return; try { CONV = await (await fetch("conversations/data/conversations.json", { cache: "no-cache" })).json(); renderConversations(); } catch (e) { document.getElementById("convList").innerHTML = '<p class="note">Conversations could not load.</p>'; } }
 addEventListener("message", (e) => { const f = document.getElementById("earlyFrame"); if (f && e.origin === location.origin && e.data && e.data.bnm === "early-height") f.style.height = e.data.h + "px"; });
