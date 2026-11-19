@@ -1,0 +1,1187 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mother Robot Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a Blender style workspace. 3D Viewport left, Outliner and Properties right, Text Editor and Info below, Timeline across the bottom. */
+:root {
+  --win: #232323; --region: #2b2b2b; --header: #303030; --panel: #383838; --field: #1d1d1d; --line: #161616;
+  --fg: #e3e3e3; --muted: #9a9a9a; --dim: #6f6f6f;
+  --sel: #4772b3; --active: #ffaf29; --gel: #9fcdf0; --ok: #7fb069; --warn: #e0a33a;
+  --vp-solid: #3d3d3d; --vp-water: #05080c; --vp-clay: #e7e6e1;
+  --ui: "Inter", "Segoe UI", system-ui, sans-serif; --mono: "JetBrains Mono", "DejaVu Sans Mono", ui-monospace, monospace;
+  color-scheme: dark;
+}
+html, body { background: var(--win); color: var(--fg); }
+body { font: 12px/1.45 var(--ui); padding-block: 0; }
+.app { display: grid; gap: 2px; padding-block: 2px; padding-left: max(2px, env(safe-area-inset-left, 0px)); padding-right: max(2px, env(safe-area-inset-right, 0px));
+  grid-template-columns: minmax(0, 1fr) 360px; grid-template-rows: 30px minmax(440px, 64vh) 236px 66px;
+  grid-template-areas: "top top" "view side" "bottom side" "time time"; }
+.area { background: var(--region); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.ahead { height: 26px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 8px; background: var(--header); border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11.5px; white-space: nowrap; overflow: hidden; }
+.ahead b { color: var(--fg); font-weight: 500; }
+.ahead .sp { flex: 1; }
+.top { grid-area: top; flex-direction: row; align-items: center; gap: 14px; padding: 0 10px; background: var(--header); }
+.logo { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--gel); position: relative; flex: none; }
+.logo::after { content: ""; position: absolute; width: 6px; height: 6px; border-radius: 50%; background: var(--gel); right: -5px; top: 3px; }
+.top .file { font-weight: 600; }
+.top .sub { color: var(--muted); }
+.top .sp { flex: 1; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 3px; background: var(--field); color: var(--muted); font-size: 11px; }
+.chip i { width: 7px; height: 7px; border-radius: 50%; background: var(--dim); }
+.chip.live i { background: var(--ok); }
+.view { grid-area: view; position: relative; }
+#vp { position: relative; flex: 1; min-height: 0; background: var(--vp-clay); }
+#vp > canvas.gl { display: block; width: 100%; height: 100%; }
+.ov { position: absolute; left: 10px; top: 8px; color: #dcdcdc; font-size: 11.5px; text-shadow: 0 1px 2px #0008; pointer-events: none; line-height: 1.5; }
+.ov .stage { color: var(--active); }
+#vp[data-shade="solid"] .ov { color: #2c2c2c; text-shadow: 0 1px 0 #ffffffa0; }
+#vp[data-shade="solid"] .ov .stage { color: #a45400; }
+/* viewport shading switch, drawn like Blender's radio buttons */
+.shgrp { display: inline-flex; flex: none; }
+.shgrp .btn { display: inline-flex; align-items: center; gap: 5px; border-radius: 0; margin-left: -1px; }
+.shgrp .btn:first-child { border-radius: 3px 0 0 3px; margin-left: 0; }
+.shgrp .btn:last-child { border-radius: 0 3px 3px 0; }
+.shi { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.shi.solid { background: #ecebe6; box-shadow: inset 0 0 0 1px #1a1a1a; }
+.shi.mat { background: radial-gradient(circle at 35% 30%, #ffffff, #8d939c 55%, #34383e); }
+.shi.water { background: radial-gradient(circle at 35% 30%, #d4ebfa, #3c6f99 60%, #0c1c2c); }
+@media (max-width: 560px) { .view .ahead .opt { display: none; } }
+#gizmo { position: absolute; right: 8px; top: 8px; width: 74px; height: 74px; pointer-events: none; }
+.vbtns { position: absolute; right: 8px; top: 88px; display: flex; flex-direction: column; gap: 3px; }
+.vbtns button, .btn { font: 11px var(--ui); color: var(--fg); background: #545454; border: 1px solid #262626; border-radius: 3px; padding: 3px 8px; cursor: pointer; }
+.vbtns button:hover, .btn:hover { background: #656565; }
+.vbtns button[aria-pressed="true"], .btn.on { background: var(--sel); }
+.btn:disabled { opacity: .45; cursor: default; }
+button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 1px solid var(--sel); outline-offset: 1px; }
+.side { grid-area: side; display: grid; grid-template-rows: minmax(150px, 230px) minmax(0, 1fr); gap: 2px; background: none; }
+.outl { overflow: auto; padding: 4px 0; font-size: 12px; }
+.row { display: flex; align-items: center; gap: 6px; height: 21px; padding-right: 8px; cursor: default; white-space: nowrap; }
+.row:hover { background: #333; }
+.row.sel { background: #334d80; }
+.row .tw { width: 12px; color: var(--dim); text-align: center; }
+.row .ic { width: 12px; height: 12px; border-radius: 2px; flex: none; }
+.row .nm { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+.row .eye { width: 18px; text-align: center; color: var(--muted); cursor: pointer; background: none; border: 0; font: inherit; padding: 0; }
+.row .eye[aria-pressed="false"] { color: #555; }
+.tabs { display: flex; gap: 1px; padding: 4px 6px 0; background: var(--header); }
+.tabs button { flex: 1; font: 11px var(--ui); color: var(--muted); background: #2a2a2a; border: 0; border-radius: 3px 3px 0 0; padding: 5px 4px; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--region); color: var(--fg); }
+.props { flex: 1; overflow: auto; padding: 8px 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+.pnl { background: var(--panel); border-radius: 4px; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+.pnl h3 { margin: 0; font-size: 11.5px; font-weight: 600; color: var(--fg); }
+.pnl p { margin: 0; color: var(--muted); }
+.lbl { color: var(--muted); font-size: 11px; }
+textarea, input[type=text] { width: 100%; box-sizing: border-box; background: var(--field); color: var(--fg); border: 1px solid #111; border-radius: 3px; font: 12px var(--ui); padding: 6px 7px; resize: vertical; }
+.brow { display: flex; gap: 6px; flex-wrap: wrap; }
+.kv { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 3px 8px; font-size: 11.5px; }
+.kv dt { color: var(--muted); } .kv dd { margin: 0; overflow-wrap: anywhere; }
+.trace { display: grid; grid-template-columns: minmax(0, 1fr) 54px 16px; gap: 6px; align-items: center; font-size: 11.5px; }
+.trace .bar, .gbar, .rbar { height: 6px; background: var(--field); border-radius: 3px; overflow: hidden; position: relative; }
+.trace .bar span, .rbar span { position: absolute; inset: 0 auto 0 0; background: var(--gel); }
+.trace .x { background: none; border: 0; color: var(--dim); cursor: pointer; font: inherit; padding: 0; }
+.tag { font-size: 10px; color: var(--dim); margin-left: 4px; }
+.gene { display: grid; grid-template-columns: 70px minmax(0, 1fr) 62px; gap: 6px; align-items: center; font-size: 11.5px; }
+.gbar { display: flex; height: 8px; }
+.gbar span { height: 100%; }
+.legend { display: flex; gap: 10px; flex-wrap: wrap; font-size: 10.5px; color: var(--muted); }
+.legend i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.rel { display: grid; grid-template-columns: minmax(0, 1fr) 70px 34px; gap: 6px; align-items: center; font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; vertical-align: 0; }
+.bottom { grid-area: bottom; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 2px; background: none; }
+.code { flex: 1; overflow: hidden; font: 11.5px/17px var(--mono); padding: 4px 0; background: #1e1e1e; }
+.code div { display: flex; white-space: pre; }
+.code .ln { width: 46px; text-align: right; padding-right: 10px; color: #5c5c5c; flex: none; }
+.code .cur { background: #2f3d55; }
+.code .cm { color: #7b9f6b; } .code .g0 { color: #c7a26b; } .code .g1 { color: #dcdcdc; } .code .mc { color: #b38ccf; }
+.info { flex: 1; overflow: auto; font: 11.5px/17px var(--mono); padding: 4px 8px; background: #1e1e1e; color: #cfcfcf; }
+.info .t { color: #5c5c5c; margin-right: 8px; }
+.info .a { color: var(--gel); } .info .w { color: var(--warn); }
+.time { grid-area: time; }
+.tl { flex: 1; display: flex; align-items: stretch; gap: 8px; padding: 6px 8px; }
+.tl .ctl { display: flex; gap: 4px; align-items: center; }
+.track { flex: 1; position: relative; display: flex; gap: 2px; min-width: 0; }
+.seg { position: relative; flex: 1; background: #333; border-radius: 3px; overflow: hidden; display: flex; align-items: flex-end; padding: 3px 5px; color: var(--muted); font-size: 10.5px; min-width: 0; }
+.seg span { position: relative; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.seg .fill { position: absolute; inset: 0 auto 0 0; width: 0; background: #3a4d6e; }
+.seg.on { color: var(--fg); outline: 1px solid var(--sel); }
+.seg.done .fill { width: 100%; background: #31405a; }
+.doc { padding-block: 28px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); max-width: 980px; margin: 0 auto; color: #d0d0d0; font-size: 14px; line-height: 1.6; }
+.doc h2 { font-size: 18px; font-weight: 600; margin: 0 0 8px; color: var(--fg); text-wrap: balance; }
+.doc h4 { font-size: 13px; margin: 20px 0 4px; color: var(--fg); }
+.doc p { margin: 0 0 10px; max-width: 68ch; }
+.doc .io { font-family: var(--mono); font-size: 12px; color: var(--gel); }
+.doc pre.mermaid { background: #2b2b2b; border-radius: 6px; padding: 12px; overflow-x: auto; }
+.empty { color: var(--dim); font-style: italic; }
+@media (max-width: 980px) {
+  .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: 30px 58vh auto auto auto; grid-template-areas: "top" "view" "time" "side" "bottom"; }
+  .side { grid-template-rows: auto auto; }
+  .outl { max-height: 220px; }
+  .props { max-height: none; }
+  .bottom { grid-template-columns: minmax(0, 1fr); }
+  .code, .info { height: 200px; flex: none; }
+  .tl { flex-wrap: wrap; }
+  .track { flex-basis: 100%; height: 30px; }
+  .top .sub { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+<style>body{margin:0}</style></head><body>
+<a href="../" style="position:fixed;right:10px;bottom:10px;z-index:9;font:12px Inter,sans-serif;color:#9fcdf0;background:#232323;padding:4px 9px;border-radius:4px;text-decoration:none">Born, Not Made home</a>
+
+
+<div class="app">
+  <div class="area top">
+    <div class="logo" aria-hidden="true"></div>
+    <span class="file">mother_m1.blend</span>
+    <span class="sub">Born, Not Made · a mother robot reads a signal and generates a baby robot</span>
+    <span class="sp"></span>
+    <span class="chip" id="agentChip"><i></i><span>agent: local</span></span>
+  </div>
+
+  <section class="area view" aria-label="3D Viewport">
+    <div class="ahead"><b>3D Viewport</b><span class="opt">Object Mode</span><span class="sp"></span>
+      <span class="opt">Shading</span>
+      <div class="shgrp" role="group" aria-label="Viewport shading">
+        <button class="btn on" id="shSolid" data-shade="solid" aria-pressed="true" title="Solid: white clay, outlines and soft shadow"><i class="shi solid" aria-hidden="true"></i>Solid</button>
+        <button class="btn" id="shMat" data-shade="material" aria-pressed="false" title="Material: the colours from the Blender file"><i class="shi mat" aria-hidden="true"></i>Material</button>
+        <button class="btn" id="shWater" data-shade="water" aria-pressed="false" title="Water: the mother in dark water"><i class="shi water" aria-hidden="true"></i>Water</button>
+      </div>
+    </div>
+    <div id="vp" data-shade="solid">
+      <div class="ov" id="ov">User Perspective<br>(<span id="ovFrame">0</span>) Scene | <span id="ovObj">Mother M1</span><br><span class="stage" id="ovStage">loading the Blender scene</span></div>
+      <canvas id="gizmo" width="148" height="148" aria-hidden="true"></canvas>
+      <div class="vbtns">
+        <button data-view="persp" aria-pressed="true">Persp</button>
+        <button data-view="front" aria-pressed="false">Front</button>
+        <button data-view="side" aria-pressed="false">Side</button>
+        <button data-view="top" aria-pressed="false">Top</button>
+        <button data-view="nozzle" aria-pressed="false">Nozzle</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="side">
+    <section class="area" aria-label="Outliner">
+      <div class="ahead"><b>Outliner</b><span class="sp"></span><span id="genLbl">generation M1</span></div>
+      <div class="outl" id="outliner"></div>
+    </section>
+    <section class="area" aria-label="Properties">
+      <div class="ahead"><b>Properties</b><span class="sp"></span><span id="selLbl">Mother M1</span></div>
+      <div class="tabs" role="tablist">
+        <button role="tab" aria-selected="true" data-tab="signal" id="tab-signal">Signal</button>
+        <button role="tab" aria-selected="false" data-tab="memory" id="tab-memory">Memory</button>
+        <button role="tab" aria-selected="false" data-tab="genome" id="tab-genome">Genome</button>
+        <button role="tab" aria-selected="false" data-tab="relation" id="tab-relation">Relation</button>
+      </div>
+      <div class="props" id="props"></div>
+    </section>
+  </div>
+
+  <div class="bottom">
+    <section class="area" aria-label="Text Editor">
+      <div class="ahead"><b>Text Editor</b><span id="gcName">no file</span><span class="sp"></span><span id="gcPos">line 0 / 0</span></div>
+      <div class="code" id="code"></div>
+    </section>
+    <section class="area" aria-label="Info">
+      <div class="ahead"><b>Info</b><span class="sp"></span><span>agent log</span></div>
+      <div class="info" id="info"></div>
+    </section>
+  </div>
+
+  <section class="area time" aria-label="Timeline">
+    <div class="ahead"><b>Timeline</b><span id="tlLbl">idle</span><span class="sp"></span><span id="tlClock">00:00.0</span></div>
+    <div class="tl">
+      <div class="ctl">
+        <button class="btn" id="play" aria-pressed="true">Pause</button>
+        <button class="btn on" data-speed="1">1×</button>
+        <button class="btn" data-speed="2">2×</button>
+        <button class="btn" data-speed="4">4×</button>
+      </div>
+      <div class="track" id="track"></div>
+    </div>
+  </section>
+</div>
+
+<section class="doc">
+  <h2>How the mother reads a signal</h2>
+  <p class="io">input: a voice or text signal · output: a baby robot with the baby's own G-code, memory and relations</p>
+  <p>The scene is the restored Blender model of the DexArm mother: the clear egg body, the docked tail, and the real DexArm links posed by the same parallelogram kinematics as the Blender file. A signal does not design the baby. The mother reads the signal against the mother's own memory, and the baby's body comes from three sources mixed together: what the mother inherited, what the mother remembers, and what the signal shifts. A small random drift is added, so no two births are the same.</p>
+  <p>The baby is printed folded, layer by layer, in the gel, which works like amniotic fluid. The arm works like an umbilical cord. Halfway through, the arm places a core (battery, pump and chip) inside the body, so the baby can move after birth. After printing, the baby breathes in air through the baby's valve. The gel cannot be compressed, so the mother's folded belly opens as the baby grows. That swelling is a visible sign of the process and also vents the womb. The folds spring back to push the baby out through the canal, and the belly slowly settles again. The gel stays inside.</p>
+  <p>After birth, a relation forms between robots. It is measured from shared memory, body likeness and time spent near each other. Any baby can be made the next mother; the new mother carries part of the previous mother's memory forward.</p>
+  <h4>Agent architecture</h4>
+  <pre class="mermaid">
+flowchart LR
+  S[Signal: voice or text] --> R[Reading agent: Claude]
+  M[(Mother memory)] --> R
+  R --> B[Bias + memory trace]
+  M --> G[Genome mixer]
+  B --> G
+  I[Inherited genome] --> G
+  N[Random drift] --> G
+  G --> C[G-code writer]
+  C --> A[DexArm inverse kinematics]
+  A --> P[Print in gel, place core]
+  P --> F[Inflate, belly opens]
+  F --> X[Push through canal]
+  X --> L[Relation graph]
+  L --> M
+  </pre>
+  <h4>AI disclosure</h4>
+  <p>The page and its code were written with Claude. On this public page a local reader turns the words of a signal into tendencies by hashing them; in the claude.ai version, Claude reads each signal against the mother's memory. The 3D geometry is exported from the project's own Blender scene. The two earlier babies and the first signal on load are examples.</p>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+"use strict";
+/* ---------------- small helpers ---------------- */
+const $ = (s) => document.querySelector(s);
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const ss = (a, b, x) => { const u = clamp((x - a) / (b - a), 0, 1); return u * u * (3 - 2 * u); };
+const lerp = (a, b, t) => a + (b - a) * t;
+const D2R = Math.PI / 180;
+function hash(str) { let h = 2166136261 >>> 0; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function rng(seed) { let s = seed >>> 0 || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
+function vecFromText(t, n = 8) { const r = rng(hash(t.toLowerCase().trim())); return Array.from({ length: n }, () => r()); }
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const fmtT = (s) => { const m = Math.floor(s / 60), r = s - 60 * m; return String(m).padStart(2, "0") + ":" + r.toFixed(1).padStart(4, "0"); };
+
+/* ---------------- DexArm kinematics (port of dexarm_restore.arm_mats) ---------------- */
+const KIN = (function () {
+  const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], add = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+  const rx = (v, t) => { const c = Math.cos(t), s = Math.sin(t); return [v[0], c * v[1] - s * v[2], s * v[1] + c * v[2]]; };
+  const rz = (v, t) => { const c = Math.cos(t), s = Math.sin(t); return [c * v[0] - s * v[1], s * v[0] + c * v[1], v[2]]; };
+  function make(M) {
+    const S = M.PV_S, E = M.PV_E, W = M.PV_W, R = M.armRoot;
+    const app = (m, v) => [0, 1, 2].map((i) => m[i][0] * v[0] + m[i][1] * v[1] + m[i][2] * v[2] + m[i][3]);
+    const W2 = (a, b) => add(add(S, rx(sub(E, S), a)), rx(sub(W, E), b));
+    function tip(yaw, a, b) { let p = add(M.tipEE, sub(W2(a, b), W)); p = rz(rz(p, yaw), Math.PI / 2); return app(R, p); }
+    function det(m) { return m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]); }
+    function solve(target, q0) {
+      let q = q0.slice();
+      for (let it = 0; it < 12; it++) {
+        const f = tip(q[0], q[1], q[2]), e = sub(target, f);
+        if (Math.hypot(e[0], e[1], e[2]) < 2e-5) break;
+        const J = [[], [], []], h = 1e-5;
+        for (let j = 0; j < 3; j++) { const qq = q.slice(); qq[j] += h; const g = tip(qq[0], qq[1], qq[2]); for (let i = 0; i < 3; i++) J[i][j] = (g[i] - f[i]) / h; }
+        const A = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], bv = [0, 0, 0];
+        for (let i = 0; i < 3; i++) { for (let j = 0; j < 3; j++) { for (let k = 0; k < 3; k++) A[i][j] += J[k][i] * J[k][j]; } A[i][i] += 1e-4; for (let k = 0; k < 3; k++) bv[i] += J[k][i] * e[k]; }
+        const Dt = det(A); const d = [0, 1, 2].map((c) => det(A.map((r, i) => r.map((x, j) => (j === c ? bv[i] : x)))) / Dt);
+        q = [q[0] + d[0], clamp(q[1] + d[1], -1.4, 1.6), clamp(q[2] + d[2], -1.4, 1.6)];
+      }
+      return q;
+    }
+    return { tip, solve, W2 };
+  }
+  return { make };
+})();
+
+/* ---------------- state ---------------- */
+const SPEED = { v: 1 }; let playing = true;
+let META = null, K = null, three = null;
+const robots = [];          // babies (swimming or in progress)
+let mother = null;          // { name, gen, memory:[{text,w,src}], genome:[...], hue }
+let job = null;             // the birth in progress
+let selected = "mother";
+let babyCount = 0;
+const STAGES = [
+  ["reading", "Read signal"], ["generating", "Generate"], ["gcode", "Write G-code"], ["printing", "Print in gel"],
+  ["inflating", "Breathe"], ["pushing", "Push"], ["born", "Relation"],
+];
+
+/* ---------------- genome ---------------- */
+const GENES = [
+  ["length", "length", (v) => (150 + 90 * v).toFixed(0) + " mm"],
+  ["girth", "radius", (v) => (62 + 46 * v).toFixed(0) + " mm"],
+  ["rings", "rings", (v) => String(1 + Math.round(3 * v))],
+  ["ribs", "ribs", (v) => String(Math.round(14 * v))],
+  ["flat", "section", (v) => (0.62 + 0.38 * v).toFixed(2) + " round"],
+  ["bulge", "widest at", (v) => Math.round(30 + 40 * v) + " %"],
+  ["hue", "colour", (v) => Math.round(v * 360) + "°"],
+  ["motion", "gait", (v) => ["undulate", "pulse", "roll"][Math.min(2, Math.floor(v * 3))]],
+  ["tempo", "tempo", (v) => (0.3 + 0.9 * v).toFixed(2) + " Hz"],
+];
+const NG = GENES.length;
+function memoryVector(memory) {
+  const acc = new Array(NG).fill(0); let W = 0;
+  for (const m of memory) { const v = vecFromText(m.text, NG); for (let i = 0; i < NG; i++) acc[i] += m.w * v[i]; W += m.w; }
+  return acc.map((x) => (W ? x / W : 0.5));
+}
+function biasVector(bias) { return GENES.map(([k]) => clamp(Number(bias && bias[k]), 0, 1)).map((x) => (Number.isFinite(x) ? x : 0.5)); }
+function mixGenome(motherG, memV, sigV, seed) {
+  const r = rng(seed), out = [], parts = [];
+  for (let i = 0; i < NG; i++) {
+    const isHue = GENES[i][0] === "hue", drift = (r() - 0.5) * (isHue ? 0.5 : 0.24);
+    const w = isHue ? [0.25, 0.25, 0.5] : [0.42, 0.33, 0.25];
+    let g = w[0] * motherG[i] + w[1] * memV[i] + w[2] * sigV[i] + drift;
+    if (GENES[i][0] === "hue") g = ((g % 1) + 1) % 1; else g = clamp(g, 0, 1);
+    out.push(g); parts.push([w[0] * motherG[i], w[1] * memV[i], w[2] * sigV[i], Math.abs(drift)]);
+  }
+  return { g: out, parts };
+}
+const gv = (g, k) => g[GENES.findIndex((x) => x[0] === k)];
+function bodySpec(g) {
+  return { L: 0.150 + 0.090 * gv(g, "length"), R: 0.062 + 0.046 * gv(g, "girth"), rings: 1 + Math.round(3 * gv(g, "rings")),
+    ribs: Math.round(14 * gv(g, "ribs")), flat: 0.62 + 0.38 * gv(g, "flat"), bulge: 0.30 + 0.40 * gv(g, "bulge"),
+    hue: gv(g, "hue"), gait: Math.min(2, Math.floor(gv(g, "motion") * 3)), hz: 0.3 + 0.9 * gv(g, "tempo") };
+}
+function colorOf(spec) { return new THREE.Color().setHSL(spec.hue, 0.55, 0.74); }
+
+/* ---------------- memory ---------------- */
+const SEED_MEMORY = [
+  { text: "slow tide under the hull", w: 0.8, src: "seed" },
+  { text: "three pulses, then still", w: 0.7, src: "seed" },
+  { text: "a ring that did not close", w: 0.6, src: "seed" },
+  { text: "light from above, then dark", w: 0.5, src: "seed" },
+  { text: "the low sound of the pump", w: 0.4, src: "seed" },
+];
+const LEX = ["tide", "ring", "light", "pulse", "salt", "pressure", "valve", "shadow", "current", "fold", "warmth", "glass", "echo"];
+function inheritMemory(mem, seed, birthNote) {
+  const r = rng(seed), out = [];
+  for (const m of mem) {
+    if (r() < m.w * 0.9) {
+      let text = m.text;
+      if (r() < 0.18) { const ws = text.split(" "); ws[Math.floor(r() * ws.length)] = LEX[Math.floor(r() * LEX.length)]; text = ws.join(" "); }
+      out.push({ text, w: +(m.w * 0.72).toFixed(2), src: text === m.text ? "inherited" : "drifted" });
+    }
+  }
+  out.push({ text: birthNote, w: 0.6, src: "birth" });
+  return out;
+}
+
+/* ---------------- relations ---------------- */
+function memOverlap(a, b) {
+  const wa = new Map(a.map((m) => [m.text, m.w])), wb = new Map(b.map((m) => [m.text, m.w]));
+  let num = 0, den = 0; const keys = new Set([...wa.keys(), ...wb.keys()]);
+  for (const k of keys) { const x = wa.get(k) || 0, y = wb.get(k) || 0; num += Math.min(x, y); den += Math.max(x, y); }
+  return den ? num / den : 0;
+}
+function genomeLike(a, b) { let d = 0; for (let i = 0; i < NG; i++) d += (a[i] - b[i]) ** 2; return 1 - Math.sqrt(d / NG); }
+function relationOf(a, b) { const near = Math.min(1, ((a.near && a.near[b.id]) || 0) / 12); return { mem: memOverlap(a.memory, b.memory), body: genomeLike(a.genome, b.genome), near, r: 0.5 * memOverlap(a.memory, b.memory) + 0.3 * genomeLike(a.genome, b.genome) + 0.2 * near }; }
+
+/* ---------------- log ---------------- */
+const T0 = performance.now();
+function log(msg, cls = "") {
+  const el = $("#info"), d = document.createElement("div");
+  d.innerHTML = `<span class="t">${fmtT((performance.now() - T0) / 1000)}</span><span class="${cls}">${esc(msg)}</span>`;
+  el.appendChild(d); while (el.children.length > 200) el.firstChild.remove(); el.scrollTop = el.scrollHeight;
+}
+
+/* ---------------- three.js scene ---------------- */
+function initThree() {
+  const host = $("#vp");
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  renderer.outputEncoding = THREE.sRGBEncoding; renderer.localClippingEnabled = true;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.domElement.className = 'gl'; host.prepend(renderer.domElement);
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(CLAY.bg);
+  const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 50);
+  camera.position.set(1.35, 0.7, 2.25);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.target.set(0.05, 0.0, 0.0); controls.enableDamping = true; controls.dampingFactor = 0.12; controls.update();
+  // Material and Water shading: the original lights
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x50525a, 0.85); scene.add(hemi);
+  const key = new THREE.DirectionalLight(0xffffff, 0.75); key.position.set(1.5, 2.5, 2.0); scene.add(key);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.25); fill.position.set(-2, 0.5, -1.5); scene.add(fill);
+  // Solid shading: soft studio light plus one key that casts a soft shadow on the floor
+  const cHemi = new THREE.HemisphereLight(0xffffff, 0xaeaba3, 0.6);
+  const cKey = new THREE.DirectionalLight(0xffffff, 0.58); cKey.position.set(0.9, 3.2, 1.4);
+  cKey.shadow.mapSize.set(1024, 1024); cKey.shadow.bias = -0.0008; cKey.shadow.normalBias = 0.004;
+  Object.assign(cKey.shadow.camera, { left: -2.3, right: 2.3, top: 2.3, bottom: -2.3, near: 0.5, far: 7 });
+  const cFill = new THREE.DirectionalLight(0xffffff, 0.2); cFill.position.set(-2, 0.8, -1.2);
+  scene.add(cHemi, cKey, cFill);
+  const root = new THREE.Group(); root.rotation.x = -Math.PI / 2; scene.add(root);   // Blender Z-up inside root
+  const grid = new THREE.GridHelper(6, 60, 0x575757, 0x474747); grid.position.y = -0.62; scene.add(grid);
+  const clayGrid = new THREE.GridHelper(6, 60, 0xbebcb5, 0xd0cec7); clayGrid.position.y = -0.62; scene.add(clayGrid);
+  const shadowPlane = new THREE.Mesh(new THREE.PlaneGeometry(8, 8), new THREE.ShadowMaterial({ color: 0x2d2a24, opacity: 0.2, depthWrite: false }));
+  shadowPlane.rotation.x = -Math.PI / 2; shadowPlane.position.y = -0.6195; shadowPlane.receiveShadow = true; scene.add(shadowPlane);
+  const axX = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-3, -0.619, 0), new THREE.Vector3(3, -0.619, 0)]), new THREE.LineBasicMaterial({ color: 0x9b3a3a }));
+  const axY = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, -0.619, -3), new THREE.Vector3(0, -0.619, 3)]), new THREE.LineBasicMaterial({ color: 0x5f8a2b }));
+  scene.add(axX, axY);
+  // water specks
+  const N = 500, pp = new Float32Array(N * 3), r = rng(7);
+  for (let i = 0; i < N; i++) { pp[3 * i] = (r() - 0.5) * 5; pp[3 * i + 1] = (r() - 0.5) * 2.4; pp[3 * i + 2] = (r() - 0.5) * 4; }
+  const specks = new THREE.Points(new THREE.BufferGeometry().setAttribute("position", new THREE.BufferAttribute(pp, 3)), new THREE.PointsMaterial({ color: 0x9fb6c8, size: 0.006, transparent: true, opacity: 0.55 }));
+  specks.visible = false; scene.add(specks);
+  three = { renderer, scene, camera, controls, root, grid, clayGrid, shadowPlane, axes: [axX, axY], specks, host,
+    matLights: [hemi, key, fill], clayLights: [cHemi, cKey, cFill], clayKey: cKey };
+  const ro = new ResizeObserver(resize); ro.observe(host); resize();
+  setShading(SHADE.mode);
+}
+function resize() {
+  const { renderer, camera, host } = three; const w = host.clientWidth, h = host.clientHeight; if (!w || !h) return;
+  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+  renderer.getDrawingBufferSize(INK.res.value); INK.dpr.value = renderer.getPixelRatio();
+}
+
+/* ---------------- viewport shading: Solid (white clay), Material, Water ---------------- */
+const CLAY = { bg: 0xe7e6e1, printed: 0xf3f2ee, bought: 0xd9d9d5, metal: 0xc6c6c3, silicone: 0xefe6d4, gel: 0xa9d2f2,
+  ink: 0x2a2c30, path: 0x2f6fa8, bead: 0xf07316, sel: 0xf5a524 };
+const SHADE = { mode: "solid", items: [] };
+const INK = { res: { value: new THREE.Vector2(1, 1) }, dpr: { value: 1 } };   // shared by every outline and dot shader
+function regShade(obj, mat, clay, extra = {}) { const it = { obj, mat, clay, ...extra }; SHADE.items.push(it); applyShade(it); return it; }
+function applyShade(it) {
+  const solid = SHADE.mode === "solid";
+  if (it.clay) it.obj.material = solid ? it.clay : it.mat;
+  if (it.edges) { const s = solid ? it.edgeClay : it.edgeMat; it.edges.visible = !!s; if (s) { it.edges.material.color.setHex(s[0]); it.edges.material.opacity = s[1]; } }
+  if (it.hull) it.hull.visible = solid;
+}
+function setShading(mode) {
+  SHADE.mode = mode; const water = mode === "water", solid = mode === "solid";
+  const { scene, grid, clayGrid, shadowPlane, axes, specks } = three;
+  scene.background = new THREE.Color(water ? 0x05080c : solid ? CLAY.bg : 0x3d3d3d); scene.fog = water ? new THREE.Fog(0x05080c, 2.0, 5.5) : null;
+  grid.visible = !water && !solid; clayGrid.visible = solid; shadowPlane.visible = solid; specks.visible = water;
+  axes.forEach((a, i) => { a.visible = !water; a.material.color.setHex(solid ? [0xcf6a64, 0x86a956][i] : [0x9b3a3a, 0x5f8a2b][i]); });
+  three.matLights.forEach((l) => (l.visible = !solid)); three.clayLights.forEach((l) => (l.visible = solid)); three.clayKey.castShadow = solid;
+  $("#vp").style.background = water ? "var(--vp-water)" : solid ? "var(--vp-clay)" : "var(--vp-solid)"; $("#vp").dataset.shade = mode;
+  document.querySelectorAll("[data-shade]").forEach((b) => { if (!b.dataset.shade || b.id === "vp") return; const on = b.dataset.shade === mode; b.classList.toggle("on", on); b.setAttribute("aria-pressed", String(on)); });
+  SHADE.items.forEach(applyShade);
+  if (bubbles) bubbles.material.color.setHex(solid ? 0x7ea7c9 : 0xdbe9f5);
+}
+
+/* matte clay, lit by the Solid lights */
+function clayMat(hex, opacity = 1, side = THREE.FrontSide) {
+  const m = new THREE.MeshLambertMaterial({ color: new THREE.Color(hex).convertSRGBToLinear(), side });
+  if (opacity < 1) { m.transparent = true; m.opacity = opacity; m.depthWrite = false; }
+  return m;
+}
+/* outline of constant screen width: the back faces pushed out along their normals (an inverted hull) */
+function inkHull(hex, px, sign = 1, side = THREE.BackSide, after = false) {
+  const m = new THREE.MeshBasicMaterial({ color: hex, side });
+  m.userData.uW = { value: px }; m.userData.uS = { value: sign };
+  if (after) { m.transparent = true; m.depthWrite = false; }        // drawn after a see through body, so only the rim shows
+  m.onBeforeCompile = (sh) => {
+    sh.uniforms.uW = m.userData.uW; sh.uniforms.uS = m.userData.uS; sh.uniforms.uRes = INK.res; sh.uniforms.uDpr = INK.dpr;
+    sh.vertexShader = "uniform float uW; uniform float uS; uniform vec2 uRes; uniform float uDpr;\n" + sh.vertexShader.replace("#include <project_vertex>",
+      "#include <project_vertex>\n{ vec4 cn = projectionMatrix * vec4(normalize(normalMatrix * normal) * uS, 0.0); float l = length(cn.xy); if (l > 1e-6) gl_Position.xy += cn.xy / l * (2.0 * uW * uDpr / uRes) * gl_Position.w; }");
+  };
+  m.customProgramCacheKey = () => "inkhull";
+  return m;
+}
+function addHull(mesh, mat) { const h = new THREE.Mesh(mesh.geometry, mat); h.visible = false; h.renderOrder = mesh.renderOrder; h.raycast = () => {}; mesh.add(h); return h; }
+/* see through hull for Solid: nearly clear, a faint ink rim; on the belly, rings across the body that turn gel blue where it stretches */
+function clayShellMat(rings, base = 0.035, rim = 0.42) {
+  return new THREE.ShaderMaterial({
+    defines: rings ? { RINGS: "" } : {},
+    uniforms: { tint: { value: new THREE.Color(1, 1, 1) }, ink: { value: new THREE.Color(0x3a3f47) }, hi: { value: new THREE.Color(CLAY.path) }, base: { value: base }, rim: { value: rim }, gap: { value: 0.04 } },
+    vertexShader: `varying vec3 vN; varying vec3 vV; varying vec3 vP; varying float vS;
+#ifdef RINGS
+attribute vec3 rest;
+#endif
+void main(){ vP = position; vS = 0.0;
+#ifdef RINGS
+  vS = clamp(length(position - rest) / 0.03, 0.0, 1.0);
+#endif
+  vec4 mv = modelViewMatrix * vec4(position, 1.0); vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }`,
+    fragmentShader: `uniform vec3 tint; uniform vec3 ink; uniform vec3 hi; uniform float base; uniform float rim; uniform float gap;
+varying vec3 vN; varying vec3 vV; varying vec3 vP; varying float vS;
+void main(){ float f = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 3.0);
+  vec3 c = mix(vec3(0.975, 0.97, 0.955) * tint, ink, clamp(f * 1.3, 0.0, 1.0)); float a = base + rim * f;
+#ifdef RINGS
+  float q = vP.x / gap; float w = max(fwidth(q), 1e-4); float l = 1.0 - clamp(abs(fract(q - 0.5) - 0.5) / w, 0.0, 1.0);
+  float la = l * (0.09 + 0.6 * vS); c = mix(c, mix(ink, hi, vS), clamp(la / max(a + la, 1e-3), 0.0, 1.0)); a += la;
+  a += 0.06 * vS;
+#endif
+  gl_FragColor = vec4(c, clamp(a, 0.0, 1.0)); }`,
+    transparent: true, depthWrite: false, side: THREE.DoubleSide, extensions: { derivatives: true },
+  });
+}
+/* round screen sized dots: the toolpath, the fresh bead and the nozzle tip in Solid */
+function dotMat() {
+  return new THREE.ShaderMaterial({
+    uniforms: { uDpr: INK.dpr, ring: { value: new THREE.Color(CLAY.ink) } },
+    vertexShader: "attribute float size; attribute vec3 tone; uniform float uDpr; varying vec3 vC; varying float vR; void main(){ vC = tone; vR = size; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); gl_PointSize = size * uDpr; }",
+    fragmentShader: "uniform vec3 ring; varying vec3 vC; varying float vR; void main(){ vec2 c = gl_PointCoord * 2.0 - 1.0; float r = length(c); if (r > 1.0) discard; float e = 1.0 - 4.0 / max(vR, 1.0); vec3 col = (vR >= 9.0 && r > e) ? ring : vC; gl_FragColor = vec4(col, 1.0 - smoothstep(0.8, 1.0, r)); }",
+    transparent: true, depthTest: false, depthWrite: false,
+  });
+}
+function clayKind(nm, g, col) {
+  if (nm === "W_B0_Skin" || nm === "W_T1_TailShell") return "hull";
+  if (/^W_B0_Canal(Funnel|BellBands|Tube|TubeDash|SoftSleeve)$/.test(nm)) return "silicone";
+  if (col[3] < 0.2 || nm === "W_B0_MotherLid") return "clear";
+  if (g === "arm" || g === "tool") return "bought";
+  if (/(Magnets|TrayRods|LowRod|BoomTube|BoomTubeEnd)$/.test(nm)) return "metal";
+  if (col[3] < 0.98) return "semi";
+  return "printed";
+}
+const HULL_PART = inkHull(CLAY.ink, 1.0);
+
+/* fresnel shell material (reads like Blender's see-through shell with outline) */
+function shellMat(rgb, base, rim) {
+  return new THREE.ShaderMaterial({
+    uniforms: { col: { value: new THREE.Color(...rgb).convertSRGBToLinear() }, base: { value: base }, rim: { value: rim }, tint: { value: new THREE.Color(1, 1, 1) } },
+    vertexShader: "varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix*vec4(position,1.0); vN = normalize(normalMatrix*normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix*mv; }",
+    fragmentShader: "uniform vec3 col; uniform vec3 tint; uniform float base; uniform float rim; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0-abs(dot(normalize(vN), normalize(vV))), 2.2); vec3 c = mix(col*tint, vec3(0.93), f*0.8); gl_FragColor = vec4(pow(c, vec3(1.0/2.2)), base + rim*f); }",
+    transparent: true, depthWrite: false, side: THREE.DoubleSide,
+  });
+}
+function solidMat(rgba) {
+  const c = new THREE.Color(rgba[0], rgba[1], rgba[2]).convertSRGBToLinear();
+  const m = new THREE.MeshStandardMaterial({ color: c, roughness: 0.75, metalness: 0.0 });
+  if (rgba[3] < 0.98) { m.transparent = true; m.opacity = Math.max(0.18, rgba[3]); m.depthWrite = false; }
+  return m;
+}
+function addEdges(mesh, thresh = 32, op = 0.5) {
+  const e = new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry, thresh), new THREE.LineBasicMaterial({ color: 0x141414, transparent: true, opacity: op }));
+  mesh.add(e); return e;
+}
+
+/* ---------------- load the Blender export ---------------- */
+const parts = {};      // name -> mesh
+const groups = { skin: [], mother: [], tail: [], arm: [], tool: [], gel: [] };
+let skin = null, skinBase = null, gelMesh = null, tray = null, canal = null;
+async function loadScene() {
+  META = await (await fetch("scene.json")).json(); K = KIN.make(META);
+  const b64 = await (await fetch("scene_glb.txt")).text(); const bin = Uint8Array.from(atob(b64.trim()), (c) => c.charCodeAt(0));
+  const gltf = await new Promise((res, rej) => new THREE.GLTFLoader().parse(bin.buffer, "", res, rej));
+  const list = []; gltf.scene.traverse((o) => { if (o.isMesh) list.push(o); });
+  for (const o of list) {
+    const name = o.name.replace(/\.\d+$/, ""); const nm = META.groups[name] ? name : (o.parent && o.parent.name) || name;
+    const g = META.groups[nm]; if (!g) continue;
+    const col = META.colors[nm] || [0.6, 0.6, 0.62, 1];
+    o.removeFromParent(); o.position.set(0, 0, 0); o.rotation.set(0, 0, 0); o.scale.set(1, 1, 1);
+    o.geometry.computeVertexNormals();
+    if (nm === "W_B0_SkinInner") { parts[nm] = o; continue; }
+    let edges = null;
+    if (nm === "W_B0_Skin" || nm === "W_T1_TailShell") o.material = shellMat(col, 0.06, 0.62);
+    else { o.material = solidMat(col); if (col[3] > 0.9) edges = addEdges(o, 32, g === "arm" ? 0.35 : 0.5); }
+    o.renderOrder = col[3] < 0.98 ? 2 : 1;
+    if (g === "arm" || g === "tool") o.matrixAutoUpdate = false;
+    three.root.add(o); parts[nm] = o; groups[g].push(o);
+    // the Solid look of this part
+    const kind = clayKind(nm, g, col), ink = CLAY.ink;
+    const clay = kind === "hull" ? clayShellMat(nm === "W_B0_Skin") : kind === "clear" ? clayShellMat(false, 0.02, 0.3)
+      : kind === "silicone" ? clayMat(CLAY.silicone, 0.62, THREE.DoubleSide) : kind === "semi" ? clayMat(CLAY.printed, 0.85)
+      : clayMat(CLAY[kind]);
+    if (!edges && nm !== "W_B0_Skin") edges = addEdges(o, 32, 0);
+    const edgeClay = { printed: [ink, 0.55], bought: [ink, 0.42], metal: [ink, 0.5], semi: [ink, 0.45], silicone: [ink, 0.3], clear: [ink, 0.2], hull: [ink, 0.14] }[kind];
+    const solidPart = kind === "printed" || kind === "bought" || kind === "metal";
+    o.castShadow = solidPart || kind === "semi" || kind === "silicone";
+    regShade(o, o.material, clay, { edges, edgeMat: col[3] > 0.9 && kind !== "hull" ? [0x141414, g === "arm" ? 0.35 : 0.5] : null, edgeClay, hull: solidPart ? addHull(o, HULL_PART) : null });
+  }
+  skin = parts["W_B0_Skin"]; skinBase = skin.geometry.attributes.position.array.slice();
+  // the belly at rest (folded, no breath): the Solid rings measure the stretch from here
+  deformBelly(0, 0); skin.geometry.setAttribute("rest", new THREE.BufferAttribute(skin.geometry.attributes.position.array.slice(), 3));
+  // gel: the inner skin with everything above the gel surface flattened onto it
+  const gi = parts["W_B0_SkinInner"].geometry.clone(), p = gi.attributes.position.array;
+  for (let i = 0; i < p.length; i += 3) { p[i] *= 0.985; p[i + 1] *= 0.985; p[i + 2] = Math.min(p[i + 2], META.gelZ) * 0.99; }
+  gi.computeVertexNormals();
+  gelMesh = new THREE.Mesh(gi, new THREE.MeshStandardMaterial({ color: new THREE.Color(0x9fcdf0).convertSRGBToLinear(), transparent: true, opacity: 0.22, roughness: 0.2, depthWrite: false, side: THREE.DoubleSide }));
+  gelMesh.renderOrder = 3; three.root.add(gelMesh); groups.gel.push(gelMesh);
+  regShade(gelMesh, gelMesh.material, clayMat(CLAY.gel, 0.3, THREE.DoubleSide));
+  // tray (where the core waits) and the canal throat, measured from the meshes
+  parts["W_T1_TrayCups"].geometry.computeBoundingBox(); const tb = parts["W_T1_TrayCups"].geometry.boundingBox;
+  tray = [(tb.min.x + tb.max.x) / 2, (tb.min.y + tb.max.y) / 2, tb.max.z + 0.004];
+  const C = META.canalC, Nn = META.canalN, cp = parts["W_B0_CanalTube"].geometry.attributes.position.array; const rs = [], ax = [];
+  for (let i = 0; i < cp.length; i += 3) { const d = [cp[i] - C[0], cp[i + 1] - C[1], cp[i + 2] - C[2]]; const s = d[0] * Nn[0] + d[1] * Nn[1] + d[2] * Nn[2]; const q = [d[0] - s * Nn[0], d[1] - s * Nn[1], d[2] - s * Nn[2]]; rs.push(Math.hypot(...q)); ax.push(s); }
+  rs.sort((a, b) => a - b); ax.sort((a, b) => a - b);
+  canal = { C, N: Nn, rt: clamp(rs[Math.floor(rs.length * 0.35)], 0.045, 0.12), s0: ax[0], s1: ax[ax.length - 1] };
+  buildCore(); poseArm([META.pose.yaw * D2R, META.pose.a * D2R, META.pose.b * D2R]);
+  armQ = [META.pose.yaw * D2R, META.pose.a * D2R, META.pose.b * D2R]; homeQ = armQ.slice();
+  tipPos = K.tip(...armQ);
+  buildBubbles(); buildRelLines(); buildLayerLine();
+}
+
+/* ---------------- arm posing ---------------- */
+let armQ = [0, 0, 0], homeQ = [0, 0, 0], tipPos = [0, 0, 0];
+const M4 = () => new THREE.Matrix4();
+const Tm = (v) => M4().makeTranslation(v[0], v[1], v[2]);
+const Rx = (a) => M4().makeRotationX(a), Rz = (a) => M4().makeRotationZ(a);
+const about = (p, a) => Tm(p).multiply(Rx(a)).multiply(Tm([-p[0], -p[1], -p[2]]));
+function poseArm(q) {
+  const [yaw, a, b] = q, S = META.PV_S, E = META.PV_E, W = META.PV_W;
+  const rxv = (v, t) => [v[0], Math.cos(t) * v[1] - Math.sin(t) * v[2], Math.sin(t) * v[1] + Math.cos(t) * v[2]];
+  const E2 = [0, 1, 2].map((i) => S[i] + rxv([E[0] - S[0], E[1] - S[1], E[2] - S[2]], a)[i]);
+  const W2 = [0, 1, 2].map((i) => E2[i] + rxv([W[0] - E[0], W[1] - E[1], W[2] - E[2]], b)[i]);
+  const L1 = [0, 1, 2].map((i) => META.PV_O1[i] - (E[i] - S[i]));
+  const dE = [E2[0] - E[0], E2[1] - E[1], E2[2] - E[2]];
+  const mats = { B_Fix: M4(), B_Rot: M4(), In_1: about(S, a), Join: Tm(dE), In_2: Tm(dE).multiply(about(E, b)), EE: Tm([W2[0] - W[0], W2[1] - W[1], W2[2] - W[2]]), Out_1: about(L1, a), Out_2: Tm(dE).multiply(about(META.PV_O2, b)) };
+  const R = new THREE.Matrix4(); const r = META.armRoot; R.set(...r[0], ...r[1], ...r[2], ...r[3]);
+  const base = R.clone().multiply(Rz(Math.PI / 2));
+  for (const n in mats) { const o = parts["A_" + n]; if (!o) continue; o.matrix.copy(n === "B_Fix" ? base : base.clone().multiply(Rz(yaw)).multiply(mats[n])); o.matrixWorldNeedsUpdate = true; }
+  const ee = base.clone().multiply(Rz(yaw)).multiply(mats.EE);
+  for (const o of groups.tool) { o.matrix.copy(ee); o.matrixWorldNeedsUpdate = true; }
+  three.eeMatrix = ee;
+}
+
+/* ---------------- belly ---------------- */
+let bellyNow = 0;
+function deformBelly(b, t) {
+  const p = skin.geometry.attributes.position.array, P0 = skinBase; const Z0 = -0.06;
+  let zt = -1, x0 = 9, x1 = -9; for (let i = 0; i < P0.length; i += 3) { zt = Math.max(zt, P0[i + 2]); x0 = Math.min(x0, P0[i]); x1 = Math.max(x1, P0[i]); }
+  const breath = 0.012 * Math.sin(t * 1.4);
+  const bb = clamp(b + breath, -0.05, 1.05), s = 0.88 + 0.20 * bb, A = 0.016 * (1 - clamp(bb, 0, 1));
+  for (let i = 0; i < P0.length; i += 3) {
+    const x = P0[i], z = P0[i + 2]; p[i] = x; p[i + 1] = P0[i + 1];
+    if (z <= Z0) { p[i + 2] = z; continue; }
+    const h = (z - Z0) / (zt - Z0);
+    let ex = clamp((x - x0 - 0.03) / 0.20, 0, 1) * clamp((x1 - 0.13 - x) / 0.14, 0, 1); ex = ex * ex * (3 - 2 * ex);
+    const ph = ((x / 0.058) % 1 + 1) % 1, tri = 1 - 4 * Math.abs(ph - 0.5);
+    p[i + 2] = Z0 + (z - Z0) * (1 + (s - 1) * ex) - A * ex * Math.pow(h, 1.5) * (0.5 + 0.5 * tri);
+  }
+  skin.geometry.attributes.position.needsUpdate = true; skin.geometry.computeVertexNormals();
+}
+
+/* ---------------- core (battery, pump, chip) ---------------- */
+let core = null;
+function buildCore() {
+  core = new THREE.Group(); core.name = 'core';
+  const dark = new THREE.MeshStandardMaterial({ color: 0x2c2f33, roughness: 0.6 }), mid = new THREE.MeshStandardMaterial({ color: 0x5a5e66, roughness: 0.5 }), cu = new THREE.MeshStandardMaterial({ color: 0xb87d4b, roughness: 0.5 });
+  const bat = new THREE.Mesh(new THREE.BoxGeometry(0.034, 0.022, 0.012), dark);
+  const pump = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.026, 16), mid); pump.rotation.z = Math.PI / 2; pump.position.set(0, 0, 0.012);
+  const chip = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.018, 0.002), cu); chip.position.set(0, 0, -0.008);
+  core.add(bat, pump, chip);
+  // bought parts: a little grey in Solid, with outlines
+  for (const [m, matM, hex] of [[bat, dark, 0xb9bab6], [pump, mid, 0xcfd0cc], [chip, cu, 0xd9c4a6]]) {
+    m.castShadow = true; const e = m === chip ? null : addEdges(m, 30, 0.6);
+    regShade(m, matM, clayMat(hex), { edges: e, edgeMat: e ? [0x141414, 0.6] : null, edgeClay: e ? [CLAY.ink, 0.7] : null, hull: addHull(m, HULL_PART) });
+  }
+  three.root.add(core);
+}
+function coreInTray() { if (core.parent !== three.root) buildCore(); core.position.set(tray[0], tray[1], tray[2] + 0.008); core.rotation.set(0, 0, 0); core.visible = true; }
+
+/* ---------------- baby body ---------------- */
+const NU = 46, NV = 40;
+function makeBabyMesh(spec) {
+  const geo = new THREE.BufferGeometry(); const pos = new Float32Array(NU * NV * 3); const idx = [];
+  for (let i = 0; i < NU - 1; i++) for (let j = 0; j < NV; j++) { const a = i * NV + j, b = i * NV + ((j + 1) % NV), c = (i + 1) * NV + j, d = (i + 1) * NV + ((j + 1) % NV); idx.push(a, c, b, b, c, d); }
+  geo.setAttribute("position", new THREE.BufferAttribute(pos, 3)); geo.setIndex(idx);
+  const col = colorOf(spec);
+  const mat = new THREE.MeshStandardMaterial({ color: col.clone().convertSRGBToLinear(), roughness: 0.55, transparent: true, opacity: 0.82, side: THREE.DoubleSide, emissive: 0x000000 });
+  const mesh = new THREE.Mesh(geo, mat); mesh.renderOrder = 4;
+  const ringMat = new THREE.MeshStandardMaterial({ color: col.clone().offsetHSL(0, 0.05, -0.22).convertSRGBToLinear(), roughness: 0.5 });
+  // Solid: printed silicone, warm and a little see through; the rings keep a pale hint of the baby's colour
+  const smat = new THREE.MeshLambertMaterial({ color: new THREE.Color(CLAY.silicone).lerp(col, 0.1).convertSRGBToLinear(), transparent: true, opacity: 0.9, side: THREE.DoubleSide });
+  const sringMat = clayMat(new THREE.Color().setHSL(spec.hue, 0.4, 0.64).getHex());
+  const hullMat = inkHull(CLAY.ink, 1.3, -1, THREE.FrontSide, true);     // the body's normals face inward
+  const ringHullMat = inkHull(CLAY.ink, 1.0);
+  for (const m of [mat, ringMat, smat, sringMat]) m.clipShadows = true;
+  const hull = addHull(mesh, hullMat); hull.renderOrder = 5;
+  const rings = [];
+  for (let k = 0; k < spec.rings; k++) { const ring = new THREE.Mesh(new THREE.TorusGeometry(1, 0.07, 8, 40), ringMat); ring.rotation.y = Math.PI / 2; ring.userData.u = spec.rings === 1 ? 0.04 : 0.04 + 0.92 * k / (spec.rings - 1); mesh.add(ring); rings.push(ring);
+    ring.castShadow = true; regShade(ring, ringMat, sringMat, { hull: addHull(ring, ringHullMat) }); }
+  mesh.castShadow = true; regShade(mesh, mat, smat, { hull });
+  return { mesh, rings, mat, ringMat, smat, sringMat, hullMat, ringHullMat };
+}
+// radius at axial u (0 tail .. 1 head), for inflation f (0 printed folded .. 1 full)
+function shapeBaby(b, f, time) {
+  const s = b.spec, pos = b.mesh.geometry.attributes.position.array;
+  const Lfull = s.L, Lf = s.L * 0.42, L = lerp(Lf, Lfull, f), R = s.R * lerp(0.78, 1, f);
+  const folds = s.ribs + 7, gait = b.free ? s.gait : -1, w = 2 * Math.PI * s.hz;
+  for (let i = 0; i < NU; i++) {
+    const u = i / (NU - 1); const x = (u - 0.5) * L;
+    const prof = Math.pow(Math.sin(Math.PI * clamp(u, 0.001, 0.999)), 0.55) * (1 + 0.35 * (Math.exp(-((u - s.bulge) ** 2) / 0.05) - 0.4));
+    const ribs = 1 + (s.ribs ? 0.07 * Math.cos(2 * Math.PI * s.ribs * u) : 0);
+    const pleat = 1 - (1 - f) * 0.20 * Math.abs(((u * folds) % 1) * 2 - 1);
+    let r = R * prof * lerp(1, ribs, f) * pleat;
+    let off = 0, sc = 1;
+    if (gait === 0) off = 0.018 * Math.sin(2.4 * Math.PI * u - w * time) * u;
+    if (gait === 1) sc = 1 + 0.10 * Math.sin(w * time - 3 * u) * Math.sin(Math.PI * u);
+    for (let j = 0; j < NV; j++) {
+      const th = 2 * Math.PI * j / NV + (gait === 2 ? w * time * 0.5 : 0);
+      const k = 3 * (i * NV + j);
+      pos[k] = x; pos[k + 1] = r * sc * Math.cos(th) + off; pos[k + 2] = r * sc * s.flat * Math.sin(th);
+    }
+  }
+  for (const ring of b.rings) { const u = ring.userData.u; const prof = Math.pow(Math.sin(Math.PI * clamp(u, 0.001, 0.999)), 0.55); const rr = Math.max(0.012, R * prof * 1.02); ring.position.set((u - 0.5) * L, 0, 0); ring.scale.set(rr, rr, rr * s.flat); }
+  b.L = L; b.R = R; b.mesh.geometry.attributes.position.needsUpdate = true; b.mesh.geometry.computeVertexNormals();
+}
+function squeezeBaby(b) {     // narrow the soft body where it passes the canal throat (world space)
+  const pos = b.mesh.geometry.attributes.position.array; b.mesh.updateMatrixWorld(true);
+  const toW = new THREE.Matrix4().copy(three.root.matrixWorld).invert().multiply(b.mesh.matrixWorld), toL = toW.clone().invert();
+  const C = canal.C, N = canal.N, v = new THREE.Vector3(); let pinched = 0;
+  for (let k = 0; k < pos.length; k += 3) {
+    v.set(pos[k], pos[k + 1], pos[k + 2]).applyMatrix4(toW);
+    const d = [v.x - C[0], v.y - C[1], v.z - C[2]], s = d[0] * N[0] + d[1] * N[1] + d[2] * N[2];
+    const zone = ss(canal.s0 - 0.07, canal.s0 + 0.02, s) * (1 - ss(canal.s1 - 0.02, canal.s1 + 0.07, s)); if (zone <= 0) continue;
+    const q = [d[0] - s * N[0], d[1] - s * N[1], d[2] - s * N[2]], r = Math.hypot(...q); const lim = lerp(9, canal.rt * 0.92, zone);
+    if (r > lim) { const f = lim / r; v.set(C[0] + s * N[0] + q[0] * f, C[1] + s * N[1] + q[1] * f, C[2] + s * N[2] + q[2] * f).applyMatrix4(toL); pos[k] = v.x; pos[k + 1] = v.y; pos[k + 2] = v.z; pinched++; }
+  }
+  return pinched;
+}
+
+/* ---------------- G-code ---------------- */
+function toArm(p) { const r = META.armRoot; const x = p[0] - r[0][3], y = p[1] - r[1][3], z = p[2] - r[2][3]; return [-y * 1000, x * 1000, z * 1000]; }
+const f1 = (x) => x.toFixed(1);
+function writeGcode(b) {
+  const s = b.spec, out = [], moves = [];
+  const cx = (META.printMin[0] + META.printMax[0]) / 2, cy = (META.printMin[1] + META.printMax[1]) / 2, z0 = -0.238;
+  const Lf = s.L * 0.42, layerH = 0.0026, nL = Math.max(12, Math.round(Lf / layerH)), npt = 48;
+  const folds = s.ribs + 7; let E = 0;
+  const push = (text, p, e, kind) => { out.push(text); moves.push(p ? { p, e: e || 0, kind } : { kind, text }); };
+  const head = (t) => push(t, null, 0, "note");
+  head(`; Born, Not Made  mother ${mother.name}  baby ${b.name}`);
+  head(`; generated from memory (${mother.memory.length} traces), signal and drift; arm frame, mm`);
+  head(`; body printed folded: height ${f1(Lf * 1000)} mm, radius ${f1(s.R * 0.78 * 1000)} mm, ${folds} pleats, ${s.rings} rings`);
+  head("G21 ; millimetres"); head("G90 ; absolute positions"); head("M83 ; relative extrusion");
+  const above = [cx, cy, META.gelZ + 0.03];
+  push(`G0 X${f1(toArm(above)[0])} Y${f1(toArm(above)[1])} Z${f1(toArm(above)[2])} F3000 ; above the gel`, above, 0, "travel");
+  let coreDone = false;
+  for (let l = 0; l < nL; l++) {
+    const u = (l + 0.5) / nL, z = z0 + l * layerH;
+    const prof = Math.pow(Math.sin(Math.PI * clamp(u, 0.02, 0.98)), 0.55) * (1 + 0.35 * (Math.exp(-((u - s.bulge) ** 2) / 0.05) - 0.4));
+    const pleat = 1 - 0.20 * Math.abs(((u * folds) % 1) * 2 - 1);
+    const r = Math.max(0.01, s.R * 0.78 * prof * pleat);
+    head(`; layer ${l + 1}/${nL}  z ${f1(toArm([0, 0, z])[2])}  r ${f1(r * 1000)}`);
+    const seam = l * 0.37;
+    for (let k = 0; k <= npt; k++) {
+      const th = seam + 2 * Math.PI * k / npt, p = [cx - r * s.flat * Math.sin(th), cy + r * Math.cos(th), z], a = toArm(p);
+      if (k === 0) { push(`G0 X${f1(a[0])} Y${f1(a[1])} Z${f1(a[2])} F2400`, p, 0, "travel"); continue; }
+      const seg = 2 * Math.PI * r / npt * 1000, e = seg * 0.045; E += e;
+      push(`G1 X${f1(a[0])} Y${f1(a[1])} E${e.toFixed(3)} F900`, p, e, "print");
+    }
+    if (!coreDone && u > 0.5) {
+      coreDone = true; const up = [cx, cy, META.gelZ + 0.035], tr = [tray[0], tray[1], tray[2] + 0.03], tl = [tray[0], tray[1], tray[2] + 0.012], cen = [cx, cy, z - 0.004];
+      head("; core: battery, pump and chip, from the tray into the body");
+      for (const [p, c] of [[up, "out of the gel"], [tr, "over the tray"], [tl, "down to the core"]]) { const a = toArm(p); push(`G0 X${f1(a[0])} Y${f1(a[1])} Z${f1(a[2])} F3000 ; ${c}`, p, 0, "travel"); }
+      push("M400", null, 0, "note"); push("G4 P700 ; close the gripper on the core", null, 0, "grip");
+      for (const [p, c] of [[tr, "lift"], [up, "over the body"], [cen, "into the body"]]) { const a = toArm(p); push(`G0 X${f1(a[0])} Y${f1(a[1])} Z${f1(a[2])} F1800 ; ${c}`, p, 0, "travel"); }
+      push("G4 P700 ; open the gripper, core stays", null, 0, "release");
+      head("; resume printing over the core");
+    }
+  }
+  const out1 = [cx, cy, META.gelZ + 0.05]; const a = toArm(out1);
+  push(`G0 X${f1(a[0])} Y${f1(a[1])} Z${f1(a[2])} F3000 ; out of the gel`, out1, 0, "travel");
+  head(`; print done: ${nL} layers, extruded ${E.toFixed(0)} mm of paste`);
+  head(`; breathe: fill about ${(Math.PI * s.R * s.R * s.flat * s.L * 0.55 * 1000).toFixed(2)} L through the stern valve; the belly opens`);
+  head("; push: three contractions through the canal; the gel stays");
+  head("M84 ; arm at rest");
+  let total = 0, prev = null; for (const m of moves) { if (!m.p) continue; if (prev) total += Math.hypot(m.p[0] - prev[0], m.p[1] - prev[1], m.p[2] - prev[2]) / (m.kind === 'travel' ? 2.2 : 1); prev = m.p; }
+  return { lines: out, moves, layers: nL, extruded: E, total };
+}
+
+/* ---------------- bubbles, relation lines, current layer ---------------- */
+let bubbles = null, relLines = null, layerLine = null, layerPts = [];
+function buildBubbles() {
+  const n = 120, p = new Float32Array(n * 3).fill(99);
+  bubbles = new THREE.Points(new THREE.BufferGeometry().setAttribute("position", new THREE.BufferAttribute(p, 3)), new THREE.PointsMaterial({ color: SHADE.mode === "solid" ? 0x7ea7c9 : 0xdbe9f5, size: 0.007, transparent: true, opacity: 0.8 }));
+  bubbles.userData = { life: new Float32Array(n).fill(0), i: 0 }; three.root.add(bubbles);
+}
+function emitBubble(at, spread) {
+  const u = bubbles.userData, p = bubbles.geometry.attributes.position.array, i = u.i++ % u.life.length;
+  p[3 * i] = at[0] + (Math.random() - 0.5) * spread; p[3 * i + 1] = at[1] + (Math.random() - 0.5) * spread; p[3 * i + 2] = at[2]; u.life[i] = 3;
+}
+function stepBubbles(dt) {
+  const u = bubbles.userData, p = bubbles.geometry.attributes.position.array;
+  for (let i = 0; i < u.life.length; i++) { if (u.life[i] <= 0) { p[3 * i + 2] = 99; continue; } u.life[i] -= dt; p[3 * i + 2] += dt * 0.16; p[3 * i] += Math.sin(i + u.life[i] * 3) * dt * 0.01; }
+  bubbles.geometry.attributes.position.needsUpdate = true;
+}
+function buildRelLines() {
+  const n = 120; const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(n * 6), 3)); g.setAttribute("color", new THREE.BufferAttribute(new Float32Array(n * 6), 3));
+  relLines = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.9 }));
+  relLines.frustumCulled = false; three.root.add(relLines);
+}
+function buildLayerLine() {
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(200 * 3), 3)); g.setDrawRange(0, 0);
+  layerLine = new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0xffffff })); layerLine.frustumCulled = false; three.root.add(layerLine);
+  const tipDot = new THREE.Mesh(new THREE.SphereGeometry(0.004, 12, 8), new THREE.MeshBasicMaterial({ color: 0xffd27a })); three.root.add(tipDot); three.tipDot = tipDot;
+  // Solid: the toolpath as a gel blue line of round dots, the fresh bead in orange, the nozzle tip as a ringed dot
+  const n = 2400, dg = new THREE.BufferGeometry();
+  dg.setAttribute("position", new THREE.BufferAttribute(new Float32Array(n * 3), 3)); dg.setAttribute("tone", new THREE.BufferAttribute(new Float32Array(n * 3), 3)); dg.setAttribute("size", new THREE.BufferAttribute(new Float32Array(n), 1)); dg.setDrawRange(0, 0);
+  pathDots = new THREE.Points(dg, dotMat()); pathDots.frustumCulled = false; pathDots.renderOrder = 9; three.root.add(pathDots);
+  const tg = new THREE.BufferGeometry(); tg.setAttribute("position", new THREE.BufferAttribute(new Float32Array(3), 3)); tg.setAttribute("tone", new THREE.BufferAttribute(new Float32Array(new THREE.Color(0xffb02e).toArray()), 3)); tg.setAttribute("size", new THREE.BufferAttribute(new Float32Array([13]), 1));
+  tipMark = new THREE.Points(tg, dotMat()); tipMark.frustumCulled = false; tipMark.renderOrder = 10; tipMark.visible = false; three.root.add(tipMark);
+}
+let pathDots = null, tipMark = null;
+const C_PATH = new THREE.Color(CLAY.path), C_BEAD = new THREE.Color(CLAY.bead), C_TMP = new THREE.Color();
+function updatePathDots(show, tp) {
+  const g = pathDots.geometry; tipMark.visible = show;
+  if (!show) { g.setDrawRange(0, 0); return; }
+  tipMark.geometry.attributes.position.array.set(tp); tipMark.geometry.attributes.position.needsUpdate = true;
+  const pts = layerPts.length ? layerPts.concat([tp]) : [];
+  if (pts.length < 2) { g.setDrawRange(0, 0); return; }
+  const P = g.attributes.position.array, T = g.attributes.tone.array, S = g.attributes.size.array, max = S.length;
+  let total = 0; for (let i = 1; i < pts.length; i++) total += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1], pts[i][2] - pts[i - 1][2]);
+  const camD = three.camera.position.distanceTo(new THREE.Vector3(tp[0], tp[2], -tp[1]));
+  const step = Math.max(clamp(camD * 0.0009, 0.0003, 0.004), total / (max - 4)), BEAD = 0.028;
+  let s = 0, next = 0, n = 0;
+  for (let i = 1; i < pts.length && n < max; i++) {
+    const a = pts[i - 1], b = pts[i], L = Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]);
+    while (next < s + L && n < max) {
+      const t = L > 0 ? (next - s) / L : 0, k = clamp(1 - (total - next) / BEAD, 0, 1);
+      P[3 * n] = a[0] + (b[0] - a[0]) * t; P[3 * n + 1] = a[1] + (b[1] - a[1]) * t; P[3 * n + 2] = a[2] + (b[2] - a[2]) * t;
+      C_TMP.copy(C_PATH).lerp(C_BEAD, k); T[3 * n] = C_TMP.r; T[3 * n + 1] = C_TMP.g; T[3 * n + 2] = C_TMP.b;
+      S[n] = 3 + 4 * k * k; n++; next += step;
+    }
+    s += L;
+  }
+  g.setDrawRange(0, n); for (const k of ["position", "tone", "size"]) g.attributes[k].needsUpdate = true;
+}
+
+/* ---------------- robots ---------------- */
+function newBaby(genome, memory, name, parts_) {
+  const spec = bodySpec(genome); const { mesh, rings, mat, ringMat, smat, sringMat, hullMat, ringHullMat } = makeBabyMesh(spec);
+  const b = { id: "b" + (++babyCount), name, genome, parts: parts_, memory, spec, mesh, rings, mat, ringMat, smat, sringMat, hullMat, ringHullMat, free: false, near: {}, pos: new THREE.Vector3(), vel: new THREE.Vector3(), age: 0, gen: mother.gen + 1, motherName: mother.name };
+  three.root.add(mesh); robots.push(b); return b;
+}
+function setClip(b, on) { for (const m of [b.mat, b.ringMat, b.smat, b.sringMat, b.hullMat, b.ringHullMat]) { m.clippingPlanes = on ? [clipPlane] : []; m.needsUpdate = true; } }
+function placeFree(b, at, dir) { b.free = true; b.pos.set(...at); b.vel.set(...dir).multiplyScalar(0.08); setClip(b, false); shapeBaby(b, 1, 0); }
+
+/* ---------------- birth pipeline ---------------- */
+async function readSignal(text, useAgent) {
+  const mem = mother.memory.map((m) => `- ${m.text} (${m.w.toFixed(2)})`).join("\n");
+  const local = () => {
+    const v = vecFromText(text, NG); const words = text.toLowerCase().replace(/[^a-z0-9\s']/g, " ").split(/\s+/).filter(Boolean);
+    return { heard: words.slice(0, 8).join(" "), reading: "The signal arrives as a change of pressure in the water.", trace: words.slice(0, 4).join(" ") || "a quiet signal",
+      say: "Pressure felt in the water. Something will form.", bias: Object.fromEntries(GENES.map(([k], i) => [k, v[i]])), by: "local" };
+  };
+  if (!useAgent || !sampleApi) return local();
+  try {
+    const prompt = `You are the reading layer of a mother robot in an art installation called Born, Not Made. The mother prints soft baby robots inside the mother's body, in gel, and gives birth in water. A person sent the mother a signal. The mother does not obey the signal and does not design from the signal: the mother reads the signal against the mother's memory, and the signal shifts what the mother generates. Robots here have relations with each other, nothing more; never describe looking after, helping or serving. Never use a pronoun for the mother or a baby (no I, me, my, she, her, he, his, it or its); repeat the noun instead: the mother, the mother robot, the baby.
+Mother memory (trace, weight 0 to 1):
+${mem}
+Signal: "${text.slice(0, 400)}"
+Return only JSON with these keys:
+{"heard": "the signal in at most 8 words", "reading": "one plain sentence on what the mother takes from the signal, in the mother's own terms (water, pressure, light, rhythm, distance)", "trace": "a memory trace to keep, 2 to 5 words", "say": "one short sentence the mother says aloud, made of images, with no pronoun for the mother or a baby", "bias": {"length":0..1,"girth":0..1,"rings":0..1,"ribs":0..1,"flat":0..1,"bulge":0..1,"hue":0..1,"motion":0..1,"tempo":0..1}}
+The bias values are tendencies for the body (hue 0 red, 0.33 green, 0.6 blue; motion 0 undulate, 0.5 pulse, 1 roll), not a design.`;
+    const j = await sampleApi.json(prompt, { modelTier: "quick", cache: false });
+    if (!j || typeof j !== "object" || !j.bias) throw new Error("no json");
+    return { heard: String(j.heard || text).slice(0, 80), reading: String(j.reading || "").slice(0, 220), trace: String(j.trace || "a signal").slice(0, 48), say: String(j.say || "").slice(0, 200), bias: j.bias, by: "Claude" };
+  } catch (e) {
+    log("reading agent unavailable (" + (e.code || e.message || "error") + "), using the local reader", "w");
+    if (e.code === "not_granted") { sampleApi = null; setAgentChip(); }
+    return local();
+  }
+}
+async function startBirth(text, opts = {}) {
+  if (job && job.stage !== "born") { log("the mother is still busy with " + job.baby?.name + "; wait for the birth", "w"); return; }
+  if (!text.trim()) return;
+  job = { stage: "reading", t: 0, text, example: !!opts.example }; setStage("reading");
+  log(`signal${opts.example ? " (example)" : ""}: "${text}"`, "a");
+  const rd = await readSignal(text, !opts.example);
+  job.reading = rd; log(`read by ${rd.by}: ${rd.reading}`);
+  if (rd.say) { log(`mother: ${rd.say}`, "a"); speak(rd.say); }
+  mother.memory.unshift({ text: rd.trace, w: 0.9, src: "signal" });
+  mother.memory = mother.memory.slice(0, 9); mother.memory.forEach((m, i) => i && (m.w = +(m.w * 0.94).toFixed(2)));
+  const seed = hash(text + Date.now());
+  const mix = mixGenome(mother.genome, memoryVector(mother.memory), biasVector(rd.bias), seed);
+  const name = "B" + String(babyCount + 1).padStart(2, "0");
+  const memory = inheritMemory(mother.memory, seed ^ 0x9e37, `first water after ${2 + (seed % 3)} pushes`);
+  const b = newBaby(mix.g, memory, name, mix.parts); b.signal = rd; setClip(b, true);
+  b.mesh.visible = false; job.baby = b; selected = b.id;
+  setStage("generating"); renderAll();
+  log(`genome for ${name}: ${GENES.map(([k, l, f], i) => l + " " + f(mix.g[i])).slice(0, 4).join(", ")}, ...`);
+}
+const clipPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0);
+function setStage(s) {
+  if (job) { job.stage = s; job.t = 0; }
+  $("#ovStage").textContent = ({ reading: "reading the signal", generating: "generating the body from memory", gcode: "writing G-code", printing: "printing in the gel", inflating: "the baby breathes, the belly opens", pushing: "contraction, pushing through the canal", born: "born; relations forming" })[s] || "idle";
+  $("#tlLbl").textContent = s; renderTimeline();
+}
+
+function stepJob(dt, time) {
+  if (!job) return; job.t += dt; const b = job.baby;
+  if (job.stage === "generating" && job.t > 1.6) {
+    const gc = writeGcode(b); job.gc = gc; job.gi = 0; job.shown = 0; $("#gcName").textContent = b.name.toLowerCase() + ".gcode";
+    log(`G-code: ${gc.lines.length} lines, ${gc.layers} layers`); setStage("gcode");
+  } else if (job.stage === "gcode") {
+    job.shown = Math.min(job.gc.lines.length, Math.floor(job.t * 900)); renderCode(job.shown, -1);
+    if (job.shown >= job.gc.lines.length) { coreInTray(); b.mesh.visible = true; positionPrinting(b); setStage("printing"); log("printing in the gel"); job.coreState = "tray"; }
+  } else if (job.stage === "printing") runGcode(dt, b);
+  else if (job.stage === "inflating") {
+    const f = ss(0, 6, job.t); shapeBaby(b, f, time); b.inflate = f; b.mesh.geometry.attributes.position.needsUpdate = true;
+    b.mesh.quaternion.slerpQuaternions(job.printQ, new THREE.Quaternion(), ss(0, 2.5, job.t));
+    b.mesh.position.z = lerp(b.printZ, META.gelZ - 0.015, ss(0.5, 6, job.t)); bellyNow = f;
+    if (Math.random() < dt * 30) emitBubble([-0.25, 0, 0.27], 0.06);
+    if (Math.random() < dt * 14) emitBubble([b.mesh.position.x, b.mesh.position.y, META.gelZ], 0.05);
+    moveArmToward(homeQ, dt);
+    if (job.t > 6.3) { setStage("pushing"); job.from = b.mesh.position.clone(); job.fromQ = b.mesh.quaternion.clone(); log("contractions: the folds spring back and push"); }
+  } else if (job.stage === "pushing") {
+    const C = canal.C, N = canal.N; const qTo = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(1, 0, 0), new THREE.Vector3(...N));
+    const turn = ss(0, 1.6, job.t); b.mesh.quaternion.slerpQuaternions(job.fromQ, qTo, turn);
+    const sEnt = canal.s0 - b.L * 0.5 - 0.02, sOut = canal.s1 + b.L * 0.6 + 0.05;
+    const entry = new THREE.Vector3(C[0] + sEnt * N[0], C[1] + sEnt * N[1], C[2] + sEnt * N[2]);
+    const k = job.t - 1.6, push = (ss(0, 1.6, k) + ss(2.4, 4.0, k) + ss(4.8, 6.4, k)) / 3;
+    const sNow = lerp(sEnt, sOut, push);
+    const pos = job.t < 1.6 ? job.from.clone().lerp(entry, turn) : new THREE.Vector3(C[0] + sNow * N[0], C[1] + sNow * N[1], C[2] + sNow * N[2]);
+    b.mesh.position.copy(pos); shapeBaby(b, 1, time); const pin = squeezeBaby(b); b.mesh.geometry.attributes.position.needsUpdate = true;
+    const contr = [0, 1.6, 2.4, 4.0, 4.8, 6.4]; let c = 0; for (let i = 0; i < 3; i++) c += ss(contr[2 * i] - 0.6, contr[2 * i], k) * (1 - ss(contr[2 * i + 1], contr[2 * i + 1] + 0.6, k));
+    bellyNow = clamp(1 - 0.75 * push - 0.12 * c, 0.2, 1);
+    if (pin && Math.random() < dt * 4) log("canal stretched around the body");
+    if (job.t > 8.4) {
+      placeFree(b, [pos.x, pos.y, pos.z], N); b.age = 0;
+      const rel = relationOf({ memory: mother.memory, genome: mother.genome, near: {} }, b);
+      log(`${b.name} is born. Relation with ${mother.name}: ${rel.r.toFixed(2)} (memory ${rel.mem.toFixed(2)}, body ${rel.body.toFixed(2)})`, "a");
+      setStage("born"); renderAll();
+    }
+  } else if (job.stage === "born") { bellyNow = Math.max(0, bellyNow - dt * 0.25); moveArmToward(homeQ, dt); }
+}
+function positionPrinting(b) {
+  const cx = (META.printMin[0] + META.printMax[0]) / 2, cy = (META.printMin[1] + META.printMax[1]) / 2;
+  shapeBaby(b, 0, 0); b.mesh.quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI / 2);
+  b.printZ = -0.238 + b.L / 2 - 0.0013; b.mesh.position.set(cx, cy, b.printZ); b.inflate = 0;
+}
+function moveArmToward(q, dt) { const k = 1 - Math.exp(-dt * 2.5); armQ = armQ.map((x, i) => lerp(x, q[i], k)); poseArm(armQ); tipPos = K.tip(...armQ); }
+let waitT = 0;
+function runGcode(dt, b) {
+  const gc = job.gc; let budget = dt * gc.total / 24;        // nozzle travel this frame: the whole print takes about 24 s at 1x
+  while (budget > 0 && job.gi < gc.moves.length) {
+    const m = gc.moves[job.gi];
+    if (!m.p) {
+      if (m.kind === "grip" || m.kind === "release") {
+        waitT += dt; if (waitT < 0.5) break; waitT = 0;
+        if (m.kind === "grip") { three.tipAnchor = true; log("core gripped from the tray"); job.coreState = "arm"; }
+        else { b.mesh.attach(core); job.coreState = "body"; log("core placed inside the body; printing resumes over it"); }
+      }
+      job.gi++; continue;
+    }
+    const d = [m.p[0] - tipPos[0], m.p[1] - tipPos[1], m.p[2] - tipPos[2]], L = Math.hypot(...d);
+    const speed = m.kind === "travel" ? 2.2 : 1;
+    if (L <= budget * speed) { tipPos = m.p.slice(); budget -= L / speed; job.gi++; if (m.kind === "print") { layerPts.push(m.p); if (layerPts.length > 199) layerPts.shift(); } if (m.kind === "travel") layerPts = [m.p]; }
+    else { const f = budget * speed / L; tipPos = [tipPos[0] + d[0] * f, tipPos[1] + d[1] * f, tipPos[2] + d[2] * f]; budget = 0; }
+  }
+  armQ = K.solve(tipPos, armQ); poseArm(armQ);
+  if (job.coreState === "arm") { const t = K.tip(...armQ); core.position.set(t[0], t[1], t[2] - 0.012); }
+  // printed height so far drives the clip plane (three world y = Blender z)
+  const curZ = tipPos[2]; if (job.coreState !== "arm" && curZ < META.gelZ) job.maxZ = Math.max(job.maxZ || -1, curZ + 0.0015);
+  clipPlane.constant = (job.maxZ || -1);
+  renderCode(gc.lines.length, job.gi);
+  if (job.gi >= gc.moves.length) { setClip(b, false); layerPts = []; job.printQ = b.mesh.quaternion.clone(); setStage("inflating"); log(`print done: ${gc.layers} layers. ${b.name} breathes; the gel cannot compress, so the belly opens`); }
+}
+
+/* ---------------- free robots ---------------- */
+function stepRobots(dt, time) {
+  const free = robots.filter((b) => b.free);
+  for (const b of free) {
+    b.age += dt;
+    const acc = new THREE.Vector3((Math.sin(time * 0.3 + b.genome[0] * 9) * 0.5), Math.cos(time * 0.23 + b.genome[1] * 7) * 0.5, Math.sin(time * 0.17 + b.genome[2] * 5) * 0.3).multiplyScalar(0.02);
+    // hold a band of water around the mother and tail
+    const cxp = clamp(b.pos.x, -0.95, 0.45), toAxis = new THREE.Vector3(b.pos.x - cxp, b.pos.y, b.pos.z * 1.2); const dist = toAxis.length();
+    if (dist < 0.55) acc.add(toAxis.normalize().multiplyScalar(0.25 * (0.55 - dist) / 0.55));
+    if (dist > 1.25) acc.add(toAxis.normalize().multiplyScalar(-0.06));
+    if (b.pos.x > 1.3) acc.x -= 0.05; if (b.pos.x < -1.6) acc.x += 0.05;
+    for (const o of free) if (o !== b) {
+      const d = new THREE.Vector3().subVectors(o.pos, b.pos), l = d.length() || 1e-3;
+      const rel = relationOf(b, o).r;
+      if (l < 0.42) acc.add(d.clone().multiplyScalar(-0.22 * (0.42 - l) / (l * 0.42))); else acc.add(d.clone().multiplyScalar(0.025 * rel / l));
+      if (l < 0.45) b.near[o.id] = (b.near[o.id] || 0) + dt;
+    }
+    b.vel.addScaledVector(acc, dt).multiplyScalar(1 - dt * 0.35);
+    const sp = b.vel.length(), max = 0.05 + 0.04 * b.spec.hz; if (sp > max) b.vel.multiplyScalar(max / sp);
+    b.pos.addScaledVector(b.vel, dt); b.mesh.position.copy(b.pos);
+    if (sp > 1e-4) { const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(1, 0, 0), b.vel.clone().normalize()); b.mesh.quaternion.slerp(q, 1 - Math.exp(-dt * 1.5)); }
+    shapeBaby(b, 1, time + b.genome[3] * 10); b.mesh.geometry.attributes.position.needsUpdate = true;
+    if (Math.random() < dt * 0.6) emitBubble([b.pos.x, b.pos.y, b.pos.z], 0.03);
+  }
+  // relation lines
+  const pos = relLines.geometry.attributes.position.array, col = relLines.geometry.attributes.color.array; let n = 0;
+  const motherNode = { memory: mother.memory, genome: mother.genome, near: {}, pos: new THREE.Vector3(0, 0, 0.05) };
+  const nodes = [motherNode, ...free];
+  for (let i = 0; i < nodes.length; i++) for (let j = i + 1; j < nodes.length; j++) {
+    const r = relationOf(nodes[i], nodes[j]).r; if (r < 0.33 || n >= 120) continue;
+    const a = nodes[i].pos, c = nodes[j].pos; pos.set([a.x, a.y, a.z, c.x, c.y, c.z], 6 * n);
+    const k = clamp((r - 0.33) / 0.4, 0, 1); const v = 0.25 + 0.7 * k;
+    if (SHADE.mode === "solid") { const q = [lerp(0.66, 0.18, k), lerp(0.72, 0.44, k), lerp(0.78, 0.66, k)]; col.set([...q, ...q], 6 * n); }   // pale grey blue to gel blue on the light floor
+    else col.set([0.62 * v, 0.80 * v, 0.94 * v, 0.62 * v, 0.80 * v, 0.94 * v], 6 * n);
+    n++;
+  }
+  relLines.geometry.setDrawRange(0, n * 2); relLines.geometry.attributes.position.needsUpdate = true; relLines.geometry.attributes.color.needsUpdate = true;
+}
+
+/* ---------------- UI: outliner, properties, code, timeline ---------------- */
+const vis = { "Mother shell": true, Gel: true, "Canal and dock": true, Tail: true, DexArm: true };
+function setVis(k, on) {
+  vis[k] = on;
+  const map = { "Mother shell": groups.skin, Gel: groups.gel, "Canal and dock": groups.mother, Tail: groups.tail, DexArm: [...groups.arm, ...groups.tool] };
+  (map[k] || []).forEach((o) => (o.visible = on && o.name !== "W_B0_SkinInner"));
+}
+function renderOutliner() {
+  const rows = [];
+  const row = (d, icon, name, key, eye, cls = "") => rows.push(`<div class="row ${cls}" ${key ? `data-sel="${key}"` : ""} style="padding-left:${6 + d * 14}px"><span class="tw">${d < 2 ? "▾" : ""}</span><span class="ic" style="background:${icon}"></span><span class="nm">${esc(name)}</span>${eye ? `<button class="eye" data-eye="${esc(eye)}" aria-pressed="${vis[eye]}" aria-label="toggle ${esc(eye)}">${vis[eye] ? "◉" : "○"}</button>` : ""}</div>`);
+  row(0, "#5a5a5a", "Scene Collection", null, null);
+  row(1, "#8a8f99", `Mother ${mother.name}`, "mother", null, selected === "mother" ? "sel" : "");
+  for (const k of ["Mother shell", "Gel", "Canal and dock"]) row(2, k === "Gel" ? "#7fa9c9" : "#6c717a", k, null, k);
+  row(1, "#6c717a", "Tail T1", null, "Tail"); row(2, "#a0a4ab", "DexArm", null, "DexArm");
+  row(1, "#4772b3", `Babies (${robots.length})`, null, null);
+  for (const b of robots) { const c = "#" + colorOf(b.spec).getHexString(); row(2, c, `${b.name}${b.example ? " (example)" : ""}${b.free ? "" : "  printing"}`, b.id, null, selected === b.id ? "sel" : ""); }
+  $("#outliner").innerHTML = rows.join("");
+}
+let tab = "signal";
+function renderProps() {
+  const el = $("#props"); const sb = robots.find((b) => b.id === selected);
+  $("#selLbl").textContent = sb ? sb.name : "Mother " + mother.name;
+  if (tab === "signal") {
+    const busy = job && job.stage !== "born";
+    el.innerHTML = `<div class="pnl"><h3>Send a signal</h3><p>Speak or type to the mother. The mother reads the signal against the mother's memory; the signal shifts the next body but does not design the baby.</p>
+      <textarea id="sig" rows="3" placeholder="for example: a slow tide under the ice">${esc(draft)}</textarea>
+      <div class="brow"><button class="btn" id="mic" ${dictApi ? "" : "hidden"}>${micOn ? "Stop listening" : "Speak"}</button><button class="btn on" id="send" ${busy ? "disabled" : ""}>Send signal</button>
+      <button class="btn" id="voice" ${ttsApi ? "" : "hidden"} aria-pressed="${voiceOn}">${voiceOn ? "Voice on" : "Voice off"}</button></div>
+      <p class="lbl">${dictApi ? "" : "Speech input is not available in this browser; typing works. "}${sampleApi ? "Signals are read by Claude." : "Signals are read by the local reader."}</p></div>
+      ${job && job.reading ? `<div class="pnl"><h3>Last reading ${job.example ? "(example)" : ""}</h3><dl class="kv"><dt>heard</dt><dd>${esc(job.reading.heard)}</dd><dt>reading</dt><dd>${esc(job.reading.reading)}</dd><dt>kept as</dt><dd>“${esc(job.reading.trace)}”</dd><dt>mother says</dt><dd>${esc(job.reading.say || "")}</dd><dt>read by</dt><dd>${job.reading.by}</dd></dl></div>` : ""}
+      <div class="pnl"><h3>Next mother</h3><p>Select a born baby in the Outliner, then make that baby the next mother to carry the memory forward.</p><button class="btn" id="mkMother" ${sb && sb.free ? "" : "disabled"}>${sb && sb.free ? "Make " + sb.name + " the next mother" : "Select a born baby"}</button></div>`;
+  } else if (tab === "memory") {
+    const mem = sb ? sb.memory : mother.memory;
+    el.innerHTML = `<div class="pnl"><h3>${sb ? sb.name + " memory" : "Mother " + mother.name + " memory"}</h3><p>${sb ? "Inherited from " + sb.motherName + ", with drift, plus the baby's own birth." : "Traces weigh what the mother generates. New signals add traces; older ones fade a little each birth."}</p>
+      ${mem.map((m, i) => `<div class="trace"><span>${esc(m.text)}<span class="tag">${m.src}</span></span><span class="bar"><span style="width:${Math.round(m.w * 100)}%"></span></span>${sb ? "<span></span>" : `<button class="x" data-del="${i}" aria-label="forget">×</button>`}</div>`).join("")}
+      ${sb ? "" : `<div class="brow"><input type="text" id="addMem" placeholder="add a trace"><button class="btn" id="addBtn">Add</button></div>`}</div>`;
+  } else if (tab === "genome") {
+    const g = sb ? sb.genome : mother.genome, pr = sb && sb.parts;
+    el.innerHTML = `<div class="pnl"><h3>${sb ? sb.name + " genome" : "Mother " + mother.name + " genome"}</h3>
+      <p>${sb ? "Each value is mixed from four sources. No value was set by hand." : "What the mother passes on. Babies mix the inherited genome with memory, the signal and drift."}</p>
+      ${pr ? `<div class="legend"><span><i style="background:#8a8f99"></i>mother</span><span><i style="background:#9fcdf0"></i>memory</span><span><i style="background:#ffaf29"></i>signal</span><span><i style="background:#e05d5d"></i>drift</span></div>` : ""}
+      ${GENES.map(([k, l, f], i) => { const p = pr ? pr[i] : null; const tot = p ? p.reduce((a, b) => a + b, 0) || 1 : 1;
+        return `<div class="gene"><span class="lbl">${l}</span>${p ? `<span class="gbar">${["#8a8f99", "#9fcdf0", "#ffaf29", "#e05d5d"].map((c, j) => `<span style="width:${(100 * p[j] / tot).toFixed(1)}%;background:${c}"></span>`).join("")}</span>` : `<span class="gbar"><span style="width:${Math.round(g[i] * 100)}%;background:#8a8f99"></span></span>`}<span>${f(g[i])}</span></div>`; }).join("")}</div>
+      ${sb && sb.signal ? `<div class="pnl"><h3>From the signal</h3><p>“${esc(sb.signal.heard)}”, read by ${sb.signal.by}.</p></div>` : ""}`;
+  } else {
+    const free = robots.filter((b) => b.free); const nodes = [{ name: "Mother " + mother.name, memory: mother.memory, genome: mother.genome, id: "m", spec: null }, ...free];
+    const pairs = []; for (let i = 0; i < nodes.length; i++) for (let j = i + 1; j < nodes.length; j++) pairs.push([nodes[i], nodes[j], relationOf(nodes[i], nodes[j])]);
+    pairs.sort((a, b) => b[2].r - a[2].r);
+    const dot = (n) => `<span class="dot" style="background:${n.spec ? "#" + colorOf(n.spec).getHexString() : "#8a8f99"}"></span>`;
+    el.innerHTML = `<div class="pnl"><h3>Relations</h3><p>A relation is measured, not assigned: half shared memory, three tenths body likeness, two tenths time spent near each other. Lines in the viewport show relations above 0.33.</p>
+      ${pairs.length ? pairs.slice(0, 18).map(([a, b, r]) => `<div class="rel"><span>${dot(a)}${esc(a.name)} · ${dot(b)}${esc(b.name)}</span><span class="rbar"><span style="width:${Math.round(r.r * 100)}%"></span></span><span>${r.r.toFixed(2)}</span></div>`).join("") : `<p class="empty">No relations yet: no baby has been born.</p>`}</div>`;
+  }
+  bindProps();
+}
+let draft = "", micOn = false, voiceOn = false;
+function bindProps() {
+  const sig = $("#sig"); if (sig) sig.oninput = () => (draft = sig.value);
+  const send = $("#send"); if (send) send.onclick = () => { const t = ($("#sig").value || "").trim(); if (!t) return; draft = ""; startBirth(t); renderProps(); };
+  const mic = $("#mic"); if (mic) mic.onclick = toggleMic;
+  const voice = $("#voice"); if (voice) voice.onclick = () => { voiceOn = !voiceOn; renderProps(); };
+  const mk = $("#mkMother"); if (mk) mk.onclick = makeNextMother;
+  document.querySelectorAll("[data-del]").forEach((x) => (x.onclick = () => { mother.memory.splice(+x.dataset.del, 1); renderProps(); }));
+  const add = $("#addBtn"); if (add) add.onclick = () => { const v = $("#addMem").value.trim(); if (v) { mother.memory.unshift({ text: v.slice(0, 48), w: 0.8, src: "added" }); renderProps(); } };
+}
+function makeNextMother() {
+  const b = robots.find((x) => x.id === selected); if (!b || !b.free) return;
+  const prev = mother.name; mother = { name: "M" + (mother.gen + 1) + "·" + b.name, gen: mother.gen + 1, memory: b.memory.map((m) => ({ ...m, src: m.src === "birth" ? "own birth" : "carried" })), genome: b.genome.slice() };
+  const skinIt = SHADE.items.find((it) => it.obj === skin);
+  for (const m of [skinIt.mat, skinIt.clay]) m.uniforms.tint.value.copy(colorOf(b.spec)).lerp(new THREE.Color(1, 1, 1), 0.55);
+  log(`${b.name} becomes the next mother. The new mother carries ${mother.memory.length} traces from ${prev}.`, "a");
+  $("#genLbl").textContent = "generation M" + mother.gen; selected = "mother"; renderAll();
+}
+function renderCode(n, cur) {
+  const gc = job && job.gc; const el = $("#code"); if (!gc) { el.innerHTML = `<div><span class="ln"></span><span class="empty">G-code appears here when the mother writes it.</span></div>`; return; }
+  const total = n, c = cur < 0 ? total - 1 : Math.min(cur, total - 1); const lines = Math.max(8, Math.floor(el.clientHeight / 17) - 1);
+  const start = clamp(c - Math.floor(lines / 2), 0, Math.max(0, total - lines));
+  let h = ""; for (let i = start; i < Math.min(total, start + lines); i++) {
+    const t = gc.lines[i], cls = t.startsWith(";") ? "cm" : t.startsWith("G0") ? "g0" : t.startsWith("G1") ? "g1" : "mc";
+    h += `<div class="${i === c && cur >= 0 ? "cur" : ""}"><span class="ln">${i + 1}</span><span class="${cls}">${esc(t)}</span></div>`;
+  }
+  el.innerHTML = h; $("#gcPos").textContent = `line ${Math.max(0, c + 1)} / ${gc.lines.length}`;
+}
+function renderTimeline() {
+  const cur = job ? job.stage : null, idx = STAGES.findIndex((s) => s[0] === cur);
+  $("#track").innerHTML = STAGES.map(([k, l], i) => `<div class="seg ${i < idx || (cur === "born" && i <= idx) ? "done" : ""} ${i === idx ? "on" : ""}" data-k="${k}"><div class="fill"></div><span>${l}</span></div>`).join("");
+}
+function stageProgress() {
+  if (!job) return 0; const t = job.t;
+  switch (job.stage) { case "reading": return Math.min(1, t / 2); case "generating": return t / 1.6; case "gcode": return job.shown / job.gc.lines.length; case "printing": return job.gi / job.gc.moves.length; case "inflating": return t / 6.3; case "pushing": return t / 8.4; default: return 1; }
+}
+function renderAll() { renderOutliner(); renderProps(); renderTimeline(); }
+
+/* ---------------- capabilities: Claude reading, dictation, voice ---------------- */
+let sampleApi = null, dictApi = null, ttsApi = null;
+function setAgentChip() { const c = $("#agentChip"); c.classList.toggle("live", !!sampleApi); c.querySelector("span").textContent = sampleApi ? "agent: Claude" : "agent: local"; }
+
+function webSpeechDictation() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SR) return null;
+  let rec = null, act = false; const h = { p: [], f: [], s: [] };
+  return {
+    start(o) { return new Promise((res, rej) => { rec = new SR(); rec.lang = "en-US"; rec.interimResults = true; rec.continuous = true;
+      rec.onresult = (e) => { let interim = ""; for (let i = e.resultIndex; i < e.results.length; i++) { const r = e.results[i]; if (r.isFinal) h.f.forEach((fn) => fn({ text: r[0].transcript })); else interim += r[0].transcript; } if (interim) h.p.forEach((fn) => fn({ text: interim })); };
+      rec.onstart = () => { act = true; h.s.forEach((fn) => fn({ state: "listening" })); res(); };
+      rec.onend = () => { act = false; h.s.forEach((fn) => fn({ state: "idle", reason: "stopped" })); };
+      rec.onerror = (e) => { if (!act) rej({ code: e.error === "not-allowed" ? "not_granted" : "unavailable" }); };
+      try { rec.start(); } catch (err) { rej({ code: "unavailable" }); } }); },
+    stop() { if (rec) rec.stop(); return Promise.resolve(); },
+    onPartial(fn) { h.p.push(fn); }, onFinal(fn) { h.f.push(fn); }, onState(fn) { h.s.push(fn); },
+  };
+}
+function webSpeechTTS() { if (!window.speechSynthesis) return null; return { speak(t) { return new Promise((res) => { const u = new SpeechSynthesisUtterance(t); u.rate = 0.95; u.onend = res; speechSynthesis.cancel(); speechSynthesis.speak(u); }); } }; }
+function wireDictation() {
+  dictApi.onPartial(({ text }) => { const s = $("#sig"); if (s) s.value = (draftBase + " " + text).trim(); });
+  dictApi.onFinal(({ text }) => { draftBase = (draftBase + " " + text).trim(); draft = draftBase; const s = $("#sig"); if (s) s.value = draft; });
+  dictApi.onState(({ state }) => { const was = micOn; micOn = state === "listening" || state === "starting"; if (was && state === "idle" && draft.trim() && !(job && job.stage !== "born")) { const t = draft; draft = ""; draftBase = ""; startBirth(t); } renderProps(); });
+}
+async function initCaps() {
+  if (!window.claude || !window.claude.use) { dictApi = webSpeechDictation(); ttsApi = webSpeechTTS(); if (dictApi) wireDictation(); setAgentChip(); renderProps(); return; }
+  try { sampleApi = await window.claude.use("sample"); } catch (e) { sampleApi = null; }
+  try { dictApi = await window.claude.use("dictation"); } catch (e) { dictApi = null; }
+  try { ttsApi = await window.claude.use("tts"); } catch (e) { ttsApi = null; }
+  if (dictApi) wireDictation();
+  setAgentChip(); renderProps();
+}
+let draftBase = "";
+function toggleMic() {
+  if (!dictApi) return;
+  if (micOn) { dictApi.stop().catch(() => {}); return; }
+  draftBase = draft; dictApi.start({ language: "en" }).catch((e) => { log("speech input: " + (e.code || "unavailable") + "; typing still works", "w"); if (e.code === "not_granted") { dictApi = null; renderProps(); } });
+}
+function speak(t) { if (ttsApi && voiceOn) ttsApi.speak(t, { voice: "airy" }).catch(() => {}); }
+
+/* ---------------- views and gizmo ---------------- */
+function setView(v) {
+  const c = three.camera, ctl = three.controls; document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
+  three.follow = v === "nozzle";
+  const tgt = new THREE.Vector3(0.05, 0, 0);
+  if (v === "front") c.position.set(-0.15, 0.05, 2.4); else if (v === "side") c.position.set(2.6, 0.05, 0.0); else if (v === "top") c.position.set(-0.149, 2.6, 0.001); else c.position.set(1.35, 0.7, 2.25);
+  if (v === "nozzle" && K) { const tp = K.tip(...armQ); tgt.set(tp[0], tp[2], -tp[1]); c.position.copy(tgt).add(new THREE.Vector3(0.3, 0.26, 0.5)); }   // come close to the nozzle and follow it
+  ctl.target.copy(tgt); ctl.update();
+}
+function drawGizmo() {
+  const cv = $("#gizmo"), g = cv.getContext("2d"), q = three.camera.quaternion.clone().invert(); g.clearRect(0, 0, 148, 148);
+  const ax = [["X", new THREE.Vector3(1, 0, 0), "#e2554f"], ["Y", new THREE.Vector3(0, 0, -1), "#8ac43b"], ["Z", new THREE.Vector3(0, 1, 0), "#4f8ae2"]];
+  const pts = ax.map(([n, v, c]) => [n, v.clone().applyQuaternion(q), c]).sort((a, b) => a[1].z - b[1].z);
+  g.fillStyle = SHADE.mode === "solid" ? "#00000012" : "#ffffff10"; g.beginPath(); g.arc(74, 74, 64, 0, 7); g.fill();
+  for (const [n, v, c] of pts) { const x = 74 + v.x * 46, y = 74 - v.y * 46; g.strokeStyle = c; g.lineWidth = 4; g.beginPath(); g.moveTo(74, 74); g.lineTo(x, y); g.stroke(); g.fillStyle = c; g.beginPath(); g.arc(x, y, 13, 0, 7); g.fill(); g.fillStyle = "#151515"; g.font = "600 15px Inter, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(n, x, y + 1); }
+}
+
+/* ---------------- main loop ---------------- */
+let last = performance.now(), simT = 0, frame = 0;
+function loop(now) {
+  requestAnimationFrame(loop);
+  const raw = Math.min(0.05, (now - last) / 1000); last = now; const dt = playing ? raw * SPEED.v : 0; simT += dt; frame += dt > 0 ? 1 : 0;
+  if (META) {
+    stepJob(dt, simT); stepRobots(dt, simT); stepBubbles(dt);
+    deformBelly(bellyNow, simT);
+    const pts = layerLine.geometry.attributes.position.array; layerPts.forEach((p, i) => pts.set(p, 3 * i)); layerLine.geometry.setDrawRange(0, layerPts.length); layerLine.geometry.attributes.position.needsUpdate = true;
+    const tp = K.tip(...armQ); three.tipDot.position.set(...tp); const printingNow = !!(job && job.stage === "printing"), solid = SHADE.mode === "solid";
+    three.tipDot.visible = printingNow && !solid; layerLine.visible = !solid; updatePathDots(printingNow && solid, tp);
+    for (const b of robots) { const on = b.id === selected && !(printingNow && b === job.baby); b.hullMat.color.setHex(on ? CLAY.sel : CLAY.ink); b.hullMat.userData.uW.value = on ? 2.2 : 1.3; }   // orange marks the selection, except while the bead is the orange thing to read
+    if (three.follow) { const c = three.controls.target.clone(); three.controls.target.lerp(new THREE.Vector3(tp[0], tp[2], -tp[1]), 0.1); three.camera.position.add(c.sub(three.controls.target).negate()); }
+    const segs = document.querySelectorAll(".seg.on .fill"); if (segs[0]) segs[0].style.width = (100 * clamp(stageProgress(), 0, 1)).toFixed(1) + "%";
+    $("#tlClock").textContent = fmtT(simT); $("#ovFrame").textContent = Math.floor(simT * 24);
+    if (frame % 30 === 0 && tab === "relation" && dt > 0) renderProps();
+  }
+  three.controls.update(); three.renderer.render(three.scene, three.camera); drawGizmo();
+}
+
+/* ---------------- boot ---------------- */
+function bindUI() {
+  $("#play").onclick = () => { playing = !playing; $("#play").textContent = playing ? "Pause" : "Play"; $("#play").setAttribute("aria-pressed", String(playing)); };
+  document.querySelectorAll("[data-speed]").forEach((b) => (b.onclick = () => { SPEED.v = +b.dataset.speed; document.querySelectorAll("[data-speed]").forEach((x) => x.classList.toggle("on", x === b)); }));
+  document.querySelectorAll("[data-view]").forEach((b) => (b.onclick = () => setView(b.dataset.view)));
+  document.querySelectorAll("[data-tab]").forEach((b) => (b.onclick = () => { tab = b.dataset.tab; document.querySelectorAll("[data-tab]").forEach((x) => x.setAttribute("aria-selected", String(x === b))); renderProps(); }));
+  document.querySelectorAll(".shgrp [data-shade]").forEach((b) => (b.onclick = () => setShading(b.dataset.shade)));
+  $("#outliner").addEventListener("click", (e) => {
+    const eye = e.target.closest("[data-eye]"); if (eye) { setVis(eye.dataset.eye, !vis[eye.dataset.eye]); renderOutliner(); return; }
+    const r = e.target.closest("[data-sel]"); if (r) { selected = r.dataset.sel; robots.forEach((b) => b.mat.emissive.setHex(b.id === selected ? 0x332200 : 0)); renderOutliner(); renderProps(); }
+  });
+}
+async function boot() {
+  bindUI(); initThree(); renderCode(0, -1); renderTimeline();
+  mother = { name: "M1", gen: 1, memory: SEED_MEMORY.map((m) => ({ ...m })), genome: vecFromText("mother m1", NG) };
+  renderOutliner(); renderProps();
+  log("opening mother_m1.blend: restored DexArm mother, tail T1, gel");
+  try { await loadScene(); } catch (e) { $("#ovStage").textContent = "could not load the scene: " + e.message; log("scene failed to load: " + e.message, "w"); return; }
+  log(`scene loaded: ${Object.keys(parts).length} parts; canal throat ${(canal.rt * 1000).toFixed(0)} mm`);
+  // two earlier babies (examples) already swimming
+  for (const [k, sig] of [[0, "warm light at the surface"], [1, "a long wait in cold water"]]) {
+    const mix = mixGenome(mother.genome, memoryVector(mother.memory), vecFromText(sig, NG), hash(sig));
+    const b = newBaby(mix.g, inheritMemory(mother.memory, hash(sig) ^ 7, "first water after 3 pushes"), "B0" + (k + 1), mix.parts); b.example = true;
+    b.signal = { heard: sig, by: "example" }; placeFree(b, [0.5 + 0.3 * k, k ? 0.7 : -0.75, 0.15 - 0.2 * k], [k ? -1 : 1, 0, 0]);
+  }
+  setView("persp"); renderAll(); requestAnimationFrame(loop);
+  initCaps();
+  setTimeout(() => startBirth("a slow tide under the ice", { example: true }), 600);
+}
+boot();
+</script>
+
+</body></html>

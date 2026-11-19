@@ -197,7 +197,7 @@ function addMesh(p, m, edgesAng = 30) { m.castShadow = m.material.transparent ? 
 const LABEL = { hull: "Mother hull", belly: "Belly skin, printed origami", canal: "Birth canal", front: "Front plate", bore: "Rear bore and ring", magnets: "Dock magnets", tail: "Tail shell", tailring: "Tail ring", rails: "Rails and keel", boom: "Boom and carriage", tray: "Parts tray", tool: "Tool head", dexarm: "DexArm", gel: "Support gel", baby: "Baby body", capsule: "Electronics capsule", needle: "Inflation valve", valve3: "Three way valve", duckbill: "Lips, check valve", pump: "Air pump", battery: "Battery", ctrl: "Controller", psensor: "Pressure sensor", thrusters: "Thrusters" };
 const DIR = { belly: [0, 0, 0.34], canal: [0.46, 0, 0.06], front: [0.3, 0, 0], bore: [-0.18, 0, 0], magnets: [-0.3, 0, 0], tail: [-0.62, 0, 0], tailring: [-0.42, 0, 0], rails: [-0.62, 0, -0.26], boom: [-0.32, 0, 0.3], tray: [-0.36, 0, 0.14], tool: [0.12, 0, 0.62], dexarm: [-0.06, 0, 0.42], gel: [0, 0, -0.18], baby: [0, 0, -0.18], capsule: [0, 0, -0.06], needle: [0, 0, 0.1], valve3: [0.12, 0, 0.7], duckbill: [0.62, 0, 0.1], pump: [-0.62, 0, 0.18], battery: [-0.62, 0, 0.1], ctrl: [-0.62, 0, 0.26], psensor: [-0.62, 0, 0.34], thrusters: [-0.72, 0, -0.1] };
 const MAKE = { hull: "glass", belly: "silicone", canal: "silicone", front: "rigid", bore: "rigid", magnets: "bought", tail: "rigid", tailring: "rigid", rails: "bought", boom: "bought", tray: "rigid", tool: "rigid", dexarm: "bought", gel: "gel", baby: "silicone", capsule: "bought", needle: "bought", valve3: "bought", duckbill: "silicone", pump: "bought", battery: "bought", ctrl: "bought", psensor: "bought", thrusters: "bought" };
-const MAP = [[/Magnets$/, "magnets"], [/^W_B0_Canal/, "canal"], [/^W_B0_Mother(FrontPlate|Lid)$/, "front"], [/^W_B0_(MotherRearWall|MotherBoreHoop|RingA|RingB|RingBEdge|RingBKnurl)$/, "bore"], [/^W_T1_(TailShell|TailFacePlate)$/, "tail"], [/^W_T1_TailRing/, "tailring"], [/^W_T1_(Keel|LowRod)/, "rails"], [/^W_T1_(BoomTube|CarriagePlate)/, "boom"], [/^W_T1_(Tray|LidStraps)/, "tray"], [/^W_T1_(Tool|Gripper)/, "tool"], [/^A_/, "dexarm"]];
+const MAP = [[/^W_V2_(Pads|EPM)$/, "magnets"], [/^W_V2_BoreRing$/, "bore"], [/^W_V2_(Collar|LipSeal)$/, "tailring"], [/^W_V2_Rails$/, "rails"], [/^W_V2_Boom$/, "boom"], [/^W_V2_(Cartridge|Battery|Thrusters)$/, "tail"], [/^W_V2_Gel$/, "gel"], [/^W_V2_TrayWall$/, "tray"], [/^W_V2_Chute$/, "canal"], [/^W_V2_BellyPleats$/, "belly"], [/Magnets$/, "magnets"], [/^W_B0_Canal/, "canal"], [/^W_B0_Mother(FrontPlate|Lid)$/, "front"], [/^W_B0_(MotherRearWall|MotherBoreHoop|RingA|RingB|RingBEdge|RingBKnurl)$/, "bore"], [/^W_T1_(TailShell|TailFacePlate)$/, "tail"], [/^W_T1_TailRing/, "tailring"], [/^W_T1_(Keel|LowRod)/, "rails"], [/^W_T1_(BoomTube|CarriagePlate)/, "boom"], [/^W_T1_(Tray|LidStraps)/, "tray"], [/^W_T1_(Tool|Gripper)/, "tool"], [/^A_/, "dexarm"]];
 for (const k in LABEL) part(k, LABEL[k], DIR[k] || [0, 0, 0], MAKE[k]);
 
 let META = null, skinGeo = null, skinBase = null, bellyMesh = null, hullSlices = [], Z0 = -0.06, eeMatrix = new THREE.Matrix4();
@@ -222,8 +222,8 @@ function clipMesh(m, planes) { m.material.clippingPlanes = planes.map((p) => p.c
 function updateClips() { for (const m of clipped) { m.updateMatrixWorld(); m.userData.localPlanes.forEach((p, i) => m.material.clippingPlanes[i].copy(p).applyMatrix4(m.matrixWorld)); } }
 
 async function loadModel() {
-  META = await getJSON("../simulator/scene.json");
-  const b64 = await (await fetch("../simulator/scene_glb.txt")).text();
+  META = await getJSON("../simulator/scene_v2.json");
+  const b64 = await (await fetch("../simulator/scene_v2_glb.txt")).text();
   const bin = Uint8Array.from(atob(b64.trim()), (c) => c.charCodeAt(0));
   const gltf = await new Promise((res, rej) => new THREE.GLTFLoader().parse(bin.buffer, "", res, rej));
   const list = []; gltf.scene.traverse((o) => { if (o.isMesh) list.push(o); });
@@ -231,7 +231,7 @@ async function loadModel() {
   for (const o of list) {
     const src = o.name.replace(/\.\d+$/, ""), nm = META.groups[src] ? src : (o.parent && o.parent.name) || src;
     o.removeFromParent(); o.position.set(0, 0, 0); o.rotation.set(0, 0, 0); o.scale.set(1, 1, 1); o.geometry.computeVertexNormals(); o.userData.src = nm;
-    if (nm === "W_B0_SkinInner") { buildGel(o.geometry); continue; }
+    if (nm === "W_B0_SkinInner") { if (!META.groups.W_V2_Gel) buildGel(o.geometry); continue; }
     if (nm === "W_B0_Skin") { skinGeo = o.geometry; continue; }
     const hit = MAP.find(([re]) => re.test(nm)); if (!hit) continue;
     const p = PART[hit[1]]; o.material = mat(p.make);
