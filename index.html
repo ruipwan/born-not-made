@@ -427,6 +427,12 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
   <div class="fullframe" style="background:#0c0c0d;height:min(88vh,960px)"><iframe data-src="voices/" title="Voices: an open discussion"></iframe></div>
 </section>
 
+<!-- ============================== PHYSICS ============================== -->
+<section class="tab" id="physics">
+  <div class="tabhead"><div><p class="kicker">Simulator</p><h2>The physics of printing and birth</h2><p>A finite element model of the bellows baby passing the soft sleeve, four ways of pushing side by side, and the bead, layer and gel numbers that decide the print.</p></div><a class="btn" href="build/?view=physics" target="_blank" rel="noopener">Open full screen</a></div>
+  <div class="fullframe" style="height:min(88vh,1000px)"><iframe data-src="build/?view=physics" title="Physics of printing and birth"></iframe></div>
+</section>
+
 <!-- ============================== SOCIETY ============================== -->
 <section class="tab" id="society">
   <div class="tabhead"><div><p class="kicker">Society</p><h2>When reproduction runs at scale</h2><p>Many mothers and babies share one body of water. A robot bears only with enough relations and energy. Memory passes on with drift. The water feeds only so many. Send a signal and follow how far it travels.</p></div><a class="btn" href="society/" target="_blank" rel="noopener">Open full screen</a></div>
@@ -439,7 +445,7 @@ const GROUPS = [
   { g: "work", label: "The Work", tabs: [["work", "The Work"]] },
   { g: "think", label: "Think", tabs: [["ideas", "Ideas", "questions the work raises"], ["culture", "Culture", "stories, screens and art"]] },
   { g: "make", label: "Make", tabs: [["prototypes", "Prototypes", "versions one to three"], ["build", "Build", "every part, with sources"], ["society", "Society", "reproduction at scale"], ["process", "Process", "how the work changed"]] },
-  { g: "sim", label: "Simulator", tabs: [["simulator", "Simulator"]] },
+  { g: "sim", label: "Simulator", tabs: [["simulator", "Printing console", "signal, G-code, print, birth"], ["physics", "Physics", "birth and printing, simulated"]] },
   { g: "talk", label: "Talk", tabs: [["conversations", "Conversations", "one to one"], ["voices", "Voices", "open to everyone"]] }];
 const TABS = GROUPS.flatMap((x) => x.tabs.map((t) => t[0]));
 const ALIAS = { trunk: "work", branches: "ideas", questions: "ideas", early: "prototypes", log: "process", think: "ideas", make: "prototypes", talk: "conversations" };

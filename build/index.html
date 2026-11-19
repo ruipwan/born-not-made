@@ -591,6 +591,11 @@ async function renderBench() {
   const check = (t) => { const v = parseFloat($("#b_" + t.id).value), o = $("#o_" + t.id); if (isNaN(v)) { o.textContent = ""; return; } const ok = (t.pass_max == null || v <= t.pass_max) && (t.pass_min == null || v >= t.pass_min); o.textContent = ok ? "in window" : "outside"; o.style.color = ok ? "var(--ok)" : "var(--bad)"; };
   for (const t of B.tests) { const el = $("#b_" + t.id); el.addEventListener("input", () => { saved[t.id] = el.value; try { localStorage.setItem("bnm-bench", JSON.stringify(saved)); } catch (e) {} check(t); if (t.id === "mu" && !isNaN(parseFloat(el.value))) { $("#bMu").value = el.value; $("#bMu").dispatchEvent(new Event("input")); simReset(); } }); check(t); }
 }
+if (new URLSearchParams(location.search).get("view") === "physics") {   // the physics simulations alone, for the Simulator section
+  document.querySelector(".app").hidden = true;
+  for (const id of ["fold", "swell", "push", "dock", "v2", "bench", "sources"]) { const el = document.getElementById(id); if (el) el.hidden = true; }
+  const fem = document.getElementById("fem"), birth = document.getElementById("birth"); if (fem && birth) birth.parentNode.insertBefore(fem, birth);
+}
 /* ====================================================================== start */
 (async () => {
   DATA = (await getJSON("data/components.json")) || DATA; PHYS = (await getJSON("data/physics.json")) || {};
