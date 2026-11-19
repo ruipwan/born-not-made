@@ -1,0 +1,966 @@
+{
+ "fold": {
+  "recommended": "Accordion bellows, collapsed diaphragm form: flat annular flanks printed parallel with a real gel gap, joined at outer and inner crest rings, axis vertical in the gel, nose on the bed, tail cap on top. Axial growth only, diameter kept. A length tether stops the growth.",
+  "params": {
+   "pleats": 6,
+   "flanks": 12,
+   "pleat_angle_folded_deg": 0,
+   "pleat_angle_deployed_deg": 43.6,
+   "flank_opening_deg_deployed": 87,
+   "outer_crest_r_mm": 105,
+   "inner_crest_r_mm_printed": 55,
+   "inner_crest_r_mm_deployed": 69,
+   "pleat_depth_mm": 50,
+   "wall_mm": 1.5,
+   "cap_wall_mm": 3.0,
+   "gel_gap_mm": 3.0,
+   "pitch_folded_mm": 9.0,
+   "folded_D_mm": 210,
+   "folded_L_mm": 54,
+   "deployed_D_mm": 210,
+   "deployed_L_mm": 385,
+   "tether_L_mm": 385,
+   "length_ratio": 7.1,
+   "volume_folded_envelope_L": 1.87,
+   "volume_deployed_L": 9.26,
+   "volume_ratio": 4.9,
+   "air_to_fill_L": 8.35,
+   "trapped_gel_L": 0.91,
+   "silicone_L": 0.64,
+   "mass_dry_kg": 0.76,
+   "mass_with_gel_kg": 1.67,
+   "hoop_stretch_inner_crest": 1.25,
+   "hoop_limit_neoHookean": 1.38,
+   "material": "Dragon Skin 10 (Ecoflex 00-30 too soft: stretch 1.4 at 0.25 kPa)",
+   "p_to_deploy_kPa": 0.37,
+   "p_work_kPa": "0.4 to 1.0 (tether taut)",
+   "p_cap_peak_kPa": "7.5 at 3 mm cap, 3.8 at 1.5 mm",
+   "canal_clear_bore_mm": 280,
+   "clearance_each_side_mm": 35,
+   "sleeve_relaxed_D_mm": 180,
+   "L_vs_p_DS10": [
+    [
+     0,
+     54
+    ],
+    [
+     20,
+     172
+    ],
+    [
+     50,
+     220
+    ],
+    [
+     100,
+     265
+    ],
+    [
+     150,
+     297
+    ],
+    [
+     250,
+     346
+    ],
+    [
+     365,
+     385
+    ]
+   ],
+   "V_vs_p_DS10_L": [
+    [
+     0,
+     1.87
+    ],
+    [
+     20,
+     3.66
+    ],
+    [
+     50,
+     4.74
+    ],
+    [
+     100,
+     5.84
+    ],
+    [
+     150,
+     6.67
+    ],
+    [
+     250,
+     8.03
+    ],
+    [
+     365,
+     9.26
+    ]
+   ],
+   "print_time_h": "1.5 at 50 mm/s, 3.7 at 20 mm/s (0.64 L, bead 1.6 x 1.5 mm)"
+  },
+  "why": "It is the only listed fold that prints as closed stacked rings with real gel gaps, has no vertices, needs no stiff panels, and never gets wider than the D 280 bore. Silicone can take the hoop stretch at the inner crests that paper cannot (Demaine et al. 2011; Dias et al. 2012), so the bellows opens by bending plus a small stretch kept at 1.25, under the 1.38 limit. Growth anchored at the tail pushes the nose out with about 20 N at 1 kPa. It also matches the artist note of 28 Oct: plain folded silicone, no Kresling.",
+  "lantern_errors": [
+   [
+    "radial growth 1/0.78 = 1.28 with no radial fold",
+    "pure hoop stretch, close to the 1.38 peak; rigid rings cannot grow at all"
+   ],
+   [
+    "folded pleat period 5.9 mm, depth 13 mm, wall 1.5 mm",
+    "gel gap between flanks below zero: the pleats print as one solid block"
+   ],
+   [
+    "G-code layer 2.6 mm, flank slope 4.4 mm radial per mm height",
+    "beads jump 11 mm per layer and do not overlap: the wall leaks"
+   ],
+   [
+    "sim squeezes the baby to r 41 mm at the canal",
+    "that is the 64 mm stub tube clamped to 45 mm; the birth bore is the D 280 ring plate"
+   ]
+  ],
+  "rejected": [
+   [
+    "Yoshimura",
+    "Diamond facets with many vertices; flat folded tiers touch, so no gel gap; diameter does not grow; facets must stay near rigid (Yoshimura 1955)."
+   ],
+   [
+    "Kresling",
+    "Twists while it deploys, so the baby screws through the canal; bistability needs stiff panels that strain, which soft silicone lacks; diameter fixed. Artist ruled it out on 28 Oct."
+   ],
+   [
+    "Waterbomb",
+    "Can grow in diameter (stent from a 13 mm tube to 25.4 mm, about 2x, Kuribayashi 2006) but needs stiff facets and 6 crease vertices; every vertex needs gel gaps on many sides; silicone facets bend and lose the mechanism."
+   ],
+   [
+    "Everting tube",
+    "Grows from the tip, so the stored tube and the capsule cannot sit in one closed printed body; keep it as a canal liner (push methods)."
+   ],
+   [
+    "Gored bud (meridian pleats)",
+    "Would grow in diameter, but meridian length is capped by the bed (about 340 mm), which limits the deployed D to about 190 mm; more complex paths for little gain."
+   ],
+   [
+    "Origamizer tucks (Demaine, Tachi 2017)",
+    "Watertight, but tucks stack many layers with zero gap; made for paper, not printable in gel."
+   ]
+  ],
+  "demaine": [
+   [
+    "1D pleats, no vertices",
+    "Parallel or concentric pleats have no vertex conditions (Kawasaki, Maekawa); simplest crease class (GFALOP)."
+   ],
+   [
+    "Flat foldability",
+    "Not wanted: flat means zero gap and fused flanks. Print near flat with a 3 mm gap."
+   ],
+   [
+    "Rigid foldability",
+    "Not needed: silicone flanks bend and stretch; it matters only for stiff panel patterns (Abel et al. 2016)."
+   ],
+   [
+    "Circular pleat",
+    "Closed concentric pleats cannot open isometrically: paper buckles into a saddle (Dias 2012) or needs extra creases (Demaine et al. 2011). Silicone stretches instead: limit the stretch with a tether."
+   ],
+   [
+    "Self folding",
+    "The printed folded shape is the rest state, so venting refolds the baby by itself (programmable folding, Hawkes et al. 2010)."
+   ]
+  ],
+  "sources": [
+   [
+    "Li, Vogt, Rus, Wood 2017, Fluid-driven origami-inspired artificial muscles, PNAS 114(50):13132, doi:10.1073/pnas.1713450114",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC5740677"
+   ],
+   [
+    "Melancon, Gorissen, Garcia-Mora, Hoberman, Bertoldi 2021, Multistable inflatable origami structures at the metre scale, Nature 592:545, doi:10.1038/s41586-021-03407-4",
+    "https://par.nsf.gov/servlets/purl/10295963"
+   ],
+   [
+    "Kresling 2020, The Fifth Fold: complex symmetries in Kresling origami patterns, Symmetry: Culture and Science 31(4):403, doi:10.26830/symmetry_2020_4_403",
+    "https://journal-scs.symmetry.hu/abstract/?pid=814"
+   ],
+   [
+    "Kresling 2008, Natural twist buckling in shells: from the hawkmoth bellows to the deployable Kresling pattern and cylindrical Miura-ori, IASS-IACM 2008, Cornell",
+    "https://ecommons.cornell.edu/entities/publication/076a6eb3-0d10-46af-a078-3206f67a0c5b"
+   ],
+   [
+    "Yoshimura 1955, On the mechanism of buckling of a circular cylindrical shell under axial compression, NACA TM 1390",
+    "https://ntrs.nasa.gov/citations/19930093840"
+   ],
+   [
+    "Kuribayashi et al. 2006, Self-deployable origami stent grafts, Mater Sci Eng A 419:131, doi:10.1016/j.msea.2005.12.016",
+    "https://scispace.com/pdf/self-deployable-origami-stent-grafts-as-a-biomedical-3fsf13bk5l.pdf"
+   ],
+   [
+    "Hawkes, Blumenschein, Greer, Okamura 2017, A soft robot that navigates its environment through growth, Science Robotics 2(8):eaan3028, doi:10.1126/scirobotics.aan3028",
+    "https://escholarship.org/content/qt3nx45751/qt3nx45751.pdf"
+   ],
+   [
+    "Hinton, Hudson, Pusch, Lee, Feinberg 2016, 3D printing PDMS elastomer in a hydrophilic support bath via freeform reversible embedding, ACS Biomater Sci Eng, doi:10.1021/acsbiomaterials.6b00170",
+    "https://acs.figshare.com/articles/journal_contribution/3D_Printing_PDMS_Elastomer_in_a_Hydrophilic_Support_Bath_via_Freeform_Reversible_Embedding/3386209/1"
+   ],
+   [
+    "O'Bryan et al. 2017, Self-assembled micro-organogels for 3D printing silicone structures, Science Advances 3:e1602800, doi:10.1126/sciadv.1602800",
+    "https://par.nsf.gov/servlets/purl/10085332"
+   ],
+   [
+    "Hajash, Sparrman, Guberan, Laucks, Tibbits 2017, Large-Scale Rapid Liquid Printing, 3D Printing and Additive Manufacturing 4(3):123, doi:10.1089/3dp.2017.0037",
+    "https://dspace.mit.edu/bitstream/handle/1721.1/122801/3dp.2017.0037.pdf?sequence=2"
+   ],
+   [
+    "Demaine, Demaine, Hart, Price, Tachi 2011, (Non)existence of pleated folds: how paper folds between creases, Graphs and Combinatorics 27(3):377, doi:10.1007/s00373-011-1025-2",
+    "https://erikdemaine.org/papers/Hypar_GC/"
+   ],
+   [
+    "Same paper, full text (circular pleat = concentric circles with a central hole; conjectured to fold without extra creases)",
+    "https://ar5iv.arxiv.org/html/0906.4747"
+   ],
+   [
+    "Dias, Dudte, Mahadevan, Santangelo 2012, Geometric mechanics of curved crease origami, PRL 109:114301, doi:10.1103/PhysRevLett.109.114301 (a closed folded crease must buckle out of plane into a saddle)",
+    "https://link.aps.org/doi/10.1103/PhysRevLett.109.114301"
+   ],
+   [
+    "Demaine, Tachi 2017, Origamizer: a practical algorithm for folding any polyhedron, SoCG 2017, LIPIcs 34:1, doi:10.4230/LIPIcs.SoCG.2017.34",
+    "https://erikdemaine.org/papers/Origamizer_SoCG2017/"
+   ],
+   [
+    "Abel, Cantarella, Demaine, Eppstein, Hull, Ku, Lang, Tachi 2016, Rigid origami vertices: conditions and forcing sets, J Comput Geom 7(1):171, doi:10.20382/jocg.v7i1a9",
+    "https://erikdemaine.org/papers/RigidOrigami_JoCG/"
+   ],
+   [
+    "Hawkes, An, Benbernou, Tanaka, Kim, Demaine, Rus, Wood 2010, Programmable matter by folding, PNAS 107(28):12441, doi:10.1073/pnas.0914069107",
+    "https://erikdemaine.org/papers/Matter_PNAS"
+   ],
+   [
+    "Demaine, O'Rourke 2007, Geometric Folding Algorithms: Linkages, Origami, Polyhedra, Cambridge University Press, ISBN 9780521857574",
+    "https://erikdemaine.org/papers/GFALOP/"
+   ],
+   [
+    "Goriely, Destrade, Ben Amar 2006, Instabilities in elastomers and in soft tissues (neo-Hookean balloon pressure peak at stretch 7^(1/6) = 1.38, from Adkins and Rivlin 1952)",
+    "https://arxiv.org/pdf/0711.4664"
+   ],
+   [
+    "Guo, Wang, Fu 2022, Localised bulging of an inflated rubber tube with fixed ends (bulging starts at the pressure maximum)",
+    "https://ar5iv.labs.arxiv.org/html/2203.04110"
+   ],
+   [
+    "Smooth-On Dragon Skin 10 NV technical bulletin: SG 1.07, 100 % modulus 27 psi, elongation 663 %, pot life 15 min, cure 75 min",
+    "https://www.smooth-on.com/tb/files/DRAGON_SKIN_10_NV_TB.pdf"
+   ],
+   [
+    "Smooth-On Ecoflex series technical bulletin: 00-30 SG 1.07, 100 % modulus 10 psi, elongation 900 %, pot life 45 min, cure 4 h; platinum cure inhibitors listed",
+    "https://www.smooth-on.com/tb/files/ECOFLEX_SERIES_TB.pdf"
+   ]
+  ]
+ },
+ "belly_fold": {
+  "recommended": "Concentric elliptical pleats (closed curved creases, a curved crease bellows dome) around a small crown cap, rim clamped at the seam. One pleat family, no vertices, no pleat ends.",
+  "params": {
+   "pleats": 5,
+   "pitch_mm": 58,
+   "depth_folded_mm": 16,
+   "wall_mm": 1.5,
+   "crease_gap_mm": 3.0,
+   "crown_cap_mm": "120 x 110 (innermost pleat r 60 or more)",
+   "pleated_plan_area_m2": 0.29,
+   "stored_length_per_meridian_mm": 82,
+   "max_crown_rise_mm": 54,
+   "design_stop_L": 10,
+   "design_stop_rise_mm": 41,
+   "rise_per_L_mm": 4.1,
+   "open_pressure_kPa": "0.05 to 0.1",
+   "skin_weight_Pa": 16,
+   "hoop_stretch_innermost": 1.07,
+   "stop": "tether net or skin going taut at 10 L, then gas compliance 1.6 L/kPa",
+   "rise_for_baby_air_8_35L_mm": 34,
+   "web_model_now": "17.9 L and 73 mm: about 2x too much for the air the baby takes in"
+  },
+  "why": "A dome must lengthen along every meridian to rise. Closed concentric pleats store length in all directions, have no ends at the fixed seam, and no vertices. In paper a closed curved pleat buckles into a saddle (Albers 1927-28; Dias 2012; Demaine et al. 2011); in printed silicone the small hoop stretch (about 7 % at the innermost pleat) lets it rise round, with a faint saddle wobble at most. The current straight transverse pleats store length only along x: the web model needs about 10 % stretch across, and each pleat must die out where it meets the seam.",
+  "rejected": [
+   [
+    "Straight transverse pleats (current)",
+    "Store length along x only; rise needs about 10 % stretch across; pleat ends at the clamped seam concentrate strain."
+   ],
+   [
+    "Waterbomb dome (proposal A)",
+    "Works only with stiff panels (1 mm PC) and about 190 triangles; vertex seals in silicone are the weak point; more parts."
+   ],
+   [
+    "Kresling",
+    "Needs twist; a dome clamped on a fixed elliptical rim cannot twist."
+   ],
+   [
+    "Yoshimura",
+    "A cylinder pattern, not a dome; many vertices."
+   ],
+   [
+    "Radial or flasher pleats",
+    "Open in plane, so the dome spreads and flattens instead of rising."
+   ],
+   [
+    "Pleated hypar (straight concentric squares)",
+    "Does not exist with only its creases (Demaine et al. 2011); folds to a saddle, not a dome."
+   ],
+   [
+    "Origamizer",
+    "Exact target shape but tucks stack layers with no gap; a paper method."
+   ]
+  ],
+  "demaine": [
+   [
+    "Curved crease, concentric pleats",
+    "Recommended family; Demaine sculptures use concentric circles and ellipses; Albers pleat twists to a saddle in paper (erikdemaine.org/curved/history)."
+   ],
+   [
+    "(Non)existence of pleated folds",
+    "Inextensible pleats need extra creases; silicone uses stretch instead, kept under 10 %."
+   ],
+   [
+    "Flat and rigid foldability",
+    "Neither is needed: the skin is printed folded with gaps and opens by bending."
+   ],
+   [
+    "Self folding",
+    "Printed rest state = folded belly, so venting returns it to folded by itself."
+   ]
+  ],
+  "sources": [
+   [
+    "Demaine, Demaine, Hart, Price, Tachi 2011, (Non)existence of pleated folds: how paper folds between creases, Graphs and Combinatorics 27(3):377, doi:10.1007/s00373-011-1025-2",
+    "https://erikdemaine.org/papers/Hypar_GC/"
+   ],
+   [
+    "Same paper, full text (circular pleat = concentric circles with a central hole; conjectured to fold without extra creases)",
+    "https://ar5iv.arxiv.org/html/0906.4747"
+   ],
+   [
+    "Demaine, History of Curved Origami Sculpture (Albers 1927-28 concentric circle pleat twists into a saddle)",
+    "https://erikdemaine.org/curved/history/"
+   ],
+   [
+    "Dias, Dudte, Mahadevan, Santangelo 2012, Geometric mechanics of curved crease origami, PRL 109:114301, doi:10.1103/PhysRevLett.109.114301 (a closed folded crease must buckle out of plane into a saddle)",
+    "https://link.aps.org/doi/10.1103/PhysRevLett.109.114301"
+   ],
+   [
+    "Demaine, Tachi 2017, Origamizer: a practical algorithm for folding any polyhedron, SoCG 2017, LIPIcs 34:1, doi:10.4230/LIPIcs.SoCG.2017.34",
+    "https://erikdemaine.org/papers/Origamizer_SoCG2017/"
+   ],
+   [
+    "Abel, Cantarella, Demaine, Eppstein, Hull, Ku, Lang, Tachi 2016, Rigid origami vertices: conditions and forcing sets, J Comput Geom 7(1):171, doi:10.20382/jocg.v7i1a9",
+    "https://erikdemaine.org/papers/RigidOrigami_JoCG/"
+   ],
+   [
+    "Hawkes, An, Benbernou, Tanaka, Kim, Demaine, Rus, Wood 2010, Programmable matter by folding, PNAS 107(28):12441, doi:10.1073/pnas.0914069107",
+    "https://erikdemaine.org/papers/Matter_PNAS"
+   ],
+   [
+    "Demaine, O'Rourke 2007, Geometric Folding Algorithms: Linkages, Origami, Polyhedra, Cambridge University Press, ISBN 9780521857574",
+    "https://erikdemaine.org/papers/GFALOP/"
+   ],
+   [
+    "Kresling 2020, The Fifth Fold: complex symmetries in Kresling origami patterns, Symmetry: Culture and Science 31(4):403, doi:10.26830/symmetry_2020_4_403",
+    "https://journal-scs.symmetry.hu/abstract/?pid=814"
+   ],
+   [
+    "Melancon, Gorissen, Garcia-Mora, Hoberman, Bertoldi 2021, Multistable inflatable origami structures at the metre scale, Nature 592:545, doi:10.1038/s41586-021-03407-4",
+    "https://par.nsf.gov/servlets/purl/10295963"
+   ],
+   [
+    "Smooth-On Dragon Skin 10 NV technical bulletin: SG 1.07, 100 % modulus 27 psi, elongation 663 %, pot life 15 min, cure 75 min",
+    "https://www.smooth-on.com/tb/files/DRAGON_SKIN_10_NV_TB.pdf"
+   ]
+  ]
+ },
+ "birth": {
+  "equations": [
+   [
+    "gel hold",
+    "F_hold = 3.5 pi d^2 tau_y",
+    "Force the gel needs to hold a body of size d still. From Y = 3 tau_y/(drho g d) and Y_c = 0.145."
+   ],
+   [
+    "breakout",
+    "rho_gel g V_air > F_hold",
+    "Air volume that frees the folded baby; it then rises to the gel surface."
+   ],
+   [
+    "crest stretch",
+    "lambda_i = (r_o - h cos(beta)) / r_i",
+    "Hoop stretch at the inner crest when flanks open by beta. Keep at 1.25 or less."
+   ],
+   [
+    "length",
+    "L = 10 h sin(beta) + 11 g + 4 t",
+    "Bellows length from the flank angle."
+   ],
+   [
+    "bellows curve",
+    "p_eq(L) = dU/dV, U = sum of 0.5 E t eps_theta^2 over the flanks",
+    "Pressure that holds length L. Use the L_vs_p table."
+   ],
+   [
+    "growth push",
+    "F_grow = (p_b - p_eq(L)) A_eff, A_eff = pi r_m^2, r_m = (r_o + lambda r_i)/2",
+    "Push of the nose while the arm holds the tail on the needle."
+   ],
+   [
+    "tether",
+    "L <= L_max",
+    "Stops growth; above it extra pressure only stiffens."
+   ],
+   [
+    "womb push",
+    "F_w = p_w A_seal, A_seal = pi r_o^2",
+    "Gauge womb pressure on the sealed canal section."
+   ],
+   [
+    "sleeve squeeze",
+    "N = 2 pi L_s E_s t_s (lambda_s - 1), lambda_s = r_o / r_s0",
+    "Normal force of the stretched soft sleeve on the baby."
+   ],
+   [
+    "friction",
+    "F_f = mu N (mu_s at rest, mu_k sliding)",
+    "Silicone on silicone, wet with gel or water."
+   ],
+   [
+    "incline",
+    "F_inc = m g sin(theta)",
+    "Weight along the 21 deg canal axis."
+   ],
+   [
+    "buoyancy pull",
+    "F_b = rho_w g V_sub sin(theta)",
+    "Part already in the water floats and pulls along the axis."
+   ],
+   [
+    "gel drag",
+    "F_gel = 3.5 pi d^2 tau_y f_sub",
+    "Only for the share f_sub still in the gel."
+   ],
+   [
+    "motion",
+    "v = (F_net - F_k)/c if F_net > F_s at rest, else v = 0; F_net = F_w + F_grow + F_b - F_inc - F_gel",
+    "Overdamped stick slip; c about 1000 N s/m (tune)."
+   ],
+   [
+    "womb gas",
+    "dp_w/dt = (Q_in - A_seal v - dV_belly/dt) / C_gas, C_gas = V_air/p_0",
+    "Womb pressure once the belly is at its stop. Below the stop p_w stays at the belly open pressure."
+   ],
+   [
+    "slip per pulse",
+    "ds = dV_pulse / A_seal",
+    "Advance per contraction volume."
+   ],
+   [
+    "slip arrest",
+    "dp = (mu_s - mu_k) N / A_seal",
+    "Pressure lost in one slip; it then sticks again."
+   ],
+   [
+    "inflation",
+    "dV_b/dt = Q_pump while p_b < p_set",
+    "Pump limited filling."
+   ],
+   [
+    "cap peak",
+    "p_max = 2.48 mu t / R (stretch 7^(1/6) = 1.38)",
+    "Neo-Hookean balloon peak; above it a cap bulges away."
+   ]
+  ],
+  "params": {
+   "tau_y_Pa": "50 (range 10 to 100; measure)",
+   "rho_gel": 1000,
+   "rho_water": 1000,
+   "g": 9.81,
+   "p0_Pa": 101325,
+   "r_o_m": 0.105,
+   "r_i_m": 0.055,
+   "h_m": 0.05,
+   "g_m": 0.003,
+   "t_m": 0.0015,
+   "E_DS10_Pa": 319000,
+   "L_max_m": 0.385,
+   "A_eff_m2": 0.0237,
+   "A_seal_m2": 0.0346,
+   "theta_deg": 20.8,
+   "canal_bore_mm": 280,
+   "sleeve": {
+    "r_s0_m": 0.09,
+    "L_s_m": 0.08,
+    "t_s_m": 0.003,
+    "E_s_Pa": 118000,
+    "material": "Ecoflex 00-30"
+   },
+   "mu_s": 0.6,
+   "mu_k": 0.4,
+   "mu_note": "assumed; about 0.2 wet with suspensions (Yakubov 2015), high when dry (Selway 2017); test on a tilt plate",
+   "m_baby_kg": "0.76 dry, 1.67 with trapped gel",
+   "Q_pump_L_min": "3 (assumed; measure)",
+   "p_set_kPa": 1.0,
+   "C_gas_L_per_kPa": 1.62,
+   "V_air_womb_L": "124 plus about 40 in the docked tail",
+   "belly_open_kPa": 0.07,
+   "belly_cap_L": 10,
+   "c_N_s_per_m": 1000
+  },
+  "numbers": [
+   [
+    "canal lowest bore point above gel surface (print level)",
+    "74 mm"
+   ],
+   [
+    "canal lowest bore point above waterline (mother 45 kg)",
+    "48 mm"
+   ],
+   [
+    "gel hold on folded baby (d_eq 153 mm) at 10 / 50 / 100 Pa",
+    "2.6 / 12.8 / 25.7 N"
+   ],
+   [
+    "air for breakout at 10 / 50 / 100 Pa",
+    "0.26 / 1.3 / 2.6 L"
+   ],
+   [
+    "bellows pressure to full length (DS10)",
+    "0.37 kPa"
+   ],
+   [
+    "growth push at 1 kPa, L 250 mm",
+    "22 N"
+   ],
+   [
+    "sleeve stretch / normal force",
+    "1.17 / 30 N"
+   ],
+   [
+    "friction static / sliding",
+    "17.8 / 11.9 N"
+   ],
+   [
+    "incline along axis, dry / with gel",
+    "2.6 / 5.8 N"
+   ],
+   [
+    "womb push per 1 kPa",
+    "34.6 N"
+   ],
+   [
+    "womb pressure to start sliding (no growth push)",
+    "0.68 kPa"
+   ],
+   [
+    "gel drag if fully in gel at 50 Pa (d 210 mm)",
+    "24 N"
+   ],
+   [
+    "pressure lost per slip",
+    "0.17 kPa (about 8 mm of travel)"
+   ],
+   [
+    "advance per 1 L contraction",
+    "29 mm"
+   ],
+   [
+    "chute length from gel surface to bore at 21 deg",
+    "207 mm"
+   ],
+   [
+    "inflation time, 8.35 L at 3 L/min",
+    "170 s"
+   ],
+   [
+    "contraction pulse 0.7 to 1.0 kPa needs",
+    "1.1 to 1.6 L in about 2 s"
+   ],
+   [
+    "full birth after cure",
+    "about 7 to 9 min"
+   ],
+   [
+    "newborn floats with",
+    "82 N lift, about 17 % submerged"
+   ]
+  ],
+  "sequence": [
+   "print folded",
+   "cure in gel (DS10 75 min)",
+   "first breath 1.3 L at 0.25 kPa: breakout, float up",
+   "arm pitches the baby to the 21 deg chute, holds the tail on the needle",
+   "growth to 385 mm at up to 1 kPa: nose climbs 207 mm, enters the sleeve in stick slip steps",
+   "needle out, valve shuts",
+   "womb contractions 0.7 to 1 kPa push the rest, buoyancy pulls once the nose is in the water",
+   "tail leaves, sleeve shuts, belly drops"
+  ],
+  "sources": [
+   [
+    "Tabuteau, Coussot, de Bruyn 2007, Drag force on a sphere in steady motion through a yield-stress fluid, J Rheol 51(1):125, doi:10.1122/1.2401614 (Carbopol; critical Y 0.145, Beris et al. 1985 predict 0.143)",
+    "https://physics.uwo.ca/~debruyn/pdfs/j_rheol_2007.pdf"
+   ],
+   [
+    "Hawkes, Blumenschein, Greer, Okamura 2017, A soft robot that navigates its environment through growth, Science Robotics 2(8):eaan3028, doi:10.1126/scirobotics.aan3028",
+    "https://escholarship.org/content/qt3nx45751/qt3nx45751.pdf"
+   ],
+   [
+    "Goriely, Destrade, Ben Amar 2006, Instabilities in elastomers and in soft tissues (neo-Hookean balloon pressure peak at stretch 7^(1/6) = 1.38, from Adkins and Rivlin 1952)",
+    "https://arxiv.org/pdf/0711.4664"
+   ],
+   [
+    "Guo, Wang, Fu 2022, Localised bulging of an inflated rubber tube with fixed ends (bulging starts at the pressure maximum)",
+    "https://ar5iv.labs.arxiv.org/html/2203.04110"
+   ],
+   [
+    "Smooth-On Dragon Skin 10 NV technical bulletin: SG 1.07, 100 % modulus 27 psi, elongation 663 %, pot life 15 min, cure 75 min",
+    "https://www.smooth-on.com/tb/files/DRAGON_SKIN_10_NV_TB.pdf"
+   ],
+   [
+    "Smooth-On Ecoflex series technical bulletin: 00-30 SG 1.07, 100 % modulus 10 psi, elongation 900 %, pot life 45 min, cure 4 h; platinum cure inhibitors listed",
+    "https://www.smooth-on.com/tb/files/ECOFLEX_SERIES_TB.pdf"
+   ],
+   [
+    "Yakubov, Branfield, Bongaerts, Stokes 2015, Tribology of particle suspensions in rolling-sliding soft contacts, Biotribology 3:1 (PDMS on PDMS with aqueous particle suspensions: friction about 0.2 at 1 mm/s)",
+    "https://core.ac.uk/download/43380511.pdf"
+   ],
+   [
+    "Selway, Stokes 2017, Soft Matter 13:1702 (notes the high Coulomb friction of PDMS on PDMS)",
+    "https://core.ac.uk/download/83983552.pdf"
+   ],
+   [
+    "Hinton, Hudson, Pusch, Lee, Feinberg 2016, 3D printing PDMS elastomer in a hydrophilic support bath via freeform reversible embedding, ACS Biomater Sci Eng, doi:10.1021/acsbiomaterials.6b00170",
+    "https://acs.figshare.com/articles/journal_contribution/3D_Printing_PDMS_Elastomer_in_a_Hydrophilic_Support_Bath_via_Freeform_Reversible_Embedding/3386209/1"
+   ],
+   [
+    "Lubrizol Pharmaceutical Bulletin 6, Thickening Properties: Carbopol 940 0.5 % at pH 7 about 58,000 cP; soluble salts lower mucilage efficiency",
+    "https://www.lubrizol.com:443/-/media/Lubrizol/Health/Literature/Bulletin-06---Thickening-Properties.pdf"
+   ],
+   [
+    "DexArm datasheet (MYBOTSHOP, manufacturer specs): repeatability 0.05 mm, precision 0.1 mm, payload 500 g, max print speed 150 mm/s, 2.4 kg",
+    "https://www.mybotshop.de/Datasheet/Datasheet_DexArm_MakerKit.pdf"
+   ]
+  ]
+ },
+ "swelling": {
+  "reasons": [
+   [
+    "baby air from outside into the closed womb",
+    "+8.35 L, crown rises about 34 mm (4.1 mm per L)",
+    "Gel is incompressible, so every litre pumped into the baby lifts the gel and the pleated belly. If the pump draws womb air instead, there is no swelling."
+   ],
+   [
+    "first breath",
+    "+1.3 L, about 5 mm rise; gel level +3.9 mm",
+    "Breakout air."
+   ],
+   [
+    "printing",
+    "+0.64 L silicone from the syringe, about 2.6 mm rise; gel level +1.9 mm",
+    "The print adds volume to the womb."
+   ],
+   [
+    "belly as accumulator",
+    "opens at 0.05 to 0.1 kPa up to 10 L, then 1.6 L/kPa",
+    "While pleats open the pressure stays low; at the stop the womb air is the spring."
+   ],
+   [
+    "contractions",
+    "0.7 to 1.0 kPa pulses of 1.1 to 1.6 L",
+    "Tendons pulling the belly in (belly dips about 5 mm) or a reservoir puff (belly taut, no visible dip)."
+   ],
+   [
+    "stick slip twitch",
+    "0.17 kPa drop, about 0.3 L, 1 mm",
+    "Each slip of the baby frees womb volume; the belly gives a small after kick."
+   ],
+   [
+    "baby leaving",
+    "9.3 L leaves over the push; ends 0.9 L below the start (about 4 mm)",
+    "The baby takes its volume and 0.9 L of trapped gel out; gel level drops 2.7 mm per birth."
+   ],
+   [
+    "venting after birth",
+    "back to printed rest shape",
+    "The folded print is the rest state, so the belly refolds by itself."
+   ],
+   [
+    "arm coming in",
+    "mother sinks about 9 mm",
+    "3.4 kg of arm and carriage moves from tail to mother; waterplane 0.38 m2."
+   ],
+   [
+    "newborn gone",
+    "mother rises about 4 mm",
+    "1.67 kg leaves."
+   ]
+  ],
+  "web_model_fix": "bellyNow should follow V_baby_inside / 10 L and never exceed the litres the baby took in: about 34 mm, not 73. After birth it ends about 0.05 below the start, not at 0.2 of full.",
+  "sources": [
+   [
+    "Demaine, History of Curved Origami Sculpture (Albers 1927-28 concentric circle pleat twists into a saddle)",
+    "https://erikdemaine.org/curved/history/"
+   ],
+   [
+    "Dias, Dudte, Mahadevan, Santangelo 2012, Geometric mechanics of curved crease origami, PRL 109:114301, doi:10.1103/PhysRevLett.109.114301 (a closed folded crease must buckle out of plane into a saddle)",
+    "https://link.aps.org/doi/10.1103/PhysRevLett.109.114301"
+   ],
+   [
+    "Hawkes, An, Benbernou, Tanaka, Kim, Demaine, Rus, Wood 2010, Programmable matter by folding, PNAS 107(28):12441, doi:10.1073/pnas.0914069107",
+    "https://erikdemaine.org/papers/Matter_PNAS"
+   ],
+   [
+    "Smooth-On Dragon Skin 10 NV technical bulletin: SG 1.07, 100 % modulus 27 psi, elongation 663 %, pot life 15 min, cure 75 min",
+    "https://www.smooth-on.com/tb/files/DRAGON_SKIN_10_NV_TB.pdf"
+   ],
+   [
+    "Hinton, Hudson, Pusch, Lee, Feinberg 2016, 3D printing PDMS elastomer in a hydrophilic support bath via freeform reversible embedding, ACS Biomater Sci Eng, doi:10.1021/acsbiomaterials.6b00170",
+    "https://acs.figshare.com/articles/journal_contribution/3D_Printing_PDMS_Elastomer_in_a_Hydrophilic_Support_Bath_via_Freeform_Reversible_Embedding/3386209/1"
+   ]
+  ]
+ },
+ "push_methods": [
+  [
+   "DexArm push",
+   "no",
+   "Payload 500 g, so a few N at most; guide and hold the tail needle only.",
+   "https://www.mybotshop.de/Datasheet/Datasheet_DexArm_MakerKit.pdf"
+  ],
+  [
+   "Womb pressure pulses",
+   "works after test",
+   "0.7 to 1 kPa on the sealed 210 mm section gives 24 to 35 N, above 18 N static friction; needs a seal and a belly stop; 29 mm per 1 L pulse.",
+   "https://escholarship.org/content/qt3nx45751/qt3nx45751.pdf"
+  ],
+  [
+   "Everting liner in the canal",
+   "works after test",
+   "A thin tube stored in the funnel everts outward around the baby; grows when p exceeds a yield pressure, rate about proportional to (p - Y). One more part.",
+   "https://escholarship.org/content/qt3nx45751/qt3nx45751.pdf"
+  ],
+  [
+   "Peristaltic canal rings",
+   "works after test",
+   "3 or more ring chambers in the sleeve fired in sequence move a bolus; adds 3 valves and lines.",
+   "https://researchspace.auckland.ac.nz/handle/2292/40216?show=full"
+  ],
+  [
+   "Gel flow",
+   "no",
+   "Canal is 74 mm above the gel, so gel cannot carry the baby there; liquefying gel with salt ruins the bath.",
+   "https://www.lubrizol.com:443/-/media/Lubrizol/Health/Literature/Bulletin-06---Thickening-Properties.pdf"
+  ],
+  [
+   "Baby growth ratchet (tail on needle)",
+   "works",
+   "Bellows growth pushes the nose with about 20 N at 1 kPa; tether stops it at 385 mm.",
+   "https://pmc.ncbi.nlm.nih.gov/articles/PMC5740677"
+  ],
+  [
+   "Buoyancy",
+   "works for breakout only",
+   "Rises the baby to the gel surface once air exceeds the gel hold; outside, the part in water adds rho g V sin 21 deg.",
+   "https://physics.uwo.ca/~debruyn/pdfs/j_rheol_2007.pdf"
+  ]
+ ],
+ "precision": [
+  [
+   "RLP finest silicone bead",
+   "1.02 mm high x 1.14 mm wide from a 1.07 mm nozzle",
+   "https://dspace.mit.edu/bitstream/handle/1721.1/122801/3dp.2017.0037.pdf?sequence=2"
+  ],
+  [
+   "RLP nozzles / speed / path",
+   "0.15 to 3.0 mm ID; up to 50 mm/s shown; 3D paths, no layers",
+   "https://dspace.mit.edu/bitstream/handle/1721.1/122801/3dp.2017.0037.pdf?sequence=2"
+  ],
+  [
+   "RLP robot error",
+   "about 0.5 mm (6 axis robot)",
+   "https://dspace.mit.edu/bitstream/handle/1721.1/122801/3dp.2017.0037.pdf?sequence=2"
+  ],
+  [
+   "RLP gel",
+   "Carbomer 940 0.5 % (0.25 to 1.0 %), pH 7",
+   "https://dspace.mit.edu/bitstream/handle/1721.1/122801/3dp.2017.0037.pdf?sequence=2"
+  ],
+  [
+   "Embedded silicone smallest feature",
+   "30 um; trachea wall 0.40 to 0.45 mm (organogel, yield 3 to 4 Pa)",
+   "https://par.nsf.gov/servlets/purl/10085332"
+  ],
+  [
+   "Carbopol 0.2 % bath",
+   "yield 9 Pa, G 64 Pa; disturbance gone within about 1 tip diameter",
+   "https://par.nsf.gov/servlets/purl/10085335"
+  ],
+  [
+   "Yielded zone around nozzle",
+   "2 to 5 nozzle diameters wide",
+   "https://lewisgroup.seas.harvard.edu/resource/pdf-24"
+  ],
+  [
+   "PDMS in Carbopol",
+   "held up to 72 h of cure; released with saline",
+   "https://acs.figshare.com/articles/journal_contribution/3D_Printing_PDMS_Elastomer_in_a_Hydrophilic_Support_Bath_via_Freeform_Reversible_Embedding/3386209/1"
+  ],
+  [
+   "Project bath (replicated paper)",
+   "1 % w/v Carbopol",
+   "https://par.nsf.gov/servlets/purl/10432202"
+  ],
+  [
+   "DexArm repeatability",
+   "0.05 mm",
+   "https://manual.rotrics.com/product-overview/product-profile"
+  ],
+  [
+   "DexArm precision / payload / speed",
+   "0.1 mm / 500 g / 150 mm/s",
+   "https://www.mybotshop.de/Datasheet/Datasheet_DexArm_MakerKit.pdf"
+  ],
+  [
+   "Project bead and layer",
+   "1.6 mm wide x 1.5 mm high; layer 1.2 to 1.5 mm",
+   "https://dspace.mit.edu/bitstream/handle/1721.1/122801/3dp.2017.0037.pdf?sequence=2"
+  ],
+  [
+   "Project wall",
+   "1.5 mm flanks, 3.0 mm caps (2 layers)",
+   "https://www.smooth-on.com/tb/files/DRAGON_SKIN_10_NV_TB.pdf"
+  ],
+  [
+   "Project gel gap (no fusion)",
+   "3.0 mm; test coupons at 2.5, 3, 4 mm (needle OD about 2.1 mm)",
+   "https://par.nsf.gov/servlets/purl/10085335"
+  ],
+  [
+   "Project valve seat",
+   "do not print the seat; print a pocket 1 mm oversize, place a moulded valve core with the arm, print over it",
+   "https://par.nsf.gov/servlets/purl/10085335"
+  ],
+  [
+   "Project capsule pocket",
+   "3 mm clearance all round",
+   "https://lewisgroup.seas.harvard.edu/resource/pdf-24"
+  ],
+  [
+   "Shape error budget",
+   "about 0.3 to 0.5 mm, set by gel and bead, not by the arm (0.05 mm)",
+   "https://lewisgroup.seas.harvard.edu/resource/pdf-24"
+  ],
+  [
+   "Silicone timing",
+   "DS10 pot life 15 min, cure 75 min: mix at the nozzle",
+   "https://www.smooth-on.com/tb/files/DRAGON_SKIN_10_NV_TB.pdf"
+  ]
+ ],
+ "docking": {
+  "numbers": [
+   [
+    "hatch bore in scene",
+    "D 227 (inner of bore hoop)"
+   ],
+   [
+    "DexArm base alone, smallest circle",
+    "R 112 mm"
+   ],
+   [
+    "DexArm with tool, most compact pose found",
+    "R 117 mm (stowed pose R 152)"
+   ],
+   [
+    "bore needed",
+    "D 250 (8 mm clearance)"
+   ],
+   [
+    "lateral tolerance after guide",
+    "8 mm or less"
+   ],
+   [
+    "tilt tolerance",
+    "2 deg (5 mm lip over R 138)"
+   ],
+   [
+    "roll tolerance",
+    "15 deg with 12 alternating magnets"
+   ],
+   [
+    "magnets in scene",
+    "mother 4 at 45 + 90k deg, tail 6 at 0 + 60k deg: none face each other; faces 18 mm apart"
+   ],
+   [
+    "N42 D20 x 8 pair pull at 2 / 4 / 6 / 18 mm",
+    "64 / 42 / 30 / 5 N (model; datasheet 91 N to steel)"
+   ],
+   [
+    "12 pairs at 2 mm",
+    "770 N, about 100 N m"
+   ],
+   [
+    "womb pressure on dock seal R 138 at 1 / 2 kPa",
+    "60 / 120 N"
+   ],
+   [
+    "growth reaction through arm",
+    "20 to 30 N"
+   ],
+   [
+    "DexArm reaction",
+    "5 N or less"
+   ],
+   [
+    "drag at 0.05 m/s",
+    "about 0.1 N"
+   ],
+   [
+    "arm weight moment",
+    "20 N m (3.4 kg x 0.6 m)"
+   ],
+   [
+    "hold needed (x2)",
+    "300 N and 40 N m"
+   ],
+   [
+    "magnet snap 14 to 2 mm",
+    "3.7 J, up to 0.39 m/s for 50 kg: use the soft bleed lip"
+   ],
+   [
+    "boom stroke",
+    "0 to 0.62 m, print at 0.49 to 0.59 m"
+   ],
+   [
+    "rail slope",
+    "5.5 % (3.1 deg)"
+   ],
+   [
+    "mother sink when arm enters",
+    "9 mm"
+   ]
+  ],
+  "geometry": "Female lead in on the mother band: 35 to 40 deg half angle, 30 mm deep, R 150 to R 125, so it captures 21 to 25 mm of offset. Half angle must stay below 90 deg minus the friction angle (45 deg for silicone at mu 1). Tail rim rounded R 10, no male cone. 12 N42 D20 x 8 pairs on both rings at the same radius (r 134) and angles, 1 mm cover each side, alternating poles for roll. Hollow lip seals 12 mm early and bleeds to slow the snap. Rails: joint gap 3 mm or less, step 1 mm or less, 20 mm tapered lead in on the mother rods. Bore D 250 for the arm with its tool.",
+  "sources": [
+   [
+    "Hennessey 1982, Compliant part mating and minimum energy chamfer design, MIT MS thesis (Draper Lab, supervisor D. Whitney): no wedging if chamfer slope exceeds friction",
+    "https://core.ac.uk/download/4398847.pdf"
+   ],
+   [
+    "supermagnete S-20-08-N, disc 20 x 8 mm N42 axial: pull approx 9.3 kg (91.2 N), shear approx 1.9 kg (18.2 N), 19 g",
+    "https://supermagnete.pt/disc-magnets-neodymium/disc-magnet-20mm-8mm_S-20-08-N"
+   ],
+   [
+    "DexArm datasheet (MYBOTSHOP, manufacturer specs): repeatability 0.05 mm, precision 0.1 mm, payload 500 g, max print speed 150 mm/s, 2.4 kg",
+    "https://www.mybotshop.de/Datasheet/Datasheet_DexArm_MakerKit.pdf"
+   ],
+   [
+    "Rotrics DexArm manual, product profile: repeatability 0.05 mm",
+    "https://manual.rotrics.com/product-overview/product-profile"
+   ]
+  ]
+ },
+ "meta": {
+  "date": "2026-11-19",
+  "scene": "/home/claude/bnm_design/web_mother/scene.json",
+  "notes": "/home/claude/bnm_design/build_research/physics_notes.md",
+  "mother_mass_assumed_kg": 45
+ }
+}
