@@ -119,6 +119,7 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
   </section>
 
   <section id="fem"><h2>Birth, simulated properly</h2><p class="sub">An axisymmetric finite element model of the pressurised bellows, the soft sleeve, friction, the pump and the womb pulses, validated against the neo-Hookean balloon curve. The lanes above are a sketch; these are the numbers.</p><video src="media/birth_sim.mp4" poster="media/birth_sim_poster.png" controls muted playsinline style="width:100%;border:1px solid var(--line);border-radius:8px;background:#fff"></video><div id="femDoc" style="margin-top:16px"></div></section>
+  <section id="bench"><h2>Bench tests</h2><p class="sub">Seven measurements turn the model's assumptions into facts. Enter a result to check it against the design window. Results stay in this browser.</p><div id="benchDoc"></div></section>
   <section id="print">
     <h2>Printing in gel</h2>
     <p class="sub">A bead of silicone leaves the nozzle and stays where it is put, because the gel only flows where the nozzle cuts it. These are the numbers that decide wall, layer and pleat gap.</p>
@@ -584,10 +585,16 @@ async function renderFem() {
   const F = await getJSON("data/birth_sim.json"); if (!F) return;
   $("#femDoc").innerHTML = `<table class="t"><tr><th>Case</th><th>Passes</th><th>Time</th><th>Peak force</th><th>Notes</th></tr>${(F.cases || []).map((c) => `<tr><td>${esc(c.name)}</td><td>${c.passes ? "yes" : "no"}</td><td>${c.time_s != null ? esc(c.time_s) + " s" : ""}</td><td>${c.peak_force_N != null ? esc(c.peak_force_N) + " N" : ""}</td><td>${esc(c.notes)}</td></tr>`).join("")}</table><p style="margin-top:12px"><b>Safe window.</b> ${esc(F.window || "")}</p><p class="hint">${(F.sources || []).map((x) => `<a href="${esc(safeUrl(x[1]))}" target="_blank" rel="noopener">${esc(x[0])}</a>`).join(" · ")}</p>`;
 }
+async function renderBench() {
+  const B = await getJSON("data/bench.json"); if (!B) return; let saved = {}; try { saved = JSON.parse(localStorage.getItem("bnm-bench") || "{}"); } catch (e) {}
+  $("#benchDoc").innerHTML = B.tests.map((t, i) => `<div class="card"><h3>${i + 1}. ${esc(t.name)}</h3><p class="role">${esc(t.why)}</p><p><b>Kit.</b> ${esc(t.kit)}</p><ol>${t.steps.map((x) => `<li>${esc(x)}</li>`).join("")}</ol><p><b>Target.</b> ${esc(t.target)} · <a href="${esc(safeUrl(t.source[1]))}" target="_blank" rel="noopener">${esc(t.source[0])}</a></p><div class="ctl"><label for="b_${t.id}">Measured ${esc(t.unit)}</label><input type="number" step="any" id="b_${t.id}" value="${esc(saved[t.id] ?? "")}" style="font:13px var(--mono);padding:4px 6px;border:1px solid var(--line);border-radius:6px"><output id="o_${t.id}"></output></div></div>`).join("");
+  const check = (t) => { const v = parseFloat($("#b_" + t.id).value), o = $("#o_" + t.id); if (isNaN(v)) { o.textContent = ""; return; } const ok = (t.pass_max == null || v <= t.pass_max) && (t.pass_min == null || v >= t.pass_min); o.textContent = ok ? "in window" : "outside"; o.style.color = ok ? "var(--ok)" : "var(--bad)"; };
+  for (const t of B.tests) { const el = $("#b_" + t.id); el.addEventListener("input", () => { saved[t.id] = el.value; try { localStorage.setItem("bnm-bench", JSON.stringify(saved)); } catch (e) {} check(t); if (t.id === "mu" && !isNaN(parseFloat(el.value))) { $("#bMu").value = el.value; $("#bMu").dispatchEvent(new Event("input")); simReset(); } }); check(t); }
+}
 /* ====================================================================== start */
 (async () => {
   DATA = (await getJSON("data/components.json")) || DATA; PHYS = (await getJSON("data/physics.json")) || {};
-  renderTree(); renderPrecision(); renderV2(); renderFem(); renderPhysics(); renderSources(); applyPhysDefaults();
+  renderTree(); renderPrecision(); renderV2(); renderFem(); renderBench(); renderPhysics(); renderSources(); applyPhysDefaults();
   simReset(); requestAnimationFrame(simLoop); printCalc();
   try { await loadModel(); $("#loading").remove(); size(); frame(); } catch (e) { $("#loading").textContent = "The 3D model could not load here. The parts list still works."; console.error(e); }
 })();
