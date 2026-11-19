@@ -45,8 +45,8 @@
   },
   {
    "id": "siggraph-artist",
-   "who": "An artist with a background in marine biology",
-   "role": "shown in the SIGGRAPH 2026 Art Gallery with two talking robots worn on the shoulders",
+   "who": "An artist with a background in biology",
+   "role": "shown in the SIGGRAPH 2026 Art Gallery, Los Angeles, with two arguing AI voices worn on the shoulders",
    "when": "2026-07",
    "stance": "suggests",
    "themes": [
@@ -54,6 +54,19 @@
     "sex and gender"
    ],
    "said": "Some sea creatures have no fixed sex. She was the first to raise this, and it opened the question of whether a mother is a sex, a gender or a role.",
+   "kind": "conversation"
+  },
+  {
+   "id": "la-alumnus",
+   "who": "An MIT graduate of more than 30 years ago",
+   "role": "met at the Worlds in Action Hack, SIGGRAPH edition, Los Angeles",
+   "when": "2026-07",
+   "stance": "affirms",
+   "themes": [
+    "fear of AI",
+    "lovable"
+   ],
+   "said": "Many people are afraid of AI. A small, lovable robot body changes that. A robot mother raising a baby shows AI as gentle, even lovable, and then people may stop being afraid.",
    "kind": "conversation"
   },
   {
@@ -71,7 +84,7 @@
   {
    "id": "zach",
    "who": "Zach Lieberman",
-   "role": "artist, MIT Media Lab",
+   "role": "artist, Future Sketches, MIT Media Lab",
    "when": "2026-10",
    "stance": "questions",
    "themes": [
@@ -83,7 +96,7 @@
   {
    "id": "blaise",
    "who": "Blaise Agüera y Arcas",
-   "role": "Google",
+   "role": "Vice President and Fellow, Google",
    "when": "2026-10-13",
    "stance": "questions",
    "themes": [
@@ -145,19 +158,6 @@
     "Jibo"
    ],
    "said": "Why was Jibo so loved? Its small shifts of expression and motion feel so natural that people forget how hard they were to make. Interaction with a robot works when it is smooth enough to go unnoticed.",
-   "kind": "conversation"
-  },
-  {
-   "id": "la-alumnus",
-   "who": "An MIT graduate of more than 30 years ago",
-   "role": "met at the World in Action hackathon, Los Angeles",
-   "when": "2026",
-   "stance": "affirms",
-   "themes": [
-    "fear of AI",
-    "lovable"
-   ],
-   "said": "Many people are afraid of AI. A small, lovable robot body changes that. A robot mother raising a baby shows AI as gentle, even lovable, and then people may stop being afraid.",
    "kind": "conversation"
   },
   {
@@ -226,7 +226,7 @@
   {
    "id": "steve-mann",
    "who": "Steve Mann",
-   "role": "MIT Media Lab alumnus",
+   "role": "MIT Media Lab alumnus (PhD 1997), University of Toronto",
    "when": "2026-11",
    "stance": "questions",
    "themes": [
@@ -256,7 +256,7 @@
    "id": "mark-feldmeier",
    "kind": "collaborator",
    "who": "Mark Feldmeier",
-   "role": "Responsive Environments, MIT Media Lab; independent study advisor",
+   "role": "Lecturer, Responsive Environments, MIT Media Lab; independent study advisor",
    "when": "2026",
    "stance": "suggests",
    "themes": [
@@ -311,7 +311,7 @@
    "id": "kexin-wang",
    "kind": "collaborator",
    "who": "Kexin Wang",
-   "role": "HCI Engineering Group, MIT CSAIL",
+   "role": "MIT CSAIL",
    "when": "2026",
    "stance": "suggests",
    "themes": [

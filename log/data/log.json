@@ -20,20 +20,30 @@
   }
  },
  {
-  "date": "2026-04",
+  "date": "2026-03",
   "stage": "show",
   "title": "Hard Mode hackathon prize",
-  "text": "At Hard Mode, MIT's AI and hardware hackathon, the project runs under the name Life 3.0. The jury creates a Special Visionary Prize for it.",
+  "text": "At Hard Mode, the MIT Media Lab's hardware and AI hackathon (6 to 8 March 2026), the project runs under the name Life 3.0. The jury creates a Special Visionary Prize for it.",
   "media": [],
-  "links": []
+  "links": [
+   {
+    "label": "HARD MODE: Hardware x AI Hackathon, MIT Media Lab",
+    "url": "https://hardmode.media.mit.edu"
+   }
+  ]
  },
  {
   "date": "2026-08",
   "stage": "show",
   "title": "ALIFE 2026, Waterloo",
-  "text": "Shown in the ALIFE 2026 art gallery as an exhibition finalist, and presented in a 7 minute talk at the Artificial Life in the Wild workshop. The display is a 3D printed resin model in a water tank, a looping video and a monitor.",
+  "text": "Shown in the ALIFE 2026 art gallery as an exhibition finalist, and presented in a 7 minute talk at the Artificial Life in the Wild workshop (listed by ALIFE 2026 as Agent Ethology, studying artificial life in the wild) on 20 Aug. The conference ran 17 to 21 Aug in Waterloo, Ontario. The display is a 3D printed resin model in a water tank, a looping video and a monitor.",
   "media": [],
-  "links": []
+  "links": [
+   {
+    "label": "Artificial Life in the Wild workshop, ALIFE 2026",
+    "url": "https://alife-in-the-wild.github.io/"
+   }
+  ]
  },
  {
   "date": "2026-08-27",
@@ -514,12 +524,17 @@
   }
  },
  {
-  "date": "2026-11-09",
+  "date": "2026-11-11",
   "stage": "show",
-  "title": "VISAP 2026, Boston",
-  "text": "Shown in the IEEE VIS Arts Program, 9 to 13 Nov. Visitors no longer reach into the water: a hand resting on a copper strip along the tank's top edge is the touch.",
+  "title": "VISAP 2026: Amplification, MIT Met Warehouse",
+  "text": "Shown in Amplification, the exhibition of VISAP 2026, the IEEE VIS Arts Program, at MIT Met Warehouse in Cambridge from 11 to 13 Nov, alongside IEEE VIS in Boston (9 to 13 Nov). Visitors no longer reach into the water: a hand resting on a copper strip along the tank's top edge is the touch.",
   "media": [],
-  "links": []
+  "links": [
+   {
+    "label": "VISAP 2026 exhibition, Amplification",
+    "url": "https://visap.net/2026/exhibition.html"
+   }
+  ]
  },
  {
   "date": "2026-11",
@@ -535,14 +550,6 @@
   "threads": {
    "tail": "Tail body born as a collapsed bellows; the made core slides in after birth."
   }
- },
- {
-  "date": "2026-11",
-  "stage": "show",
-  "title": "Amplification, MIT Met Warehouse",
-  "text": "Shown in Amplification, an exhibition at MIT Met Warehouse in Boston, in November 2026. The exact dates are not in the sources.",
-  "media": [],
-  "links": []
  },
  {
   "date": "2026-11-14",
