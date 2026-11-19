@@ -95,6 +95,19 @@
    "kind": "conversation"
   },
   {
+   "id": "city-science-instructor",
+   "kind": "conversation",
+   "who": "An instructor of the City Science class",
+   "role": "MAS.552, MIT Media Lab, Fall 2026",
+   "when": "2026-10",
+   "stance": "suggests",
+   "themes": [
+    "the name",
+    "umbilical cord"
+   ],
+   "said": "Born, Not Made is a good name; there may be an even better one, but do not change it until a better one appears. The cord between mother and child is like the tie between the mother robot and the arm."
+  },
+  {
    "id": "cynthia",
    "who": "Cynthia Breazeal",
    "role": "Personal Robots, MIT Media Lab",
@@ -276,6 +289,41 @@
     "Much of the writing work around the project."
    ],
    "said": "Explored what kind of group the robots form and what state the group is in. As a large installation, one robot bears the next and that one bears the next, and the relations between them become the work."
+  },
+  {
+   "id": "di-wu",
+   "kind": "collaborator",
+   "who": "Di Wu",
+   "role": "PhD candidate in Computer Science, Northwestern University",
+   "when": "2026",
+   "stance": "suggests",
+   "themes": [
+    "gel printing",
+    "arm instead of gantry"
+   ],
+   "contributed": [
+    "Proposed printing in a liquid gel bath, drawing on a paper he coauthored that prints epoxy in a Carbopol bath (EpoMemory, CHI 2023).",
+    "Proposed replacing the 3D printer axes with a robot arm."
+   ],
+   "said": "Willing to propose bold changes of direction. When the team was leaning toward an automatic printing rig, he asked whether a liquid would be better, and later whether an arm could replace the printer axes, which were hard to take apart, looked too much like a machine and could do only one thing."
+  },
+  {
+   "id": "kexin-wang",
+   "kind": "collaborator",
+   "who": "Kexin Wang",
+   "role": "HCI Engineering Group, MIT CSAIL",
+   "when": "2026",
+   "stance": "suggests",
+   "themes": [
+    "arm",
+    "factory visit"
+   ],
+   "contributed": [
+    "Joined the project early.",
+    "Proposed an early printing rig that the team used for a while.",
+    "Travelled to Changzhou, China, to visit factories and examine a robot arm made to be built into other machines, close to the project's own idea of an arm inside a body."
+   ],
+   "said": ""
   }
  ]
 }

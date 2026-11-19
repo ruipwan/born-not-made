@@ -48,7 +48,7 @@
   "date": "2026-08-29",
   "stage": "design",
   "title": "Material purchase list",
-  "text": "The materials list follows the EpoMemory paper (CHI 2023): a print ink of EPON 828 resin and EPIKURE 3380 crosslinker, a support gel of Carbopol 940 neutralized with NaOH in deionized water, safety gear, lab tools and Ecoflex silicone.",
+  "text": "Di Wu, a coauthor of the EpoMemory paper (CHI 2023), proposes printing in a gel bath, and the materials list follows that paper: a print ink of EPON 828 resin and EPIKURE 3380 crosslinker, a support gel of Carbopol 940 neutralized with NaOH in deionized water, safety gear, lab tools and Ecoflex silicone.",
   "decision": "Print inside a gel bath, so the baby needs no supports.",
   "media": [],
   "links": [
@@ -70,7 +70,7 @@
   "media": [],
   "links": [
    {
-    "label": "Reference paper, ACM 10.1145/3411764.3445097",
+    "label": "Yang et al., Freeform Fabrication of Fluidic Edible Materials, CHI 2021 (the Carbopol bath recipe EpoMemory cites)",
     "url": "https://dl.acm.org/doi/10.1145/3411764.3445097"
    }
   ]
@@ -79,8 +79,8 @@
   "date": "2026-09-17",
   "stage": "design",
   "title": "Stage or arm",
-  "text": "With the printer in, the group weighs XYZ stages against desktop arms: UFACTORY xArm 7 and Lite 6, myCobot 280 and the open source SO-101. Arms are hard to run on a battery. An image from the group: printing with an arm is like a silkworm spinning a cocoon.",
-  "decision": "An arm, not a stage. The mother should stay unplugged, with the arm enclosed in the body, or the whole thing reads as an appliance.",
+  "text": "The team first bought 3D printer axes for their accuracy, then found them hard to take apart, too much like a machine and good for one job only. Di Wu proposed an arm instead. The group weighs XYZ stages against desktop arms: UFACTORY xArm 7 and Lite 6, myCobot 280 and the open source SO-101. Arms are hard to run on a battery. An image from the group: printing with an arm is like a silkworm spinning a cocoon.",
+  "decision": "An arm, not a stage, and everyone agrees. The mother should stay unplugged, with the arm enclosed in the body, or the whole thing reads as an appliance.",
   "media": [],
   "links": [],
   "threads": {
@@ -170,7 +170,7 @@
   "stage": "test",
   "title": "Neutralize by the paper",
   "text": "Carbopol is an acidic polymer. Without NaOH its chains do not extend, the yield stress stays low and a print sinks or collapses. Lesson: do not trust a chatbot with material ratios; test them.",
-  "decision": "From 5 Oct the ratio follows the paper: 1 g Carbomer 940 in 100 mL deionized water with 0.832 mL of 1 M NaOH, then vacuum degassing and rest.",
+  "decision": "From 5 Oct the ratio follows the gel bath method Di Wu brought from EpoMemory, scaled from the recipe that paper cites (Yang et al., CHI 2021, 0.416 mL of 10 M NaOH per 100 mL of 5% stock): 1 g Carbomer 940 in 100 mL deionized water with 0.832 mL of 1 M NaOH, then vacuum degassing and rest.",
   "media": [],
   "links": [],
   "threads": {
