@@ -382,8 +382,8 @@ function render(m) {
     // the label sits just outside the top of the arc
     const ax = (R.c.x0 + R.c.x1) / 2, ay = L.yT - b.side * R.c.A, off = L.strip ? 7 : 15;
     const lab = el("text", { class: "bnm-label", x: ax.toFixed(1), y: (b.side > 0 ? ay - off : ay + off + L.labelPx * 0.72).toFixed(1), "text-anchor": "middle", "font-size": L.labelPx }, g);
-    lab.textContent = b.label.toUpperCase();
-    if (coming) { const t = el("tspan", { class: "bnm-soon", dx: "0.6em" }, lab); t.textContent = "COMING"; }
+    lab.textContent = b.label;
+    if (coming) { const t = el("tspan", { class: "bnm-soon", dx: "0.6em" }, lab); t.textContent = "soon"; }
     const lw = ((b.label.length + (coming ? 7.6 : 0)) * 0.74 * L.labelPx) / 2, ly = +lab.getAttribute("y");
     m.labels.push({ tab: b.tab, cx: ax, cy: ly - L.labelPx * 0.36, hw: lw + 3, hh: L.labelPx * 0.5 + 3 });
     if (!coming) {

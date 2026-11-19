@@ -3,7 +3,7 @@
 <title>Born, Not Made · Voices</title>
 <meta name="description" content="Voices: an open, public discussion about Born, Not Made, a mother robot that prints a baby robot inside the mother's body and gives birth in water. Leave words or a drawing.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 /* Voices: anyone can leave words or a drawing. Each voice is a GitHub issue; each floats in the water as a small body. */
 :root {
@@ -224,7 +224,8 @@ dialog::backdrop { background: rgba(205, 223, 240, .62); -webkit-backdrop-filter
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
-</style></head><body>
+</style>
+<link rel="stylesheet" href="../assets/css/organic.css"></head><body class="org-doc org-voices">
 
 <header class="top"><div class="wrap"><a class="brand" href="../">Born, Not Made</a><span class="here">Voices</span></div></header>
 
@@ -1321,4 +1322,5 @@ loadVoices().then((res) => {
 window.BNMVoices = { encodeSketch, decodeSketch, parseBody, buildUrl: (eps) => buildUrl(eps == null ? 1 : eps, true), fitUrl, get strokes() { return strokes; }, set strokes(s) { strokes = s; redrawBase(); updateDrawToggle(); changed(); } };
 })();
 </script>
+<script src="../assets/js/organic.js" defer></script>
 </body></html>
