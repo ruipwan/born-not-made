@@ -19,6 +19,7 @@ nav.tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
 nav.tabs a { font: 500 13.5px var(--sans); color: var(--muted); text-decoration: none; padding: 7px 12px; border-radius: 999px; }
 nav.tabs a:hover { color: var(--ink); background: #ebe9e3; }
 nav.tabs a[aria-current="page"] { color: var(--paper); background: var(--ink); }
+nav.tabs .sep { width: 1px; background: var(--line); margin: 6px 6px; }
 nav.tabs a.voices { color: var(--gel); border: 1px solid #b9d3ea; margin-left: 6px; }
 nav.tabs a.voices::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--gel); margin-right: 7px; vertical-align: 1px; animation: breathe 3.2s ease-in-out infinite; }
 nav.tabs a.voices[aria-current="page"] { background: var(--gel); color: #fff; border-color: var(--gel); }
@@ -82,15 +83,15 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 @media (max-width: 560px) { .timeline, .grid2, .grid3, .vids, .pairs { grid-template-columns: minmax(0, 1fr); } nav.tabs { margin-left: 0; } }
 </style></head><body>
 <header class="top"><div class="bar">
-  <a class="brand" href="#trunk">Born, Not Made</a>
+  <a class="brand" href="#work">Born, Not Made</a>
   <nav class="tabs" aria-label="Sections">
-    <a href="#trunk">Trunk</a><a href="#branches">Branches</a><a href="#early">Early</a><a href="#build">Build</a><a href="#simulator">Simulator</a><a href="#society">Society</a><a href="#log">Log</a><a href="#voices" class="voices">Voices</a>
+    <a href="#work">The Work</a><a href="#ideas">Ideas</a><a href="#culture" hidden>Culture</a><span class="sep" aria-hidden="true"></span><a href="#prototypes">Prototypes</a><a href="#build">Build</a><a href="#simulator">Simulator</a><a href="#society">Society</a><a href="#process">Process</a><a href="#voices" class="voices">Voices</a>
   </nav>
 </div></header>
 <main>
 
 <!-- ============================== TRUNK ============================== -->
-<section class="tab" id="trunk">
+<section class="tab" id="work">
   <div class="hero">
     <div>
       <p class="kicker">MAS thesis · MIT Media Lab · 2026</p>
@@ -164,7 +165,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
         <div class="fig"><img src="assets/img/prototype2_photo.jpg" alt="Second prototype" loading="lazy"><p class="yr">Second</p><p class="note">A soft, clear body. Mother and baby each carry a chip, a battery and a water pump.</p></div>
         <div class="fig"><img src="assets/img/prototype3_render.jpg" alt="Third prototype" loading="lazy"><p class="yr">Third</p><p class="note">An arm with a syringe goes inside the mother. The baby is made inside, not put in.</p></div>
       </div>
-      <p class="note" style="margin-top:14px">How each version worked, and what it taught: <a href="#early">Early versions</a> and the <a href="https://ruipengwang.space/born-not-made" target="_blank" rel="noopener">first prototype page</a>.</p>
+      <p class="note" style="margin-top:14px">How each version worked, and what it taught: <a href="#prototypes">Prototypes</a> and the <a href="https://ruipengwang.space/born-not-made" target="_blank" rel="noopener">first prototype page</a>.</p>
       <div class="fig" style="margin-top:26px"><img src="assets/img/print_assemble_cycle.jpg" alt="Print and assemble cycle" loading="lazy"><p class="cap">Print and assemble in one cycle: print the soft body, place the made parts, print over them.</p></div>
     </div>
   </div>
@@ -190,7 +191,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
       <div class="frame"><video src="assets/video/fold_belly.mp4" controls muted playsinline preload="metadata"></video></div>
       <div class="fig" style="margin-top:14px"><img src="assets/img/fold_belly_stages.png" alt="Belly stages" loading="lazy"></div>
       <p style="margin-top:16px">The upper skin is printed silicone origami. The womb is closed and full of gel, so when the baby inflates its volume has to go somewhere: the pleats open and the belly rises. Pressure pulses then push the baby down the canal. After birth the womb vents, the pleats fold back and the skin sags a little under gravity. The swelling is not decoration. It is how a closed body makes room, pushes, and lets go.</p>
-      <p class="note">Full mechanism, parts and sources: <a href="#build" hidden>Build</a>.</p>
+      <p class="note">Full mechanism, parts and sources: <a href="#build">Build</a>.</p>
     </div>
   </div>
 
@@ -199,7 +200,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
     <div class="prose">
       <div class="frame"><video src="assets/video/relation.mp4" controls muted playsinline preload="metadata"></video></div>
       <p class="cap">Babies of different forms and colours stay near the mother. One takes the arm and becomes the next mother.</p>
-      <p style="margin-top:16px">A copy repeats its maker. Each birth here is generated from the mother's memory, the signals she receives and chance, so every baby differs. What links them is relation: shared memory, likeness of body and time spent near each other. The <a href="#society">Society</a> tab runs this at the scale of a population.</p>
+      <p style="margin-top:16px">A copy repeats its maker. Each birth here is generated from the mother's memory, the signals it receives and chance, so every baby differs. What links them is relation: shared memory, likeness of body and time spent near each other. The <a href="#society">Society</a> tab runs this at the scale of a population.</p>
       <div class="fig" style="margin-top:14px"><img src="assets/img/simulation_diagram.jpg" alt="Simulation diagram" loading="lazy"></div>
     </div>
   </div>
@@ -242,8 +243,8 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 </section>
 
 <!-- ============================== BRANCHES ============================== -->
-<section class="tab" id="branches">
-  <div class="tabhead"><div><p class="kicker">Side branches</p><h2>Discussions that grow off the trunk</h2><p>Each branch is a reading the work invites. None of them is the work's thesis; together they explain its vocabulary.</p></div></div>
+<section class="tab" id="ideas">
+  <div class="tabhead"><div><p class="kicker">Ideas</p><h2>Questions the work raises</h2><p>Readings the work invites: what a womb is, whether a robot can be a mother, and what a mother is at all.</p></div></div>
 
   <div class="block">
     <div class="side"><h2>Matrix and cyberfeminism</h2></div>
@@ -348,14 +349,14 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 </section>
 
 <!-- ============================== EARLY ============================== -->
-<section class="tab" id="early">
-  <div class="tabhead"><div><p class="kicker">Early versions</p><h2>Before the womb printed</h2><p>The first and second versions in full, and the third as the bridge to printing: how each worked and what each taught.</p></div><a class="btn" href="early/" target="_blank" rel="noopener">Open full screen</a></div>
+<section class="tab" id="prototypes">
+  <div class="tabhead"><div><p class="kicker">Prototypes</p><h2>Before the womb printed</h2><p>The first and second versions in full, and the third as the bridge to printing: how each worked and what each taught.</p></div><a class="btn" href="early/" target="_blank" rel="noopener">Open full screen</a></div>
   <iframe id="earlyFrame" data-src="early/" title="Early versions" style="display:block;width:100%;height:85vh;border:0;margin-top:20px"></iframe>
 </section>
 
 <!-- ============================== LOG ============================== -->
-<section class="tab" id="log">
-  <div class="tabhead"><div><p class="kicker">Log</p><h2>How the work got here</h2><p>Discussions, options, decisions and reversals, tests, renders and shows, oldest first. Follow one idea through its changes.</p></div><a class="btn" href="log/" target="_blank" rel="noopener">Open full screen</a></div>
+<section class="tab" id="process">
+  <div class="tabhead"><div><p class="kicker">Process</p><h2>How the work got here</h2><p>Discussions, options, decisions and reversals, tests, renders and shows, oldest first. Follow one idea through its changes.</p></div><a class="btn" href="log/" target="_blank" rel="noopener">Open full screen</a></div>
   <div class="fullframe" style="background:#f4f3ef"><iframe data-src="log/" title="Making log"></iframe></div>
 </section>
 
@@ -373,10 +374,12 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 </main>
 <footer>Born, Not Made · Ruipeng Wang · MIT Media Lab · <a href="https://github.com/ruipwan/born-not-made">source on GitHub</a></footer>
 <script>
-const TABS = ["trunk", "branches", "early", "build", "simulator", "society", "log", "voices"];
+const TABS = ["work", "ideas", "culture", "prototypes", "build", "simulator", "society", "process", "voices"];
+const ALIAS = { trunk: "work", branches: "ideas", questions: "ideas", early: "prototypes", log: "process" };
+if (ALIAS[location.hash.slice(1)]) history.replaceState(null, "", "#" + ALIAS[location.hash.slice(1)]);
 function show() {
-  const id = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "trunk";
-  for (const t of TABS) document.getElementById(t).classList.toggle("on", t === id);
+  const h = ALIAS[location.hash.slice(1)] || location.hash.slice(1); const id = TABS.includes(h) && document.getElementById(h) ? h : "work";
+  for (const t of TABS) { const el = document.getElementById(t); if (el) el.classList.toggle("on", t === id); }
   document.querySelectorAll("nav.tabs a").forEach((a) => { if (a.getAttribute("href") !== "#" + id) a.removeAttribute("aria-current"); else a.setAttribute("aria-current", "page"); });
   const f = document.querySelector("#" + id + " iframe[data-src]"); if (f && !f.src) f.src = f.dataset.src;
   document.querySelectorAll("section.tab:not(.on) video").forEach((v) => v.pause());
