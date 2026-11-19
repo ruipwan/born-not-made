@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Born, Not Made</title>
+<link rel="stylesheet" href="assets/css/map.css">
 <meta name="description" content="A mother robot prints a baby robot inside the mother's own body, in gel, and gives birth in water. Soft robotics meets artificial life, under the umbrella of reproduction.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -127,6 +128,8 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
       <p class="cap">Film. The tail docks, the arm prints, the baby is born.</p>
     </div>
   </div>
+
+  <div id="bnm-map" data-mode="hero" aria-label="Living map of the work"></div>
 
   <div class="open">
     <p>This is an ongoing social experiment about a new kind of artificial species. The work has a trunk, the argument below, but it is an open question, so the site grows branches, keeps a log, and invites you in. The discussion is the work, as in Olafur Eliasson and Minik Rosing's <a href="https://olafureliasson.net/artwork/ice-watch-2014/" target="_blank" rel="noopener"><i>Ice Watch</i></a>, where Greenland ice melting in a public square became the conversation it started.</p>
@@ -439,6 +442,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
   <div class="fullframe"><iframe data-src="society/" title="Society simulation"></iframe></div>
 </section>
 </main>
+<div style="max-width:1180px;margin:0 auto;padding:0 max(16px, env(safe-area-inset-left, 0px))"><div class="bnm-map" data-mode="strip"></div></div>
 <footer>Born, Not Made · Ruipeng Wang · MIT Media Lab · <a href="https://github.com/ruipwan/born-not-made">source on GitHub</a></footer>
 <script>
 const GROUPS = [
@@ -482,4 +486,5 @@ async function loadConversations() { if (CONV) return; try { CONV = await (await
 addEventListener("message", (e) => { const f = document.getElementById("earlyFrame"); if (f && e.origin === location.origin && e.data && e.data.bnm === "early-height") f.style.height = e.data.h + "px"; });
 addEventListener("hashchange", show); show();
 </script>
+<script src="assets/js/map.js" defer></script>
 </body></html>
