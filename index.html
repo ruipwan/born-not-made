@@ -19,6 +19,16 @@ nav.tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
 nav.tabs a { font: 500 13.5px var(--sans); color: var(--muted); text-decoration: none; padding: 7px 12px; border-radius: 999px; }
 nav.tabs a:hover { color: var(--ink); background: #ebe9e3; }
 nav.tabs a[aria-current="page"] { color: var(--paper); background: var(--ink); }
+nav.tabs a.voices { color: var(--gel); border: 1px solid #b9d3ea; margin-left: 6px; }
+nav.tabs a.voices::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--gel); margin-right: 7px; vertical-align: 1px; animation: breathe 3.2s ease-in-out infinite; }
+nav.tabs a.voices[aria-current="page"] { background: var(--gel); color: #fff; border-color: var(--gel); }
+nav.tabs a.voices[aria-current="page"]::before { background: #fff; }
+@keyframes breathe { 0%, 100% { transform: scale(0.75); opacity: 0.55; } 50% { transform: scale(1.15); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { nav.tabs a.voices::before { animation: none; } }
+.open { margin: 8px 0 0; padding: 26px 28px; border-radius: 10px; background: var(--gel-soft); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: center; }
+.open p { margin: 0; font: 400 20px/1.42 var(--serif); max-width: 62ch; }
+.open .btn { background: var(--gel); }
+@media (max-width: 700px) { .open { grid-template-columns: minmax(0, 1fr); } }
 main { max-width: 1180px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-left, 0px)) 80px; }
 section.tab { display: none; } section.tab.on { display: block; }
 .hero { padding: 56px 0 28px; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 40px; align-items: end; }
@@ -74,7 +84,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 <header class="top"><div class="bar">
   <a class="brand" href="#trunk">Born, Not Made</a>
   <nav class="tabs" aria-label="Sections">
-    <a href="#trunk">Trunk</a><a href="#branches">Branches</a><a href="#build" hidden>Build</a><a href="#simulator">Simulator</a><a href="#society">Society</a>
+    <a href="#trunk">Trunk</a><a href="#branches">Branches</a><a href="#early" hidden>Early</a><a href="#build">Build</a><a href="#simulator">Simulator</a><a href="#society">Society</a><a href="#log" hidden>Log</a><a href="#voices" class="voices" hidden>Voices</a>
   </nav>
 </div></header>
 <main>
@@ -92,6 +102,11 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
       <div class="frame"><iframe src="https://drive.google.com/file/d/1ecxk0uEEKis7chZShfqGONlnMfaAXYqI/preview" allow="autoplay; fullscreen" loading="lazy" title="Born, Not Made, film"></iframe></div>
       <p class="cap">Film. The tail docks, the arm prints, the baby is born.</p>
     </div>
+  </div>
+
+  <div class="open">
+    <p>This is an ongoing social experiment about a new kind of artificial species. The work has a trunk, the argument below, but it is an open question, so the site grows branches, keeps a log, and invites you in. The discussion is the work.</p>
+    
   </div>
 
   <div class="block">
@@ -145,10 +160,11 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
     <div class="side"><h2>Three prototypes, toward a womb that prints</h2></div>
     <div>
       <div class="grid3">
-        <div class="fig"><img src="assets/img/prototype1_photo.jpg" alt="First prototype" loading="lazy"><p class="yr">First</p><p class="note">A rigid shell. A water muscle and a pump push a ready made baby out.</p><img src="assets/img/prototype1_diagram.jpg" alt="First prototype diagram" loading="lazy" style="margin-top:10px"></div>
-        <div class="fig"><img src="assets/img/prototype2_photo.jpg" alt="Second prototype" loading="lazy"><p class="yr">Second</p><p class="note">A soft, clear body. Mother and baby each carry a chip, a battery and a water pump.</p><img src="assets/img/prototype2_diagram.jpg" alt="Second prototype diagram" loading="lazy" style="margin-top:10px"></div>
+        <div class="fig"><img src="assets/img/prototype1_photo.jpg" alt="First prototype" loading="lazy"><p class="yr">First</p><p class="note">A rigid shell. A water muscle and a pump push a ready made baby out.</p></div>
+        <div class="fig"><img src="assets/img/prototype2_photo.jpg" alt="Second prototype" loading="lazy"><p class="yr">Second</p><p class="note">A soft, clear body. Mother and baby each carry a chip, a battery and a water pump.</p></div>
         <div class="fig"><img src="assets/img/prototype3_render.jpg" alt="Third prototype" loading="lazy"><p class="yr">Third</p><p class="note">An arm with a syringe goes inside the mother. The baby is made inside, not put in.</p></div>
       </div>
+      <p class="note" style="margin-top:14px">How each version worked, and what it taught: <a href="#early">Early versions</a> and the <a href="https://ruipengwang.space/born-not-made" target="_blank" rel="noopener">first prototype page</a>.</p>
       <div class="fig" style="margin-top:26px"><img src="assets/img/print_assemble_cycle.jpg" alt="Print and assemble cycle" loading="lazy"><p class="cap">Print and assemble in one cycle: print the soft body, place the made parts, print over them.</p></div>
     </div>
   </div>
@@ -186,6 +202,11 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
       <p style="margin-top:16px">A copy repeats its maker. Each birth here is generated from the mother's memory, the signals she receives and chance, so every baby differs. What links them is relation: shared memory, likeness of body and time spent near each other. The <a href="#society">Society</a> tab runs this at the scale of a population.</p>
       <div class="fig" style="margin-top:14px"><img src="assets/img/simulation_diagram.jpg" alt="Simulation diagram" loading="lazy"></div>
     </div>
+  </div>
+
+  <div class="open" style="margin:28px 0">
+    <p>Can a machine be kin? What should a robot mother pass on, and what never? Tell us, in words or in a sketch. Every voice stays on the record, in the open.</p>
+    <a class="btn" href="#voices">Go to Voices</a>
   </div>
 
   <div class="block">
@@ -326,6 +347,24 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
   <div class="fullframe"><iframe data-src="simulator/" title="Printing simulator" allow="microphone"></iframe></div>
 </section>
 
+<!-- ============================== EARLY ============================== -->
+<section class="tab" id="early">
+  <div class="tabhead"><div><p class="kicker">Early versions</p><h2>Before the womb printed</h2><p>The first and second versions, how they worked and what each one taught.</p></div><a class="btn" href="early/" target="_blank" rel="noopener">Open full screen</a></div>
+  <div class="fullframe" style="background:#f4f3ef"><iframe data-src="early/" title="Early versions"></iframe></div>
+</section>
+
+<!-- ============================== LOG ============================== -->
+<section class="tab" id="log">
+  <div class="tabhead"><div><p class="kicker">Log</p><h2>How the work changed</h2><p>Discussions, options, decisions and reversals, in order. Follow one idea, the door or the tail or the belly, through every version.</p></div><a class="btn" href="log/" target="_blank" rel="noopener">Open full screen</a></div>
+  <div class="fullframe" style="background:#f4f3ef"><iframe data-src="log/" title="Making log"></iframe></div>
+</section>
+
+<!-- ============================== VOICES ============================== -->
+<section class="tab" id="voices">
+  <div class="tabhead"><div><p class="kicker">Open experiment</p><h2>Voices</h2><p>What do you think a robot mother is? Can machines be kin? Write, or draw. Every voice is public and kept, with where it came from.</p></div><a class="btn" href="voices/" target="_blank" rel="noopener">Open full screen</a></div>
+  <div class="fullframe" style="background:#f4f3ef"><iframe data-src="voices/" title="Voices"></iframe></div>
+</section>
+
 <!-- ============================== SOCIETY ============================== -->
 <section class="tab" id="society">
   <div class="tabhead"><div><p class="kicker">Society</p><h2>When reproduction runs at scale</h2><p>Many mothers and babies share one body of water. A robot bears only when it has enough relations and energy. Memory passes on with drift. The water feeds only so many. Send a signal and follow how far it travels.</p></div><a class="btn" href="society/" target="_blank" rel="noopener">Open full screen</a></div>
@@ -334,7 +373,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 </main>
 <footer>Born, Not Made · Ruipeng Wang · MIT Media Lab · <a href="https://github.com/ruipwan/born-not-made">source on GitHub</a></footer>
 <script>
-const TABS = ["trunk", "branches", "build", "simulator", "society"];
+const TABS = ["trunk", "branches", "early", "build", "simulator", "society", "log", "voices"];
 function show() {
   const id = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "trunk";
   for (const t of TABS) document.getElementById(t).classList.toggle("on", t === id);
