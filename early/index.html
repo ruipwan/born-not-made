@@ -59,9 +59,12 @@ ol.steps li::before { content: counter(s, decimal-leading-zero); font: 500 12px/
 .lanes { display: grid; gap: 10px; margin: 0; padding: 14px; list-style: none; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; }
 .lane { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .lane .tag { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); width: 100%; }
-.node { font-size: 13px; line-height: 1.3; padding: 5px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
+.node { position: relative; font-size: 13px; line-height: 1.3; padding: 5px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
 .node.gel { background: var(--gel-soft); border-color: #b9d3ea; }
-.arr { color: var(--gel); font: 500 13px var(--mono); }
+/* The arrow belongs to the node it points to, so a wrapped line starts with its arrow. */
+.lane .arr { display: none; }
+.lane .node ~ .node { margin-left: 18px; }
+.lane .node ~ .node::before { content: "→"; position: absolute; left: -19px; top: 50%; transform: translateY(-50%); color: var(--gel); font: 500 13px var(--mono); }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 table.spec { width: 100%; border-collapse: collapse; font-size: 14.5px; }
 table.spec caption { text-align: left; font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 0 0 6px; }
@@ -121,7 +124,7 @@ html.embedded.auto .side .stick { position: static; }
   .figs { grid-template-columns: minmax(0, 1fr); }
   .meta { grid-template-columns: minmax(0, 1fr); }
   .bar nav { margin-left: 0; }
-  table.spec, table.spec tbody, table.spec tr, table.spec th, table.spec td { display: block; width: 100%; }
+  table.spec, table.spec caption, table.spec tbody, table.spec tr, table.spec th, table.spec td { display: block; width: 100%; }
   table.spec th { border-top: 1px solid var(--line); padding: 10px 0 0; }
   table.spec td { border-top: 0; padding: 2px 0 10px; }
   table.spec tr:last-child th { border-bottom: 0; }
@@ -195,7 +198,7 @@ html.embedded.auto .side .stick { position: static; }
   <div class="prose">
     <div class="figs">
       <figure><img src="../assets/img/prototype1_photo.jpg" width="1600" height="960" alt="First version: the white printed shell of the mother, with the small printed baby beside it." loading="lazy"><figcaption>Mother shell and baby, both printed.</figcaption></figure>
-      <figure><img src="../assets/img/prototype1_diagram.jpg" width="1132" height="760" alt="Exploded view of the first version, labelled from top: lid, water muscle, electronics, baby robot, water pump." loading="lazy"><figcaption>Exploded view: lid, water muscle, electronics, baby, pump.</figcaption></figure>
+      <figure><a href="../assets/img/prototype1_diagram.jpg"><img src="../assets/img/prototype1_diagram.jpg" width="1132" height="760" alt="Exploded view of the first version, labelled from top: lid, water muscle, electronics, baby robot, water pump." loading="lazy"></a><figcaption>Exploded view: lid, water muscle, electronics, baby, pump.</figcaption></figure>
     </div>
 
     <h3>How it works</h3>
@@ -287,7 +290,7 @@ html.embedded.auto .side .stick { position: static; }
   <div class="prose">
     <div class="figs">
       <figure><img src="../assets/img/prototype2_photo.jpg" width="1600" height="576" alt="Second version: two clear printed bodies, each held in a hand; wires show through the smaller one." loading="lazy"><figcaption>Clear printed bodies, held in the hand.</figcaption></figure>
-      <figure><img src="../assets/img/prototype2_diagram.jpg" width="1600" height="866" alt="Line drawing of the second version: an internal water muscle behind the baby, a mini chip and small battery in mother and in baby, and a water pump drawing in tank water." loading="lazy"><figcaption>Inside view: muscle behind the baby, pump at the base. Drawing by Vera Yu Wu.</figcaption></figure>
+      <figure><a href="../assets/img/prototype2_diagram.jpg"><img src="../assets/img/prototype2_diagram.jpg" width="1600" height="866" alt="Line drawing of the second version: an internal water muscle behind the baby, a mini chip and small battery in mother and in baby, and a water pump drawing in tank water." loading="lazy"></a><figcaption>Inside view: muscle behind the baby, pump at the base. Drawing by Vera Yu Wu.</figcaption></figure>
     </div>
 
     <h3>How it works</h3>
@@ -300,7 +303,7 @@ html.embedded.auto .side .stick { position: static; }
       <li><span>Beside the tank, an Unreal Engine simulation carries the lineage on. It starts with four mothers and draws each generation smaller. Births in the tank enter it. See <a href="../#society" target="_top">Society</a>.</span></li>
     </ol>
 
-    <figure class="wide"><img src="media/v2_touch_loop.jpg" width="1400" height="777" alt="Touch loop: a hand rests on the clear mother in a glass tank edged with copper wire. Labels: somatic contact, touching raises capacitance and pump voltage; signal capture on pin D3; a 5 megaohm resistor between pins D2 and D3; Arduino ground wired to the tank bottom." loading="lazy"><figcaption>The touch loop. Design and footage by Ruipeng Wang, drawing by Vera Yu Wu.</figcaption></figure>
+    <figure class="wide"><a href="media/v2_touch_loop.jpg"><img src="media/v2_touch_loop.jpg" width="1400" height="777" alt="Touch loop: a hand rests on the clear mother in a glass tank edged with copper wire. Labels: somatic contact, touching raises capacitance and pump voltage; signal capture on pin D3; a 5 megaohm resistor between pins D2 and D3; Arduino ground wired to the tank bottom." loading="lazy"></a><figcaption>The touch loop. Design and footage by Ruipeng Wang, drawing by Vera Yu Wu. Tap to enlarge.</figcaption></figure>
 
     <h3>Signal path</h3>
     <ul class="lanes">
@@ -390,10 +393,6 @@ html.embedded.auto .side .stick { position: static; }
   </div>
 </section>
 
-<section class="end" aria-label="Where to go next">
-  <p>Today's printing system, part by part, is on the <a href="../#build" target="_top">Build</a> tab; the full chronology is on the <a href="../#log" target="_top">Log</a> tab.</p>
-</section>
-
 <section class="block" aria-labelledby="src-h">
   <div class="side"><h2 id="src-h">Sources</h2></div>
   <ol class="refs">
@@ -403,6 +402,10 @@ html.embedded.auto .side .stick { position: static; }
     <li>Born, Not Made hardware group. Weekly notes, August to October 2026.</li>
     <li>Zhong, K., Minori, A. F., Wu, D., Yang, H., Islam, M. F., Yao, L. "EpoMemory: Multi-State Shape Memory for Programmable Morphing Interfaces." CHI 2023. <a href="https://doi.org/10.1145/3544548.3580638">doi</a></li>
   </ol>
+</section>
+
+<section class="end" aria-label="Where to go next">
+  <p>Today's printing system, part by part, is on the <a href="../#build" target="_top">Build</a> tab; the full chronology is on the <a href="../#log" target="_top">Log</a> tab.</p>
 </section>
 
 </div></main>
@@ -426,6 +429,9 @@ html.embedded.auto .side .stick { position: static; }
     document.querySelectorAll("img").forEach(function (im) { im.addEventListener("load", postHeight); });
     postHeight();
   }
+
+  // Enlarged images open in a new tab, so the record stays in place (also inside the tab frame).
+  document.querySelectorAll('a[href$=".jpg"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
 
   // In page links: scroll the element into view (this also scrolls the parent page when embedded).
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
