@@ -139,6 +139,7 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
   <section id="fold"><h2>Why this fold</h2><div id="foldDoc"><p class="pend">Waiting for the physics check.</p></div></section>
   <section id="swell"><h2>Why the mother swells</h2><p class="sub">No swelling for its own sake. Each movement of the belly has a mechanical cause.</p><div id="swellDoc"><p class="pend">Waiting for the physics check.</p></div></section>
   <section id="push"><h2>Ways to push</h2><div id="pushDoc"><p class="pend">Waiting for the physics check.</p></div></section>
+  <section id="v2"><h2>Design v2: seven problems, seven decisions</h2><p class="sub">The checks above found problems; this revision resolves each with a number, a source, a remaining risk and a bench test.</p><img src="media/design_v2.png" alt="Mechanical design v2, docked pair, labelled" style="width:100%;border:1px solid var(--line);border-radius:8px;background:#fff"><div id="v2Doc" style="margin-top:16px"></div></section>
   <section id="dock"><h2>Docking and entry</h2><div id="dockDoc"><p class="pend">Waiting for the physics check.</p></div></section>
   <section id="sources"><h2>Sources</h2><p class="sub">Every part and number above, with its primary source. Code and data: <a href="https://github.com/ruipwan/born-not-made/tree/main/build">build/ on GitHub</a>.</p><ol class="src" id="srcList"></ol></section>
 </div>
@@ -574,10 +575,14 @@ function applyPhysDefaults() {
   if (pat.includes("bellows")) $("#foldNote").textContent = "Collapsed bellows: printed flat with a 3 mm gel gap between flanks, then air lengthens it while the diameter stays. A tether stops it at full length.";
 }
 
+async function renderV2() {
+  const V = await getJSON("data/design_v2.json"); if (!V) return;
+  $("#v2Doc").innerHTML = `<table class="t"><tr><th>Problem</th><th>Decision</th><th>Risk</th><th>Bench test</th><th></th></tr>${(V.decisions || []).map((d) => `<tr><td>${esc(d.problem)}</td><td>${esc(d.decision)}</td><td>${esc(d.risk)}</td><td>${esc(d.test)}</td><td>${(d.sources || []).map((x) => `<a href="${esc(safeUrl(x[1]))}" target="_blank" rel="noopener">${esc(x[0])}</a>`).join("<br>")}</td></tr>`).join("")}</table>`;
+}
 /* ====================================================================== start */
 (async () => {
   DATA = (await getJSON("data/components.json")) || DATA; PHYS = (await getJSON("data/physics.json")) || {};
-  renderTree(); renderPrecision(); renderPhysics(); renderSources(); applyPhysDefaults();
+  renderTree(); renderPrecision(); renderV2(); renderPhysics(); renderSources(); applyPhysDefaults();
   simReset(); requestAnimationFrame(simLoop); printCalc();
   try { await loadModel(); $("#loading").remove(); size(); frame(); } catch (e) { $("#loading").textContent = "The 3D model could not load here. The parts list still works."; console.error(e); }
 })();
