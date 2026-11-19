@@ -849,7 +849,7 @@
    "group": "tail",
    "name": "Trim ballast, stainless, mother and tail",
    "role": "set both bodies level at the design waterline",
-   "how": "Mother: 1.5 kg in the bilge at x -0.26. Tail: 1.4 kg low at x_t -0.36. Add or remove 191 g pieces to hold the hatch axis 145 mm above water.",
+   "how": "Mother: 1.5 kg in the bilge at x -0.27. Tail: 1.8 kg low at x_t -0.29. Add or remove 191 g pieces to hold the hatch axis 145 mm above water.",
    "specs": [
     [
      "Ballast",
@@ -857,11 +857,11 @@
     ],
     [
      "Mother",
-     "1.46 kg at x -0.26 m"
+     "1.51 kg at x -0.27 m"
     ],
     [
      "Tail",
-     "1.44 kg at x_t -0.36 m"
+     "1.81 kg at x_t -0.29 m"
     ],
     [
      "Target",
@@ -869,9 +869,9 @@
     ]
    ],
    "make": "buy",
-   "qty": 16,
-   "mass_g": 2900,
-   "cost_usd": 224,
+   "qty": 17,
+   "mass_g": 3320,
+   "cost_usd": 238,
    "sources": [
     {
      "label": "Blue Robotics stainless ballast 200 g BR-101039",

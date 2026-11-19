@@ -47,7 +47,7 @@
   {
    "id": "waterline",
    "problem": "Waterline and buoyancy: mother 35 to 45 kg, tail 13 kg, rear bore at or under water",
-   "decision": "Design waterline z -0.145 at the hatch. Mother 30.5 kg: round tray D 410 with 18 L gel and 1.5 kg trim ballast. Tail reshaped as a gourd (max D 466, centre 50 mm lower, bottom z -0.283, 600 long, 3 mm PETG), 15.6 kg with 1.4 kg trim ballast, floats level at the same height. Foam inside a dry hull adds no lift.",
+   "decision": "Design waterline z -0.145 at the hatch. Mother 30.5 kg: round tray D 410 with 18 L gel and 1.5 kg trim ballast. Tail reshaped as a gourd (max D 466, centre 50 mm lower, bottom z -0.283, 600 long, 3 mm PETG), 15.6 kg with 1.8 kg trim ballast, floats level at the same height. Foam inside a dry hull adds no lift.",
    "numbers": [
     [
      "mother mass",
@@ -67,7 +67,7 @@
     ],
     [
      "tail roll GM",
-     "0.071 m"
+     "0.077 m"
     ],
     [
      "old slim tail lift at dock height",
@@ -130,7 +130,7 @@
     ],
     [
      "pitch moment worst",
-     "7.68 N m"
+     "7.69 N m"
     ],
     [
      "shear worst",
@@ -452,12 +452,12 @@
   ],
   "gel_surface_z_m": -0.124,
   "mother_mass_kg": 30.54,
-  "mother_trim_ballast_kg": 1.46,
+  "mother_trim_ballast_kg": 1.51,
   "gel_L": 18.0,
   "tray_inner_D_mm": 410,
   "tray_centre_x_m": -0.04,
   "tail_mass_kg": 15.55,
-  "tail_trim_ballast_kg": 1.44,
+  "tail_trim_ballast_kg": 1.81,
   "tail_length_mm": 600,
   "tail_max_D_mm": 466,
   "tail_profile": {
