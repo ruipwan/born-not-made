@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Born, Not Made · Bodies</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Inter:wght@300;400;500;600&display=swap">
+<style>
+/* Society with the real bodies: hull, tail and baby from the v2 design, at the design waterline. */
+:root { --bg: #0b0b0c; --ink: #ecebe6; --muted: #9b9a94; --gel: #9cc8ec; --warm: #e8c9a8; --line: rgba(236, 235, 230, .12); color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font: 300 15px/1.6 "Inter", system-ui, sans-serif; overflow-x: hidden; }
+.wrap { max-width: 1320px; margin: 0 auto; padding: 18px 16px 28px; }
+.top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.top nav a { margin-left: 14px; font-size: 13.5px; }
+.top nav a:first-child { margin-left: 0; }
+h1 { font: 300 clamp(40px, 6vw, 72px)/1 "Cormorant Garamond", Georgia, serif; margin: 10px 0 12px; letter-spacing: -.01em; }
+.intro { max-width: 70ch; color: var(--muted); font-size: 16px; margin: 0 0 16px; }
+.pond { position: relative; height: min(68vh, 720px); min-height: 420px; border-radius: 18px; overflow: hidden; background: var(--bg); border: 1px solid var(--line); }
+.pond canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.bar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 12px 0 0; }
+.bar button { font: 400 13px "Inter", sans-serif; color: var(--ink); background: rgba(255,255,255,.05); border: 1px solid var(--line); border-radius: 999px; padding: 6px 13px; cursor: pointer; }
+.bar button:hover { background: rgba(255,255,255,.09); }
+.bar button.on { background: rgba(156,200,236,.18); border-color: rgba(156,200,236,.45); }
+.bar .sp { width: 10px; }
+.bar .hint { color: var(--muted); font-size: 13px; margin-left: 6px; }
+.ev { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 16px 12px; background: linear-gradient(transparent, rgba(11,11,12,.85)); pointer-events: none; font-size: 14px; }
+.ev div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ev .old { color: var(--muted); font-size: 12.5px; opacity: .7; }
+.ev .t { color: var(--muted); font-size: 12px; margin-right: 8px; }
+.follow { position: absolute; right: 12px; top: 12px; width: 260px; background: rgba(18,18,19,.86); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; font-size: 13px; display: none; backdrop-filter: blur(6px); }
+.follow h3 { margin: 0 0 6px; font: 400 24px/1.1 "Cormorant Garamond", Georgia, serif; }
+.follow dl { display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 2px 8px; margin: 0; }
+.follow dt { color: var(--muted); } .follow dd { margin: 0; overflow-wrap: anywhere; }
+.meter { height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 7px; }
+.meter i { display: block; height: 100%; background: linear-gradient(90deg, #c9a77f, var(--warm)); border-radius: 3px; }
+.follow .mem { color: var(--muted); font-size: 12px; margin-top: 8px; }
+.hud { position: absolute; left: 14px; top: 12px; color: var(--muted); font-size: 12.5px; pointer-events: none; }
+.legend { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px 20px; margin: 18px 0 0; padding: 0; list-style: none; }
+.legend li { font-size: 13.5px; color: var(--muted); }
+.legend b { display: block; color: var(--ink); font: italic 400 19px/1.3 "Cormorant Garamond", Georgia, serif; }
+.err { position: absolute; inset: 0; display: none; place-items: center; color: var(--muted); padding: 20px; text-align: center; }
+@media (max-width: 900px) { .legend { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) {
+  .pond { height: 64vh; min-height: 380px; }
+  .follow { left: 10px; right: 10px; top: auto; bottom: 64px; width: auto; padding: 10px 12px; }
+  .follow h3 { font-size: 20px; } .follow .mem { display: none; }
+  .legend { grid-template-columns: minmax(0, 1fr); }
+  .hud { font-size: 11.5px; }
+}
+</style>
+<link rel="stylesheet" href="../../assets/css/organic.css"></head><body>
+<div class="wrap">
+  <div class="top"><span class="kicker">Society</span><nav><a href="../">Society</a><a href="../../#society">Born, Not Made home</a></nav></div>
+  <h1>Bodies</h1>
+  <p class="intro">The same society as the population page, drawn with the real bodies from the Build page: the hard shell hull, the tail and the baby, floating at the design waterline. Mothers swim slowly, dock by electropermanent magnets, charge, print babies, and raise the babies in turns with other adults. A baby is printed folded, 54 mm long, and the arm brings the baby out of the opening while inflating the baby to 385 mm. The dead stop, lose color and drift into a cluster of clear shells that grows slowly. Click any body to follow.</p>
+  <div class="pond" id="pond">
+    <canvas id="gl" aria-label="Mother, tail and baby robots on a water surface"></canvas>
+    <div class="hud" id="hud"></div>
+    <div class="follow" id="follow" aria-live="polite"></div>
+    <div class="ev" id="ev"></div>
+    <div class="err" id="err">The 3D view could not start in this browser.</div>
+  </div>
+  <div class="bar">
+    <button id="run" class="on" type="button">Pause</button><span class="sp"></span>
+    <button data-sp="1" class="on" type="button">1×</button><button data-sp="4" type="button">4×</button><button data-sp="16" type="button">16×</button><span class="sp"></span>
+    <button id="over" type="button">Whole pond</button>
+    <span class="hint" id="hint">Click a body to follow. Drag to turn, scroll to zoom.</span>
+  </div>
+  <ul class="legend">
+    <li><b>Dock</b>Two bodies meet at a port, line up, click together, and a small light shows the magnets on. Then they move as one. Undocking runs the other way.</li>
+    <li><b>Charge</b>A mother low on energy docks to another mother or to a charging buoy. The warm fill in the tail rises as energy flows.</li>
+    <li><b>Print</b>The tail opens the way, the arm rides in through the opening and the needle traces a folded baby layer by layer. Then the arm brings the baby out while inflating the baby.</li>
+    <li><b>Raise</b>Babies dock to the mother and to other adults in turns and take memory from each. A grown baby undocks and leaves the pond.</li>
+    <li><b>Die</b>A dead body stops, loses color, turns into a nearly clear shell and drifts into the cluster of earlier shells.</li>
+  </ul>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const D2R = Math.PI / 180, PI = Math.PI, TAU = 2 * Math.PI;
+const rnd = Math.random, clamp = (x, a, b) => Math.max(a, Math.min(b, x)), lerp = (a, b, t) => a + (b - a) * t;
+const ss = (t) => { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); };
+const wrapA = (a) => { while (a > PI) a -= TAU; while (a < -PI) a += TAU; return a; };
+const esc = (x) => String(x ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+/* ---------------- real numbers, read from the design data (defaults are the same values) ---------------- */
+const K = { WL: -0.145, Lfold: 0.054, Ldep: 0.385, Rb: 0.105, boreD: 0.25, dockX: -0.3835, cx: -0.04, bed: -0.245, stations: { rear: 0.287, front: 0.367 } };
+const POND = { x0: -7.5, x1: 7.5, y0: -4.6, y1: 4.6 };
+const CLUSTER = { x: -5.0, y: 2.7 };
+const CHARGERS = [[5.2, 2.6], [0.6, -3.4]];
+const MOTHERS = 12, BABY_CAP = 32, PRINT_CAP = 3;
+let SC = null;
+
+/* ---------------- water: the same three wave sum in JS and GLSL, small and slow ---------------- */
+const WAVES = [[0.006, 0.55, 0.2, 1.1, 0.0], [0.003, -0.3, 0.9, 1.7, 1.3], [0.002, 1.3, -0.6, 2.3, 0.4]];
+function eta(x, y, t) { let s = 0; for (const w of WAVES) s += w[0] * Math.sin(w[1] * x + w[2] * y - w[3] * t + w[4]); return s; }
+const GLSL_ETA = `uniform float uTime;
+float etaW(vec2 p){ return ${WAVES.map((w) => `${w[0].toFixed(4)}*sin(${w[1].toFixed(3)}*p.x+${w[2].toFixed(3)}*p.y-${w[3].toFixed(3)}*uTime+${w[4].toFixed(3)})`).join("+")}; }
+`;
+const UT = { value: 0 };
+
+/* ---------------- three.js ---------------- */
+let renderer, scene, camera, controls;
+function initThree() {
+  const cv = $("#gl");
+  renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, powerPreference: "high-performance" });
+  renderer.setPixelRatio(Math.min(1.75, window.devicePixelRatio || 1)); renderer.outputEncoding = THREE.sRGBEncoding; renderer.localClippingEnabled = true;
+  scene = new THREE.Scene(); scene.background = new THREE.Color(0x0b0b0c);
+  camera = new THREE.PerspectiveCamera(34, 1, 0.05, 80);
+  controls = new THREE.OrbitControls(camera, cv); controls.enableDamping = true; controls.dampingFactor = 0.08; controls.maxPolarAngle = 1.32; controls.minDistance = 0.8; controls.maxDistance = 30; controls.enablePan = false;
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x1d2228, 0.85));
+  const key = new THREE.DirectionalLight(0xfffaf2, 0.75); key.position.set(-4, 9, 6); scene.add(key);
+  const fill = new THREE.DirectionalLight(0xbcd2e6, 0.3); fill.position.set(6, 3, -5); scene.add(fill);
+  buildWater();
+  new ResizeObserver(resize).observe($("#pond")); resize();
+}
+function resize() {
+  const el = $("#pond"), w = el.clientWidth, h = el.clientHeight; if (!w || !h) return;
+  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+  if (!FOLLOW && !CAMFLY) overview(true);
+}
+function overview(now) {
+  const a = camera.aspect, d = 15.5 * Math.max(1, 1.75 / a) ** 0.85;
+  const pos = new THREE.Vector3(0, d * 0.58, d * 0.8), tgt = new THREE.Vector3(0, 0, -0.2);
+  if (now) { camera.position.copy(pos); controls.target.copy(tgt); controls.update(); } else CAMFLY = { t: 0, p0: camera.position.clone(), t0: controls.target.clone(), p1: pos, t1: tgt };
+}
+function buildWater() {
+  const w = POND.x1 - POND.x0 + 8, h = POND.y1 - POND.y0 + 8;
+  const g = new THREE.PlaneGeometry(w, h, 1, 1); g.rotateX(-PI / 2);
+  const m = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uTime: UT, uBg: { value: new THREE.Color(0x0b0b0c) } },
+    vertexShader: "varying vec3 vW; void main(){ vec4 p = modelMatrix * vec4(position,1.0); vW = p.xyz; gl_Position = projectionMatrix * viewMatrix * p; }",
+    fragmentShader: GLSL_ETA + `uniform vec3 uBg; varying vec3 vW;
+      void main(){
+        vec2 p = vec2(vW.x, -vW.z); float e = 0.05;
+        vec3 n = normalize(vec3(-(etaW(p+vec2(e,0.0))-etaW(p-vec2(e,0.0)))/(2.0*e)*14.0, 1.0, (etaW(p+vec2(0.0,e))-etaW(p-vec2(0.0,e)))/(2.0*e)*14.0));
+        vec3 v = normalize(cameraPosition - vW);
+        float fr = pow(1.0 - max(dot(n, v), 0.0), 3.0);
+        vec3 deep = vec3(0.045, 0.06, 0.07), sky = vec3(0.30, 0.36, 0.42);
+        vec3 h = normalize(v + normalize(vec3(-0.4, 0.9, 0.6))); float sp = pow(max(dot(n, h), 0.0), 90.0);
+        vec3 col = mix(deep, sky, fr * 0.8) + sp * vec3(0.45, 0.5, 0.55);
+        float dx = max(max(${(POND.x0 - 0.5).toFixed(2)} - vW.x, vW.x - ${(POND.x1 + 0.5).toFixed(2)}), 0.0);
+        float dy = max(max(${(POND.y0 - 0.5).toFixed(2)} - p.y, p.y - ${(POND.y1 + 0.5).toFixed(2)}), 0.0);
+        float edge = 1.0 - smoothstep(0.0, 2.6, length(vec2(dx, dy)));
+        gl_FragColor = vec4(col, 0.80 * edge);
+        #include <encodings_fragment>
+      }` });
+  const water = new THREE.Mesh(g, m); water.renderOrder = -1; scene.add(water);
+}
+
+/* ---------------- materials: white clay, with water tint below the line, an energy fill and a dead state ---------------- */
+function bodyMat(kind, o = {}) {
+  const base = { clay: [0xf1efe9, 1], shell: [0xf4f2ec, 1], dark: [0x9a9ea5, 1], silicone: [0xf0e7d6, 1] }[kind];
+  const m = new THREE.MeshStandardMaterial({ color: base[0], roughness: kind === "silicone" ? 0.6 : 0.86, metalness: 0, side: o.side || THREE.FrontSide, flatShading: !!o.flat });
+  const u = { uDead: { value: 0 }, uFillZ: { value: -9 }, uFillOn: { value: o.fill ? 1 : 0 }, uA0: { value: o.a0 ?? 1 }, uA1: { value: o.a1 ?? 0 }, uWaterOn: { value: 1 } };
+  m.userData.u = u;
+  if (o.a0 !== undefined) { m.transparent = true; m.depthWrite = false; }
+  if (o.clip) m.clippingPlanes = o.clip;
+  m.onBeforeCompile = (sh) => {
+    Object.assign(sh.uniforms, u, { uTime: UT });
+    sh.vertexShader = "varying vec3 vW; varying vec3 vL;\n" + sh.vertexShader.replace("#include <project_vertex>", "#include <project_vertex>\nvW = (modelMatrix * vec4(transformed, 1.0)).xyz; vL = transformed;");
+    sh.fragmentShader = "varying vec3 vW; varying vec3 vL; uniform float uDead; uniform float uFillZ; uniform float uFillOn; uniform float uA0; uniform float uA1; uniform float uWaterOn;\n" + GLSL_ETA +
+      sh.fragmentShader.replace("#include <output_fragment>", `#include <output_fragment>
+      { vec3 col = gl_FragColor.rgb;
+        float fr = pow(1.0 - abs(dot(normalize(normal), normalize(vViewPosition))), 2.4);
+        float a = clamp(uA0 + uA1 * fr, 0.0, 1.0);
+        if (uFillOn > 0.5) { float f = smoothstep(uFillZ + 0.008, uFillZ - 0.008, vL.z); col = mix(col, col * vec3(1.0, 0.78, 0.52) * 1.05, f * 0.62); col += (1.0 - smoothstep(0.0, 0.007, abs(vL.z - uFillZ))) * vec3(0.12, 0.09, 0.05); }
+        col = mix(col, vec3(0.72, 0.76, 0.80) * (0.55 + 0.6 * fr), uDead);
+        a = mix(a, 0.035 + 0.42 * fr, uDead);
+        float dW = vW.y - etaW(vec2(vW.x, -vW.z));
+        float below = smoothstep(0.0, 0.012, -dW) * uWaterOn;
+        col = mix(col, col * vec3(0.30, 0.40, 0.50) + vec3(0.0, 0.015, 0.03), below * 0.82);
+        float ln = (1.0 - smoothstep(0.0, 0.006, abs(dW))) * uWaterOn;
+        col = mix(col, vec3(0.86, 0.94, 1.0), ln * 0.55 * (1.0 - uDead * 0.6));
+        gl_FragColor = vec4(col, a * (1.0 - below * 0.25)); }`);
+  };
+  m.customProgramCacheKey = () => "body" + kind + (o.flat ? "f" : "") + (o.side || 0);
+  return m;
+}
+function setDead(mats, d) {
+  for (const m of mats) { if (d > 0 && !m.transparent) { m.transparent = true; m.depthWrite = false; m.needsUpdate = true; } m.userData.u.uDead.value = d; }
+}
+
+/* ---------------- geometry ---------------- */
+const G = {};
+function mergeGeos(list) {
+  let nv = 0, ni = 0; for (const g of list) { nv += g.attributes.position.count; ni += g.index ? g.index.count : g.attributes.position.count; }
+  const P = new Float32Array(nv * 3), N = new Float32Array(nv * 3), I = new Uint32Array(ni); let ov = 0, oi = 0;
+  for (const g of list) {
+    if (!g.attributes.normal) g.computeVertexNormals();
+    P.set(g.attributes.position.array, ov * 3); N.set(g.attributes.normal.array, ov * 3);
+    const c = g.attributes.position.count;
+    if (g.index) for (let i = 0; i < g.index.count; i++) I[oi++] = g.index.array[i] + ov; else for (let i = 0; i < c; i++) I[oi++] = i + ov;
+    ov += c;
+  }
+  const m = new THREE.BufferGeometry(); m.setAttribute("position", new THREE.BufferAttribute(P, 3)); m.setAttribute("normal", new THREE.BufferAttribute(N, 3)); m.setIndex(new THREE.BufferAttribute(I, 1)); m.computeBoundingSphere(); return m;
+}
+const Tm = (x, y, z) => new THREE.Matrix4().makeTranslation(x, y, z);
+function prim(g, M) { g.applyMatrix4(M); g.deleteAttribute("uv"); return g; }
+/* the baby: a spindle printed with oblique Kresling style twist pleats; folds flat to 54 mm, grows only in length to 385 mm */
+const BABY = { m: 9, n: 7, R: 0.105 };
+function babyPositions(L, f, arr) {
+  const { m, n, R } = BABY, rings = 2 * n + 1; let q = 0;
+  const valley = lerp(0.56, 0.86, ss(f)), twist = (PI / m) * (0.3 + 0.7 * (1 - f));
+  for (let k = 0; k <= rings + 1; k++) {
+    const u = k / (rings + 1), x = u * L - L / 2;
+    let env = Math.pow(Math.max(0, 1 - Math.pow(2 * u - 1, 2)), 0.62 - 0.22 * f);
+    if (k === 0 || k === rings + 1) env = 0;
+    const r = R * env * (k % 2 === 0 && k > 0 && k <= rings ? valley : 1), rot = k * twist;
+    for (let j = 0; j < m; j++) { const t = rot + (j * TAU) / m; arr[q++] = x; arr[q++] = r * Math.cos(t); arr[q++] = r * Math.sin(t); }
+  }
+  return arr;
+}
+function babyGeometry(L, f) {
+  const { m, n } = BABY, rings = 2 * n + 1, pos = babyPositions(L, f, new Float32Array((rings + 2) * m * 3)), idx = [];
+  for (let k = 0; k <= rings; k++) for (let j = 0; j < m; j++) { const a = k * m + j, b = k * m + ((j + 1) % m), c = (k + 1) * m + j, d = (k + 1) * m + ((j + 1) % m); idx.push(a, d, b, a, c, d); }
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); g.computeBoundingSphere(); return g;
+}
+function setBabyLen(g, L) { babyPositions(L, (L - K.Lfold) / (K.Ldep - K.Lfold), g.attributes.position.array); g.attributes.position.needsUpdate = true; g.computeVertexNormals(); g.computeBoundingSphere(); }
+let HW = null;   // hull half width at (x, z), from the skin
+function halfWidth(x, z) { let w = 0; const p = HW; for (let i = 0; i < p.length; i += 3) if (Math.abs(p[i] - x) < 0.03 && Math.abs(p[i + 2] - z) < 0.03) w = Math.max(w, Math.abs(p[i + 1])); return w; }
+const PORTS = {};
+async function loadModel() {
+  const get = (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(u); return r; });
+  const [sc, b64, dv, ph] = await Promise.all([get("../../simulator/scene_v2.json").then((r) => r.json()), get("../../simulator/scene_v2_glb.txt").then((r) => r.text()), get("../../build/data/design_v2.json").then((r) => r.json()).catch(() => null), get("../../build/data/physics.json").then((r) => r.json()).catch(() => null)]);
+  SC = sc;
+  const f = ph && ph.fold && ph.fold.params; if (f) { K.Lfold = f.folded_L_mm / 1000; K.Ldep = f.deployed_L_mm / 1000; K.Rb = f.outer_crest_r_mm / 1000; BABY.R = K.Rb; }
+  const p = dv && dv.params; if (p) { K.WL = p.waterline_z_m ?? K.WL; K.boreD = (p.hatch_D_mm ?? 250) / 1000; K.cx = p.print_disc_centre_x_m ?? K.cx; }
+  K.WL = SC.waterZ ?? K.WL; K.dockX = SC.dockX ?? K.dockX; K.bed = SC.printMin ? SC.printMin[2] : K.bed;
+  const bin = Uint8Array.from(atob(b64.trim()), (c) => c.charCodeAt(0));
+  const gltf = await new Promise((res, rej) => new THREE.GLTFLoader().parse(bin.buffer, "", res, rej));
+  const src = {}; gltf.scene.traverse((o) => { if (o.isMesh) { const g = o.geometry; g.deleteAttribute("uv"); g.computeVertexNormals(); src[o.name.replace(/\.\d+$/, "")] = g; } });
+  HW = src.W_B0_Skin.attributes.position.array;
+  // ports on the hull: the plain opening with three magnets at the rear; flank pads for charging (widest line) and for babies (lower, 55 mm above water)
+  const wc = halfWidth(-0.05, 0.0) + 0.006, wb = halfWidth(0.1, -0.09) + 0.006;
+  Object.assign(PORTS, { wc, wb });
+  const pads = [];
+  for (const s of [1, -1]) {
+    pads.push(prim(new THREE.BoxGeometry(0.05, 0.012, 0.05), Tm(-0.05, s * (wc - 0.004), 0.0)), prim(new THREE.CylinderGeometry(0.014, 0.014, 0.016, 16), Tm(-0.05, s * (wc - 0.004), 0.0)));
+    pads.push(prim(new THREE.BoxGeometry(0.044, 0.012, 0.044), Tm(0.1, s * (wb - 0.004), -0.09)));
+  }
+  // two water pumps under the hull: the hull swims on its own too
+  const pumps = []; for (const s of [1, -1]) { pumps.push(prim(new THREE.CylinderGeometry(0.032, 0.032, 0.12, 20, 1, false), new THREE.Matrix4().makeTranslation(-0.05, s * 0.11, -0.272).multiply(new THREE.Matrix4().makeRotationZ(PI / 2)))); pumps.push(prim(new THREE.BoxGeometry(0.05, 0.03, 0.03), Tm(-0.05, s * 0.11, -0.25))); }
+  G.skin = src.W_B0_Skin; G.walls = mergeGeos([src.W_B0_MotherRearWall]);
+  G.hullClay = mergeGeos([src.W_V2_BoreRing, src.W_B0_RingA, ...pads]);
+  G.hullMag = mergeGeos([src.W_V2_Pads, ...pumps]);
+  const toTail = (g) => g.clone().applyMatrix4(Tm(-K.dockX, 0, 0));
+  G.tailShell = toTail(src.W_T1_TailShell);
+  G.tailClay = mergeGeos([src.W_V2_Collar, src.W_V2_LipSeal, src.W_V2_Rails, src.W_V2_Cartridge, src.W_V2_Battery].map(toTail));
+  G.tailDark = mergeGeos([src.W_V2_EPM, src.W_V2_Thrusters].map(toTail));
+  G.boom = src.W_V2_Boom;
+  G.arm = {}; G.tool = {};
+  for (const k in src) { const gr = SC.groups[k]; if (gr === "arm") G.arm[k.slice(2)] = src[k]; else if (gr === "tool") G.tool[k] = src[k]; }
+  G.babyDep = babyGeometry(K.Ldep, 1); G.babyFold = babyGeometry(K.Lfold, 0);
+  G.capsule = mergeGeos([prim(new THREE.CapsuleGeometry(0.014, 0.04, 4, 10), new THREE.Matrix4().makeRotationZ(PI / 2)), prim(new THREE.CylinderGeometry(0.008, 0.01, 0.022, 12), new THREE.Matrix4().makeTranslation(-0.035, 0, 0).multiply(new THREE.Matrix4().makeRotationZ(PI / 2)))]);
+  // charging buoy: float ring, post, lamp, three pads at the flank port height
+  const cp = [prim(new THREE.TorusGeometry(0.3, 0.075, 12, 40), new THREE.Matrix4().makeRotationX(0)), prim(new THREE.CylinderGeometry(0.05, 0.07, 0.62, 16), new THREE.Matrix4().makeTranslation(0, 0, 0.29).multiply(new THREE.Matrix4().makeRotationX(PI / 2)))];
+  for (let i = 0; i < 3; i++) { const a = (90 + 120 * i) * D2R; cp.push(prim(new THREE.BoxGeometry(0.1, 0.03, 0.03), new THREE.Matrix4().makeTranslation(0.32 * Math.cos(a), 0.32 * Math.sin(a), 0.145).multiply(new THREE.Matrix4().makeRotationZ(a))), prim(new THREE.BoxGeometry(0.012, 0.05, 0.05), new THREE.Matrix4().makeTranslation(0.37 * Math.cos(a), 0.37 * Math.sin(a), 0.145).multiply(new THREE.Matrix4().makeRotationZ(a)))); cp.push(prim(new THREE.CylinderGeometry(0.025, 0.025, 0.16, 8), new THREE.Matrix4().makeTranslation(0.3 * Math.cos(a), 0.3 * Math.sin(a), 0.07).multiply(new THREE.Matrix4().makeRotationX(PI / 2)))); }
+  G.charger = mergeGeos(cp);
+  G.lamp = new THREE.SphereGeometry(0.05, 16, 10);
+}
+
+/* ---------------- DexArm kinematics, ported from the simulator page ---------------- */
+const KIN = {
+  rx: (v, t) => { const c = Math.cos(t), s = Math.sin(t); return [v[0], c * v[1] - s * v[2], s * v[1] + c * v[2]]; },
+  rz: (v, t) => { const c = Math.cos(t), s = Math.sin(t); return [c * v[0] - s * v[1], s * v[0] + c * v[1], v[2]]; },
+  root(boom) { const R = SC.armRoot.map((r) => r.slice()); R[0][3] += boom - SC.boomRef; return R; },
+  W2(a, b) { const S = SC.PV_S, E = SC.PV_E, W = SC.PV_W; const e = KIN.rx([E[0] - S[0], E[1] - S[1], E[2] - S[2]], a), w = KIN.rx([W[0] - E[0], W[1] - E[1], W[2] - E[2]], b); return [S[0] + e[0] + w[0], S[1] + e[1] + w[1], S[2] + e[2] + w[2]]; },
+  tip(q, boom) { const W = SC.PV_W, w2 = KIN.W2(q[1], q[2]); let p = [SC.tipEE[0] + w2[0] - W[0], SC.tipEE[1] + w2[1] - W[1], SC.tipEE[2] + w2[2] - W[2]]; p = KIN.rz(KIN.rz(p, q[0]), PI / 2); const R = KIN.root(boom); return [0, 1, 2].map((i) => R[i][0] * p[0] + R[i][1] * p[1] + R[i][2] * p[2] + R[i][3]); },
+  LIM: [[-110 * D2R, 110 * D2R], [-12 * D2R, 115 * D2R], [-32 * D2R, 112 * D2R]],
+  solve(target, q0, boom, iters = 8) {
+    const det = (m) => m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+    let q = q0.slice();
+    for (let it = 0; it < iters; it++) {
+      const f = KIN.tip(q, boom), e = [target[0] - f[0], target[1] - f[1], target[2] - f[2]]; if (Math.hypot(...e) < 2e-5) break;
+      const J = [[], [], []], h = 1e-5;
+      for (let j = 0; j < 3; j++) { const qq = q.slice(); qq[j] += h; const g = KIN.tip(qq, boom); for (let i = 0; i < 3; i++) J[i][j] = (g[i] - f[i]) / h; }
+      const A = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], bv = [0, 0, 0];
+      for (let i = 0; i < 3; i++) { for (let j = 0; j < 3; j++) for (let k = 0; k < 3; k++) A[i][j] += J[k][i] * J[k][j]; A[i][i] += 2e-5; for (let k = 0; k < 3; k++) bv[i] += J[k][i] * e[k]; }
+      const Dt = det(A); const d = [0, 1, 2].map((c) => det(A.map((r, i) => r.map((x, j) => (j === c ? bv[i] : x)))) / Dt);
+      q = q.map((x, i) => clamp(x + clamp(d[i], -0.3, 0.3), KIN.LIM[i][0], KIN.LIM[i][1]));
+    }
+    return q;
+  },
+};
+const PASS_Q = [0, 70 * D2R, 60 * D2R];
+const M4 = () => new THREE.Matrix4();
+const about = (p, a) => Tm(p[0], p[1], p[2]).multiply(M4().makeRotationX(a)).multiply(Tm(-p[0], -p[1], -p[2]));
+const MAT = {};
+function makeRig(parent) {
+  const g = new THREE.Group(); parent.add(g);
+  const rig = { g, parts: {}, tool: [], tiltParts: [], q: PASS_Q.slice(), boom: 0, tilt: 180 };
+  for (const k in G.arm) { const o = new THREE.Mesh(G.arm[k], MAT.arm); o.matrixAutoUpdate = false; g.add(o); rig.parts[k] = o; }
+  for (const k in G.tool) { const o = new THREE.Mesh(G.tool[k], MAT.arm); o.matrixAutoUpdate = false; g.add(o); rig.tool.push(o); if (SC.tilt.includes(k)) rig.tiltParts.push(o); }
+  rig.boomMesh = new THREE.Mesh(G.boom, MAT.arm); g.add(rig.boomMesh);
+  const piv = SC.tiltPivotEE; rig.piv = M4(); rig.piv.set(...piv[0], ...piv[1], ...piv[2], ...piv[3]); rig.pivI = rig.piv.clone().invert();
+  return rig;
+}
+function poseRig(rig) {
+  const [yaw, a, b] = rig.q, S = SC.PV_S, E = SC.PV_E, W = SC.PV_W;
+  const e2 = KIN.rx([E[0] - S[0], E[1] - S[1], E[2] - S[2]], a), E2 = [S[0] + e2[0], S[1] + e2[1], S[2] + e2[2]];
+  const w2 = KIN.rx([W[0] - E[0], W[1] - E[1], W[2] - E[2]], b), W2 = [E2[0] + w2[0], E2[1] + w2[1], E2[2] + w2[2]];
+  const L1 = [0, 1, 2].map((i) => SC.PV_O1[i] - (E[i] - S[i])), dE = [E2[0] - E[0], E2[1] - E[1], E2[2] - E[2]];
+  const mats = { B_Fix: M4(), B_Rot: M4(), In_1: about(S, a), Join: Tm(...dE), In_2: Tm(...dE).multiply(about(E, b)), EE: Tm(W2[0] - W[0], W2[1] - W[1], W2[2] - W[2]), Out_1: about(L1, a), Out_2: Tm(...dE).multiply(about(SC.PV_O2, b)) };
+  const r = KIN.root(rig.boom), Rm = M4(); Rm.set(...r[0], ...r[1], ...r[2], ...r[3]);
+  const base = Rm.clone().multiply(M4().makeRotationZ(PI / 2)), yb = base.clone().multiply(M4().makeRotationZ(yaw));
+  for (const n in mats) { const o = rig.parts[n]; if (o) o.matrix.copy(n === "B_Fix" ? base : yb.clone().multiply(mats[n])); }
+  const ee = yb.clone().multiply(mats.EE), tm = rig.piv.clone().multiply(M4().makeRotationY(-rig.tilt * D2R)).multiply(rig.pivI);
+  for (const o of rig.tool) o.matrix.copy(rig.tiltParts.includes(o) ? ee.clone().multiply(tm) : ee);
+  rig.boomMesh.position.x = rig.boom - SC.boomRef;
+}
+
+/* ---------------- glow for the magnets ---------------- */
+let GLOWTEX = null;
+function glowSprite() {
+  if (!GLOWTEX) { const c = document.createElement("canvas"); c.width = c.height = 64; const x = c.getContext("2d"); const gr = x.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(0.25, "rgba(190,225,255,.75)"); gr.addColorStop(1, "rgba(150,200,255,0)"); x.fillStyle = gr; x.fillRect(0, 0, 64, 64); GLOWTEX = new THREE.CanvasTexture(c); }
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: GLOWTEX, color: 0xbfe0ff, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }));
+  s.scale.setScalar(0.12); s.renderOrder = 20; return s;
+}
+
+/* ---------------- bodies ---------------- */
+const SEED = ["slow tide", "three pulses", "an open ring", "light above", "the low pump"];
+const LEX = ["salt", "current", "fold", "glass", "echo", "shadow", "warmth", "valve", "pressure", "silt", "hum", "drift"];
+let bodies = [], nextM = 1, nextB = 1, nextT = 1, simT = 0, speed = 1, running = true, FOLLOW = null, CAMFLY = null, EVENTS = [];
+const P = { inh: 0.7, drift: 0.12, rel: 2 };
+function event(msg) { EVENTS.push({ t: simT, msg }); if (EVENTS.length > 3) EVENTS.shift(); renderEvents(); }
+function renderEvents() { const n = EVENTS.length; $("#ev").innerHTML = EVENTS.map((e, i) => `<div class="${i < n - 1 ? "old" : ""}"><span class="t">${fmtT(e.t)}</span>${esc(e.msg)}</div>`).join(""); }
+function fmtT(t) { const m = Math.floor(t / 60), s = Math.floor(t % 60); return m ? `${m} min ${String(s).padStart(2, "0")} s` : `${s} s`; }
+
+function portsOf(b) {
+  if (b.kind === "hull") return { rear: { x: K.dockX, y: 0, n: PI, z: 0 }, cL: { x: -0.05, y: PORTS.wc, n: PI / 2, z: 0, side: "L" }, cR: { x: -0.05, y: -PORTS.wc, n: -PI / 2, z: 0, side: "R" }, bL: { x: 0.1, y: PORTS.wb, n: PI / 2, z: -0.09, side: "L" }, bR: { x: 0.1, y: -PORTS.wb, n: -PI / 2, z: -0.09, side: "R" } };
+  if (b.kind === "tail") return { front: { x: 0, y: 0, n: 0, z: 0 } };
+  if (b.kind === "baby") return { cap: { x: -b.L / 2, y: 0, n: PI, z: 0 } };
+  const o = {}; for (let i = 0; i < 3; i++) { const a = (90 + 120 * i) * D2R; o["p" + i] = { x: 0.376 * Math.cos(a), y: 0.376 * Math.sin(a), n: a, z: 0.145 }; } return o;
+}
+const CIRC = { hull: [[0.02, 0, 0.37]], tail: [[-0.18, 0, 0.235], [-0.45, 0, 0.2]], baby: [[-0.1, 0, 0.1], [0.1, 0, 0.1]], charger: [[0, 0, 0.39]] };
+function newGenome() { return Array.from({ length: 5 }, () => rnd()); }
+function makeBody(kind, x, y, th) {
+  const b = { kind, x, y, th, v: 0, w: 0, parent: null, rel: null, docks: {}, reserved: {}, children: [], alive: true, dead: 0, cluster: false, energy: 1, age: 0, task: null, hold: 0, ph: rnd() * TAU, near: new Map(), relN: 0, wander: null, think: rnd() };
+  b.obj = new THREE.Group(); b.obj.matrixAutoUpdate = false; scene.add(b.obj);
+  b.bl = new THREE.Group(); b.bl.rotation.x = -PI / 2; b.obj.add(b.bl);
+  b.mats = []; b.glow = {};
+  const add = (geo, mat, ro = 0) => { const m = new THREE.Mesh(geo, mat); m.renderOrder = ro; b.bl.add(m); b.mats.push(mat); return m; };
+  if (kind === "hull") {
+    b.bl.position.y = -K.WL;
+    add(G.hullClay, bodyMat("clay")); add(G.hullMag, bodyMat("dark"));
+    add(G.walls, bodyMat("shell", { a0: 0.3, a1: 0.3, side: THREE.DoubleSide }), 5);
+    b.shell = add(G.skin, bodyMat("shell", { a0: 0.36, a1: 0.55 }), 6);
+    b.name = "M" + nextM++;
+  } else if (kind === "tail") {
+    b.bl.position.y = -K.WL;
+    b.fillMat = bodyMat("clay", { fill: true }); add(G.tailShell, b.fillMat); add(G.tailClay, bodyMat("clay")); add(G.tailDark, bodyMat("dark"));
+    b.boomMesh = add(G.boom, bodyMat("clay")); b.boomMesh.position.x = -K.dockX - SC.boomRef;
+    b.name = "T" + nextT++;
+  } else if (kind === "baby") {
+    b.bl.position.y = 0.055; b.L = K.Ldep;
+    b.fillMat = bodyMat("silicone", { fill: true, flat: true, a0: 0.9, a1: 0.1, side: THREE.DoubleSide }); b.mesh = add(G.babyDep, b.fillMat, 3);
+    b.cap = add(G.capsule, bodyMat("dark")); b.cap.position.x = -b.L / 2 + 0.04;
+    b.name = "B" + nextB++;
+  } else {
+    add(G.charger, bodyMat("clay")); const lamp = add(G.lamp, new THREE.MeshBasicMaterial({ color: 0xf2d9b0 })); lamp.position.z = 0.62; b.mats.pop();
+    b.name = "Buoy"; b.energy = 1;
+  }
+  bodies.push(b); return b;
+}
+function makeMother(x, y, th, withTail = true, gen = 0, mom = null) {
+  const h = makeBody("hull", x, y, th);
+  Object.assign(h, { genome: newGenome(), memory: SEED.map((t) => ({ t, w: 0.5 + 0.5 * rnd(), src: "seed" })), gen, mom, life: 520 + 260 * rnd(), energy: 0.55 + 0.4 * rnd(), babies: 0 });
+  if (withTail) { const t = makeBody("tail", x, y, th); t.energy = 0; attach(t, "front", h, "rear", true); }
+  return h;
+}
+
+/* pose: 2D in the water plane (x, y with y = -Z), heading th; children follow their parent rigidly */
+function rootOf(b) { while (b.parent) b = b.parent; return b; }
+function portWorld(b, key) { const p = portsOf(b)[key], c = Math.cos(b.th), s = Math.sin(b.th); return { x: b.x + c * p.x - s * p.y, y: b.y + s * p.x + c * p.y, n: b.th + p.n }; }
+function dockPose(A, pa, B, pb) {
+  const PB = portWorld(B, pb), p = portsOf(A)[pa], th = wrapA(PB.n + PI - p.n), c = Math.cos(th), s = Math.sin(th);
+  return { x: PB.x - (c * p.x - s * p.y), y: PB.y - (s * p.x + c * p.y), th, nx: Math.cos(PB.n), ny: Math.sin(PB.n) };
+}
+function attach(A, pa, B, pb, silent) {
+  const T = dockPose(A, pa, B, pb), c = Math.cos(-B.th), s = Math.sin(-B.th), dx = T.x - B.x, dy = T.y - B.y;
+  A.parent = B; A.rel = { x: c * dx - s * dy, y: s * dx + c * dy, th: wrapA(T.th - B.th), off: 0 }; A.myPort = pa; A.theirPort = pb;
+  B.children.push(A); A.docks[pa] = B; B.docks[pb] = A; delete B.reserved[pb];
+  Object.assign(A, { x: T.x, y: T.y, th: T.th, v: 0, w: 0 });
+  if (!silent) { glowAt(B, pb, 1); }
+  else glowAt(B, pb, 0.35);
+}
+function detach(A, silent) {
+  const B = A.parent; if (!B) return;
+  B.children = B.children.filter((c) => c !== A); delete B.docks[A.theirPort]; delete A.docks[A.myPort];
+  const g = B.glow[A.theirPort]; if (g) { g.flash = silent ? 0 : 0.5; g.level = 0; }
+  const n = portWorld(B, A.theirPort);
+  A.parent = null; A.rel = null; A.backoff = { nx: Math.cos(n.n), ny: Math.sin(n.n), d: 0, max: A.kind === "baby" ? 0.35 : 0.5 };
+  A.task = null;
+}
+function glowAt(B, key, level) {
+  let g = B.glow[key]; const p = portsOf(B)[key];
+  if (!g) { g = B.glow[key] = { s: glowSprite(), level: 0, flash: 0 }; const pz = key === "rear" ? 0 : p.z; g.s.position.set(p.x + Math.cos(p.n) * 0.02, p.y + Math.sin(p.n) * 0.02, pz); B.bl.add(g.s); }
+  g.level = 0.35; g.flash = level >= 1 ? 1 : 0;
+  if (key === "rear") { g.s.position.set(p.x - 0.03, PORTS.rearY || 0.185, 0.0); }
+}
+function updatePoses() {
+  const roots = bodies.filter((b) => !b.parent);
+  const M = new THREE.Matrix4(), R = new THREE.Matrix4();
+  const place = (b, Mp) => {
+    if (Mp) {
+      const off = b.rel.off || 0, pn = portsOf(b.parent)[b.theirPort].n;   // off: the tail backs off along the port normal during a birth
+      b.obj.matrix.copy(Mp).multiply(Tm(b.rel.x + Math.cos(pn) * off, 0, -(b.rel.y + Math.sin(pn) * off))).multiply(R.makeRotationY(b.rel.th));
+      const pc = Math.cos(b.parent.th), ps = Math.sin(b.parent.th), rx = b.rel.x + Math.cos(pn) * off, ry = b.rel.y + Math.sin(pn) * off;
+      b.x = b.parent.x + pc * rx - ps * ry; b.y = b.parent.y + ps * rx + pc * ry; b.th = wrapA(b.parent.th + b.rel.th);
+    } else {
+      const amp = b.cluster ? 0.4 : b.kind === "baby" ? 1.3 : b.kind === "charger" ? 0.7 : 1;
+      const h = eta(b.x, b.y, simT) * amp * 0.9 + Math.sin(simT * 0.9 + b.ph) * 0.004 * amp;
+      const pitch = (Math.sin(simT * 0.71 + b.ph) * 1.2 + (eta(b.x + 0.4 * Math.cos(b.th), b.y + 0.4 * Math.sin(b.th), simT) - eta(b.x, b.y, simT)) * 60) * D2R * amp;
+      const roll = Math.sin(simT * 0.57 + b.ph * 1.7) * 1.1 * D2R * amp;
+      b.obj.matrix.makeTranslation(b.x, h + (b.sink || 0), -b.y).multiply(R.makeRotationY(b.th)).multiply(M.makeRotationX(roll)).multiply(new THREE.Matrix4().makeRotationZ(pitch));
+    }
+    b.obj.matrixWorldNeedsUpdate = true;
+    for (const c of b.children) place(c, b.obj.matrix);
+  };
+  for (const r of roots) place(r, null);
+}
+
+/* ---------------- society logic, as on the population page: relation, birth, memory with drift ---------------- */
+function overlap(a, b) { const m = new Map(a.map((x) => [x.t, x.w])), mb = new Map(b.map((x) => [x.t, x.w])); let n = 0, d = 0; for (const k of new Set([...m.keys(), ...mb.keys()])) { const x = m.get(k) || 0, y = mb.get(k) || 0; n += Math.min(x, y); d += Math.max(x, y); } return d ? n / d : 0; }
+function like(a, b) { let s = 0; for (let i = 0; i < 5; i++) s += (a[i] - b[i]) ** 2; return 1 - Math.sqrt(s / 5); }
+function relation(a, b) { return 0.5 * overlap(a.memory, b.memory) + 0.3 * like(a.genome, b.genome) + 0.2 * Math.min(1, (a.near.get(b.name) || 0) / 8); }
+function inherit(m) {
+  const genome = m.genome.map((v) => clamp(v + (rnd() - 0.5) * 2 * P.drift, 0, 1)), mem = [];
+  for (const x of m.memory) if (rnd() < x.w * P.inh) { let t = x.t; if (rnd() < P.drift) { const ws = t.split(" "); ws[Math.floor(rnd() * ws.length)] = LEX[Math.floor(rnd() * LEX.length)]; t = ws.join(" "); } mem.push({ t, w: x.w * 0.85, src: m.name }); }
+  return { genome, memory: mem.slice(0, 7) };
+}
+const mothers = () => bodies.filter((b) => b.kind === "hull" && b.alive);
+const tailOf = (h) => h.docks.rear && h.docks.rear.kind === "tail" ? h.docks.rear : null;
+
+/* ---------------- tasks ---------------- */
+function sideFree(B, side) { return !["c" + side, "b" + side].some((k) => B.docks[k] || B.reserved[k]); }
+function startDock(A, pa, B, pb, purpose) {
+  if (A.parent) detach(A);
+  B.reserved[pb] = A; A.task = { type: "dock", B, pa, pb, purpose, phase: "go", t: 0 };
+}
+function cancelTask(A) { if (A.task && A.task.type === "dock") delete A.task.B.reserved[A.task.pb]; A.task = null; }
+function moveToward(b, tx, ty, vmax, dt, faceTh) {
+  const dx = tx - b.x, dy = ty - b.y, d = Math.hypot(dx, dy);
+  const want = faceTh !== undefined && d < 0.4 ? faceTh : Math.atan2(dy, dx);
+  const turn = clamp(wrapA(want - b.th), -0.35 * dt, 0.35 * dt); b.th = wrapA(b.th + turn);
+  const align = Math.max(0, Math.cos(wrapA(Math.atan2(dy, dx) - b.th)));
+  const vt = Math.min(vmax, d * 0.35) * (d < 0.4 ? 1 : align * align);
+  b.v = lerp(b.v, vt, 1 - Math.exp(-dt * 0.8));
+  if (d < 0.4) { b.x += dx / (d || 1) * Math.min(d, b.v * dt); b.y += dy / (d || 1) * Math.min(d, b.v * dt); }
+  else { b.x += Math.cos(b.th) * b.v * dt; b.y += Math.sin(b.th) * b.v * dt; }
+  return d;
+}
+const VMAX = { hull: 0.12, tail: 0.11, baby: 0.06 };
+function runDock(A, dt) {
+  const T = A.task, B = T.B;
+  if (!B.alive || (rootOf(B) === A)) { cancelTask(A); return; }
+  const P = dockPose(A, T.pa, B, T.pb), stand = A.kind === "baby" ? 0.35 : 0.55;
+  const sx = P.x + P.nx * stand, sy = P.y + P.ny * stand;
+  T.t += dt;
+  if (T.phase === "go") { const d = moveToward(A, sx, sy, VMAX[A.kind], dt, P.th); if (d < 0.05) T.phase = "turn"; if (T.t > 160) cancelTask(A); }
+  else if (T.phase === "turn") { const dth = wrapA(P.th - A.th); A.th = wrapA(A.th + clamp(dth, -0.25 * dt, 0.25 * dt)); A.x = lerp(A.x, sx, 1 - Math.exp(-dt)); A.y = lerp(A.y, sy, 1 - Math.exp(-dt)); if (Math.abs(dth) < 0.01) { T.phase = "in"; T.d = stand; } }
+  else if (T.phase === "in") {
+    T.d = Math.max(0, T.d - 0.045 * dt);
+    A.th = lerp(A.th, P.th, 0.2); A.x = P.x + P.nx * T.d; A.y = P.y + P.ny * T.d;
+    if (T.d <= 0) { attach(A, T.pa, B, T.pb); A.task = { type: "docked", purpose: T.purpose, t: 0 }; dockEvent(A, B, T.purpose); }
+  }
+}
+function dockEvent(A, B, purpose) {
+  if (purpose === "charge") event(`${A.name} docks to ${B.kind === "charger" ? "a charging buoy" : B.name} to charge`);
+  else if (purpose === "raise") event(`${A.name} docks to ${B.name}${B.name === A.momName ? ", the mother," : ""} to be raised`);
+  else if (purpose === "tail") event(`${A.name} docks to ${B.name}: tail to hull`);
+}
+
+/* ---------------- birth: open, print, bring out while inflating ---------------- */
+const TP = { open: 3, armIn: 5, print: 22, armOut: 3, carry: 4, out: 12, release: 3, close: 5 };
+const TP_END = Object.values(TP).reduce((a, b) => a + b, 0);
+function startPrint(h) {
+  const t = tailOf(h); if (!t) return;
+  const kid = inherit(h);
+  h.print = { t: 0, tail: t, kid, rig: makeRig(h.bl), q: PASS_Q.slice(), phi: 0 };
+  t.boomMesh.visible = false;
+  // folded baby standing on the bed, nose down, valve on top; revealed layer by layer
+  const clipP = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0);
+  const mat = bodyMat("silicone", { flat: true, side: THREE.DoubleSide, clip: [clipP] });
+  const g = babyGeometry(K.Lfold, 0), m = new THREE.Mesh(g, mat); m.renderOrder = 3;
+  const cap = new THREE.Mesh(G.capsule, bodyMat("dark", { clip: [clipP] }));
+  const grp = new THREE.Group(); grp.add(m); grp.add(cap); h.bl.add(grp);
+  h.print.baby = { grp, m, g, mat, cap, clipP, L: K.Lfold };
+  h.hold = 1; h.energy -= 0.05;
+  event(`${h.name} is printing`);
+}
+function placeBabyInPrint(pb, cx, cz, axisDown, L) {   // in the hull frame
+  pb.grp.position.set(cx, 0, cz); pb.grp.rotation.set(0, axisDown ? PI / 2 : 0, 0);   // axis local x; rotated about y: x to -z (nose down)
+  pb.cap.position.set(-L / 2 + 0.035, 0, 0);
+}
+function stepPrint(h, dt) {
+  const P = h.print, rig = P.rig, t = (P.t += dt), pb = P.baby, tail = P.tail;
+  let s = 0; const seg = (name) => { const a = s; s += TP[name]; return t >= a && t < s ? (t - a) / TP[name] : null; };
+  const bedTop = K.bed;
+  let u;
+  // layer height for the clip plane, in the hull frame z
+  let layerZ = bedTop - 0.01;
+  if ((u = seg("open")) !== null) { rig.boom = 0; rig.q = PASS_Q.slice(); rig.tilt = 180; }
+  else if ((u = seg("armIn")) !== null) { rig.boom = SC.stations.front * ss(u); rig.tilt = 180 * (1 - ss((u - 0.6) / 0.4)); rig.q = PASS_Q.map((q, i) => lerp(q, [0, 55 * D2R, 42 * D2R][i], ss((u - 0.6) / 0.4))); }
+  else if ((u = seg("print")) !== null) {
+    rig.boom = SC.stations.front; rig.tilt = 0;
+    const L = K.Lfold, zl = bedTop + L * u, k = u * (2 * BABY.n + 1), valley = k % 2 < 1 ? lerp(1, 0.56, k % 1) : lerp(0.56, 1, k % 1);
+    const env = Math.pow(Math.max(0, 1 - Math.pow(2 * u - 1, 2)), 0.62);
+    P.phi += dt * 9; const r = BABY.R * env * valley * 0.96;
+    rig.q = KIN.solve([K.cx + r * Math.cos(P.phi), r * Math.sin(P.phi), zl + 0.004], rig.q, rig.boom, 4);
+    layerZ = zl;
+  }
+  else if ((u = seg("armOut")) !== null) { layerZ = 1; rig.q = KIN.solve([K.cx, 0, bedTop + K.Lfold + 0.02], rig.q, rig.boom, 6); if (u > 0.98 && !P.hooked) { P.hooked = true; event(`${h.name}: the needle meets the valve of the new baby`); } }
+  else if ((u = seg("carry")) !== null) {
+    layerZ = 1; if (!P.qCarry) P.qCarry = KIN.solve([-0.24, 0, 0.0], [0, 40 * D2R, 50 * D2R], SC.stations.front, 40);
+    const tgt = [lerp(K.cx, -0.24, ss(u)), 0, lerp(bedTop + K.Lfold + 0.02, 0.0, ss(u))];
+    rig.q = KIN.solve(tgt, rig.q, rig.boom, 6);
+  }
+  else if ((u = seg("out")) !== null) {
+    layerZ = 1;
+    if (!P.undocked) { P.undocked = true; const g = h.glow.rear; if (g) { g.flash = 0.5; g.level = 0; } event(`${tail.name} unlocks from ${h.name} and backs off, the arm brings the baby out`); }
+    tail.rel.off = 0.62 * ss(u);
+    rig.q = P.qCarry;
+  }
+  else if ((u = seg("release")) !== null) { layerZ = 1; tail.rel.off = 0.62; }
+  else if ((u = seg("close")) !== null) { tail.rel.off = 0.62 * (1 - ss(u)); rig.boom = SC.stations.front * (1 - ss(u)); rig.q = PASS_Q.slice(); rig.tilt = 180; if (u > 0.97 && !P.redock) { P.redock = true; glowAt(h, "rear", 1); event(`${tail.name} docks back to ${h.name}`); } }
+  else { endPrint(h); return; }
+  // arm root moves with the tail when the tail backs off: the rig sits in the hull frame, shifted by the tail offset
+  rig.g.position.x = -(tail.rel.off || 0);
+  poseRig(rig);
+  const tip = KIN.tip(rig.q, rig.boom); tip[0] -= tail.rel.off || 0;
+  const tS = TP.open + TP.armIn, tPrintEnd = tS + TP.print, tCarry = tPrintEnd + TP.armOut, tOut = tCarry + TP.carry, tRel = tOut + TP.out;
+  if (t < tCarry) { placeBabyInPrint(pb, K.cx, bedTop + K.Lfold / 2, true, K.Lfold); }
+  else if (t < tRel) {
+    // valve held on the needle: horizontal, valve end toward the opening, growing in length while carried out
+    const uc = clamp((t - tCarry) / TP.carry, 0, 1), uo = clamp((t - tOut) / TP.out, 0, 1);
+    const L = lerp(K.Lfold, K.Ldep, ss(uo)); if (Math.abs(L - pb.L) > 0.0005) { setBabyLen(pb.g, L); pb.L = L; }
+    const rotY = lerp(PI / 2, PI, ss(uc));   // from nose down to valve end facing -x
+    pb.grp.rotation.set(0, rotY, 0);
+    const c = Math.cos(rotY), sn = Math.sin(rotY);   // local x after rotY about y: (c, 0, -sn)
+    const capOff = -L / 2 - 0.01; pb.grp.position.set(tip[0] - c * capOff, 0, tip[2] + sn * capOff);
+    pb.cap.position.set(-L / 2 + 0.035, 0, 0);
+  }
+  else if (!P.released) { P.released = true; releaseBaby(h); }
+  pb.clipP.normal.set(0, -1, 0); pb.clipP.constant = layerZ;
+  pb.clipP.applyMatrix4(h.bl.matrixWorld);
+  h.energy -= dt * 0.006;
+}
+function releaseBaby(h) {
+  const P = h.print, pb = P.baby;
+  pb.grp.updateMatrixWorld(true);
+  const wp = new THREE.Vector3(); pb.grp.getWorldPosition(wp);
+  const dirW = new THREE.Vector3(1, 0, 0).transformDirection(pb.grp.matrixWorld);
+  h.bl.remove(pb.grp); pb.g.dispose();
+  const b = makeBody("baby", wp.x, -wp.z, Math.atan2(-dirW.z, dirW.x));
+  Object.assign(b, { genome: P.kid.genome, memory: P.kid.memory, gen: h.gen + 1, mom: h, momName: h.name, energy: 0.45, raisedBy: [], sink: 0.09, drop: 1, life: 900 });
+  b.task = { type: "drift", t: 0, side: rnd() < 0.5 ? 1 : -1 };
+  h.babies++; h.lastBirth = simT;
+  event(`${b.name} is born to ${h.name}, ${Math.round(K.Ldep * 1000)} mm long`);
+}
+function endPrint(h) {
+  const P = h.print; if (!P) return;
+  h.bl.remove(P.rig.g); if (P.tail) { P.tail.boomMesh.visible = true; if (P.tail.rel) P.tail.rel.off = 0; }
+  if (P.baby && !P.released) { h.bl.remove(P.baby.grp); }
+  h.print = null; h.hold = 0;
+}
+
+/* ---------------- death ---------------- */
+function die(b, why) {
+  if (!b.alive) return; b.alive = false; b.dead = 0.0001;
+  if (b.print) endPrint(b);
+  cancelTask(b);
+  for (const c of b.children.slice()) { detach(c, true); if (c.kind === "tail") c.task = null; }
+  if (b.parent) detach(b, true);
+  for (const k in b.reserved) { const a = b.reserved[k]; if (a.task && a.task.B === b) a.task = null; }
+  b.reserved = {};
+  b.task = { type: "toCluster" }; b.backoff = null;
+  event(`${b.name} dies${why ? ", " + why : ""}`);
+}
+
+/* ---------------- one step of the world ---------------- */
+function step(dt) {
+  simT += dt; UT.value = simT;
+  const ms = mothers(), live = bodies.filter((b) => b.alive && b.kind !== "charger");
+  // near time for relations
+  for (let i = 0; i < ms.length; i++) for (let j = i + 1; j < ms.length; j++) { const a = ms[i], b = ms[j]; if (Math.hypot(a.x - b.x, a.y - b.y) < 2.6) { a.near.set(b.name, (a.near.get(b.name) || 0) + dt); b.near.set(a.name, (b.near.get(a.name) || 0) + dt); } }
+  for (const b of bodies) {
+    if (b.kind === "charger") continue;
+    if (!b.alive) { b.dead += dt; setDead(b.mats, ss(b.dead / 6)); for (const k in b.glow) b.glow[k].level = 0; stepDead(b, dt); continue; }
+    b.age += dt;
+    if (b.kind === "hull") stepMother(b, dt);
+    else if (b.kind === "tail") stepTail(b, dt);
+    else stepBaby(b, dt);
+  }
+  // charging and raising flows
+  for (const b of live) {
+    if (!b.parent || !b.task || b.task.type !== "docked") continue;
+    const B = b.parent; b.task.t += dt;
+    if (b.task.purpose === "charge") { const rate = B.kind === "charger" ? 0.035 : 0.022; b.energy = Math.min(1, b.energy + rate * dt); if (B.kind === "hull") B.energy -= rate * dt * 0.8; if (b.energy >= 0.96 || (B.kind === "hull" && B.energy < 0.45)) { detach(b); event(`${b.name} undocks from ${B.kind === "charger" ? "the buoy" : B.name}, charged`); } }
+    else if (b.task.purpose === "raise") {
+      b.energy = Math.min(1, b.energy + 0.02 * dt); B.energy -= 0.005 * dt;
+      if ((b.task.mem = (b.task.mem || 0) + dt) > 7) { b.task.mem = 0; const src = B.memory[Math.floor(rnd() * B.memory.length)]; if (src) { const ex = b.memory.find((m) => m.t === src.t); if (ex) ex.w = Math.min(1, ex.w + 0.1); else if (b.memory.length < 9) b.memory.push({ t: src.t, w: 0.35, src: B.name }); } }
+      if (b.task.t > 28 + 10 * b.genome[1] || b.energy > 0.98 || B.print) { detach(b); event(`${b.name} undocks from ${B.name}, the turn ends`); }
+    }
+  }
+  // glow decay
+  for (const b of bodies) for (const k in b.glow) { const g = b.glow[k]; g.flash = Math.max(0, g.flash - dt * 0.7); const docked = !!b.docks[k]; const on = docked ? g.level : 0; g.s.material.opacity = clamp(on * (0.6 + 0.4 * Math.sin(simT * 2 + b.ph)) + g.flash, 0, 1); g.s.scale.setScalar(0.09 + 0.18 * g.flash); }
+  // backing off after an undock
+  for (const b of bodies) if (b.backoff && !b.parent) { const d = 0.05 * dt; b.x += b.backoff.nx * d; b.y += b.backoff.ny * d; b.backoff.d += d; if (b.backoff.d > b.backoff.max) b.backoff = null; }
+  collide();
+  // grown babies leave the pond
+  bodies = bodies.filter((b) => { if (b.gone) { scene.remove(b.obj); if (FOLLOW === b) unfollow(); return false; } return true; });
+  manage(dt);
+  updatePoses();
+}
+function canAct(b) { return !b.parent && !b.backoff && !b.hold; }
+function wander(b, dt, v) {
+  if (!b.wander || Math.hypot(b.wander[0] - b.x, b.wander[1] - b.y) < 0.4 || rnd() < dt * 0.01) b.wander = [lerp(POND.x0 + 1.2, POND.x1 - 1.2, rnd()), lerp(POND.y0 + 1, POND.y1 - 1, rnd())];
+  if (Math.hypot(b.wander[0] - CLUSTER.x, b.wander[1] - CLUSTER.y) < 2.2) b.wander = null; else moveToward(b, b.wander[0], b.wander[1], v, dt);
+}
+function stepMother(h, dt) {
+  const t = tailOf(h);
+  h.energy -= dt * (t ? 0.0022 : 0.0016);
+  if (h.print) { stepPrint(h, dt); }
+  if (h.energy <= 0) { die(h, "out of energy"); return; }
+  if (h.age > h.life && !h.print) { die(h, "old"); return; }
+  if ((h.think -= dt) < 0) {
+    h.think = 1;
+    h.relN = mothers().filter((o) => o !== h && Math.hypot(o.x - h.x, o.y - h.y) < 6 && relation(h, o) > 0.42).length;
+  }
+  if (h.parent || h.print) return;
+  const busy = Object.keys(h.reserved).length > 0 || h.children.some((c) => c.task && c.task.purpose === "charge");
+  if (busy) { h.v *= 0.9; return; }
+  if (h.task && h.task.type === "dock") { runDock(h, dt); return; }
+  if (h.backoff) return;
+  if (h.energy < 0.3 && rnd() < dt * 0.5) { seekCharge(h); if (h.task) return; }
+  const printing = mothers().filter((m) => m.print).length, babies = bodies.filter((b) => b.kind === "baby" && b.alive).length;
+  if (t && h.energy > 0.7 && h.relN >= P.rel && printing < PRINT_CAP && babies < BABY_CAP && (!h.lastBirth || simT - h.lastBirth > 120) && h.children.filter((c) => c.kind === "baby").length === 0 && rnd() < dt * 0.012) { startPrint(h); return; }
+  wander(h, dt, t ? 0.09 : 0.05);
+}
+function seekCharge(h) {
+  let best = null, bd = 1e9;
+  for (const c of bodies) {
+    if (c.kind === "charger") for (const k of ["p0", "p1", "p2"]) { if (c.docks[k] || c.reserved[k]) continue; const p = portWorld(c, k), d = Math.hypot(p.x - h.x, p.y - h.y); if (d < bd) { bd = d; best = [c, k]; } }
+    if (c.kind === "hull" && c !== h && c.alive && !c.parent && !c.print && c.energy > 0.75 && tailOf(c)) for (const s of ["L", "R"]) { if (!sideFree(c, s)) continue; const p = portWorld(c, "c" + s), d = Math.hypot(p.x - h.x, p.y - h.y) * 0.8; if (d < bd) { bd = d; best = [c, "c" + s]; } }
+  }
+  if (!best) return;
+  const [B, pb] = best, side = ["L", "R"].find((s) => sideFree(h, s)); if (!side) return;
+  startDock(h, "c" + side, B, pb, "charge");
+  event(`${h.name} is low and heads to ${B.kind === "charger" ? "a charging buoy" : B.name}`);
+}
+function stepTail(t, dt) {
+  if (t.parent) { t.energy = 0; return; }
+  if (t.task && t.task.type === "dock") { runDock(t, dt); return; }
+  if (t.backoff) return;
+  if ((t.think -= dt) < 0) {
+    t.think = 2;
+    const free = mothers().filter((h) => !tailOf(h) && !h.reserved.rear && !h.parent);
+    if (free.length) { free.sort((a, b) => Math.hypot(a.x - t.x, a.y - t.y) - Math.hypot(b.x - t.x, b.y - t.y)); startDock(t, "front", free[0], "rear", "tail"); return; }
+  }
+  wander(t, dt, 0.05);
+}
+function stepBaby(b, dt) {
+  b.energy -= dt * 0.004;
+  if (b.drop) { b.drop = Math.max(0, b.drop - dt * 0.6); b.sink = 0.09 * b.drop * b.drop; }
+  if (b.energy <= 0) { die(b, "no adult reached in time"); return; }
+  if (b.task && b.task.type === "drift") { b.task.t += dt; const nx = -Math.sin(b.th) * b.task.side, ny = Math.cos(b.th) * b.task.side; b.x += nx * 0.06 * dt; b.y += ny * 0.06 * dt; if (b.task.t > 7) b.task = null; return; }
+  if (b.parent) return;
+  if (b.task && b.task.type === "dock") { runDock(b, dt); return; }
+  if (b.task && b.task.type === "leave") { const d = moveToward(b, b.task.x, b.task.y, 0.08, dt); if (d < 0.3) b.gone = true; return; }
+  if (b.backoff) return;
+  if (b.age > 300 && b.energy > 0.5) { const e = edgePoint(b); b.task = { type: "leave", x: e[0], y: e[1] }; event(`${b.name} is grown and leaves the pond`); return; }
+  if (b.energy < 0.7 && (b.think -= dt) < 0) {
+    b.think = 1.5;
+    const last = b.raisedBy[b.raisedBy.length - 1];
+    const cands = mothers().filter((h) => h.alive && !h.print && !h.parent && tailOf(h) && h.energy > 0.35 && (sideFree(h, "L") || sideFree(h, "R")) && h.name !== last && Math.hypot(h.x - b.x, h.y - b.y) < 7);
+    if (cands.length) {
+      const score = (h) => Math.hypot(h.x - b.x, h.y - b.y) - (h === b.mom && !b.raisedBy.length ? 5 : 0) + (b.raisedBy.includes(h.name) ? 1.5 : 0);
+      cands.sort((x, y) => score(x) - score(y)); const B = cands[0];
+      const sides = ["L", "R"].filter((s) => sideFree(B, s)).map((s) => { const p = portWorld(B, "b" + s); return [s, Math.hypot(p.x - b.x, p.y - b.y)]; }).sort((x, y) => x[1] - y[1]);
+      startDock(b, "cap", B, "b" + sides[0][0], "raise"); b.raisedBy.push(B.name); if (b.raisedBy.length > 6) b.raisedBy.shift();
+      return;
+    }
+  }
+  wander(b, dt, 0.035);
+}
+function edgePoint(b) { const opts = [[POND.x0 - 1.5, b.y], [POND.x1 + 1.5, b.y], [b.x, POND.y0 - 1.5], [b.x, POND.y1 + 1.5]]; opts.sort((p, q) => Math.hypot(p[0] - b.x, p[1] - b.y) - Math.hypot(q[0] - b.x, q[1] - b.y)); return opts[0]; }
+function stepDead(b, dt) {
+  if (b.cluster || b.parent) return;
+  if (b.dead < 5) return;          // stops first
+  const dx = CLUSTER.x - b.x, dy = CLUSTER.y - b.y, d = Math.hypot(dx, dy);
+  b.x += dx / (d || 1) * 0.04 * dt; b.y += dy / (d || 1) * 0.04 * dt; b.th = wrapA(b.th + 0.01 * dt);
+  const touching = bodies.some((o) => o.cluster && o !== b && circlesTouch(b, o, 0.03));
+  if (touching || d < 0.25) { b.cluster = true; b.task = null; if (b.kind === "hull" && FOLLOW === b) {} }
+}
+function worldCircles(b) {
+  const c = Math.cos(b.th), s = Math.sin(b.th);
+  return CIRC[b.kind].map(([x, y, r]) => { const xx = b.kind === "baby" ? x * b.L / K.Ldep * 1.8 : x; return [b.x + c * xx - s * y, b.y + s * xx + c * y, r]; });
+}
+function circlesTouch(a, b, m) { for (const p of worldCircles(a)) for (const q of worldCircles(b)) if (Math.hypot(p[0] - q[0], p[1] - q[1]) < p[2] + q[2] + m) return true; return false; }
+function collide() {
+  const list = bodies.filter((b) => !b.gone);
+  const W = list.map((b) => ({ b, r: rootOf(b), c: worldCircles(b) }));
+  for (let i = 0; i < W.length; i++) for (let j = i + 1; j < W.length; j++) {
+    const A = W[i], B = W[j]; if (A.r === B.r) continue;
+    if (Math.abs(A.b.x - B.b.x) > 2 || Math.abs(A.b.y - B.b.y) > 2) continue;
+    const ta = A.r.task, tb = B.r.task;
+    if (ta && ta.type === "dock" && rootOf(ta.B) === B.r && ta.phase !== "go") continue;
+    if (tb && tb.type === "dock" && rootOf(tb.B) === A.r && tb.phase !== "go") continue;
+    const fa = A.r.kind === "charger" || A.r.cluster || A.r.hold || Object.keys(A.r.reserved).length > 0, fb = B.r.kind === "charger" || B.r.cluster || B.r.hold || Object.keys(B.r.reserved).length > 0;
+    for (const p of A.c) for (const q of B.c) {
+      const dx = q[0] - p[0], dy = q[1] - p[1], d = Math.hypot(dx, dy) || 1e-6, o = p[2] + q[2] - d;
+      if (o <= 0) continue;
+      const nx = dx / d, ny = dy / d, wa = fa && fb ? 0.5 : fa ? 0 : fb ? 1 : 0.5;
+      if (fa && fb && (A.r.kind === "charger" || A.r.cluster) && (B.r.kind === "charger" || B.r.cluster)) continue;
+      A.r.x -= nx * o * wa; A.r.y -= ny * o * wa; B.r.x += nx * o * (1 - wa); B.r.y += ny * o * (1 - wa);
+    }
+  }
+  for (const b of list) if (!b.parent && b.kind !== "charger" && !(b.task && b.task.type === "leave")) { b.x = clamp(b.x, POND.x0 + 0.4, POND.x1 - 0.4); b.y = clamp(b.y, POND.y0 + 0.4, POND.y1 - 0.4); }
+}
+function manage(dt) {
+  // keep a dozen mothers: when a tail is free and no hull waits, a new hull floats in from the edge
+  const ms = mothers(), freeTails = bodies.filter((b) => b.kind === "tail" && !b.parent).length, waiting = ms.filter((h) => !tailOf(h)).length;
+  if (ms.length < MOTHERS && freeTails > waiting && rnd() < dt * 0.05) {
+    const e = [[POND.x1 - 0.8, lerp(-3, 3, rnd())], [lerp(-2, 5, rnd()), POND.y0 + 0.8]][Math.floor(rnd() * 2)];
+    const h = makeMother(e[0], e[1], rnd() * TAU, false);
+    const pool = ms.length ? ms[Math.floor(rnd() * ms.length)] : null; if (pool) h.memory = inherit(pool).memory.concat([{ t: SEED[Math.floor(rnd() * 5)], w: 0.6, src: "seed" }]);
+    h.energy = 0.6; event(`A new hull, ${h.name}, swims in`);
+  }
+  // the cluster grows slowly; the oldest shells fade out past 48
+  const shells = bodies.filter((b) => b.cluster);
+  if (shells.length > 48) { const o = shells[0]; o.gone = true; }
+}
+
+/* ---------------- setup ---------------- */
+function setup() {
+  for (const [x, y] of CHARGERS) { const c = makeBody("charger", x, y, 0); }
+  const spots = [[-3.5, -1.2], [-1.2, 1.6], [1.4, -0.4], [3.6, 0.9], [-4.6, -3.0], [2.2, 2.8], [5.4, -1.6], [-2.4, -2.9], [0.0, 3.4], [4.0, -3.4], [-6.0, 0.0]];
+  for (const [x, y] of spots) { const h = makeMother(x + rnd() * 0.4, y + rnd() * 0.4, rnd() * TAU); h.age = 40 + 200 * rnd(); }
+  const lone = makeMother(-0.6, -1.6, 0.4, false); lone.energy = 0.8;      // a hull without a tail, and a free tail nearby: the first dock
+  const ft = makeBody("tail", 1.4, -2.9, 2.6); ft.energy = 0;
+  // a charge early: one mother is low
+  bodies.find((b) => b.kind === "hull").energy = 0.26;
+  // the cluster begins with the first shells
+  for (let i = 0; i < 3; i++) { const h = makeMother(CLUSTER.x + (i - 1) * 0.8, CLUSTER.y + (i % 2) * 0.6, rnd() * TAU, i < 1); h.alive = false; h.dead = 10; h.cluster = true; for (const c of h.children.slice()) { detach(c, true); c.alive = false; c.dead = 10; c.cluster = true; c.x = h.x - 0.9; c.y = h.y - 0.5; c.backoff = null; } }
+  for (const b of bodies) if (!b.alive) setDead(b.mats, 1);
+  // a few babies already in the water
+  const ms = mothers().filter((h) => tailOf(h));
+  for (let i = 0; i < 6; i++) { const m = ms[i % ms.length]; const b = makeBody("baby", m.x + 1.2 * Math.cos(i), m.y + 1.2 * Math.sin(i), rnd() * TAU); Object.assign(b, { ...inherit(m), gen: 1, mom: m, momName: m.name, energy: 0.5 + 0.2 * rnd(), raisedBy: [], age: 40 + 100 * rnd(), life: 900 }); m.babies++; }
+  updatePoses();
+  event("The pond starts: twelve hulls, twelve tails, six babies");
+}
+
+/* ---------------- follow and pick ---------------- */
+function follow(b) { FOLLOW = b; CAMFLY = { t: 0, p0: camera.position.clone(), t0: controls.target.clone(), follow: true, dist: b.kind === "baby" ? 1.6 : b.kind === "charger" ? 2.6 : 2.7 }; $("#follow").style.display = "block"; renderFollow(); }
+function unfollow() { FOLLOW = null; $("#follow").style.display = "none"; }
+function bodyCenter(b) { const v = new THREE.Vector3(); v.setFromMatrixPosition(b.obj.matrix); v.y += 0.12; if (b.kind === "hull" && tailOf(b)) { const c = Math.cos(b.th), s = Math.sin(b.th); v.x -= c * 0.3; v.z += s * 0.3; } return v; }
+function pick(cx, cy) {
+  const r = $("#gl").getBoundingClientRect(); let best = null, bd = 42;
+  for (const b of bodies) { if (b.gone) continue; const p = bodyCenter(b).project(camera); if (p.z > 1) continue; const x = (p.x + 1) / 2 * r.width, y = (1 - p.y) / 2 * r.height, d = Math.hypot(x - (cx - r.left), y - (cy - r.top)) - (b.kind === "baby" ? 6 : 0); if (d < bd) { bd = d; best = b; } }
+  if (best) follow(best);
+}
+function stateOf(b) {
+  if (!b.alive) return b.cluster ? "a clear shell in the cluster" : "dead, drifting to the cluster";
+  if (b.kind === "charger") return "fixed, charging up to three mothers";
+  if (b.print) { const t = b.print.t; return t < TP.open + TP.armIn ? "the arm rides in through the opening" : t < TP.open + TP.armIn + TP.print ? `printing, layer ${Math.round(((t - TP.open - TP.armIn) / TP.print) * 36)} of 36` : t < TP_END - TP.close ? "bringing the baby out, inflating" : "the tail docks back"; }
+  const tk = b.task;
+  if (tk && tk.type === "dock") return tk.phase === "go" ? `swimming to ${tk.B.kind === "charger" ? "a buoy" : tk.B.name} to dock` : tk.phase === "turn" ? `lining up with ${tk.B.kind === "charger" ? "a buoy" : tk.B.name}` : "closing in, magnets off";
+  if (tk && tk.type === "docked") return tk.purpose === "charge" ? "charging" : tk.purpose === "raise" ? "being raised" : "docked";
+  if (tk && tk.type === "leave") return "grown, leaving the pond";
+  if (tk && tk.type === "drift") return "newborn, drifting clear";
+  if (b.kind === "hull" && !tailOf(b)) return "a hull waiting for a tail";
+  if (b.kind === "tail" && b.parent) return "docked, carrying the arm and battery";
+  if (b.kind === "hull" && b.children.some((c) => c.kind === "baby")) return "raising";
+  return "swimming";
+}
+function renderFollow() {
+  const b = FOLLOW; if (!b) return;
+  const kind = { hull: "mother", tail: "tail", baby: "baby", charger: "charging buoy" }[b.kind];
+  const dockedTo = [b.parent ? `${b.parent.kind === "charger" ? "buoy" : b.parent.name} (${b.myPort === "front" ? "tail to hull" : b.task && b.task.purpose ? b.task.purpose : "port"})` : null, ...b.children.map((c) => c.name)].filter(Boolean);
+  let h = `<h3>${esc(b.kind === "charger" ? "Charging buoy" : b.name)}</h3><dl><dt>kind</dt><dd>${kind}</dd><dt>now</dt><dd>${esc(stateOf(b))}</dd>`;
+  if (b.kind === "hull" || b.kind === "baby") h += `<dt>mother</dt><dd>${b.momName || (b.mom && b.mom.name) || "first generation"}</dd><dt>age</dt><dd>${fmtT(b.age)}</dd>`;
+  if (b.kind === "baby") h += `<dt>length</dt><dd>${Math.round(b.L * 1000)} mm, D ${Math.round(K.Rb * 2000)} mm</dd><dt>raised by</dt><dd>${esc(b.raisedBy.join(", ") || "nobody yet")}</dd>`;
+  if (b.kind === "hull") { const t = tailOf(b); h += `<dt>tail</dt><dd>${t ? t.name : "none"}</dd><dt>relations</dt><dd>${b.relN}</dd><dt>babies</dt><dd>${b.babies}</dd>`; }
+  if (b.kind === "hull" && b.print && b.print.baby) h += `<dt>baby length</dt><dd>${Math.round(b.print.baby.L * 1000)} mm</dd>`;
+  h += `<dt>docked to</dt><dd>${esc(dockedTo.join(", ") || "nothing")}</dd></dl>`;
+  if (b.alive && b.kind !== "charger" && b.kind !== "tail") h += `<div class="meter" title="energy"><i style="width:${Math.round(clamp(b.energy, 0, 1) * 100)}%"></i></div>`;
+  if (b.memory && b.memory.length) h += `<div class="mem">memory: ${esc(b.memory.slice(0, 4).map((m) => m.t).join(", "))}</div>`;
+  $("#follow").innerHTML = h;
+}
+
+/* ---------------- loop ---------------- */
+let last = performance.now(), uiT = 0, fpsN = 0, fpsT = 0, FPS = 0;
+function frame(now) {
+  const dtR = Math.min(0.05, (now - last) / 1000); last = now;
+  if (running) { let rem = dtR * speed; while (rem > 1e-6) { const h = Math.min(1 / 30, rem); step(h); rem -= h; } }
+  // visuals tied to state: tail fill, mother fill
+  for (const b of bodies) {
+    if (b.kind === "tail") { const h = b.parent && b.parent.kind === "hull" ? b.parent : null; const e = h ? h.energy : 0.15; b.fillMat.userData.u.uFillZ.value = lerp(-0.283, 0.2, clamp(e, 0, 1)); b.fillMat.userData.u.uFillOn.value = b.alive ? 1 : 0; }
+    if (b.kind === "baby") { b.fillMat.userData.u.uFillZ.value = lerp(-0.105, 0.105, clamp(b.energy, 0, 1)); b.fillMat.userData.u.uFillOn.value = b.alive ? 1 : 0; }
+  }
+  if (FOLLOW && FOLLOW.gone) unfollow();
+  if (CAMFLY) {
+    CAMFLY.t = Math.min(1, CAMFLY.t + dtR / 1.6); const u = ss(CAMFLY.t);
+    if (CAMFLY.follow && FOLLOW) {
+      const c = bodyCenter(FOLLOW), dir = camera.position.clone().sub(controls.target).normalize(); dir.y = Math.max(dir.y, 0.45); dir.normalize();
+      controls.target.lerpVectors(CAMFLY.t0, c, u); camera.position.lerpVectors(CAMFLY.p0, c.clone().add(dir.multiplyScalar(CAMFLY.dist)), u);
+    } else if (!CAMFLY.follow) { controls.target.lerpVectors(CAMFLY.t0, CAMFLY.t1, u); camera.position.lerpVectors(CAMFLY.p0, CAMFLY.p1, u); }
+    if (CAMFLY.t >= 1) CAMFLY = null;
+  } else if (FOLLOW) {
+    const c = bodyCenter(FOLLOW), d = c.sub(controls.target).multiplyScalar(Math.min(1, dtR * 3)); controls.target.add(d); camera.position.add(d);
+  }
+  controls.update();
+  renderer.render(scene, camera);
+  fpsN++; fpsT += dtR; if (fpsT > 1) { FPS = fpsN / fpsT; fpsN = 0; fpsT = 0; }
+  if ((uiT += dtR) > 0.25) { uiT = 0; renderFollow(); const ms = mothers(), bs = bodies.filter((b) => b.kind === "baby" && b.alive).length, sh = bodies.filter((b) => !b.alive).length; $("#hud").textContent = `${fmtT(simT)} · mothers ${ms.length} · babies ${bs} · printing ${ms.filter((m) => m.print).length} · shells ${sh}`; }
+  requestAnimationFrame(frame);
+}
+
+/* ---------------- controls ---------------- */
+$("#run").onclick = () => { running = !running; $("#run").textContent = running ? "Pause" : "Play"; $("#run").classList.toggle("on", running); };
+document.querySelectorAll("[data-sp]").forEach((b) => (b.onclick = () => { speed = +b.dataset.sp; document.querySelectorAll("[data-sp]").forEach((x) => x.classList.toggle("on", x === b)); }));
+$("#over").onclick = () => { unfollow(); overview(false); };
+let down = null;
+$("#gl").addEventListener("pointerdown", (e) => { down = [e.clientX, e.clientY]; });
+$("#gl").addEventListener("pointerup", (e) => { if (down && Math.hypot(e.clientX - down[0], e.clientY - down[1]) < 6) pick(e.clientX, e.clientY); down = null; });
+
+/* hooks for tests: read state, fast forward, follow */
+window.BNM = {
+  get bodies() { return bodies; }, get fps() { return FPS; }, get t() { return simT; }, follow: (n) => { const b = bodies.find((x) => x.name === n); if (b) follow(b); return !!b; },
+  advance(sec) { const n = Math.round(sec * 30); for (let i = 0; i < n; i++) step(1 / 30); }, die: (n) => { const b = bodies.find((x) => x.name === n); if (b) die(b); }, print: (n) => { const b = bodies.find((x) => x.name === n); if (b && tailOf(b) && !b.print && !b.parent) { cancelTask(b); startPrint(b); } return !!(b && b.print); },
+  setSpeed(s) { speed = s; }, pause(v) { running = !v; }, overview: () => { unfollow(); overview(true); },
+};
+(async () => {
+  try { initThree(); } catch (e) { $("#err").style.display = "grid"; console.warn(e); return; }
+  try { await loadModel(); } catch (e) { $("#err").textContent = "The design model could not be loaded."; $("#err").style.display = "grid"; console.warn(e); return; }
+  MAT.arm = bodyMat("clay");
+  PORTS.rearY = 0.185;
+  setup(); requestAnimationFrame(frame);
+  window.BNM.ready = true;
+})();
+</script>
+</body></html>
