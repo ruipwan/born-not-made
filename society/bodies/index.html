@@ -239,21 +239,23 @@ function babyGeometry(L, f) {
 const WB = { m: 36, n: 30 };
 const BORN = { L: 0.72, R: 0.25 };   // a baby is about the size of a mother; individuals differ in shape, not much in size
 function shapeOf(g) {
-  return { L: BORN.L * (0.95 + 0.1 * g[0]), R: BORN.R * (0.94 + 0.12 * g[1]), k: 2 + Math.floor(g[2] * 3.99), ph: g[3] * TAU, lobe: 0.06 + 0.1 * g[4],
-    p: 0.42 + 0.4 * g[2], bulge: (g[4] - 0.5) * 0.36, tw: (g[1] - 0.5) * 1.6, seed: rnd() * 100 };
+  // size stays close (length within 5%, width within 6%); the form is what differs
+  const h = (i, a) => (g[i] * 7.31 + a) % 1;
+  return { L: BORN.L * (0.95 + 0.1 * g[0]), R: BORN.R * (0.94 + 0.12 * g[1]), k: 2 + Math.floor(h(2, 0.1) * 3.99), ph: g[3] * TAU, lobe: 0.06 + 0.2 * h(4, 0.3),
+    p: 0.32 + 0.66 * h(0, 0.5), bulge: (h(1, 0.7) - 0.5) * 1.0, waist: Math.max(0, h(3, 0.2) - 0.45) * 0.75, ell: 0.68 + 0.32 * h(2, 0.6), tw: (h(4, 0.9) - 0.5) * 2.4, seed: rnd() * 100 };
 }
 function wrinklePositions(sh, f, L, arr) {
   const { m, n } = WB; let q = 0; const w = 1 - f, squash = lerp(0.42, 1, ss(f)), shrink = lerp(0.86, 1, ss(f));
   for (let k = 0; k <= n + 1; k++) {
     const u = k / (n + 1), x = u * L - L / 2, uu = clamp(u - sh.bulge * u * (1 - u) * 2, 0, 1);
-    let env = Math.pow(Math.max(0, 1 - Math.pow(2 * uu - 1, 2)), sh.p);
+    let env = Math.pow(Math.max(0, 1 - Math.pow(2 * uu - 1, 2)), sh.p) * (1 - sh.waist * Math.exp(-Math.pow((u - 0.5) / 0.13, 2)));
     if (k === 0 || k === n + 1) env = 0;
     for (let j = 0; j < m; j++) {
       const t = (j * TAU) / m + sh.tw * u;
       const lobes = 1 + sh.lobe * Math.cos(sh.k * t + sh.ph);
       const crease = Math.sin(t * 7 + u * 26 + sh.seed) * 0.6 + Math.sin(t * 4 - u * 15 + sh.seed * 1.7) * 0.4;
       const r = sh.R * env * lobes * shrink * (1 + w * 0.17 * crease);
-      arr[q++] = x; arr[q++] = r * Math.cos(t); arr[q++] = r * Math.sin(t) * squash;
+      arr[q++] = x; arr[q++] = r * Math.cos(t); arr[q++] = r * Math.sin(t) * squash * sh.ell;
     }
   }
   return arr;
@@ -418,7 +420,7 @@ function makeBody(kind, x, y, th) {
   const add = (geo, mat, ro = 0) => { const m = new THREE.Mesh(geo, mat); m.renderOrder = ro; b.bl.add(m); b.mats.push(mat); return m; };
   if (kind === "hull") {
     b.bl.position.y = -K.WL;
-    add(G.hullClay, bodyMat("clay", { vc: true }));
+    b.hullMesh = add(G.hullClay, bodyMat("clay", { vc: true }));
     b.shell = add(G.skin, bodyMat("shell", { a0: 0.36, a1: 0.55, vc: true }), 6);
     b.name = "M" + nextM++;
   } else if (kind === "tail") {
@@ -439,7 +441,10 @@ function makeBody(kind, x, y, th) {
 }
 function makeMother(x, y, th, withTail = true, gen = 0, mom = null) {
   const h = makeBody("hull", x, y, th);
-  Object.assign(h, { genome: newGenome(), memory: SEED.map((t) => ({ t, w: 0.5 + 0.5 * rnd(), src: "seed" })), gen, mom, life: 520 + 260 * rnd(), energy: 0.55 + 0.4 * rnd(), babies: 0 });
+  const gen0 = mom ? inherit(mom).genome : newGenome();
+  const sy = 0.9 + 0.2 * gen0[2], sz = 0.88 + 0.24 * gen0[3];   // width and height differ a little; length and ports stay
+  h.hullMesh.scale.set(1, sy, sz); h.shell.scale.set(1, sy, sz);
+  Object.assign(h, { genome: gen0, memory: SEED.map((t) => ({ t, w: 0.5 + 0.5 * rnd(), src: "seed" })), gen, mom, life: 520 + 260 * rnd(), energy: 0.55 + 0.4 * rnd(), babies: 0 });
   if (withTail) { const t = makeBody("tail", x, y, th); t.energy = 0; attach(t, "front", h, "rear", true); }
   return h;
 }
