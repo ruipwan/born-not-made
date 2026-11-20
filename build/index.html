@@ -474,8 +474,8 @@ const ECO_COMP = { id: "eco62", group: "tail", name: "RealMan ECO62", role: "pri
   specs: [["Payload", "2 kg"], ["Working radius", "425 mm"], ["Weight", "3.6 kg"], ["Repeatability", "0.1 mm"], ["Overall height", "514.5 mm"], ["Axes", "6"],
     ["Joint ranges", "J1 -178 to 178, J2 -169 to 104, J3 -151 to 133, J4 -172 to 172, J5 -172 to 172, J6 -360 to 360 deg"], ["Max joint speed", "J1 to J3 225 deg/s, J4 to J6 180 deg/s"],
     ["Power", "100 W typical, 180 W peak, DC 24 V"], ["System scale", "1.25: mother 959 x 890 x 761 mm, tail 1048 mm, gel 195 mm deep, hatch bore D 280"], ["Arm ceiling", "467 mm above the floor"],
-    ["Price", "academic quote from Foundova, November 2026"], ["Status", "built, targets not all met: 64 collision frames at 10 mm clearance, 57 frames above datasheet joint speed"]],
-  make: "buy", qty: 1, mass_g: 3600, cost_usd: 6670, verdict: "open", owned: false,
+    ["Status", "built, targets not all met: 64 collision frames at 10 mm clearance, 57 frames above datasheet joint speed"]],
+  make: "buy", qty: 1, mass_g: 3600, cost_usd: 0, verdict: "open", owned: false,
   sources: [{ label: "RealMan ECO62 URDF and meshes, ros2_rm_robot on GitHub", url: "https://github.com/RealManRobot/ros2_rm_robot/tree/711abedd48c6614f26fb4f7661db92f306ff05bd/rm_description" }] };
 function compsNow() { const cs = DATA.components || []; return armSel === "eco62" && ECO ? cs.map((c) => (c.id === "dexarm" ? ECO_COMP : c)) : cs; }
 function renderTree() {
