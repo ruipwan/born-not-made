@@ -147,6 +147,7 @@ textarea, input[type=text] { width: 100%; background: var(--field); color: var(-
       <div class="cams" role="group" aria-label="Camera">
         <button class="btn" data-cam="overview">Overview</button><button class="btn" data-cam="section">Section</button><button class="btn" data-cam="nozzle">Nozzle</button><button class="btn" data-cam="canal">Canal</button>
       </div>
+      <button class="btn on" id="ringBtn" aria-pressed="true" title="Show or hide the ring on the top shell">Top ring</button>
       <button class="btn on" id="autoCam" aria-pressed="true" title="Camera follows the process">Auto</button>
     </div>
     <div id="vp">
@@ -407,6 +408,12 @@ function poseArm() {
 /* ================================================================ scene load */
 const PARTS = {};
 let SKIN = null, SKIN0 = null, PLEATS = null, PLEATS0 = null, EPM = null, BOOMMESH = null;
+function topRingGeo(geo) {   // ring on the top shell, around the pleated belly zone: follows the outline of the pleats
+  geo.computeBoundingBox(); const b = geo.boundingBox, cx = (b.min.x + b.max.x) / 2, cy = (b.min.y + b.max.y) / 2, a = (b.max.x - b.min.x) / 2 + 0.004, c = (b.max.y - b.min.y) / 2 + 0.004, z = b.min.z + 0.003;
+  const pts = []; for (let i = 0; i < 96; i++) { const t = i / 96 * Math.PI * 2; pts.push(new THREE.Vector3(cx + a * Math.cos(t), cy + c * Math.sin(t), z)); }
+  return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, true), 192, 0.006, 10, true);
+}
+let TOPRING = null;
 async function loadScene() {
   const [sc, b64, fe, dv, ph] = await Promise.all([getJSON("scene_v2.json"), fetch("scene_v2_glb.txt").then((r) => r.text()), getJSON("birth_fe.json"), getJSON("../build/data/design_v2.json"), getJSON("../build/data/physics.json")]);
   if (!sc || !fe) throw new Error("scene or birth data missing");
@@ -442,6 +449,7 @@ async function loadScene() {
     else R3.vessel.add(o);
   }
   if (EPM) { EPM.material.emissive = new THREE.Color(0x000000); }
+  if (PLEATS) { TOPRING = new THREE.Mesh(topRingGeo(PLEATS.geometry), clayMat(0xe9e7e1)); PLEATS.parent.add(TOPRING); }
   buildPetals(); buildSleeve(); buildHeel(); measureWaterplanes();
   poseArm();
 }
@@ -1244,6 +1252,7 @@ function loop(now) {
 function bindUI() {
   $("#play").onclick = () => { playing = !playing; $("#play").textContent = playing ? "Pause" : "Play"; $("#play").setAttribute("aria-pressed", String(!playing)); };
   document.querySelectorAll("[data-speed]").forEach((b) => (b.onclick = () => { SPEED = +b.dataset.speed; document.querySelectorAll("[data-speed]").forEach((x) => x.classList.toggle("on", x === b)); }));
+  $("#ringBtn").onclick = (e) => { const on = !(TOPRING && TOPRING.visible); if (TOPRING) TOPRING.visible = on; e.currentTarget.classList.toggle("on", on); e.currentTarget.setAttribute("aria-pressed", on); };
   document.querySelectorAll("[data-cam]").forEach((b) => (b.onclick = () => { autoOn = false; $("#autoCam").classList.remove("on"); $("#autoCam").setAttribute("aria-pressed", "false"); setCam(b.dataset.cam); }));
   $("#autoCam").onclick = () => { autoOn = !autoOn; $("#autoCam").classList.toggle("on", autoOn); $("#autoCam").setAttribute("aria-pressed", String(autoOn)); if (autoOn) autoCam(); };
   document.querySelectorAll("[data-tab]").forEach((b) => (b.onclick = () => { tab = b.dataset.tab; document.querySelectorAll("[data-tab]").forEach((x) => x.setAttribute("aria-selected", String(x === b))); renderProps(); }));

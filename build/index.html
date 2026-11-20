@@ -76,7 +76,7 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
     <div class="loading" id="loading">Loading the model…</div>
     <div class="viewbar">
       <div class="pill"><label for="explode">Explode</label><input type="range" id="explode" min="0" max="1" step="0.01" value="0"></div>
-      <button id="vAsm" class="on">Assembly</button><button id="vBaby">Baby</button><button id="vCut">Section</button><button id="vReset">Reset view</button>
+      <button id="vAsm" class="on">Assembly</button><button id="vBaby">Baby</button><button id="vCut">Section</button><button id="vRing" class="on" aria-pressed="true" title="Show or hide the ring on the top shell">Top ring</button><button id="vReset">Reset view</button>
     </div>
   </section>
   <aside>
@@ -196,9 +196,9 @@ function addEdges(mesh, ang = 30, op = 0.45) {
 const PART = {};
 function part(key, label, dir, make) { if (PART[key]) return PART[key]; const g = new THREE.Group(); g.name = key; root.add(g); return (PART[key] = { key, label, g, meshes: [], dir, make, comp: [] }); }
 function addMesh(p, m, edgesAng = 30) { m.castShadow = m.material.transparent ? false : true; m.receiveShadow = true; m.userData.part = p.key; p.g.add(m); p.meshes.push(m); if (edgesAng) addEdges(m, edgesAng, m.material.transparent ? 0.3 : 0.62); return m; }
-const LABEL = { hull: "Mother hull", belly: "Belly skin, printed origami", canal: "Birth canal", front: "Front plate", bore: "Rear bore and ring", magnets: "Dock magnets", tail: "Tail shell", tailring: "Tail ring", rails: "Rails and keel", boom: "Boom and carriage", tray: "Parts tray", tool: "Tool head", dexarm: "DexArm", gel: "Support gel", baby: "Baby body", capsule: "Electronics capsule", needle: "Inflation valve", valve3: "Three way valve", duckbill: "Lips, check valve", pump: "Air pump", battery: "Battery", ctrl: "Controller", psensor: "Pressure sensor", thrusters: "Thrusters" };
-const DIR = { belly: [0, 0, 0.34], canal: [0.46, 0, 0.06], front: [0.3, 0, 0], bore: [-0.18, 0, 0], magnets: [-0.3, 0, 0], tail: [-0.62, 0, 0], tailring: [-0.42, 0, 0], rails: [-0.62, 0, -0.26], boom: [-0.32, 0, 0.3], tray: [-0.36, 0, 0.14], tool: [0.12, 0, 0.62], dexarm: [-0.06, 0, 0.42], gel: [0, 0, -0.18], baby: [0, 0, -0.18], capsule: [0, 0, -0.06], needle: [0, 0, 0.1], valve3: [0.12, 0, 0.7], duckbill: [0.62, 0, 0.1], pump: [-0.62, 0, 0.18], battery: [-0.62, 0, 0.1], ctrl: [-0.62, 0, 0.26], psensor: [-0.62, 0, 0.34], thrusters: [-0.72, 0, -0.1] };
-const MAKE = { hull: "glass", belly: "silicone", canal: "silicone", front: "rigid", bore: "rigid", magnets: "bought", tail: "rigid", tailring: "rigid", rails: "bought", boom: "bought", tray: "rigid", tool: "rigid", dexarm: "bought", gel: "gel", baby: "silicone", capsule: "bought", needle: "bought", valve3: "bought", duckbill: "silicone", pump: "bought", battery: "bought", ctrl: "bought", psensor: "bought", thrusters: "bought" };
+const LABEL = { hull: "Mother hull", topring: "Top shell ring", belly: "Belly skin, printed origami", canal: "Birth canal", front: "Front plate", bore: "Rear bore and ring", magnets: "Dock magnets", tail: "Tail shell", tailring: "Tail ring", rails: "Rails and keel", boom: "Boom and carriage", tray: "Parts tray", tool: "Tool head", dexarm: "DexArm", gel: "Support gel", baby: "Baby body", capsule: "Electronics capsule", needle: "Inflation valve", valve3: "Three way valve", duckbill: "Lips, check valve", pump: "Air pump", battery: "Battery", ctrl: "Controller", psensor: "Pressure sensor", thrusters: "Thrusters" };
+const DIR = { topring: [0, 0, 0.22], belly: [0, 0, 0.34], canal: [0.46, 0, 0.06], front: [0.3, 0, 0], bore: [-0.18, 0, 0], magnets: [-0.3, 0, 0], tail: [-0.62, 0, 0], tailring: [-0.42, 0, 0], rails: [-0.62, 0, -0.26], boom: [-0.32, 0, 0.3], tray: [-0.36, 0, 0.14], tool: [0.12, 0, 0.62], dexarm: [-0.06, 0, 0.42], gel: [0, 0, -0.18], baby: [0, 0, -0.18], capsule: [0, 0, -0.06], needle: [0, 0, 0.1], valve3: [0.12, 0, 0.7], duckbill: [0.62, 0, 0.1], pump: [-0.62, 0, 0.18], battery: [-0.62, 0, 0.1], ctrl: [-0.62, 0, 0.26], psensor: [-0.62, 0, 0.34], thrusters: [-0.72, 0, -0.1] };
+const MAKE = { hull: "glass", topring: "rigid", belly: "silicone", canal: "silicone", front: "rigid", bore: "rigid", magnets: "bought", tail: "rigid", tailring: "rigid", rails: "bought", boom: "bought", tray: "rigid", tool: "rigid", dexarm: "bought", gel: "gel", baby: "silicone", capsule: "bought", needle: "bought", valve3: "bought", duckbill: "silicone", pump: "bought", battery: "bought", ctrl: "bought", psensor: "bought", thrusters: "bought" };
 const MAP = [[/^W_V2_(Pads|EPM)$/, "magnets"], [/^W_V2_BoreRing$/, "bore"], [/^W_V2_(Collar|LipSeal)$/, "tailring"], [/^W_V2_Rails$/, "rails"], [/^W_V2_Boom$/, "boom"], [/^W_V2_(Cartridge|Battery|Thrusters)$/, "tail"], [/^W_V2_Gel$/, "gel"], [/^W_V2_TrayWall$/, "tray"], [/^W_V2_Chute$/, "canal"], [/^W_V2_BellyPleats$/, "belly"], [/Magnets$/, "magnets"], [/^W_B0_Canal/, "canal"], [/^W_B0_Mother(FrontPlate|Lid)$/, "front"], [/^W_B0_(MotherRearWall|MotherBoreHoop|RingA|RingB|RingBEdge|RingBKnurl)$/, "bore"], [/^W_T1_(TailShell|TailFacePlate)$/, "tail"], [/^W_T1_TailRing/, "tailring"], [/^W_T1_(Keel|LowRod)/, "rails"], [/^W_T1_(BoomTube|CarriagePlate)/, "boom"], [/^W_T1_(Tray|LidStraps)/, "tray"], [/^W_T1_(Tool|Gripper)/, "tool"], [/^A_/, "dexarm"]];
 for (const k in LABEL) part(k, LABEL[k], DIR[k] || [0, 0, 0], MAKE[k]);
 
@@ -223,6 +223,12 @@ const clipped = [];
 function clipMesh(m, planes) { m.material.clippingPlanes = planes.map((p) => p.clone()); m.userData.localPlanes = planes; clipped.push(m); for (const c of m.children) if (c.material) c.material.clippingPlanes = m.material.clippingPlanes; }
 function updateClips() { for (const m of clipped) { m.updateMatrixWorld(); m.userData.localPlanes.forEach((p, i) => m.material.clippingPlanes[i].copy(p).applyMatrix4(m.matrixWorld)); } }
 
+function topRingGeo(geo) {   // ring on the top shell, around the pleated belly zone: follows the outline of the pleats
+  geo.computeBoundingBox(); const b = geo.boundingBox, cx = (b.min.x + b.max.x) / 2, cy = (b.min.y + b.max.y) / 2, a = (b.max.x - b.min.x) / 2 + 0.004, c = (b.max.y - b.min.y) / 2 + 0.004, z = b.min.z + 0.003;
+  const pts = []; for (let i = 0; i < 96; i++) { const t = i / 96 * Math.PI * 2; pts.push(new THREE.Vector3(cx + a * Math.cos(t), cy + c * Math.sin(t), z)); }
+  return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, true), 192, 0.006, 10, true);
+}
+let ringOn = true;
 async function loadModel() {
   META = await getJSON("../simulator/scene_v2.json");
   const b64 = await (await fetch("../simulator/scene_v2_glb.txt")).text();
@@ -236,6 +242,7 @@ async function loadModel() {
     if (nm === "W_B0_SkinInner") { if (!META.groups.W_V2_Gel) buildGel(o.geometry); continue; }
     if (nm === "W_B0_Skin") { skinGeo = o.geometry; continue; }
     const hit = MAP.find(([re]) => re.test(nm)); if (!hit) continue;
+    if (hit[1] === "belly" && PART.topring) addMesh(PART.topring, new THREE.Mesh(topRingGeo(o.geometry), mat("rigid")), 0);
     const p = PART[hit[1]]; o.material = mat(p.make);
     if (p.key === "dexarm") { o.matrixAutoUpdate = false; armParts.push(o); }
     if (p.key === "tool") { o.matrixAutoUpdate = false; toolParts.push(o); }
@@ -392,10 +399,11 @@ new ResizeObserver(size).observe(cv);
 function frame() { ctl.update(); updateClips(); R.render(scene, cam); requestAnimationFrame(frame); }
 
 /* view modes */
+$("#vRing").addEventListener("click", (e) => { ringOn = !ringOn; e.currentTarget.classList.toggle("on", ringOn); e.currentTarget.setAttribute("aria-pressed", ringOn); if (PART.topring) PART.topring.g.visible = ringOn && mode === "asm"; });
 $("#explode").addEventListener("input", (e) => { E = +e.target.value; layout(); });
 function setMode(m) {
   mode = m; $("#vAsm").classList.toggle("on", m === "asm"); $("#vBaby").classList.toggle("on", m === "baby");
-  for (const k in PART) PART[k].g.visible = m === "asm" || ["baby", "capsule", "needle"].includes(k);
+  for (const k in PART) PART[k].g.visible = m === "asm" || ["baby", "capsule", "needle"].includes(k); if (PART.topring) PART.topring.g.visible = ringOn && m === "asm";
   if (m === "baby") { const c = babyMesh.getWorldPosition(new THREE.Vector3()); ctl.target.copy(c); cam.position.set(c.x + 0.55, c.y + 0.4, c.z + 0.7); } else resetView();
 }
 $("#vAsm").onclick = () => setMode("asm"); $("#vBaby").onclick = () => setMode("baby"); $("#vReset").onclick = resetView;
