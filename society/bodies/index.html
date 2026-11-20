@@ -153,7 +153,7 @@ function buildWater() {
 const LIGHT_GLSL = "vec3 shade(vec3 base, vec3 n){ float hemi = 0.5 + 0.5 * n.y; vec3 amb = mix(vec3(0.10, 0.11, 0.13), vec3(0.78), hemi); float d = max(dot(n, normalize(vec3(-0.45, 0.78, 0.45))), 0.0) * 0.72 + max(dot(n, normalize(vec3(0.6, 0.3, -0.55))), 0.0) * 0.22; return base * (amb * 0.8 + d * vec3(1.0, 0.98, 0.95)); }\n";
 function bodyMat(kind, o = {}) {
   const base = { clay: 0xf1efe9, shell: 0xf4f2ec, dark: 0x8e939a, silicone: 0xf0e7d6 }[kind];
-  const u = { uColor: { value: new THREE.Color(base).convertSRGBToLinear() }, uDead: { value: 0 }, uFillZ: { value: -9 }, uFillOn: { value: o.fill ? 1 : 0 }, uA0: { value: o.a0 ?? 1 }, uA1: { value: o.a1 ?? 0 }, uFlat: { value: o.flat ? 1 : 0 }, uTime: UT };
+  const u = { uColor: { value: new THREE.Color(base).convertSRGBToLinear() }, uDead: { value: 0 }, uFillZ: { value: -9 }, uFillOn: { value: o.fill ? 1 : 0 }, uA0: { value: o.a0 ?? 1 }, uA1: { value: o.a1 ?? 0 }, uFlat: { value: o.flat ? 1 : 0 }, uPr: { value: new THREE.Vector4(0, 0, 1, 0) }, uTime: UT };
   const m = new THREE.ShaderMaterial({ uniforms: u, side: o.side || THREE.FrontSide, clipping: true,
     vertexShader: `#include <common>
 #include <clipping_planes_pars_vertex>
@@ -169,7 +169,7 @@ varying vec3 vN; varying vec3 vW; varying vec3 vL; varying vec3 vC; varying floa
 }`,
     fragmentShader: `#include <common>
 #include <clipping_planes_pars_fragment>
-uniform vec3 uColor; uniform float uDead; uniform float uFillZ; uniform float uFillOn; uniform float uA0; uniform float uA1; uniform float uFlat;
+uniform vec4 uPr; uniform vec3 uColor; uniform float uDead; uniform float uFillZ; uniform float uFillOn; uniform float uA0; uniform float uA1; uniform float uFlat;
 varying vec3 vN; varying vec3 vW; varying vec3 vL; varying vec3 vC; varying float vDW;
 ` + LIGHT_GLSL + `void main(){
 #include <clipping_planes_fragment>
@@ -179,6 +179,14 @@ varying vec3 vN; varying vec3 vW; varying vec3 vL; varying vec3 vC; varying floa
   vec3 col = shade(uColor * vC, n);
   float fr = pow(1.0 - abs(dot(n, v)), 2.4);
   float a = clamp(uA0 + uA1 * fr, 0.0, 1.0);
+  if (uPr.w > 0.0) {   // print texture: faint toolpath lines, each body its own direction, pitch and strength
+    float ang = atan(vL.z, vL.y), arc = ang * 0.2;
+    float sc = uPr.x < 0.5 ? vL.x : uPr.x < 1.5 ? vL.x * cos(uPr.y) + arc * sin(uPr.y) : arc + 0.04 * sin(vL.x * 9.0 + uPr.y);
+    float ridge = pow(1.0 - abs(fract(sc / uPr.z) - 0.5) * 2.0, 5.0);
+    float brk = 0.55 + 0.45 * sin(vL.x * 71.0 + ang * 13.0 + uPr.y * 5.0) * sin(vL.x * 23.0 - ang * 5.0);
+    col *= 1.0 - uPr.w * (1.0 - ridge) * 0.22;
+    col += uPr.w * ridge * brk * (0.08 + 0.3 * fr) * vec3(0.95, 0.96, 1.0);
+  }
   if (uFillOn > 0.5) { float f = smoothstep(uFillZ + 0.008, uFillZ - 0.008, vL.z); col = mix(col, col * vec3(1.0, 0.76, 0.5), f * 0.6); col += (1.0 - smoothstep(0.0, 0.007, abs(vL.z - uFillZ))) * vec3(0.12, 0.09, 0.05); }
   col = mix(col, vec3(0.55, 0.6, 0.64) * (0.5 + 0.7 * fr), uDead);
   a = mix(a, 0.035 + 0.42 * fr, uDead);
@@ -242,7 +250,7 @@ function shapeOf(g) {
   // size stays close (length within 5%, width within 6%); the form is what differs
   const h = (i, a) => (g[i] * 7.31 + a) % 1;
   return { L: BORN.L * (0.95 + 0.1 * g[0]), R: BORN.R * (0.94 + 0.12 * g[1]), k: 2 + Math.floor(h(2, 0.1) * 3.99), ph: g[3] * TAU, lobe: 0.06 + 0.2 * h(4, 0.3),
-    p: 0.32 + 0.66 * h(0, 0.5), bulge: (h(1, 0.7) - 0.5) * 1.0, waist: Math.max(0, h(3, 0.2) - 0.45) * 0.75, ell: 0.68 + 0.32 * h(2, 0.6), tw: (h(4, 0.9) - 0.5) * 2.4, seed: rnd() * 100 };
+    p: 0.32 + 0.66 * h(0, 0.5), tex: Math.floor(h(0, 0.37) * 2.999), tang: (h(3, 0.81) - 0.5) * 1.4, pitch: 0.004 + 0.007 * h(1, 0.23), tamt: 0.35 + 0.45 * h(4, 0.64), bulge: (h(1, 0.7) - 0.5) * 1.0, waist: Math.max(0, h(3, 0.2) - 0.45) * 0.75, ell: 0.68 + 0.32 * h(2, 0.6), tw: (h(4, 0.9) - 0.5) * 2.4, seed: rnd() * 100 };
 }
 function wrinklePositions(sh, f, L, arr) {
   const { m, n } = WB; let q = 0; const w = 1 - f, squash = lerp(0.42, 1, ss(f)), shrink = lerp(0.86, 1, ss(f));
@@ -266,7 +274,8 @@ function wrinkleGeometry(sh, f, L) {
   const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); g.computeBoundingSphere(); return g;
 }
 function setWrinkle(g, sh, f, L) { wrinklePositions(sh, f, L, g.attributes.position.array); g.attributes.position.needsUpdate = true; g.computeVertexNormals(); g.computeBoundingSphere(); }
-function setInflation(b, f) { b.inf = clamp(f, 0, 1); b.infShown = b.inf; setWrinkle(b.mesh.geometry, b.sh, b.inf, b.L); }
+function setPrintTex(mat, sh) { mat.userData.u.uPr.value.set(sh.tex, sh.tang, sh.pitch, sh.tamt); }
+function setInflation(b, f) { setPrintTex(b.fillMat, b.sh); b.inf = clamp(f, 0, 1); b.infShown = b.inf; setWrinkle(b.mesh.geometry, b.sh, b.inf, b.L); }
 function setBabyLen(g, L) { babyPositions(L, (L - K.Lfold) / (K.Ldep - K.Lfold), g.attributes.position.array); g.attributes.position.needsUpdate = true; g.computeVertexNormals(); g.computeBoundingSphere(); }
 /* vertex clustering: snap to a grid, merge, drop collapsed triangles. Keeps a dozen mothers light enough to run in a browser without a GPU. */
 function decimate(geo, cell) {
@@ -561,7 +570,7 @@ function startPrint(h) {
   t.boomMesh.visible = false;
   // folded baby standing on the bed, nose down, valve on top; revealed layer by layer
   const clipP = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0);
-  const mat = bodyMat("silicone", { flat: true, side: THREE.DoubleSide, clip: [clipP] });
+  const mat = bodyMat("silicone", { flat: true, side: THREE.DoubleSide, clip: [clipP] }); setPrintTex(mat, kid.sh);
   const g = babyGeometry(K.Lfold, 0), m = new THREE.Mesh(g, mat); m.renderOrder = 3;
   const cap = new THREE.Mesh(G.capsule, bodyMat("clay", { clip: [clipP], vc: true }));
   const grp = new THREE.Group(); grp.add(m); grp.add(cap); h.bl.add(grp);
@@ -622,7 +631,7 @@ function stepPrint(h, dt) {
     // valve held on the needle: horizontal, valve end toward the opening, growing in length while carried out
     const uc = clamp((t - tCarry) / TP.carry, 0, 1), uo = clamp((t - tOut) / TP.out, 0, 1);
     // the folded print unfolds to full length while the arm draws it to the opening; it stays limp and wrinkled
-    if (!pb.wr) { pb.wr = true; pb.g.dispose(); pb.g = wrinkleGeometry(P.kid.sh, 0, K.Lfold); pb.m.geometry = pb.g; }
+    if (!pb.wr) { pb.wr = true; pb.g.dispose(); pb.g = wrinkleGeometry(P.kid.sh, 0, K.Lfold); pb.m.geometry = pb.g; setPrintTex(pb.mat, P.kid.sh); }
     const L = lerp(K.Lfold, P.kid.sh.L, ss(uc)); if (Math.abs(L - pb.L) > 0.0005) { setWrinkle(pb.g, P.kid.sh, 0, L); pb.L = L; }
     const rotY = lerp(PI / 2, 0, ss(uc));   // from nose down to valve end facing -x
     pb.grp.rotation.set(0, rotY, 0);
