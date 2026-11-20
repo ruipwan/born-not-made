@@ -5,7 +5,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Voices: anyone can leave words or a drawing. Each voice is a GitHub issue; each floats in the water as a small body. */
+/* Voices: anyone can leave words or a drawing. Each voice is a GitHub issue; each is born as a small robot that swims in the water. */
 :root {
   --bg: #0c0c0d; --paper: #141415; --white: #fffefb; --ink: #ecebe6; --muted: #9b9a94; --line: #2a2a2c;
   --gel: #9cc8ec; --gel-soft: #15283a; --water-ink: #3f6488;
@@ -58,28 +58,26 @@ html.embedded .artist .sig { grid-column: 1 / -1; font-size: 13.5px; }
 .pool-msg p { margin: 0 0 14px; color: var(--water-ink); }
 .pool-cap { font: 13.5px/1.5 var(--sans); color: var(--muted); margin: 10px 2px 0; max-width: 62ch; }
 
-.body { position: absolute; left: 0; top: 0; width: var(--d); height: var(--d); padding: 0; border: 0; margin: 0; background: none; cursor: pointer; border-radius: 50%; will-change: transform; -webkit-tap-highlight-color: transparent; transition: opacity .4s; }
-.body .mem { position: absolute; inset: 0; border-radius: var(--br); display: grid; place-items: center; overflow: hidden;
-  background: radial-gradient(circle at 34% 28%, rgba(255,255,255,.98) 0 16%, rgba(255,255,255,.62) 44%, color-mix(in srgb, var(--c) 17%, #15283a) 100%);
-  border: 1.5px solid color-mix(in srgb, var(--c) 58%, transparent);
-  box-shadow: 0 10px 18px -12px color-mix(in srgb, var(--c) 80%, transparent), inset 0 -5px 10px -4px color-mix(in srgb, var(--c) 22%, transparent);
-  animation: wob var(--dur, 7s) ease-in-out var(--del, 0s) infinite alternate; }
-.body .mem svg { width: 76%; height: auto; display: block; opacity: .92; }
-.body .nuc { width: 24%; height: 24%; border-radius: 46% 54% 52% 48%; background: color-mix(in srgb, var(--c) 70%, white); opacity: .75; }
-.body .w { padding: 0 17%; font: italic 400 calc(var(--d) * 0.105)/1.18 var(--serif); color: color-mix(in srgb, var(--c) 45%, var(--ink)); text-align: center;
-  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; max-height: 3.6em; opacity: .82; }
-.body:not(.tiny) .nuc { display: none; }
-.body.tiny .w { display: none; }
-.body:hover .mem { border-color: var(--c); }
+.body { position: absolute; left: 0; top: 0; width: var(--d); height: calc(var(--d) * 0.6); padding: 0; border: 0; margin: 0; background: none; cursor: pointer; border-radius: 50%; will-change: transform; -webkit-tap-highlight-color: transparent; transition: opacity .4s; }
+.body .mem { position: absolute; inset: 0; display: block; transition: transform .6s ease; }
+.body.left .mem { transform: scaleX(-1); }
+.body .mem svg.bot { width: 100%; height: 100%; display: block; overflow: visible; }
+.bot .shell { fill: color-mix(in srgb, var(--c) 22%, #0b0b0c); stroke: var(--c); stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+.bot .pleat { fill: none; stroke: var(--c); stroke-width: 1; opacity: .55; vector-effect: non-scaling-stroke; }
+.bot .tail { fill: none; stroke: var(--c); stroke-width: 1.4; stroke-linecap: round; vector-effect: non-scaling-stroke; transform-box: view-box; transform-origin: 22px 30px; animation: wag var(--dur, 3s) ease-in-out var(--del, 0s) infinite alternate; }
+.bot .eye { fill: var(--ink); }
+@keyframes wag { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
+@media (prefers-reduced-motion: reduce) { .bot .tail { animation: none; } }
+.body:hover .shell { fill: color-mix(in srgb, var(--c) 40%, #0b0b0c); }
 .body:focus-visible { outline: none; }
-.body:focus-visible .mem { outline: 2px solid var(--ink); outline-offset: 3px; }
+.body:focus-visible .mem { outline: 1px solid var(--ink); outline-offset: 4px; border-radius: 8px; }
 .body.dim { opacity: .18; }
 .body.draft { cursor: default; pointer-events: none; transition: opacity .5s, transform .6s; }
-.body.draft .mem { background: rgba(255,255,255,.35); border: 1.5px dashed var(--gel); box-shadow: none; }
+.body.draft .shell, .body.draft .tail { stroke-dasharray: 3 3; fill: none; }
 .body.draft.off { opacity: 0; }
-.body.draft.sent .mem { border-style: solid; background: radial-gradient(circle at 34% 28%, #141415 0 16%, rgba(255,255,255,.6) 44%, #15283a 100%); }
+.body.draft.sent .shell, .body.draft.sent .tail { stroke-dasharray: none; }
+.body.draft.sent .shell { fill: color-mix(in srgb, var(--c) 22%, #0b0b0c); }
 .draft-label { position: absolute; left: 50%; top: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap; font: 11px var(--mono); color: var(--water-ink); }
-@keyframes wob { from { border-radius: var(--br); } to { border-radius: var(--br2); } }
 
 .whisper { position: absolute; z-index: 3; left: 0; top: 0; max-width: min(260px, 80%); background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 9px 12px; font: 400 15.5px/1.35 var(--serif); box-shadow: 0 10px 28px -14px rgba(21, 23, 26, .45); pointer-events: none; opacity: 0; transition: opacity .15s; overflow-wrap: anywhere; }
 .whisper.on { opacity: 1; }
@@ -168,8 +166,8 @@ legend { font: 500 13.5px/1.4 var(--sans); margin: 0 0 8px; padding: 0; }
 @keyframes flash { 0% { background: var(--gel-soft); } 100% { background: transparent; } }
 .gut { font: 12px/1.5 var(--mono); color: var(--muted); display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
 .gut a { color: var(--muted); }
-.glyph { width: 30px; height: 30px; border-radius: var(--br); border: 1.5px solid color-mix(in srgb, var(--c) 60%, transparent);
-  background: radial-gradient(circle at 34% 28%, #141415 0 18%, color-mix(in srgb, var(--c) 18%, #15283a) 100%); }
+.glyph { display: block; width: 46px; height: 28px; }
+.glyph svg { width: 100%; height: 100%; overflow: visible; }
 .v { min-width: 0; border-radius: 12px; }
 .v .ans { font-size: 13.5px; color: var(--muted); margin: 0 0 6px; }
 .v .ans q { font: italic 400 15.5px var(--serif); color: var(--ink); }
@@ -246,12 +244,12 @@ dialog::backdrop { background: rgba(205, 223, 240, .62); -webkit-backdrop-filter
   <div class="pool-col">
     <div class="pool" id="pool">
       <canvas id="ripples" aria-hidden="true"></canvas>
-      <div class="bodies" id="bodies" role="group" aria-label="The water. Each small body is a voice. Use the arrow keys to move between them."></div>
+      <div class="bodies" id="bodies" role="group" aria-label="The water. Each small robot is a voice. Use the arrow keys to move between them."></div>
       <div class="whisper" id="whisper" aria-hidden="true"></div>
       <div class="pool-msg" id="poolMsg" role="status"></div>
       <p class="pool-count" id="poolCount" aria-hidden="true"></p>
     </div>
-    <p class="pool-cap">Each small body is a voice, and a drawing floats inside its body. Open one to read it, or touch the water.</p>
+    <p class="pool-cap">Each voice is born as a small robot. Open one to read it, or touch the water.</p>
   </div>
 
   <form class="composer" id="composer" novalidate aria-labelledby="composeTitle">
@@ -759,6 +757,36 @@ function renderVoice(v, inDialog) {
   if (inDialog) { const src = el("p", "how"); src.append("Source: "); const a = el("a", null, "issue #" + v.number); a.href = v.url; a.target = "_blank"; a.rel = "noopener"; src.appendChild(a); src.append(", opened " + dateFmt(v.created) + (v.login ? " by @" + v.login : "") + "."); art.appendChild(src); }
   return art;
 }
+/* each voice is born as a small robot: a pleated soft body and a tail, its proportions seeded by the voice */
+function robotSVG(seed, label) {
+  const r = seeded(seed * 7 + 3);
+  const x0 = 22, x1 = 96, hh = 13 + r() * 9, k = 2 + Math.floor(r() * 3), ph = r() * 6.283, lobe = 0.04 + r() * 0.14, front = 0.45 + r() * 0.3;
+  const n = 40, top = [], bot = [];
+  for (let i = 0; i <= n; i++) {
+    const t = i / n, x = x0 + (x1 - x0) * t;
+    const env = Math.pow(Math.sin(Math.PI * t), t > 0.5 ? front : 0.7);
+    const h = hh * env * (1 + lobe * Math.cos(k * 6.283 * t + ph));
+    top.push([x, 30 - h]); bot.push([x, 30 + h * 0.84]);
+  }
+  const f = (q) => q[0].toFixed(1) + " " + q[1].toFixed(1);
+  const shell = "M" + top.map(f).join("L") + "L" + bot.slice().reverse().map(f).join("L") + "Z";
+  const pleats = 3 + Math.floor(r() * 4);
+  let pl = "";
+  for (let j = 1; j <= pleats; j++) {
+    const i = Math.round((n * (0.12 + 0.62 * j / (pleats + 1))));
+    const [x, yt] = top[i], yb = bot[i][1], bend = 3 + r() * 2;
+    pl += "M" + x.toFixed(1) + " " + (yt + 1.5).toFixed(1) + "Q" + (x + bend).toFixed(1) + " 30 " + x.toFixed(1) + " " + (yb - 1.5).toFixed(1);
+  }
+  const tl = 12 + r() * 10, tc = (r() - 0.5) * 16;
+  const tail = "M" + x0 + " 30Q" + (x0 - tl * 0.5).toFixed(1) + " " + (30 + tc).toFixed(1) + " " + (x0 - tl).toFixed(1) + " " + (30 - tc * 0.4).toFixed(1);
+  const ex = x0 + (x1 - x0) * (0.8 + r() * 0.06), ey = 30 - hh * 0.25;
+  const NS = "http://www.w3.org/2000/svg", svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", "0 0 100 60"); svg.setAttribute("class", "bot"); svg.setAttribute("aria-hidden", "true");
+  if (label) svg.setAttribute("aria-label", label);
+  for (const [cls, d] of [["tail", tail], ["shell", shell], ["pleat", pl]]) { const pth = document.createElementNS(NS, "path"); pth.setAttribute("class", cls); pth.setAttribute("d", d); svg.appendChild(pth); }
+  const eye = document.createElementNS(NS, "circle"); eye.setAttribute("class", "eye"); eye.setAttribute("cx", ex.toFixed(1)); eye.setAttribute("cy", ey.toFixed(1)); eye.setAttribute("r", "1.6"); svg.appendChild(eye);
+  return svg;
+}
 function shapeFor(v) { const r = seeded(v.number); return { br: blobShape(r), br2: blobShape(r), r }; }
 
 function filtered() {
@@ -791,7 +819,7 @@ function renderList() {
     const li = el("li", "entry"); li.id = "voice-" + v.number;
     const g = el("div", "gut");
     const s = shapeFor(v);
-    const glyph = el("span", "glyph"); glyph.style.setProperty("--br", s.br); glyph.style.setProperty("--c", topicVar(v.topic)); glyph.setAttribute("aria-hidden", "true");
+    const glyph = el("span", "glyph"); glyph.style.setProperty("--c", topicVar(v.topic)); glyph.setAttribute("aria-hidden", "true"); glyph.appendChild(robotSVG(v.number));
     const num = el("a", null, "#" + v.number); num.href = v.url; num.target = "_blank"; num.rel = "noopener"; num.setAttribute("aria-label", "Issue " + v.number + " on GitHub");
     g.append(glyph, el("span", null, dateFmt(v.created)), num);
     li.append(g, renderVoice(v, false));
@@ -863,10 +891,9 @@ function buildBodies() {
     btn.setAttribute("aria-label", "Voice by " + who(v) + ", about " + v.topic + ": " + firstWords(v, 90));
     btn.style.setProperty("--c", topicVar(v.topic));
     btn.style.setProperty("--br", s.br); btn.style.setProperty("--br2", s.br2);
-    btn.style.setProperty("--dur", (6 + r() * 5).toFixed(2) + "s"); btn.style.setProperty("--del", (-r() * 8).toFixed(2) + "s");
+    btn.style.setProperty("--dur", (1.6 + r() * 1.6).toFixed(2) + "s"); btn.style.setProperty("--del", (-r() * 3).toFixed(2) + "s");
     const mem = el("span", "mem");
-    if (sk) { const svg = sketchSVG(sk, ""); svg.setAttribute("aria-hidden", "true"); svg.removeAttribute("role"); mem.appendChild(svg); }
-    else { mem.appendChild(el("i", "nuc")); const w = el("span", "w", firstWords(v, 44)); w.setAttribute("aria-hidden", "true"); mem.appendChild(w); }
+    mem.appendChild(robotSVG(v.number));
     btn.appendChild(mem);
     const b = { v, el: btn, d0, d: d0, r: d0 / 2, x: 0, y: 0, vx: 0, vy: 0, ph: r() * 6.28, rr: r };
     btn.addEventListener("click", () => openVoice(v));
@@ -886,12 +913,12 @@ function buildBodies() {
   paint();
   kick();
 }
-// Few voices float larger, many float smaller: the bodies together cover about a tenth of the water.
+// Few voices swim larger, many swim smaller: the robots together take up about a sixth of the water.
 function scaleK() {
   if (!bodies.length || !W || !H) return 1;
   let area = 0;
   for (const b of bodies) area += Math.PI * b.d0 * b.d0 / 4;
-  const k = Math.sqrt(0.1 * W * H / area);
+  const k = Math.sqrt(0.16 * W * H / area);
   const maxD = Math.max(...bodies.map((b) => b.d0));
   return Math.max(0.6, Math.min(2.1, k, Math.min(W, H) * 0.3 / maxD));
 }
@@ -966,7 +993,10 @@ function step(dt, settling) {
   }
 }
 function paint() {
-  for (const b of bodies) b.el.style.transform = "translate(" + (b.x - b.r).toFixed(1) + "px," + (b.y - b.r).toFixed(1) + "px)";
+  for (const b of bodies) {
+    b.el.style.transform = "translate(" + (b.x - b.r).toFixed(1) + "px," + (b.y - b.r * 0.6).toFixed(1) + "px)";
+    if (Math.abs(b.vx) > 1.5) b.el.classList.toggle("left", b.vx < 0);
+  }
   if (hovered) placeWhisper(hovered);
   cx.clearRect(0, 0, W, H);
   const now = performance.now();
@@ -1019,8 +1049,8 @@ function poolMessage(kind, extra) {
   const box = el("div");
   if (kind === "loading") box.appendChild(el("p", null, "Listening to the water…"));
   if (kind === "empty") {
-    box.appendChild(el("p", "still", "The water is still."));
-    box.appendChild(el("p", null, "Nobody has spoken yet. Be the first voice."));
+    box.appendChild(el("p", "still", "No robots yet."));
+    box.appendChild(el("p", null, "Each voice is born as a small robot. Leave the first one."));
     const b = el("button", "soft", "Leave the first voice"); b.type = "button"; b.addEventListener("click", goCompose); box.appendChild(b);
   }
   if (kind === "limited" || kind === "error") {
@@ -1246,15 +1276,15 @@ function resetComposer() {
 function placeDraft() {
   if (!draft.el) return;
   draft.x = W / 2; draft.y = H - draft.d / 2 - 34;
-  draft.el.style.transform = "translate(" + (draft.x - draft.d / 2).toFixed(1) + "px," + (draft.y - draft.d / 2).toFixed(1) + "px)";
+  draft.el.style.transform = "translate(" + (draft.x - draft.d / 2).toFixed(1) + "px," + (draft.y - draft.d * 0.3).toFixed(1) + "px)";
 }
 function updateDraft() {
   if (!draft.el) {
     draft.el = el("div", "body draft off"); draft.el.setAttribute("aria-hidden", "true");
     draft.el.style.setProperty("--br", "52% 48% 46% 54% / 50% 44% 56% 50%"); draft.el.style.setProperty("--br2", "46% 54% 52% 48% / 56% 50% 50% 44%");
     draft.el.style.setProperty("--c", "var(--gel)");
-    draft.el.appendChild(el("span", "mem"));
-    draft.el.appendChild(el("span", "draft-label", "yours, forming"));
+    const dm = el("span", "mem"); dm.appendChild(robotSVG(0)); draft.el.appendChild(dm);
+    draft.el.appendChild(el("span", "draft-label", "your robot, forming"));
     bodiesEl.appendChild(draft.el);
   }
   const amount = words.value.trim().length + strokes.length * 14;
@@ -1269,7 +1299,7 @@ function updateDraft() {
 function release() {
   if (!draft.el) return;
   draft.el.classList.add("sent");
-  draft.el.querySelector(".draft-label").textContent = "waiting on GitHub";
+  draft.el.querySelector(".draft-label").textContent = "being born on GitHub";
   ripple(draft.x, draft.y, 180, 90);
 }
 
