@@ -124,6 +124,10 @@ dialog::backdrop { background: rgba(21, 23, 26, .82); }
   .stats b { font-size: 26px; }
   .lbar p { flex-basis: 100%; }
 }
+.source-figure { margin: 0; }
+.source-figure button { width: 100%; }
+.source-figure figcaption { margin: 6px 0 2px; font: 12px/1.5 var(--sans); color: var(--muted); }
+.source-figure figcaption a { color: inherit; }
 </style>
 <link rel="stylesheet" href="../assets/css/organic.css"></head><body class="org-doc org-log">
 <div class="wrap">
@@ -247,8 +251,13 @@ function build() {
     if (e.media && e.media.length) {
       const m = el("div", { class: "media" + (e.media.length === 1 ? " one" : "") });
       e.media.forEach((src, j) => {
-        const alt = e.title + (e.media.length > 1 ? `, image ${j + 1} of ${e.media.length}` : "");
-        m.append(el("button", { type: "button", "aria-label": "Enlarge: " + alt, onclick: (ev) => openLb(e, j, ev.currentTarget) }, el("img", { src, alt, loading: "lazy", decoding: "async" })));
+        const note = e.mediaNotes?.[j];
+        const alt = note?.alt || e.title + (e.media.length > 1 ? `, image ${j + 1} of ${e.media.length}` : "");
+        const button = el("button", { type: "button", "aria-label": "Enlarge: " + alt, onclick: (ev) => openLb(e, j, ev.currentTarget) }, el("img", { src, alt, loading: "lazy", decoding: "async" }));
+        if (note) {
+          const caption = el("figcaption", {}, el("a", { href: note.source, text: note.credit }));
+          m.append(el("figure", {class:"source-figure"}, button, caption));
+        } else m.append(button);
       });
       card.append(m);
     }
@@ -332,7 +341,7 @@ function jump(i) {
 }
 
 function openLb(e, j, opener) {
-  lb = { list: e.media, i: j, title: e.title + ", " + fmt(e.date), opener };
+  lb = { list: e.media, notes: e.mediaNotes, i: j, title: e.title + ", " + fmt(e.date), opener };
   showLb();
   const d = $("#lb");
   if (d.showModal) d.showModal(); else d.setAttribute("open", "");
@@ -341,8 +350,9 @@ function openLb(e, j, opener) {
 function showLb() {
   const img = $("#lbImg");
   img.src = lb.list[lb.i];
-  img.alt = lb.title + (lb.list.length > 1 ? `, image ${lb.i + 1} of ${lb.list.length}` : "");
-  $("#lbCap").textContent = lb.title + (lb.list.length > 1 ? `  (${lb.i + 1}/${lb.list.length})` : "");
+  const note = lb.notes?.[lb.i];
+  img.alt = note?.alt || lb.title + (lb.list.length > 1 ? `, image ${lb.i + 1} of ${lb.list.length}` : "");
+  $("#lbCap").textContent = note ? note.alt + " · " + note.credit : lb.title + (lb.list.length > 1 ? `  (${lb.i + 1}/${lb.list.length})` : "");
   $("#lbPrev").hidden = $("#lbNext").hidden = lb.list.length < 2;
 }
 function closeLb() { const d = $("#lb"); if (d.close) d.close(); else d.removeAttribute("open"); }

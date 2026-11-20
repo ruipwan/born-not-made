@@ -24,11 +24,20 @@
   "stage": "show",
   "title": "Hard Mode hackathon prize",
   "text": "At Hard Mode, the MIT Media Lab's hardware and AI hackathon (6 to 8 March 2026), the project runs under the name Life 3.0. The jury creates a Special Visionary Prize for it.",
-  "media": [],
+  "media": [
+   "../assets/img/society-ref/hard-mode.webp"
+  ],
   "links": [
    {
     "label": "HARD MODE: Hardware x AI Hackathon, MIT Media Lab",
     "url": "https://hardmode.media.mit.edu"
+   }
+  ],
+  "mediaNotes": [
+   {
+    "alt": "Line drawing of a handheld electronic device on the Hard Mode event banner.",
+    "credit": "Event artwork by Cyrus Clark, via MIT Morningside Academy for Design",
+    "source": "https://design.mit.edu/events/hard-mode-hardware-ai-hackathon"
    }
   ]
  },
@@ -37,11 +46,20 @@
   "stage": "show",
   "title": "ALIFE 2026, Waterloo",
   "text": "Shown in the ALIFE 2026 art gallery as an exhibition finalist, and presented in a 7 minute talk at the Artificial Life in the Wild workshop (listed by ALIFE 2026 as Agent Ethology, studying artificial life in the wild) on 20 Aug. The conference ran 17 to 21 Aug in Waterloo, Ontario. The display is a 3D printed resin model in a water tank, a looping video and a monitor.",
-  "media": [],
+  "media": [
+   "../assets/img/society-ref/alife-paper.webp"
+  ],
   "links": [
    {
     "label": "Artificial Life in the Wild workshop, ALIFE 2026",
     "url": "https://alife-in-the-wild.github.io/"
+   }
+  ],
+  "mediaNotes": [
+   {
+    "alt": "Opening page of Born, Not Made with the authors and abstract from the ALIFE workshop.",
+    "credit": "Workshop paper, Artificial Life in the Wild, Waterloo",
+    "source": "https://alife-in-the-wild.github.io/papers/born-not-made.pdf"
    }
   ]
  },
@@ -60,7 +78,9 @@
   "title": "Material purchase list",
   "text": "Di Wu, a coauthor of the EpoMemory paper (CHI 2023), proposes printing in a gel bath, and the materials list follows that paper: a print ink of EPON 828 resin and EPIKURE 3380 crosslinker, a support gel of Carbopol 940 neutralized with NaOH in deionized water, safety gear, lab tools and Ecoflex silicone.",
   "decision": "Print inside a gel bath, so the baby needs no supports.",
-  "media": [],
+  "media": [
+   "../assets/img/society-ref/epomemory.webp"
+  ],
   "links": [
    {
     "label": "EpoMemory, CHI 2023",
@@ -69,7 +89,14 @@
   ],
   "threads": {
    "gel": "Carbopol 940 gel, neutralized with NaOH, as the support bath; epoxy ink."
-  }
+  },
+  "mediaNotes": [
+   {
+    "alt": "The EpoMemory team’s nozzle deposits epoxy in a clear support bath.",
+    "credit": "Embedded-printing photograph by the Morphing Matter Lab",
+    "source": "https://morphingmatter.org/projects/epomemory"
+   }
+  ]
  },
  {
   "date": "2026-08-30",
@@ -77,11 +104,20 @@
   "title": "Printer or syringe extruder",
   "text": "Printers compared: Ultimaker 2, Bambu A1 mini, TRONXY, Flashforge Adventurer 5M and a used 3 axis machine. Syringe extruders compared: an MG996R servo syringe and a Funssor paste kit. Deionized water, syringe parts and SORTA-Clear 18 silicone arrive by 2 Sep.",
   "decision": "A Flashforge Adventurer 5M is bought; it arrives on 17 Sep.",
-  "media": [],
+  "media": [
+   "../assets/img/society-ref/edible-print.webp"
+  ],
   "links": [
    {
     "label": "Yang et al., Freeform Fabrication of Fluidic Edible Materials, CHI 2021 (the Carbopol bath recipe EpoMemory cites)",
     "url": "https://dl.acm.org/doi/10.1145/3411764.3445097"
+   }
+  ],
+  "mediaNotes": [
+   {
+    "alt": "Three successive stages of an edible print in a transparent container.",
+    "credit": "Freeform Fabrication of Fluidic Edible Materials, Morphing Matter Lab",
+    "source": "https://morphingmatter.org/projects/freeform-food-printing"
    }
   ]
  },
@@ -103,7 +139,9 @@
   "title": "SO-ARM101 bought",
   "text": "A Hiwonder SO-ARM101, the assembled LeRobot arm, is ordered on 20 to 21 Sep and unboxed on 22 Sep.",
   "decision": "Next step: put a motor on the syringe.",
-  "media": [],
+  "media": [
+   "../assets/img/society-ref/so101.webp"
+  ],
   "links": [
    {
     "label": "Hiwonder SO-ARM101 manual",
@@ -112,7 +150,14 @@
   ],
   "threads": {
    "arm": "Hiwonder SO-ARM101, a 6 axis open source arm."
-  }
+  },
+  "mediaNotes": [
+   {
+    "alt": "The two SO-ARM101 arm configurations in Hiwonder’s product photograph.",
+    "credit": "SO-ARM101 hardware, Hiwonder",
+    "source": "https://www.hiwonder.com/products/lerobot-so-101"
+   }
+  ]
  },
  {
   "date": "2026-09-22",
@@ -128,7 +173,9 @@
   "title": "First arm test",
   "text": "The SO-ARM101 moves for the first time. The crosslinker is chosen: EPIKURE 3380. Beakers, containers and syringes are ordered.",
   "decision": "Validate the gel first; it does not depend on the crosslinker.",
-  "media": [],
+  "media": [
+   "../assets/img/society-ref/epikure-ratio.webp"
+  ],
   "links": [
    {
     "label": "EPIKURE 3380, Westlake Epoxy",
@@ -137,7 +184,14 @@
   ],
   "threads": {
    "gel": "Gel tests go first, before any resin."
-  }
+  },
+  "mediaNotes": [
+   {
+    "alt": "EpoMemory graph comparing triggering and glass-transition temperatures at four crosslinker-to-epoxy ratios.",
+    "credit": "EPIKURE 3380 and EPON 828 ratios in the cited laboratory study, Morphing Matter Lab",
+    "source": "https://morphingmatter.org/projects/epomemory"
+   }
+  ]
  },
  {
   "date": "2026-09-28",
@@ -205,7 +259,9 @@
   "title": "Born is not replicated",
   "text": "After reading the replicator account in Blaise Agüera y Arcas's What Is Intelligence?, Ruipeng holds that a replicator and a born body are not the same. Offspring that can only make simpler things mean little.",
   "decision": "Ask whether the baby could gestate too, revisiting the position that offspring are sterile.",
-  "media": [],
+  "media": [
+   "../assets/img/society-ref/intel.webp"
+  ],
   "links": [
    {
     "label": "What Is Intelligence?",
@@ -214,7 +270,14 @@
   ],
   "threads": {
    "lineage": "Question raised: could the baby gestate too?"
-  }
+  },
+  "mediaNotes": [
+   {
+    "alt": "Book cover for What Is Intelligence? by Blaise Agüera y Arcas.",
+    "credit": "Book artwork from the Antikythera edition",
+    "source": "https://whatisintelligence.antikythera.org/"
+   }
+  ]
  },
  {
   "date": "2026-10-12",
@@ -276,7 +339,9 @@
   "title": "First silicone print in gel",
   "text": "Sealed and left for a day, the gel loses almost all its bubbles: its own weight pushes them out. The first silicone injected into the gel prints and stays suspended. Silicone that sets in 5 minutes is too fast and 30 minutes is slow.",
   "decision": "Aim for a silicone that sets in about 10 minutes, and check the gel every 12 hours to find the shortest rest. Add shape change, so the result does not read as plain Rapid Liquid Printing.",
-  "media": [],
+  "media": [
+   "../assets/img/society-ref/firstprint.webp"
+  ],
   "links": [
    {
     "label": "First print in gel, video",
@@ -285,7 +350,14 @@
   ],
   "threads": {
    "gel": "A day of rest removes the bubbles; silicone prints and stays suspended."
-  }
+  },
+  "mediaNotes": [
+   {
+    "alt": "A nozzle descends into the transparent gel bath in the first silicone printing test.",
+    "credit": "Frame from the hardware group’s October 14 test recording",
+    "source": "https://drive.google.com/file/d/1jH1xqi_G-yIH9yQR79T77lY0z6bkesVg/view"
+   }
+  ]
  },
  {
   "date": "2026-10-14",
@@ -528,11 +600,20 @@
   "stage": "show",
   "title": "VISAP 2026: Amplification, MIT Met Warehouse",
   "text": "Shown in Amplification, the exhibition of VISAP 2026, the IEEE VIS Arts Program, at MIT Met Warehouse in Cambridge from 11 to 13 Nov, alongside IEEE VIS in Boston (9 to 13 Nov). Visitors no longer reach into the water: a hand resting on a copper strip along the tank's top edge is the touch.",
-  "media": [],
+  "media": [
+   "../assets/img/society-ref/visap.webp"
+  ],
   "links": [
    {
     "label": "VISAP 2026 exhibition, Amplification",
     "url": "https://visap.net/2026/exhibition.html"
+   }
+  ],
+  "mediaNotes": [
+   {
+    "alt": "A lit water tank beneath a projected population of robots.",
+    "credit": "Born, Not Made, artwork image published by VISAP",
+    "source": "https://visap.net/2026/artwork-4.html"
    }
   ]
  },

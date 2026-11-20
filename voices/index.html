@@ -223,7 +223,8 @@ dialog::backdrop { background: rgba(205, 223, 240, .62); -webkit-backdrop-filter
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 </style>
-<link rel="stylesheet" href="../assets/css/organic.css"></head><body class="org-doc org-voices">
+<link rel="stylesheet" href="../assets/css/organic.css">
+<link rel="stylesheet" href="../assets/css/talk.css"></head><body class="org-doc org-voices">
 
 <header class="top"><div class="wrap"><a class="brand" href="../">Mother Robot Giving Birth to Baby Robot</a><span class="here">Voices</span></div></header>
 
@@ -324,7 +325,7 @@ dialog::backdrop { background: rgba(205, 223, 240, .62); -webkit-backdrop-filter
     <fieldset><legend class="sr">Show voices about</legend><div class="chips" id="filterChips"></div></fieldset>
     <fieldset><legend class="sr">Order</legend><div class="chips" id="orderChips"></div></fieldset>
   </div>
-  <ol class="entries" id="entries"></ol>
+  <ol class="entries bubble-field" id="entries"></ol>
   <div class="empty" id="empty" hidden></div>
   <div class="more" id="more" hidden><button type="button" class="soft" id="moreBtn">Show more voices</button></div>
 </section>
@@ -817,12 +818,22 @@ function renderList() {
   const ol = $("entries"); ol.textContent = "";
   for (const v of list.slice(0, shown)) {
     const li = el("li", "entry"); li.id = "voice-" + v.number;
-    const g = el("div", "gut");
-    const s = shapeFor(v);
-    const glyph = el("span", "glyph"); glyph.style.setProperty("--c", topicVar(v.topic)); glyph.setAttribute("aria-hidden", "true"); glyph.appendChild(robotSVG(v.number));
-    const num = el("a", null, "#" + v.number); num.href = v.url; num.target = "_blank"; num.rel = "noopener"; num.setAttribute("aria-label", "Issue " + v.number + " on GitHub");
-    g.append(glyph, el("span", null, dateFmt(v.created)), num);
-    li.append(g, renderVoice(v, false));
+    const button = el("button", "talk-orb");
+    button.type = "button";
+    button.setAttribute("aria-haspopup", "dialog");
+    button.style.setProperty("--voice-color", topicVar(v.topic));
+    button.append(el("span","orb-meta",[v.topic, dateFmt(v.created)].filter(Boolean).join(" · ")),
+      el("span","orb-person" + (who(v).length > 25 ? " long" : ""),who(v)));
+    const robot = el("span","orb-robot"); robot.setAttribute("aria-hidden","true"); robot.appendChild(robotSVG(v.number)); button.prepend(robot);
+    const drawing = sketchOf(v);
+    if (drawing) {
+      const preview = el("span","orb-sketch");
+      preview.appendChild(sketchSVG(drawing,"Visitor drawing"));
+      button.appendChild(preview);
+    }
+    button.appendChild(el("span","orb-excerpt",firstWords(v,125)));
+    button.addEventListener("click", () => openVoice(v));
+    li.appendChild(button);
     ol.appendChild(li);
   }
   $("more").hidden = list.length <= shown;
@@ -1049,6 +1060,7 @@ function poolMessage(kind, extra) {
   const box = el("div");
   if (kind === "loading") box.appendChild(el("p", null, "Listening to the water…"));
   if (kind === "empty") {
+    box.className = "empty-orb";
     box.appendChild(el("p", "still", "No robots yet."));
     box.appendChild(el("p", null, "Each voice is born as a small robot. Leave the first one."));
     const b = el("button", "soft", "Leave the first voice"); b.type = "button"; b.addEventListener("click", goCompose); box.appendChild(b);

@@ -136,6 +136,20 @@ html.embedded.auto .side .stick { position: static; }
   .cmp tbody tr:last-child > * { border-bottom: 0; }
   .cmp tbody tr:last-child td:last-child { padding-bottom: 12px; border-bottom: 1px solid var(--line); }
 }
+
+.recs .record-thumb { display: grid; grid-template-columns: 56px minmax(0,1fr); align-items: center; gap: 10px; margin: 8px 0; }
+.record-thumb img { width: 56px; height: 40px; object-fit: contain; background: #171a1e; border-radius: 4px; }
+.refs { list-style: none; padding: 0; }
+.refs li { display: grid; grid-template-columns: minmax(96px, 31%) minmax(0,1fr); align-items: center; gap: 18px; padding: 13px 0; border-top: 1px solid var(--line); font-size: 15px; }
+.refs figure img { display:block; aspect-ratio: 16 / 10; object-fit: contain; background:#171a1e; height: auto; }
+.photo-credit { color: var(--muted); text-decoration-thickness: 1px; font: 11px/1.4 var(--sans); }
+.component-thumb { margin-top: 8px; max-width: 142px; }
+.component-thumb img { display: block; width: 100%; height: 76px; object-fit: contain; }
+@media (max-width:560px) {
+  .refs li { grid-template-columns: 94px minmax(0,1fr); gap: 12px; align-items: start; }
+  .component-thumb { float: right; margin: 0 0 4px 8px; width: 90px; }
+  table.spec th::after { content:""; display:block; clear:both; }
+}
 </style>
 <link rel="stylesheet" href="../assets/css/organic.css"></head><body class="org-doc org-early">
 <a class="skip" href="#content">Skip to content</a>
@@ -189,10 +203,10 @@ html.embedded.auto .side .stick { position: static; }
       <div><dt>When</dt><dd>Fall 2025. First birth filmed in December 2025.</dd></div>
       <div><dt>Context</dt><dd>Final project, How to Make (Almost) Anything, MIT. The record calls the two bodies parent (Commander) and baby (Receiver).</dd></div>
       <div><dt>Records</dt><dd><ul class="recs">
-        <li><a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html">Fab class record: final project</a></li>
-        <li><a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week14.html">Fab class record: water inflatables</a></li>
-        <li><a href="https://ruipengwang.space/born-not-made">Artist's page</a></li>
-        <li><a href="https://vimeo.com/1147548218">Film: first birth (Vimeo)</a></li>
+        <li class="record-thumb"><img src="../assets/img/prototype1_photo.jpg" alt="Printed mother and baby robot shells from the MIT final project." width="1600" height="960" loading="lazy" decoding="async"><span><a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html">Fab class record: final project</a></span></li>
+        <li class="record-thumb"><img src="media/v1_tpu_bags.jpg" alt="Water-inflatable TPU bags used to push the baby robot." width="960" height="1280" loading="lazy" decoding="async"><span><a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week14.html">Fab class record: water inflatables</a></span></li>
+        <li class="record-thumb"><img src="../assets/img/prototype2_diagram.jpg" alt="Drawing of the water muscle, battery and pump inside the second mother robot." width="1600" height="866" loading="lazy" decoding="async"><span><a href="https://ruipengwang.space/born-not-made">Artist's page</a></span></li>
+        <li class="record-thumb"><img src="media/v1_birth_in_tank.jpg" alt="Still of the first prototype in the tank." width="1400" height="788" loading="lazy" decoding="async"><span><a href="https://vimeo.com/1147548218">Film: first birth (Vimeo)</a></span></li>
       </ul></dd></div>
     </dl>
   </div></div>
@@ -229,9 +243,9 @@ html.embedded.auto .side .stick { position: static; }
     <table class="spec">
       <caption>First version, as recorded in the Fab class record</caption>
       <tbody>
-        <tr><th scope="row">Controller</th><td>Seeed Studio XIAO ESP32S3, one in each body. <a class="src" href="https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/">Seeed wiki</a></td></tr>
-        <tr><th scope="row">Motor driver</th><td>DRV8833 dual H bridge board, 1.5 A per channel, one in each body. The mother uses channel A for the bag pump and channel B for the swim pump. PWM 30 kHz, 8 bit. <a class="src" href="https://www.ti.com/product/DRV8833">TI datasheet</a> <a class="src" href="https://www.amazon.com/dp/B07FZY8GX2">board used</a></td></tr>
-        <tr><th scope="row">Pumps</th><td>Mini DC water pumps: two in the mother, one in the baby. Other pumps tried were too noisy or too weak to move a body. <a class="src" href="https://www.amazon.com/dp/B0B6HQ4637">pump used</a></td></tr>
+        <tr><th scope="row">Controller<figure class="component-thumb"><img src="../assets/img/society-ref/xiao.webp" alt="Seeed Studio XIAO ESP32S3 controller board." width="850" height="638" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/">Seeed Studio · board photograph</a></figcaption></figure></th><td>Seeed Studio XIAO ESP32S3, one in each body. <a class="src" href="https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/">Seeed wiki</a></td></tr>
+        <tr><th scope="row">Motor driver<figure class="component-thumb"><img src="../assets/img/society-ref/driver.webp" alt="Texas Instruments block diagram of the DRV8833 motor driver." width="365" height="204" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://www.ti.com/product/DRV8833">Texas Instruments · DRV8833 block diagram</a></figcaption></figure></th><td>DRV8833 dual H bridge board, 1.5 A per channel, one in each body. The mother uses channel A for the bag pump and channel B for the swim pump. PWM 30 kHz, 8 bit. <a class="src" href="https://www.ti.com/product/DRV8833">TI datasheet</a> <a class="src" href="https://www.amazon.com/dp/B07FZY8GX2">board used</a></td></tr>
+        <tr><th scope="row">Pumps<figure class="component-thumb"><img src="../assets/img/society-ref/waterpump.webp" alt="Miniature pumps pictured in the MIT fabrication record." width="679" height="465" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html">Pump image from the MIT Fab class record</a></figcaption></figure></th><td>Mini DC water pumps: two in the mother, one in the baby. Other pumps tried were too noisy or too weak to move a body. <a class="src" href="https://www.amazon.com/dp/B0B6HQ4637">pump used</a></td></tr>
         <tr><th scope="row">Water muscle</th><td>TPU inflatable bag, filled with water. The tube is pushed straight into the bag's neck, one size larger, and seals by tension. No glue, no fitting.</td></tr>
         <tr><th scope="row">Mother power</th><td>3.7 V LiPo 800 mAh for the XIAO and WiFi. Two 3.7 V LiPo 400 mAh in series (7.4 V) for the pumps. Firmware caps pump PWM at 195 of 255, about 6 V, to protect the 6 V motors.</td></tr>
         <tr><th scope="row">Baby power</th><td>One small LiPo for pump and XIAO, with a charging port. Pump PWM levels 150, 185, 220, 255.</td></tr>
@@ -240,7 +254,7 @@ html.embedded.auto .side .stick { position: static; }
         <tr><th scope="row">Baby shell</th><td>Foaming filament, lighter than water. Bambu P1S, nozzle 255 °C, max volumetric speed 5 mm³/s (about 13 h), part fan off, side panel open. Three wall loops and six top layers keep water out. Pump in the center, held by a closed ring; battery and XIAO on opposite sides for balance; lid seam sealed with waterproof glue.</td></tr>
         <tr><th scope="row">Control</th><td>Phone page served by the mother, with sliders for water pump and forward. The mother relays the baby's speed (levels 0 to 4) over HTTP. Level 0 sends PWM 1 so the driver does not sleep.</td></tr>
         <tr><th scope="row">Sensors</th><td>None in the final build. The birth starts from the phone.</td></tr>
-        <tr><th scope="row">Tank</th><td>Glass fish tank. <a class="src" href="https://www.amazon.com/dp/B0BZ8H8FYJ">tank used</a></td></tr>
+        <tr><th scope="row">Tank<figure class="component-thumb"><img src="../assets/img/society-ref/tank.webp" alt="Glass tank profile from the MIT fabrication record." width="850" height="382" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html">Tank detail from the MIT Fab class record</a></figcaption></figure></th><td>Glass fish tank. <a class="src" href="https://www.amazon.com/dp/B0BZ8H8FYJ">tank used</a></td></tr>
         <tr><th scope="row">Projection</th><td>None.</td></tr>
       </tbody>
     </table>
@@ -281,10 +295,10 @@ html.embedded.auto .side .stick { position: static; }
       <div><dt>When</dt><dd>2026. Film released June 2026.</dd></div>
       <div><dt>Team</dt><dd>Ruipeng Wang. 3D printing and hardware fabrication: Richard Haoxi Zhang. Drawings: Vera Yu Wu.</dd></div>
       <div><dt>Records</dt><dd><ul class="recs">
-        <li><a href="https://ruipengwang.space/born-not-made">Artist's page, with the touch loop drawing</a></li>
-        <li><a href="https://vimeo.com/1202399561/7ac02ffdc8">Film, June 2026 (Vimeo)</a></li>
-        <li><a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html">Fab class record, where the water muscle and jet began</a></li>
-        <li><a href="https://neurips.cc/virtual/2026/160668">NeurIPS 2026 Creative AI paper</a></li>
+        <li class="record-thumb"><img src="media/v2_touch_loop.jpg" alt="Drawing of the touch-sensing circuit around the water tank." width="1400" height="777" loading="lazy" decoding="async"><span><a href="https://ruipengwang.space/born-not-made">Artist's page, with the touch loop drawing</a></span></li>
+        <li class="record-thumb"><img src="../assets/img/society-ref/june-film.webp" alt="The title frame of the June film shows a clear robot in a hand." width="850" height="478" loading="lazy" decoding="async"><span><a href="https://vimeo.com/1202399561/7ac02ffdc8">Film, June 2026 (Vimeo)</a></span></li>
+        <li class="record-thumb"><img src="../assets/img/prototype1_photo.jpg" alt="Printed mother and baby robot shells from the MIT final project." width="1600" height="960" loading="lazy" decoding="async"><span><a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html">Fab class record, where the water muscle and jet began</a></span></li>
+        <li class="record-thumb"><img src="../assets/img/society-ref/visap.webp" alt="Illuminated tank beneath the digital population in Born, Not Made." width="850" height="478" loading="lazy" decoding="async"><span><a href="https://neurips.cc/virtual/2026/160668">NeurIPS 2026 Creative AI paper</a></span></li>
       </ul></dd></div>
     </dl>
   </div></div>
@@ -318,10 +332,10 @@ html.embedded.auto .side .stick { position: static; }
       <caption>Second version, as described in the project papers</caption>
       <tbody>
         <tr><th scope="row">Mother body</th><td>3D printed clear resin, soft, organic shape. The baby shows through it.</td></tr>
-        <tr><th scope="row">Controller</th><td>Seeed Studio XIAO ESP32, with a motor driver. <a class="src" href="https://wiki.seeedstudio.com/SeeedStudio_XIAO_Series_Introduction/">Seeed wiki</a></td></tr>
+        <tr><th scope="row">Controller<figure class="component-thumb"><img src="../assets/img/prototype2_diagram.jpg" alt="Drawing of the water muscle, battery and pump inside the second mother robot." width="1600" height="866" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://ruipengwang.space/born-not-made">Vera Yu Wu · project drawing</a></figcaption></figure></th><td>Seeed Studio XIAO ESP32, with a motor driver. <a class="src" href="https://wiki.seeedstudio.com/SeeedStudio_XIAO_Series_Introduction/">Seeed wiki</a></td></tr>
         <tr><th scope="row">Water muscle</th><td>Custom TPU structure, filled with water by a micro water pump.</td></tr>
         <tr><th scope="row">Power</th><td>Rechargeable battery. All electronics run at low voltage, sealed inside the bodies.</td></tr>
-        <tr><th scope="row">Touch sensing</th><td>Copper contact points on the mother's surface. Arduino Uno; a 5 MΩ resistor between D2 and D3; D3 reads the change; GND wired to the tank floor so the loop closes through the water. <a class="src" href="https://docs.arduino.cc/hardware/uno-rev3/">Arduino Uno docs</a></td></tr>
+        <tr><th scope="row">Touch sensing<figure class="component-thumb"><img src="../assets/img/society-ref/uno.webp" alt="Top view of the Arduino Uno Rev3 board." width="670" height="478" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://docs.arduino.cc/hardware/uno-rev3/">Arduino · Uno Rev3 board illustration</a></figcaption></figure></th><td>Copper contact points on the mother's surface. Arduino Uno; a 5 MΩ resistor between D2 and D3; D3 reads the change; GND wired to the tank floor so the loop closes through the water. <a class="src" href="https://docs.arduino.cc/hardware/uno-rev3/">Arduino Uno docs</a></td></tr>
         <tr><th scope="row">Baby</th><td>Clear printed body with a microcontroller, a small rechargeable battery, a micro pump for jet propulsion and a photoresistor. A Bluetooth link to siblings.</td></tr>
         <tr><th scope="row">Tank</th><td>Custom glass tank, 60 × 36 × 18 cm, shallow water, 1 to 2 cm deep.</td></tr>
         <tr><th scope="row">Projection</th><td>Unreal Engine simulation beside the tank, projected or on a monitor. Language model agents decide when to reproduce; color shows each one's stance toward birth.</td></tr>
@@ -357,9 +371,9 @@ html.embedded.auto .side .stick { position: static; }
       <div><dt>When</dt><dd>September to October 2026.</dd></div>
       <div><dt>Team</dt><dd>With collaborators at MIT CSAIL and Northwestern University. Material and arm: Di Wu. Arm control: Kexin Wang.</dd></div>
       <div><dt>Records</dt><dd><ul class="recs">
-        <li><a href="https://ruipengwang.space/born-not-made">Artist's page, credits</a></li>
-        <li><a href="https://doi.org/10.1145/3544548.3580638">EpoMemory, CHI 2023 (the gel method)</a></li>
-        <li><a href="https://www.hiwonder.com/products/lerobot-so-101">SO-ARM101 arm</a></li>
+        <li class="record-thumb"><img src="../assets/img/prototype2_diagram.jpg" alt="Drawing of the water muscle, battery and pump inside the second mother robot." width="1600" height="866" loading="lazy" decoding="async"><span><a href="https://ruipengwang.space/born-not-made">Artist's page, credits</a></span></li>
+        <li class="record-thumb"><img src="../assets/img/society-ref/epomemory.webp" alt="The EpoMemory printer deposits material into a transparent support bath." width="827" height="680" loading="lazy" decoding="async"><span><a href="https://doi.org/10.1145/3544548.3580638">EpoMemory, CHI 2023 (the gel method)</a></span></li>
+        <li class="record-thumb"><img src="../assets/img/society-ref/so101.webp" alt="The white and black configurations of the SO-ARM101." width="680" height="680" loading="lazy" decoding="async"><span><a href="https://www.hiwonder.com/products/lerobot-so-101">SO-ARM101 arm</a></span></li>
       </ul></dd></div>
     </dl>
   </div></div>
@@ -377,11 +391,11 @@ html.embedded.auto .side .stick { position: static; }
     <table class="spec">
       <caption>Third version, from the team's weekly notes</caption>
       <tbody>
-        <tr><th scope="row">Arm</th><td>Hiwonder SO-ARM101 (LeRobot SO-101 follower arm), bought assembled. Chosen after comparing a 3 axis stage, xArm, Lite 6 and myCobot. Arrived 22 Sep 2026; first test 24 Sep 2026. <a class="src" href="https://github.com/TheRobotStudio/SO-ARM100">SO-101 design files</a></td></tr>
+        <tr><th scope="row">Arm<figure class="component-thumb"><img src="../assets/img/society-ref/so101.webp" alt="The white and black configurations of the SO-ARM101." width="680" height="680" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://www.hiwonder.com/products/lerobot-so-101">Hiwonder · SO-ARM101</a></figcaption></figure></th><td>Hiwonder SO-ARM101 (LeRobot SO-101 follower arm), bought assembled. Chosen after comparing a 3 axis stage, xArm, Lite 6 and myCobot. Arrived 22 Sep 2026; first test 24 Sep 2026. <a class="src" href="https://github.com/TheRobotStudio/SO-ARM100">SO-101 design files</a></td></tr>
         <tr><th scope="row">Extruder</th><td>Syringe at the arm's tip, fed from a material reservoir.</td></tr>
         <tr><th scope="row">Gel</th><td>Carbopol 940 in deionized water, neutralized with NaOH. Sealed and rested about a day, the gel pushes out its own bubbles.</td></tr>
         <tr><th scope="row">Print material</th><td>First chosen: EPON 828 epoxy with EPIKURE 3380, which needs 24 h and heat to cure. Fast curing silicone went first instead: a 5 minute silicone sets too fast; about 10 minutes is the target.</td></tr>
-        <tr><th scope="row">Method</th><td>Embedded printing in a Carbopol bath, after EpoMemory (Zhong et al., CHI 2023). <a class="src" href="https://doi.org/10.1145/3544548.3580638">doi</a></td></tr>
+        <tr><th scope="row">Method<figure class="component-thumb"><img src="../assets/img/society-ref/epomemory.webp" alt="The EpoMemory printer deposits material into a transparent support bath." width="827" height="680" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://morphingmatter.org/projects/epomemory">Ke Zhong et al. · Morphing Matter Lab</a></figcaption></figure></th><td>Embedded printing in a Carbopol bath, after EpoMemory (Zhong et al., CHI 2023). <a class="src" href="https://doi.org/10.1145/3544548.3580638">doi</a></td></tr>
         <tr><th scope="row">First result</th><td>14 Oct 2026: silicone injected into the gel printed and stayed suspended.</td></tr>
       </tbody>
     </table>
@@ -397,11 +411,11 @@ html.embedded.auto .side .stick { position: static; }
 <section class="block" aria-labelledby="src-h">
   <div class="side"><h2 id="src-h">Sources</h2></div>
   <ol class="refs">
-    <li>Wang, R. "Final Project · The Birth of Robots." How to Make (Almost) Anything, MIT, 2025. <a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html">Final project</a>, <a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week14.html">week 14</a>.</li>
-    <li>Wang, R. <i>Born, Not Made</i>. Artist's page, with drawings by Vera Yu Wu. <a href="https://ruipengwang.space/born-not-made">ruipengwang.space</a></li>
-    <li>Wang, R., Wu, V. Y., Wang, K., Xu, J. H. "Born, Not Made." NeurIPS 2026 Creative AI track. <a href="https://neurips.cc/virtual/2026/160668">neurips.cc</a></li>
-    <li>Born, Not Made hardware group. Weekly notes, August to October 2026.</li>
-    <li>Zhong, K., Fernandes Minori, A., Wu, D., Yang, H., Islam, M. F., Yao, L. "EpoMemory: Multi-state Shape Memory for Programmable Morphing Interfaces." CHI 2023. <a href="https://doi.org/10.1145/3544548.3580638">doi</a></li>
+    <li><figure><img src="../assets/img/prototype1_photo.jpg" alt="Printed mother and baby robot shells from the MIT final project." width="1600" height="960" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html">Ruipeng Wang · MIT Fab class</a></figcaption></figure><div>Wang, R. "Final Project · The Birth of Robots." How to Make (Almost) Anything, MIT, 2025. <a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html">Final project</a>, <a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week14.html">week 14</a>.</div></li>
+    <li><figure><img src="../assets/img/prototype2_diagram.jpg" alt="Drawing of the water muscle, battery and pump inside the second mother robot." width="1600" height="866" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://ruipengwang.space/born-not-made">Vera Yu Wu · project drawing</a></figcaption></figure><div>Wang, R. <i>Born, Not Made</i>. Artist's page, with drawings by Vera Yu Wu. <a href="https://ruipengwang.space/born-not-made">ruipengwang.space</a></div></li>
+    <li><figure><img src="../assets/img/society-ref/visap.webp" alt="Illuminated tank beneath the digital population in Born, Not Made." width="850" height="478" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://visap.net/2026/artwork-4.html">Installation image · VISAP 2026</a></figcaption></figure><div>Wang, R., Wu, V. Y., Wang, K., Xu, J. H. "Born, Not Made." NeurIPS 2026 Creative AI track. <a href="https://neurips.cc/virtual/2026/160668">neurips.cc</a></div></li>
+    <li><figure><img src="../log/media/1021_s8_render.jpg" alt="The October 21 model of the mother, from the hardware group’s weekly notes." width="840" height="498" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="../log/">Hardware group · October 21 model</a></figcaption></figure><div>Born, Not Made hardware group. Weekly notes, August to October 2026.</div></li>
+    <li><figure><img src="../assets/img/society-ref/epomemory.webp" alt="The EpoMemory printer deposits material into a transparent support bath." width="827" height="680" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://morphingmatter.org/projects/epomemory">Ke Zhong et al. · Morphing Matter Lab</a></figcaption></figure><div>Zhong, K., Fernandes Minori, A., Wu, D., Yang, H., Islam, M. F., Yao, L. "EpoMemory: Multi-state Shape Memory for Programmable Morphing Interfaces." CHI 2023. <a href="https://doi.org/10.1145/3544548.3580638">doi</a></div></li>
   </ol>
 </section>
 
