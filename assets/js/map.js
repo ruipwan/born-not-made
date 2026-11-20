@@ -1,5 +1,5 @@
 /* Born, Not Made: the map.
-   One trunk: not a copy, born, not made, born is a relation.
+   One trunk: a mother robot gives birth to a baby robot.
    One branch per tab leaves the trunk and comes back. Hover a branch to find it, click to open the tab.
    Mount: <div id="bnm-map" data-mode="hero"></div>. Plain SVG, no libraries, no motion. */
 (() => {
@@ -10,15 +10,15 @@ const ALIAS = { trunk: "work", branches: "ideas", questions: "ideas", early: "pr
 
 // u: where the phrase sits along the trunk, 0 left, 1 right
 const TRUNK = [
-  { key: "not", text: "Not a copy", u: 0.12 },
-  { key: "born", text: "Born, Not Made", u: 0.45, main: true },
-  { key: "rel", text: "Born is a relation", u: 0.8 },
+  { key: "mother", text: "Mother robot", u: 0.14, main: true },
+  { key: "birth", text: "gives birth to", u: 0.46, verb: true },
+  { key: "baby", text: "Baby robot", u: 0.8, main: true },
 ];
 
 // u0, u1: where the branch leaves and rejoins the trunk. side 1 above, -1 below. a: height as a share of the half height.
 const BRANCHES = [
-  { tab: "ideas", label: "Ideas", side: 1, u0: 0.0, u1: 0.45, a: 0.84, shape: "sin" },
-  { tab: "culture", label: "Culture", side: -1, u0: 0.12, u1: 0.45, a: 0.5, shape: "cos" },
+  { tab: "ideas", label: "Ideas", side: 1, u0: 0.0, u1: 0.46, a: 0.84, shape: "sin" },
+  { tab: "culture", label: "Culture", side: -1, u0: 0.14, u1: 0.46, a: 0.5, shape: "cos" },
   { tab: "prototypes", label: "Prototypes", side: 1, u0: 0.27, u1: 0.62, a: 0.52, shape: "cos" },
   { tab: "build", label: "Build", side: -1, u0: 0.30, u1: 0.72, a: 0.88, shape: "sin" },
   { tab: "simulator", label: "Simulator", side: 1, u0: 0.47, u1: 0.8, a: 0.76, shape: "sin" },
@@ -49,19 +49,19 @@ function draw(host, svg) {
   host.style.height = H + "px";
   svg.setAttribute("viewBox", "0 0 " + W + " " + H);
   const yT = Math.round(H / 2) + 0.5, pad = 2, serif = cssVar("--serif", "Georgia, serif");
-  const base = phone ? { not: 14, born: 18, rel: 15 } : W < 900 ? { not: 18, born: 24, rel: 19 } : { not: 20, born: 28, rel: 22 };
+  const base = phone ? { mother: 17, birth: 14, baby: 17 } : W < 900 ? { mother: 22, birth: 17, baby: 22 } : { mother: 26, birth: 19, baby: 26 };
 
   // place the phrases, shrinking until they fit
   let P = null;
   for (let scale = 1, it = 0; it < 12; it++, scale *= 0.94) {
     let x = pad;
-    P = TRUNK.map((p) => { const size = base[p.key] * scale; return { ...p, size, wd: measure(p.text, (p.main ? "500 " : "400 ") + size + "px " + serif) + 2 }; });
+    P = TRUNK.map((p) => { const size = base[p.key] * scale; return { ...p, size, wd: measure(p.text, (p.verb ? "italic 400 " : p.main ? "500 " : "400 ") + size + "px " + serif) + 2 }; });
     for (const p of P) { p.x = Math.max(pad + p.u * (W - 2 * pad), x + p.wd / 2); x = p.x + p.wd / 2 + (phone ? 16 : 30); }
     const lastP = P[P.length - 1];
     if (lastP.x + lastP.wd / 2 <= W - pad - 8) break;
   }
   const by = Object.fromEntries(P.map((p) => [p.key, p]));
-  const anchors = [[0, pad], [0.12, by.not.x], [0.45, by.born.x], [0.8, by.rel.x], [1, W - pad]];
+  const anchors = [[0, pad], [0.14, by.mother.x], [0.46, by.birth.x], [0.8, by.baby.x], [1, W - pad]];
   const X = (u) => { for (let i = 1; i < anchors.length; i++) if (u <= anchors[i][0]) { const [u0, a0] = anchors[i - 1], [u1, a1] = anchors[i]; return a0 + ((a1 - a0) * (u - u0)) / (u1 - u0); } return W - pad; };
   const AU = (yT - (phone ? 22 : 28)) * (phone ? 0.8 : 1), labelPx = phone ? 13 : 15;
   const here = currentTab(), live = cultureLive();
@@ -87,7 +87,7 @@ function draw(host, svg) {
   el("path", { class: "bnm-trunkline", d: "M" + pad + " " + yT + "H" + (W - pad) }, gT);
   for (const p of P) {   // a plain ground under each phrase, so no line shows through the gaps between words
     el("rect", { class: "bnm-ground", x: (p.x - p.wd / 2 - 8).toFixed(1), y: (yT - p.size * 0.7).toFixed(1), width: (p.wd + 16).toFixed(1), height: (p.size * 1.4).toFixed(1) }, gT);
-    const t = el("text", { class: "bnm-phrase" + (p.main ? " bnm-main" : ""), x: p.x.toFixed(1), y: yT, dy: "0.32em", "text-anchor": "middle", "font-size": p.size.toFixed(2) }, gT);
+    const t = el("text", { class: "bnm-phrase" + (p.main ? " bnm-main" : "") + (p.verb ? " bnm-verb" : ""), x: p.x.toFixed(1), y: yT, dy: "0.32em", "text-anchor": "middle", "font-size": p.size.toFixed(2) }, gT);
     t.textContent = p.text;
   }
   gT.addEventListener("click", () => { location.hash = "work"; });
@@ -97,7 +97,7 @@ function setup(host) {
   if (host.__bnm) return; host.__bnm = 1;
   host.classList.add("bnm-map");
   const svg = el("svg", { class: "bnm-svg", role: "img", focusable: "false",
-    "aria-label": "Map of the site. One line: not a copy, born, not made, born is a relation. Branches: " + BRANCHES.map((b) => b.label).join(", ") + "." }, host);
+    "aria-label": "Map of the site. One line: a mother robot gives birth to a baby robot. Branches: " + BRANCHES.map((b) => b.label).join(", ") + "." }, host);
   const nav = document.createElement("nav"); nav.className = "bnm-sr"; nav.setAttribute("aria-label", "Tabs of the site");
   const ul = document.createElement("ul");
   for (const [href, text] of [["#work", "The Work"], ...BRANCHES.map((b) => ["#" + b.tab, b.label])]) {

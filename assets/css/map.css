@@ -30,6 +30,7 @@
 }
 .bnm-ground { fill: var(--bnm-bg); }
 .bnm-phrase.bnm-main { font-weight: 500; }
+.bnm-phrase.bnm-verb { font-style: italic; fill: var(--bnm-muted); }
 
 .bnm-line { fill: none; stroke: var(--bnm-muted); stroke-width: 1; opacity: 0.45; }
 .bnm-coming .bnm-line { stroke-dasharray: 2 5; }
