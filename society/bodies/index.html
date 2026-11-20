@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Born, Not Made · Bodies</title>
+<title>Mother Robot · Bodies</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Inter:wght@300;400;500;600&display=swap">
 <style>
 /* Society with the real bodies: hull, tail and baby from the v2 design, at the design waterline. */
@@ -48,9 +48,9 @@ h1 { font: 300 clamp(40px, 6vw, 72px)/1 "Cormorant Garamond", Georgia, serif; ma
 </style>
 <link rel="stylesheet" href="../../assets/css/organic.css"></head><body>
 <div class="wrap">
-  <div class="top"><span class="kicker">Society</span><nav><a href="../">Society</a><a href="../../#society">Born, Not Made home</a></nav></div>
+  <div class="top"><span class="kicker">Society</span><nav><a href="../">Society</a><a href="../../#society">Home</a></nav></div>
   <h1>Bodies</h1>
-  <p class="intro">The same society as the population page, drawn with the real bodies from the Build page: the hard shell hull, the tail and the baby, floating at the design waterline. Mothers swim slowly, dock by electropermanent magnets, charge, print babies, and raise the babies in turns with other adults. A baby is printed folded, 54 mm long, and the arm brings the baby out of the opening while inflating the baby to 385 mm. The dead stop, lose color and drift into a cluster of clear shells that grows slowly. Click any body to follow.</p>
+  <p class="intro">The same society as the population page, drawn with the real bodies from the Build page: the hard shell hull, the tail and the baby, floating at the design waterline. Mothers swim slowly, dock by electropermanent magnets, charge, print babies, and raise the babies in turns with other adults. A baby is printed folded, unfolds as the arm brings it out, and is born limp and wrinkled. Each baby is printed to its own shape, all close to the same size, and fills with air only as adults take turns raising it. Click any body to follow.</p>
   <div class="pond" id="pond">
     <canvas id="gl" aria-label="Mother, tail and baby robots on a water surface"></canvas>
     <div class="hud" id="hud"></div>
@@ -67,9 +67,8 @@ h1 { font: 300 clamp(40px, 6vw, 72px)/1 "Cormorant Garamond", Georgia, serif; ma
   <ul class="acts">
     <li><b>Dock</b>Two bodies meet at a port, line up, click together, and a small light shows the magnets on. Then they move as one. Undocking runs the other way.</li>
     <li><b>Charge</b>A mother low on energy docks to another mother or to a charging buoy. The warm fill in the tail rises as energy flows.</li>
-    <li><b>Print</b>The tail opens the way, the arm rides in through the opening and the needle traces a folded baby layer by layer. Then the arm brings the baby out while inflating the baby.</li>
-    <li><b>Raise</b>Babies dock to the mother and to other adults in turns and take memory from each. A grown baby undocks and leaves the pond.</li>
-    <li><b>Die</b>A dead body stops, loses color, turns into a nearly clear shell and drifts into the cluster of earlier shells.</li>
+    <li><b>Print</b>The tail opens the way, the arm rides in through the opening and the needle traces a folded baby layer by layer. Then the arm brings the baby out. The baby is born limp and wrinkled, every one printed to its own shape and close to the same size.</li>
+    <li><b>Raise</b>Babies dock to the mother and to other adults in turns, take memory from each and fill with air. A baby full of air leaves the pond.</li>
   </ul>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
@@ -235,6 +234,37 @@ function babyGeometry(L, f) {
   for (let k = 0; k <= rings; k++) for (let j = 0; j < m; j++) { const a = k * m + j, b = k * m + ((j + 1) % m), c = (k + 1) * m + j, d = (k + 1) * m + ((j + 1) % m); idx.push(a, d, b, a, c, d); }
   const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); g.computeBoundingSphere(); return g;
 }
+/* the born baby: the same soft body for everyone, about the same size, but each printed to its own shape.
+   f is inflation: 0 is limp and wrinkled, waiting for air; 1 is full and smooth. */
+const WB = { m: 36, n: 30 };
+const BORN = { L: 0.72, R: 0.25 };   // a baby is about the size of a mother; individuals differ in shape, not much in size
+function shapeOf(g) {
+  return { L: BORN.L * (0.95 + 0.1 * g[0]), R: BORN.R * (0.94 + 0.12 * g[1]), k: 2 + Math.floor(g[2] * 3.99), ph: g[3] * TAU, lobe: 0.06 + 0.1 * g[4],
+    p: 0.42 + 0.4 * g[2], bulge: (g[4] - 0.5) * 0.36, tw: (g[1] - 0.5) * 1.6, seed: rnd() * 100 };
+}
+function wrinklePositions(sh, f, L, arr) {
+  const { m, n } = WB; let q = 0; const w = 1 - f, squash = lerp(0.42, 1, ss(f)), shrink = lerp(0.86, 1, ss(f));
+  for (let k = 0; k <= n + 1; k++) {
+    const u = k / (n + 1), x = u * L - L / 2, uu = clamp(u - sh.bulge * u * (1 - u) * 2, 0, 1);
+    let env = Math.pow(Math.max(0, 1 - Math.pow(2 * uu - 1, 2)), sh.p);
+    if (k === 0 || k === n + 1) env = 0;
+    for (let j = 0; j < m; j++) {
+      const t = (j * TAU) / m + sh.tw * u;
+      const lobes = 1 + sh.lobe * Math.cos(sh.k * t + sh.ph);
+      const crease = Math.sin(t * 7 + u * 26 + sh.seed) * 0.6 + Math.sin(t * 4 - u * 15 + sh.seed * 1.7) * 0.4;
+      const r = sh.R * env * lobes * shrink * (1 + w * 0.17 * crease);
+      arr[q++] = x; arr[q++] = r * Math.cos(t); arr[q++] = r * Math.sin(t) * squash;
+    }
+  }
+  return arr;
+}
+function wrinkleGeometry(sh, f, L) {
+  const { m, n } = WB, pos = wrinklePositions(sh, f, L, new Float32Array((n + 2) * m * 3)), idx = [];
+  for (let k = 0; k <= n; k++) for (let j = 0; j < m; j++) { const a = k * m + j, b = k * m + ((j + 1) % m), c = (k + 1) * m + j, d = (k + 1) * m + ((j + 1) % m); idx.push(a, d, b, a, c, d); }
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); g.computeBoundingSphere(); return g;
+}
+function setWrinkle(g, sh, f, L) { wrinklePositions(sh, f, L, g.attributes.position.array); g.attributes.position.needsUpdate = true; g.computeVertexNormals(); g.computeBoundingSphere(); }
+function setInflation(b, f) { b.inf = clamp(f, 0, 1); b.infShown = b.inf; setWrinkle(b.mesh.geometry, b.sh, b.inf, b.L); }
 function setBabyLen(g, L) { babyPositions(L, (L - K.Lfold) / (K.Ldep - K.Lfold), g.attributes.position.array); g.attributes.position.needsUpdate = true; g.computeVertexNormals(); g.computeBoundingSphere(); }
 /* vertex clustering: snap to a grid, merge, drop collapsed triangles. Keeps a dozen mothers light enough to run in a browser without a GPU. */
 function decimate(geo, cell) {
@@ -378,6 +408,7 @@ function portsOf(b) {
   const o = {}; for (let i = 0; i < 2; i++) { const a = (90 + 180 * i) * D2R; o["p" + i] = { x: 0.376 * Math.cos(a), y: 0.376 * Math.sin(a), n: a, z: 0.145 }; } return o;
 }
 const CIRC = { hull: [[0.02, 0, 0.37]], tail: [[-0.18, 0, 0.235], [-0.45, 0, 0.2]], baby: [[-0.1, 0, 0.1], [0.1, 0, 0.1]], charger: [[0, 0, 0.39]] };
+function giveShape(b, genome, inf) { b.sh = shapeOf(genome); b.L = b.sh.L; b.cap.position.x = -b.L / 2 + 0.035; setInflation(b, inf); }
 function newGenome() { return Array.from({ length: 5 }, () => rnd()); }
 function makeBody(kind, x, y, th) {
   const b = { kind, x, y, th, v: 0, w: 0, parent: null, rel: null, docks: {}, reserved: {}, children: [], alive: true, dead: 0, cluster: false, energy: 1, age: 0, task: null, hold: 0, ph: rnd() * TAU, near: new Map(), relN: 0, wander: null, think: rnd() };
@@ -396,8 +427,9 @@ function makeBody(kind, x, y, th) {
     b.boomMesh = { visible: true };   // the boom stays inside the opaque tail until a print; the print rig draws a moving boom
     b.name = "T" + nextT++;
   } else if (kind === "baby") {
-    b.bl.position.y = 0.055; b.L = K.Ldep;
-    b.fillMat = bodyMat("silicone", { fill: true, flat: true, side: THREE.DoubleSide, vc: true }); b.mesh = add(G.babyDep, b.fillMat, 3);
+    b.bl.position.y = 0.055; b.sh = shapeOf(newGenome()); b.L = b.sh.L; b.inf = 0; b.infShown = 0;
+    b.fillMat = bodyMat("silicone", { flat: true, side: THREE.DoubleSide }); b.mesh = add(wrinkleGeometry(b.sh, 0, b.L), b.fillMat, 3);
+    b.cap = add(G.capsule, bodyMat("clay", { vc: true }), 3); b.cap.position.x = -b.L / 2 + 0.035;
     b.name = "B" + nextB++;
   } else {
     add(G.charger, bodyMat("clay", { vc: true })); const lamp = add(G.lamp, new THREE.MeshBasicMaterial({ color: 0xf2d9b0 })); lamp.position.z = 0.62; b.mats.pop();
@@ -432,7 +464,7 @@ function detach(A, silent) {
   B.children = B.children.filter((c) => c !== A); delete B.docks[A.theirPort]; delete A.docks[A.myPort];
   const g = B.glow[A.theirPort]; if (g) { g.flash = silent ? 0 : 0.5; g.level = 0; }
   const n = portWorld(B, A.theirPort);
-  A.parent = null; A.rel = null; A.backoff = { nx: Math.cos(n.n), ny: Math.sin(n.n), d: 0, max: A.kind === "baby" ? 0.35 : 0.5 };
+  A.parent = null; A.rel = null; A.backoff = { nx: Math.cos(n.n), ny: Math.sin(n.n), d: 0, max: 0.5 };
   A.task = null;
 }
 function glowAt(B, key, level) {
@@ -497,7 +529,7 @@ const VMAX = { hull: 0.12, tail: 0.11, baby: 0.06 };
 function runDock(A, dt) {
   const T = A.task, B = T.B;
   if (!B.alive || (rootOf(B) === A)) { cancelTask(A); return; }
-  const P = dockPose(A, T.pa, B, T.pb), stand = A.kind === "baby" ? 0.35 : 0.55;
+  const P = dockPose(A, T.pa, B, T.pb), stand = 0.55;
   const sx = P.x + P.nx * stand, sy = P.y + P.ny * stand;
   T.t += dt;
   if (T.phase === "go") { const d = moveToward(A, sx, sy, VMAX[A.kind], dt, P.th); if (d < 0.05) T.phase = "turn"; if (T.t > 160) cancelTask(A); }
@@ -519,7 +551,7 @@ const TP = { open: 3, armIn: 5, print: 22, armOut: 3, carry: 4, out: 12, release
 const TP_END = Object.values(TP).reduce((a, b) => a + b, 0);
 function startPrint(h) {
   const t = tailOf(h); if (!t) return;
-  const kid = inherit(h);
+  const kid = inherit(h); kid.sh = shapeOf(kid.genome);
   h.print = { t: 0, tail: t, kid, rig: makeRig(h.bl), q: PASS_Q.slice(), phi: 0 };
   t.boomMesh.visible = false;
   // folded baby standing on the bed, nose down, valve on top; revealed layer by layer
@@ -584,7 +616,9 @@ function stepPrint(h, dt) {
   else if (t < tRel) {
     // valve held on the needle: horizontal, valve end toward the opening, growing in length while carried out
     const uc = clamp((t - tCarry) / TP.carry, 0, 1), uo = clamp((t - tOut) / TP.out, 0, 1);
-    const L = lerp(K.Lfold, K.Ldep, ss(uo)); if (Math.abs(L - pb.L) > 0.0005) { setBabyLen(pb.g, L); pb.L = L; }
+    // the folded print unfolds to full length while the arm draws it to the opening; it stays limp and wrinkled
+    if (!pb.wr) { pb.wr = true; pb.g.dispose(); pb.g = wrinkleGeometry(P.kid.sh, 0, K.Lfold); pb.m.geometry = pb.g; }
+    const L = lerp(K.Lfold, P.kid.sh.L, ss(uc)); if (Math.abs(L - pb.L) > 0.0005) { setWrinkle(pb.g, P.kid.sh, 0, L); pb.L = L; }
     const rotY = lerp(PI / 2, 0, ss(uc));   // from nose down to valve end facing -x
     pb.grp.rotation.set(0, rotY, 0);
     const c = Math.cos(rotY), sn = Math.sin(rotY);   // local x after rotY about y: (c, 0, -sn)
@@ -603,10 +637,11 @@ function releaseBaby(h) {
   const dirW = new THREE.Vector3(1, 0, 0).transformDirection(pb.grp.matrixWorld);
   h.bl.remove(pb.grp); pb.g.dispose();
   const b = makeBody("baby", wp.x, -wp.z, Math.atan2(-dirW.z, dirW.x));
+  b.sh = P.kid.sh; b.L = b.sh.L; b.cap.position.x = -b.L / 2 + 0.035; setInflation(b, 0);
   Object.assign(b, { genome: P.kid.genome, memory: P.kid.memory, gen: h.gen + 1, mom: h, momName: h.name, energy: 0.45, raisedBy: [], sink: 0.09, drop: 1, life: 900 });
   b.task = { type: "drift", t: 0, side: rnd() < 0.5 ? 1 : -1 };
   h.babies++; h.lastBirth = simT;
-  event(`${b.name} is born to ${h.name}, ${Math.round(K.Ldep * 1000)} mm long`);
+  event(`${b.name} is born to ${h.name}, limp and wrinkled, waiting for air`);
 }
 function endPrint(h) {
   const P = h.print; if (!P) return;
@@ -649,6 +684,7 @@ function step(dt) {
     if (b.task.purpose === "charge") { const rate = B.kind === "charger" ? 0.035 : 0.022; b.energy = Math.min(1, b.energy + rate * dt); if (B.kind === "hull") B.energy -= rate * dt * 0.8; if (b.energy >= 0.96 || (B.kind === "hull" && B.energy < 0.45)) { detach(b); event(`${b.name} undocks from ${B.kind === "charger" ? "the buoy" : B.name}, charged`); } }
     else if (b.task.purpose === "raise") {
       b.energy = Math.min(1, b.energy + 0.02 * dt); B.energy -= 0.005 * dt;
+      b.inf = Math.min(1, b.inf + 0.011 * dt); if (b.inf - b.infShown > 0.015 || (b.inf >= 1 && b.infShown < 1)) setInflation(b, b.inf);
       if ((b.task.mem = (b.task.mem || 0) + dt) > 7) { b.task.mem = 0; const src = B.memory[Math.floor(rnd() * B.memory.length)]; if (src) { const ex = b.memory.find((m) => m.t === src.t); if (ex) ex.w = Math.min(1, ex.w + 0.1); else if (b.memory.length < 9) b.memory.push({ t: src.t, w: 0.35, src: B.name }); } }
       if (b.task.t > 28 + 10 * b.genome[1] || b.energy > 0.98 || B.print) { detach(b); event(`${b.name} undocks from ${B.name}, the turn ends`); }
     }
@@ -666,15 +702,14 @@ function step(dt) {
 function canAct(b) { return !b.parent && !b.backoff && !b.hold; }
 function wander(b, dt, v) {
   if (!b.wander || Math.hypot(b.wander[0] - b.x, b.wander[1] - b.y) < 0.4 || rnd() < dt * 0.01) b.wander = [lerp(POND.x0 + 1.2, POND.x1 - 1.2, rnd()), lerp(POND.y0 + 1, POND.y1 - 1, rnd())];
-  if (Math.hypot(b.wander[0] - CLUSTER.x, b.wander[1] - CLUSTER.y) < 2.2) b.wander = null; else moveToward(b, b.wander[0], b.wander[1], v, dt);
+  moveToward(b, b.wander[0], b.wander[1], v, dt);
 }
 function stepMother(h, dt) {
   const t = tailOf(h);
   h.energy -= dt * (t ? 0.0022 : 0.0016);
   if (h.print) { stepPrint(h, dt); }
   if (h.print) h.energy = Math.max(0.02, h.energy);
-  if (h.energy <= 0) { die(h, "out of energy"); return; }
-  if (h.age > h.life && !h.print) { die(h, "old"); return; }
+  if (h.energy < 0.03) h.energy = 0.03;      // nobody dies: a mother that runs low drifts slowly until it finds a charge
   if ((h.think -= dt) < 0) {
     h.think = 1;
     h.relN = mothers().filter((o) => o !== h && Math.hypot(o.x - h.x, o.y - h.y) < 6 && relation(h, o) > 0.42).length;
@@ -684,7 +719,7 @@ function stepMother(h, dt) {
   if (busy) { h.v *= 0.9; return; }
   if (h.task && h.task.type === "dock") { runDock(h, dt); return; }
   if (h.backoff) return;
-  if (h.energy < 0.3 && rnd() < dt * 0.5) { seekCharge(h); if (h.task) return; }
+  if (h.energy < 0.3 && rnd() < dt * (h.energy < 0.1 ? 3 : 0.5)) { seekCharge(h); if (h.task) return; }
   const printing = mothers().filter((m) => m.print).length, babies = bodies.filter((b) => b.kind === "baby" && b.alive).length;
   if (t && h.energy > 0.7 && h.relN >= P.rel && printing < PRINT_CAP && babies < BABY_CAP && (!h.lastBirth || simT - h.lastBirth > 120) && h.children.filter((c) => c.kind === "baby").length === 0 && rnd() < dt * 0.012) { startPrint(h); return; }
   wander(h, dt, t ? 0.09 : 0.05);
@@ -714,13 +749,13 @@ function stepTail(t, dt) {
 function stepBaby(b, dt) {
   b.energy -= dt * 0.004;
   if (b.drop) { b.drop = Math.max(0, b.drop - dt * 0.6); b.sink = 0.09 * b.drop * b.drop; }
-  if (b.energy <= 0) { die(b, "no adult reached in time"); return; }
+  if (b.energy < 0.05) b.energy = 0.05;      // a baby waits, limp, until an adult takes a turn
   if (b.task && b.task.type === "drift") { b.task.t += dt; const nx = -Math.sin(b.th) * b.task.side, ny = Math.cos(b.th) * b.task.side; b.x += nx * 0.09 * dt; b.y += ny * 0.09 * dt; if (b.task.t > 7) b.task = null; return; }
   if (b.parent) return;
   if (b.task && b.task.type === "dock") { runDock(b, dt); return; }
   if (b.task && b.task.type === "leave") { const d = moveToward(b, b.task.x, b.task.y, 0.08, dt); if (d < 0.3) b.gone = true; return; }
   if (b.backoff) return;
-  if (b.age > 300 && b.energy > 0.5) { const e = edgePoint(b); b.task = { type: "leave", x: e[0], y: e[1] }; event(`${b.name} is grown and leaves the pond`); return; }
+  if (b.inf >= 1) { const e = edgePoint(b); b.task = { type: "leave", x: e[0], y: e[1] }; event(`${b.name} is full of air and leaves the pond`); return; }
   if (b.energy < 0.7 && (b.think -= dt) < 0) {
     b.think = 1.5;
     const last = b.raisedBy[b.raisedBy.length - 1];
@@ -747,7 +782,8 @@ function stepDead(b, dt) {
 }
 function worldCircles(b) {
   const c = Math.cos(b.th), s = Math.sin(b.th);
-  return CIRC[b.kind].map(([x, y, r]) => { const xx = b.kind === "baby" ? x * b.L / K.Ldep * 1.8 : x; return [b.x + c * xx - s * y, b.y + s * xx + c * y, r]; });
+  if (b.kind === "baby") return [-0.3, 0, 0.3].map((x) => { const xx = x * b.L; return [b.x + c * xx, b.y + s * xx, b.sh.R * 0.95]; });
+  return CIRC[b.kind].map(([x, y, r]) => [b.x + c * x - s * y, b.y + s * x + c * y, r]);
 }
 function circlesTouch(a, b, m) { for (const p of worldCircles(a)) for (const q of worldCircles(b)) if (Math.hypot(p[0] - q[0], p[1] - q[1]) < p[2] + q[2] + m) return true; return false; }
 function collide() {
@@ -779,9 +815,6 @@ function manage(dt) {
     const pool = ms.length ? ms[Math.floor(rnd() * ms.length)] : null; if (pool) h.memory = inherit(pool).memory.concat([{ t: SEED[Math.floor(rnd() * 5)], w: 0.6, src: "seed" }]);
     h.energy = 0.6; event(`A new hull, ${h.name}, swims in`);
   }
-  // the cluster grows slowly; the oldest shells fade out past 48
-  const shells = bodies.filter((b) => b.cluster);
-  if (shells.length > 48) { const o = shells[0]; o.gone = true; }
 }
 
 /* ---------------- setup ---------------- */
@@ -793,12 +826,9 @@ function setup() {
   const ft = makeBody("tail", 1.4, -2.9, 2.6); ft.energy = 0;
   // a charge early: one mother is low
   bodies.find((b) => b.kind === "hull").energy = 0.26;
-  // the cluster begins with the first shells
-  for (let i = 0; i < 3; i++) { const h = makeMother(CLUSTER.x + (i - 1) * 0.8, CLUSTER.y + (i % 2) * 0.6, rnd() * TAU, i < 1); h.alive = false; h.dead = 10; h.cluster = true; for (const c of h.children.slice()) { detach(c, true); c.alive = false; c.dead = 10; c.cluster = true; c.x = h.x - 0.9; c.y = h.y - 0.5; c.backoff = null; } }
-  for (const b of bodies) if (!b.alive) setDead(b.mats, 1);
   // a few babies already in the water
   const ms = mothers().filter((h) => tailOf(h));
-  for (let i = 0; i < 6; i++) { const m = ms[i % ms.length]; const b = makeBody("baby", m.x + 1.2 * Math.cos(i), m.y + 1.2 * Math.sin(i), rnd() * TAU); Object.assign(b, { ...inherit(m), gen: 1, mom: m, momName: m.name, energy: 0.5 + 0.2 * rnd(), raisedBy: [], age: 40 + 100 * rnd(), life: 900 }); m.babies++; }
+  for (let i = 0; i < 6; i++) { const m = ms[i % ms.length]; const b = makeBody("baby", m.x + 1.2 * Math.cos(i), m.y + 1.2 * Math.sin(i), rnd() * TAU); const kid = inherit(m); giveShape(b, kid.genome, 0.5 * rnd()); Object.assign(b, { ...kid, gen: 1, mom: m, momName: m.name, energy: 0.5 + 0.2 * rnd(), raisedBy: [], age: 40 + 100 * rnd(), life: 900 }); m.babies++; }
   updatePoses();
   event("The pond starts: twelve hulls, twelve tails, six babies");
 }
@@ -815,7 +845,7 @@ function pick(cx, cy) {
 function stateOf(b) {
   if (!b.alive) return b.cluster ? "a clear shell in the cluster" : "dead, drifting to the cluster";
   if (b.kind === "charger") return "fixed, charging up to two mothers";
-  if (b.print) { const t = b.print.t; return t < TP.open + TP.armIn ? "the arm rides in through the opening" : t < TP.open + TP.armIn + TP.print ? `printing, layer ${Math.round(((t - TP.open - TP.armIn) / TP.print) * 36)} of 36` : t < TP_END - TP.close ? "bringing the baby out, inflating" : "the tail docks back"; }
+  if (b.print) { const t = b.print.t; return t < TP.open + TP.armIn ? "the arm rides in through the opening" : t < TP.open + TP.armIn + TP.print ? `printing, layer ${Math.round(((t - TP.open - TP.armIn) / TP.print) * 36)} of 36` : t < TP_END - TP.close ? "bringing the baby out, unfolding" : "the tail docks back"; }
   const tk = b.task;
   if (tk && tk.type === "dock") return tk.phase === "go" ? `swimming to ${tk.B.kind === "charger" ? "a buoy" : tk.B.name} to dock` : tk.phase === "turn" ? `lining up with ${tk.B.kind === "charger" ? "a buoy" : tk.B.name}` : "closing in, magnets off";
   if (tk && tk.type === "docked") return tk.purpose === "charge" ? "charging" : tk.purpose === "raise" ? "being raised" : "docked";
@@ -832,7 +862,7 @@ function renderFollow() {
   const dockedTo = [b.parent ? `${b.parent.kind === "charger" ? "buoy" : b.parent.name} (${b.myPort === "front" ? "tail to hull" : b.task && b.task.purpose ? b.task.purpose : "port"})` : null, ...b.children.map((c) => c.name)].filter(Boolean);
   let h = `<h3>${esc(b.kind === "charger" ? "Charging buoy" : b.name)}</h3><dl><dt>kind</dt><dd>${kind}</dd><dt>now</dt><dd>${esc(stateOf(b))}</dd>`;
   if (b.kind === "hull" || b.kind === "baby") h += `<dt>mother</dt><dd>${b.momName || (b.mom && b.mom.name) || "first generation"}</dd><dt>age</dt><dd>${fmtT(b.age)}</dd>`;
-  if (b.kind === "baby") h += `<dt>length</dt><dd>${Math.round(b.L * 1000)} mm, D ${Math.round(K.Rb * 2000)} mm</dd><dt>raised by</dt><dd>${esc(b.raisedBy.join(", ") || "nobody yet")}</dd>`;
+  if (b.kind === "baby") h += `<dt>length</dt><dd>${Math.round(b.L * 1000)} mm, D ${Math.round(b.sh.R * 2000)} mm</dd><dt>air</dt><dd>${Math.round(b.inf * 100)}%${b.inf < 0.05 ? ", limp, waiting" : ""}</dd><dt>raised by</dt><dd>${esc(b.raisedBy.join(", ") || "nobody yet")}</dd>`;
   if (b.kind === "hull") { const t = tailOf(b); h += `<dt>tail</dt><dd>${t ? t.name : "none"}</dd><dt>relations</dt><dd>${b.relN}</dd><dt>babies</dt><dd>${b.babies}</dd>`; }
   if (b.kind === "hull" && b.print && b.print.baby) h += `<dt>baby length</dt><dd>${Math.round(b.print.baby.L * 1000)} mm</dd>`;
   h += `<dt>docked to</dt><dd>${esc(dockedTo.join(", ") || "nothing")}</dd></dl>`;
@@ -849,7 +879,6 @@ function frame(now) {
   // visuals tied to state: tail fill, mother fill
   for (const b of bodies) {
     if (b.kind === "tail") { const h = b.parent && b.parent.kind === "hull" ? b.parent : null; const e = h ? h.energy : 0.15; b.fillMat.userData.u.uFillZ.value = lerp(-0.283, 0.2, clamp(e, 0, 1)); b.fillMat.userData.u.uFillOn.value = b.alive ? 1 : 0; }
-    if (b.kind === "baby") { b.fillMat.userData.u.uFillZ.value = lerp(-0.105, 0.105, clamp(b.energy, 0, 1)); b.fillMat.userData.u.uFillOn.value = b.alive ? 1 : 0; }
   }
   if (FOLLOW && FOLLOW.gone) unfollow();
   if (CAMFLY) {
@@ -865,7 +894,7 @@ function frame(now) {
   controls.update();
   renderer.render(scene, camera);
   fpsN++; fpsT += dtR; if (fpsT > 1) { FPS = fpsN / fpsT; fpsN = 0; fpsT = 0; }
-  if ((uiT += dtR) > 0.25) { uiT = 0; renderFollow(); const ms = mothers(), bs = bodies.filter((b) => b.kind === "baby" && b.alive).length, sh = bodies.filter((b) => !b.alive).length; $("#hud").textContent = `${fmtT(simT)} · mothers ${ms.length} · babies ${bs} · printing ${ms.filter((m) => m.print).length} · shells ${sh}`; }
+  if ((uiT += dtR) > 0.25) { uiT = 0; renderFollow(); const ms = mothers(), bs = bodies.filter((b) => b.kind === "baby" && b.alive).length;  $("#hud").textContent = `${fmtT(simT)} · mothers ${ms.length} · babies ${bs} · printing ${ms.filter((m) => m.print).length}`; }
   requestAnimationFrame(frame);
 }
 
