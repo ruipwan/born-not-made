@@ -1,0 +1,11 @@
+.engineering-references {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));
+  gap:28px 20px; padding:0; margin:20px 0; list-style:none;
+}
+.engineering-references li {display:flex; flex-direction:column; gap:8px; min-width:0; margin:0;}
+.engineering-references .eng-image {display:grid; place-items:center; aspect-ratio:4/3; border:1px solid #4e5558; border-radius:10px; overflow:hidden; background:#e7e9e6;}
+.engineering-references .eng-image img {width:100%; height:100%; min-height:0; object-fit:contain;}
+.engineering-references .eng-title {font:500 15px/1.4 var(--sans,system-ui); overflow-wrap:anywhere;}
+.engineering-references .eng-credit {font:12px/1.4 var(--sans,system-ui); color:#b7c3c8;}
+.engineering-references.engineering-compact {grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr)); gap:16px; padding:0; margin:14px 0 0;}
+.engineering-compact .eng-image {aspect-ratio:1.9;}

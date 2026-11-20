@@ -39,3 +39,6 @@
 .org-doc .ref-credit { display: block; margin-top: .25rem; font-size: .84em; line-height: 1.4; }
 .org-doc .ref-credit a { color: var(--muted); }
 .org-doc .ref-thumb:focus-visible { outline: 2px solid var(--gel); outline-offset: 3px; }
+.org-doc .block:has(.ref-entry) { grid-template-columns:minmax(0,1fr); row-gap:1.25rem; }
+.org-doc .refs .ref-text { color:var(--ink); font-size:1rem; line-height:1.5; }
+.org-doc .refs .ref-credit, .org-doc .refs .ref-credit a { color:#bcb9b2; }

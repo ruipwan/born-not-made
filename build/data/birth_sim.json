@@ -7,7 +7,8 @@
    "time_s": null,
    "peak_force_N": 0.0,
    "peak_strain": 0.529,
-   "notes": "does not pass: pulses cannot start a birth. Pressed 2 mm into the cone, the soft cone springs the nose back off; with no sealing contact the womb pressure acts all round the baby (zero net push), balloons the closed sleeve and squeezes the baby up to 1.7 kPa, past the bulging limit of the bellows near 1.5 kPa. Womb peak 1.00 kPa; baby peak 1.67 kPa; peak womb push on the seal 0.0 N, sleeve resistance -0.0 N; strain baby 30 % (break 663 %), sleeve 53 % (break 900 %); belly rise 63 mm max"
+   "notes": "does not pass: pulses cannot start a birth. Pressed 2 mm into the cone, the soft cone springs the nose back off; with no sealing contact the womb pressure acts all round the baby (zero net push), balloons the closed sleeve and squeezes the baby up to 1.7 kPa, past the bulging limit of the bellows near 1.5 kPa. Womb peak 1.00 kPa; baby peak 1.67 kPa; peak womb push on the seal 0.0 N, sleeve resistance -0.0 N; strain baby 30 % (break 663 %), sleeve 53 % (break 900 %); belly rise 63 mm max",
+   "exit_result": "no_exit"
   },
   {
    "name": "(b) own growth, tail on the heel stop, sleeve r 90 (task)",
@@ -16,7 +17,8 @@
    "time_s": null,
    "peak_force_N": 10.6,
    "peak_strain": 0.322,
-   "notes": "does not pass: growth lifts the nose 74 mm up the chute (at the ring plate after 87 s, baby at 0.34 kPa), seals the nose in the sleeve, then the strap ring stops growth with the nose dome at s +163 mm, short of the exit; tail stays on the heel. Womb peak 0.13 kPa; baby peak 1.00 kPa; peak heel reaction 10.6 N; strain baby 32 % (break 663 %), sleeve 6 % (break 900 %); belly rise 50 mm max"
+   "notes": "does not pass: growth lifts the nose 74 mm up the chute (at the ring plate after 87 s, baby at 0.34 kPa), seals the nose in the sleeve, then the strap ring stops growth with the nose dome at s +163 mm, short of the exit; tail stays on the heel. Womb peak 0.13 kPa; baby peak 1.00 kPa; peak heel reaction 10.6 N; strain baby 32 % (break 663 %), sleeve 6 % (break 900 %); belly rise 50 mm max",
+   "exit_result": "no_exit"
   },
   {
    "name": "(c) growth, then womb pulses, sleeve r 90 (task)",
@@ -25,7 +27,8 @@
    "time_s": 483.0,
    "peak_force_N": 16.4,
    "peak_strain": 0.437,
-   "notes": "solver stopped at 307 s (sleeve end folding over a crest) with the tail at -203 mm, still advancing 58 mm in the last 30 s; exit time 483 s is extrapolated. Womb peak 0.54 kPa, slips start at up to 0.53 kPa; baby peak 1.30 kPa; peak womb push on the seal 16.4 N, sleeve resistance 20.2 N; strain baby 44 % (break 663 %), sleeve 25 % (break 900 %); belly rise 62 mm max"
+   "notes": "solver stopped at 307 s (sleeve end folding over a crest) with the tail at -203 mm, still advancing 58 mm in the last 30 s; exit time 483 s is extrapolated. Womb peak 0.54 kPa, slips start at up to 0.53 kPa; baby peak 1.30 kPa; peak womb push on the seal 16.4 N, sleeve resistance 20.2 N; strain baby 44 % (break 663 %), sleeve 25 % (break 900 %); belly rise 62 mm max",
+   "exit_result": "extrapolated"
   },
   {
    "name": "(d) growth, then womb pulses with an everting liner (Y 0.2 kPa), sleeve r 90 (task)",
@@ -34,7 +37,8 @@
    "time_s": 464.0,
    "peak_force_N": 8.5,
    "peak_strain": 0.397,
-   "notes": "solver stopped at 284 s (sleeve end folding over a crest) with the tail at -232 mm, still advancing 61 mm in the last 30 s; exit time 464 s is extrapolated. Womb peak 0.48 kPa, slips start at up to 0.48 kPa; baby peak 1.25 kPa; peak womb push on the seal 8.5 N, sleeve resistance 475.9 N; strain baby 40 % (break 663 %), sleeve 21 % (break 900 %); belly rise 62 mm max"
+   "notes": "solver stopped at 284 s (sleeve end folding over a crest) with the tail at -232 mm, still advancing 61 mm in the last 30 s; exit time 464 s is extrapolated. Womb peak 0.48 kPa, slips start at up to 0.48 kPa; baby peak 1.25 kPa; peak womb push on the seal 8.5 N, sleeve resistance 475.9 N; strain baby 40 % (break 663 %), sleeve 21 % (break 900 %); belly rise 62 mm max",
+   "exit_result": "extrapolated"
   },
   {
    "name": "(a) womb pulses only, sleeve r 80 (tighter)",
@@ -43,7 +47,8 @@
    "time_s": null,
    "peak_force_N": 0.0,
    "peak_strain": 0.524,
-   "notes": "does not pass: pulses cannot start a birth. Pressed 2 mm into the cone, the soft cone springs the nose back off; with no sealing contact the womb pressure acts all round the baby (zero net push), balloons the closed sleeve and squeezes the baby up to 1.7 kPa, past the bulging limit of the bellows near 1.5 kPa. Womb peak 1.00 kPa; baby peak 1.67 kPa; peak womb push on the seal 0.0 N, sleeve resistance -0.0 N; strain baby 30 % (break 663 %), sleeve 52 % (break 900 %); belly rise 63 mm max"
+   "notes": "does not pass: pulses cannot start a birth. Pressed 2 mm into the cone, the soft cone springs the nose back off; with no sealing contact the womb pressure acts all round the baby (zero net push), balloons the closed sleeve and squeezes the baby up to 1.7 kPa, past the bulging limit of the bellows near 1.5 kPa. Womb peak 1.00 kPa; baby peak 1.67 kPa; peak womb push on the seal 0.0 N, sleeve resistance -0.0 N; strain baby 30 % (break 663 %), sleeve 52 % (break 900 %); belly rise 63 mm max",
+   "exit_result": "no_exit"
   },
   {
    "name": "(b) own growth, tail on the heel stop, sleeve r 80 (tighter)",
@@ -52,7 +57,8 @@
    "time_s": null,
    "peak_force_N": 16.1,
    "peak_strain": 0.306,
-   "notes": "does not pass: growth lifts the nose 74 mm up the chute (at the ring plate after 87 s, baby at 0.34 kPa), seals the nose in the sleeve, then the strap ring stops growth with the nose dome at s +161 mm, short of the exit; tail stays on the heel. Womb peak 0.13 kPa; baby peak 1.00 kPa; peak heel reaction 16.1 N; strain baby 31 % (break 663 %), sleeve 15 % (break 900 %); belly rise 51 mm max"
+   "notes": "does not pass: growth lifts the nose 74 mm up the chute (at the ring plate after 87 s, baby at 0.34 kPa), seals the nose in the sleeve, then the strap ring stops growth with the nose dome at s +161 mm, short of the exit; tail stays on the heel. Womb peak 0.13 kPa; baby peak 1.00 kPa; peak heel reaction 16.1 N; strain baby 31 % (break 663 %), sleeve 15 % (break 900 %); belly rise 51 mm max",
+   "exit_result": "no_exit"
   },
   {
    "name": "(c) growth, then womb pulses, sleeve r 80 (tighter)",
@@ -61,7 +67,8 @@
    "time_s": 417.0,
    "peak_force_N": 22.1,
    "peak_strain": 0.484,
-   "notes": "born at 417 s. Womb peak 0.72 kPa, slips start at up to 0.73 kPa; baby peak 1.37 kPa; peak womb push on the seal 22.1 N, sleeve resistance 11.4 N; strain baby 48 % (break 663 %), sleeve 34 % (break 900 %); belly rise 62 mm max"
+   "notes": "born at 417 s. Womb peak 0.72 kPa, slips start at up to 0.73 kPa; baby peak 1.37 kPa; peak womb push on the seal 22.1 N, sleeve resistance 11.4 N; strain baby 48 % (break 663 %), sleeve 34 % (break 900 %); belly rise 62 mm max",
+   "exit_result": "completed"
   },
   {
    "name": "(d) growth, then womb pulses with an everting liner (Y 0.2 kPa), sleeve r 80 (tighter)",
@@ -70,7 +77,8 @@
    "time_s": 415.0,
    "peak_force_N": 13.4,
    "peak_strain": 0.449,
-   "notes": "born at 415 s. Womb peak 0.64 kPa, slips start at up to 0.65 kPa; baby peak 1.30 kPa; peak womb push on the seal 13.4 N, sleeve resistance 7.9 N; strain baby 45 % (break 663 %), sleeve 30 % (break 900 %); belly rise 62 mm max"
+   "notes": "born at 415 s. Womb peak 0.64 kPa, slips start at up to 0.65 kPa; baby peak 1.30 kPa; peak womb push on the seal 13.4 N, sleeve resistance 7.9 N; strain baby 45 % (break 663 %), sleeve 30 % (break 900 %); belly rise 62 mm max",
+   "exit_result": "completed"
   },
   {
    "name": "(c) sleeve r 85",
@@ -79,7 +87,8 @@
    "time_s": 417.0,
    "peak_force_N": 18.4,
    "peak_strain": 0.468,
-   "notes": "solver stopped at 297 s (sleeve end folding over a crest) with the tail at -196 mm, still advancing 83 mm in the last 30 s; exit time 417 s is extrapolated. Womb peak 0.61 kPa, slips start at up to 0.61 kPa; baby peak 1.30 kPa; peak womb push on the seal 18.4 N, sleeve resistance 8.2 N; strain baby 47 % (break 663 %), sleeve 30 % (break 900 %); belly rise 62 mm max"
+   "notes": "solver stopped at 297 s (sleeve end folding over a crest) with the tail at -196 mm, still advancing 83 mm in the last 30 s; exit time 417 s is extrapolated. Womb peak 0.61 kPa, slips start at up to 0.61 kPa; baby peak 1.30 kPa; peak womb push on the seal 18.4 N, sleeve resistance 8.2 N; strain baby 47 % (break 663 %), sleeve 30 % (break 900 %); belly rise 62 mm max",
+   "exit_result": "extrapolated"
   },
   {
    "name": "(c) sleeve r 80, softer Ecoflex 00-10",
@@ -88,7 +97,8 @@
    "time_s": 416.0,
    "peak_force_N": 19.0,
    "peak_strain": 0.462,
-   "notes": "born at 416 s. Womb peak 0.64 kPa, slips start at up to 0.64 kPa; baby peak 1.32 kPa; peak womb push on the seal 19.0 N, sleeve resistance 10.4 N; strain baby 46 % (break 663 %), sleeve 39 % (break 900 %); belly rise 62 mm max"
+   "notes": "born at 416 s. Womb peak 0.64 kPa, slips start at up to 0.64 kPa; baby peak 1.32 kPa; peak womb push on the seal 19.0 N, sleeve resistance 10.4 N; strain baby 46 % (break 663 %), sleeve 39 % (break 900 %); belly rise 62 mm max",
+   "exit_result": "completed"
   },
   {
    "name": "(c) sleeve r 80, 2 mm wall",
@@ -97,7 +107,8 @@
    "time_s": 445.0,
    "peak_force_N": 18.7,
    "peak_strain": 0.452,
-   "notes": "solver stopped at 340 s (sleeve end folding over a crest) with the tail at -119 mm, still advancing 72 mm in the last 30 s; exit time 445 s is extrapolated. Womb peak 0.60 kPa, slips start at up to 0.60 kPa; baby peak 1.30 kPa; peak womb push on the seal 18.7 N, sleeve resistance 7.0 N; strain baby 45 % (break 663 %), sleeve 44 % (break 900 %); belly rise 62 mm max"
+   "notes": "solver stopped at 340 s (sleeve end folding over a crest) with the tail at -119 mm, still advancing 72 mm in the last 30 s; exit time 445 s is extrapolated. Womb peak 0.60 kPa, slips start at up to 0.60 kPa; baby peak 1.30 kPa; peak womb push on the seal 18.7 N, sleeve resistance 7.0 N; strain baby 45 % (break 663 %), sleeve 44 % (break 900 %); belly rise 62 mm max",
+   "exit_result": "extrapolated"
   },
   {
    "name": "(c) sleeve r 80, lubricated (mu 0.2)",
@@ -106,7 +117,8 @@
    "time_s": 426.0,
    "peak_force_N": 15.7,
    "peak_strain": 0.443,
-   "notes": "born at 426 s. Womb peak 0.53 kPa, slips start at up to 0.54 kPa; baby peak 1.22 kPa; peak womb push on the seal 15.7 N, sleeve resistance 8.8 N; strain baby 44 % (break 663 %), sleeve 28 % (break 900 %); belly rise 62 mm max"
+   "notes": "born at 426 s. Womb peak 0.53 kPa, slips start at up to 0.54 kPa; baby peak 1.22 kPa; peak womb push on the seal 15.7 N, sleeve resistance 8.8 N; strain baby 44 % (break 663 %), sleeve 28 % (break 900 %); belly rise 62 mm max",
+   "exit_result": "completed"
   }
  ],
  "sweep": {
