@@ -10,7 +10,7 @@ Live site: https://ruipwan.github.io/born-not-made/
 | Trunk | `index.html#trunk` | Why: soft robotics meets artificial life, under the umbrella of reproduction |
 | Branches | `index.html#branches` | Side readings: matrix, cyberfeminism, artificial womb, labour |
 | Build | `build/` | Parametric teardown: every part, spec, tolerance and source |
-| Simulator | `simulator/` | Blender style console: signal, G-code, print, inflate, birth |
+| Simulator | `simulator/` | Stage 3 console: dock under water, place the kit, print from G-code, push and inflate, swim. Data: `stage3.json`, `stage3_print.gcode` (from `bnm_design/stage3/physics.py`). Stage 2 kept in `simulator/old_/stage2/` |
 | Society | `society/` | Population model: relation, inheritance with drift, capacity |
 
 Everything is static HTML and JavaScript (three.js r147 from jsDelivr). No build step.

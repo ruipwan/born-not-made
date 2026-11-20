@@ -1,0 +1,749 @@
+{
+ "title": "Born, Not Made: stage 3, one encapsulated kit placed once and printed around",
+ "date": "2026-11-20",
+ "frame": {
+  "origin": "nose tip of the inflated baby",
+  "x": "toward the tail (axis)",
+  "y": "left",
+  "z": "up, belly at -z",
+  "units": "m",
+  "as_printed": "same axes; the baby lies in the gel with its axis horizontal, nose toward the opening, belly down; as printed x positions are given separately (stories folded to 10 mm)"
+ },
+ "baby": {
+  "length_deployed": 0.28,
+  "length_as_printed": 0.184,
+  "max_radius": 0.045,
+  "n_sides": 8,
+  "rings_deployed": [
+   [
+    0.025,
+    0.027
+   ],
+   [
+    0.051,
+    0.039
+   ],
+   [
+    0.077,
+    0.045
+   ],
+   [
+    0.089,
+    0.045
+   ],
+   [
+    0.139,
+    0.045
+   ],
+   [
+    0.151,
+    0.045
+   ],
+   [
+    0.177,
+    0.043
+   ],
+   [
+    0.203,
+    0.037
+   ],
+   [
+    0.229,
+    0.029
+   ],
+   [
+    0.255,
+    0.019
+   ]
+  ],
+  "rings_as_printed": [
+   [
+    0.025,
+    0.027
+   ],
+   [
+    0.035,
+    0.039
+   ],
+   [
+    0.045,
+    0.045
+   ],
+   [
+    0.057,
+    0.045
+   ],
+   [
+    0.107,
+    0.045
+   ],
+   [
+    0.119,
+    0.045
+   ],
+   [
+    0.129,
+    0.043
+   ],
+   [
+    0.139,
+    0.037
+   ],
+   [
+    0.149,
+    0.029
+   ],
+   [
+    0.159,
+    0.019
+   ]
+  ],
+  "segments": [
+   "nose cap",
+   "front story 1",
+   "front story 2",
+   "soft collar 12 mm",
+   "kit saddle 50 mm",
+   "soft collar 12 mm",
+   "aft story 1",
+   "aft story 2",
+   "aft story 3",
+   "aft story 4",
+   "tail cap with needle septum"
+  ],
+  "story_chirality": "alternating (left, right) so the band and kit do not roll during inflation",
+  "working_pressure_Pa": 600,
+  "skin": "Dragon Skin 10 NV, 1.6 mm beads, caps and band 3 mm"
+ },
+ "kit": {
+  "mass_kg": 0.1075,
+  "envelope_m": [
+   0.05,
+   0.061,
+   0.058
+  ],
+  "cog_deployed_m": [
+   0.1142,
+   0.0,
+   -0.022
+  ],
+  "orientation": "pumps lowest, side by side along x; LiPo flat on top; C6 Drive on top of the LiPo, antenna up; IMU axes aligned with the body axes",
+  "parts": [
+   {
+    "id": "codecell",
+    "name": "Microbots CodeCell C6 Drive",
+    "qty": 1,
+    "mass_kg": 0.0037,
+    "mass_estimated": false,
+    "size_m": [
+     0.0225,
+     0.0185,
+     0.0094
+    ],
+    "power": "ESP32-C6, 2 H-bridges, about 750 mA each with both on; sleep about 40 uA",
+    "price_usd": 33.0,
+    "datasheet": "https://microbots.io/products/codecell-c6-drive",
+    "note": "",
+    "pos_deployed_m": [
+     0.108,
+     0.0,
+     0.004
+    ],
+    "pos_as_printed_m": [
+     0.076,
+     0.0,
+     0.004
+    ]
+   },
+   {
+    "id": "lipo",
+    "name": "Adafruit LiPo 3.7 V 500 mAh (PID 1578)",
+    "qty": 1,
+    "mass_kg": 0.0105,
+    "mass_estimated": false,
+    "size_m": [
+     0.036,
+     0.029,
+     0.00475
+    ],
+    "power": "1.9 Wh, protection circuit",
+    "price_usd": 7.95,
+    "datasheet": "https://www.adafruit.com/product/1578",
+    "note": "",
+    "pos_deployed_m": [
+     0.114,
+     0.0,
+     -0.0035
+    ],
+    "pos_as_printed_m": [
+     0.082,
+     0.0,
+     -0.0035
+    ]
+   },
+   {
+    "id": "pump_L",
+    "name": "DFRobot FIT0800 amphibious horizontal pump (left)",
+    "qty": 1,
+    "mass_kg": 0.018,
+    "mass_estimated": true,
+    "size_m": [
+     0.046,
+     0.0235,
+     0.0235
+    ],
+    "power": "DC 3 to 6 V, 130 to 220 mA, 80 to 100 L/h, head 25 to 45 cm, 5 mm ports",
+    "price_usd": 2.9,
+    "datasheet": "https://www.mouser.com/pdfDocs/Product_Overview_DFRobot_FIT0800.pdf",
+    "note": "mass and body size not in the overview; size taken from the same class Adafruit 4546 (46 x 23.5 mm); weigh it",
+    "pos_deployed_m": [
+     0.114,
+     0.013,
+     -0.0185
+    ],
+    "pos_as_printed_m": [
+     0.082,
+     0.013,
+     -0.0185
+    ]
+   },
+   {
+    "id": "pump_R",
+    "name": "DFRobot FIT0800 amphibious horizontal pump (right)",
+    "qty": 1,
+    "mass_kg": 0.018,
+    "mass_estimated": true,
+    "size_m": [
+     0.046,
+     0.0235,
+     0.0235
+    ],
+    "power": "as left",
+    "price_usd": 2.9,
+    "datasheet": "https://www.mouser.com/pdfDocs/Product_Overview_DFRobot_FIT0800.pdf",
+    "note": "",
+    "pos_deployed_m": [
+     0.114,
+     -0.013,
+     -0.0185
+    ],
+    "pos_as_printed_m": [
+     0.082,
+     -0.013,
+     -0.0185
+    ]
+   },
+   {
+    "id": "water_in_pumps",
+    "name": "Water held in pump chambers and tubes",
+    "qty": 1,
+    "mass_kg": 0.004,
+    "mass_estimated": true,
+    "size_m": null,
+    "power": "",
+    "price_usd": 0,
+    "datasheet": "",
+    "note": "",
+    "pos_deployed_m": [
+     0.114,
+     0.0,
+     -0.0185
+    ],
+    "pos_as_printed_m": [
+     0.082,
+     0.0,
+     -0.0185
+    ]
+   },
+   {
+    "id": "tubes",
+    "name": "Silicone tube stubs 5 mm ID (2 intake, 2 jet) and flex wiring",
+    "qty": 1,
+    "mass_kg": 0.004,
+    "mass_estimated": true,
+    "size_m": null,
+    "power": "",
+    "price_usd": 3,
+    "datasheet": "",
+    "note": "",
+    "pos_deployed_m": [
+     0.124,
+     0.0,
+     -0.03
+    ],
+    "pos_as_printed_m": [
+     0.092,
+     0.0,
+     -0.03
+    ]
+   },
+   {
+    "id": "encap",
+    "name": "Hand cast kit encapsulation, Dragon Skin 10 NV, saddle with lap lip",
+    "qty": 1,
+    "mass_kg": 0.0493,
+    "mass_estimated": false,
+    "size_m": null,
+    "power": "",
+    "price_usd": 4,
+    "datasheet": "https://www.smooth-on.com/products/dragon-skin-10-nv/",
+    "note": "",
+    "pos_deployed_m": [
+     0.114,
+     0.0,
+     -0.033
+    ],
+    "pos_as_printed_m": [
+     0.082,
+     0.0,
+     -0.033
+    ]
+   }
+  ],
+  "ports": {
+   "jet_L": [
+    0.135,
+    0.026,
+    -0.034
+   ],
+   "jet_R": [
+    0.135,
+    -0.026,
+    -0.034
+   ],
+   "intake_L": [
+    0.126,
+    0.01,
+    -0.043
+   ],
+   "intake_R": [
+    0.126,
+    -0.01,
+    -0.043
+   ]
+  },
+  "jet_direction": "aft, parallel to the axis, splayed 5 deg outward",
+  "intake_direction": "down through the saddle"
+ },
+ "placement": {
+  "tool": "fork with quarter turn bayonet latch on an STS3215 servo, beside the needle on the DexArm head",
+  "payload_check_kg": {
+   "head_estimate": 0.2,
+   "fork_and_servo": 0.065,
+   "kit": 0.108,
+   "dexarm_limit": 0.5
+  },
+  "seat": "three 4 mm feet on the saddle drop into three cups on the tray floor (kinematic seat)",
+  "events": [
+   {
+    "t_s": 0,
+    "event": "pick kit from the cradle (wet lip coat applied just before, if used)"
+   },
+   {
+    "t_s": 60,
+    "event": "lower through gel at 10 mm/s, seat feet in floor cups"
+   },
+   {
+    "t_s": 90,
+    "event": "servo quarter turn releases latch; fork withdraws at 2 mm/s"
+   },
+   {
+    "t_s": 120,
+    "event": "start bottom up print; first layers lay lap beads in the lip dovetail"
+   },
+   {
+    "t_s": 800,
+    "event": "lap zone done (lip top)"
+   },
+   {
+    "t_s": 4471,
+    "event": "print done"
+   },
+   {
+    "t_s": 8971,
+    "event": "cure done (75 min); needle into tail septum, inflate to 600 Pa while pushing out"
+   }
+  ]
+ },
+ "physics": {
+  "gel_cases": {
+   "0.0": {
+    "mass_kg": 0.283,
+    "G_m": [
+     0.1266,
+     -0.0,
+     -0.0088
+    ],
+    "freeboard_m": 0.0617,
+    "submerged_fraction": 0.238,
+    "trim_deg_nose_down_negative": 0.12,
+    "reserve_buoyancy": 4.2,
+    "GZ_deg_m": [
+     [
+      0.0,
+      -0.0
+     ],
+     [
+      10.0,
+      null
+     ],
+     [
+      20.0,
+      0.003
+     ],
+     [
+      30.0,
+      0.00439
+     ],
+     [
+      40.0,
+      0.00564
+     ],
+     [
+      50.0,
+      0.00672
+     ],
+     [
+      60.0,
+      0.0076
+     ],
+     [
+      70.0,
+      0.00824
+     ],
+     [
+      80.0,
+      0.00864
+     ],
+     [
+      90.0,
+      0.00877
+     ],
+     [
+      100.0,
+      0.00864
+     ],
+     [
+      110.0,
+      0.00824
+     ],
+     [
+      120.0,
+      0.0076
+     ],
+     [
+      130.0,
+      0.00672
+     ],
+     [
+      140.0,
+      0.00564
+     ],
+     [
+      150.0,
+      0.00439
+     ],
+     [
+      160.0,
+      0.003
+     ],
+     [
+      170.0,
+      0.00152
+     ],
+     [
+      180.0,
+      0.0
+     ]
+    ],
+    "depth_below_water_m": {
+     "intake_L": 0.0264,
+     "intake_R": 0.0264,
+     "jet_L": 0.0175,
+     "jet_R": 0.0175,
+     "antenna": -0.0256,
+     "top_of_band": -0.0616
+    }
+   },
+   "0.5": {
+    "mass_kg": 0.532,
+    "G_m": [
+     0.1207,
+     -0.0,
+     -0.0047
+    ],
+    "freeboard_m": 0.049,
+    "submerged_fraction": 0.448,
+    "trim_deg_nose_down_negative": -2.92,
+    "reserve_buoyancy": 2.23,
+    "GZ_deg_m": [
+     [
+      0.0,
+      -0.0
+     ],
+     [
+      10.0,
+      0.00081
+     ],
+     [
+      20.0,
+      0.00159
+     ],
+     [
+      30.0,
+      0.00233
+     ],
+     [
+      40.0,
+      0.003
+     ],
+     [
+      50.0,
+      0.00357
+     ],
+     [
+      60.0,
+      0.00404
+     ],
+     [
+      70.0,
+      0.00438
+     ],
+     [
+      80.0,
+      0.00459
+     ],
+     [
+      90.0,
+      0.00466
+     ],
+     [
+      100.0,
+      0.00459
+     ],
+     [
+      110.0,
+      0.00438
+     ],
+     [
+      120.0,
+      0.00404
+     ],
+     [
+      130.0,
+      0.00357
+     ],
+     [
+      140.0,
+      0.003
+     ],
+     [
+      150.0,
+      0.00233
+     ],
+     [
+      160.0,
+      0.00159
+     ],
+     [
+      170.0,
+      0.00081
+     ],
+     [
+      180.0,
+      0.0
+     ]
+    ],
+    "depth_below_water_m": {
+     "intake_L": 0.0401,
+     "intake_R": 0.0401,
+     "jet_L": 0.0301,
+     "jet_R": 0.0301,
+     "antenna": -0.0103,
+     "top_of_band": -0.0471
+    }
+   },
+   "1.0": {
+    "mass_kg": 0.781,
+    "G_m": [
+     0.1185,
+     -0.0,
+     -0.0032
+    ],
+    "freeboard_m": 0.0377,
+    "submerged_fraction": 0.659,
+    "trim_deg_nose_down_negative": -6.64,
+    "reserve_buoyancy": 1.52,
+    "GZ_deg_m": [
+     [
+      0.0,
+      -0.0
+     ],
+     [
+      10.0,
+      0.00055
+     ],
+     [
+      20.0,
+      0.00109
+     ],
+     [
+      30.0,
+      null
+     ],
+     [
+      40.0,
+      0.00204
+     ],
+     [
+      50.0,
+      0.00243
+     ],
+     [
+      60.0,
+      0.00275
+     ],
+     [
+      70.0,
+      0.00298
+     ],
+     [
+      80.0,
+      0.00313
+     ],
+     [
+      90.0,
+      0.00317
+     ],
+     [
+      100.0,
+      0.00313
+     ],
+     [
+      110.0,
+      0.00298
+     ],
+     [
+      120.0,
+      0.00275
+     ],
+     [
+      130.0,
+      0.00243
+     ],
+     [
+      140.0,
+      0.00204
+     ],
+     [
+      150.0,
+      0.00159
+     ],
+     [
+      160.0,
+      0.00109
+     ],
+     [
+      170.0,
+      0.00055
+     ],
+     [
+      180.0,
+      0.0
+     ]
+    ],
+    "depth_below_water_m": {
+     "intake_L": 0.0536,
+     "intake_R": 0.0536,
+     "jet_L": 0.0423,
+     "jet_R": 0.0423,
+     "antenna": 0.0053,
+     "top_of_band": -0.0324
+    }
+   }
+  },
+  "swim_speed_m_s": {
+   "0.0": {
+    "low (25 cm, 80 L/h)": {
+     "1.0": 0.619,
+     "2.0": 0.456,
+     "4.0": 0.322
+    },
+    "high (45 cm, 100 L/h)": {
+     "1.0": 0.857,
+     "2.0": 0.634,
+     "4.0": 0.449
+    }
+   },
+   "0.5": {
+    "low (25 cm, 80 L/h)": {
+     "1.0": 0.45,
+     "2.0": 0.317,
+     "4.0": 0.216
+    },
+    "high (45 cm, 100 L/h)": {
+     "1.0": 0.626,
+     "2.0": 0.443,
+     "4.0": 0.302
+    }
+   },
+   "1.0": {
+    "low (25 cm, 80 L/h)": {
+     "1.0": 0.365,
+     "2.0": 0.252,
+     "4.0": 0.168
+    },
+    "high (45 cm, 100 L/h)": {
+     "1.0": 0.509,
+     "2.0": 0.352,
+     "4.0": 0.236
+    }
+   }
+  },
+  "nozzle_mm": 3.6,
+  "fold_at_600Pa": {
+   "none": {
+    "length_m": 0.2771,
+    "band_roll_deg": 12.2
+   },
+   "band": {
+    "length_m": 0.2748,
+    "band_roll_deg": 8.7
+   },
+   "band_full": {
+    "length_m": 0.2472,
+    "band_roll_deg": 0.4
+   },
+   "band_ring": {
+    "length_m": 0.2314,
+    "band_roll_deg": -10.9
+   },
+   "aft_story": {
+    "length_m": 0.2429,
+    "band_roll_deg": 4.4
+   },
+   "crease": {
+    "length_m": 0.2462,
+    "band_roll_deg": 14.1
+   },
+   "same_hand": {
+    "length_m": 0.2769,
+    "band_roll_deg": 57.9
+   }
+  }
+ },
+ "alternatives": [
+  {
+   "id": "qi",
+   "fixes": "charging after encapsulation",
+   "part": "Adafruit Universal Qi receiver 1901, 5 V 500 mA, 8 g, coil 40 x 29 mm",
+   "url": "https://www.adafruit.com/product/1901",
+   "where": "under the saddle, coil flat against the belly"
+  },
+  {
+   "id": "wet_lip",
+   "fixes": "weak fresh on cured bond in gel",
+   "how": "brush 0.3 mm uncured Dragon Skin 10 NV on the lip right before the pick; lap beads finish 13 min later, inside the 15 min pot life"
+  }
+ ]
+}
