@@ -26,13 +26,13 @@ a:hover { background-size: 100% 1px; color: #bfdcf5; }
 body.org-doc { font: 400 18.5px/1.66 var(--sans); letter-spacing: .003em; overflow-x: clip; }
 body.org-doc p, body.org-doc li { font-weight: 400; }
 body.org-doc b, body.org-doc strong { font-weight: 500; }
-.org-doc h1 { font: 300 clamp(54px, 8vw, 108px)/.98 var(--serif); letter-spacing: -.02em; margin: 0 0 24px; }
-.org-doc h2 { font: 300 clamp(32px, 4vw, 50px)/1.1 var(--serif); letter-spacing: -.012em; margin: 0 0 18px; }
+.org-doc h1 { font: 300 clamp(32px, 3.4vw, 46px)/1.1 var(--serif); letter-spacing: -.02em; margin: 0 0 24px; }
+.org-doc h2 { font: 300 clamp(24px, 2.4vw, 32px)/1.2 var(--serif); letter-spacing: -.012em; margin: 0 0 18px; }
 .org-doc h3 { font: 400 20px/1.35 var(--sans); margin: 0 0 8px; }
-.org-doc .lede { font: 300 clamp(23px, 2.5vw, 30px)/1.45 var(--serif); max-width: 32ch; margin: 0 0 26px; }
+.org-doc .lede { font: 300 clamp(18px, 1.7vw, 21px)/1.5 var(--serif); max-width: 40ch; margin: 0 0 26px; }
 .org-doc .prose p, .org-doc .card p, .org-doc .tabhead p { max-width: 62ch; }
 .org-doc .prose p.big, #ideas .plain, .org-doc .open p, .org-doc .pointer p, .org-doc .end p { font-family: var(--serif); font-weight: 300; }
-.org-doc .prose p.big { font-size: clamp(23px, 2.3vw, 28px); line-height: 1.5; }
+.org-doc .prose p.big { font-size: clamp(19px, 1.8vw, 22px); line-height: 1.55; }
 .org-doc .note, .org-doc .credit, .org-doc .refs, .org-doc .cap, .org-doc figcaption { font: 300 14.5px/1.6 var(--sans); color: var(--muted); }
 .org-doc .cap, .org-doc figcaption { font-style: italic; font-family: var(--serif); font-size: 16.5px; }
 .org-doc .tabhead p { color: var(--muted); font-size: 18px; }
@@ -84,7 +84,7 @@ nav.sub a .d { font: italic 400 15px var(--serif) !important; margin-left: 8px; 
 
 /* ---------- layout and breathing room ---------- */
 main { padding-bottom: 110px !important; }
-.hero { padding: 84px 0 44px !important; gap: 56px !important; }
+.hero { padding: 56px 0 44px !important; gap: 56px !important; align-items: center !important; }
 .tabhead { padding: 72px 0 18px !important; }
 .block { padding: 88px 0 !important; gap: 56px !important; }
 @media (max-width: 900px) { .hero { padding: 48px 0 24px !important; gap: 30px !important; } .tabhead { padding: 44px 0 12px !important; } .block { padding: 60px 0 !important; gap: 22px !important; } }
@@ -110,7 +110,7 @@ footer a { color: var(--muted); }
 }
 .card { padding: 24px 26px; }
 .open { padding: 38px 42px !important; border-radius: 8px !important; }
-.open p { font: 300 clamp(21px, 2.2vw, 26px)/1.5 var(--serif) !important; }
+.open p { font: 300 clamp(18px, 1.7vw, 21px)/1.55 var(--serif) !important; }
 #ideas .dgm { padding: 28px 30px; }
 #ideas .vs .mine, #ideas .ask, .taught, .dec { background: var(--gel-soft) !important; }
 #ideas .ask, .taught, .dec { padding: 22px 26px; border-radius: 8px !important; }
@@ -429,7 +429,7 @@ input[type=text] { color: var(--ink); }
 html { overflow-x: clip; }
 
 /* ---------- header after ruipengwang.space: name centred, serif nav underneath ---------- */
-header.top { background: color-mix(in srgb, var(--bg) 88%, transparent) !important; border-bottom: 0 !important; }
+header.top { background: var(--bg) !important; border-bottom: 0 !important; }
 .bar { flex-direction: column !important; justify-content: center !important; align-items: center !important; gap: 12px !important; padding-top: 26px !important; padding-bottom: 16px !important; }
 .brand { font: 400 30px/1 var(--serif) !important; letter-spacing: 0 !important; }
 nav.tabs { margin-left: 0 !important; justify-content: center; }
@@ -437,3 +437,4 @@ nav.tabs a, .bar nav a { font: 400 19px var(--serif) !important; }
 nav.sub { justify-content: center; }
 @media (max-width: 700px) { .bar { padding-top: 16px !important; gap: 8px !important; } .brand { font-size: 25px !important; } nav.tabs a, .bar nav a { font-size: 17px !important; } }
 header.top { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+@media (max-width: 700px) { .brand { white-space: normal !important; text-align: center; font-size: 21px !important; line-height: 1.2 !important; } }

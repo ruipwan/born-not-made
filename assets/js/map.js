@@ -49,7 +49,7 @@ function draw(host, svg) {
   host.style.height = H + "px";
   svg.setAttribute("viewBox", "0 0 " + W + " " + H);
   const yT = Math.round(H / 2) + 0.5, pad = 2, serif = cssVar("--serif", "Georgia, serif");
-  const base = phone ? { mother: 17, birth: 14, baby: 17 } : W < 900 ? { mother: 22, birth: 17, baby: 22 } : { mother: 26, birth: 19, baby: 26 };
+  const base = phone ? { mother: 15, birth: 13, baby: 15 } : W < 900 ? { mother: 18, birth: 15, baby: 18 } : { mother: 20, birth: 16, baby: 20 };
 
   // place the phrases, shrinking until they fit
   let P = null;
