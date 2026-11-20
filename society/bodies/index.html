@@ -255,7 +255,7 @@ async function loadModel() {
   G.capsule = mergeGeos([prim(new THREE.CapsuleGeometry(0.014, 0.04, 4, 10), new THREE.Matrix4().makeRotationZ(PI / 2)), prim(new THREE.CylinderGeometry(0.008, 0.01, 0.022, 12), new THREE.Matrix4().makeTranslation(-0.035, 0, 0).multiply(new THREE.Matrix4().makeRotationZ(PI / 2)))]);
   // charging buoy: float ring, post, lamp, three pads at the flank port height
   const cp = [prim(new THREE.TorusGeometry(0.3, 0.075, 12, 40), new THREE.Matrix4().makeRotationX(0)), prim(new THREE.CylinderGeometry(0.05, 0.07, 0.62, 16), new THREE.Matrix4().makeTranslation(0, 0, 0.29).multiply(new THREE.Matrix4().makeRotationX(PI / 2)))];
-  for (let i = 0; i < 3; i++) { const a = (90 + 120 * i) * D2R; cp.push(prim(new THREE.BoxGeometry(0.1, 0.03, 0.03), new THREE.Matrix4().makeTranslation(0.32 * Math.cos(a), 0.32 * Math.sin(a), 0.145).multiply(new THREE.Matrix4().makeRotationZ(a))), prim(new THREE.BoxGeometry(0.012, 0.05, 0.05), new THREE.Matrix4().makeTranslation(0.37 * Math.cos(a), 0.37 * Math.sin(a), 0.145).multiply(new THREE.Matrix4().makeRotationZ(a)))); cp.push(prim(new THREE.CylinderGeometry(0.025, 0.025, 0.16, 8), new THREE.Matrix4().makeTranslation(0.3 * Math.cos(a), 0.3 * Math.sin(a), 0.07).multiply(new THREE.Matrix4().makeRotationX(PI / 2)))); }
+  for (let i = 0; i < 2; i++) { const a = (90 + 180 * i) * D2R; cp.push(prim(new THREE.BoxGeometry(0.1, 0.03, 0.03), new THREE.Matrix4().makeTranslation(0.32 * Math.cos(a), 0.32 * Math.sin(a), 0.145).multiply(new THREE.Matrix4().makeRotationZ(a))), prim(new THREE.BoxGeometry(0.012, 0.05, 0.05), new THREE.Matrix4().makeTranslation(0.37 * Math.cos(a), 0.37 * Math.sin(a), 0.145).multiply(new THREE.Matrix4().makeRotationZ(a)))); cp.push(prim(new THREE.CylinderGeometry(0.025, 0.025, 0.16, 8), new THREE.Matrix4().makeTranslation(0.3 * Math.cos(a), 0.3 * Math.sin(a), 0.07).multiply(new THREE.Matrix4().makeRotationX(PI / 2)))); }
   G.charger = mergeGeos(cp);
   G.lamp = new THREE.SphereGeometry(0.05, 16, 10);
 }
@@ -331,7 +331,7 @@ function portsOf(b) {
   if (b.kind === "hull") return { rear: { x: K.dockX, y: 0, n: PI, z: 0 }, cL: { x: -0.05, y: PORTS.wc, n: PI / 2, z: 0, side: "L" }, cR: { x: -0.05, y: -PORTS.wc, n: -PI / 2, z: 0, side: "R" }, bL: { x: 0.1, y: PORTS.wb, n: PI / 2, z: -0.09, side: "L" }, bR: { x: 0.1, y: -PORTS.wb, n: -PI / 2, z: -0.09, side: "R" } };
   if (b.kind === "tail") return { front: { x: 0, y: 0, n: 0, z: 0 } };
   if (b.kind === "baby") return { cap: { x: -b.L / 2, y: 0, n: PI, z: 0 } };
-  const o = {}; for (let i = 0; i < 3; i++) { const a = (90 + 120 * i) * D2R; o["p" + i] = { x: 0.376 * Math.cos(a), y: 0.376 * Math.sin(a), n: a, z: 0.145 }; } return o;
+  const o = {}; for (let i = 0; i < 2; i++) { const a = (90 + 180 * i) * D2R; o["p" + i] = { x: 0.376 * Math.cos(a), y: 0.376 * Math.sin(a), n: a, z: 0.145 }; } return o;
 }
 const CIRC = { hull: [[0.02, 0, 0.37]], tail: [[-0.18, 0, 0.235], [-0.45, 0, 0.2]], baby: [[-0.1, 0, 0.1], [0.1, 0, 0.1]], charger: [[0, 0, 0.39]] };
 function newGenome() { return Array.from({ length: 5 }, () => rnd()); }
@@ -397,7 +397,7 @@ function glowAt(B, key, level) {
   let g = B.glow[key]; const p = portsOf(B)[key];
   if (!g) { g = B.glow[key] = { s: glowSprite(), level: 0, flash: 0 }; const pz = key === "rear" ? 0 : p.z; g.s.position.set(p.x + Math.cos(p.n) * 0.02, p.y + Math.sin(p.n) * 0.02, pz); B.bl.add(g.s); }
   g.level = 0.35; g.flash = level >= 1 ? 1 : 0;
-  if (key === "rear") { g.s.position.set(p.x - 0.03, PORTS.rearY || 0.185, 0.0); }
+  if (key === "rear") { g.s.position.set(p.x - 0.03, 0, 0.185); }
 }
 function updatePoses() {
   const roots = bodies.filter((b) => !b.parent);
@@ -473,7 +473,7 @@ function dockEvent(A, B, purpose) {
 }
 
 /* ---------------- birth: open, print, bring out while inflating ---------------- */
-const TP = { open: 3, armIn: 5, print: 22, armOut: 3, carry: 4, out: 12, release: 3, close: 5 };
+const TP = { open: 3, armIn: 5, print: 22, armOut: 3, carry: 4, out: 12, release: 5, close: 5 };
 const TP_END = Object.values(TP).reduce((a, b) => a + b, 0);
 function startPrint(h) {
   const t = tailOf(h); if (!t) return;
@@ -513,7 +513,7 @@ function stepPrint(h, dt) {
   }
   else if ((u = seg("armOut")) !== null) { layerZ = 1; rig.q = KIN.solve([K.cx, 0, bedTop + K.Lfold + 0.02], rig.q, rig.boom, 6); if (u > 0.98 && !P.hooked) { P.hooked = true; event(`${h.name}: the needle meets the valve of the new baby`); } }
   else if ((u = seg("carry")) !== null) {
-    layerZ = 1; if (!P.qCarry) P.qCarry = KIN.solve([-0.24, 0, 0.0], [0, 40 * D2R, 50 * D2R], SC.stations.front, 40);
+    layerZ = 1;
     const tgt = [lerp(K.cx, -0.24, ss(u)), 0, lerp(bedTop + K.Lfold + 0.02, 0.0, ss(u))];
     rig.q = KIN.solve(tgt, rig.q, rig.boom, 6);
   }
@@ -521,7 +521,7 @@ function stepPrint(h, dt) {
     layerZ = 1;
     if (!P.undocked) { P.undocked = true; const g = h.glow.rear; if (g) { g.flash = 0.5; g.level = 0; } event(`${tail.name} unlocks from ${h.name} and backs off, the arm brings the baby out`); }
     tail.rel.off = 0.62 * ss(u);
-    rig.q = P.qCarry;
+    if (!P.qOut) P.qOut = rig.q.slice(); rig.q = P.qOut;
   }
   else if ((u = seg("release")) !== null) { layerZ = 1; tail.rel.off = 0.62; }
   else if ((u = seg("close")) !== null) { tail.rel.off = 0.62 * (1 - ss(u)); rig.boom = SC.stations.front * (1 - ss(u)); rig.q = PASS_Q.slice(); rig.tilt = 180; if (u > 0.97 && !P.redock) { P.redock = true; glowAt(h, "rear", 1); event(`${tail.name} docks back to ${h.name}`); } }
@@ -536,14 +536,14 @@ function stepPrint(h, dt) {
     // valve held on the needle: horizontal, valve end toward the opening, growing in length while carried out
     const uc = clamp((t - tCarry) / TP.carry, 0, 1), uo = clamp((t - tOut) / TP.out, 0, 1);
     const L = lerp(K.Lfold, K.Ldep, ss(uo)); if (Math.abs(L - pb.L) > 0.0005) { setBabyLen(pb.g, L); pb.L = L; }
-    const rotY = lerp(PI / 2, PI, ss(uc));   // from nose down to valve end facing -x
+    const rotY = lerp(PI / 2, 0, ss(uc));   // from nose down to valve end facing -x
     pb.grp.rotation.set(0, rotY, 0);
     const c = Math.cos(rotY), sn = Math.sin(rotY);   // local x after rotY about y: (c, 0, -sn)
     const capOff = -L / 2 - 0.01; pb.grp.position.set(tip[0] - c * capOff, 0, tip[2] + sn * capOff);
     pb.cap.position.set(-L / 2 + 0.035, 0, 0);
   }
   else if (!P.released) { P.released = true; releaseBaby(h); }
-  pb.clipP.normal.set(0, -1, 0); pb.clipP.constant = layerZ;
+  pb.clipP.normal.set(0, 0, -1); pb.clipP.constant = layerZ;
   pb.clipP.applyMatrix4(h.bl.matrixWorld);
   h.energy -= dt * 0.006;
 }
@@ -642,7 +642,7 @@ function stepMother(h, dt) {
 function seekCharge(h) {
   let best = null, bd = 1e9;
   for (const c of bodies) {
-    if (c.kind === "charger") for (const k of ["p0", "p1", "p2"]) { if (c.docks[k] || c.reserved[k]) continue; const p = portWorld(c, k), d = Math.hypot(p.x - h.x, p.y - h.y); if (d < bd) { bd = d; best = [c, k]; } }
+    if (c.kind === "charger") for (const k of ["p0", "p1"]) { if (c.docks[k] || c.reserved[k]) continue; const p = portWorld(c, k), d = Math.hypot(p.x - h.x, p.y - h.y); if (d < bd) { bd = d; best = [c, k]; } }
     if (c.kind === "hull" && c !== h && c.alive && !c.parent && !c.print && c.energy > 0.75 && tailOf(c)) for (const s of ["L", "R"]) { if (!sideFree(c, s)) continue; const p = portWorld(c, "c" + s), d = Math.hypot(p.x - h.x, p.y - h.y) * 0.8; if (d < bd) { bd = d; best = [c, "c" + s]; } }
   }
   if (!best) return;
@@ -665,7 +665,7 @@ function stepBaby(b, dt) {
   b.energy -= dt * 0.004;
   if (b.drop) { b.drop = Math.max(0, b.drop - dt * 0.6); b.sink = 0.09 * b.drop * b.drop; }
   if (b.energy <= 0) { die(b, "no adult reached in time"); return; }
-  if (b.task && b.task.type === "drift") { b.task.t += dt; const nx = -Math.sin(b.th) * b.task.side, ny = Math.cos(b.th) * b.task.side; b.x += nx * 0.06 * dt; b.y += ny * 0.06 * dt; if (b.task.t > 7) b.task = null; return; }
+  if (b.task && b.task.type === "drift") { b.task.t += dt; const nx = -Math.sin(b.th) * b.task.side, ny = Math.cos(b.th) * b.task.side; b.x += nx * 0.09 * dt; b.y += ny * 0.09 * dt; if (b.task.t > 7) b.task = null; return; }
   if (b.parent) return;
   if (b.task && b.task.type === "dock") { runDock(b, dt); return; }
   if (b.task && b.task.type === "leave") { const d = moveToward(b, b.task.x, b.task.y, 0.08, dt); if (d < 0.3) b.gone = true; return; }
@@ -763,7 +763,7 @@ function pick(cx, cy) {
 }
 function stateOf(b) {
   if (!b.alive) return b.cluster ? "a clear shell in the cluster" : "dead, drifting to the cluster";
-  if (b.kind === "charger") return "fixed, charging up to three mothers";
+  if (b.kind === "charger") return "fixed, charging up to two mothers";
   if (b.print) { const t = b.print.t; return t < TP.open + TP.armIn ? "the arm rides in through the opening" : t < TP.open + TP.armIn + TP.print ? `printing, layer ${Math.round(((t - TP.open - TP.armIn) / TP.print) * 36)} of 36` : t < TP_END - TP.close ? "bringing the baby out, inflating" : "the tail docks back"; }
   const tk = b.task;
   if (tk && tk.type === "dock") return tk.phase === "go" ? `swimming to ${tk.B.kind === "charger" ? "a buoy" : tk.B.name} to dock` : tk.phase === "turn" ? `lining up with ${tk.B.kind === "charger" ? "a buoy" : tk.B.name}` : "closing in, magnets off";
