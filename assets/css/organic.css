@@ -1,15 +1,16 @@
+@import url("https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap");
 /* Born, Not Made: one shared, softer visual language. Loaded last by every page.
    Black ground, light text, whitespace instead of boxes, one hairline where a line is needed,
    slow breathing light, and almost no motion otherwise. All motion stops under prefers-reduced-motion. */
 
 :root {
-  --bg: #0b0b0c; --ink: #ecebe6; --muted: #9b9a94; --gel: #9cc8ec; --warm: #e8c9a8;
-  --paper: #121213; --line: rgba(236, 235, 230, .10); --hair: rgba(236, 235, 230, .12);
+  --bg: #000; --ink: #f3f2ee; --muted: #9b9a94; --gel: #9cc8ec; --warm: #e8c9a8;
+  --paper: #0d0d0e; --line: rgba(236, 235, 230, .10); --hair: rgba(236, 235, 230, .12);
   --soft: rgba(255, 255, 255, .04); --soft2: rgba(255, 255, 255, .07);
   --gel-soft: rgba(156, 200, 236, .09);
   --white: #f1ede4;
-  --serif: "Cormorant Garamond", Georgia, serif; --sans: "Inter", system-ui, sans-serif;
-  --mono: "Inter", system-ui, sans-serif;           /* no engineering type: old mono labels become plain Inter */
+  --serif: "Cormorant Garamond", Georgia, serif; --sans: "Alegreya Sans", "Inter", system-ui, sans-serif;
+  --mono: "Alegreya Sans", "Inter", system-ui, sans-serif;           /* no engineering type: old mono labels become plain Inter */
   --ease: cubic-bezier(.3, .6, .3, 1);
   --r: 24px;
 }
@@ -22,8 +23,8 @@ a:hover { background-size: 100% 1px; color: #bfdcf5; }
 .code, .info, code, pre, .code .ln, .kv dd.n { font-family: ui-monospace, "JetBrains Mono", Menlo, monospace !important; }
 
 /* ---------- document pages: calm type ---------- */
-body.org-doc { font: 300 17.5px/1.72 var(--sans); letter-spacing: .003em; overflow-x: clip; }
-body.org-doc p, body.org-doc li { font-weight: 300; }
+body.org-doc { font: 400 18.5px/1.66 var(--sans); letter-spacing: .003em; overflow-x: clip; }
+body.org-doc p, body.org-doc li { font-weight: 400; }
 body.org-doc b, body.org-doc strong { font-weight: 500; }
 .org-doc h1 { font: 300 clamp(54px, 8vw, 108px)/.98 var(--serif); letter-spacing: -.02em; margin: 0 0 24px; }
 .org-doc h2 { font: 300 clamp(32px, 4vw, 50px)/1.1 var(--serif); letter-spacing: -.012em; margin: 0 0 18px; }
@@ -459,3 +460,12 @@ input[type=text] { color: var(--ink); }
 @media (min-width: 981px) { .app:has(> .area) { grid-template-rows: 40px minmax(360px, calc(100vh - 392px)) 214px 100px !important; } }
 .tl .ctl { align-self: center; } .tl .ctl .btn { padding: 6px 14px; }
 html { overflow-x: clip; }
+
+/* ---------- header after ruipengwang.space: name centred, serif nav underneath ---------- */
+header.top { background: color-mix(in srgb, var(--bg) 88%, transparent) !important; border-bottom: 0 !important; }
+.bar { flex-direction: column !important; justify-content: center !important; align-items: center !important; gap: 12px !important; padding-top: 26px !important; padding-bottom: 16px !important; }
+.brand { font: 400 30px/1 var(--serif) !important; letter-spacing: 0 !important; }
+nav.tabs { margin-left: 0 !important; justify-content: center; }
+nav.tabs a, .bar nav a { font: 400 19px var(--serif) !important; }
+nav.sub { justify-content: center; }
+@media (max-width: 700px) { .bar { padding-top: 16px !important; gap: 8px !important; } .brand { font-size: 25px !important; } nav.tabs a, .bar nav a { font-size: 17px !important; } }
