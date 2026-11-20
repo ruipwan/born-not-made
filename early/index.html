@@ -199,7 +199,7 @@ html.embedded.auto .side .stick { position: static; }
   <div class="prose">
     <div class="figs">
       <figure><img src="../assets/img/prototype1_photo.jpg" width="1600" height="960" alt="First version: the white printed shell of the mother, with the small printed baby beside it." loading="lazy"><figcaption>Mother shell and baby, both printed.</figcaption></figure>
-      <figure><a href="../assets/img/prototype1_diagram.jpg"><img src="../assets/img/prototype1_diagram.jpg" width="1132" height="760" alt="Exploded view of the first version, labelled from top: lid, water muscle, electronics, baby robot, water pump." loading="lazy"></a><figcaption>Exploded view: lid, water muscle, electronics, baby, pump.</figcaption></figure>
+      <figure><a href="../assets/img/prototype1_diagram.jpg"><img src="../assets/img/prototype1_diagram.jpg" width="1132" height="760" alt="Exploded view of the first version, labeled from top: lid, water muscle, electronics, baby robot, water pump." loading="lazy"></a><figcaption>Exploded view: lid, water muscle, electronics, baby, pump.</figcaption></figure>
     </div>
 
     <h3>How it works</h3>
@@ -237,7 +237,7 @@ html.embedded.auto .side .stick { position: static; }
         <tr><th scope="row">Baby power</th><td>One small LiPo for pump and XIAO, with a charging port. Pump PWM levels 150, 185, 220, 255.</td></tr>
         <tr><th scope="row">Board</th><td>Custom power board milled from FR1 on a Roland mill: battery, slide switch, pads on the back of the XIAO. The shell has a cutout for those pads.</td></tr>
         <tr><th scope="row">Mother shell</th><td>3D printed, with a cavity for the baby and a lid over the electronics.</td></tr>
-        <tr><th scope="row">Baby shell</th><td>Foaming filament, lighter than water. Bambu P1S, nozzle 255 °C, max volumetric speed 5 mm³/s (about 13 h), part fan off, side panel open. Three wall loops and six top layers keep water out. Pump in the centre, held by a closed ring; battery and XIAO on opposite sides for balance; lid seam sealed with waterproof glue.</td></tr>
+        <tr><th scope="row">Baby shell</th><td>Foaming filament, lighter than water. Bambu P1S, nozzle 255 °C, max volumetric speed 5 mm³/s (about 13 h), part fan off, side panel open. Three wall loops and six top layers keep water out. Pump in the center, held by a closed ring; battery and XIAO on opposite sides for balance; lid seam sealed with waterproof glue.</td></tr>
         <tr><th scope="row">Control</th><td>Phone page served by the mother, with sliders for water pump and forward. The mother relays the baby's speed (levels 0 to 4) over HTTP. Level 0 sends PWM 1 so the driver does not sleep.</td></tr>
         <tr><th scope="row">Sensors</th><td>None in the final build. The birth starts from the phone.</td></tr>
         <tr><th scope="row">Tank</th><td>Glass fish tank. <a class="src" href="https://www.amazon.com/dp/B0BZ8H8FYJ">tank used</a></td></tr>
@@ -252,7 +252,7 @@ html.embedded.auto .side .stick { position: static; }
       <li><b>Air in the bag</b> was too weak to push even a light object. Water was strong enough.</li>
       <li><b>First shell</b> was too heavy. It sank, and floor friction held it. A pump pushed into a sponge floated and moved.</li>
       <li><b>Airbags and silicone</b> were hard to shape and to fix a pump to. <b>PCTG</b> looked translucent, but it is denser than water and it leaked.</li>
-      <li><b>One outlet off centre</b> made the baby spin. A taped tube turned the jet and the path straightened.</li>
+      <li><b>One outlet off center</b> made the baby spin. A taped tube turned the jet and the path straightened.</li>
       <li><b>Foaming filament</b> fused to tight supports and to a 10 mm brim. With too few supports the soft print collapsed.</li>
     </ul>
 
@@ -260,7 +260,7 @@ html.embedded.auto .side .stick { position: static; }
       <figure role="listitem"><a href="media/v1_tpu_bags.jpg"><img src="media/v1_tpu_bags.jpg" width="960" height="1280" alt="Clear TPU bags in many sizes and shapes on a workbench." loading="lazy"></a><figcaption>TPU bags for thrust tests</figcaption></figure>
       <figure role="listitem"><a href="media/v1_parent_power.jpg"><img src="media/v1_parent_power.jpg" width="1050" height="1400" alt="Mother wiring: two mini pumps, an 800 mAh LiPo, the milled board with the XIAO, and two 400 mAh LiPos in series." loading="lazy"></a><figcaption>Mother power: two packs, two pumps</figcaption></figure>
       <figure role="listitem"><a href="media/v1_phone_page.jpg"><img src="media/v1_phone_page.jpg" width="1218" height="1400" alt="Phone control page titled Mission Control, with sliders for robot 1 water pump and forward, and robot 2 speed." loading="lazy"></a><figcaption>Phone page, two robots</figcaption></figure>
-      <figure role="listitem"><a href="media/v1_baby_layout.jpg"><img src="media/v1_baby_layout.jpg" width="1221" height="1084" alt="CAD of the baby: rounded shell and lid, a central slot for the pump and side pockets for battery and controller." loading="lazy"></a><figcaption>Baby layout, pump in the centre</figcaption></figure>
+      <figure role="listitem"><a href="media/v1_baby_layout.jpg"><img src="media/v1_baby_layout.jpg" width="1221" height="1084" alt="CAD of the baby: rounded shell and lid, a central slot for the pump and side pockets for battery and controller." loading="lazy"></a><figcaption>Baby layout, pump in the center</figcaption></figure>
     </div>
     <p class="cap">Photos and screenshots from the Fab class record.</p>
 
@@ -324,7 +324,7 @@ html.embedded.auto .side .stick { position: static; }
         <tr><th scope="row">Touch sensing</th><td>Copper contact points on the mother's surface. Arduino Uno; a 5 MΩ resistor between D2 and D3; D3 reads the change; GND wired to the tank floor so the loop closes through the water. <a class="src" href="https://docs.arduino.cc/hardware/uno-rev3/">Arduino Uno docs</a></td></tr>
         <tr><th scope="row">Baby</th><td>Clear printed body with a microcontroller, a small rechargeable battery, a micro pump for jet propulsion and a photoresistor. A Bluetooth link to siblings.</td></tr>
         <tr><th scope="row">Tank</th><td>Custom glass tank, 60 × 36 × 18 cm, shallow water, 1 to 2 cm deep.</td></tr>
-        <tr><th scope="row">Projection</th><td>Unreal Engine simulation beside the tank, projected or on a monitor. Language model agents decide when to reproduce; colour shows each one's stance toward birth.</td></tr>
+        <tr><th scope="row">Projection</th><td>Unreal Engine simulation beside the tank, projected or on a monitor. Language model agents decide when to reproduce; color shows each one's stance toward birth.</td></tr>
       </tbody>
     </table>
 
@@ -379,7 +379,7 @@ html.embedded.auto .side .stick { position: static; }
       <tbody>
         <tr><th scope="row">Arm</th><td>Hiwonder SO-ARM101 (LeRobot SO-101 follower arm), bought assembled. Chosen after comparing a 3 axis stage, xArm, Lite 6 and myCobot. Arrived 22 Sep 2026; first test 24 Sep 2026. <a class="src" href="https://github.com/TheRobotStudio/SO-ARM100">SO-101 design files</a></td></tr>
         <tr><th scope="row">Extruder</th><td>Syringe at the arm's tip, fed from a material reservoir.</td></tr>
-        <tr><th scope="row">Gel</th><td>Carbopol 940 in deionised water, neutralised with NaOH. Sealed and rested about a day, the gel pushes out its own bubbles.</td></tr>
+        <tr><th scope="row">Gel</th><td>Carbopol 940 in deionized water, neutralized with NaOH. Sealed and rested about a day, the gel pushes out its own bubbles.</td></tr>
         <tr><th scope="row">Print material</th><td>First chosen: EPON 828 epoxy with EPIKURE 3380, which needs 24 h and heat to cure. Fast curing silicone went first instead: a 5 minute silicone sets too fast; about 10 minutes is the target.</td></tr>
         <tr><th scope="row">Method</th><td>Embedded printing in a Carbopol bath, after EpoMemory (Zhong et al., CHI 2023). <a class="src" href="https://doi.org/10.1145/3544548.3580638">doi</a></td></tr>
         <tr><th scope="row">First result</th><td>14 Oct 2026: silicone injected into the gel printed and stayed suspended.</td></tr>

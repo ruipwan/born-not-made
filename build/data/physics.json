@@ -646,7 +646,7 @@
    [
     "baby air from outside into the closed womb",
     "+8.35 L, crown rises about 34 mm (4.1 mm per L)",
-    "Gel is incompressible, so every litre pumped into the baby lifts the gel and the pleated belly. If the pump draws womb air instead, there is no swelling."
+    "Gel is incompressible, so every liter pumped into the baby lifts the gel and the pleated belly. If the pump draws womb air instead, there is no swelling."
    ],
    [
     "first breath",
@@ -694,7 +694,7 @@
     "1.67 kg leaves."
    ]
   ],
-  "web_model_fix": "bellyNow should follow V_baby_inside / 10 L and never exceed the litres the baby took in: about 34 mm, not 73. After birth it ends about 0.05 below the start, not at 0.2 of full.",
+  "web_model_fix": "bellyNow should follow V_baby_inside / 10 L and never exceed the liters the baby took in: about 34 mm, not 73. After birth it ends about 0.05 below the start, not at 0.2 of full.",
   "sources": [
    [
     "Demaine, History of Curved Origami Sculpture (Albers 1927-28 concentric circle pleat twists into a saddle)",
@@ -835,7 +835,7 @@
   ],
   [
    "Project valve seat",
-   "do not print the seat; print a pocket 1 mm oversize, place a moulded valve core with the arm, print over it",
+   "do not print the seat; print a pocket 1 mm oversize, place a molded valve core with the arm, print over it",
    "https://par.nsf.gov/servlets/purl/10085335"
   ],
   [

@@ -143,7 +143,7 @@
   "date": "2026-09-28",
   "stage": "idea",
   "title": "Thesis abstract",
-  "text": "Shared for feedback: Born, Not Made: Robots That Fabricate and Give Birth to Their Offspring. The baby is printed inside the mother by an arm with syringe extrusion and born in water; a visitor's touch speeds the labour; an Unreal Engine simulation runs the society.",
+  "text": "Shared for feedback: Born, Not Made: Robots That Fabricate and Give Birth to Their Offspring. The baby is printed inside the mother by an arm with syringe extrusion and born in water; a visitor's touch speeds the labor; an Unreal Engine simulation runs the society.",
   "decision": "Feedback on 29 Sep: write more on the technical innovations and on how the work could inspire robot fabrication.",
   "media": [],
   "links": []
@@ -349,7 +349,7 @@
   "date": "2026-10-18",
   "stage": "idea",
   "title": "Mother names a function",
-  "text": "No pronouns for the mother or the baby: which pronoun fits stays a question of the work. The working sentence, set on 19 Oct: mother names a function rather than a gender, the body that labours and delivers.",
+  "text": "No pronouns for the mother or the baby: which pronoun fits stays a question of the work. The working sentence, set on 19 Oct: mother names a function rather than a gender, the body that labors and delivers.",
   "media": [],
   "links": []
  },
@@ -586,15 +586,15 @@
   "date": "2026-11-16",
   "stage": "design",
   "title": "Shorter tail, spring door",
-  "text": "The lost Blender scenes of R23, R24 and R25 are rebuilt from the films. Measuring the R25 tail finds bugs: the boom pokes 108 mm out of the rear cap, the folded arm cannot pass the 280 mm bore, and the lid's needle valve sits on the boom's centre line.",
-  "decision": "Tail shortened from 1050 to 944 mm, with an over centre spring hinge that the arm nudges open; the needle valve moves 70 mm to the side. An independent check had failed the first two door options.",
+  "text": "The lost Blender scenes of R23, R24 and R25 are rebuilt from the films. Measuring the R25 tail finds bugs: the boom pokes 108 mm out of the rear cap, the folded arm cannot pass the 280 mm bore, and the lid's needle valve sits on the boom's center line.",
+  "decision": "Tail shortened from 1050 to 944 mm, with an over center spring hinge that the arm nudges open; the needle valve moves 70 mm to the side. An independent check had failed the first two door options.",
   "media": [
    "media/1116_spring_door.jpg"
   ],
   "links": [],
   "threads": {
    "tail": "1050 to 944 mm.",
-   "opening": "An over centre spring door, nudged open by the arm.",
+   "opening": "An over center spring door, nudged open by the arm.",
    "valve": "The lid's needle valve moves 70 mm off the boom line."
   }
  },
@@ -617,7 +617,7 @@
   "date": "2026-11-16",
   "stage": "idea",
   "title": "Title: Born, Not Made again",
-  "text": "On 1 Nov the title became Robotic Womb, in praise of the robot mother's labour. On 16 Nov the main title returns to Born, Not Made, with the subtitle A Speculative Prototype of a Mother Robot Giving Birth to a Baby Robot.",
+  "text": "On 1 Nov the title became Robotic Womb, in praise of the robot mother's labor. On 16 Nov the main title returns to Born, Not Made, with the subtitle A Speculative Prototype of a Mother Robot Giving Birth to a Baby Robot.",
   "decision": "Prototype, not design: the work is being built, not only imagined.",
   "media": [],
   "links": []
@@ -652,7 +652,7 @@
   "date": "2026-11-17",
   "stage": "render",
   "title": "Relation animation",
-  "text": "A first relation animation with babies of different forms and colours (the finished version is on The Work). A second version follows on 18 Nov.",
+  "text": "A first relation animation with babies of different forms and colors (the finished version is on The Work). A second version follows on 18 Nov.",
   "media": [
    "media/1117_relation.jpg"
   ],
@@ -712,7 +712,7 @@
   "date": "2026-11-19",
   "stage": "site",
   "title": "Web console and this site",
-  "text": "The project site goes up: Trunk, Branches, a Build teardown, a Simulator console modelled on Blender, where a spoken or typed signal becomes G-code, a print, an inflation and a birth, and a Society model of many mothers and babies in one body of water. This Log joins them.",
+  "text": "The project site goes up: Trunk, Branches, a Build teardown, a Simulator console modeled on Blender, where a spoken or typed signal becomes G-code, a print, an inflation and a birth, and a Society model of many mothers and babies in one body of water. This Log joins them.",
   "media": [
    "media/1119_console.jpg"
   ],

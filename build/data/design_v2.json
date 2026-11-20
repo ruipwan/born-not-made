@@ -2,7 +2,7 @@
  "meta": {
   "date": "2026-11-19",
   "notes": "/home/claude/bnm_design/build_research/design_v2.md",
-  "frames": "mother frame: egg centre origin, x forward, z up (m); tail frame x_t = x + 0.3835"
+  "frames": "mother frame: egg center origin, x forward, z up (m); tail frame x_t = x + 0.3835"
  },
  "decisions": [
   {
@@ -47,7 +47,7 @@
   {
    "id": "waterline",
    "problem": "Waterline and buoyancy: mother 35 to 45 kg, tail 13 kg, rear bore at or under water",
-   "decision": "Design waterline z -0.145 at the hatch. Mother 30.5 kg: round tray D 410 with 18 L gel and 1.5 kg trim ballast. Tail reshaped as a gourd (max D 466, centre 50 mm lower, bottom z -0.283, 600 long, 3 mm PETG), 15.6 kg with 1.8 kg trim ballast, floats level at the same height. Foam inside a dry hull adds no lift.",
+   "decision": "Design waterline z -0.145 at the hatch. Mother 30.5 kg: round tray D 410 with 18 L gel and 1.5 kg trim ballast. Tail reshaped as a gourd (max D 466, center 50 mm lower, bottom z -0.283, 600 long, 3 mm PETG), 15.6 kg with 1.8 kg trim ballast, floats level at the same height. Foam inside a dry hull adds no lift.",
    "numbers": [
     [
      "mother mass",
@@ -314,7 +314,7 @@
    "decision": "5 concentric elliptical pleats, pitch 45, depth 14 at the sides and 9 at the ends, 2 mm SORTA-Clear 18, zone 0.29 m2 above z 0.164 and aft of x -0.30. Stop: 24 clear 0.5 mm nylon meridian cords cast in the skin, cut to the 10 L meridian. Pump inlet through a snorkel to outside air.",
    "numbers": [
     [
-     "rise per litre",
+     "rise per liter",
      "6.1 mm (paraboloid, rim clamped)"
     ],
     [
@@ -358,7 +358,7 @@
   {
    "id": "rails",
    "problem": "Rails and boom: 0.72 m of rail in a 588 mm tail",
-   "decision": "2 HIWIN MGNR12 x 500 mm, level, x_t -0.530 to -0.030, 2 MGN12H per rail at 130 mm span; boom plate 280 x 120 x 6 mm; stroke 370 mm; home base centre x_t -0.327; print stations x_t -0.040 and +0.040; NEMA 17 belt drive at the front end; cartridge off the boom.",
+   "decision": "2 HIWIN MGNR12 x 500 mm, level, x_t -0.530 to -0.030, 2 MGN12H per rail at 130 mm span; boom plate 280 x 120 x 6 mm; stroke 370 mm; home base center x_t -0.327; print stations x_t -0.040 and +0.040; NEMA 17 belt drive at the front end; cartridge off the boom.",
    "numbers": [
     [
      "stroke",

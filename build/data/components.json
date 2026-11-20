@@ -71,7 +71,7 @@
     ],
     [
      "Epoxy after 500 h water",
-     "11.5 MPa on aluminium"
+     "11.5 MPa on aluminum"
     ],
     [
      "Cured look",
@@ -202,7 +202,7 @@
      "tilted 20.8 deg up"
     ],
     [
-     "Canal centre",
+     "Canal center",
      "x 0.302, z 0.081 m"
     ],
     [
@@ -288,11 +288,11 @@
    "group": "mother",
    "name": "Gel pool tray, round, 4 clear quarters",
    "role": "holds the support gel over the keel",
-   "how": "A round tray with vertical walls down to the hull, centred under the print. The front quarter is notched where the chute enters. Quarters bond with DP100 Plus.",
+   "how": "A round tray with vertical walls down to the hull, centered under the print. The front quarter is notched where the chute enters. Quarters bond with DP100 Plus.",
    "specs": [
     [
      "Inner",
-     "D 410 mm, centre x -0.040 m"
+     "D 410 mm, center x -0.040 m"
     ],
     [
      "Gel surface",
@@ -300,7 +300,7 @@
     ],
     [
      "Gel depth",
-     "about 160 mm at centre"
+     "about 160 mm at center"
     ],
     [
      "Gel volume",
@@ -328,7 +328,7 @@
    "verdict": "works after bench test",
    "test": "Fill with water 24 h before the first gel.",
    "owned": false,
-   "changed_in_v2": "v2: round D 410 on the print centre x -0.040; 18 L; front quarter notched for the chute."
+   "changed_in_v2": "v2: round D 410 on the print center x -0.040; 18 L; front quarter notched for the chute."
   },
   {
    "id": "chute",
@@ -530,7 +530,7 @@
     ],
     [
      "Max",
-     "D 466 at x_t -0.22, centre 50 mm lower"
+     "D 466 at x_t -0.22, center 50 mm lower"
     ],
     [
      "Bottom",
@@ -699,7 +699,7 @@
     ],
     [
      "Print stations",
-     "base centre x_t -0.040 and +0.040"
+     "base center x_t -0.040 and +0.040"
     ]
    ],
    "make": "buy",
@@ -1310,7 +1310,7 @@
    "group": "fluid",
    "name": "Support gel: Carbomer 940, 1% w/v",
    "role": "holds the liquid silicone while the silicone cures",
-   "how": "1 g Carbomer 940 per 100 ml DI water, neutralised with 1 M NaOH, rested sealed about one day.",
+   "how": "1 g Carbomer 940 per 100 ml DI water, neutralized with 1 M NaOH, rested sealed about one day.",
    "specs": [
     [
      "Grade",
@@ -1375,7 +1375,7 @@
   {
    "id": "naoh",
    "group": "fluid",
-   "name": "Neutraliser: 1 M NaOH",
+   "name": "Neutralizer: 1 M NaOH",
    "role": "opens the Carbopol chains so the gel holds",
    "how": "Add by syringe after the powder is fully wetted and bubbles have risen.",
    "specs": [
@@ -1495,7 +1495,7 @@
    "group": "fluid",
    "name": "Cast silicone: SORTA-Clear 18",
    "role": "clear silicone for belly, lips, door and seal",
-   "how": "Cast in printed moulds. Mix by weight, degas, cure about 24 h. Trial kit in hand; about 4 kg more needed.",
+   "how": "Cast in printed molds. Mix by weight, degas, cure about 24 h. Trial kit in hand; about 4 kg more needed.",
    "specs": [
     [
      "Mix",
@@ -1743,7 +1743,7 @@
    "group": "dock",
    "name": "Lead in: recess in the mother, collar on the tail",
    "role": "guides the tail onto the bore; carries the lip seal",
-   "how": "A 28 mm collar on the tail mouth enters the 30 mm recess in the mother. Flat faces meet first; the cone only centres. No long nose.",
+   "how": "A 28 mm collar on the tail mouth enters the 30 mm recess in the mother. Flat faces meet first; the cone only centers. No long nose.",
    "specs": [
     [
      "Half angle",
@@ -1785,7 +1785,7 @@
     }
    ],
    "verdict": "works after bench test",
-   "test": "Approach at 20 mm offset; cone must centre the tail.",
+   "test": "Approach at 20 mm offset; cone must center the tail.",
    "owned": false,
    "changed_in_v2": "v2: female recess in the mother and a short collar on the tail instead of a cone on the tail mouth."
   },

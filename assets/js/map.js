@@ -34,9 +34,9 @@ const TRUNK = [
    matches any ending (pleat* finds pleats, pleated); otherwise a plain s or es is allowed.        */
 const BRANCHES = [
   { tab: "ideas", label: "Ideas", side: 1, u0: 0.03, u1: 0.45, a: 0.84, shape: "sin",
-    terms: ["womb", "matrix", "mater", "mould", "cyberfeminism=cyberfemin*", "VNS Matrix", "Sadie Plant", "hospitality", "Aristarkhova",
+    terms: ["womb", "matrix", "mater", "mold=mold/mould", "cyberfeminism=cyberfemin*", "VNS Matrix", "Sadie Plant", "hospitality", "Aristarkhova",
       "matricentric", "mothering", "gestation", "surrogacy", "Mosuo", "matrilineal", "kinship", "kin", "ectogenesis", "Haldane", "Biobag",
-      "artificial womb", "labour=labour/labor", "robota", "Čapek=Čapek/Capek", "hysteria", "hystera", "garbha", "子宫", "uterus",
+      "artificial womb", "labor=labor/labour", "robota", "Čapek=Čapek/Capek", "hysteria", "hystera", "garbha", "子宫", "uterus",
       "weaving", "seahorse*", "budding", "jellyfish", "ammonite", "sanctum", "fathers", "O'Reilly", "Sophie Lewis", "Daedalus", "sacred"] },
   { tab: "culture", label: "Culture", side: -1, u0: 0.15, u1: 0.45, a: 0.5, shape: "cos",
     terms: ["Blade Runner", "begotten", "Nicene Creed", "Frankenstein", "golem", "Pygmalion", "Galatea", "Pinocchio", "Astro Boy",

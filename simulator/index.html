@@ -532,7 +532,7 @@ function measureWaterplanes() {
   HYD.A_p = A; HYD.xF_p = xF; HYD.IL_p = IL;
   HYD.kTh_p = K.rho * K.g * IL - (K.mMother + K.mTail) * K.g * K.kzGz;                 // pitch stiffness, N m per rad
   HYD.kTh_m = K.rho * K.g * m.IL; HYD.kTh_t = K.rho * K.g * t.IL;
-  log(`waterplanes at z ${f3(K.WL)}: mother ${f3(m.A)} m², tail ${f3(t.A)} m², pair centre of flotation x ${f3(xF)} m, pitch stiffness ${HYD.kTh_p.toFixed(0)} N m per rad`);
+  log(`waterplanes at z ${f3(K.WL)}: mother ${f3(m.A)} m², tail ${f3(t.A)} m², pair center of flotation x ${f3(xF)} m, pitch stiffness ${HYD.kTh_p.toFixed(0)} N m per rad`);
 }
 
 /* ================================================================ petal door, sleeve, heel stop */
@@ -637,7 +637,7 @@ function writeGcode(baby) {
   note(`; sliced from the printed mid surface: walls ${f1(K.tf * 1000)} mm, caps ${f1(K.tc * 1000)} mm, gel gaps ${f1(K.gap * 1000)} mm`);
   note(`; Dragon Skin 10 NV, stepped 12G/14G needle, bead ${f2(K.beadA * 1e6)} mm2 at ${(K.feed * 1000).toFixed(0)} mm/s, rings at ${f2(pitch * 1000)} mm pitch, layers ${f1(K.layer * 1000)} mm`);
   note("; DexArm frame: X right, Y forward, Z up from the base, mm. Boom on Klipper manual_stepper, mm from home.");
-  note("G21 ; millimetres"); note("G90 ; absolute positions"); note("M83 ; relative extrusion"); note("M200 D0 ; E in mm3 of mixed silicone");
+  note("G21 ; millimeters"); note("G90 ; absolute positions"); note("M83 ; relative extrusion"); note("M200 D0 ; E in mm3 of mixed silicone");
   note(`G0 F${(K.travel * 60000).toFixed(0)}`);
   boomTo(st[0]);
   let order = 0;

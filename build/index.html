@@ -98,7 +98,7 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
       <div class="ctl"><label for="pleatL">Pleat spacing</label><input type="range" id="pleatL" min="30" max="100" step="1" value="58"><output></output></div>
       <div class="ctl"><label for="pleatA">Pleat depth</label><input type="range" id="pleatA" min="0" max="30" step="1" value="16"><output></output></div>
       <div class="ctl"><label for="segs">Hull gores</label><input type="range" id="segs" min="3" max="10" step="1" value="6"><output></output></div>
-      <p class="hint">The clear lower hull is a keel cap plus gores, small enough for a desktop resin printer, joined by flanges over a silicone cord. The upper skin is printed silicone origami. Pleats open when the womb is pressurised and fold back, sagging a little, when it vents.</p>
+      <p class="hint">The clear lower hull is a keel cap plus gores, small enough for a desktop resin printer, joined by flanges over a silicone cord. The upper skin is printed silicone origami. Pleats open when the womb is pressurized and fold back, sagging a little, when it vents.</p>
       <p class="grp">Baby</p>
       <div class="ctl"><label for="pattern">Fold pattern</label><select id="pattern"><option value="bellows">Bellows</option><option value="yoshimura">Yoshimura</option><option value="kresling">Kresling</option></select><span></span></div>
       <div class="ctl"><label for="fold">Deployed</label><input type="range" id="fold" min="0" max="1" step="0.01" value="0"><output></output></div>
@@ -130,7 +130,7 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
     <div class="results" id="bRes"></div>
   </section>
 
-  <section id="fem"><h2>Birth, simulated properly</h2><p class="sub">An axisymmetric finite element model of the pressurised bellows, the soft sleeve, friction, the pump and the womb pulses, validated against the neo-Hookean balloon curve. The lanes above are a sketch; these are the numbers.</p><video src="media/birth_sim.mp4" poster="media/birth_sim_poster.png" controls muted playsinline style="width:100%;border:1px solid var(--line);border-radius:8px;background:#141415"></video><div id="femDoc" style="margin-top:16px"></div></section>
+  <section id="fem"><h2>Birth, simulated properly</h2><p class="sub">An axisymmetric finite element model of the pressurized bellows, the soft sleeve, friction, the pump and the womb pulses, validated against the neo-Hookean balloon curve. The lanes above are a sketch; these are the numbers.</p><video src="media/birth_sim.mp4" poster="media/birth_sim_poster.png" controls muted playsinline style="width:100%;border:1px solid var(--line);border-radius:8px;background:#141415"></video><div id="femDoc" style="margin-top:16px"></div></section>
   <section id="bench"><h2>Bench tests</h2><p class="sub">Seven measurements turn the model's assumptions into facts. Enter a result to check it against the design window. Results stay in this browser.</p><div id="benchDoc"></div></section>
   <section id="print">
     <h2>Printing in gel</h2>
@@ -146,14 +146,14 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
         <div class="ctl"><label for="pVol">Silicone per baby</label><input type="range" id="pVol" min="0.2" max="10" step="0.01" value="0.67"><output></output></div>
         <div class="kv" id="pOut"></div>
       </div>
-      <div><canvas id="bead" aria-label="Cross section of printed beads"></canvas><p class="hint">Cross section of a wall and a pleat gap, to scale. Grey bars are the arm's error.</p></div>
+      <div><canvas id="bead" aria-label="Cross section of printed beads"></canvas><p class="hint">Cross section of a wall and a pleat gap, to scale. Gray bars are the arm's error.</p></div>
     </div>
   </section>
 
   <section id="fold"><h2>Why this fold</h2><div id="foldDoc"><p class="pend">Waiting for the physics check.</p></div></section>
   <section id="swell"><h2>Why the mother swells</h2><p class="sub">No swelling for its own sake. Each movement of the belly has a mechanical cause.</p><div id="swellDoc"><p class="pend">Waiting for the physics check.</p></div></section>
   <section id="push"><h2>Ways to push</h2><div id="pushDoc"><p class="pend">Waiting for the physics check.</p></div></section>
-  <section id="v2"><h2>Design v2: seven problems, seven decisions</h2><p class="sub">The checks above found problems; this revision resolves each with a number, a source, a remaining risk and a bench test.</p><img src="media/design_v2.png" alt="Mechanical design v2, docked pair, labelled" style="width:100%;border:1px solid var(--line);border-radius:8px;background:#141415"><div id="v2Doc" style="margin-top:16px"></div></section>
+  <section id="v2"><h2>Design v2: seven problems, seven decisions</h2><p class="sub">The checks above found problems; this revision resolves each with a number, a source, a remaining risk and a bench test.</p><img src="media/design_v2.png" alt="Mechanical design v2, docked pair, labeled" style="width:100%;border:1px solid var(--line);border-radius:8px;background:#141415"><div id="v2Doc" style="margin-top:16px"></div></section>
   <section id="dock"><h2>Docking and entry</h2><div id="dockDoc"><p class="pend">Waiting for the physics check.</p></div></section>
   <section id="sources"><h2>Sources</h2><p class="sub">Every part and number above, with its primary source. Code and data: <a href="https://github.com/ruipwan/born-not-made/tree/main/build">build/ on GitHub</a>.</p><ol class="src" id="srcList"></ol></section>
 </div>
