@@ -9,8 +9,15 @@
 html, body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 "Inter", system-ui, sans-serif; }
 a { color: var(--gel); }
 .app { display: grid; grid-template-columns: minmax(0, 1fr) 380px; height: min(100vh, 900px); min-height: 560px; border-bottom: 1px solid var(--line); }
-.view { position: relative; min-width: 0; }
-#gl { width: 100%; height: 100%; display: block; touch-action: none; }
+.view { position: relative; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+.stage3d { position: relative; flex: 1 1 auto; min-height: 0; }
+#gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.armsw { display: inline-flex; align-items: center; gap: 0; }
+.armsw .lbl { font-size: 12.5px; color: var(--muted); margin-right: 7px; }
+.viewbar .armsw button:first-of-type { border-radius: 999px 0 0 999px; }
+.viewbar .armsw button:last-of-type { border-radius: 0 999px 999px 0; margin-left: 1px; }
+.armnote { margin: 0; padding: 9px 14px; font-size: 12.5px; line-height: 1.45; color: var(--muted); border-top: 1px solid var(--line); background: var(--paper); }
+.row.off { opacity: .45; }
 .viewbar { position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; pointer-events: none; }
 .viewbar > * { pointer-events: auto; }
 .pill { background: color-mix(in srgb, var(--paper) 92%, transparent); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; display: flex; gap: 8px; align-items: center; font-size: 12.5px; }
@@ -69,6 +76,7 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
 <link rel="stylesheet" href="../assets/css/organic.css"></head><body>
 <div class="app">
   <section class="view">
+    <div class="stage3d">
     <canvas id="gl" aria-label="Parametric white model of the mother, tail, arm and baby"></canvas>
     <div class="legend"><span><i style="background:#d5d8dc"></i>bought</span><span><i style="background:#f6f5f1"></i>printed rigid</span><span><i style="background:#efe6d4"></i>silicone, printed in gel</span><span><i style="background:#cfe2f3"></i>gel</span><span><i style="background:#141415;border-style:dashed"></i>clear hull</span></div>
     <div class="dims" id="dims"></div>
@@ -76,8 +84,10 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
     <div class="loading" id="loading">Loading the model…</div>
     <div class="viewbar">
       <div class="pill"><label for="explode">Explode</label><input type="range" id="explode" min="0" max="1" step="0.01" value="0"></div>
-      <button id="vAsm" class="on">Assembly</button><button id="vBaby">Baby</button><button id="vCut">Section</button><button id="vRing" class="on" aria-pressed="true" title="Show or hide the ring on the top shell">Top ring</button><button id="vReset">Reset view</button>
+      <button id="vAsm" class="on">Assembly</button><button id="vBaby">Baby</button><button id="vCut">Section</button><button id="vRing" class="on" aria-pressed="true" title="Show or hide the ring on the top shell">Top ring</button><span class="armsw" role="group" aria-label="Arm"><span class="lbl">Arm</span><button id="vArmDex" class="on" aria-pressed="true" title="Rotrics DexArm on the low boom and rails">DexArm</button><button id="vArmEco" aria-pressed="false" title="RealMan ECO62 hanging from a flat top boom, whole system 1.25 times larger">ECO62</button></span><button id="vReset">Reset view</button>
     </div>
+    </div>
+    <p class="armnote" id="armNote" hidden></p>
   </section>
   <aside>
     <div class="ptabs" role="tablist"><button class="on" data-p="pParts">Parts</button><button data-p="pShape">Shape</button><button data-p="pPrec">Precision</button></div>
@@ -152,6 +162,7 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="../assets/js/eco62.js"></script>
 <script>
 "use strict";
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -171,7 +182,8 @@ const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0c0c0d);
 const cam = new THREE.PerspectiveCamera(30, 1, 0.01, 60);
 const ctl = new THREE.OrbitControls(cam, cv); ctl.enableDamping = true;
 const HOME = { pos: [1.55, 0.95, 2.05], tgt: [-0.12, -0.02, 0] };
-function resetView() { cam.position.set(...HOME.pos); ctl.target.set(...HOME.tgt); ctl.update(); }
+let VIEWK = 1;   // 1.25 while the ECO62 layout is shown: the whole system is drawn that much larger
+function resetView() { cam.position.set(...HOME.pos).multiplyScalar(VIEWK); ctl.target.set(...HOME.tgt).multiplyScalar(VIEWK); ctl.update(); }
 resetView();
 scene.add(new THREE.HemisphereLight(0xffffff, 0xd9d5cc, 0.9));
 const sun = new THREE.DirectionalLight(0xffffff, 0.7); sun.position.set(1.2, 3.2, 1.6); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
@@ -196,9 +208,9 @@ function addEdges(mesh, ang = 30, op = 0.45) {
 const PART = {};
 function part(key, label, dir, make) { if (PART[key]) return PART[key]; const g = new THREE.Group(); g.name = key; root.add(g); return (PART[key] = { key, label, g, meshes: [], dir, make, comp: [] }); }
 function addMesh(p, m, edgesAng = 30) { m.castShadow = m.material.transparent ? false : true; m.receiveShadow = true; m.userData.part = p.key; p.g.add(m); p.meshes.push(m); if (edgesAng) addEdges(m, edgesAng, m.material.transparent ? 0.3 : 0.62); return m; }
-const LABEL = { hull: "Mother hull", topring: "Top shell ring", belly: "Belly skin, printed origami", canal: "Birth canal", front: "Front plate", bore: "Rear bore and ring", magnets: "Dock magnets", tail: "Tail shell", tailring: "Tail ring", rails: "Rails and keel", boom: "Boom and carriage", tray: "Parts tray", tool: "Tool head", dexarm: "DexArm", gel: "Support gel", baby: "Baby body", capsule: "Electronics capsule", needle: "Inflation valve", valve3: "Three way valve", duckbill: "Lips, check valve", pump: "Air pump", battery: "Battery", ctrl: "Controller", psensor: "Pressure sensor", thrusters: "Thrusters" };
-const DIR = { topring: [0, 0, 0.22], belly: [0, 0, 0.34], canal: [0.46, 0, 0.06], front: [0.3, 0, 0], bore: [-0.18, 0, 0], magnets: [-0.3, 0, 0], tail: [-0.62, 0, 0], tailring: [-0.42, 0, 0], rails: [-0.62, 0, -0.26], boom: [-0.32, 0, 0.3], tray: [-0.36, 0, 0.14], tool: [0.12, 0, 0.62], dexarm: [-0.06, 0, 0.42], gel: [0, 0, -0.18], baby: [0, 0, -0.18], capsule: [0, 0, -0.06], needle: [0, 0, 0.1], valve3: [0.12, 0, 0.7], duckbill: [0.62, 0, 0.1], pump: [-0.62, 0, 0.18], battery: [-0.62, 0, 0.1], ctrl: [-0.62, 0, 0.26], psensor: [-0.62, 0, 0.34], thrusters: [-0.72, 0, -0.1] };
-const MAKE = { hull: "glass", topring: "rigid", belly: "silicone", canal: "silicone", front: "rigid", bore: "rigid", magnets: "bought", tail: "rigid", tailring: "rigid", rails: "bought", boom: "bought", tray: "rigid", tool: "rigid", dexarm: "bought", gel: "gel", baby: "silicone", capsule: "bought", needle: "bought", valve3: "bought", duckbill: "silicone", pump: "bought", battery: "bought", ctrl: "bought", psensor: "bought", thrusters: "bought" };
+const LABEL = { hull: "Mother hull", topring: "Top shell ring", belly: "Belly skin, printed origami", canal: "Birth canal", front: "Front plate", bore: "Rear bore and ring", magnets: "Dock magnets", tail: "Tail shell", tailring: "Tail ring", rails: "Rails and keel", boom: "Boom and carriage", tray: "Parts tray", tool: "Tool head", dexarm: "DexArm", eco62: "RealMan ECO62", topboom: "Top boom, flat, three stages", ecotool: "Print tube and needle", gel: "Support gel", baby: "Baby body", capsule: "Electronics capsule", needle: "Inflation valve", valve3: "Three way valve", duckbill: "Lips, check valve", pump: "Air pump", battery: "Battery", ctrl: "Controller", psensor: "Pressure sensor", thrusters: "Thrusters" };
+const DIR = { topring: [0, 0, 0.22], belly: [0, 0, 0.34], canal: [0.46, 0, 0.06], front: [0.3, 0, 0], bore: [-0.18, 0, 0], magnets: [-0.3, 0, 0], tail: [-0.62, 0, 0], tailring: [-0.42, 0, 0], rails: [-0.62, 0, -0.26], boom: [-0.32, 0, 0.3], tray: [-0.36, 0, 0.14], tool: [0.12, 0, 0.62], dexarm: [-0.06, 0, 0.42], eco62: [-0.16, 0, 0.5], topboom: [-0.5, 0, 0.34], ecotool: [-0.02, 0, 0.66], gel: [0, 0, -0.18], baby: [0, 0, -0.18], capsule: [0, 0, -0.06], needle: [0, 0, 0.1], valve3: [0.12, 0, 0.7], duckbill: [0.62, 0, 0.1], pump: [-0.62, 0, 0.18], battery: [-0.62, 0, 0.1], ctrl: [-0.62, 0, 0.26], psensor: [-0.62, 0, 0.34], thrusters: [-0.72, 0, -0.1] };
+const MAKE = { hull: "glass", topring: "rigid", belly: "silicone", canal: "silicone", front: "rigid", bore: "rigid", magnets: "bought", tail: "rigid", tailring: "rigid", rails: "bought", boom: "bought", tray: "rigid", tool: "rigid", dexarm: "bought", eco62: "bought", topboom: "bought", ecotool: "rigid", gel: "gel", baby: "silicone", capsule: "bought", needle: "bought", valve3: "bought", duckbill: "silicone", pump: "bought", battery: "bought", ctrl: "bought", psensor: "bought", thrusters: "bought" };
 const MAP = [[/^W_V2_(Pads|EPM)$/, "magnets"], [/^W_V2_BoreRing$/, "bore"], [/^W_V2_(Collar|LipSeal)$/, "tailring"], [/^W_V2_Rails$/, "rails"], [/^W_V2_Boom$/, "boom"], [/^W_V2_(Cartridge|Battery|Thrusters)$/, "tail"], [/^W_V2_Gel$/, "gel"], [/^W_V2_TrayWall$/, "tray"], [/^W_V2_Chute$/, "canal"], [/^W_V2_BellyPleats$/, "belly"], [/Magnets$/, "magnets"], [/^W_B0_Canal/, "canal"], [/^W_B0_Mother(FrontPlate|Lid)$/, "front"], [/^W_B0_(MotherRearWall|MotherBoreHoop|RingA|RingB|RingBEdge|RingBKnurl)$/, "bore"], [/^W_T1_(TailShell|TailFacePlate)$/, "tail"], [/^W_T1_TailRing/, "tailring"], [/^W_T1_(Keel|LowRod)/, "rails"], [/^W_T1_(BoomTube|CarriagePlate)/, "boom"], [/^W_T1_(Tray|LidStraps)/, "tray"], [/^W_T1_(Tool|Gripper)/, "tool"], [/^A_/, "dexarm"]];
 for (const k in LABEL) part(k, LABEL[k], DIR[k] || [0, 0, 0], MAKE[k]);
 
@@ -251,7 +263,39 @@ async function loadModel() {
   poseArm([META.pose.yaw * Math.PI / 180, META.pose.a * Math.PI / 180, META.pose.b * Math.PI / 180], armParts, toolParts);
   skinBase = skinGeo.attributes.position.array.slice();
   buildBelly(); buildHull(); buildBaby(); buildSchematic();
+  try { await buildEco(); } catch (e) { console.warn("ECO62 not loaded", e); $("#vArmEco").disabled = true; $("#vArmEco").title = "ECO62 model could not be loaded"; }
 }
+/* ---------------- arm option: RealMan ECO62 hanging from a flat top boom (R25 layout, the whole system 1.25 times larger) ---------------- */
+let armSel = "dexarm", ECO = null;
+const ARM_DEX = ["dexarm", "boom", "rails", "tool"], ARM_ECO = ["eco62", "topboom", "ecotool"];
+function ecoMesh(key, geo, material, M, edgeAng) { const p = PART[key], m = new THREE.Mesh(geo, material); m.matrixAutoUpdate = false; m.matrix.copy(M); m.castShadow = true; m.receiveShadow = true; m.userData.part = key; p.eg.add(m); p.meshes.push(m); if (edgeAng) addEdges(m, edgeAng, 0.5); return m; }
+async function buildEco() {
+  const A = await ECO62.load("../simulator/"), S = ECO62.S, L = ECO62.LAYOUT, boom = META.stations.front;
+  for (const k of ARM_ECO) { const g = new THREE.Group(); g.scale.setScalar(1 / S); PART[k].g.add(g); PART[k].eg = g; PART[k].g.visible = false; }   // arm data are real metres; the root is scaled by S when shown
+  const B = ECO62.baseM(boom), tgt = [(META.print.cx + 0.03) * S, 0.02 * S, (META.printMin[2] + 0.03) * S];
+  const r = ECO62.ik(tgt, ECO62.SEED, B, { iters: 300 }), F = ECO62.fk(r.q, B);
+  A.meta.links.forEach((ln, i) => ecoMesh("eco62", A.geo[ln], new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.62, metalness: 0.04 }), ECO62.toM4(F[i]), 40));
+  const F6 = ECO62.toM4(F[6]);
+  for (const t of ECO62.toolShapes()) ecoMesh("ecotool", t.geo, mat(t.kind === "block" ? "bought" : "rigid"), F6.clone().multiply(Tm(t.pos)), 30);
+  for (const b of ECO62.boomStages(boom)) ecoMesh("topboom", new THREE.BoxGeometry(b.x1 - b.x0, b.w, b.z1 - b.z0), mat("bought"), Tm([(b.x0 + b.x1) / 2, 0, (b.z0 + b.z1) / 2]), 30);
+  ecoMesh("topboom", new THREE.CylinderGeometry(0.058, 0.058, L.seat, 40), mat("bought"), Tm([ECO62.footX(boom), 0, L.boomZ[0] - L.seat / 2]).multiply(Rx(Math.PI / 2)), 30);
+  ECO = { F6, spec: A.meta.spec };
+  $("#armNote").textContent = ECO62.STATUS;
+}
+function applyArm(resetCam) {
+  const eco = armSel === "eco62" && !!ECO, asm = mode === "asm";
+  for (const k of ARM_DEX) PART[k].g.visible = asm && !eco;
+  for (const k of ARM_ECO) PART[k].g.visible = asm && eco;
+  VIEWK = eco && asm ? ECO62.S : 1; root.scale.setScalar(VIEWK);
+  if (SCHEM.valve3) SCHEM.valve3.matrix.copy(eco ? M4().makeScale(1 / ECO62.S, 1 / ECO62.S, 1 / ECO62.S).multiply(ECO.F6).multiply(Tm([0.039, 0, 0.016])) : eeMatrix.clone().multiply(Tm([0, 0.045, 0.06])));
+  $("#vArmDex").classList.toggle("on", !eco); $("#vArmDex").setAttribute("aria-pressed", !eco); $("#vArmEco").classList.toggle("on", eco); $("#vArmEco").setAttribute("aria-pressed", eco);
+  $("#armNote").hidden = !eco;
+  $("#tip").style.display = "none";
+  if (selKey && !PART[selKey].g.visible) { selectPart(null, false); $("#card").innerHTML = ""; }
+  if (DATA.components.length) renderTree();
+  if (resetCam && asm) resetView();
+}
+function setArm(v) { armSel = v === "eco62" && ECO ? "eco62" : "dexarm"; ECO62.setArm(armSel); applyArm(true); }
 function buildGel(geo) {
   const g = geo.clone(), p = g.attributes.position.array;
   for (let i = 0; i < p.length; i += 3) { p[i] *= 0.985; p[i + 1] *= 0.985; p[i + 2] = Math.min(p[i + 2], META.gelZ) * 0.99; }
@@ -354,7 +398,7 @@ function buildSchematic() {
   schemMesh("capsule", new THREE.CapsuleGeometry(0.016, 0.05, 6, 16), [c[0], c[1], c[2] + 0.02], [0, Math.PI / 2, 0]);
   schemMesh("needle", new THREE.CylinderGeometry(0.009, 0.012, 0.024, 20), [c[0], c[1], c[2] + 0.06], [Math.PI / 2, 0, 0]);
   // three way valve on the tool head, in the end block's frame
-  const v = schemMesh("valve3", new THREE.BoxGeometry(0.03, 0.03, 0.03), [0, 0, 0]); v.matrixAutoUpdate = false; v.matrix.copy(eeMatrix).multiply(Tm([0, 0.045, 0.06]));
+  const v = schemMesh("valve3", new THREE.BoxGeometry(0.03, 0.03, 0.03), [0, 0, 0]); v.matrixAutoUpdate = false; v.matrix.copy(eeMatrix).multiply(Tm([0, 0.045, 0.06]));   // moved to the ECO62 flange by applyArm
   // the canal lips: a duckbill of four lips at the outer end of the canal
   const C = META.canalC, N = META.canalN, tip = [C[0] + N[0] * 0.07, 0, C[2] + N[2] * 0.07];
   const lips = schemMesh("duckbill", new THREE.ConeGeometry(0.11, 0.07, 4, 1, true), tip); lips.lookAt(new THREE.Vector3(tip[0] + N[0], 0, tip[2] + N[2])); lips.rotateX(Math.PI / 2);
@@ -385,12 +429,13 @@ function pick(ev) {
 cv.addEventListener("pointermove", (ev) => { if (ev.buttons) return; const k = pick(ev); hoverKey = k; const tip = $("#tip"); if (k) { tip.textContent = PART[k].label; tip.style.display = "block"; const r = cv.getBoundingClientRect(); tip.style.left = ev.clientX - r.left + 14 + "px"; tip.style.top = ev.clientY - r.top + 10 + "px"; } else tip.style.display = "none"; });
 let downAt = null; cv.addEventListener("pointerdown", (ev) => (downAt = [ev.clientX, ev.clientY]));
 cv.addEventListener("pointerup", (ev) => { if (!downAt || Math.hypot(ev.clientX - downAt[0], ev.clientY - downAt[1]) > 4) return; selectPart(pick(ev), true); });
-function setHighlight(k, on) { const p = PART[k]; if (!p) return; for (const m of p.meshes) { m.material.emissive = new THREE.Color(on ? 0x2f6fa8 : 0x000000); m.material.emissiveIntensity = on ? 0.35 : 0; } }
+function setHighlight(k, on) { const p = PART[k]; if (!p) return; for (const m of p.meshes) { if (!m.material.emissive) continue; m.material.emissive = new THREE.Color(on ? 0x2f6fa8 : 0x000000); m.material.emissiveIntensity = on ? 0.35 : 0; } }
 function selectPart(k, fromView) {
   if (selKey) setHighlight(selKey, false); selKey = k; if (k) setHighlight(k, true);
   const d = $("#dims");
-  if (k) { const b = new THREE.Box3(); for (const m of PART[k].meshes) b.expandByObject(m); const s = b.getSize(new THREE.Vector3()); d.textContent = `${PART[k].label}: ${Math.round(s.x * 1000)} × ${Math.round(s.z * 1000)} × ${Math.round(s.y * 1000)} mm${PART[k].meshes.some((m) => m.userData.schematic) ? " (schematic)" : ""}`; d.style.display = "block"; } else d.style.display = "none";
-  if (fromView) { const comp = DATA.components.find((c) => LINK[c.id] === k); showCard(comp || null, k); }
+  if (k && !PART[k].g.visible && mode === "asm") { d.textContent = `${PART[k].label}: not in the ${armSel === "eco62" ? "ECO62" : "DexArm"} layout`; d.style.display = "block"; }
+  else if (k) { const b = new THREE.Box3(); for (const m of PART[k].meshes) b.expandByObject(m); const s = b.getSize(new THREE.Vector3()); d.textContent = `${PART[k].label}: ${Math.round(s.x * 1000)} × ${Math.round(s.z * 1000)} × ${Math.round(s.y * 1000)} mm${PART[k].meshes.some((m) => m.userData.schematic) ? " (schematic)" : ""}`; d.style.display = "block"; } else d.style.display = "none";
+  if (fromView) { const comp = k ? compsNow().find((c) => LINK[c.id] === k) : null; showCard(comp || null, k); }
   $$(".row").forEach((r) => r.classList.toggle("sel", !!k && LINK[r.dataset.id] === k));
 }
 /* ---------------- render loop ---------------- */
@@ -404,8 +449,10 @@ $("#explode").addEventListener("input", (e) => { E = +e.target.value; layout(); 
 function setMode(m) {
   mode = m; $("#vAsm").classList.toggle("on", m === "asm"); $("#vBaby").classList.toggle("on", m === "baby");
   for (const k in PART) PART[k].g.visible = m === "asm" || ["baby", "capsule", "needle"].includes(k); if (PART.topring) PART.topring.g.visible = ringOn && m === "asm";
+  applyArm(false);   // arm parts, and the 1.25 scale of the ECO62 layout (assembly only, so the baby sliders stay in real millimetres)
   if (m === "baby") { const c = babyMesh.getWorldPosition(new THREE.Vector3()); ctl.target.copy(c); cam.position.set(c.x + 0.55, c.y + 0.4, c.z + 0.7); } else resetView();
 }
+$("#vArmDex").onclick = () => setArm("dexarm"); $("#vArmEco").onclick = () => setArm("eco62");
 $("#vAsm").onclick = () => setMode("asm"); $("#vBaby").onclick = () => setMode("baby"); $("#vReset").onclick = resetView;
 let cut = false; $("#vCut").onclick = () => { cut = !cut; $("#vCut").classList.toggle("on", cut); R.clippingPlanes = cut ? [new THREE.Plane(new THREE.Vector3(0, 0, -1), 0.0)] : []; };
 $$(".ptabs button").forEach((b) => (b.onclick = () => { $$(".ptabs button").forEach((x) => x.classList.toggle("on", x === b)); $$(".pane").forEach((p) => p.classList.toggle("on", p.id === b.dataset.p)); }));
@@ -418,15 +465,25 @@ for (const id of ["pattern", "fold", "nPleat", "mSide", "dDep", "lDep", "lFold"]
 /* ====================================================================== parts list */
 const LINK = {};
 const RULES = [[/dexarm/i, "dexarm"], [/three.?way|3.?way|3\/2|diverter/i, "valve3"], [/needle|inflation valve|ball valve/i, "needle"], [/duckbill|lip|check valve/i, "duckbill"], [/canal|sleeve/i, "canal"], [/belly|origami|pleat|upper skin/i, "belly"], [/magnet/i, "magnets"], [/pogo|o.?ring|gasket|seal|cone|guide pin|latch/i, "tailring"], [/rail|linear guide|mgn|keel/i, "rails"], [/boom|carriage|belt|lead ?screw|stepper|telescop/i, "boom"], [/tail (shell|hull|body)|tail$/i, "tail"], [/nozzle|mixer|cartridge|syringe|tool|dispens|extru/i, "tool"], [/capsule|mcu|esp32|xiao|imu|baby (battery|pump|electronics)|micro ?pump/i, "capsule"], [/gel|carbopol|carbomer|neutrali/i, "gel"], [/baby|silicone|ecoflex|dragon ?skin|elastomer/i, "baby"], [/pump|blower|compressor/i, "pump"], [/relief|regulator|pressure sensor|transducer/i, "psensor"], [/battery|lipo|li.?ion/i, "battery"], [/controller|raspberry|arduino|board|driver/i, "ctrl"], [/thruster|propeller/i, "thrusters"], [/tray|magazine/i, "tray"], [/front plate|nose/i, "front"], [/bore|rear wall|hoop|ring/i, "bore"], [/hull|shell|egg|mother body|segment|petg|acrylic/i, "hull"]];
-const PARTMAP = { hull_lower: "hull", hull_seam_seal: "hull", rear_wall: "bore", bore_hoop: "bore", front_plate: "front", belly_skin: "belly", gel_tray: "gel", rear_door: "bore", canal_sleeve: "canal", canal_lips: "duckbill", tail_shell: "tail", rails: "rails", boom_drive: "boom", dexarm: "dexarm", tail_battery: "battery", controller: "ctrl", thrusters: "thrusters", trim: "tail", brackets: "tail", cartridge: "tool", cartridge_drive: "tool", static_mixer: "tool", three_way_valve: "valve3", valve_servo: "valve3", needle: "tool", air_pump: "pump", vent_valve: "pump", pressure_sensor: "psensor", support_gel: "gel", naoh: "gel", print_silicone: "baby", clear_silicone: "belly", fast_silicone: "baby", dock_magnets: "magnets", pogo_pins: "tailring", dock_seal: "tailring", dock_cone: "tailring", baby_body: "baby", needle_valve: "needle", baby_mcu: "capsule", baby_battery: "capsule", baby_pump: "capsule", capsule_shell: "capsule", mother_node: "ctrl", mother_battery: "battery" };
+const PARTMAP = { hull_lower: "hull", hull_seam_seal: "hull", rear_wall: "bore", bore_hoop: "bore", front_plate: "front", belly_skin: "belly", gel_tray: "gel", rear_door: "bore", canal_sleeve: "canal", canal_lips: "duckbill", tail_shell: "tail", rails: "rails", boom_drive: "boom", dexarm: "dexarm", eco62: "eco62", tail_battery: "battery", controller: "ctrl", thrusters: "thrusters", trim: "tail", brackets: "tail", cartridge: "tool", cartridge_drive: "tool", static_mixer: "tool", three_way_valve: "valve3", valve_servo: "valve3", needle: "tool", air_pump: "pump", vent_valve: "pump", pressure_sensor: "psensor", support_gel: "gel", naoh: "gel", print_silicone: "baby", clear_silicone: "belly", fast_silicone: "baby", dock_magnets: "magnets", pogo_pins: "tailring", dock_seal: "tailring", dock_cone: "tailring", baby_body: "baby", needle_valve: "needle", baby_mcu: "capsule", baby_battery: "capsule", baby_pump: "capsule", capsule_shell: "capsule", mother_node: "ctrl", mother_battery: "battery" };
 function linkOf(c) { if (PARTMAP[c.id] && PART[PARTMAP[c.id]]) return PARTMAP[c.id]; if (c.part && PART[c.part]) return c.part; const s = `${c.id} ${c.name} ${c.group}`; const r = RULES.find(([re]) => re.test(s)); return r ? r[1] : null; }
 const BADGE = { works: ["works", "works"], "works after bench test": ["test", "bench test"], open: ["open", "open"] };
+/* the arm row of the parts list while the ECO62 is shown: numbers from the RealMan ECO62 parameter sheet, layout from the R25 note */
+const ECO_COMP = { id: "eco62", group: "tail", name: "RealMan ECO62", role: "prints and places inside the womb, hanging from the top boom",
+  how: "A six axis arm that hangs upside down under the tip of a flat telescopic top boom (80 x 20 mm, three stages) that comes with the tail. The foot is turned 180 degrees on the boom tip. The whole system is 1.25 times larger than the DexArm version to make room for the arm. Numbers are from the RealMan ECO62 parameter sheet.",
+  specs: [["Payload", "2 kg"], ["Working radius", "425 mm"], ["Weight", "3.6 kg"], ["Repeatability", "0.1 mm"], ["Overall height", "514.5 mm"], ["Axes", "6"],
+    ["Joint ranges", "J1 -178 to 178, J2 -169 to 104, J3 -151 to 133, J4 -172 to 172, J5 -172 to 172, J6 -360 to 360 deg"], ["Max joint speed", "J1 to J3 225 deg/s, J4 to J6 180 deg/s"],
+    ["Power", "100 W typical, 180 W peak, DC 24 V"], ["System scale", "1.25: mother 959 x 890 x 761 mm, tail 1048 mm, gel 195 mm deep, hatch bore D 280"], ["Arm ceiling", "467 mm above the floor"],
+    ["Price", "academic quote from Foundova, November 2026"], ["Status", "built, targets not all met: 64 collision frames at 10 mm clearance, 57 frames above datasheet joint speed"]],
+  make: "buy", qty: 1, mass_g: 3600, cost_usd: 6670, verdict: "open", owned: false,
+  sources: [{ label: "RealMan ECO62 URDF and meshes, ros2_rm_robot on GitHub", url: "https://github.com/RealManRobot/ros2_rm_robot/tree/711abedd48c6614f26fb4f7661db92f306ff05bd/rm_description" }] };
+function compsNow() { const cs = DATA.components || []; return armSel === "eco62" && ECO ? cs.map((c) => (c.id === "dexarm" ? ECO_COMP : c)) : cs; }
 function renderTree() {
-  const comps = DATA.components || []; for (const c of comps) LINK[c.id] = linkOf(c);
+  const comps = compsNow(), eco = armSel === "eco62" && !!ECO; for (const c of comps) LINK[c.id] = linkOf(c);
   const cost = comps.reduce((a, c) => a + (+c.cost_usd || 0) * (+c.qty || 1), 0), mass = comps.reduce((a, c) => a + (+c.mass_g || 0) * (+c.qty || 1), 0);
-  $("#bomSum").textContent = comps.length ? `${comps.length} parts · about $${Math.round(cost).toLocaleString("en-US")} · about ${(mass / 1000).toFixed(1)} kg · click a part or a row` : "Parts list not loaded.";
+  $("#bomSum").textContent = comps.length ? `${comps.length} parts · about $${Math.round(cost).toLocaleString("en-US")} · about ${(mass / 1000).toFixed(1)} kg · click a part or a row${eco ? " · ECO62 arm, other parts as in the DexArm version" : ""}` : "Parts list not loaded.";
   const groups = {}; for (const c of comps) (groups[c.group] = groups[c.group] || []).push(c);
-  $("#tree").innerHTML = Object.entries(groups).map(([g, cs]) => `<p class="grp">${esc(g)}</p>` + cs.map((c) => { const b = BADGE[c.verdict] || ["", c.verdict || ""]; return `<div class="row" data-id="${esc(c.id)}" tabindex="0"><span class="nm">${esc(c.name)}${c.qty > 1 ? " ×" + esc(c.qty) : ""}${c.owned ? " <span class=\"badge\">owned</span>" : ""}</span><span class="badge ${b[0]}">${esc(b[1])}</span></div>`; }).join("")).join("");
+  $("#tree").innerHTML = Object.entries(groups).map(([g, cs]) => `<p class="grp">${esc(g)}</p>` + cs.map((c) => { const b = BADGE[c.verdict] || ["", c.verdict || ""]; return `<div class="row${eco && ARM_DEX.includes(LINK[c.id]) ? " off" : ""}" data-id="${esc(c.id)}" tabindex="0"${eco && ARM_DEX.includes(LINK[c.id]) ? ' title="DexArm version part, not in the ECO62 layout"' : ""}><span class="nm">${esc(c.name)}${c.qty > 1 ? " ×" + esc(c.qty) : ""}${c.owned ? " <span class=\"badge\">owned</span>" : ""}</span><span class="badge ${b[0]}">${esc(b[1])}</span></div>`; }).join("")).join("");
   $$(".row").forEach((r) => { const go = () => { const c = comps.find((x) => x.id === r.dataset.id); showCard(c, LINK[c.id]); selectPart(LINK[c.id], false); $$(".row").forEach((x) => x.classList.toggle("sel", x === r)); }; r.onclick = go; r.onkeydown = (e) => { if (e.key === "Enter") go(); }; });
 }
 function showCard(c, k) {
@@ -611,7 +668,7 @@ if (new URLSearchParams(location.search).get("view") === "physics") {   // the p
   DATA = (await getJSON("data/components.json")) || DATA; PHYS = (await getJSON("data/physics.json")) || {};
   renderTree(); renderPrecision(); renderV2(); renderFem(); renderBench(); renderPhysics(); renderSources(); applyPhysDefaults();
   simReset(); requestAnimationFrame(simLoop); printCalc();
-  try { await loadModel(); $("#loading").remove(); size(); frame(); } catch (e) { $("#loading").textContent = "The 3D model could not load here. The parts list still works."; console.error(e); }
+  try { await loadModel(); if (ECO62.getArm() === "eco62" && ECO) armSel = "eco62"; applyArm(true); $("#loading").remove(); size(); frame(); } catch (e) { $("#loading").textContent = "The 3D model could not load here. The parts list still works."; console.error(e); }
 })();
 </script>
 </body></html>

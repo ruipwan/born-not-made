@@ -1,0 +1,320 @@
+{
+ "name": "RealMan ECO62",
+ "units": "metres, radians; meshes in link local frames (URDF visual origin 0)",
+ "source": {
+  "urdf": "github.com/RealManRobot/ros2_rm_robot @ 711abedd48c6614f26fb4f7661db92f306ff05bd, rm_description, rm_eco62.urdf and dae visuals",
+  "urdf_url": "https://github.com/RealManRobot/ros2_rm_robot/tree/711abedd48c6614f26fb4f7661db92f306ff05bd/rm_description",
+  "spec": "RealMan ECO62 parameter sheet (PDF, October 2026)"
+ },
+ "links": [
+  "base_link",
+  "link_1",
+  "link_2",
+  "link_3",
+  "link_4",
+  "link_5",
+  "link_6"
+ ],
+ "joints": [
+  {
+   "name": "joint_1",
+   "parent": "base_link",
+   "child": "link_1",
+   "xyz": [
+    0.0,
+    0.0,
+    0.136
+   ],
+   "rpy": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "axis": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "lower": -3.1067,
+   "upper": 3.1067,
+   "velocity": 3.927
+  },
+  {
+   "name": "joint_2",
+   "parent": "link_1",
+   "child": "link_2",
+   "xyz": [
+    -0.07,
+    0.0,
+    0.0
+   ],
+   "rpy": [
+    -1.570796,
+    -1.570796,
+    0.0
+   ],
+   "axis": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "lower": -2.9496,
+   "upper": 1.8151,
+   "velocity": 3.927
+  },
+  {
+   "name": "joint_3",
+   "parent": "link_2",
+   "child": "link_3",
+   "xyz": [
+    0.148,
+    0.0,
+    0.0
+   ],
+   "rpy": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "axis": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "lower": -2.6354,
+   "upper": 2.3213,
+   "velocity": 3.927
+  },
+  {
+   "name": "joint_4",
+   "parent": "link_3",
+   "child": "link_4",
+   "xyz": [
+    0.136,
+    0.0,
+    -0.0585
+   ],
+   "rpy": [
+    0.0,
+    0.0,
+    1.5708
+   ],
+   "axis": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "lower": -3.002,
+   "upper": 3.002,
+   "velocity": 3.14159
+  },
+  {
+   "name": "joint_5",
+   "parent": "link_4",
+   "child": "link_5",
+   "xyz": [
+    0.0,
+    -0.071,
+    0.0
+   ],
+   "rpy": [
+    1.570796,
+    0.0,
+    0.0
+   ],
+   "axis": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "lower": -3.002,
+   "upper": 3.002,
+   "velocity": 3.14159
+  },
+  {
+   "name": "joint_6",
+   "parent": "link_5",
+   "child": "link_6",
+   "xyz": [
+    0.0,
+    0.0707,
+    0.0
+   ],
+   "rpy": [
+    -1.570796,
+    0.0,
+    0.0
+   ],
+   "axis": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "lower": -6.2832,
+   "upper": 6.2832,
+   "velocity": 3.14159
+  }
+ ],
+ "flange": {
+  "link": "link_6",
+  "axis": [
+   0,
+   0,
+   1
+  ],
+  "note": "flange face at the link_6 origin, tool axis +z"
+ },
+ "spec": {
+  "dof": 6,
+  "payload_kg": 2,
+  "mass_kg": 3.6,
+  "repeatability_mm": 0.1,
+  "working_radius_mm": 425,
+  "overall_height_mm": 514.5,
+  "joint_range_deg": [
+   [
+    -178,
+    178
+   ],
+   [
+    -169,
+    104
+   ],
+   [
+    -151,
+    133
+   ],
+   [
+    -172,
+    172
+   ],
+   [
+    -172,
+    172
+   ],
+   [
+    -360,
+    360
+   ]
+  ],
+  "max_joint_speed_deg_s": [
+   225,
+   225,
+   225,
+   180,
+   180,
+   180
+  ],
+  "power_typical_W": 100,
+  "power_peak_W": 180,
+  "supply": "DC 20 to 30 V, rated 24 V",
+  "material": "aluminium alloy and ABS"
+ },
+ "mesh": {
+  "base_link": {
+   "tris_source": 32090,
+   "tris": 12843,
+   "verts": 7974,
+   "bbox_min": [
+    -0.0548,
+    -0.055,
+    -0.0
+   ],
+   "bbox_max": [
+    0.0443,
+    0.055,
+    0.102
+   ]
+  },
+  "link_1": {
+   "tris_source": 4630,
+   "tris": 4624,
+   "verts": 2388,
+   "bbox_min": [
+    -0.1018,
+    -0.0438,
+    -0.034
+   ],
+   "bbox_max": [
+    0.031,
+    0.031,
+    0.0318
+   ]
+  },
+  "link_2": {
+   "tris_source": 3486,
+   "tris": 3486,
+   "verts": 1816,
+   "bbox_min": [
+    -0.0315,
+    -0.032,
+    -0.0821
+   ],
+   "bbox_max": [
+    0.1799,
+    0.032,
+    -0.0138
+   ]
+  },
+  "link_3": {
+   "tris_source": 3048,
+   "tris": 3048,
+   "verts": 1602,
+   "bbox_min": [
+    -0.0315,
+    -0.0315,
+    -0.0304
+   ],
+   "bbox_max": [
+    0.1602,
+    0.0315,
+    0.0237
+   ]
+  },
+  "link_4": {
+   "tris_source": 4750,
+   "tris": 4736,
+   "verts": 3107,
+   "bbox_min": [
+    -0.0235,
+    -0.0395,
+    -0.0235
+   ],
+   "bbox_max": [
+    0.0235,
+    0.0235,
+    0.0281
+   ]
+  },
+  "link_5": {
+   "tris_source": 5042,
+   "tris": 5030,
+   "verts": 2683,
+   "bbox_min": [
+    -0.0235,
+    -0.0357,
+    -0.0315
+   ],
+   "bbox_max": [
+    0.0235,
+    0.0432,
+    0.0235
+   ]
+  },
+  "link_6": {
+   "tris_source": 3192,
+   "tris": 3184,
+   "verts": 1892,
+   "bbox_min": [
+    -0.0237,
+    -0.0237,
+    -0.0275
+   ],
+   "bbox_max": [
+    0.0238,
+    0.0237,
+    -0.0
+   ]
+  }
+ }
+}

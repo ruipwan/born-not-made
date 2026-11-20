@@ -36,7 +36,9 @@ body { font: 12.5px/1.45 var(--sans); -webkit-font-smoothing: antialiased; }
 .ov { position: absolute; left: 14px; top: 10px; pointer-events: none; line-height: 1.35; max-width: calc(100% - 28px); }
 .ov .stage { font: 500 26px/1.1 var(--serif); color: var(--ink); }
 .ov .stepl { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+.ov .armnote { color: var(--warn, #e3b36a); font-size: 12px; margin-top: 3px; }
 .ov .clk { font: 500 13px var(--mono); color: var(--gel); margin-top: 6px; }
+.rnote { margin: 4px 0 0; color: var(--dim); font-size: 11.5px; line-height: 1.4; }
 .ov .clk span { color: var(--muted); font-weight: 400; }
 .notes { position: absolute; left: 12px; bottom: 10px; right: 12px; pointer-events: none; display: flex; flex-direction: column; gap: 3px; align-items: flex-start; }
 .notes div { font-size: 11px; color: #b9b8b2; background: #0c0c0dcc; border: 1px solid var(--line); border-radius: 4px; padding: 3px 7px; max-width: 760px; }
@@ -123,6 +125,10 @@ textarea, input[type=text] { width: 100%; background: var(--field); color: var(-
   .notes div { font-size: 10.5px; }
   .notes div:nth-child(n+3) { display: none; }
 }
+@media (max-width: 760px) {
+  .view .ahead { flex-wrap: wrap; height: auto; min-height: 38px; row-gap: 5px; padding-top: 5px !important; padding-bottom: 5px !important; overflow: visible; }   /* camera, ring and arm buttons take two rows on a phone */
+  .view .ahead .sp { display: none; }
+}
 @media (max-width: 480px) {
   .seg { padding: 3px 3px; font-size: 9.5px; }
   .notes { bottom: 6px; }
@@ -148,10 +154,11 @@ textarea, input[type=text] { width: 100%; background: var(--field); color: var(-
         <button class="btn" data-cam="overview">Overview</button><button class="btn" data-cam="section">Section</button><button class="btn" data-cam="nozzle">Nozzle</button><button class="btn" data-cam="canal">Canal</button>
       </div>
       <button class="btn on" id="ringBtn" aria-pressed="true" title="Show or hide the ring on the top shell">Top ring</button>
+      <span class="opt">arm</span><div class="cams" id="armSw" role="group" aria-label="Arm"><button class="btn on" data-arm="dexarm" aria-pressed="true" title="Arm: Rotrics DexArm on the low boom and rails">DexArm</button><button class="btn" data-arm="eco62" aria-pressed="false" title="Arm: RealMan ECO62 hanging from a flat top boom, scene 1.25 times larger">ECO62</button></div>
       <button class="btn on" id="autoCam" aria-pressed="true" title="Camera follows the process">Auto</button>
     </div>
     <div id="vp">
-      <div class="ov"><div class="stage" id="ovStage">Loading the v2 assembly</div><div class="stepl" id="ovStep"></div><div class="clk" id="ovClock"></div></div>
+      <div class="ov"><div class="stage" id="ovStage">Loading the v2 assembly</div><div class="stepl" id="ovStep"></div><div class="armnote" id="ovArm"></div><div class="clk" id="ovClock"></div></div>
       <div class="notes" id="notes"></div>
     </div>
   </section>
@@ -199,6 +206,7 @@ textarea, input[type=text] { width: 100%; background: var(--field); color: var(-
   <p>A voice or text signal is read against the mother robot's memory. The reading, the memory and a small random drift set the next baby: the number of pleats, the length and a faint hue. The console then slices that bellows into a real toolpath, docks the tail, sends the DexArm in through the hatch, prints, inflates and gives birth. The clock shows real process time; the view runs as a time lapse.</p>
   <h4>The model</h4>
   <p>The viewport shows mechanical design v2, exported from the Blender script that made the v2 Workbench capture: the gourd tail, the 37.5 degree lead in recess with three electropermanent magnets, the six petal door, two 500 mm rails with a 370 mm stroke, the 18 L gel tray, the 294 mm chute and the pleated belly. The DexArm links are the real meshes, posed by the same parallelogram kinematics as the Blender file.</p>
+  <p>The arm switch in the viewport header swaps the DexArm for a RealMan ECO62. The ECO62 hangs upside down under the tip of a flat telescopic top boom and follows the same nozzle point through the printing and the birth: forward kinematics of the official URDF chain, and a small inverse kinematics solver that holds the nozzle position and keeps the tool pointing down inside the joint limits. The arm is drawn at real size against a scene that stands for a system 1.25 times larger. The nozzle path, G-code, timings and physics stay those of the DexArm version, and collisions are not checked here. Where a point is out of reach or a joint is at a limit, the pose is clamped and a note appears under the process step. The ECO62 version is built, but the targets are not all met (64 collision frames at 10 mm clearance, 57 frames above datasheet joint speed), and the DexArm version remains the only one that passes every check.</p>
   <h4>What runs live</h4>
   <ul>
     <li>Floating: heave, pitch and roll of the mother robot and the tail, with buoyancy stiffness from the waterplane measured on the exported hulls, the moment of every moving mass (arm on the boom, silicone moving from the cartridge to the print, the baby in the canal, the baby leaving), and small waves. The static trim this gives matches the design table: about 1.1 degrees bow down with the arm at the front station.</li>
@@ -217,6 +225,7 @@ textarea, input[type=text] { width: 100%; background: var(--field); color: var(-
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script src="../assets/js/eco62.js"></script>
 <script>
 "use strict";
 /* ================================================================ helpers */
@@ -272,7 +281,7 @@ function addWater(sh, opt) {
 function clayMat(hex, o = {}) {
   const m = new THREE.MeshPhongMaterial({ color: new THREE.Color(hex).convertSRGBToLinear(), shininess: 8, specular: 0x111111, side: o.side || THREE.FrontSide });
   if (o.opacity !== undefined && o.opacity < 1) { m.transparent = true; m.opacity = o.opacity; m.depthWrite = false; }
-  m.onBeforeCompile = (sh) => addWater(sh, o); m.customProgramCacheKey = () => "clay";
+  m.onBeforeCompile = (sh) => { addWater(sh, o); if (o.noclip) sh.fragmentShader = sh.fragmentShader.replace("#include <clipping_planes_fragment>", ""); }; m.customProgramCacheKey = () => (o.noclip ? "clay-noclip" : "clay");   // noclip: drawn whole in the section view
   return m;
 }
 /* see through hull: nearly clear in the middle, a light rim toward the silhouette */
@@ -369,6 +378,7 @@ const KIN = {
   tip(q, boom) { const W = SC.PV_W, w2 = KIN.W2(q[1], q[2]); let p = [SC.tipEE[0] + w2[0] - W[0], SC.tipEE[1] + w2[1] - W[1], SC.tipEE[2] + w2[2] - W[2]]; p = KIN.rz(KIN.rz(p, q[0]), Math.PI / 2); const R = KIN.root(boom); return [0, 1, 2].map((i) => R[i][0] * p[0] + R[i][1] * p[1] + R[i][2] * p[2] + R[i][3]); },
   LIM: [[-110 * D2R, 110 * D2R], [-12 * D2R, 115 * D2R], [-32 * D2R, 112 * D2R]],     // yaw, upper arm, forearm (film convention), a little wider than the published ranges
   solve(target, q0, boom) {
+    ARM.target = [target[0], target[1], target[2]];          // the nozzle point asked for; the ECO62 follows the same point
     const det = (m) => m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
     let q = q0.slice();
     for (let it = 0; it < 14; it++) {
@@ -388,7 +398,7 @@ const PASS_Q = [0, 70 * D2R, 60 * D2R];
 const M4 = () => new THREE.Matrix4();
 const Tm = (v) => M4().makeTranslation(v[0], v[1], v[2]);
 const about = (p, a) => Tm(p).multiply(M4().makeRotationX(a)).multiply(Tm([-p[0], -p[1], -p[2]]));
-const ARM = { q: PASS_Q.slice(), boom: 0, tilt: 180, parts: {}, tool: [], tiltParts: [], piv: null, pivI: null, tip: [0, 0, 0] };
+const ARM = { q: PASS_Q.slice(), boom: 0, tilt: 180, parts: {}, tool: [], tiltParts: [], piv: null, pivI: null, tip: [0, 0, 0], target: null };
 function poseArm() {
   const [yaw, a, b] = ARM.q, S = SC.PV_S, E = SC.PV_E, W = SC.PV_W;
   const rxv = (v, t) => KIN.rx(v, t);
@@ -403,6 +413,47 @@ function poseArm() {
   const tm = ARM.piv.clone().multiply(M4().makeRotationY(-ARM.tilt * D2R)).multiply(ARM.pivI);
   for (const o of ARM.tool) o.matrix.copy(ARM.tiltParts.includes(o) ? ee.clone().multiply(tm) : ee);
   ARM.tip = KIN.tip(ARM.q, ARM.boom);
+  poseEco();
+}
+/* ================================================================ arm option: RealMan ECO62 (R25 layout)
+   The ECO62 hangs upside down under the tip of a flat telescopic top boom and follows the same nozzle point as the DexArm: forward kinematics of the
+   URDF chain, damped least squares inverse kinematics on position and tool axis down, joint limits clamped, each frame started from the last one.
+   The nozzle path, G-code, timings and physics are untouched. The arm is real size and the R25 system is 1.25 times larger, so the arm group is drawn at 1 / 1.25. */
+const ECOV = { ready: false, on: false, g: null, links: [], tool: [], stages: [], seat: null, q: null, qik: null, res: null, bad: 0, note: "" };
+function buildEco(A) {
+  const S = ECO62.S, g = new THREE.Group(); g.scale.setScalar(1 / S); g.visible = false; R3.tail.add(g); ECOV.g = g;
+  const NC = { noclip: true };          // the arm sits beside the centre plane, so the section view shows the arm whole instead of fragments
+  const add = (geo, m) => { const o = new THREE.Mesh(geo, m); o.matrixAutoUpdate = false; g.add(o); const e = edgeLines(o, 40, 0.16); e.material.onBeforeCompile = (sh) => { sh.fragmentShader = sh.fragmentShader.replace("#include <clipping_planes_fragment>", ""); }; e.material.customProgramCacheKey = () => "edge-noclip"; return o; };
+  for (const ln of A.meta.links) { const m = clayMat(0xffffff, NC); m.vertexColors = true; ECOV.links.push(add(A.geo[ln], m)); }
+  for (const t of ECO62.toolShapes()) ECOV.tool.push({ o: add(t.geo, clayMat(t.kind === "block" ? 0xd9dadd : 0xe9e7e1, NC)), T: Tm(t.pos) });
+  for (let i = 0; i < 3; i++) ECOV.stages.push(add(new THREE.BoxGeometry(1, 1, 1), clayMat(0xd4d6d8, NC)));
+  const sg = new THREE.CylinderGeometry(0.058, 0.058, ECO62.LAYOUT.seat, 36); sg.rotateX(Math.PI / 2); ECOV.seat = add(sg, clayMat(0xd4d6d8, NC));
+  ECOV.q = ECO62.FOLD.slice(); ECOV.qik = ECO62.SEED.slice(); ECOV.ready = true;
+}
+function poseEco() {
+  if (!ECOV.ready || !ECOV.on) return;
+  const S = ECO62.S, L = ECO62.LAYOUT, B = ECO62.baseM(ARM.boom), w = clamp(1 - ARM.tilt / 180, 0, 1);
+  if (w <= 0 || !ARM.target) { ECOV.qik = ECO62.SEED.slice(); ECOV.q = ECO62.FOLD.slice(); ECOV.res = null; ECOV.bad = 0; }
+  else {
+    const tgt = ARM.target.map((v) => v * S); let r = ECO62.ik(tgt, ECOV.qik, B, { iters: 12 });
+    if (!r.ok && ECOV.bad > 20 && ECOV.bad % 30 === 21) { const r2 = ECO62.ik(tgt, ECO62.SEED, B, { iters: 60 }); if (r2.ok || r2.err + 0.05 * r2.tilt < r.err + 0.05 * r.tilt - 0.004) r = r2; }   // stuck: try once more from the seed
+    ECOV.qik = r.q; ECOV.res = w >= 1 ? r : null; ECOV.bad = w >= 1 && !r.ok ? ECOV.bad + 1 : 0;
+    ECOV.q = w >= 1 ? r.q : ECO62.FOLD.map((f, i) => lerp(f, r.q[i], w));
+  }
+  ECOV.note = ECOV.res && ECOV.bad > 4 ? ECO62.note(ECOV.res) : "";
+  const F = ECO62.fk(ECOV.q, B); ECOV.links.forEach((o, i) => o.matrix.copy(ECO62.toM4(F[i])));
+  const F6 = ECO62.toM4(F[6]); for (const t of ECOV.tool) t.o.matrix.copy(F6).multiply(t.T);
+  ECO62.boomStages(ARM.boom).forEach((b, i) => ECOV.stages[i].matrix.makeScale(b.x1 - b.x0, b.w, b.z1 - b.z0).setPosition((b.x0 + b.x1) / 2, 0, (b.z0 + b.z1) / 2));
+  ECOV.seat.matrix.makeTranslation(ECO62.footX(ARM.boom), 0, L.boomZ[0] - L.seat / 2);
+}
+function setArmSel(v, save = true) {
+  const eco = v === "eco62" && ECOV.ready; ECOV.on = eco; if (save) ECO62.setArm(eco ? "eco62" : "dexarm");
+  for (const n in ARM.parts) ARM.parts[n].visible = !eco; for (const o of ARM.tool) o.visible = !eco;
+  if (BOOMMESH) BOOMMESH.visible = !eco; if (PARTS.W_V2_Rails) PARTS.W_V2_Rails.visible = !eco;
+  if (ECOV.g) ECOV.g.visible = eco;
+  ECOV.qik = ECO62.SEED.slice(); ECOV.bad = 0; ECOV.note = "";
+  document.querySelectorAll("[data-arm]").forEach((b) => { const on = b.dataset.arm === (eco ? "eco62" : "dexarm"); b.classList.toggle("on", on); b.setAttribute("aria-pressed", String(on)); });
+  if (SC) { poseArm(); renderReadouts(); }
 }
 
 /* ================================================================ scene load */
@@ -415,7 +466,7 @@ function topRingGeo(geo) {   // ring on the top shell, around the pleated belly 
 }
 let TOPRING = null;
 async function loadScene() {
-  const [sc, b64, fe, dv, ph] = await Promise.all([getJSON("scene_v2.json"), fetch("scene_v2_glb.txt").then((r) => r.text()), getJSON("birth_fe.json"), getJSON("../build/data/design_v2.json"), getJSON("../build/data/physics.json")]);
+  const [sc, b64, fe, dv, ph, eco] = await Promise.all([getJSON("scene_v2.json"), fetch("scene_v2_glb.txt").then((r) => r.text()), getJSON("birth_fe.json"), getJSON("../build/data/design_v2.json"), getJSON("../build/data/physics.json"), ECO62.load("").catch((e) => { console.warn("ECO62 not loaded", e); return null; })]);
   if (!sc || !fe) throw new Error("scene or birth data missing");
   SC = sc; FE = fe; DV = dv; PH = ph; readParams();
   const bin = Uint8Array.from(atob(b64.trim()), (c) => c.charCodeAt(0));
@@ -451,6 +502,7 @@ async function loadScene() {
   if (EPM) { EPM.material.emissive = new THREE.Color(0x000000); }
   if (PLEATS) { TOPRING = new THREE.Mesh(topRingGeo(PLEATS.geometry), clayMat(0xe9e7e1)); PLEATS.parent.add(TOPRING); }
   buildPetals(); buildSleeve(); buildHeel(); measureWaterplanes();
+  if (eco) buildEco(eco); else document.querySelectorAll('[data-arm="eco62"]').forEach((b) => { b.disabled = true; b.title = "ECO62 model could not be loaded"; });
   poseArm();
 }
 function readParams() {
@@ -898,8 +950,8 @@ function stepProcess(dtW) {
   if (s === "printing") {
     const pre = JOB.pre, gc = JOB.gc;
     if (t < TP.door) { setPetals(mj(t / TP.door)); ARM.q = PASS_Q.slice(); ARM.tilt = 180; ARM.boom = 0; PROC.step = "petal door opens"; }
-    else if (t < TP.door + TP.boomIn) { setPetals(1); const u = mj((t - TP.door) / TP.boomIn); ARM.boom = gc.startBoom * u; PROC.step = `the arm rides the rails in through the D 250 hatch, boom ${f1(ARM.boom * 1000)} mm`; }
-    else if (t < pre) { const u = mj((t - TP.door - TP.boomIn) / TP.unfold); ARM.boom = gc.startBoom; ARM.tilt = 180 * (1 - u); ARM.q = PASS_Q.map((q, i) => lerp(q, JOB.q0[i], u)); PROC.step = "head tilts needle down, the arm unfolds to the first point"; }
+    else if (t < TP.door + TP.boomIn) { setPetals(1); const u = mj((t - TP.door) / TP.boomIn); ARM.boom = gc.startBoom * u; PROC.step = ECOV.on ? `the top boom carries the folded, hanging arm in through the hatch, boom tip ${f1(ECO62.LAYOUT.gain * ARM.boom * ECO62.S * 1000)} mm` : `the arm rides the rails in through the D 250 hatch, boom ${f1(ARM.boom * 1000)} mm`; }
+    else if (t < pre) { const u = mj((t - TP.door - TP.boomIn) / TP.unfold); ARM.boom = gc.startBoom; ARM.tilt = 180 * (1 - u); ARM.q = PASS_Q.map((q, i) => lerp(q, JOB.q0[i], u)); PROC.step = ECOV.on ? "the arm unfolds under the boom, tool down, to the first point" : "head tilts needle down, the arm unfolds to the first point"; }
     else {
       const tp = t - pre; const st = gcAt(gc, tp); ARM.boom = st.boom; ARM.tilt = 0; ARM.q = KIN.solve(st.p, ARM.q, ARM.boom);
       ensureLayers(st.layer); JOB.beadMat.userData.uT.value = tp; JOB.printT = tp; JOB.gi = st.i; PROC.silFrac = clamp(st.E / gc.E, 0, 1);
@@ -1081,7 +1133,7 @@ function renderReadouts() {
   const lay = gc && JOB.gi !== undefined ? gc.LY[JOB.gi] + 1 : 0;
   let h = `<div class="rg"><h4>Process</h4>${rr("stage", s)}${rr("process clock", hms(PROC.clock))}${rr("time lapse", (PROC.lapse * SPEED).toFixed(0) + "×")}</div>`;
   h += `<div class="rg"><h4>Floating</h4>${rr("hatch axis above water", f1(fb * 1000 + SC.hatch.R * 1000), "mm")}${rr("hatch bottom above water", f1(fb * 1000), "mm")}${rr("trim, bow down", f2(VES.th / D2R), "deg")}${rr("heel", f2(VES.ph / D2R), "deg")}${rr("heave", f1(VES.h * 1000), "mm")}${rr(TAIL.docked ? "pair mass" : "mother mass", f1(VES.mass || K.mMother), "kg")}${rr("dock", TAIL.docked ? (TAIL.magnets ? "magnets on" : "contact") : `gap ${f1(TAIL.g * 1000)} mm`)}</div>`;
-  h += `<div class="rg"><h4>Print</h4>${rr("print time", gc ? `${hms(pt)} / ${hms(gc.total)}` : "none")}${rr("layer", gc ? `${lay} / ${gc.layers}` : "0")}${rr("bead laid", gc ? f1(gc.path * (PROC.silFrac || 0)) : "0.0", "m")}${rr("silicone in the womb", gc ? (gc.E / 1000 * (PROC.silFrac || 0)).toFixed(0) : "0", "ml")}${rr("boom", f1(ARM.boom * 1000), "mm")}${rr("arm yaw, upper, fore", ARM.q.map((q) => (q / D2R).toFixed(0)).join(", "), "deg")}</div>`;
+  h += `<div class="rg"><h4>Print</h4>${rr("print time", gc ? `${hms(pt)} / ${hms(gc.total)}` : "none")}${rr("layer", gc ? `${lay} / ${gc.layers}` : "0")}${rr("bead laid", gc ? f1(gc.path * (PROC.silFrac || 0)) : "0.0", "m")}${rr("silicone in the womb", gc ? (gc.E / 1000 * (PROC.silFrac || 0)).toFixed(0) : "0", "ml")}${ECOV.on ? rr("arm shown", "RealMan ECO62") + rr("top boom tip travel", f1(ECO62.LAYOUT.gain * ARM.boom * ECO62.S * 1000), "mm") + rr("joints 1 to 6", ECOV.q.map((q) => (q / D2R).toFixed(0)).join(", "), "deg") + rr("nozzle off target", ECOV.res ? f1(ECOV.res.err * 1000) : "folded", ECOV.res ? "mm" : "") + `<p class="rnote">The ECO62 follows the same nozzle path. The scene stands for a system 1.25 times larger. G-code, timings and physics are those of the DexArm version. ${ECO62.STATUS}</p>` : rr("arm shown", "Rotrics DexArm") + rr("boom", f1(ARM.boom * 1000), "mm") + rr("arm yaw, upper, fore", ARM.q.map((q) => (q / D2R).toFixed(0)).join(", "), "deg")}</div>`;
   h += `<div class="rg"><h4>Birth</h4>${rr("womb pressure", f2((PROC.wombP || 0) / 1000), "kPa")}${rr("baby pressure", f2((PROC.babyP || 0) / 1000), "kPa")}${rr("baby volume", f2(PROC.babyV || (b && b.printed ? 1.87 : 0)), "L")}${rr("belly rise", f1(PROC.rise || 0), "mm")}${rr("push on the seal", f1(PROC.push || 0), "N")}${rr("sleeve friction", f1(Math.abs(PROC.fric || 0)), "N")}${rr("heel reaction", f1(PROC.heel || 0), "N")}${rr("slips", `${PROC.slips || 0} / ${FE.n_slips}`)}${rr("finite element time", f1(PROC.feT || 0), "s")}</div>`;
   const nb = babies.filter((x) => x.free && x.local).slice(-1)[0];
   if (nb) h += `<div class="rg"><h4>Newborn ${esc(nb.name)}</h4>${rr("volume", f1(nb.V * 1000), "L")}${rr("mass with trapped gel", f2(nb.mass), "kg")}${rr("submerged", ((nb.sub || 0) * 100).toFixed(0), "%")}${rr("net buoyant lift", f1(nb.lift || 0), "N")}${rr("drift", (Math.hypot(nb.v[0], nb.v[1]) * 1000).toFixed(0), "mm/s")}</div>`;
@@ -1243,6 +1295,7 @@ function loop(now) {
     const seg = document.querySelector(".seg.on .fill"); if (seg) seg.style.width = (100 * clamp(stageProgress(), 0, 1)).toFixed(1) + "%";
     const sg = STAGES.find((s) => s[0] === PROC.stage); $("#ovStage").textContent = sg ? sg[1] : "Afloat, waiting for a signal";
     $("#ovStep").textContent = PROC.step || (JOB ? "" : "the mother robot floats at the design waterline; the tail waits behind");
+    if ($("#ovArm").textContent !== (ECOV.on ? ECOV.note : "")) $("#ovArm").textContent = ECOV.on ? ECOV.note : "";
     $("#ovClock").innerHTML = `${hms(PROC.clock)} <span>real time · ${(PROC.lapse * SPEED).toFixed(0)}× time lapse</span>`;
     $("#tlClock").textContent = hms(PROC.clock);
     if (++roTick % 6 === 0) renderReadouts(); if (roTick % 30 === 0) renderNotes();
@@ -1253,6 +1306,7 @@ function bindUI() {
   $("#play").onclick = () => { playing = !playing; $("#play").textContent = playing ? "Pause" : "Play"; $("#play").setAttribute("aria-pressed", String(!playing)); };
   document.querySelectorAll("[data-speed]").forEach((b) => (b.onclick = () => { SPEED = +b.dataset.speed; document.querySelectorAll("[data-speed]").forEach((x) => x.classList.toggle("on", x === b)); }));
   $("#ringBtn").onclick = (e) => { const on = !(TOPRING && TOPRING.visible); if (TOPRING) TOPRING.visible = on; e.currentTarget.classList.toggle("on", on); e.currentTarget.setAttribute("aria-pressed", on); };
+  document.querySelectorAll("[data-arm]").forEach((b) => (b.onclick = () => setArmSel(b.dataset.arm)));
   document.querySelectorAll("[data-cam]").forEach((b) => (b.onclick = () => { autoOn = false; $("#autoCam").classList.remove("on"); $("#autoCam").setAttribute("aria-pressed", "false"); setCam(b.dataset.cam); }));
   $("#autoCam").onclick = () => { autoOn = !autoOn; $("#autoCam").classList.toggle("on", autoOn); $("#autoCam").setAttribute("aria-pressed", String(autoOn)); if (autoOn) autoCam(); };
   document.querySelectorAll("[data-tab]").forEach((b) => (b.onclick = () => { tab = b.dataset.tab; document.querySelectorAll("[data-tab]").forEach((x) => x.setAttribute("aria-selected", String(x === b))); renderProps(); }));
@@ -1264,6 +1318,7 @@ async function boot() {
   renderProps(); buildWater(); setCam("overview", true);
   log("loading mechanical design v2: mother robot, gourd tail, DexArm");
   try { await loadScene(); decodeFE(); buildDroop(); } catch (e) { $("#ovStage").textContent = "Could not load the scene"; $("#ovStep").textContent = String(e.message || e); log("load failed: " + (e.message || e), "w"); console.warn(e); return; }
+  setArmSel(ECO62.getArm(), false);
   stepFloat(0.016, 0); setPetals(0); setSleeveRest(); setBelly(0);
   log(`v2 assembly loaded: ${Object.keys(PARTS).length} parts; birth case ${FE.case}, ${FE.n_slips} slips, born at ${f1(FE.t_born_s)} s`);
   renderReadouts(); renderNotes(); requestAnimationFrame(loop); initCaps();
@@ -1271,7 +1326,7 @@ async function boot() {
   if (!qs.has("idle")) setTimeout(() => startJob("a slow tide under the ice", { example: true }), 1200);
 }
 function setSleeveRest() { writeSleeve(feFrame(0)); }
-window.__sim = { jump: (s, f) => jump(s, f), get stage() { return PROC.stage; }, get fps() { return FPS; }, setCam: (m) => { autoOn = false; setCam(m, true); }, speed: (v) => (SPEED = v), state: () => ({ stage: PROC.stage, t: PROC.t, clock: PROC.clock, fe: PROC.feT, slips: PROC.slips, trim: VES.th / D2R, fb: hatchFreeboard(), docked: TAIL.docked, arm: ARM.q.map((q) => q / D2R), boom: ARM.boom, tip: ARM.tip, babies: babies.length, ikErr: PROC.ikErr, lapse: PROC.lapse }) };
+window.__sim = { jump: (s, f) => jump(s, f), get stage() { return PROC.stage; }, get fps() { return FPS; }, setCam: (m) => { autoOn = false; setCam(m, true); }, speed: (v) => (SPEED = v), state: () => ({ stage: PROC.stage, t: PROC.t, clock: PROC.clock, fe: PROC.feT, slips: PROC.slips, trim: VES.th / D2R, fb: hatchFreeboard(), docked: TAIL.docked, arm: ARM.q.map((q) => q / D2R), boom: ARM.boom, tip: ARM.tip, babies: babies.length, ikErr: PROC.ikErr, lapse: PROC.lapse, armShown: ECOV.on ? "eco62" : "dexarm", eco: ECOV.on ? { q: ECOV.q.map((q) => q / D2R), err: ECOV.res ? ECOV.res.err : null, tilt: ECOV.res ? ECOV.res.tilt : null, lim: ECOV.res ? ECOV.res.lim : [], note: ECOV.note } : null }), setArm: (v) => setArmSel(v) };
 boot();
 </script>
 </body></html>
