@@ -623,9 +623,28 @@ function poseArm() {
   ARM.tool.needle.visible = ARM.mod === "needle"; ARM.tool.cup.visible = ARM.mod === "cup";
   if (R3.rack) { R3.rack.A.visible = ARM.mod !== "cup"; R3.rack.B.visible = ARM.mod !== "needle"; }
   ARM.tip = KIN.tip(ARM.q, ARM.xb);
+  ARM.joints = [S, E2, W2].map((p) => new THREE.Vector3(...p).applyMatrix4(yb));
   // boom: the first stage runs on the rails up to the v2 front station, the second stage carries the base further
   const off1 = Math.min(ARM.xb, SC.armRoot[0][3]) - SC.armRoot[0][3]; PARTS.boom1.position.x = off1;
   const x0 = -0.300 + off1, x1 = ARM.xb + 0.07; PARTS.boom2.visible = x1 - x0 > 0.01; PARTS.boom2.scale.x = Math.max(0.01, x1 - x0); PARTS.boom2.position.x = (x0 + x1) / 2;
+}
+
+/* the air line: a pump in the tail, along the boom and the arm to the module on the head; pulses show the flow */
+const AIR = { mesh: null, dots: [], mat: null };
+function updateAirLine(S, now) {
+  if (!AIR.mat) { AIR.mat = clayMat(0x9cc8ec, { opacity: 0.85 }); for (let i = 0; i < 6; i++) { const d = new THREE.Mesh(new THREE.SphereGeometry(0.0042, 10, 8), new THREE.MeshBasicMaterial({ color: 0xe8f6ff })); R3.arm.add(d); AIR.dots.push(d); } }
+  const on = ARM.mod !== "none" && ARM.joints;
+  if (AIR.mesh) { R3.arm.remove(AIR.mesh); AIR.mesh.geometry.dispose(); AIR.mesh = null; }
+  AIR.dots.forEach((d) => { d.visible = false; });
+  if (!on) return;
+  const L = J.layout.stem, g = ARM.tool.g.matrix, head = new THREE.Vector3(0.016, 0, L + 0.055).applyMatrix4(g), stem = new THREE.Vector3(0.006, 0, L * 0.4).applyMatrix4(g), tip = new THREE.Vector3(...ARM.tip);
+  const [js, je, jw] = ARM.joints, rz = J.layout.root_z;
+  const pts = [new THREE.Vector3(-0.80, 0.07, -0.16), new THREE.Vector3(-0.74, 0.06, rz + 0.006), new THREE.Vector3(ARM.xb - 0.06, 0.06, rz + 0.006), new THREE.Vector3(ARM.xb - 0.01, 0.05, rz + 0.05),
+    js.clone().add(new THREE.Vector3(0, 0, 0.012)), je.clone().add(new THREE.Vector3(0, 0, 0.014)), jw.clone().add(new THREE.Vector3(0, 0, 0.012)), head, stem, tip];
+  const curve = new THREE.CatmullRomCurve3(pts, false, "centripetal", 0.3);
+  AIR.mesh = new THREE.Mesh(new THREE.TubeGeometry(curve, 180, 0.0025, 6, false), AIR.mat); R3.arm.add(AIR.mesh);
+  const flow = (S.k === "push" || S.k === "drain") ? (S.k === "drain" || S.airFlow) : S.vac;
+  if (flow) AIR.dots.forEach((d, i) => { const f = ((now / 1000) * 0.45 + i / AIR.dots.length) % 1; d.position.copy(curve.getPointAt(S.vac && S.k !== "push" ? 1 - f : f)); d.visible = true; });
 }
 
 /* ================================================================ load */
@@ -770,7 +789,8 @@ function readBirth(S, tt) {
   const bt = J.birth.track;
   S.bx = at(bt, tt, 2); S.bz = at(bt, tt, 3); S.pitch = at(bt, tt, 4); S.lam = at(bt, tt, 5); S.bV = at(bt, tt, 6); S.bp = at(bt, tt, 7); S.air = at(bt, tt, 8);
   S.F = at(bt, tt, 9); S.Fch = at(bt, tt, 10); S.Fgel = at(bt, tt, 11); S.outF = at(bt, tt, 12); S.gate = at(bt, tt, 13); S.xcg = at(bt, tt, 14); S.Lb = at(bt, tt, 16); S.Fext = at(bt, tt, 17);
-  const [i] = track(bt, tt); S.phase = bt[i][18]; S.nOpen = bt[i][19]; S.nOut = bt[i][20]; S.Fres = bt[i][21];
+  const [i] = track(bt, tt); S.phase = bt[i][18]; S.nOpen = bt[i][19]; S.nOut = bt[i][20]; S.Fres = bt[i][21]; S.hold = bt[i][22] || 0; S.Fpull = bt[i][23] || 0;
+  S.airFlow = S.phase === 0 && at(bt, Math.min(tt + 1, bt[bt.length - 1][0]), 8) - S.air > 0.01;
 }
 function rTab(arr, z) { const L = J.layout, zs = L.rz; let i = clamp(Math.floor((z - zs[0]) / (zs[1] - zs[0])), 0, zs.length - 2); let a = arr[i], b = arr[i + 1]; if (a === null) a = b; if (b === null) b = a; const u = clamp((z - zs[i]) / (zs[1] - zs[0]), 0, 1); return lerp(a, b, u); }
 function boomFor(p, margin = 0.025) { const L = J.layout, zr = p[2] - L.root_z; const r = Math.min(Math.max(rTab(L.rmin, zr) + margin, Math.abs(p[1]) + 0.03), rTab(L.rmax, zr) - 0.01); return p[0] - Math.sqrt(Math.max(r * r - p[1] * p[1], 0.0004)); }
@@ -797,6 +817,7 @@ function applyState(S, now) {
   else { let q = KIN.solve(S.tip, S.qSeed || ARM.q, ARM.xb); const e = KIN.tip(q, ARM.xb); if (Math.hypot(e[0] - S.tip[0], e[1] - S.tip[1], e[2] - S.tip[2]) > 0.002) { for (const sd of [[Math.atan2(S.tip[1], S.tip[0] - ARM.xb), 0.9, 0.5], [Math.atan2(S.tip[1], S.tip[0] - ARM.xb), 0.4, 0.9], [0, 1.3, 0.3]]) { const q2 = KIN.solve(S.tip, sd, ARM.xb), e2 = KIN.tip(q2, ARM.xb); if (Math.hypot(e2[0] - S.tip[0], e2[1] - S.tip[1], e2[2] - S.tip[2]) < Math.hypot(e[0] - S.tip[0], e[1] - S.tip[1], e[2] - S.tip[2])) { q = q2; break; } } }
     ARM.q = S.armMode === "blend" ? J.layout.pass_q.map((p, i) => lerp(p, q[i], S.blend)) : q; }
   poseArm(); ARM.target = S.tip; ARM.err = S.armMode === "ik" ? Math.hypot(...ARM.tip.map((v, i) => v - S.tip[i])) * 1000 : 0;
+  updateAirLine(S, now);
   // baby: inside the womb it moves with the egg; once born it is in the world
   babyMeshUpdate(S.lam.map((l) => clamp(l, 0, 1.2)));
   BB.mesh.visible = S.babyVis; R3.vessel.updateMatrixWorld(true);
@@ -912,8 +933,8 @@ function renderOverlay(S) {
   if (S.k === "tool1" || S.k === "tool2") step = `${S.k === "tool1" ? "The needle module goes into the rack and the suction module comes on" : "The suction module goes back into the rack and the needle module comes on"}: ${S.toolStep || ""}.`;
   if (S.k === "kit") step = "The suction cup places the kit once, before any print: " + (S.toolStep || "") + ". CodeCell C6 Drive, LiPo and two jet pumps in one silicone saddle, 108 g.";
   if (S.k === "drain") step = `Air through the needle at ${f0(J.drain.p)} Pa pushes the trapped gel out of the nose vent while the body still lies in the gel: ${f2(J.drain.V_L * (S.drainF || 0))} of ${f2(J.drain.V_L)} L out.`;
-  if (S.k === "push") step = `Push while inflating: the arm pushes the folded baby out of the trough and up the chute; each segment opens only once the segment is out of the stern opening. ${S.nOut ?? 0} of ${J.body.nseg} segments out, ${S.nOpen ?? 0} open.`;
-  if (S.k === "birth") step = S.phase === 2 ? `In the water the whole skin stretches smooth to full size: ${f2(BB.L)} m long, ${f0(S.bp || 0)} Pa.` : `The arm lets go; the needle stays in on the air line. The opened part pulls on the rim and the body slides out, the last segments opening as they pass the rim. ${S.nOut ?? 0} of ${J.body.nseg} out.`;
+  if (S.k === "push") step = S.hold ? `The arm holds the needle in the valve at full reach while the rest of the air comes through the arm: ${S.nOpen ?? 0} of ${J.body.nseg} segments open, ${f1(S.bV || 0)} L, ${f0(S.bp || 0)} Pa.` : `Push while inflating: the arm pushes the folded baby up the chute, and the air comes through the needle on the arm; each segment opens once the segment is out of the stern opening. ${S.nOut ?? 0} of ${J.body.nseg} out, ${S.nOpen ?? 0} open.`;
+  if (S.k === "birth") step = S.phase === 2 ? `In the water: the full size newborn, ${f2(BB.L)} m long, rocks and settles.` : `All the air is in. The needle comes out of the valve, the arm lets go, and the full body slides off the lip.`;
   $("#ovStep").textContent = step;
   $("#ovClock").innerHTML = `${hms(S.clock)} <span>process clock</span>`;
   $("#tlClock").textContent = hms(S.clock) + " / " + hms(TL.realTotal);
@@ -921,6 +942,7 @@ function renderOverlay(S) {
   if (ARM.err > 1) notes.push(`<b>DexArm</b> tip ${f1(ARM.err)} mm off target`);
   if (S.k === "kit") notes.push(`Cup ${f0(J.kit.suction.cup_d_mm)} mm at ${f0(J.kit.suction.p_vac_kPa)} kPa holds ${f2(J.kit.suction.F_hold)} N; the worst load is ${f2(J.kit.suction.worst)} N, margin ${f1(J.kit.suction.sf)}×. The kit only moves sideways in air.`);
   if (S.k === "tool1" || S.k === "tool2") notes.push(`Rotrics quick release: a pin on the fork presses the end effector button, the module stays; the next one clicks on. Boom at ${f0(J.tools.rack_xb * 1000)} mm, closest ${f1(S.k === "tool1" ? J.tools.clear1 : J.tools.clear2)} mm.`);
+  if (S.k === "push" && S.hold) notes.push(`Holding: the opened part pulls the needle outward with ${f2(S.Fpull || 0)} N.`);
   if (S.k === "push") notes.push(`Arm force ${f2(S.F || 0)} N of the ${f2(J.birth.F_lim)} N payload${(S.F || 0) > J.birth.F_lim ? " <b>over the payload</b>" : ""}. Friction on the chute ${f1(J.constants.mu)}.`);
   if (S.k === "gel") notes.push(`Gel ${f1(J.gel.V_L)} L at ${f1(J.gel.Q_L_min)} L/min: dock line, 1 L buffer and pump in the tail, ${f0(J.gel.dp_kPa)} kPa in the line to the arm. No gel cylinder: the gel fills the bottom of the shell.`);
   $("#notes").innerHTML = notes.map((n) => `<div>${n}</div>`).join("");
