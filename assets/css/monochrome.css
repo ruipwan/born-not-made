@@ -1,0 +1,81 @@
+/* Shared across the document and its embedded tools. Layered rules take
+   precedence over the older page-specific !important control styles. */
+:root {
+  color-scheme: dark;
+  --bg: #000; --paper: #000; --ink: #fff; --white: #fff;
+  --muted: #aaa; --dim: #888; --gel: #fff; --warm: #fff;
+  --warn: #fff; --ok: #fff; --bad: #fff; --line: #333; --hair: #333;
+  --header: #000; --region: #000; --panel: #000; --field: #111;
+  --soft: transparent; --soft2: transparent; --gel-soft: transparent;
+  --r: 0;
+}
+::selection { background: #fff; color: #000; }
+
+@layer monochrome {
+  nav a, .brand, a.btn, a.home, button:not(:where(.inks button)), .vid .pill, .chip span {
+    color: var(--muted) !important;
+    background: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    text-decoration: none !important;
+    transition: none !important;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .brand, nav a:hover, a:hover, button:enabled:hover { color: #fff !important; }
+  nav [aria-current="page"], nav .here, button.on,
+  [aria-pressed="true"]:not(.inks *), [aria-selected="true"],
+  .chip input:checked + span, .seg.on, .row.sel {
+    color: #fff !important;
+    font-weight: 700 !important;
+  }
+  :focus-visible, .chip input:focus-visible + span {
+    outline: 1px solid #fff !important;
+    outline-offset: 2px !important;
+  }
+  a:not(nav a, .brand) { background-image: none !important; }
+  .prose p a, .refs a, .doc p a { text-decoration: underline; text-underline-offset: .15em; }
+  .frame, .fullframe, .area, .ahead, .pnl, .card, .research-card, .open, .pointer,
+  .talk-tools, .composer, .toolbar, .focus, .tags span {
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background-color: #000 !important;
+  }
+  .research-image { background: #111 !important; }
+  .card-label, .people, .focus, .image-placeholder span, .image-placeholder small { color: #aaa !important; }
+  .talk-orb { --rim: #aaa !important; }
+  .talk-detail { background: #000 !important; border: 1px solid #555; }
+  .talk-detail :is(.meta, .tags, .talk-followup b) { color: #aaa; }
+
+  /* Keep the model, its annotations and the controls on one black surface. */
+  .app:has(.area) { gap: 8px !important; }
+  .app .logo { display: none; }
+  .app :is(.ov, .notes div, .lab, .seg, .code, .info, #chart) {
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  .app #vp, .app .code, .app .info { background: #000 !important; }
+  .app .ov, .app .notes div, .app .lab { background: rgb(0 0 0 / 75%) !important; }
+  .app .lab, .app .notes div, .app .chk { color: #fff !important; }
+  .app #vp canvas, .app .code, .app .info, .app #chart { filter: grayscale(1); }
+  .app .seg { background: #111 !important; }
+  .app .seg .fill { background: #333 !important; }
+  .app .rr { border: 0 !important; }
+  .app .ro .bar { padding: 0 !important; margin-block: 2px 4px !important; }
+  .app .btn, .app a.home { padding: 5px 8px !important; }
+  .app .view .ahead { flex-wrap: wrap; height: auto; min-height: 32px; gap: 2px 6px; }
+  .app .cams { flex-wrap: wrap; }
+  nav.tabs, nav.sub { gap: 2px 18px !important; }
+  nav.sub a { padding: 6px 0 !important; }
+  nav.sub:empty { display: none; }
+  .app :is(.btn, .home):disabled { opacity: .5; }
+  @media (max-width: 700px) {
+    nav.tabs { padding: 0 !important; }
+    .app .btn, .app a.home { min-height: 32px; padding: 5px 6px !important; }
+    .app .view .ahead { padding: 3px 6px !important; }
+    .app .top .file { font-size: 16px !important; }
+    .app .ahead { white-space: normal; }
+  }
+}
