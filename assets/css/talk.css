@@ -1,51 +1,35 @@
-/* A field of readable bubbles. Grid tracks keep their contents apart at every width. */
+/* Each conversation and each voice sits inside one robot body: an outline and the words. */
 .bubble-field {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 248px), 1fr));
-  align-items: center; justify-items: center; gap: clamp(12px, 2vw, 30px);
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  align-items: center; justify-items: center; gap: clamp(12px, 2vw, 28px);
   list-style: none; padding: 24px 0 48px; margin: 0; max-width: none;
-  background: radial-gradient(ellipse at 45% 28%, #16212b42, transparent 62%);
 }
 .bubble-field > li { display: grid; width: 100%; justify-items: center; align-content: center; min-width: 0; }
 .talk-orb {
-  --rim: #9dcbde; appearance: none; isolation: isolate; position: relative;
-  display: flex; align-items: center; justify-content: center; flex-direction: column; gap: .38rem;
-  width: 100%; max-width: 340px; min-height: 246px; aspect-ratio: 1.07;
-  margin: 0; padding: 13% 13% 12%; color: #f1eee8; cursor: pointer;
-  border: 1px solid color-mix(in srgb, var(--rim) 50%, #273139);
-  border-radius: 48% 52% 50% 50% / 50% 48% 52% 50%;
-  background:
-    radial-gradient(ellipse at 24% 8%, color-mix(in srgb, var(--rim) 27%, transparent), transparent 32%),
-    radial-gradient(ellipse at 87% 89%, color-mix(in srgb, var(--rim) 14%, transparent), transparent 38%),
-    radial-gradient(ellipse at 48% 45%, #101317 25%, #1b2025 72%, #34424a);
-  box-shadow: inset 0 1px 2px #ffffff4a, inset 6px -9px 19px #080a0d66, inset -1px -2px 4px color-mix(in srgb, var(--rim) 35%, transparent);
+  --rim: #9dcbde; appearance: none; position: relative;
+  display: flex; align-items: center; justify-content: center; flex-direction: column; gap: .3rem;
+  width: 100%; max-width: 400px; aspect-ratio: 1.5;
+  margin: 0; padding: 0 21%; color: #f1eee8; cursor: pointer; border: 0; background: none;
   font-family: var(--sans, system-ui); text-align: center; overflow-wrap: anywhere;
-  transition: border-color .2s, transform .25s, box-shadow .25s;
 }
-.talk-orb::before {
-  content: ""; position: absolute; z-index: -1; pointer-events: none; inset: 3.5%;
-  border: 1px solid transparent; border-top-color: color-mix(in srgb, var(--rim) 32%, transparent);
-  border-left-color: color-mix(in srgb, var(--rim) 10%, transparent); border-radius: inherit; transform: rotate(-17deg);
-}
-.bubble-field > li:nth-child(3n + 2) .talk-orb { max-width: 310px; border-radius: 52% 48% 47% 53% / 49% 54% 46% 51%; }
-.bubble-field > li:nth-child(3n) .talk-orb { max-width: 324px; border-radius: 49% 51% 54% 46% / 53% 49% 51% 47%; }
+.talk-orb svg.bot { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.talk-orb svg.bot .shell { fill: none; stroke: var(--rim); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.talk-orb > span { position: relative; }
+.talk-orb:hover svg.bot .shell { stroke-width: 2; }
 .talk-orb[data-stance="affirms"] { --rim: #9fd2b8; }
 .talk-orb[data-stance="questions"] { --rim: #dec195; }
 .talk-orb[data-stance="doubts"] { --rim: #dca5a9; }
-.talk-orb .orb-meta { font: 500 .78rem/1.35 var(--sans,system-ui); color: var(--rim); letter-spacing: .025em; }
-.talk-orb .orb-person { font: 400 clamp(24px,2.2vw,33px)/1.05 var(--serif,Georgia); text-wrap: balance; }
-.talk-orb .orb-person.long { font-size: clamp(20px,1.8vw,27px); }
-.talk-orb .orb-role { font: 400 .83rem/1.3 var(--sans,system-ui); color: #c1c5c8; }
-.talk-orb .orb-excerpt { margin-top: .2rem; font: 400 .96rem/1.38 var(--sans,system-ui); color: #e1e1dd; }
+.talk-orb .orb-meta { font: 500 .72rem/1.35 var(--sans,system-ui); color: var(--rim); letter-spacing: .025em; }
+.talk-orb .orb-person { font: 400 21px/1.12 var(--serif,Georgia); text-wrap: balance; }
+.talk-orb .orb-person.long { font-size: 18px; }
+.talk-orb .orb-role { font: 400 .74rem/1.3 var(--sans,system-ui); color: #c1c5c8; }
+.talk-orb .orb-excerpt { font: 400 .84rem/1.35 var(--sans,system-ui); color: #e1e1dd; }
 .talk-orb .orb-role, .talk-orb .orb-excerpt { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
-.talk-orb .orb-role { -webkit-line-clamp: 2; }
-.talk-orb .orb-excerpt { -webkit-line-clamp: 3; }
-.talk-orb .orb-sketch { width: 55%; height: 68px; }
+.talk-orb .orb-role { -webkit-line-clamp: 1; }
+.talk-orb .orb-excerpt { -webkit-line-clamp: 2; }
+.talk-orb .orb-sketch { width: 40%; height: 40px; }
 .talk-orb .orb-sketch svg { display: block; width: 100%; height: 100%; }
 .talk-orb:focus-visible, .talk-prompts button:focus-visible, .talk-detail button:focus-visible { outline: 3px solid #c4e7fc; outline-offset: 5px; }
-@media (hover:hover) and (prefers-reduced-motion:no-preference) {
-  .talk-orb:hover { transform: translateY(-4px); border-color:var(--rim);
-    box-shadow: inset 0 1px 3px #fff6, inset -2px -5px 10px color-mix(in srgb, var(--rim) 25%, transparent), 0 10px 38px -22px var(--rim); }
-}
 .talk-tools { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:6px 24px; padding:10px 0; border-block:1px solid #33373c; }
 #conversations .talk-tools .conv-f { margin:0 !important; }
 .talk-prompts { margin: 14px 0; color:#c8ccce; }
@@ -53,8 +37,8 @@
 .talk-prompts ul { display:flex; flex-wrap:wrap; gap:8px; padding:0; list-style:none; }
 .talk-prompts button { border:1px solid #495059; border-radius:18px; background:#161b21; color:#e1e5e8; text-align:left; padding:9px 16px; font:inherit; font-size:14px; cursor:pointer; }
 .talk-detail { position:fixed; width:min(580px,calc(100% - 30px)); max-height:min(84vh,780px); overflow:auto; padding:30px clamp(20px,4vw,44px) 32px;
-  background:#141c22; color:#eeeae4; border:1px solid #5c6c77; border-radius:30px; box-shadow:0 25px 90px #0009; }
-.talk-detail::backdrop { background:#070b0fbb; backdrop-filter:blur(5px); }
+  background:#141c22; color:#eeeae4; border:1px solid #5c6c77; border-radius:8px; }
+.talk-detail::backdrop { background:#000c; }
 .talk-detail form { text-align:right; margin:0 0 6px; }
 .talk-detail button { border:1px solid #76838b; border-radius:999px; padding:7px 15px; background:transparent; color:#edf1f3; cursor:pointer; font:inherit; font-size:14px; }
 .talk-detail h3 { margin:4px 0 8px; color:#fff7ec; font:400 clamp(28px,4vw,39px)/1.1 var(--serif,Georgia); }
@@ -66,13 +50,8 @@
 #entries.bubble-field { max-width:none; }
 #entries .entry { display:grid; padding:0; border:none; }
 #entries .talk-orb { --rim:var(--voice-color,#9dcbde); }
-#poolMsg .empty-orb { width:min(230px,82%); aspect-ratio:1; border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px;
-  background:radial-gradient(ellipse at 24% 12%,#354550,#18242c 35%,#101920 64%,#2b4250);
-  border:1px solid #637c8a; box-shadow:inset -1px -3px 10px #9bbcca40; }
+#poolMsg .empty-orb { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; }
 @media (max-width:600px) { .bubble-field { gap:15px; } .talk-orb { max-width:320px; } .talk-tools { flex-direction:column; align-items:flex-start; padding:12px 0; } }
-@media (prefers-reduced-motion:reduce) { .talk-orb { transition:none; } }
 #entries .entry { padding:0 !important; }
 #entries .entry + .entry::before { content:none; }
 
-.orb-robot { width:44px; height:30px; display:block; margin:auto; }
-.orb-robot svg { width:100%; height:100%; }

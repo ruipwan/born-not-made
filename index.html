@@ -325,6 +325,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 </style>
 <link rel="stylesheet" href="assets/css/organic.css?v=3">
 <link rel="stylesheet" href="assets/css/talk.css">
+<script src="assets/js/robot.js"></script>
 <link rel="stylesheet" href="assets/css/bibliography.css?v=2"></head><body class="org-doc">
 <header class="top"><div class="bar">
   <a class="brand" href="#work">Speculative design: a robot giving birth to another</a>
@@ -1341,6 +1342,7 @@ function renderConversations() {
       <span class="orb-person${e.who.length > 25 ? " long" : ""}">${esc(e.who)}</span>
       <span class="orb-role">${esc(e.role || "")}</span><span class="orb-excerpt">${esc(conversationPreview(e))}</span>
     </button></li>`).join("");
+  document.querySelectorAll("#convList .talk-orb").forEach((b, i) => { let h = 0; for (const c of b.dataset.talk) h = (h * 31 + c.charCodeAt(0)) >>> 0; b.prepend(window.bnmRobot(h % 9973)); });
 }
 document.getElementById("conversations").addEventListener("click", event => {
   const button = event.target.closest("button");
