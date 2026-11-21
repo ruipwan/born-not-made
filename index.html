@@ -1273,7 +1273,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 <section class="tab" id="academia">
   <div class="tabhead"><div><p class="kicker">Research Atlas</p><h2>Academia Research</h2><p>A visual working index of research projects, artists, laboratories and doctoral pathways related to Born, Not Made and Baby Robot.</p></div>
   <a class="btn" href="academia/" target="_blank" rel="noopener">Open full screen ↗</a></div>
-  <iframe id="academiaFrame" data-src="academia/" title="Academia Research — works, images, keywords and doctoral pathways" loading="lazy" style="display:block;width:100%;min-height:1000px;height:1600px;border:0;background:#0c0c0d" scrolling="no"></iframe>
+  <iframe id="academiaFrame" data-src="academia/?v=20261121-2" title="Academia Research — works, images, keywords and doctoral pathways" loading="lazy" style="display:block;width:100%;min-height:1000px;height:1600px;border:0;background:#0c0c0d" scrolling="no"></iframe>
 </section>
 </main>
 <footer>Ruipeng Wang · MIT Media Lab · <a href="https://github.com/ruipwan/born-not-made">source on GitHub</a></footer>
@@ -1283,8 +1283,9 @@ const GROUPS = [
   { g: "think", label: "Think", tabs: [["ideas", "Ideas", "questions the work raises"], ["culture", "Culture", "stories, screens and art"], ["nature", "Nature", "how other species give birth"]] },
   { g: "make", label: "Make", tabs: [["prototypes", "Prototypes", "versions one to three"], ["build", "Build", "every part, with sources"], ["society", "Society", "reproduction at scale"], ["process", "Process", "how the work changed"]] },
   { g: "sim", label: "Simulator", tabs: [["simulator", "Printing console", "signal, G-code, print, birth"], ["physics", "Physics", "birth and printing, simulated"]] },
-  { g: "talk", label: "Talk", tabs: [["conversations", "Conversations", "one to one"], ["voices", "Voices", "open to everyone"]] }],
-  { g: "academia", label: "Academia Research", tabs: [["academia", "Research Atlas", "labs, works and PhD paths"]] };
+  { g: "talk", label: "Talk", tabs: [["conversations", "Conversations", "one to one"], ["voices", "Voices", "open to everyone"]] },
+  { g: "academia", label: "Academia Research", tabs: [["academia", "Research Atlas", "labs, works and PhD paths"]] }
+];
 const TABS = GROUPS.flatMap((x) => x.tabs.map((t) => t[0]));
 const ALIAS = { trunk: "work", branches: "ideas", questions: "ideas", early: "prototypes", log: "process", think: "ideas", make: "prototypes", talk: "conversations" };
 if (ALIAS[location.hash.slice(1)]) history.replaceState(null, "", "#" + ALIAS[location.hash.slice(1)]);
@@ -1377,7 +1378,10 @@ addEventListener("message", (e) => {
   }
   if (e.data.bnm === "academia-height") {
     const f = document.getElementById("academiaFrame");
-    if (f && e.source === f.contentWindow && Number.isFinite(+e.data.h)) f.style.height = Math.max(700, Math.min(80000, +e.data.h)) + "px";
+    if (f && e.source === f.contentWindow && Number.isFinite(+e.data.h)) {
+      const height = Math.max(700, Math.min(80000, +e.data.h)) + "px";
+      if (f.style.height !== height) f.style.height = height;
+    }
   }
 });
 addEventListener("hashchange", show); show();

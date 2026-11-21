@@ -25,10 +25,14 @@ function card(e){
 }
 grid.innerHTML=items.map(card).join("\n");
 const cards=Array.from(grid.children);
+const main=document.querySelector("main");
+let lastHeight=0;
 function reportHeight(){
- if(window.parent!==window.parent.parent || window.parent!==window){
-   try{window.parent.postMessage({bnm:"academia-height",h:Math.ceil(document.documentElement.scrollHeight+16)},window.location.origin)}catch(e){}
- }
+ if(window.parent===window || !main)return;
+ const height=Math.ceil(main.getBoundingClientRect().height);
+ if(height<=0 || height===lastHeight)return;
+ lastHeight=height;
+ try{window.parent.postMessage({bnm:"academia-height",h:height},window.location.origin)}catch(e){}
 }
 function apply(){
  let n=0;
@@ -59,6 +63,6 @@ grid.querySelectorAll("img").forEach((img)=>{
 });
 window.addEventListener("load",reportHeight);
 window.addEventListener("resize",reportHeight);
-if(window.ResizeObserver)new ResizeObserver(reportHeight).observe(grid);
+if(window.ResizeObserver)new ResizeObserver(reportHeight).observe(main);
 apply();
 })();
