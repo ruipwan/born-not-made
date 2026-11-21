@@ -11,13 +11,14 @@ const element = () => ({children: [], appendChild(el) { this.children.push(el); 
 const document = {querySelector: element, createElement: element, querySelectorAll: () => []};
 const context = vm.createContext({
   console, performance, atob, URL, TextDecoder, document,
-  fetch: async file => new Response(read('simulator/' + file)),
+  fetch: async file => new Response(read(path.join('simulator/old_/stage3_sphere', file))),
 });
 const run = code => vm.runInContext(code, context);
 before(async () => {
   run('window = self = globalThis;');
+  // the sphere draft of Stage 3, archived in simulator/old_/stage3_sphere/
   for (const name of ['assets/vendor/three-r147/three.min.js', 'assets/vendor/three-r147/GLTFLoader.js', 'assets/js/eco62.js']) run(read(name));
-  const script = read('simulator/index.html').match(/<script>([\s\S]*?)<\/script>/)[1];
+  const script = read('simulator/old_/stage3_sphere/index.html').match(/<script>([\s\S]*?)<\/script>/)[1];
   run(script.slice(0, script.indexOf('(async function main()')));
   run('R3 = {scene: new THREE.Scene(), host: document.createElement("div")}; for (const k of ["vessel","tail","arm","baby"]) R3[k] = new THREE.Group();');
   await run('loadAll()');
