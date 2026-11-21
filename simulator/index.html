@@ -100,6 +100,11 @@ button:focus-visible, input:focus-visible, a:focus-visible, .track:focus-visible
 .head { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--gel); pointer-events: none; border-radius: 1px; }
 .doc { padding: 34px max(16px, env(safe-area-inset-right, 0px)) 56px max(16px, env(safe-area-inset-left, 0px)); max-width: 980px; margin: 0 auto; color: #cfcdc6; font-size: 14.5px; line-height: 1.62; }
 .doc h2 { font: 500 30px/1.1 var(--serif); margin: 0 0 10px; color: var(--ink); text-wrap: balance; }
+.derivfig { display: grid; grid-template-columns: 1fr 1.3fr; gap: 14px; margin: 10px 0 12px; }
+.derivfig figure { margin: 0; }
+.derivfig img, .derivfig svg { width: 100%; height: auto; display: block; background: #f3f2ef; border-radius: 6px; }
+.derivfig figcaption { font-size: 11px; opacity: 0.75; margin-top: 4px; }
+@media (max-width: 700px) { .derivfig { grid-template-columns: 1fr; } }
 .doc h4 { font: 500 19px/1.2 var(--serif); margin: 24px 0 6px; color: var(--ink); }
 .doc p { margin: 0 0 10px; max-width: 72ch; }
 .doc ul { margin: 0 0 10px; padding-left: 18px; max-width: 72ch; }
@@ -209,10 +214,14 @@ button:focus-visible, input:focus-visible, a:focus-visible, .track:focus-visible
 
 <section class="doc" id="how">
   <h2>How this is simulated</h2>
-  <p>The parent body is one clear egg made of two parts held by magnets: the gel chamber, the wide end, and the tail, the narrow end with the folded Rotrics DexArm inside. The shapes are the v2 design (the same meshes as the Stage 2 console and the build page). Following the decisions of 20 and 21 November 2026, the gel chamber is a hard shell with no belly pleats, no top ring, no petals, no lips and no sock canal. The birth opening at the stern is a plain opening with a thin 3 mm lip and no magnets; the docking face is at the other end of the gel chamber, with a thin 4 mm lip and the three magnets. As in the artist's sketch of 21 November, the gel sits only in a small trough under the gel chamber, sized to the folded newborn, and comes from the tail through a bottom channel; the rest of the gel chamber stays air. The arm comes out of the tail, changes the needle module for the suction module at a small rack, places one electronics kit with the suction cup, changes back to the needle module, prints the folded newborn around the kit, then pushes the newborn up a smooth chute and out of the stern opening while air goes in through the needle. Each segment of the body opens only after the segment has passed out through the opening, and in the water the whole skin stretches smooth to full size, about 0.53 m long and 0.38 m across. There are no contractions.</p>
+  <p>The parent body is one clear body made of two parts held by magnets: the gel chamber, with a flat floor and the gel trough under it, and the tail, a tapering shell with the folded Rotrics DexArm inside. The hull follows the logic of the artist's side section and every dimension is calculated (see How each dimension is set); the arm, the parts in the tail and the magnets are those of the v2 design. Following the decisions of 20 and 21 November 2026, the gel chamber is a hard shell with no belly pleats, no top ring, no petals, no lips and no sock canal. The birth opening in the vertical front face is a plain opening with a thin 3 mm lip and no magnets; the docking face is at the other end of the gel chamber, with a thin 4 mm lip and the three magnets. As in the artist's sketch of 21 November, the gel sits only in a small trough under the gel chamber, sized to the folded newborn, and comes from the tail through a bottom channel; the rest of the gel chamber stays air. The arm comes out of the tail, changes the needle module for the suction module at a small rack, places one electronics kit with the suction cup, changes back to the needle module, prints the folded newborn around the kit, then pushes the newborn up a smooth chute and out of the birth opening. All the air comes through the arm: a pump in the tail, an air line along the boom and the arm, the needle in the newborn's valve. While the arm pushes, each segment opens only after the segment has passed out through the opening; at full reach the arm holds the needle in until the body is full, about 0.53 m long and 0.38 m across, then lets go. There are no contractions.</p>
   <p>Every number on this page comes from <code>stage3_egg.json</code>, written by a Python script (<code>bnm_design/stage3_egg/physics_egg.py</code>) that reads the same mesh file the page draws. The body is designed in <code>bnm_design/baby_fullsize/</code> (a design study with figures). The browser replays and interpolates. The clock shows real process time; the view runs as a time lapse, slower during the birth.</p>
+  <h4>How each dimension is set</h4>
+  <div class="derivfig"><figure><img src="sketch_section.jpg" alt="The artist's side section sketch" loading="lazy"><figcaption>The artist's sketch: the logic the design follows (flat floored gel chamber, trough under the floor, low channel, vertical seam, tapering tail, opening at the front). No dimension is traced from the drawing.</figcaption></figure>
+  <figure><svg id="secSvg" viewBox="0 0 400 200" role="img" aria-label="Side section of the hull, built from the derived dimensions"></svg><figcaption>The hull section built from the numbers below (y = 0, to scale, gel chamber on the left as in the sketch), with the waterline, the opening (red) and the folded print in the trough.</figcaption></figure></div>
+  <ul id="deriv"></ul>
   <h4>Floating and trim</h4>
-  <p>The gel chamber and the tail float as one egg once docked. The script rasterizes the bottom of each exported hull on a 4 mm grid and integrates the volume under a tilted water plane, so the script finds the waterline and the trim where buoyancy equals weight and the center of buoyancy lies under the center of gravity. Before the tail comes, the gel chamber takes water into two ballast bags beside the trough, so the gel chamber floats at the same height as the tail and the docking faces meet. While gel comes into the trough the bags let out as much water, so the egg keeps that height. A small trim tank in the tail end, run by the tail pump, holds the egg level as the arm moves out on the boom. Waves are drawn but do not move the hulls.</p>
+  <p>The gel chamber and the tail float as one egg once docked. The script rasterizes the bottom of each exported hull on a 4 mm grid and integrates the volume under a tilted water plane, so the script finds the waterline and the trim where buoyancy equals weight and the center of buoyancy lies under the center of gravity. The tail carries water ballast in a keel tank so the tail floats at the docking height, and the gel chamber takes a little water into two ballast bags; while gel comes into the trough the tail pumps out as much water, so the egg keeps that height. A small trim tank in the tail end, run by the tail pump, holds the egg level as the arm moves out on the boom. Waves are drawn but do not move the hulls.</p>
   <h4>Gel trough</h4>
   <p>The trough is a box, 270 by 180 mm inside, around the folded print, with a flat floor that hangs a little below the curved hull like a shallow keel. The gel covers the print by 15 mm: 7.3 L of gel instead of about 30 L to fill the bottom of the gel chamber to the same level. A gel pump and a 1 L buffer in the tail push the gel through a 12 mm line in the bottom channel into the floor of the trough (Bingham flow, yield stress 25 Pa, an estimated plastic viscosity of 0.3 Pa s); the buffer is topped up through the dock line, because carrying all the gel would sink the tail below the docking height. The trough fills from below in about 3.6 minutes and levels by itself. The DexArm cannot pass through a low channel, so the arm still comes out through the docking bore and reaches down into the trough.</p>
   <h4>Docking</h4>
@@ -223,10 +232,10 @@ button:focus-visible, input:focus-visible, a:focus-visible, .track:focus-visible
   <p>The DexArm modules attach by the Rotrics quick release: pressing the button on the end effector releases a module, and the next one is pushed on until the latch clicks, with power and signal through the 5 pin module port (Rotrics manual). The tail is too tight for a rack (the folded arm passes within 2 mm of the tail shell wherever a slot was tried), so the rack stands just inside the gel chamber beside the docking wall: two forks on posts from the floor, slot A for the suction module on the port side and slot B for the needle module on the starboard side. To park a module the arm slides the module into the fork; a pin on the fork presses the release button and the bare end effector lifts off. To take a module the arm comes down onto the module until the latch clicks and slides the module out. Every pose of both changes is checked for reach and for 10 mm to the shell, the forks and the other module. Rotrics asks for the arm to be switched off for a change, so a change under power needs a bench test.</p>
   <p>The suction module is the Rotrics pneumatic module with the 15 mm cup of the Rotrics suction cup set, on the same 150 mm stem as the needle so both modules share one tool point, run from the Air Pump Box in the tail (M1000 pump in, M1002 release air, M1003 close the valves). Rotrics publishes no vacuum figure; the 35 kPa of the pump and the 350 g payload come from a reseller's listing of the pneumatic kit, and the cup is assumed to seal at 60 percent on the flat top of the kit's silicone saddle. The cup lifts the 108 g kit from the cradle, carries the kit through the air, lowers the kit straight down through the gel onto the three seat cups, releases the vacuum and lifts clear. Going down, the gel pushes the kit into the cup, so the cup pulls hardest while carrying the kit in air; the readouts give the holding force, the load and the margin.</p>
   <h4>The full size body and printing</h4>
-  <p>The newborn is printed folded, 200 mm long and 120 mm across, so the newborn fits the trough and the arm's reach and passes the 280 mm opening. Each of eight segments is a Kresling story with sixteen radial star pleats, and the middle segment is a waist band whose belly carries the kit saddle. Opening the folds gives a design size of about 0.42 by 0.30 m; a 25 percent stretch of the skin then takes the creases out and gives the full size. The stretch stays below the limit point of the Dragon Skin 10 NV membrane (stretch 1.38 in the neo-Hookean model), so the body grows evenly instead of bulging in one place. The size is limited by how much skin packs into the printed envelope: folds closer than a wall plus 2 mm of gel cannot be printed. The G-code is the slicing of the folded body into 1.5 mm layers around the kit.</p>
+  <p>The newborn is printed folded, 200 mm long and 120 mm across, so the newborn fits the trough and the arm's reach and passes the opening. Each of eight segments is a Kresling story with sixteen radial star pleats, and the middle segment is a waist band whose belly carries the kit saddle. Opening the folds gives a design size of about 0.42 by 0.30 m; a 25 percent stretch of the skin then takes the creases out and gives the full size. The stretch stays below the limit point of the Dragon Skin 10 NV membrane (stretch 1.38 in the neo-Hookean model), so the body grows evenly instead of bulging in one place. The size is limited by how much skin packs into the printed envelope: folds closer than a wall plus 2 mm of gel cannot be printed. The G-code is the slicing of the folded body into 1.5 mm layers around the kit.</p>
   <h4>Push while inflating</h4>
   <p>Before the climb, air through the needle at 450 Pa pushes the gel trapped inside the folded body out of a small duckbill vent in the nose, while the body still lies in the gel; the gel round the body keeps the folds shut. That halves the weight the arm has to push up the chute. The chute is lined with PTFE film and wet with gel (friction taken as 0.2), and the septum and push boss sit 20 mm below the axis on the tail cap, so the arm pushes lower and the forearm keeps clear of the shell under the opening. The second boom stage is an aluminum box tube, stiff enough to hold the deflection under 3 mm at full reach.</p>
-  <p>The body is cut into slices. A slice in the gel weighs almost nothing, because the folded body is mostly gel, and costs only the yield drag of the gel. Every slice on the chute in air costs the slice's weight times the sine of the slope plus friction times the cosine. The air pump (12 L/min through the 12G needle) is metered by the push position: only the segments outside the opening get air, at the pressure that opens the folds, and the push waits for the air, so the segments open one by one, front first. An opened segment outside is wider than the rim, so the pressure on the rim pulls the body out and the arm force falls. When the center of gravity passes the lip the arm lets go; the needle stays in the septum on the air line while the body slides off the lip into the water. There all segments stretch together to full size.</p>
+  <p>The body is cut into slices. A slice in the gel weighs almost nothing, because the folded body is mostly gel, and costs only the yield drag of the gel. Every slice on the chute in air costs the slice's weight times the sine of the slope plus friction times the cosine. The air pump (12 L/min through the 12G needle) is metered by the push position: only the segments outside the opening get air, at the pressure that opens the folds, and the push waits for the air, so the segments open one by one, front first. An opened segment outside is wider than the rim, so the pressure on the rim pulls the body out and the arm force falls. All the air comes through the arm: a pump in the tail, an air line along the boom and the arm, and the needle in the valve on the tail cap. At full reach the arm stops and holds the needle in while the rest of the air goes in; the segments still inside are at the narrow tail end and open at the rim, which is sized for them. When the body is full the needle comes out, the arm lets go, and the body slides off the lip into the water.</p>
   <h4>Newborn</h4>
   <p>The full size newborn floats very high, so the kit pumps take water into a belly pocket until the pumps sit 50 mm under water; the kit and the water keep the newborn upright. The newborn swims on the two kit jets: thrust is mass flow times jet speed, with the flow where the pump curve meets the jet head.</p>
   <h4>Limits</h4>
@@ -338,7 +347,7 @@ function resize() {
 
 /* ================================================================ the egg from the v2 meshes */
 const PARTS = {};
-const HIDE = new Set(["W_V2_BellyPleats", "W_V2_TrayWall", "W_V2_Chute", "W_V2_Gel", "W_B0_SkinInner", "W_B0_RingA", "W_V2_BoreRing", "W_V2_Collar", "W_V2_LipSeal", "W_V2_Thrusters"]);   // removed by the simplification of 20 November, or redrawn here
+const HIDE = new Set(["W_B0_Skin", "W_T1_TailShell", "W_B0_MotherRearWall", "W_B0_MotherFrontPlate", "W_V2_BellyPleats", "W_V2_TrayWall", "W_V2_Chute", "W_V2_Gel", "W_B0_SkinInner", "W_B0_RingA", "W_V2_BoreRing", "W_V2_Collar", "W_V2_LipSeal", "W_V2_Thrusters"]);   // removed by the simplification of 20 November, or redrawn here
 async function loadEgg(b64) {
   const bin = Uint8Array.from(atob(b64.trim()), (c) => c.charCodeAt(0));
   const gltf = await new Promise((res, rej) => new THREE.GLTFLoader().parse(bin.buffer, "", res, rej));
@@ -365,6 +374,14 @@ async function loadEgg(b64) {
     else if (g === "tail") R3.tail.add(o);
     else R3.womb.add(o);
   }
+  // hull v3: built by the script from the derived dimensions (derive.json), drawn from the data file
+  const HM = (k) => { const h = J.hull[k]; const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(h.v, 3)); g.setIndex(h.i); g.computeVertexNormals(); return g; };
+  const hullMesh = (k, mat, parent, ro, ed) => { if (!J.hull[k]) return; const o = new THREE.Mesh(HM(k), mat); o.renderOrder = ro; parent.add(o); PARTS[k] = o; if (ed) edgeLines(o, 30, 0.25, 0xdfe3ea, clip); };
+  hullMesh("W_B0_Skin", shellMat(0.07, 0.6, clip), R3.womb, 7, false);
+  hullMesh("W_T1_TailShell", shellMat(0.08, 0.62, clip), R3.tail, 7, false);
+  hullMesh("W_B0_MotherFrontPlate", clayMat(0xe9e7e1, { opacity: 0.32, side: THREE.DoubleSide, clip, sub: 0.5 }), R3.womb, 5, true);
+  hullMesh("W_B0_MotherRearWall", clayMat(0xe9e7e1, { opacity: 0.32, side: THREE.DoubleSide, clip, sub: 0.5 }), R3.womb, 5, true);
+  hullMesh("W_V3_Channel", clayMat(0xc9cbce, { opacity: 0.6, clip, sub: 0.6 }), R3.womb, 5, true);
   // second telescopic boom stage: a plate that slides out of the first and carries the arm base
   PARTS.boom2 = new THREE.Mesh(new THREE.BoxGeometry(1, 0.096, 0.007), clayMat(0xcfd1d4, { sub: 0.4 })); PARTS.boom2.position.z = J.layout.root_z - 0.0045; R3.tail.add(PARTS.boom2); edgeLines(PARTS.boom2, 30, 0.3);
 }
@@ -446,8 +463,6 @@ function buildWombParts() {
   wall(lx + 0.006, 2 * T.y + 0.006, 0.003, xm, 0, T.floor - 0.0015);
   wall(lx + 0.006, 0.003, H, xm, T.y + 0.0015, T.floor + H / 2); wall(lx + 0.006, 0.003, H, xm, -T.y - 0.0015, T.floor + H / 2);
   wall(0.003, 2 * T.y, H, T.x0 - 0.0015, 0, T.floor + H / 2); wall(0.003, 2 * T.y, H, T.x1 + 0.0015, 0, T.floor + H / 2);
-  const ch = new THREE.Mesh(new THREE.BoxGeometry(T.x0 + 0.376, 0.03, 0.022).translate((T.x0 - 0.376) / 2, 0, T.floor + 0.011 + 0.02), clayMat(0xc9cbce, { opacity: 0.7, clip: [SECT], sub: 0.6 }));
-  R3.womb.add(ch); edgeLines(ch, 30, 0.4); PARTS.channel = ch;
   // kit seat: a post from the floor with three cups
   const kc = J.kit.centre, R = Math.max(...J.body.params.Ro), top = J.layout.z_axis - R - 0.002, bot = J.gel.trough.floor, m = clayMat(0xe2e0da, { sub: 0.4, clip: [SECT] });
   R3.womb.add(new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.012, top - bot, 16).rotateX(Math.PI / 2).translate(kc[0], 0, (top + bot) / 2), m));
@@ -623,9 +638,53 @@ function poseArm() {
   ARM.tool.needle.visible = ARM.mod === "needle"; ARM.tool.cup.visible = ARM.mod === "cup";
   if (R3.rack) { R3.rack.A.visible = ARM.mod !== "cup"; R3.rack.B.visible = ARM.mod !== "needle"; }
   ARM.tip = KIN.tip(ARM.q, ARM.xb);
+  ARM.joints = [S, E2, W2].map((p) => new THREE.Vector3(...p).applyMatrix4(yb));
   // boom: the first stage runs on the rails up to the v2 front station, the second stage carries the base further
   const off1 = Math.min(ARM.xb, SC.armRoot[0][3]) - SC.armRoot[0][3]; PARTS.boom1.position.x = off1;
   const x0 = -0.300 + off1, x1 = ARM.xb + 0.07; PARTS.boom2.visible = x1 - x0 > 0.01; PARTS.boom2.scale.x = Math.max(0.01, x1 - x0); PARTS.boom2.position.x = (x0 + x1) / 2;
+}
+
+/* the air line: a pump in the tail, along the boom and the arm to the module on the head; pulses show the flow */
+const AIR = { mesh: null, dots: [], mat: null };
+function updateAirLine(S, now) {
+  if (!AIR.mat) { AIR.mat = clayMat(0x9cc8ec, { opacity: 0.85 }); for (let i = 0; i < 6; i++) { const d = new THREE.Mesh(new THREE.SphereGeometry(0.0042, 10, 8), new THREE.MeshBasicMaterial({ color: 0xe8f6ff })); R3.arm.add(d); AIR.dots.push(d); } }
+  const on = ARM.mod !== "none" && ARM.joints;
+  if (AIR.mesh) { R3.arm.remove(AIR.mesh); AIR.mesh.geometry.dispose(); AIR.mesh = null; }
+  AIR.dots.forEach((d) => { d.visible = false; });
+  if (!on) return;
+  const L = J.layout.stem, g = ARM.tool.g.matrix, head = new THREE.Vector3(0.016, 0, L + 0.055).applyMatrix4(g), stem = new THREE.Vector3(0.006, 0, L * 0.4).applyMatrix4(g), tip = new THREE.Vector3(...ARM.tip);
+  const [js, je, jw] = ARM.joints, rz = J.layout.root_z;
+  const pts = [new THREE.Vector3(-0.80, 0.07, -0.16), new THREE.Vector3(-0.74, 0.06, rz + 0.006), new THREE.Vector3(ARM.xb - 0.06, 0.06, rz + 0.006), new THREE.Vector3(ARM.xb - 0.01, 0.05, rz + 0.05),
+    js.clone().add(new THREE.Vector3(0, 0, 0.012)), je.clone().add(new THREE.Vector3(0, 0, 0.014)), jw.clone().add(new THREE.Vector3(0, 0, 0.012)), head, stem, tip];
+  const curve = new THREE.CatmullRomCurve3(pts, false, "centripetal", 0.3);
+  AIR.mesh = new THREE.Mesh(new THREE.TubeGeometry(curve, 180, 0.0025, 6, false), AIR.mat); R3.arm.add(AIR.mesh);
+  const flow = (S.k === "push" || S.k === "drain") ? (S.k === "drain" || S.airFlow) : S.vac;
+  if (flow) AIR.dots.forEach((d, i) => { const f = ((now / 1000) * 0.45 + i / AIR.dots.length) % 1; d.position.copy(curve.getPointAt(S.vac && S.k !== "push" ? 1 - f : f)); d.visible = true; });
+}
+
+/* the derived section and the list of rules */
+function renderDerivation() {
+  const D = J.derive, o = D.opening, w = D.womb, t = D.tail, tr = D.trough, k = D.kresling, dp = D.deploy, m = D.material, el = $("#secSvg");
+  if (el && J.section) {
+    const X0 = -1.02, X1 = 0.40, Z0 = -0.34, Z1 = 0.34, W = 400, H = W * (Z1 - Z0) / (X1 - X0); el.setAttribute("viewBox", `0 0 ${W} ${H.toFixed(1)}`);
+    const P = (x, z) => `${((X1 - x) / (X1 - X0) * W).toFixed(1)},${((Z1 - z) / (Z1 - Z0) * H).toFixed(1)}`;      // mirrored: womb on the left, as in the sketch
+    let g = `<line x1="0" x2="${W}" y1="${((Z1 - J.WL) / (Z1 - Z0) * H).toFixed(1)}" y2="${((Z1 - J.WL) / (Z1 - Z0) * H).toFixed(1)}" stroke="#4f8fcf" stroke-width="0.8" stroke-dasharray="4 3"/>`;
+    for (const [nm, segs] of Object.entries(J.section)) for (const sg of segs) g += `<polyline points="${P(sg[0][0], sg[0][1])} ${P(sg[1][0], sg[1][1])}" fill="none" stroke="#3b3d42" stroke-width="1.1"/>`;
+    g += `<rect x="${P(tr.x1, tr.top).split(",")[0]}" y="${P(tr.x1, tr.top).split(",")[1]}" width="${((tr.x1 - tr.x0) / (X1 - X0) * W).toFixed(1)}" height="${(tr.depth / (Z1 - Z0) * H).toFixed(1)}" fill="#4f8fcf" fill-opacity="0.18" stroke="#3b3d42" stroke-width="0.8"/>`;
+    const pl = J.layout; g += `<rect x="${P(pl.x_e0 + dp.L_fold, pl.z_axis + dp.D_fold / 2).split(",")[0]}" y="${P(pl.x_e0, pl.z_axis + dp.D_fold / 2).split(",")[1]}" width="${(dp.L_fold / (X1 - X0) * W).toFixed(1)}" height="${(dp.D_fold / (Z1 - Z0) * H).toFixed(1)}" rx="4" fill="#e2e0da" stroke="#8d9097" stroke-width="0.6"/>`;
+    g += `<line x1="${P(o.x_lip, o.z_lip).split(",")[0]}" y1="${P(o.x_lip, o.z_lip).split(",")[1]}" x2="${P(o.x_lip, o.z_lip + o.D).split(",")[0]}" y2="${P(o.x_lip, o.z_lip + o.D).split(",")[1]}" stroke="#c2410c" stroke-width="2"/>`;
+    el.innerHTML = g;
+  }
+  const li = (a, b) => `<li><b>${a}</b>: ${b}</li>`;
+  $("#deriv").innerHTML = [
+    li("Trough", `the folded print (${f0(dp.L_fold * 1000)} by ${f0(dp.D_fold * 1000)} mm) plus 30 mm behind the tail end for the needle, 35 mm ahead of the nose, 30 mm each side, ${f0(tr.cover * 1000)} mm of gel over the print and a 15 mm floor: ${f0((tr.x1 - tr.x0) * 1000)} by ${f0(2 * tr.y * 1000)} mm, ${f0(tr.depth * 1000)} mm deep, ${f1(tr.V_L)} L.`),
+    li("Floor", `${f0(-w.floor * 1000 + w.wl_design * 1000)} mm under the design waterline (z ${f0(w.wl_design * 1000)} mm): floating alone with only the trough in the water the gel chamber would roll over, the floor gives a wide waterplane. The trough walls stand 5 mm above the gel.`),
+    li("Lip and chute", `the lip ${f0(o.freeboard * 1000)} mm above the waterline; the drained folded body (${f2(D.chute.m)} kg) must climb on the arm alone within the 4.91 N payload at friction 0.3, so the chute is at most ${f1(D.chute.theta_max_deg)} degrees; it is ${f1(o.chute_deg)} degrees.`),
+    li("Opening", `the arm reaches x ${f0(o.arm_x_max_in_opening * 1000)} mm while holding the needle at full reach, so the face is vertical and 15 mm ahead of it; the diameter, ${f0(o.D * 1000)} mm, is the full radius of the narrow tail end that opens at the rim while the needle is held (${f0(o.r_tail_full * 1000)} mm) plus 10 mm.`),
+    li("Gel chamber top and width", `the arm envelope of the whole cycle (print, kit, tool rack, push and hold, with the air line) plus 10 mm clearance: inner top z ${f0(w.top * 1000)} mm, half width ${f0(w.half_width * 1000)} mm; narrower at the seam (bore and magnets) and at the face.`),
+    li("Tail", `holds the folded arm at home, the rails, cartridge, battery, gel buffer, trim tank, pumps and the Air Pump Box with 15 mm: the top line falls ${f2(t.slope_top)} m per m, the steepest that clears them; the low aft parts keep the bottom flat and the tail ends in a rounded cap at x ${f0(t.x_tip * 1000)} mm. Water ballast in a keel tank sets the docking height and is pumped out as gel comes in.`),
+    li("Folds", `${k.n} sided Kresling stories (Kresling 2008; Cai et al. 2015; Reid et al. 2017): printed ${f1(k.h0 * 1000)} mm, open ${f1(k.h1 * 1000)} mm, the two rigid states at ${f1(k.phi0_deg)} and ${f1(k.phi1_deg)} degrees (sum π(1 − 2/n)); the crease strain over the transition, ${f1(k.barrier_strain * 100)} percent, makes each story bistable and stays far under the skin's limit. Radial growth by ${k.n} star pleats that keep the perimeter; the last ${f0((m.stretch_design - 1) * 100)} percent by stretch, under the limit point at ${f2(m.stretch_limit_point)} (Dragon Skin 10 NV: 663 percent at break).`),
+  ].join("");
 }
 
 /* ================================================================ load */
@@ -634,7 +693,7 @@ async function loadAll() {
   if (!j || !sc) throw new Error("stage3_egg.json or scene_v2.json missing");
   J = j; SC = sc; GC = parseGcode(gtxt); UW.uWL.value = J.WL; KIN.LIM = J.arm.lim_deg.map((r) => r.map((d) => d * D2R));
   await loadEgg(b64); ARM.tool = buildTool();
-  buildGel(); buildChute(); buildWombParts(); buildRack(); buildWater(); buildBaby(); buildLabels();
+  buildGel(); buildChute(); buildWombParts(); buildRack(); renderDerivation(); buildWater(); buildBaby(); buildLabels();
   const st = J.states;
   log(`egg docked with gel: ${f1(st.docked_gel.mass)} kg, waterline z ${f0(st.docked_gel.WL * 1000)} mm, trim ${f2(st.docked_gel.trim_deg)} deg, gel ${f1(J.gel.V_L)} L`);
   log(`G-code: ${GC.lines.length} lines, ${GC.layers} layers, ${f1(J.print.path_m)} m of bead, ${f0(J.print.silicone_ml)} ml, print time ${hms(GC.total)}`);
@@ -770,7 +829,8 @@ function readBirth(S, tt) {
   const bt = J.birth.track;
   S.bx = at(bt, tt, 2); S.bz = at(bt, tt, 3); S.pitch = at(bt, tt, 4); S.lam = at(bt, tt, 5); S.bV = at(bt, tt, 6); S.bp = at(bt, tt, 7); S.air = at(bt, tt, 8);
   S.F = at(bt, tt, 9); S.Fch = at(bt, tt, 10); S.Fgel = at(bt, tt, 11); S.outF = at(bt, tt, 12); S.gate = at(bt, tt, 13); S.xcg = at(bt, tt, 14); S.Lb = at(bt, tt, 16); S.Fext = at(bt, tt, 17);
-  const [i] = track(bt, tt); S.phase = bt[i][18]; S.nOpen = bt[i][19]; S.nOut = bt[i][20]; S.Fres = bt[i][21];
+  const [i] = track(bt, tt); S.phase = bt[i][18]; S.nOpen = bt[i][19]; S.nOut = bt[i][20]; S.Fres = bt[i][21]; S.hold = bt[i][22] || 0; S.Fpull = bt[i][23] || 0;
+  S.airFlow = S.phase === 0 && at(bt, Math.min(tt + 1, bt[bt.length - 1][0]), 8) - S.air > 0.01;
 }
 function rTab(arr, z) { const L = J.layout, zs = L.rz; let i = clamp(Math.floor((z - zs[0]) / (zs[1] - zs[0])), 0, zs.length - 2); let a = arr[i], b = arr[i + 1]; if (a === null) a = b; if (b === null) b = a; const u = clamp((z - zs[i]) / (zs[1] - zs[0]), 0, 1); return lerp(a, b, u); }
 function boomFor(p, margin = 0.025) { const L = J.layout, zr = p[2] - L.root_z; const r = Math.min(Math.max(rTab(L.rmin, zr) + margin, Math.abs(p[1]) + 0.03), rTab(L.rmax, zr) - 0.01); return p[0] - Math.sqrt(Math.max(r * r - p[1] * p[1], 0.0004)); }
@@ -797,6 +857,7 @@ function applyState(S, now) {
   else { let q = KIN.solve(S.tip, S.qSeed || ARM.q, ARM.xb); const e = KIN.tip(q, ARM.xb); if (Math.hypot(e[0] - S.tip[0], e[1] - S.tip[1], e[2] - S.tip[2]) > 0.002) { for (const sd of [[Math.atan2(S.tip[1], S.tip[0] - ARM.xb), 0.9, 0.5], [Math.atan2(S.tip[1], S.tip[0] - ARM.xb), 0.4, 0.9], [0, 1.3, 0.3]]) { const q2 = KIN.solve(S.tip, sd, ARM.xb), e2 = KIN.tip(q2, ARM.xb); if (Math.hypot(e2[0] - S.tip[0], e2[1] - S.tip[1], e2[2] - S.tip[2]) < Math.hypot(e[0] - S.tip[0], e[1] - S.tip[1], e[2] - S.tip[2])) { q = q2; break; } } }
     ARM.q = S.armMode === "blend" ? J.layout.pass_q.map((p, i) => lerp(p, q[i], S.blend)) : q; }
   poseArm(); ARM.target = S.tip; ARM.err = S.armMode === "ik" ? Math.hypot(...ARM.tip.map((v, i) => v - S.tip[i])) * 1000 : 0;
+  updateAirLine(S, now);
   // baby: inside the womb it moves with the egg; once born it is in the world
   babyMeshUpdate(S.lam.map((l) => clamp(l, 0, 1.2)));
   BB.mesh.visible = S.babyVis; R3.vessel.updateMatrixWorld(true);
@@ -823,12 +884,12 @@ function buildLabels() {
   const mk = (txt, cls, fn) => { const d = document.createElement("div"); d.className = "lab " + cls; d.textContent = txt; $("#vp").appendChild(d); LABELS.push({ d, fn }); };
   const W = (p) => { R3.womb.updateMatrixWorld(true); return new THREE.Vector3(...p).applyMatrix4(R3.womb.matrixWorld).toArray(); };
   const Tt = (p) => { R3.tail.updateMatrixWorld(true); return new THREE.Vector3(...p).applyMatrix4(R3.tail.matrixWorld).toArray(); };
-  mk("Womb", "", () => W([0.12, 0, 0.33]));
+  mk("Gel chamber", "", () => W([0.12, 0, 0.33]));
   mk("Tail", "", () => Tt([-0.72, 0, 0.25]));
   mk("Docking face, three magnets", "", () => ["approach", "dock"].includes(STATE.k) || CAM === "section" ? W([-0.384, 0, 0.27]) : null);
-  mk("Birth opening", "", () => W([0.33, 0, 0.25]));
+  mk("Birth opening", "", () => { const o = J.derive.opening; return W([o.x_lip + 0.01, 0, o.z_lip + 2 * o.R + 0.03]); });
   mk("Gel trough", "w", () => ["gel", "out", "print", "cure"].includes(STATE.k) ? W([0.0, -0.09, J.layout.gel_z + 0.01]) : null);
-  mk("Bottom channel", "", () => ["gel", "dock"].includes(STATE.k) ? W([-0.27, -0.02, J.gel.trough.floor + 0.05]) : null);
+  mk("Bottom channel", "", () => ["gel", "dock"].includes(STATE.k) ? W([-0.27, -0.02, J.derive.womb.floor - 0.03]) : null);
   mk("Tool rack, slot A: suction module", "", () => ["tool1", "kit", "tool2"].includes(STATE.k) ? W([J.tools.rack_a[0], J.tools.rack_a[1], J.tools.rack_a[2] + 0.24]) : null);
   mk("Slot B: needle module", "", () => ["tool1", "tool2"].includes(STATE.k) ? W([J.tools.rack_b[0], J.tools.rack_b[1], J.tools.rack_b[2] + 0.24]) : null);
   mk("Waterline", "w", () => [0.75 + (STATE.mx || 0), -0.25, J.WL]);
@@ -912,8 +973,8 @@ function renderOverlay(S) {
   if (S.k === "tool1" || S.k === "tool2") step = `${S.k === "tool1" ? "The needle module goes into the rack and the suction module comes on" : "The suction module goes back into the rack and the needle module comes on"}: ${S.toolStep || ""}.`;
   if (S.k === "kit") step = "The suction cup places the kit once, before any print: " + (S.toolStep || "") + ". CodeCell C6 Drive, LiPo and two jet pumps in one silicone saddle, 108 g.";
   if (S.k === "drain") step = `Air through the needle at ${f0(J.drain.p)} Pa pushes the trapped gel out of the nose vent while the body still lies in the gel: ${f2(J.drain.V_L * (S.drainF || 0))} of ${f2(J.drain.V_L)} L out.`;
-  if (S.k === "push") step = `Push while inflating: the arm pushes the folded newborn out of the trough and up the chute; each segment opens only once the segment is out of the stern opening. ${S.nOut ?? 0} of ${J.body.nseg} segments out, ${S.nOpen ?? 0} open.`;
-  if (S.k === "birth") step = S.phase === 2 ? `In the water the whole skin stretches smooth to full size: ${f2(BB.L)} m long, ${f0(S.bp || 0)} Pa.` : `The arm lets go; the needle stays in on the air line. The opened part pulls on the rim and the body slides out, the last segments opening as they pass the rim. ${S.nOut ?? 0} of ${J.body.nseg} out.`;
+  if (S.k === "push") step = S.hold ? `The arm holds the needle in the valve at full reach while the rest of the air comes through the arm: ${S.nOpen ?? 0} of ${J.body.nseg} segments open, ${f1(S.bV || 0)} L, ${f0(S.bp || 0)} Pa.` : `Push while inflating: the arm pushes the folded newborn up the chute, and the air comes through the needle on the arm; each segment opens once the segment is out of the stern opening. ${S.nOut ?? 0} of ${J.body.nseg} out, ${S.nOpen ?? 0} open.`;
+  if (S.k === "birth") step = S.phase === 2 ? `In the water: the full size newborn, ${f2(BB.L)} m long, rocks and settles.` : `All the air is in. The needle comes out of the valve, the arm lets go, and the full body slides off the lip.`;
   $("#ovStep").textContent = step;
   $("#ovClock").innerHTML = `${hms(S.clock)} <span>process clock</span>`;
   $("#tlClock").textContent = hms(S.clock) + " / " + hms(TL.realTotal);
@@ -921,6 +982,7 @@ function renderOverlay(S) {
   if (ARM.err > 1) notes.push(`<b>DexArm</b> tip ${f1(ARM.err)} mm off target`);
   if (S.k === "kit") notes.push(`Cup ${f0(J.kit.suction.cup_d_mm)} mm at ${f0(J.kit.suction.p_vac_kPa)} kPa holds ${f2(J.kit.suction.F_hold)} N; the worst load is ${f2(J.kit.suction.worst)} N, margin ${f1(J.kit.suction.sf)}×. The kit only moves sideways in air.`);
   if (S.k === "tool1" || S.k === "tool2") notes.push(`Rotrics quick release: a pin on the fork presses the end effector button, the module stays; the next one clicks on. Boom at ${f0(J.tools.rack_xb * 1000)} mm, closest ${f1(S.k === "tool1" ? J.tools.clear1 : J.tools.clear2)} mm.`);
+  if (S.k === "push" && S.hold) notes.push(`Holding: the opened part pulls the needle outward with ${f2(S.Fpull || 0)} N.`);
   if (S.k === "push") notes.push(`Arm force ${f2(S.F || 0)} N of the ${f2(J.birth.F_lim)} N payload${(S.F || 0) > J.birth.F_lim ? " <b>over the payload</b>" : ""}. Friction on the chute ${f1(J.constants.mu)}.`);
   if (S.k === "gel") notes.push(`Gel ${f1(J.gel.V_L)} L at ${f1(J.gel.Q_L_min)} L/min: dock line, 1 L buffer and pump in the tail, ${f0(J.gel.dp_kPa)} kPa in the line to the arm. No gel cylinder: the gel fills the bottom of the shell.`);
   $("#notes").innerHTML = notes.map((n) => `<div>${n}</div>`).join("");
@@ -942,11 +1004,11 @@ function renderProps() {
     el.innerHTML = `<div class="pnl"><h3>Gel chamber, ${f1(J.womb_items.reduce((a, i) => a + i.kg, 0))} kg with gel</h3><dl class="kv">${J.womb_items.map((i) => `<dt>${esc(i.name)}${i.est ? " (estimate)" : ""}</dt><dd>${f2(i.kg)}</dd>`).join("")}</dl></div>
       <div class="pnl"><h3>Tail, ${f2(J.tail_items.reduce((a, i) => a + i.kg, 0))} kg</h3><dl class="kv">${J.tail_items.map((i) => `<dt>${esc(i.name)}</dt><dd>${f2(i.kg)}</dd>`).join("")}</dl></div>
       <div class="pnl"><h3>Waterline and trim</h3><dl class="kv">${rows.map((r) => `<dt>${esc(r.name)}</dt><dd>z ${f0(r.WL * 1000)} mm, ${f2(r.trim_deg)} deg</dd>`).join("")}</dl><p>Trim is positive with the stern down. The lowest point of the birth opening is at z ${f0(J.layout.lip[2] * 1000)} mm, the bottom of the docking bore at z ${f0(-J.layout.bore_R * 1000)} mm.</p></div>
-      <div class="pnl"><h3>Baby robot, ${f3(J.body.mass_kg)} kg</h3><dl class="kv"><dt>skin, Dragon Skin 10 NV</dt><dd>${f3(J.body.skin_kg)}</dd><dt>kit</dt><dd>${f3(J.kit.mass)}</dd><dt>gel trapped inside, ${f2(J.body.trapped_gel_L)} L</dt><dd>${f3(J.body.trapped_gel_L * 1.003)}</dd></dl><p>Body plan from ${esc(J.body.source)}: ${J.body.N} sides, ${J.body.nseg} Kresling stories and a smooth waist band.</p></div>`;
+      <div class="pnl"><h3>Newborn robot, ${f3(J.body.mass_kg)} kg</h3><dl class="kv"><dt>skin, Dragon Skin 10 NV</dt><dd>${f3(J.body.skin_kg)}</dd><dt>kit</dt><dd>${f3(J.kit.mass)}</dd><dt>gel trapped inside, ${f2(J.body.trapped_gel_L)} L</dt><dd>${f3(J.body.trapped_gel_L * 1.003)}</dd></dl><p>Body plan from ${esc(J.body.source)}: ${J.body.N} sides, ${J.body.nseg} Kresling stories and a smooth waist band.</p></div>`;
   } else {
     const K = J.kit;
     el.innerHTML = `<div class="pnl"><h3>${esc(K.name)}, ${f0(K.mass * 1000)} g</h3><dl class="kv">${K.parts.map((p) => `<dt>${esc(p.name)}</dt><dd>${p.size ? p.size.map((s) => f1(s * 1000)).join(" x ") + " mm, " : ""}${f1(p.mass * 1000)} g</dd>`).join("")}</dl>
-      <dl class="kv"><dt>kit center, womb frame</dt><dd>${K.centre.map((v) => f0(v * 1000)).join(", ")} mm</dd><dt>cradle, port wall</dt><dd>${J.layout.cradle.map((v) => f0(v * 1000)).join(", ")} mm</dd><dt>placed</dt><dd>once, before the first layer</dd><dt>pick and place time</dt><dd>${f0(K.total)} s</dd><dt>suction module and kit on the arm</dt><dd>${f0(K.payload_kg * 1000)} of 500 g</dd><dt>stem clearance to the parts</dt><dd>${f1(J.print.needle_kit_clear_mm)} mm</dd><dt>gel yield needed to hold the kit</dt><dd>${f1(K.tau_needed)} of ${f0(J.constants.tau_y)} Pa</dd><dt>suction cup, vacuum</dt><dd>${f0(K.suction.cup_d_mm)} mm, ${f0(K.suction.p_vac_kPa)} kPa</dd><dt>holding force</dt><dd>${f2(K.suction.F_hold)} N (${f2(K.suction.F_ideal)} N ideal)</dd><dt>worst load, margin</dt><dd>${f2(K.suction.worst)} N, ${f1(K.suction.sf)}×</dd><dt>tool changes</dt><dd>${f0(J.tools.t1)} s and ${f0(J.tools.t2)} s</dd></dl><p>Source: ${esc(K.source)}. Pumps lowest, the LiPo flat on top, the C6 Drive on the LiPo with the antenna up.</p></div>`;
+      <dl class="kv"><dt>kit center, gel chamber frame</dt><dd>${K.centre.map((v) => f0(v * 1000)).join(", ")} mm</dd><dt>cradle, port wall</dt><dd>${J.layout.cradle.map((v) => f0(v * 1000)).join(", ")} mm</dd><dt>placed</dt><dd>once, before the first layer</dd><dt>pick and place time</dt><dd>${f0(K.total)} s</dd><dt>suction module and kit on the arm</dt><dd>${f0(K.payload_kg * 1000)} of 500 g</dd><dt>stem clearance to the parts</dt><dd>${f1(J.print.needle_kit_clear_mm)} mm</dd><dt>gel yield needed to hold the kit</dt><dd>${f1(K.tau_needed)} of ${f0(J.constants.tau_y)} Pa</dd><dt>suction cup, vacuum</dt><dd>${f0(K.suction.cup_d_mm)} mm, ${f0(K.suction.p_vac_kPa)} kPa</dd><dt>holding force</dt><dd>${f2(K.suction.F_hold)} N (${f2(K.suction.F_ideal)} N ideal)</dd><dt>worst load, margin</dt><dd>${f2(K.suction.worst)} N, ${f1(K.suction.sf)}×</dd><dt>tool changes</dt><dd>${f0(J.tools.t1)} s and ${f0(J.tools.t2)} s</dd></dl><p>Source: ${esc(K.source)}. Pumps lowest, the LiPo flat on top, the C6 Drive on the LiPo with the antenna up.</p></div>`;
   }
 }
 function drawChart() {
