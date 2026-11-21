@@ -876,7 +876,7 @@ function step(dt) {
   for (const b of bodies) for (const k in b.glow) { const g = b.glow[k]; g.flash = Math.max(0, g.flash - dt * 0.7); const docked = !!b.docks[k]; const on = docked ? g.level : 0; g.s.material.opacity = clamp(on * (0.6 + 0.4 * Math.sin(simT * 2 + b.ph)) + g.flash, 0, 1); g.s.scale.setScalar(0.09 + 0.18 * g.flash); }
   // backing off after an undock
   for (const b of bodies) if (b.backoff && !b.parent) { const d = 0.05 * dt; b.x += b.backoff.nx * d; b.y += b.backoff.ny * d; b.backoff.d += d; if (b.backoff.d > b.backoff.max) b.backoff = null; }
-  collide(); collide();   // two passes settle stacked contacts
+  collide(); collide(); if (speed >= 64) collide();   // extra passes settle stacked contacts at large substeps
   // grown babies leave the pond
   bodies = bodies.filter((b) => { if (b.gone) { scene.remove(b.obj); if (FOLLOW === b) unfollow(); return false; } return true; });
   manage(dt);
