@@ -147,7 +147,8 @@ button:focus-visible, input:focus-visible, a:focus-visible, .track:focus-visible
   .lab { font-size: 9.5px; }
 }
 </style>
-<link rel="stylesheet" href="../../../assets/css/organic.css"></head><body>
+<link rel="stylesheet" href="../assets/css/monochrome.css">
+</head><body>
 
 <div class="app">
   <header class="area top">
@@ -1028,7 +1029,7 @@ function renderProps() {
     renderLiveChecks();
   } else if (TAB === "birth") {
     const B = J.birth, fr = J.friction;
-    el.innerHTML = `<div class="pnl"><h3>Push while inflating, DexArm</h3><canvas id="chart" width="700" height="200"></canvas><div class="leg"><span><i style="background:#9cc8ec"></i>pressure, 0 to 1.2 kPa</span><span><i style="background:#9fd29a"></i>volume, 0 to ${f0(J.body.vol_deployed_L)} L</span><span><i style="background:#e3b36a"></i>arm force, 0 to the payload</span><span><i style="background:#d58a7a"></i>pull of the pressure on the rim, 0 to ${f0(Math.max(...B.track.map((r) => r[17])))} N</span><span><i style="background:#ecebe6"></i>arm lets go</span></div>
+    el.innerHTML = `<div class="pnl"><h3>Push while inflating, DexArm</h3><canvas id="chart" width="700" height="200"></canvas><div class="leg"><span><svg aria-hidden="true" width="22" height="8"><path d="M0 4h22" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="none"/></svg>pressure, 0 to 1.2 kPa</span><span><svg aria-hidden="true" width="22" height="8"><path d="M0 4h22" fill="none" stroke="#ccc" stroke-width="2" stroke-dasharray="7 4"/></svg>volume, 0 to ${f0(J.body.vol_deployed_L)} L</span><span><svg aria-hidden="true" width="22" height="8"><path d="M0 4h22" fill="none" stroke="#aaa" stroke-width="2" stroke-dasharray="2 3"/></svg>arm force, 0 to the payload</span><span><svg aria-hidden="true" width="22" height="8"><path d="M0 4h22" fill="none" stroke="#ddd" stroke-width="2" stroke-dasharray="10 3 2 3"/></svg>pull of the pressure on the rim, 0 to ${f0(Math.max(...B.track.map((r) => r[17])))} N</span><span><svg aria-hidden="true" width="22" height="8"><path d="M0 4h22" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="4 4"/></svg>arm lets go</span></div>
       <dl class="kv"><dt>push speed, free</dt><dd>${f0(B.v0 * 1000)} mm/s, waits for the air</dd><dt>air pump through the needle</dt><dd>${f1(B.Q_air_L_min)} L/min</dd><dt>pressure to open the folds / at full size</dt><dd>${f0(B.p_unfold)} / ${f0(B.p_full)} Pa</dd><dt>first segment out of the opening</dt><dd>${f0(B.t_first_out || 0)} s</dd><dt>arm lets go</dt><dd>${f0(B.t_release)} s</dd><dt>full size in the water</dt><dd>${f0(B.t_end)} s</dd><dt>peak arm force</dt><dd>${f2(B.F_peak)} of ${f2(B.F_lim)} N</dd><dt>folded part to the rim</dt><dd>${f0(B.rim_clear_mm)} mm</dd><dt>whole folded body on the steepest chute, friction 0.2 / 0.3 / 0.4 / 0.6</dt><dd>${fr["0.2"]} / ${fr["0.3"]} / ${fr["0.4"]} / ${fr["0.6"]} N</dd><dt>printed / full length</dt><dd>${f0(J.body.len_folded * 1000)} / ${f0(J.body.len_deployed * 1000)} mm</dd><dt>printed / full diameter</dt><dd>${f0(J.body.d_folded * 1000)} / ${f0(J.body.d_deployed * 1000)} mm</dd><dt>folded / full volume</dt><dd>${f2(J.body.vol_folded_L)} / ${f1(J.body.vol_deployed_L)} L</dd><dt>newborn swim speed</dt><dd>${f2(J.newborn.v_terminal)} m/s</dd></dl></div>`;
     drawChart();
   } else if (TAB === "masses") {
@@ -1046,8 +1047,8 @@ function renderProps() {
 function drawChart() {
   const c = $("#chart"); if (!c) return; const g = c.getContext("2d"), W = c.width, H = c.height, B = J.birth, tr = B.track, T1 = tr[tr.length - 1][0], Fx = Math.max(...tr.map((r) => r[17]), 1);
   g.clearRect(0, 0, W, H); g.strokeStyle = "#2a2a2c"; g.lineWidth = 1; for (let i = 1; i < 4; i++) { g.beginPath(); g.moveTo(0, H * i / 4); g.lineTo(W, H * i / 4); g.stroke(); }
-  const line = (col, f) => { g.strokeStyle = col; g.lineWidth = 2; g.beginPath(); tr.forEach((r, i) => { const x = r[0] / T1 * W, y = H - 4 - clamp(f(r), 0, 1) * (H - 8); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); };
-  line("#9cc8ec", (r) => r[7] / 1200); line("#9fd29a", (r) => r[6] / J.body.vol_deployed_L); line("#e3b36a", (r) => r[9] / B.F_lim); line("#d58a7a", (r) => r[17] / Fx);
+  const line = (col, dash, f) => { g.setLineDash(dash); g.strokeStyle = col; g.lineWidth = 2; g.beginPath(); tr.forEach((r, i) => { const x = r[0] / T1 * W, y = H - 4 - clamp(f(r), 0, 1) * (H - 8); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); g.setLineDash([]); };
+  line("#fff", [], (r) => r[7] / 1200); line("#ccc", [7, 4], (r) => r[6] / J.body.vol_deployed_L); line("#aaa", [2, 3], (r) => r[9] / B.F_lim); line("#ddd", [10, 3, 2, 3], (r) => r[17] / Fx);
   g.strokeStyle = "#ecebe6"; g.setLineDash([4, 4]); g.beginPath(); g.moveTo(B.t_release / T1 * W, 0); g.lineTo(B.t_release / T1 * W, H); g.stroke(); g.setLineDash([]);
   const tt = STATE.k === "push" ? STATE.tau : STATE.k === "birth" ? B.t_release + STATE.tau : null;
   if (tt !== null) { const x = Math.min(tt, T1) / T1 * W; g.strokeStyle = "#ecebe6"; g.lineWidth = 1; g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
