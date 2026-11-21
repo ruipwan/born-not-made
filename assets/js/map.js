@@ -1,5 +1,5 @@
 /* Born, Not Made: the map.
-   One trunk: a mother robot gives birth to a baby robot.
+   One trunk: a robot gives birth to another.
    One branch per tab leaves the trunk and comes back. Hover a branch to find it, click to open the tab.
    Mount: <div id="bnm-map" data-mode="hero"></div>. Plain SVG, no libraries, no motion. */
 (() => {
@@ -10,9 +10,9 @@ const ALIAS = { trunk: "work", branches: "ideas", questions: "ideas", early: "pr
 
 // u: where the phrase sits along the trunk, 0 left, 1 right
 const TRUNK = [
-  { key: "mother", text: "Mother robot", u: 0.14, main: true },
+  { key: "mother", text: "A robot", u: 0.14, main: true },
   { key: "birth", text: "gives birth to", u: 0.46, verb: true },
-  { key: "baby", text: "Baby robot", u: 0.8, main: true },
+  { key: "baby", text: "another", u: 0.8, main: true },
 ];
 
 // u0, u1: where the branch leaves and rejoins the trunk. side 1 above, -1 below. a: height as a share of the half height.
@@ -97,7 +97,7 @@ function setup(host) {
   if (host.__bnm) return; host.__bnm = 1;
   host.classList.add("bnm-map");
   const svg = el("svg", { class: "bnm-svg", role: "img", focusable: "false",
-    "aria-label": "Map of the site. One line: a mother robot gives birth to a baby robot. Branches: " + BRANCHES.map((b) => b.label).join(", ") + "." }, host);
+    "aria-label": "Map of the site. One line: a robot gives birth to another. Branches: " + BRANCHES.map((b) => b.label).join(", ") + "." }, host);
   const nav = document.createElement("nav"); nav.className = "bnm-sr"; nav.setAttribute("aria-label", "Tabs of the site");
   const ul = document.createElement("ul");
   for (const [href, text] of [["#work", "The Work"], ...BRANCHES.map((b) => ["#" + b.tab, b.label])]) {

@@ -96,14 +96,14 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
 <div class="app">
   <section class="view">
     <div class="stage3d">
-    <canvas id="gl" aria-label="Parametric white model of the mother, tail, arm and baby"></canvas>
+    <canvas id="gl" aria-label="Parametric white model of the parent body, tail, arm and newborn"></canvas>
     <div class="legend"><span><i style="background:#d5d8dc"></i>bought</span><span><i style="background:#f6f5f1"></i>printed rigid</span><span><i style="background:#efe6d4"></i>silicone, printed in gel</span><span><i style="background:#cfe2f3"></i>gel</span><span><i style="background:#141415;border-style:dashed"></i>clear hull</span></div>
     <div class="dims" id="dims"></div>
     <div class="tip" id="tip"></div>
     <div class="loading" id="loading">Loading the model…</div>
     <div class="viewbar">
       <div class="pill"><label for="explode">Explode</label><input type="range" id="explode" min="0" max="1" step="0.01" value="0"></div>
-      <button id="vAsm" class="on">Assembly</button><button id="vBaby">Baby</button><button id="vCut">Section</button><span class="armsw" role="group" aria-label="Arm"><span class="lbl">Arm</span><button id="vArmDex" class="on" aria-pressed="true" title="Rotrics DexArm on the low boom and rails">DexArm</button><button id="vArmEco" aria-pressed="false" title="RealMan ECO62 hanging from a flat top boom, whole system 1.25 times larger">ECO62</button></span><button id="vReset">Reset view</button>
+      <button id="vAsm" class="on">Assembly</button><button id="vBaby">Newborn</button><button id="vCut">Section</button><span class="armsw" role="group" aria-label="Arm"><span class="lbl">Arm</span><button id="vArmDex" class="on" aria-pressed="true" title="Rotrics DexArm on the low boom and rails">DexArm</button><button id="vArmEco" aria-pressed="false" title="RealMan ECO62 hanging from a flat top boom, whole system 1.25 times larger">ECO62</button></span><button id="vReset">Reset view</button>
     </div>
     </div>
     <p class="armnote" id="armNote" hidden></p>
@@ -112,11 +112,11 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
     <div class="ptabs" role="tablist"><button class="on" data-p="pParts">Parts</button><button data-p="pShape">Shape</button><button data-p="pPrec">Precision</button></div>
     <div class="pane on" id="pParts"><p class="sum" id="bomSum">Loading parts…</p><div id="card"></div><div id="tree"></div></div>
     <div class="pane" id="pShape">
-      <p class="grp">Mother</p>
+      <p class="grp">Parent</p>
       <div class="ctl"><label for="belly">Belly crown rise</label><input type="range" id="belly" min="0" max="62.1" step="0.1" value="0"><output></output></div>
       <div class="ctl"><label for="segs">Hull gores</label><input type="range" id="segs" min="3" max="10" step="1" value="6"><output></output></div>
       <p class="hint">The clear lower hull is a keel cap plus gores, small enough for a desktop resin printer, joined by flanges over a silicone cord. The upper silicone membrane is shown as a smooth envelope. Adjust its crown height to see how the arm and print bed sit beneath it.</p>
-      <p class="grp">Baby</p>
+      <p class="grp">Newborn</p>
       <div class="ctl"><label for="pattern">Fold pattern</label><select id="pattern"><option value="bellows">Bellows</option><option value="yoshimura">Yoshimura</option><option value="kresling">Kresling</option></select><span></span></div>
       <div class="ctl"><label for="fold">Deployed</label><input type="range" id="fold" min="0" max="1" step="0.01" value="0"><output></output></div>
       <div class="ctl"><label for="nPleat">Pleats</label><input type="range" id="nPleat" min="4" max="30" step="1" value="12"><output></output></div>
@@ -124,7 +124,7 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
       <div class="ctl"><label for="dDep">Deployed dia.</label><input type="range" id="dDep" min="200" max="600" step="5" value="380"><output></output></div>
       <div class="ctl"><label for="lDep">Deployed length</label><input type="range" id="lDep" min="200" max="900" step="5" value="600"><output></output></div>
       <div class="ctl"><label for="lFold">Printed height</label><input type="range" id="lFold" min="20" max="160" step="1" value="42"><output></output></div>
-      <p class="hint" id="foldNote">The baby is printed collapsed in the gel, then opened by air.</p>
+      <p class="hint" id="foldNote">The newborn is printed collapsed in the gel, then opened by air.</p>
     </div>
     <div class="pane" id="pPrec"><p class="hint">The error chain from arm to finished wall. Each number carries its source.</p><div id="precTable"><p class="pend">Waiting for verified numbers.</p></div></div>
   </aside>
@@ -132,12 +132,12 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
 
 <div class="doc">
   <section id="birth">
-    <h2>Compare four ways to move the baby</h2>
-    <p class="sub">This one-dimensional sketch starts at the funnel after breakout. Compare how pressure, interference and friction change motion. The womb can push only when the baby seals against the sleeve. The liner has its own pressure drive and the arm supplies an independent nominal 4.9 N. Times are illustrative. The reference run above the comparison table uses a separate finite element model.</p>
+    <h2>Compare four ways to move the newborn</h2>
+    <p class="sub">This one-dimensional sketch starts at the funnel after breakout. Compare how pressure, interference and friction change motion. The gel chamber can push only when the newborn seals against the sleeve. The liner has its own pressure drive and the arm supplies an independent nominal 4.9 N. Times are illustrative. The reference run above the comparison table uses a separate finite element model.</p>
     <p class="hint" id="sketchShape"></p><canvas class="lanes" id="lanes" aria-label="Four modelled trajectories. Text results follow the controls."></canvas>
     <div class="ctlgrid">
-      <div class="ctl"><label for="bPw">Womb pulse</label><input type="range" id="bPw" min="0" max="2000" step="10" value="600"><output></output></div>
-      <div class="ctl"><label for="bPb">Baby pressure</label><input type="range" id="bPb" min="0" max="2000" step="10" value="500"><output></output></div>
+      <div class="ctl"><label for="bPw">Gel chamber pulse</label><input type="range" id="bPw" min="0" max="2000" step="10" value="600"><output></output></div>
+      <div class="ctl"><label for="bPb">Newborn pressure</label><input type="range" id="bPb" min="0" max="2000" step="10" value="500"><output></output></div>
       <div class="ctl"><label for="bMu">Friction μ</label><input type="range" id="bMu" min="0" max="1.2" step="0.01" value="0.5"><output></output></div>
       <div class="ctl"><label for="bRt">Throat radius</label><input type="range" id="bRt" min="60" max="160" step="1" value="105"><output></output></div>
       <div class="ctl"><label for="bTy">Gel yield stress</label><input type="range" id="bTy" min="0" max="200" step="1" value="30"><output></output></div>
@@ -148,15 +148,15 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
   </section>
 
   <section id="fem"><h2>Stage 2 birth in the finite element model</h2>
-    <p class="sub">The recorded run begins with the baby on the chute. Its heel stays supported while the bellows grows. Once the nose seals in the sleeve, pressure pulses advance the baby. Hardware accuracy still depends on measurements of the actual sleeve, gel and pump.</p>
+    <p class="sub">The recorded run begins with the newborn on the chute. Its heel stays supported while the bellows grows. Once the nose seals in the sleeve, pressure pulses advance the newborn. Hardware accuracy still depends on measurements of the actual sleeve, gel and pump.</p>
     <div id="referenceTrace">
       <h3>Inside the 80 mm radius sleeve</h3>
       <p>Six pleats, 385 mm deployed length, static friction 0.60 and pump flow 3 L/min. Move through the run to see when pressure builds and when the tail clears the sleeve.</p>
-      <div class="trace-key"><span>Womb pressure (kPa)</span><span>Baby pressure (kPa)</span></div>
-      <svg class="trace-chart" viewBox="0 0 760 200" role="img" aria-label="Womb and baby pressure over the recorded birth, with a cursor at the selected time"></svg>
+      <div class="trace-key"><span>Gel chamber pressure (kPa)</span><span>Newborn pressure (kPa)</span></div>
+      <svg class="trace-chart" viewBox="0 0 760 200" role="img" aria-label="Gel chamber and newborn pressure over the recorded birth, with a cursor at the selected time"></svg>
       <div class="trace-time"><label for="feTime">Model time</label><input id="feTime" type="range" min="0" max="420" step="0.01" disabled><output for="feTime">Loading…</output></div>
       <div class="trace-events"><button data-event="start" disabled>Start</button><button data-event="growth" disabled>First pulse phase</button><button data-event="slip" disabled>First slip</button><button data-event="exit" disabled>Tail exits</button></div>
-      <dl class="trace-values"><div><dt>Womb pressure</dt><dd data-womb>—</dd></div><div><dt>Baby pressure</dt><dd data-baby>—</dd></div><div><dt>Tail position</dt><dd data-tail>—</dd></div><div><dt>Slip count</dt><dd data-slips>—</dd></div></dl>
+      <dl class="trace-values"><div><dt>Gel chamber pressure</dt><dd data-womb>—</dd></div><div><dt>Newborn pressure</dt><dd data-baby>—</dd></div><div><dt>Tail position</dt><dd data-tail>—</dd></div><div><dt>Slip count</dt><dd data-slips>—</dd></div></dl>
     </div>
     <p class="hint">The exit plane is at +130 mm along the canal. Readouts interpolate between the stored samples. <a href="../simulator/old_/stage2/birth_fe.json">Reference data</a> · <a href="../simulator/">Open the current Stage 3 simulator</a></p><video src="media/birth_sim.mp4" poster="media/birth_sim_poster.png" controls muted playsinline style="width:100%;border:1px solid var(--line);border-radius:8px;background:#141415"></video><div id="femDoc" style="margin-top:16px"></div></section>
   <section id="bench"><h2>Bench tests</h2><p class="sub">Seven measurements turn the model's assumptions into facts. Enter a result to check it against the design window. Results stay in this browser.</p><div id="benchDoc"></div></section>
@@ -171,7 +171,7 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
         <div class="ctl"><label for="pTy">Gel yield stress</label><input type="range" id="pTy" min="1" max="200" step="1" value="30"><output></output></div>
         <div class="ctl"><label for="pDr">Density gap</label><input type="range" id="pDr" min="0" max="300" step="5" value="80"><output></output></div>
         <div class="ctl"><label for="pRep">Arm repeatability</label><input type="range" id="pRep" min="0.01" max="2" step="0.01" value="0.05"><output></output></div>
-        <div class="ctl"><label for="pVol">Silicone per baby</label><input type="range" id="pVol" min="0.2" max="10" step="0.01" value="0.67"><output></output></div>
+        <div class="ctl"><label for="pVol">Silicone per newborn</label><input type="range" id="pVol" min="0.2" max="10" step="0.01" value="0.67"><output></output></div>
         <div class="kv" id="pOut"></div>
       </div>
       <div><canvas id="bead" aria-label="Cross section of printed beads"></canvas><p class="hint">Cross section of a wall and a pleat gap, to scale. Gray bars are the arm's error.</p></div>
@@ -179,7 +179,7 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
   </section>
 
   <section id="fold-design"><h2>Why this fold</h2><div id="foldDoc"><p class="pend">Waiting for the physics check.</p></div></section>
-  <section id="swell"><h2>Why the mother swells</h2><p class="sub">No swelling for its own sake. Each movement of the belly has a mechanical cause.</p><div id="swellDoc"><p class="pend">Waiting for the physics check.</p></div></section>
+  <section id="swell"><h2>Why the parent body swells</h2><p class="sub">No swelling for its own sake. Each movement of the belly has a mechanical cause.</p><div id="swellDoc"><p class="pend">Waiting for the physics check.</p></div></section>
   <section id="push"><h2>Ways to push</h2><div id="pushDoc"><p class="pend">Waiting for the physics check.</p></div></section>
   <section id="v2"><h2>Design v2: seven problems, seven decisions</h2><p class="sub">The checks above found problems; this revision resolves each with a number, a source, a remaining risk and a bench test.</p><img src="media/design_v2.png" alt="Mechanical design v2, docked pair, labeled" style="width:100%;border:1px solid var(--line);border-radius:8px;background:#141415"><div id="v2Doc" style="margin-top:16px"></div></section>
   <section id="dock"><h2>Docking and entry</h2><div id="dockDoc"><p class="pend">Waiting for the physics check.</p></div></section>
@@ -253,7 +253,7 @@ function addEdges(mesh, ang = 30, op = 0.45) {
 const PART = {};
 function part(key, label, dir, make) { if (PART[key]) return PART[key]; const g = new THREE.Group(); g.name = key; root.add(g); return (PART[key] = { key, label, g, meshes: [], dir, make, comp: [] }); }
 function addMesh(p, m, edgesAng = 30) { m.castShadow = m.material.transparent ? false : true; m.receiveShadow = true; m.userData.part = p.key; p.g.add(m); p.meshes.push(m); if (edgesAng) addEdges(m, edgesAng, m.material.transparent ? 0.3 : 0.62); return m; }
-const LABEL = { hull: "Mother hull", belly: "Upper silicone membrane", canal: "Birth canal", front: "Front plate", bore: "Rear bore and ring", magnets: "Dock magnets", tail: "Tail shell", tailring: "Tail ring", rails: "Rails and keel", boom: "Boom and carriage", tray: "Parts tray", tool: "Tool head", dexarm: "DexArm", eco62: "RealMan ECO62", topboom: "Top boom, flat, three stages", ecotool: "Print tube and needle", gel: "Support gel", baby: "Baby body", capsule: "Electronics capsule", needle: "Inflation valve", valve3: "Three way valve", duckbill: "Lips, check valve", pump: "Air pump", battery: "Battery", ctrl: "Controller", psensor: "Pressure sensor", thrusters: "Thrusters" };
+const LABEL = { hull: "Parent hull", belly: "Upper silicone membrane", canal: "Exit channel", front: "Front plate", bore: "Rear bore and ring", magnets: "Dock magnets", tail: "Tail shell", tailring: "Tail ring", rails: "Rails and keel", boom: "Boom and carriage", tray: "Parts tray", tool: "Tool head", dexarm: "DexArm", eco62: "RealMan ECO62", topboom: "Top boom, flat, three stages", ecotool: "Print tube and needle", gel: "Support gel", baby: "Newborn body", capsule: "Electronics capsule", needle: "Inflation valve", valve3: "Three way valve", duckbill: "Lips, check valve", pump: "Air pump", battery: "Battery", ctrl: "Controller", psensor: "Pressure sensor", thrusters: "Thrusters" };
 const DIR = { belly: [0, 0, 0.34], canal: [0.46, 0, 0.06], front: [0.3, 0, 0], bore: [-0.18, 0, 0], magnets: [-0.3, 0, 0], tail: [-0.62, 0, 0], tailring: [-0.42, 0, 0], rails: [-0.62, 0, -0.26], boom: [-0.32, 0, 0.3], tray: [-0.36, 0, 0.14], tool: [0.12, 0, 0.62], dexarm: [-0.06, 0, 0.42], eco62: [-0.16, 0, 0.5], topboom: [-0.5, 0, 0.34], ecotool: [-0.02, 0, 0.66], gel: [0, 0, -0.18], baby: [0, 0, -0.18], capsule: [0, 0, -0.06], needle: [0, 0, 0.1], valve3: [0.12, 0, 0.7], duckbill: [0.62, 0, 0.1], pump: [-0.62, 0, 0.18], battery: [-0.62, 0, 0.1], ctrl: [-0.62, 0, 0.26], psensor: [-0.62, 0, 0.34], thrusters: [-0.72, 0, -0.1] };
 const MAKE = { hull: "glass", belly: "silicone", canal: "silicone", front: "rigid", bore: "rigid", magnets: "bought", tail: "rigid", tailring: "rigid", rails: "bought", boom: "bought", tray: "rigid", tool: "rigid", dexarm: "bought", eco62: "bought", topboom: "bought", ecotool: "rigid", gel: "gel", baby: "silicone", capsule: "bought", needle: "bought", valve3: "bought", duckbill: "silicone", pump: "bought", battery: "bought", ctrl: "bought", psensor: "bought", thrusters: "bought" };
 const MAP = [[/^W_V2_(Pads|EPM)$/, "magnets"], [/^W_V2_BoreRing$/, "bore"], [/^W_V2_(Collar|LipSeal)$/, "tailring"], [/^W_V2_Rails$/, "rails"], [/^W_V2_Boom$/, "boom"], [/^W_V2_(Cartridge|Battery|Thrusters)$/, "tail"], [/^W_V2_Gel$/, "gel"], [/^W_V2_TrayWall$/, "tray"], [/^W_V2_Chute$/, "canal"], [/Magnets$/, "magnets"], [/^W_B0_Canal/, "canal"], [/^W_B0_Mother(FrontPlate|Lid)$/, "front"], [/^W_B0_(MotherRearWall|MotherBoreHoop|RingA|RingB|RingBEdge|RingBKnurl)$/, "bore"], [/^W_T1_(TailShell|TailFacePlate)$/, "tail"], [/^W_T1_TailRing/, "tailring"], [/^W_T1_(Keel|LowRod)/, "rails"], [/^W_T1_(BoomTube|CarriagePlate)/, "boom"], [/^W_T1_(Tray|LidStraps)/, "tray"], [/^W_T1_(Tool|Gripper)/, "tool"], [/^A_/, "dexarm"]];
@@ -491,16 +491,16 @@ for (const id of ["pattern", "fold", "nPleat", "mSide", "dDep", "lDep", "lFold"]
 
 /* ====================================================================== parts list */
 const LINK = {};
-const RULES = [[/dexarm/i, "dexarm"], [/three.?way|3.?way|3\/2|diverter/i, "valve3"], [/needle|inflation valve|ball valve/i, "needle"], [/duckbill|lip|check valve/i, "duckbill"], [/canal|sleeve/i, "canal"], [/belly|origami|pleat|upper skin/i, "belly"], [/magnet/i, "magnets"], [/pogo|o.?ring|gasket|seal|cone|guide pin|latch/i, "tailring"], [/rail|linear guide|mgn|keel/i, "rails"], [/boom|carriage|belt|lead ?screw|stepper|telescop/i, "boom"], [/tail (shell|hull|body)|tail$/i, "tail"], [/nozzle|mixer|cartridge|syringe|tool|dispens|extru/i, "tool"], [/capsule|mcu|esp32|xiao|imu|baby (battery|pump|electronics)|micro ?pump/i, "capsule"], [/gel|carbopol|carbomer|neutrali/i, "gel"], [/baby|silicone|ecoflex|dragon ?skin|elastomer/i, "baby"], [/pump|blower|compressor/i, "pump"], [/relief|regulator|pressure sensor|transducer/i, "psensor"], [/battery|lipo|li.?ion/i, "battery"], [/controller|raspberry|arduino|board|driver/i, "ctrl"], [/thruster|propeller/i, "thrusters"], [/tray|magazine/i, "tray"], [/front plate|nose/i, "front"], [/bore|rear wall|hoop|ring/i, "bore"], [/hull|shell|egg|mother body|segment|petg|acrylic/i, "hull"]];
+const RULES = [[/dexarm/i, "dexarm"], [/three.?way|3.?way|3\/2|diverter/i, "valve3"], [/needle|inflation valve|ball valve/i, "needle"], [/duckbill|lip|check valve/i, "duckbill"], [/canal|sleeve/i, "canal"], [/belly|origami|pleat|upper skin/i, "belly"], [/magnet/i, "magnets"], [/pogo|o.?ring|gasket|seal|cone|guide pin|latch/i, "tailring"], [/rail|linear guide|mgn|keel/i, "rails"], [/boom|carriage|belt|lead ?screw|stepper|telescop/i, "boom"], [/tail (shell|hull|body)|tail$/i, "tail"], [/nozzle|mixer|cartridge|syringe|tool|dispens|extru/i, "tool"], [/capsule|mcu|esp32|xiao|imu|(?:baby|newborn) (battery|pump|electronics)|micro ?pump/i, "capsule"], [/gel|carbopol|carbomer|neutrali/i, "gel"], [/baby|newborn|silicone|ecoflex|dragon ?skin|elastomer/i, "baby"], [/pump|blower|compressor/i, "pump"], [/relief|regulator|pressure sensor|transducer/i, "psensor"], [/battery|lipo|li.?ion/i, "battery"], [/controller|raspberry|arduino|board|driver/i, "ctrl"], [/thruster|propeller/i, "thrusters"], [/tray|magazine/i, "tray"], [/front plate|nose/i, "front"], [/bore|rear wall|hoop|ring/i, "bore"], [/hull|shell|egg|mother body|segment|petg|acrylic/i, "hull"]];
 const PARTMAP = { hull_lower: "hull", hull_seam_seal: "hull", rear_wall: "bore", bore_hoop: "bore", front_plate: "front", belly_skin: "belly", gel_tray: "gel", rear_door: "bore", canal_sleeve: "canal", canal_lips: "duckbill", tail_shell: "tail", rails: "rails", boom_drive: "boom", dexarm: "dexarm", eco62: "eco62", tail_battery: "battery", controller: "ctrl", thrusters: "thrusters", trim: "tail", brackets: "tail", cartridge: "tool", cartridge_drive: "tool", static_mixer: "tool", three_way_valve: "valve3", valve_servo: "valve3", needle: "tool", air_pump: "pump", vent_valve: "pump", pressure_sensor: "psensor", support_gel: "gel", naoh: "gel", print_silicone: "baby", clear_silicone: "belly", fast_silicone: "baby", dock_magnets: "magnets", pogo_pins: "tailring", dock_seal: "tailring", dock_cone: "tailring", baby_body: "baby", needle_valve: "needle", baby_mcu: "capsule", baby_battery: "capsule", baby_pump: "capsule", capsule_shell: "capsule", mother_node: "ctrl", mother_battery: "battery" };
 function linkOf(c) { if (PARTMAP[c.id] && PART[PARTMAP[c.id]]) return PARTMAP[c.id]; if (c.part && PART[c.part]) return c.part; const s = `${c.id} ${c.name} ${c.group}`; const r = RULES.find(([re]) => re.test(s)); return r ? r[1] : null; }
 const BADGE = { works: ["works", "works"], "works after bench test": ["test", "bench test"], open: ["open", "open"] };
 /* the arm row of the parts list while the ECO62 is shown: numbers from the RealMan ECO62 parameter sheet, layout from the R25 note */
-const ECO_COMP = { id: "eco62", group: "tail", name: "RealMan ECO62", role: "prints and places inside the womb, hanging from the top boom",
+const ECO_COMP = { id: "eco62", group: "tail", name: "RealMan ECO62", role: "prints and places inside the gel chamber, hanging from the top boom",
   how: "A six axis arm that hangs upside down under the tip of a flat telescopic top boom (80 x 20 mm, three stages) that comes with the tail. The foot is turned 180 degrees on the boom tip. The whole system is 1.25 times larger than the DexArm version to make room for the arm. Numbers are from the RealMan ECO62 parameter sheet.",
   specs: [["Payload", "2 kg"], ["Working radius", "425 mm"], ["Weight", "3.6 kg"], ["Repeatability", "0.1 mm"], ["Overall height", "514.5 mm"], ["Axes", "6"],
     ["Joint ranges", "J1 -178 to 178, J2 -169 to 104, J3 -151 to 133, J4 -172 to 172, J5 -172 to 172, J6 -360 to 360 deg"], ["Max joint speed", "J1 to J3 225 deg/s, J4 to J6 180 deg/s"],
-    ["Power", "100 W typical, 180 W peak, DC 24 V"], ["System scale", "1.25: mother 959 x 890 x 761 mm, tail 1048 mm, gel 195 mm deep, hatch bore D 280"], ["Arm ceiling", "467 mm above the floor"],
+    ["Power", "100 W typical, 180 W peak, DC 24 V"], ["System scale", "1.25: parent 959 x 890 x 761 mm, tail 1048 mm, gel 195 mm deep, hatch bore D 280"], ["Arm ceiling", "467 mm above the floor"],
     ["Status", "built, targets not all met: 64 collision frames at 10 mm clearance, 57 frames above datasheet joint speed"]],
   make: "buy", qty: 1, mass_g: 3600, cost_usd: 0, verdict: "open", owned: false,
   sources: [{ label: "RealMan ECO62 URDF and meshes, ros2_rm_robot on GitHub", url: "https://github.com/RealManRobot/ros2_rm_robot/tree/711abedd48c6614f26fb4f7661db92f306ff05bd/rm_description" }] };
@@ -521,15 +521,15 @@ function showCard(c, k) {
 }
 function renderPrecision() {
   const rows = DATA.precision || []; if (!rows.length) return;
-  $("#precTable").innerHTML = `<table class="t"><tr><th>Step</th><th>Value</th><th></th></tr>${rows.map((r) => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${r[2] ? `<a href="${esc(safeUrl(r[2]))}" target="_blank" rel="noopener">source</a>` : ""}</td></tr>`).join("")}</table>` + (DATA.mother_segments && DATA.mother_segments.count ? `<p class="grp">Mother hull</p><table class="t"><tr><td>Pieces</td><td>${esc(DATA.mother_segments.count)}</td></tr><tr><td>Printer</td><td>${esc(DATA.mother_segments.printer)}</td></tr><tr><td>Build volume</td><td>${esc((DATA.mother_segments.build_volume_mm || []).join(" × "))} mm</td></tr><tr><td>Material</td><td>${esc(DATA.mother_segments.material)}</td></tr><tr><td>Joints</td><td>${esc(DATA.mother_segments.joints)}</td></tr></table><p class="hint">${esc(DATA.mother_segments.notes)}</p>` : "");
+  $("#precTable").innerHTML = `<table class="t"><tr><th>Step</th><th>Value</th><th></th></tr>${rows.map((r) => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${r[2] ? `<a href="${esc(safeUrl(r[2]))}" target="_blank" rel="noopener">source</a>` : ""}</td></tr>`).join("")}</table>` + (DATA.mother_segments && DATA.mother_segments.count ? `<p class="grp">Parent hull</p><table class="t"><tr><td>Pieces</td><td>${esc(DATA.mother_segments.count)}</td></tr><tr><td>Printer</td><td>${esc(DATA.mother_segments.printer)}</td></tr><tr><td>Build volume</td><td>${esc((DATA.mother_segments.build_volume_mm || []).join(" × "))} mm</td></tr><tr><td>Material</td><td>${esc(DATA.mother_segments.material)}</td></tr><tr><td>Joints</td><td>${esc(DATA.mother_segments.joints)}</td></tr></table><p class="hint">${esc(DATA.mother_segments.notes)}</p>` : "");
 }
 
 /* ====================================================================== birth, three ways */
 const lanes = $("#lanes"), lg = lanes.getContext("2d");
 const METHODS = [
-  { key: "womb", name: "Womb pressure pulses", note: "pressure pulses act once the nose seals in the sleeve" },
+  { key: "womb", name: "Gel chamber pressure pulses", note: "pressure pulses act once the nose seals in the sleeve" },
   { key: "grow", name: "Its own growth", note: "the tail stays on the needle; the bellows lengthens and pushes the nose out" },
-  { key: "evert", name: "Everting liner", note: "a soft tube in the canal turns inside out and carries the baby, so the wall does not slide on the baby" },
+  { key: "evert", name: "Everting liner", note: "a soft tube in the canal turns inside out and carries the newborn, so the wall does not slide on the newborn" },
   { key: "arm", name: "Arm push only", note: "independent constant 4.9 N drive; axial force awaits measurement" }];
 // numbers from data/physics.json when present (bellows baby, sleeve, friction, areas, pump)
 const referenceBaby = { n: 6, pf: 0.009, pd: 0.064, ro: 0.105, riF: 0.055, riD: 0.069, Aseal: 0.0346, Aeff: 0.0237, Q: 5e-5, c: 1000, armF: 4.9, kappa: 25000, mass: 1.7, climb: 1.2 };
@@ -563,7 +563,7 @@ function drawLanes() {
   SIM.runs.forEach((r, li) => {
     const top = li * lh, y0 = top + lh / 2 + 6, x0 = dx0 + 0.55 * sc, X = (s) => x0 + s * sc;
     lg.fillStyle = "#101c28"; lg.fillRect(dx0, top, X(0) - dx0, lh); lg.fillStyle = "#0f1418"; lg.fillRect(X(0), top, dx0 + dw - X(0), lh);
-    lg.fillStyle = "#9cc8ec"; lg.font = "11px JetBrains Mono, monospace"; lg.fillText("womb, gel", dx0 + 6, top + lh - 8); lg.fillText("water", X(0.3), top + lh - 8);
+    lg.fillStyle = "#9cc8ec"; lg.font = "11px JetBrains Mono, monospace"; lg.fillText("gel chamber, gel", dx0 + 6, top + lh - 8); lg.fillText("water", X(0.3), top + lh - 8);
     lg.strokeStyle = "#7d8792"; lg.lineWidth = 1.6;
     for (const sg of [-1, 1]) { lg.beginPath(); for (let s = -0.55; s <= 0.6; s += 0.005) { const yy = y0 + sg * canalR(s, SIM.g.rt) * sc; s <= -0.55 ? lg.moveTo(X(s), yy) : lg.lineTo(X(s), yy); } lg.stroke(); }
     // the bellows: inner crests at pleat joints, outer crests mid pleat, squeezed by the canal
@@ -646,7 +646,7 @@ function srcLinks(arr) { return (arr || []).map((s) => Array.isArray(s) ? `<a hr
 function renderPhysics() {
   const P = PHYS; if (!P || !Object.keys(P).length) return;
   const foldBlock = (F, title) => F ? `<h3 style="font:500 20px var(--serif);margin:14px 0 6px">${esc(title)}: ${esc(F.recommended)}</h3><p>${esc(F.why)}</p>${F.params ? `<table class="t" style="max-width:640px">${Object.entries(F.params).map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(typeof v === "object" ? JSON.stringify(v) : v)}</td></tr>`).join("")}</table>` : ""}${(F.rejected || []).length ? `<p class="grp">Not chosen</p><ul class="plain">${F.rejected.map((r) => `<li><b>${esc(r[0])}</b>: ${esc(r[1])}</li>`).join("")}</ul>` : ""}<p class="hint">${srcLinks(F.sources)}</p>` : "";
-  $("#foldDoc").innerHTML = foldBlock(P.fold, "Baby") + foldBlock(P.belly_fold, "Mother's belly");
+  $("#foldDoc").innerHTML = foldBlock(P.fold, "Baby") + foldBlock(P.belly_fold, "Parent's belly");
   if (P.swelling) $("#swellDoc").innerHTML = `<ul class="plain">${(P.swelling.reasons || []).map((r) => `<li><b>${esc(r[0])}</b> (${esc(r[1])}): ${esc(r[2])}</li>`).join("")}</ul><p class="hint">${srcLinks(P.swelling.sources)}</p>`;
   if (P.push_methods) $("#pushDoc").innerHTML = `<table class="t"><tr><th>Method</th><th>Verdict</th><th>How</th><th></th></tr>${P.push_methods.map((r) => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td>${r[3] ? `<a href="${esc(safeUrl(r[3]))}" target="_blank" rel="noopener">source</a>` : ""}</td></tr>`).join("")}</table>`;
   if (P.docking) $("#dockDoc").innerHTML = `<p>${esc(P.docking.geometry || "")}</p><table class="t" style="max-width:640px">${(P.docking.numbers || []).map((r) => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join("")}</table><p class="hint">${srcLinks(P.docking.sources)}</p>`;

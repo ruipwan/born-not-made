@@ -2,12 +2,12 @@
  "title": "Born, Not Made: stage 3, one encapsulated kit placed once and printed around",
  "date": "2026-11-20",
  "frame": {
-  "origin": "nose tip of the inflated baby",
+  "origin": "nose tip of the inflated newborn",
   "x": "toward the tail (axis)",
   "y": "left",
   "z": "up, belly at -z",
   "units": "m",
-  "as_printed": "same axes; the baby lies in the gel with its axis horizontal, nose toward the opening, belly down; as printed x positions are given separately (stories folded to 10 mm)"
+  "as_printed": "same axes; the newborn lies in the gel with its axis horizontal, nose toward the opening, belly down; as printed x positions are given separately (stories folded to 10 mm)"
  },
  "baby": {
   "length_deployed": 0.28,

@@ -236,7 +236,7 @@
    "id": "belly_skin",
    "group": "mother",
    "name": "Belly origami skin, SORTA-Clear 18",
-   "role": "upper skin; pleats open as the womb fills",
+   "role": "upper skin; pleats open as the gel chamber fills",
    "how": "Cast clear silicone with 5 concentric elliptical pleats around the crown, clamped to the hull rim by a printed ring. 24 clear nylon cords in the skin along meridians go straight at 10 L and stop the rise.",
    "specs": [
     [
@@ -334,7 +334,7 @@
    "id": "chute",
    "group": "mother",
    "name": "Birth chute, one clear print",
-   "role": "carries the floating baby from the gel up to the canal",
+   "role": "carries the floating newborn from the gel up to the canal",
    "how": "A ribbed trough on the canal bottom line at 20.8 deg, from 30 mm under the gel surface to the canal low point. Fixed to the tray front quarter and the front plate.",
    "specs": [
     [
@@ -386,7 +386,7 @@
    "group": "mother",
    "name": "Petal door, 6 cast silicone petals",
    "role": "closes the rear bore when no tail is docked",
-   "how": "Six petals hinged on a ring at D 256 behind the bore shoulder. One drawstring on an N20 gear motor (mother node H bridge) pulls them open to 135 deg into the womb; the cast shape closes them. The dock seal holds the womb while docked, so the door never holds pressure.",
+   "how": "Six petals hinged on a ring at D 256 behind the bore shoulder. One drawstring on an N20 gear motor (parent node H bridge) pulls them open to 135 deg into the gel chamber; the cast shape closes them. The dock seal holds the gel chamber while docked, so the door never holds pressure.",
    "specs": [
     [
      "Silicone",
@@ -432,8 +432,8 @@
    "id": "canal_sleeve",
    "group": "canal",
    "name": "Birth canal soft sleeve, Ecoflex 00-30",
-   "role": "soft passage the baby is pushed through",
-   "how": "A thin cast tube tucked inside the canal ring. The baby, pushed and inflated, turns the sleeve out.",
+   "role": "soft passage the newborn is pushed through",
+   "how": "A thin cast tube tucked inside the canal ring. The newborn, pushed and inflated, turns the sleeve out.",
    "specs": [
     [
      "Silicone",
@@ -474,8 +474,8 @@
    "id": "canal_lips",
    "group": "canal",
    "name": "Duckbill lips, SORTA-Clear 18",
-   "role": "keeps womb air in; opens only to the baby",
-   "how": "Four cast lips pressed shut by their own preload. The baby forces them apart; they close again after.",
+   "role": "keeps gel chamber air in; opens only to the newborn",
+   "how": "Four cast lips pressed shut by their own preload. The newborn forces them apart; they close again after.",
    "specs": [
     [
      "Silicone",
@@ -514,7 +514,7 @@
    "group": "tail",
    "name": "Tail shell, gourd form, one PETG print",
    "role": "dry hull for arm, power, pump and thrusters",
-   "how": "One large FDM print, outside sealed with epoxy. Same mouth as the mother rear face, then wider and lower behind the seam; bottom level with the mother keel. Heavy parts sit low in the belly.",
+   "how": "One large FDM print, outside sealed with epoxy. Same mouth as the parent body rear face, then wider and lower behind the seam; bottom level with the parent body keel. Heavy parts sit low in the belly.",
    "specs": [
     [
      "Printer",
@@ -564,7 +564,7 @@
    "id": "rails",
    "group": "tail",
    "name": "HIWIN MGN12H rails and carriage",
-   "role": "carry the arm forward into the womb",
+   "role": "carry the arm forward into the gel chamber",
    "how": "Two parallel rails on a keel beam in the tail belly, two blocks each, under a 280 x 120 x 6 mm boom plate. The DexArm base sits 70 mm ahead of the front blocks.",
    "specs": [
     [
@@ -658,7 +658,7 @@
    "id": "dexarm",
    "group": "tail",
    "name": "Rotrics DexArm, Starter Kit",
-   "role": "prints and places inside the womb",
+   "role": "prints and places inside the gel chamber",
    "how": "A four axis desktop arm on the boom plate. Marlin G-code over USB from the Pi.",
    "specs": [
     [
@@ -805,7 +805,7 @@
    "id": "thrusters",
    "group": "tail",
    "name": "Blue Robotics T200 thrusters",
-   "role": "move the tail to the baby and dock",
+   "role": "move the tail to the newborn and dock",
    "how": "Two thrusters low on the tail. Run at low throttle for a slow, quiet approach.",
    "specs": [
     [
@@ -847,9 +847,9 @@
   {
    "id": "trim",
    "group": "tail",
-   "name": "Trim ballast, stainless, mother and tail",
+   "name": "Trim ballast, stainless, parent and tail",
    "role": "set both bodies level at the design waterline",
-   "how": "Mother: 1.5 kg in the bilge at x -0.27. Tail: 1.8 kg low at x_t -0.29. Add or remove 191 g pieces to hold the hatch axis 145 mm above water.",
+   "how": "Parent: 1.5 kg in the bilge at x -0.27. Tail: 1.8 kg low at x_t -0.29. Add or remove 191 g pieces to hold the hatch axis 145 mm above water.",
    "specs": [
     [
      "Ballast",
@@ -879,7 +879,7 @@
     }
    ],
    "verdict": "works after bench test",
-   "test": "Float the loaded tail beside the mother; match axis heights within 5 mm.",
+   "test": "Float the loaded tail beside the parent body; match axis heights within 5 mm.",
    "owned": false,
    "changed_in_v2": "v2: foam dropped (inside a dry hull foam adds no lift); stainless ballast in both bodies."
   },
@@ -917,7 +917,7 @@
    "id": "cartridge",
    "group": "tool",
    "name": "Nordson EFD 600 ml 1:1 side by side cartridge",
-   "role": "stores silicone A and B for one baby",
+   "role": "stores silicone A and B for one newborn",
    "how": "Fixed in the tail belly under the rails with the mixer at its outlet. One plunger yoke pushes both sides at 1:1. A 1.0 m mixed line runs in the drag chain to the head.",
    "specs": [
     [
@@ -929,8 +929,8 @@
      "1:1"
     ],
     [
-     "Need per baby",
-     "666 ml with waste: baby silicone 0.61 L or less, else change at a cap layer"
+     "Need per newborn",
+     "666 ml with waste: newborn silicone 0.61 L or less, else change at a cap layer"
     ],
     [
      "Piston area",
@@ -958,7 +958,7 @@
    "verdict": "works after bench test",
    "test": "Fill by hand, push 10 ml, weigh A and B outputs for 1:1.",
    "owned": false,
-   "changed_in_v2": "v2: one 600 ml cartridge per baby, fixed in the tail belly, not on the boom."
+   "changed_in_v2": "v2: one 600 ml cartridge per newborn, fixed in the tail belly, not on the boom."
   },
   {
    "id": "cartridge_drive",
@@ -1127,7 +1127,7 @@
    "id": "needle",
    "group": "tool",
    "name": "Stepped needle: 12G Luer body, 14G tip",
-   "role": "prints the bead, carries the capsule, inflates the baby",
+   "role": "prints the bead, carries the capsule, inflates the newborn",
    "how": "A 12G blunt Luer needle (custom 95 mm) with a 14G stainless cannula bonded 10 mm into the tip and 20 mm exposed. Silicone first; then air through the same needle into the capsule valve.",
    "specs": [
     [
@@ -1179,7 +1179,7 @@
    "group": "tool",
    "name": "KNF NMP830 diaphragm pump",
    "role": "blows air; can also suck gel back",
-   "how": "Brushless diaphragm pump in the tail. Inlet through a snorkel on the tail top (outside air); outlet to the stopcock air port. Air drawn from the womb would give no belly rise.",
+   "how": "Brushless diaphragm pump in the tail. Inlet through a snorkel on the tail top (outside air); outlet to the stopcock air port. Air drawn from the gel chamber would give no belly rise.",
    "specs": [
     [
      "Model",
@@ -1225,7 +1225,7 @@
    "id": "vent_valve",
    "group": "tool",
    "name": "Clippard EV-2-12 vent valve",
-   "role": "relief: vents womb air above the set point",
+   "role": "relief: vents gel chamber air above the set point",
    "how": "Opened by the controller when the BMP390 reads over 1 kPa. A dip tube 100 mm under water is the passive backup.",
    "specs": [
     [
@@ -1267,8 +1267,8 @@
    "id": "pressure_sensor",
    "group": "electronics",
    "name": "Bosch BMP390 pressure sensors",
-   "role": "measure womb, ambient and baby air pressure",
-   "how": "Gauge pressure = womb sensor minus ambient sensor. A third sensor sits in the baby capsule.",
+   "role": "measure gel chamber, ambient and newborn air pressure",
+   "how": "Gauge pressure = gel chamber sensor minus ambient sensor. A third sensor sits in the newborn capsule.",
    "specs": [
     [
      "Range",
@@ -1363,7 +1363,7 @@
      "url": "https://dspace.mit.edu/bitstream/handle/1721.1/122801/3dp.2017.0037.pdf?sequence=2"
     },
     {
-     "label": "Baby Robots Material Fabrication Updates (gel recipe)",
+     "label": "Newborn Robots Material Fabrication Updates (gel recipe)",
      "url": "https://docs.google.com/presentation/d/1gDGtGLfvkKU6tBiIV1BffReg0fe-eCJgThqy-QIFMio"
     }
    ],
@@ -1406,7 +1406,7 @@
      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5059754/fullTextXML"
     },
     {
-     "label": "Baby Robots Material Fabrication Updates (gel recipe)",
+     "label": "Newborn Robots Material Fabrication Updates (gel recipe)",
      "url": "https://docs.google.com/presentation/d/1gDGtGLfvkKU6tBiIV1BffReg0fe-eCJgThqy-QIFMio"
     }
    ],
@@ -1419,7 +1419,7 @@
    "id": "print_silicone",
    "group": "fluid",
    "name": "Print silicone: Dragon Skin 10 NV",
-   "role": "the baby's printed skin",
+   "role": "the newborn's printed skin",
    "how": "Platinum silicone, 1:1. Printed into the gel through the mixer and the stepped needle at 20 mm/s.",
    "specs": [
     [
@@ -1657,7 +1657,7 @@
    "id": "pogo_pins",
    "group": "dock",
    "name": "Mill-Max 0906 spring pins",
-   "role": "charge the mother node and carry serial data",
+   "role": "charge the parent body node and carry serial data",
    "how": "Four pins on the top of the tail rim meet gold pads on the hoop, above the waterline.",
    "specs": [
     [
@@ -1700,7 +1700,7 @@
    "group": "dock",
    "name": "Dock lip seal, SORTA-Clear 18",
    "role": "seals the collar tip to the bore shoulder, above water",
-   "how": "A cast lip on the collar tip leans 30 deg outward and bends 2 to 3 mm on the shoulder. Womb pressure presses the lip down.",
+   "how": "A cast lip on the collar tip leans 30 deg outward and bends 2 to 3 mm on the shoulder. Gel chamber pressure presses the lip down.",
    "specs": [
     [
      "Silicone",
@@ -1741,9 +1741,9 @@
   {
    "id": "dock_cone",
    "group": "dock",
-   "name": "Lead in: recess in the mother, collar on the tail",
+   "name": "Lead in: recess in the parent body, collar on the tail",
    "role": "guides the tail onto the bore; carries the lip seal",
-   "how": "A 28 mm collar on the tail mouth enters the 30 mm recess in the mother. Flat faces meet first; the cone only centers. No long nose.",
+   "how": "A 28 mm collar on the tail mouth enters the 30 mm recess in the parent body. Flat faces meet first; the cone only centers. No long nose.",
    "specs": [
     [
      "Half angle",
@@ -1787,12 +1787,12 @@
    "verdict": "works after bench test",
    "test": "Approach at 20 mm offset; cone must center the tail.",
    "owned": false,
-   "changed_in_v2": "v2: female recess in the mother and a short collar on the tail instead of a cone on the tail mouth."
+   "changed_in_v2": "v2: female recess in the parent body and a short collar on the tail instead of a cone on the tail mouth."
   },
   {
    "id": "baby_body",
    "group": "baby",
-   "name": "Baby skin, printed FX-Pro",
+   "name": "Newborn skin, printed FX-Pro",
    "role": "folded body that inflates and is born",
    "how": "Printed folded in the gel around the capsule. The capsule's valve boss stays open to the outside.",
    "specs": [
@@ -1836,7 +1836,7 @@
    "id": "needle_valve",
    "group": "baby",
    "name": "Ball needle valve core",
-   "role": "only opening of the capsule; holds the baby's air",
+   "role": "only opening of the capsule; holds the newborn's air",
    "how": "A rubber valve core like a basketball valve, set in the capsule boss. The 14G needle enters to inflate.",
    "specs": [
     [
@@ -1878,7 +1878,7 @@
    "id": "baby_mcu",
    "group": "baby",
    "name": "CodeCell C6 Drive",
-   "role": "brain of the baby: radio, IMU, motor driver",
+   "role": "brain of the newborn: radio, IMU, motor driver",
    "how": "ESP32-C6 board with a BNO085 9 axis IMU and two H bridges. Runs the pump and reports pressure by BLE.",
    "specs": [
     [
@@ -1954,7 +1954,7 @@
    "id": "baby_pump",
    "group": "baby",
    "name": "AITIAO 3 to 5 V micro submersible pump (owned)",
-   "role": "water jet for the baby to swim",
+   "role": "water jet for the newborn to swim",
    "how": "Sits in the wet bay under the capsule. Inlet and outlet tubes pass through the skin.",
    "specs": [
     [
@@ -1997,7 +1997,7 @@
    "group": "baby",
    "name": "Electronics capsule shell",
    "role": "dry home for board, cell and sensor",
-   "how": "Two clear halves with a face O ring and 4 screws. The valve boss and a side port lead air into the baby.",
+   "how": "Two clear halves with a face O ring and 4 screws. The valve boss and a side port lead air into the newborn.",
    "specs": [
     [
      "Material",
@@ -2037,9 +2037,9 @@
   {
    "id": "mother_node",
    "group": "electronics",
-   "name": "Mother node: CodeCell C6 Drive (owned)",
-   "role": "senses waves and motion of the mother",
-   "how": "A sealed node in the bilge beside the tray. The IMU reads the mother's rocking; BLE talks to tail and baby.",
+   "name": "Parent node: CodeCell C6 Drive (owned)",
+   "role": "senses waves and motion of the parent body",
+   "how": "A sealed node in the bilge beside the tray. The IMU reads the parent body's rocking; BLE talks to tail and newborn.",
    "specs": [
     [
      "IMU",
@@ -2072,7 +2072,7 @@
    "id": "mother_battery",
    "group": "electronics",
    "name": "ETWOWUP 3.7 V 3000 mAh LiPo (owned)",
-   "role": "powers the mother node",
+   "role": "powers the parent body node",
    "how": "Charged from the tail through the pogo pins while docked.",
    "specs": [
     [

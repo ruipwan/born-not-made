@@ -1,6 +1,6 @@
 # Born, Not Made
 
-A mother robot prints a baby robot inside its body, in gel, and gives birth in water.
+One robot prints another inside the body, in gel, and gives birth in water. Speculative design: a robot giving birth to another.
 MAS thesis, Ruipeng Wang, MIT Media Lab, 2026.
 
 Live site: https://ruipwan.github.io/born-not-made/

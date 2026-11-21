@@ -115,7 +115,7 @@
     "beads jump 11 mm per layer and do not overlap: the wall leaks"
    ],
    [
-    "sim squeezes the baby to r 41 mm at the canal",
+    "sim squeezes the newborn to r 41 mm at the canal",
     "that is the 64 mm stub tube clamped to 45 mm; the birth bore is the D 280 ring plate"
    ]
   ],
@@ -126,7 +126,7 @@
    ],
    [
     "Kresling",
-    "Twists while it deploys, so the baby screws through the canal; bistability needs stiff panels that strain, which soft silicone lacks; diameter fixed. Artist ruled it out on 28 Oct."
+    "Twists while it deploys, so the newborn screws through the canal; bistability needs stiff panels that strain, which soft silicone lacks; diameter fixed. Artist ruled it out on 28 Oct."
    ],
    [
     "Waterbomb",
@@ -164,7 +164,7 @@
    ],
    [
     "Self folding",
-    "The printed folded shape is the rest state, so venting refolds the baby without help (programmable folding, Hawkes et al. 2010)."
+    "The printed folded shape is the rest state, so venting refolds the newborn without help (programmable folding, Hawkes et al. 2010)."
    ]
   ],
   "sources": [
@@ -274,7 +274,7 @@
    "hoop_stretch_innermost": 1.07,
    "stop": "tether net or skin going taut at 10 L, then gas compliance 1.6 L/kPa",
    "rise_for_baby_air_8_35L_mm": 34,
-   "web_model_now": "17.9 L and 73 mm: about 2x too much for the air the baby takes in"
+   "web_model_now": "17.9 L and 73 mm: about 2x too much for the air the newborn takes in"
   },
   "why": "A dome must lengthen along every meridian to rise. Closed concentric pleats store length in all directions, have no ends at the fixed seam, and no vertices. In paper a closed curved pleat buckles into a saddle (Albers 1927-28; Dias 2012; Demaine et al. 2011); in printed silicone the small hoop stretch (about 7 % at the innermost pleat) lets it rise round, with a faint saddle wobble at most. The current straight transverse pleats store length only along x: the web model needs about 10 % stretch across, and each pleat must die out where it meets the seam.",
   "rejected": [
@@ -382,7 +382,7 @@
    [
     "breakout",
     "rho_gel g V_air > F_hold",
-    "Air volume that frees the folded baby; the baby then rises to the gel surface."
+    "Air volume that frees the folded newborn; the newborn then rises to the gel surface."
    ],
    [
     "crest stretch",
@@ -410,14 +410,14 @@
     "Stops growth; above it extra pressure only stiffens."
    ],
    [
-    "womb push",
+    "gel chamber push",
     "F_w = p_w A_seal, A_seal = pi r_o^2",
-    "Gauge womb pressure on the sealed canal section."
+    "Gauge gel chamber pressure on the sealed canal section."
    ],
    [
     "sleeve squeeze",
     "N = 2 pi L_s E_s t_s (lambda_s - 1), lambda_s = r_o / r_s0",
-    "Normal force of the stretched soft sleeve on the baby."
+    "Normal force of the stretched soft sleeve on the newborn."
    ],
    [
     "friction",
@@ -445,9 +445,9 @@
     "Overdamped stick slip; c about 1000 N s/m (tune)."
    ],
    [
-    "womb gas",
+    "gel chamber gas",
     "dp_w/dt = (Q_in - A_seal v - dV_belly/dt) / C_gas, C_gas = V_air/p_0",
-    "Womb pressure once the belly is at the stop. Below the stop p_w stays at the belly open pressure."
+    "Gel chamber pressure once the belly is at the stop. Below the stop p_w stays at the belly open pressure."
    ],
    [
     "slip per pulse",
@@ -512,11 +512,11 @@
     "74 mm"
    ],
    [
-    "canal lowest bore point above waterline (mother 45 kg)",
+    "canal lowest bore point above waterline (parent 45 kg)",
     "48 mm"
    ],
    [
-    "gel hold on folded baby (d_eq 153 mm) at 10 / 50 / 100 Pa",
+    "gel hold on folded newborn (d_eq 153 mm) at 10 / 50 / 100 Pa",
     "2.6 / 12.8 / 25.7 N"
    ],
    [
@@ -544,11 +544,11 @@
     "2.6 / 5.8 N"
    ],
    [
-    "womb push per 1 kPa",
+    "gel chamber push per 1 kPa",
     "34.6 N"
    ],
    [
-    "womb pressure to start sliding (no growth push)",
+    "gel chamber pressure to start sliding (no growth push)",
     "0.68 kPa"
    ],
    [
@@ -588,10 +588,10 @@
    "print folded",
    "cure in gel (DS10 75 min)",
    "first breath 1.3 L at 0.25 kPa: breakout, float up",
-   "arm pitches the baby to the 21 deg chute, holds the tail on the needle",
+   "arm pitches the newborn to the 21 deg chute, holds the tail on the needle",
    "growth to 385 mm at up to 1 kPa: nose climbs 207 mm, enters the sleeve in stick slip steps",
    "needle out, valve shuts",
-   "womb contractions 0.7 to 1 kPa push the rest, buoyancy pulls once the nose is in the water",
+   "gel chamber contractions 0.7 to 1 kPa push the rest, buoyancy pulls once the nose is in the water",
    "tail leaves, sleeve shuts, belly drops"
   ],
   "sources": [
@@ -644,9 +644,9 @@
  "swelling": {
   "reasons": [
    [
-    "baby air from outside into the closed womb",
+    "newborn air from outside into the closed gel chamber",
     "+8.35 L, crown rises about 34 mm (4.1 mm per L)",
-    "Gel is incompressible, so every liter pumped into the baby lifts the gel and the pleated belly. If the pump draws womb air instead, there is no swelling."
+    "Gel is incompressible, so every liter pumped into the newborn lifts the gel and the pleated belly. If the pump draws gel chamber air instead, there is no swelling."
    ],
    [
     "first breath",
@@ -656,12 +656,12 @@
    [
     "printing",
     "+0.64 L silicone from the syringe, about 2.6 mm rise; gel level +1.9 mm",
-    "The print adds volume to the womb."
+    "The print adds volume to the gel chamber."
    ],
    [
     "belly as accumulator",
     "opens at 0.05 to 0.1 kPa up to 10 L, then 1.6 L/kPa",
-    "While pleats open the pressure stays low; at the stop the womb air is the spring."
+    "While pleats open the pressure stays low; at the stop the gel chamber air is the spring."
    ],
    [
     "contractions",
@@ -671,12 +671,12 @@
    [
     "stick slip twitch",
     "0.17 kPa drop, about 0.3 L, 1 mm",
-    "Each slip of the baby frees womb volume; the belly gives a small after kick."
+    "Each slip of the newborn frees gel chamber volume; the belly gives a small after kick."
    ],
    [
-    "baby leaving",
+    "newborn leaving",
     "9.3 L leaves over the push; ends 0.9 L below the start (about 4 mm)",
-    "Each birth removes the baby volume and 0.9 L of trapped gel out; gel level drops 2.7 mm per birth."
+    "Each birth removes the newborn volume and 0.9 L of trapped gel out; gel level drops 2.7 mm per birth."
    ],
    [
     "venting after birth",
@@ -685,16 +685,16 @@
    ],
    [
     "arm coming in",
-    "mother sinks about 9 mm",
-    "3.4 kg of arm and carriage moves from tail to mother; waterplane 0.38 m2."
+    "parent sinks about 9 mm",
+    "3.4 kg of arm and carriage moves from tail to parent; waterplane 0.38 m2."
    ],
    [
     "newborn gone",
-    "mother rises about 4 mm",
+    "parent rises about 4 mm",
     "1.67 kg leaves."
    ]
   ],
-  "web_model_fix": "bellyNow should follow V_baby_inside / 10 L and never exceed the liters the baby took in: about 34 mm, not 73. After birth it ends about 0.05 below the start, not at 0.2 of full.",
+  "web_model_fix": "bellyNow should follow V_baby_inside / 10 L and never exceed the liters the newborn took in: about 34 mm, not 73. After birth it ends about 0.05 below the start, not at 0.2 of full.",
   "sources": [
    [
     "Demaine, History of Curved Origami Sculpture (Albers 1927-28 concentric circle pleat twists into a saddle)",
@@ -726,7 +726,7 @@
    "https://www.mybotshop.de/Datasheet/Datasheet_DexArm_MakerKit.pdf"
   ],
   [
-   "Womb pressure pulses",
+   "Gel chamber pressure pulses",
    "works after test",
    "0.7 to 1 kPa on the sealed 210 mm section gives 24 to 35 N, above 18 N static friction; needs a seal and a belly stop; 29 mm per 1 L pulse.",
    "https://escholarship.org/content/qt3nx45751/qt3nx45751.pdf"
@@ -734,7 +734,7 @@
   [
    "Everting liner in the canal",
    "works after test",
-   "A thin tube stored in the funnel everts outward around the baby; grows when p exceeds a yield pressure, rate about proportional to (p - Y). One more part.",
+   "A thin tube stored in the funnel everts outward around the newborn; grows when p exceeds a yield pressure, rate about proportional to (p - Y). One more part.",
    "https://escholarship.org/content/qt3nx45751/qt3nx45751.pdf"
   ],
   [
@@ -746,11 +746,11 @@
   [
    "Gel flow",
    "no",
-   "Canal is 74 mm above the gel, so gel cannot carry the baby there; liquefying gel with salt ruins the bath.",
+   "Canal is 74 mm above the gel, so gel cannot carry the newborn there; liquefying gel with salt ruins the bath.",
    "https://www.lubrizol.com:443/-/media/Lubrizol/Health/Literature/Bulletin-06---Thickening-Properties.pdf"
   ],
   [
-   "Baby growth ratchet (tail on needle)",
+   "Newborn growth ratchet (tail on needle)",
    "works",
    "Bellows growth pushes the nose with about 20 N at 1 kPa; tether stops growth at 385 mm.",
    "https://pmc.ncbi.nlm.nih.gov/articles/PMC5740677"
@@ -758,7 +758,7 @@
   [
    "Buoyancy",
    "works for breakout only",
-   "Rises the baby to the gel surface once air exceeds the gel hold; outside, the part in water adds rho g V sin 21 deg.",
+   "Rises the newborn to the gel surface once air exceeds the gel hold; outside, the part in water adds rho g V sin 21 deg.",
    "https://physics.uwo.ca/~debruyn/pdfs/j_rheol_2007.pdf"
   ]
  ],
@@ -886,7 +886,7 @@
    ],
    [
     "magnets in scene",
-    "mother 4 at 45 + 90k deg, tail 6 at 0 + 60k deg: none face each other; faces 18 mm apart"
+    "parent 4 at 45 + 90k deg, tail 6 at 0 + 60k deg: none face each other; faces 18 mm apart"
    ],
    [
     "N42 D20 x 8 pair pull at 2 / 4 / 6 / 18 mm",
@@ -897,7 +897,7 @@
     "770 N, about 100 N m"
    ],
    [
-    "womb pressure on dock seal R 138 at 1 / 2 kPa",
+    "gel chamber pressure on dock seal R 138 at 1 / 2 kPa",
     "60 / 120 N"
    ],
    [
@@ -933,11 +933,11 @@
     "5.5 % (3.1 deg)"
    ],
    [
-    "mother sink when arm enters",
+    "parent sink when arm enters",
     "9 mm"
    ]
   ],
-  "geometry": "Female lead in on the mother band: 35 to 40 deg half angle, 30 mm deep, R 150 to R 125, so it captures 21 to 25 mm of offset. Half angle must stay below 90 deg minus the friction angle (45 deg for silicone at mu 1). Tail rim rounded R 10, no male cone. 12 N42 D20 x 8 pairs on both rings at the same radius (r 134) and angles, 1 mm cover each side, alternating poles for roll. Hollow lip seals 12 mm early and bleeds to slow the snap. Rails: joint gap 3 mm or less, step 1 mm or less, 20 mm tapered lead in on the mother rods. Bore D 250 for the arm with its tool.",
+  "geometry": "Female lead in on the parent body band: 35 to 40 deg half angle, 30 mm deep, R 150 to R 125, so it captures 21 to 25 mm of offset. Half angle must stay below 90 deg minus the friction angle (45 deg for silicone at mu 1). Tail rim rounded R 10, no male cone. 12 N42 D20 x 8 pairs on both rings at the same radius (r 134) and angles, 1 mm cover each side, alternating poles for roll. Hollow lip seals 12 mm early and bleeds to slow the snap. Rails: joint gap 3 mm or less, step 1 mm or less, 20 mm tapered lead in on the parent body rods. Bore D 250 for the arm with its tool.",
   "sources": [
    [
     "Hennessey 1982, Compliant part mating and minimum energy chamfer design, MIT MS thesis (Draper Lab, supervisor D. Whitney): no wedging if chamfer slope exceeds friction",

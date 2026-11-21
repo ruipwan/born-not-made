@@ -39,7 +39,7 @@ test('twelve comparison cases distinguish computed exits, extrapolations and no 
   assert.equal(cases.length,12);
   for (const kind of ['no_exit','extrapolated','completed']) assert.equal(cases.filter(c=>c.exit_result===kind).length,4);
   for (const c of cases) assert.equal(c.exit_result==='extrapolated',/extrapolated/.test(c.notes));
-  const solved = cases.find(c=>c.name==='(c) growth, then womb pulses, sleeve r 80 (tighter)');
+  const solved = cases.find(c=>c.name==='(c) growth, then gel chamber pulses, sleeve r 80 (tighter)');
   assert.equal(solved.exit_result,'completed');
   assert.equal(Math.round(reference.t_born_s),solved.time_s);
 });

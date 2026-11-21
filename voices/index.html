@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Speculative design: a robot giving birth to another · Voices</title>
-<meta name="description" content="Voices: an open, public discussion about Born, Not Made, a mother robot that prints a baby robot inside the mother's body and gives birth in water. Leave words or a drawing.">
+<meta name="description" content="Voices: an open, public discussion about Born, Not Made, a robot that prints another robot inside the body and gives birth in water. Leave words or a drawing.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
@@ -233,7 +233,7 @@ dialog::backdrop { background: rgba(205, 223, 240, .62); -webkit-backdrop-filter
     <p class="lede">An open experiment about a new kind of artificial species. Say what you think of it.</p>
   </div>
   <div class="artist">
-    <p>Born, Not Made has a trunk: a mother robot that prints a baby inside the mother's body and gives birth in water. But the trunk is a question, not an answer. This is an ongoing experiment about a new kind of artificial species, and I do not know yet what that species should become.</p>
+    <p>Born, Not Made has a trunk: a robot that prints another robot inside the body and gives birth in water. But the trunk is a question, not an answer. This is an ongoing experiment about a new kind of artificial species, and I do not know yet what that species should become.</p>
     <p>Branches grow from the trunk, and many of them come from other people. So the discussion is not around the work. It is the work. Leave a few words or a drawing, and they will stay here, in public, next to everyone else's.</p>
     <p class="sig">Ruipeng Wang</p>
   </div>
@@ -264,7 +264,7 @@ dialog::backdrop { background: rgba(205, 223, 240, .62); -webkit-backdrop-filter
     <p class="answering" id="answering" hidden>In answer to <q id="answeringQ"></q><button type="button" class="x" id="answeringX" aria-label="Stop answering this question">&times;</button></p>
     <label class="lbl" for="words">Your words</label>
     <textarea id="words" rows="4" placeholder="Write what you think, in any language." aria-describedby="wordsHint"></textarea>
-    <p class="sr" id="wordsHint">About the mother robot, kinship between robots, a design idea, a worry or a question. Anything you think.</p>
+    <p class="sr" id="wordsHint">About birth between robots, kinship between robots, a design idea, a worry or a question. Anything you think.</p>
 
     <fieldset>
       <legend>It is about</legend>
@@ -280,7 +280,7 @@ dialog::backdrop { background: rgba(205, 223, 240, .62); -webkit-backdrop-filter
         <div class="pad-stage" id="padStage">
           <canvas id="padBase" aria-hidden="true"></canvas>
           <canvas id="padLive" role="img" aria-label="Drawing pad. Draw with a finger, a pen or a mouse."></canvas>
-          <p class="pad-hint" id="padHint">Draw the baby you imagine, or anything at all.</p>
+          <p class="pad-hint" id="padHint">Draw the newborn you imagine, or anything at all.</p>
         </div>
         <div class="pad-tools">
           <fieldset class="inks" id="inks"><legend>Ink</legend></fieldset>
@@ -360,7 +360,7 @@ const API_KEY = "bnm-voices-api-v1", DRAFT_KEY = "bnm-voices-draft-v1", VIEW_KEY
 const TTL = 10 * 60 * 1000;
 const POOL_MAX = 40, PAGE = 30;
 const TOPICS = [
-  { key: "the mother", v: "--t-mother" },
+  { key: "birth", v: "--t-mother" },
   { key: "kinship", v: "--t-kin" },
   { key: "design idea", v: "--t-design" },
   { key: "a question", v: "--t-question" },
@@ -374,15 +374,15 @@ const INKS = [
   { c: "#5d7a3a", name: "Moss" },
 ];
 const PROMPTS = [
-  { q: "What would you want a robot mother to pass on?", topic: "the mother" },
+  { q: "What would you want a robot to pass on to the robot it bears?", topic: "birth" },
   { q: "Can a machine be kin?", topic: "kinship" },
-  { q: "What should a baby robot never inherit?", topic: "a worry" },
-  { q: "Draw the baby you imagine.", topic: "design idea", draw: true },
+  { q: "What should a newborn robot never inherit?", topic: "a worry" },
+  { q: "Draw the newborn you imagine.", topic: "design idea", draw: true },
   { q: "If robots are born, who are their relatives?", topic: "kinship" },
-  { q: "What would you ask the baby on the day it is born?", topic: "a question" },
+  { q: "What would you ask a newborn robot on the day it is born?", topic: "a question" },
   { q: "What worries you about machines that give birth?", topic: "a worry" },
-  { q: "Draw how the mother could hold the baby.", topic: "design idea", draw: true },
-  { q: "Should every baby be different from the mother?", topic: "the mother" },
+  { q: "Draw how one robot could hold the robot it bore.", topic: "design idea", draw: true },
+  { q: "Should every newborn be different from the robot that bore it?", topic: "birth" },
 ];
 
 const $ = (id) => document.getElementById(id);
@@ -634,7 +634,7 @@ function fromIssue(i) {
 function topicKey(t) {
   t = String(t || "").toLowerCase();
   if (!t) return "something else";
-  if (/mother|mom|mum|womb/.test(t)) return "the mother";
+  if (/mother|mom|mum|womb|birth|born/.test(t)) return "birth";
   if (/kin|family|relat|sibling/.test(t)) return "kinship";
   if (/design|idea/.test(t)) return "design idea";
   if (/question|\?/.test(t)) return "a question";

@@ -2,13 +2,13 @@
  "meta": {
   "date": "2026-11-19",
   "notes": "/home/claude/bnm_design/build_research/design_v2.md",
-  "frames": "mother frame: egg center origin, x forward, z up (m); tail frame x_t = x + 0.3835"
+  "frames": "parent frame: egg center origin, x forward, z up (m); tail frame x_t = x + 0.3835"
  },
  "decisions": [
   {
    "id": "hatch",
    "problem": "Hatch: DexArm with tool needs R 117, scene bore D 227",
-   "decision": "Keep bore D 250. The arm passes in one fixed pose (upper arm 70 deg, forearm 60 deg, film convention) with the print head tilted needle up by a second STS3215. Base underside at z -0.090 so the passage circle sits on the egg axis. Door: 6 silicone petals hinged at D 256, opened to 135 deg into the womb by a drawstring on an N20 motor, splash guard only.",
+   "decision": "Keep bore D 250. The arm passes in one fixed pose (upper arm 70 deg, forearm 60 deg, film convention) with the print head tilted needle up by a second STS3215. Base underside at z -0.090 so the passage circle sits on the egg axis. Door: 6 silicone petals hinged at D 256, opened to 135 deg into the gel chamber by a drawstring on an N20 motor, splash guard only.",
    "numbers": [
     [
      "base alone",
@@ -46,15 +46,15 @@
   },
   {
    "id": "waterline",
-   "problem": "Waterline and buoyancy: mother 35 to 45 kg, tail 13 kg, rear bore at or under water",
-   "decision": "Design waterline z -0.145 at the hatch. Mother 30.5 kg: round tray D 410 with 18 L gel and 1.5 kg trim ballast. Tail reshaped as a gourd (max D 466, center 50 mm lower, bottom z -0.283, 600 long, 3 mm PETG), 15.6 kg with 1.8 kg trim ballast, floats level at the same height. Foam inside a dry hull adds no lift.",
+   "problem": "Waterline and buoyancy: parent 35 to 45 kg, tail 13 kg, rear bore at or under water",
+   "decision": "Design waterline z -0.145 at the hatch. Parent 30.5 kg: round tray D 410 with 18 L gel and 1.5 kg trim ballast. Tail reshaped as a gourd (max D 466, center 50 mm lower, bottom z -0.283, 600 long, 3 mm PETG), 15.6 kg with 1.8 kg trim ballast, floats level at the same height. Foam inside a dry hull adds no lift.",
    "numbers": [
     [
-     "mother mass",
+     "parent mass",
      "30.54 kg"
     ],
     [
-     "mother roll GM",
+     "parent roll GM",
      "0.222 m"
     ],
     [
@@ -94,12 +94,12 @@
      "0 to 1.5 deg bow down"
     ],
     [
-     "womb air + tail air",
+     "gel chamber air + tail air",
      "148 + 68 L, 2.1 L/kPa"
     ]
    ],
-   "risk": "Part masses are estimates (1 kg moves the mother 2.8 mm, the tail about 5 mm); tail GM 0.07 m is small; waves over 20 mm reach the hatch.",
-   "test": "Float mother with water in the tray, ballast to z -0.145 +/-3 mm; float tail, heel 10 deg, match axis heights within 5 mm; dock and run the arm, log freeboard.",
+   "risk": "Part masses are estimates (1 kg moves the parent body 2.8 mm, the tail about 5 mm); tail GM 0.07 m is small; waves over 20 mm reach the hatch.",
+   "test": "Float parent with water in the tray, ballast to z -0.145 +/-3 mm; float tail, heel 10 deg, match axis heights within 5 mm; dock and run the arm, log freeboard.",
    "sources": [
     [
      "Blue Robotics R-3318 foam BR-100099",
@@ -114,14 +114,14 @@
   {
    "id": "dock",
    "problem": "Dock: magnet sets never face each other; about 5 N per pair",
-   "decision": "3 Zubax FG401MA electropermanent magnets at r 185 (90, 210, 330 deg) on nickel plated low carbon steel pads, all above water. Female recess in the mother: 37.5 deg half angle, 30 deep, D 310 to D 264. Tail collar 28 tall, 1 mm play. Lip seal on the collar tip, SORTA-Clear 18, 1.5 x 6 mm at 30 deg, mean D 257. Magnets switched on after the faces touch. 12 N42 pairs rejected: no electrical release (about 40 N m to turn the ring) and a 3.7 J snap.",
+   "decision": "3 Zubax FG401MA electropermanent magnets at r 185 (90, 210, 330 deg) on nickel plated low carbon steel pads, all above water. Female recess in the parent body: 37.5 deg half angle, 30 deep, D 310 to D 264. Tail collar 28 tall, 1 mm play. Lip seal on the collar tip, SORTA-Clear 18, 1.5 x 6 mm at 30 deg, mean D 257. Magnets switched on after the faces touch. 12 N42 pairs rejected: no electrical release (about 40 N m to turn the ring) and a 3.7 J snap.",
    "numbers": [
     [
      "seal area",
      "0.0519 m2"
     ],
     [
-     "womb push 1 / 2 kPa",
+     "gel chamber push 1 / 2 kPa",
      "52 / 104 N"
     ],
     [
@@ -204,11 +204,11 @@
      "x 0.156"
     ],
     [
-     "gap to baby print",
+     "gap to newborn print",
      "12 mm"
     ],
     [
-     "climb force wet baby",
+     "climb force wet newborn",
      "12 N (mu 0.4) to 15 N (mu 0.6)"
     ],
     [
@@ -259,11 +259,11 @@
      "6.9 min, pot life 15 min"
     ],
     [
-     "silicone per baby",
+     "silicone per newborn",
      "666 ml with waste; cartridge 630 ml usable"
     ]
    ],
-   "risk": "Cartridge piston area and mixer drop unpublished; faster nozzle widens the yielded zone toward 5 diameters; baby must use 0.61 L or less or change cartridges at a cap layer.",
+   "risk": "Cartridge piston area and mixer drop unpublished; faster nozzle widens the yielded zone toward 5 diameters; newborn must use 0.61 L or less or change cartridges at a cap layer.",
    "test": "Push DS10 NV through the full line at 15, 20, 25 mm/s, log current and output; print 2.5, 3, 4 mm gap coupons at 15 and 20 mm/s and section them.",
    "sources": [
     [
@@ -318,7 +318,7 @@
      "6.1 mm (paraboloid, rim clamped)"
     ],
     [
-     "rise for 8.35 L baby air",
+     "rise for 8.35 L newborn air",
      "51 mm"
     ],
     [

@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en"><head>
+<base href="../../../early/"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mother Robot Giving Birth to Baby Robot · Early versions</title>
+<meta name="description" content="Technical record of the early bodies of Born, Not Made: parts, mechanism, what each version showed, what failed, and why the next one changed.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Early versions: the technical record of the first bodies. Same paper, ink and gel blue as the trunk. */
+:root { --bg: #0c0c0d; --paper: #141415; --ink: #ecebe6; --muted: #9b9a94; --line: #2a2a2c; --gel: #9cc8ec; --gel-soft: #15283a; --serif: "Cormorant Garamond", Georgia, serif; --sans: "Inter", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace; color-scheme: dark; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.62 var(--sans); -webkit-font-smoothing: antialiased; }
+a { color: var(--gel); text-underline-offset: 2px; overflow-wrap: anywhere; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--gel); outline-offset: 2px; border-radius: 3px; }
+img { display: block; max-width: 100%; height: auto; }
+.skip { position: absolute; left: -9999px; top: 0; background: var(--ink); color: var(--paper); padding: 8px 12px; z-index: 20; }
+.skip:focus { left: 8px; top: 8px; }
+header.top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.bar { max-width: 1180px; margin: 0 auto; padding: 10px max(16px, env(safe-area-inset-left, 0px)); display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.brand { font: 500 21px/1 var(--serif); letter-spacing: -0.01em; color: var(--ink); text-decoration: none; white-space: nowrap; }
+.bar nav { margin-left: auto; display: flex; gap: 4px; flex-wrap: wrap; }
+.bar nav a { font: 500 13.5px var(--sans); color: var(--muted); text-decoration: none; padding: 7px 12px; border-radius: 999px; }
+.bar nav a:hover { color: var(--ink); background: #1d1d1f; }
+.bar nav a.here { color: var(--paper); background: var(--ink); }
+main { max-width: 1180px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-left, 0px)) 64px; }
+.kicker { font: 500 12px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+h1 { font: 400 clamp(44px, 7vw, 84px)/0.95 var(--serif); letter-spacing: -0.025em; margin: 0 0 18px; }
+h2 { font: 400 clamp(28px, 3.4vw, 38px)/1.08 var(--serif); letter-spacing: -0.015em; margin: 0 0 12px; }
+h3 { font: 600 15px/1.35 var(--sans); margin: 28px 0 10px; }
+.lede { font: 400 clamp(19px, 2vw, 23px)/1.42 var(--serif); margin: 0 0 16px; max-width: 34ch; }
+.hero { padding: 52px 0 32px; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 40px; align-items: end; }
+.hero p.intro { margin: 0; max-width: 56ch; color: var(--muted); }
+.glance { list-style: none; margin: 0; padding: 0; border-bottom: 1px solid var(--line); }
+.glance li { border-top: 1px solid var(--line); }
+.glance a { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 4px 12px; padding: 14px 4px; text-decoration: none; color: var(--ink); }
+.glance a:hover { background: #1d1d1f; }
+.glance .n { font: 500 13px var(--mono); color: var(--gel); grid-row: span 2; padding-top: 3px; }
+.glance b { font: 400 21px/1.2 var(--serif); }
+.glance span { font-size: 14px; color: var(--muted); }
+.block { padding: 52px 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 40px; }
+.side .stick { position: sticky; top: 76px; }
+.meta { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; margin: 16px 0 0; font-size: 14px; }
+.meta dt { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.meta dd { margin: 2px 0 0; }
+.recs { list-style: none; padding: 0; margin: 4px 0 0; font-size: 14px; }
+.recs li { margin: 0 0 4px; }
+.prose p { margin: 0 0 14px; max-width: 66ch; }
+.figs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+figure { margin: 0; }
+figure img { width: 100%; border-radius: 6px; border: 1px solid var(--line); background: #0b0d10; }
+figure.wide { margin-top: 18px; }
+figcaption, .cap { font: 12px/1.5 var(--mono); color: var(--muted); margin: 8px 0 0; }
+.gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 4px; }
+.gallery figure { min-width: 0; }
+.gallery figure > a { display: block; }
+.gallery img { aspect-ratio: 4 / 3; max-height: 220px; object-fit: contain; background: #1c1c1e; }
+ol.steps { list-style: none; counter-reset: s; margin: 0; padding: 0; max-width: 70ch; }
+ol.steps li { counter-increment: s; display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+ol.steps li::before { content: counter(s, decimal-leading-zero); font: 500 12px/1.9 var(--mono); color: var(--gel); }
+.lanes { display: grid; gap: 10px; margin: 0; padding: 14px; list-style: none; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; }
+.lane { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.lane .tag { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); width: 100%; }
+.node { position: relative; font-size: 13px; line-height: 1.3; padding: 5px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
+.node.gel { background: var(--gel-soft); border-color: #2d4a63; }
+/* The arrow belongs to the node it points to, so a wrapped line starts with its arrow. */
+.lane .arr { display: none; }
+.lane .node ~ .node { margin-left: 18px; }
+.lane .node ~ .node::before { content: "→"; position: absolute; left: -19px; top: 50%; transform: translateY(-50%); color: var(--gel); font: 500 13px var(--mono); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+table.spec { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+table.spec caption { text-align: left; font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 0 0 6px; }
+table.spec th, table.spec td { text-align: left; padding: 9px 10px; border-top: 1px solid var(--line); vertical-align: top; }
+table.spec th { width: 26%; font: 500 12.5px/1.5 var(--mono); color: var(--ink); }
+table.spec td { overflow-wrap: anywhere; }
+table.spec tr:last-child th, table.spec tr:last-child td { border-bottom: 1px solid var(--line); }
+.src { font: 11.5px var(--mono); white-space: nowrap; }
+ul.fails { margin: 0; padding: 0 0 0 18px; max-width: 70ch; }
+ul.fails li { margin: 0 0 7px; }
+ul.fails b { font-weight: 600; }
+.taught { margin-top: 28px; padding: 16px 18px; background: var(--gel-soft); border-left: 3px solid var(--gel); border-radius: 0 8px 8px 0; }
+.taught h3 { margin: 0 0 6px; }
+.taught p { margin: 0; font: 400 19px/1.45 var(--serif); max-width: 60ch; }
+p.next { margin: 16px 0 0; font-size: 15px; max-width: 66ch; }
+p.next b { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--gel); margin-right: 6px; }
+.cmp { width: 100%; border-collapse: collapse; font-size: 14px; }
+.cmp th, .cmp td { text-align: left; padding: 9px 10px; border-top: 1px solid var(--line); vertical-align: top; }
+.cmp thead th { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); border-top: 0; }
+.cmp tbody th { font: 500 12.5px var(--mono); width: 16%; }
+.cmp tbody tr:last-child > * { border-bottom: 1px solid var(--line); }
+.cmp td.inside { color: var(--gel); font-weight: 500; }
+.vid { position: relative; aspect-ratio: 16 / 9; background: #0b0d10; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); margin-top: 18px; }
+.vid img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .82; border: 0; border-radius: 0; }
+.vid button { position: absolute; inset: 0; width: 100%; border: 0; background: transparent; cursor: pointer; display: flex; align-items: flex-end; justify-content: flex-start; padding: 14px; color: #141415; font: 500 13px var(--sans); text-align: left; }
+.vid button span.pill { display: inline-flex; align-items: center; gap: 10px; background: rgba(21, 23, 26, .82); padding: 9px 14px 9px 11px; border-radius: 999px; }
+.vid button span.tri { width: 0; height: 0; border-left: 11px solid #141415; border-top: 7px solid transparent; border-bottom: 7px solid transparent; }
+.vid button:hover span.pill { background: var(--gel); }
+.vid iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.vid.compact { aspect-ratio: auto; background: transparent; border: 0; overflow: visible; }
+.vid.compact button { position: static; padding: 0; color: var(--paper); }
+.vid.compact button span.pill { background: var(--ink); line-height: 1.35; }
+.vid.compact.playing { aspect-ratio: 16 / 9; background: #0b0d10; border: 1px solid var(--line); overflow: hidden; }
+.end { padding: 40px 0 8px; border-top: 1px solid var(--line); }
+.end p { margin: 0; font: 400 clamp(21px, 2.4vw, 27px)/1.35 var(--serif); }
+.refs { font-size: 13px; color: var(--muted); padding-left: 18px; margin: 0; }
+.refs li { margin: 0 0 6px; }
+footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-area-inset-left, 0px)); text-align: center; font-size: 13px; color: var(--muted); }
+/* Embedded as a tab inside the main page: the tab already has the site header and a title.
+   "framed": inside the fixed height .fullframe box, so keep inner gutters. "auto": the frame grows to fit, so align with the main column. */
+html.embedded header.top, html.embedded footer, html.embedded .skip { display: none; }
+html.embedded .hero .kicker, html.embedded .hero h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; }
+html.embedded .hero { padding-top: 28px; }
+html.embedded main { padding-bottom: 24px; }
+html.embedded.framed main { padding-left: 24px; padding-right: 24px; }
+html.embedded.framed .side .stick { top: 20px; }
+html.embedded.auto main { padding-left: 0; padding-right: 0; }
+html.embedded.auto .side .stick { position: static; }
+@media (max-width: 560px) { html.embedded.framed main { padding-left: 14px; padding-right: 14px; } }
+@media (max-width: 900px) {
+  .hero, .block { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .side .stick { position: static; }
+  .meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .figs { grid-template-columns: minmax(0, 1fr); }
+  .meta { grid-template-columns: minmax(0, 1fr); }
+  .bar nav { margin-left: 0; }
+  table.spec, table.spec caption, table.spec tbody, table.spec tr, table.spec th, table.spec td { display: block; width: 100%; }
+  table.spec th { border-top: 1px solid var(--line); padding: 10px 0 0; }
+  table.spec td { border-top: 0; padding: 2px 0 10px; }
+  table.spec tr:last-child th { border-bottom: 0; }
+  .cmp thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .cmp, .cmp tbody, .cmp tr, .cmp th, .cmp td { display: block; width: 100%; }
+  .cmp tbody th { width: 100%; padding: 12px 0 4px; }
+  .cmp td { border-top: 0; padding: 2px 0 2px 34px; position: relative; }
+  .cmp td::before { content: attr(data-v); position: absolute; left: 0; top: 3px; font: 500 11px var(--mono); color: var(--gel); }
+  .cmp tbody tr:last-child > * { border-bottom: 0; }
+  .cmp tbody tr:last-child td:last-child { padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+}
+
+.recs .record-thumb { margin: 8px 0; }
+.record-thumb > a { display: grid; grid-template-columns: clamp(82px, 30%, 108px) minmax(0,1fr); align-items: center; gap: 12px; }
+.record-thumb img { width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: contain; background: #171a1e; border-radius: 4px; }
+.org-doc.org-early .refs { list-style: none; padding: 0; }
+.refs li { display: grid; grid-template-columns: clamp(135px, 31%, 230px) minmax(0,1fr); align-items: center; gap: 18px; padding: 13px 0; border-top: 1px solid var(--line); font-size: 15px; }
+.refs figure > a { display:block; }
+.refs figure img { display:block; aspect-ratio: 16 / 10; object-fit: contain; background:#171a1e; height: auto; }
+.photo-credit { color: var(--muted); text-decoration-thickness: 1px; font: 11px/1.4 var(--sans); }
+.component-thumb { margin-top: 8px; max-width: 142px; }
+.component-thumb img { display: block; width: 100%; height: 76px; object-fit: contain; }
+@media (max-width:560px) {
+  .refs li { grid-template-columns: minmax(116px, 35%) minmax(0,1fr); gap: 12px; align-items: start; }
+  .refs figcaption { line-height: 1.35; }
+  .component-thumb { float: right; margin: 0 0 4px 8px; width: 90px; }
+  table.spec th::after { content:""; display:block; clear:both; }
+}
+</style>
+<link rel="stylesheet" href="../assets/css/organic.css"></head><body class="org-doc org-early">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="bar">
+  <a class="brand" href="../#work" target="_top">Mother Robot Giving Birth to Baby Robot</a>
+  <nav aria-label="Site">
+    <a href="../#work" target="_top">The Work</a><a class="here" href="./" aria-current="page">Prototypes</a><a href="../#build" target="_top">Build</a><a href="../#process" target="_top">Process</a>
+  </nav>
+</div></header>
+
+<main id="content"><div id="page">
+
+<section class="hero" aria-labelledby="title">
+  <div>
+    <p class="kicker">Early versions · technical record</p>
+    <h1 id="title">Early versions</h1>
+    <p class="lede">Before the mother printed, the mother carried. Two bodies pushed out a baby made by hand. A third began to make the baby inside.</p>
+    <p class="intro">This page keeps the detail for each body: parts, mechanism, what it showed, what failed, and why the next one changed. Facts come from the class record, the artist's page, the project papers and the team's weekly notes.</p>
+  </div>
+  <nav aria-label="Versions on this page">
+    <ol class="glance">
+      <li><a href="#v1"><span class="n">01</span><b>Rigid shell, water bag</b><span>Fall 2025 · phone control over WiFi</span></a></li>
+      <li><a href="#v2"><span class="n">02</span><b>Clear soft body, touch loop</b><span>2026 · a hand on the mother speeds the birth</span></a></li>
+      <li><a href="#v3"><span class="n">03</span><b>Arm with a syringe</b><span>Sep to Oct 2026 · bridge to printing in gel</span></a></li>
+    </ol>
+  </nav>
+</section>
+
+<section class="block" aria-labelledby="cmp-h">
+  <div class="side"><div class="stick"><h2 id="cmp-h">What changed, version to version</h2><p class="cap">Read across a row to follow one function.</p></div></div>
+  <div>
+    <table class="cmp">
+      <thead><tr><th scope="col"><span class="sr">Function</span></th><th scope="col">01 First</th><th scope="col">02 Second</th><th scope="col">03 Third</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Mother</th><td data-v="01">3D printed rigid shell, white, lid over the electronics</td><td data-v="02">3D printed clear resin, soft, organic shape</td><td data-v="03">Arm, syringe and gel bath, to sit inside the body</td></tr>
+        <tr><th scope="row">Baby</th><td data-v="01">Foaming filament shell that floats; XIAO ESP32S3, LiPo, one pump</td><td data-v="02">Clear printed body; microcontroller, battery, jet pump, light sensor</td><td data-v="03">To be printed in gel around an electronic core</td></tr>
+        <tr><th scope="row">Push</th><td data-v="01">Pump fills a TPU bag with tank water</td><td data-v="02">Micro pump fills a TPU water muscle</td><td data-v="03">Not built at this stage</td></tr>
+        <tr><th scope="row">Birth starts</th><td data-v="01">Slider on a phone page, over WiFi</td><td data-v="02">Hand on the mother closes a capacitive loop</td><td data-v="03">Not reached at this stage</td></tr>
+        <tr><th scope="row">Baby made</th><td data-v="01">By hand, outside, then placed in</td><td data-v="02">By hand, outside, then placed in</td><td data-v="03" class="inside">Inside the mother</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================== 01 ============================== -->
+<section class="block" id="v1" aria-labelledby="v1-h">
+  <div class="side"><div class="stick">
+    <p class="kicker">01 · First version</p>
+    <h2 id="v1-h">Rigid shell, water bag</h2>
+    <dl class="meta">
+      <div><dt>When</dt><dd>Fall 2025. First birth filmed in December 2025.</dd></div>
+      <div><dt>Context</dt><dd>Final project, How to Make (Almost) Anything, MIT. The record calls the two bodies parent (Commander) and baby (Receiver).</dd></div>
+      <div><dt>Records</dt><dd><ul class="recs">
+        <li class="record-thumb"><a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html"><img src="../assets/img/prototype1_photo.jpg" alt="Printed mother and baby robot shells from the MIT final project." width="1600" height="960" loading="lazy" decoding="async"><span>Fab class record: final project</span></a></li>
+        <li class="record-thumb"><a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week14.html"><img src="media/v1_tpu_bags.jpg" alt="Water-inflatable TPU bags used to push the baby robot." width="960" height="1280" loading="lazy" decoding="async"><span>Fab class record: water inflatables</span></a></li>
+        <li class="record-thumb"><a href="https://ruipengwang.space/born-not-made"><img src="../assets/img/prototype2_diagram.jpg" alt="Drawing of the water muscle, battery and pump inside the second mother robot." width="1600" height="866" loading="lazy" decoding="async"><span>Artist's page</span></a></li>
+        <li class="record-thumb"><a href="https://vimeo.com/1147548218"><img src="media/v1_birth_in_tank.jpg" alt="Still of the first prototype in the tank." width="1400" height="788" loading="lazy" decoding="async"><span>Film: first birth (Vimeo)</span></a></li>
+      </ul></dd></div>
+    </dl>
+  </div></div>
+  <div class="prose">
+    <div class="figs">
+      <figure><img src="../assets/img/prototype1_photo.jpg" width="1600" height="960" alt="First version: the white printed shell of the mother, with the small printed baby beside it." loading="lazy"><figcaption>Mother shell and baby, both printed.</figcaption></figure>
+      <figure><a href="../assets/img/prototype1_diagram.jpg"><img src="../assets/img/prototype1_diagram.jpg" width="1132" height="760" alt="Exploded view of the first version, labeled from top: lid, water muscle, electronics, baby robot, water pump." loading="lazy"></a><figcaption>Exploded view: lid, water muscle, electronics, baby, pump.</figcaption></figure>
+    </div>
+
+    <h3>How it works</h3>
+    <ol class="steps">
+      <li><span>The baby is printed and wired first, then set into a cavity in the mother's shell.</span></li>
+      <li><span>A thin TPU bag lies behind the baby. A mini DC pump fills it with tank water. The bag swells and pushes the baby out of the opening.</span></li>
+      <li><span>Once out, the baby's own pump runs. The water jet moves it forward by reaction. There are no wheels.</span></li>
+      <li><span>Both bodies join one WiFi network. The mother serves a phone page with two sliders, water pump and forward, and passes speed commands to the baby over HTTP.</span></li>
+    </ol>
+
+    <div class="vid" data-vimeo="https://player.vimeo.com/video/1147548218?dnt=1&amp;autoplay=1" data-title="First birth, December 2025">
+      <img src="media/v1_birth_in_tank.jpg" width="1400" height="788" alt="" loading="lazy">
+      <button type="button" aria-label="Play video: first birth, December 2025, 38 seconds, from Vimeo"><span class="pill"><span class="tri" aria-hidden="true"></span>First birth, December 2025 · 38 s · Vimeo</span></button>
+    </div>
+    <p class="cap">The green TPU bag swells out of the shell in the glass tank. Video loads from Vimeo when played.</p>
+
+    <h3>Signal and power path</h3>
+    <ul class="lanes">
+      <li class="lane"><span class="tag">Birth</span><span class="node">Phone page, slider</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node">WiFi</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node">Mother XIAO ESP32S3</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node">DRV8833 channel A</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node">Pump A</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node gel">TPU bag swells, baby pushed out</span></li>
+      <li class="lane"><span class="tag">Mother swims</span><span class="node">Mother XIAO ESP32S3</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node">DRV8833 channel B</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node">Pump B</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node gel">Water jet</span></li>
+      <li class="lane"><span class="tag">Baby swims</span><span class="node">Mother</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node">HTTP over WiFi</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node">Baby XIAO ESP32S3</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node">DRV8833</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node">Pump</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node gel">Water jet</span></li>
+      <li class="lane"><span class="tag">Mother logic power</span><span class="node">LiPo 800 mAh, 3.7 V</span><span class="arr" aria-hidden="true">→</span><span class="sr">feeds</span><span class="node">Switch on the milled board</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node">XIAO and WiFi</span></li>
+      <li class="lane"><span class="tag">Mother pump power, common ground</span><span class="node">2 × LiPo 400 mAh in series, 7.4 V</span><span class="arr" aria-hidden="true">→</span><span class="sr">feeds</span><span class="node">DRV8833, PWM capped near 6 V</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node">Pumps A and B</span></li>
+    </ul>
+
+    <h3>Parts</h3>
+    <table class="spec">
+      <caption>First version, as recorded in the Fab class record</caption>
+      <tbody>
+        <tr><th scope="row">Controller<figure class="component-thumb"><img src="../assets/img/society-ref/xiao.webp" alt="Seeed Studio XIAO ESP32S3 controller board." width="850" height="638" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/">Seeed Studio · board photograph</a></figcaption></figure></th><td>Seeed Studio XIAO ESP32S3, one in each body. <a class="src" href="https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/">Seeed wiki</a></td></tr>
+        <tr><th scope="row">Motor driver<figure class="component-thumb"><img src="../assets/img/society-ref/driver.webp" alt="Texas Instruments block diagram of the DRV8833 motor driver." width="365" height="204" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://www.ti.com/product/DRV8833">Texas Instruments · DRV8833 block diagram</a></figcaption></figure></th><td>DRV8833 dual H bridge board, 1.5 A per channel, one in each body. The mother uses channel A for the bag pump and channel B for the swim pump. PWM 30 kHz, 8 bit. <a class="src" href="https://www.ti.com/product/DRV8833">TI datasheet</a> <a class="src" href="https://www.amazon.com/dp/B07FZY8GX2">board used</a></td></tr>
+        <tr><th scope="row">Pumps<figure class="component-thumb"><img src="../assets/img/society-ref/waterpump.webp" alt="Miniature pumps pictured in the MIT fabrication record." width="679" height="465" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html">Pump image from the MIT Fab class record</a></figcaption></figure></th><td>Mini DC water pumps: two in the mother, one in the baby. Other pumps tried were too noisy or too weak to move a body. <a class="src" href="https://www.amazon.com/dp/B0B6HQ4637">pump used</a></td></tr>
+        <tr><th scope="row">Water muscle</th><td>TPU inflatable bag, filled with water. The tube is pushed straight into the bag's neck, one size larger, and seals by tension. No glue, no fitting.</td></tr>
+        <tr><th scope="row">Mother power</th><td>3.7 V LiPo 800 mAh for the XIAO and WiFi. Two 3.7 V LiPo 400 mAh in series (7.4 V) for the pumps. Firmware caps pump PWM at 195 of 255, about 6 V, to protect the 6 V motors.</td></tr>
+        <tr><th scope="row">Baby power</th><td>One small LiPo for pump and XIAO, with a charging port. Pump PWM levels 150, 185, 220, 255.</td></tr>
+        <tr><th scope="row">Board</th><td>Custom power board milled from FR1 on a Roland mill: battery, slide switch, pads on the back of the XIAO. The shell has a cutout for those pads.</td></tr>
+        <tr><th scope="row">Mother shell</th><td>3D printed, with a cavity for the baby and a lid over the electronics.</td></tr>
+        <tr><th scope="row">Baby shell</th><td>Foaming filament, lighter than water. Bambu P1S, nozzle 255 °C, max volumetric speed 5 mm³/s (about 13 h), part fan off, side panel open. Three wall loops and six top layers keep water out. Pump in the center, held by a closed ring; battery and XIAO on opposite sides for balance; lid seam sealed with waterproof glue.</td></tr>
+        <tr><th scope="row">Control</th><td>Phone page served by the mother, with sliders for water pump and forward. The mother relays the baby's speed (levels 0 to 4) over HTTP. Level 0 sends PWM 1 so the driver does not sleep.</td></tr>
+        <tr><th scope="row">Sensors</th><td>None in the final build. The birth starts from the phone.</td></tr>
+        <tr><th scope="row">Tank<figure class="component-thumb"><img src="../assets/img/society-ref/tank.webp" alt="Glass tank profile from the MIT fabrication record." width="850" height="382" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html">Tank detail from the MIT Fab class record</a></figcaption></figure></th><td>Glass fish tank. <a class="src" href="https://www.amazon.com/dp/B0BZ8H8FYJ">tank used</a></td></tr>
+        <tr><th scope="row">Projection</th><td>None.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>What failed on the way</h3>
+    <ul class="fails">
+      <li><b>Linear actuator push.</b> It worked, but it read as a machine ejecting a part. Dropped for a soft push.</li>
+      <li><b>Clear resin hemispheres</b> on a Formlabs printer failed, upright and inverted.</li>
+      <li><b>Air in the bag</b> was too weak to push even a light object. Water was strong enough.</li>
+      <li><b>First shell</b> was too heavy. It sank, and floor friction held it. A pump pushed into a sponge floated and moved.</li>
+      <li><b>Airbags and silicone</b> were hard to shape and to fix a pump to. <b>PCTG</b> looked translucent, but it is denser than water and it leaked.</li>
+      <li><b>One outlet off center</b> made the baby spin. A taped tube turned the jet and the path straightened.</li>
+      <li><b>Foaming filament</b> fused to tight supports and to a 10 mm brim. With too few supports the soft print collapsed.</li>
+    </ul>
+
+    <div class="gallery" role="list">
+      <figure role="listitem"><a href="media/v1_tpu_bags.jpg"><img src="media/v1_tpu_bags.jpg" width="960" height="1280" alt="Clear TPU bags in many sizes and shapes on a workbench." loading="lazy"></a><figcaption>TPU bags for thrust tests</figcaption></figure>
+      <figure role="listitem"><a href="media/v1_parent_power.jpg"><img src="media/v1_parent_power.jpg" width="1050" height="1400" alt="Mother wiring: two mini pumps, an 800 mAh LiPo, the milled board with the XIAO, and two 400 mAh LiPos in series." loading="lazy"></a><figcaption>Mother power: two packs, two pumps</figcaption></figure>
+      <figure role="listitem"><a href="media/v1_phone_page.jpg"><img src="media/v1_phone_page.jpg" width="1218" height="1400" alt="Phone control page titled Mission Control, with sliders for robot 1 water pump and forward, and robot 2 speed." loading="lazy"></a><figcaption>Phone page, two robots</figcaption></figure>
+      <figure role="listitem"><a href="media/v1_baby_layout.jpg"><img src="media/v1_baby_layout.jpg" width="1221" height="1084" alt="CAD of the baby: rounded shell and lid, a central slot for the pump and side pockets for battery and controller." loading="lazy"></a><figcaption>Baby layout, pump in the center</figcaption></figure>
+    </div>
+    <p class="cap">Photos and screenshots from the Fab class record.</p>
+
+    <div class="taught">
+      <h3>What it taught</h3>
+      <p>In water, weight and buoyancy decide first. Water, not air, gives a soft bag the force to push a body out. But the birth was a command from a phone, and the baby was made outside and put in.</p>
+    </div>
+    <p class="next"><b>Next</b>The second version kept the water muscle and the jet, made the body clear so the baby shows inside, and handed the start of the birth from the phone to a hand on the mother.</p>
+  </div>
+</section>
+
+<!-- ============================== 02 ============================== -->
+<section class="block" id="v2" aria-labelledby="v2-h">
+  <div class="side"><div class="stick">
+    <p class="kicker">02 · Second version</p>
+    <h2 id="v2-h">Clear soft body, touch loop</h2>
+    <dl class="meta">
+      <div><dt>When</dt><dd>2026. Film released June 2026.</dd></div>
+      <div><dt>Team</dt><dd>Ruipeng Wang. 3D printing and hardware fabrication: Richard Haoxi Zhang. Drawings: Vera Yu Wu.</dd></div>
+      <div><dt>Records</dt><dd><ul class="recs">
+        <li class="record-thumb"><a href="https://ruipengwang.space/born-not-made"><img src="media/v2_touch_loop.jpg" alt="Drawing of the touch-sensing circuit around the water tank." width="1400" height="777" loading="lazy" decoding="async"><span>Artist's page, with the touch loop drawing</span></a></li>
+        <li class="record-thumb"><a href="https://vimeo.com/1202399561/7ac02ffdc8"><img src="../assets/img/society-ref/june-film.webp" alt="The title frame of the June film shows a clear robot in a hand." width="850" height="478" loading="lazy" decoding="async"><span>Film, June 2026 (Vimeo)</span></a></li>
+        <li class="record-thumb"><a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html"><img src="../assets/img/prototype1_photo.jpg" alt="Printed mother and baby robot shells from the MIT final project." width="1600" height="960" loading="lazy" decoding="async"><span>Fab class record, where the water muscle and jet began</span></a></li>
+        <li class="record-thumb"><a href="https://neurips.cc/virtual/2026/160668"><img src="../assets/img/society-ref/visap.webp" alt="Illuminated tank beneath the digital population in Born, Not Made." width="850" height="478" loading="lazy" decoding="async"><span>NeurIPS 2026 Creative AI paper</span></a></li>
+      </ul></dd></div>
+    </dl>
+  </div></div>
+  <div class="prose">
+    <div class="figs">
+      <figure><img src="../assets/img/prototype2_photo.jpg" width="1600" height="576" alt="Second version: two clear printed bodies, each held in a hand; wires show through the smaller one." loading="lazy"><figcaption>Clear printed bodies, held in the hand.</figcaption></figure>
+      <figure><a href="../assets/img/prototype2_diagram.jpg"><img src="../assets/img/prototype2_diagram.jpg" width="1600" height="866" alt="Line drawing of the second version: an internal water muscle behind the baby, a mini chip and small battery in mother and in baby, and a water pump drawing in tank water." loading="lazy"></a><figcaption>Inside view: muscle behind the baby, pump at the base. Drawing by Vera Yu Wu.</figcaption></figure>
+    </div>
+
+    <h3>How it works</h3>
+    <ol class="steps">
+      <li><span>The baby is made by hand and set inside the clear mother, where the baby can be seen before birth.</span></li>
+      <li><span>A micro pump fills a custom TPU water muscle. It swells slowly and presses the baby toward a flexible opening.</span></li>
+      <li><span>Copper contacts on the mother's skin meet the water. The tank floor is wired to ground. A hand on the mother raises the capacitance the controller reads.</span></li>
+      <li><span>The controller raises the pump voltage. The muscle fills faster and the birth comes sooner.</span></li>
+      <li><span>Free of the opening, the baby's own water jet starts and the baby swims. A photoresistor lets it respond to light.</span></li>
+      <li><span>Beside the tank, an Unreal Engine simulation carries the lineage on. It starts with four mothers and draws each generation smaller. Births in the tank enter it. See <a href="../#society" target="_top">Society</a>.</span></li>
+    </ol>
+
+    <figure class="wide"><a href="media/v2_touch_loop.jpg"><img src="media/v2_touch_loop.jpg" width="1400" height="777" alt="Touch loop: a hand rests on the clear mother in a glass tank edged with copper wire. Labels: somatic contact, touching raises capacitance and pump voltage; signal capture on pin D3; a 5 megaohm resistor between pins D2 and D3; Arduino ground wired to the tank bottom." loading="lazy"></a><figcaption>The touch loop. Design and footage by Ruipeng Wang, drawing by Vera Yu Wu. Tap to enlarge.</figcaption></figure>
+
+    <h3>Signal path</h3>
+    <ul class="lanes">
+      <li class="lane"><span class="tag">Touch</span><span class="node">Hand on the mother</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node">Copper contact and water</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node">Pin D3 reads, 5 MΩ from pin D2</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node">Pump voltage up</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node gel">Muscle fills faster, birth comes sooner</span></li>
+      <li class="lane"><span class="tag">Return</span><span class="node">Water</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node">Tank floor</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node">Arduino GND</span></li>
+      <li class="lane"><span class="tag">After birth</span><span class="node">Baby free of the opening</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node">Jet pump on</span><span class="arr" aria-hidden="true">→</span><span class="sr">then</span><span class="node gel">Swims, turns to light</span></li>
+    </ul>
+
+    <h3>Parts</h3>
+    <table class="spec">
+      <caption>Second version, as described in the project papers</caption>
+      <tbody>
+        <tr><th scope="row">Mother body</th><td>3D printed clear resin, soft, organic shape. The baby shows through it.</td></tr>
+        <tr><th scope="row">Controller<figure class="component-thumb"><img src="../assets/img/prototype2_diagram.jpg" alt="Drawing of the water muscle, battery and pump inside the second mother robot." width="1600" height="866" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://ruipengwang.space/born-not-made">Vera Yu Wu · project drawing</a></figcaption></figure></th><td>Seeed Studio XIAO ESP32, with a motor driver. <a class="src" href="https://wiki.seeedstudio.com/SeeedStudio_XIAO_Series_Introduction/">Seeed wiki</a></td></tr>
+        <tr><th scope="row">Water muscle</th><td>Custom TPU structure, filled with water by a micro water pump.</td></tr>
+        <tr><th scope="row">Power</th><td>Rechargeable battery. All electronics run at low voltage, sealed inside the bodies.</td></tr>
+        <tr><th scope="row">Touch sensing<figure class="component-thumb"><img src="../assets/img/society-ref/uno.webp" alt="Top view of the Arduino Uno Rev3 board." width="670" height="478" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://docs.arduino.cc/hardware/uno-rev3/">Arduino · Uno Rev3 board illustration</a></figcaption></figure></th><td>Copper contact points on the mother's surface. Arduino Uno; a 5 MΩ resistor between D2 and D3; D3 reads the change; GND wired to the tank floor so the loop closes through the water. <a class="src" href="https://docs.arduino.cc/hardware/uno-rev3/">Arduino Uno docs</a></td></tr>
+        <tr><th scope="row">Baby</th><td>Clear printed body with a microcontroller, a small rechargeable battery, a micro pump for jet propulsion and a photoresistor. A Bluetooth link to siblings.</td></tr>
+        <tr><th scope="row">Tank</th><td>Custom glass tank, 60 × 36 × 18 cm, shallow water, 1 to 2 cm deep.</td></tr>
+        <tr><th scope="row">Projection</th><td>Unreal Engine simulation beside the tank, projected or on a monitor. Language model agents decide when to reproduce; color shows each one's stance toward birth.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>What it showed</h3>
+    <p>A visitor's hand changes the pace of a machine birth. One circuit runs through a person, a robot and the water. In the tank the birth is slow and clumsy. On the screen the same life form is born at once.</p>
+    <h3>What failed</h3>
+    <ul class="fails">
+      <li><b>Water is not a screen.</b> Membranes snag and jets sputter. A birth can stall.</li>
+      <li><b>The making stayed outside.</b> The baby was still made by people and placed inside. The mother delivered a body the mother never formed.</li>
+    </ul>
+
+    <div class="vid compact" data-vimeo="https://player.vimeo.com/video/1202399561?h=7ac02ffdc8&amp;dnt=1&amp;autoplay=1" data-title="Born, Not Made, film, June 2026">
+      <button type="button" aria-label="Play video: Born, Not Made film, June 2026, 2 minutes 30 seconds, from Vimeo"><span class="pill"><span class="tri" aria-hidden="true"></span>Watch the second version: film, June 2026 · 2 min 30 s · Vimeo</span></button>
+    </div>
+
+    <div class="taught">
+      <h3>What it taught</h3>
+      <p>Touch made the birth shared, and the clear body made the waiting visible. What remained was making: the mother pushed out a body the mother did not form.</p>
+    </div>
+    <p class="next"><b>Next</b>The third version brings the making inside the mother, with an arm, a syringe and a bath of gel.</p>
+  </div>
+</section>
+
+<!-- ============================== 03 ============================== -->
+<section class="block" id="v3" aria-labelledby="v3-h">
+  <div class="side"><div class="stick">
+    <p class="kicker">03 · Third version · bridge</p>
+    <h2 id="v3-h">Arm with a syringe</h2>
+    <dl class="meta">
+      <div><dt>When</dt><dd>September to October 2026.</dd></div>
+      <div><dt>Team</dt><dd>With collaborators at MIT CSAIL and Northwestern University. Material and arm: Di Wu. Arm control: Kexin Wang.</dd></div>
+      <div><dt>Records</dt><dd><ul class="recs">
+        <li class="record-thumb"><a href="https://ruipengwang.space/born-not-made"><img src="../assets/img/prototype2_diagram.jpg" alt="Drawing of the water muscle, battery and pump inside the second mother robot." width="1600" height="866" loading="lazy" decoding="async"><span>Artist's page, credits</span></a></li>
+        <li class="record-thumb"><a href="https://doi.org/10.1145/3544548.3580638"><img src="../assets/img/society-ref/epomemory.webp" alt="The EpoMemory printer deposits material into a transparent support bath." width="827" height="680" loading="lazy" decoding="async"><span>EpoMemory, CHI 2023 (the gel method)</span></a></li>
+        <li class="record-thumb"><a href="https://www.hiwonder.com/products/lerobot-so-101"><img src="../assets/img/society-ref/so101.webp" alt="The white and black configurations of the SO-ARM101." width="680" height="680" loading="lazy" decoding="async"><span>SO-ARM101 arm</span></a></li>
+      </ul></dd></div>
+    </dl>
+  </div></div>
+  <div class="prose">
+    <figure><img src="../assets/img/prototype3_render.jpg" width="1281" height="757" alt="Render: a small robotic arm inside a clear mother body, a folded ring print below it, and a round pleated opening at the far end." loading="lazy"><figcaption>Render: the arm inside the mother.</figcaption></figure>
+
+    <h3>How it works, as planned then</h3>
+    <ol class="steps">
+      <li><span>A desktop arm carries a syringe. The needle writes soft material into a bath of gel.</span></li>
+      <li><span>The gel holds each line where it is laid, so the print needs no supports.</span></li>
+      <li><span>The arm also places the electronic parts, and the shell is printed around them.</span></li>
+    </ol>
+
+    <h3>Parts and first results</h3>
+    <table class="spec">
+      <caption>Third version, from the team's weekly notes</caption>
+      <tbody>
+        <tr><th scope="row">Arm<figure class="component-thumb"><img src="../assets/img/society-ref/so101.webp" alt="The white and black configurations of the SO-ARM101." width="680" height="680" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://www.hiwonder.com/products/lerobot-so-101">Hiwonder · SO-ARM101</a></figcaption></figure></th><td>Hiwonder SO-ARM101 (LeRobot SO-101 follower arm), bought assembled. Chosen after comparing a 3 axis stage, xArm, Lite 6 and myCobot. Arrived 22 Sep 2026; first test 24 Sep 2026. <a class="src" href="https://github.com/TheRobotStudio/SO-ARM100">SO-101 design files</a></td></tr>
+        <tr><th scope="row">Extruder</th><td>Syringe at the arm's tip, fed from a material reservoir.</td></tr>
+        <tr><th scope="row">Gel</th><td>Carbopol 940 in deionized water, neutralized with NaOH. Sealed and rested about a day, the gel pushes out its own bubbles.</td></tr>
+        <tr><th scope="row">Print material</th><td>First chosen: EPON 828 epoxy with EPIKURE 3380, which needs 24 h and heat to cure. Fast curing silicone went first instead: a 5 minute silicone sets too fast; about 10 minutes is the target.</td></tr>
+        <tr><th scope="row">Method<figure class="component-thumb"><img src="../assets/img/society-ref/epomemory.webp" alt="The EpoMemory printer deposits material into a transparent support bath." width="827" height="680" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://morphingmatter.org/projects/epomemory">Ke Zhong et al. · Morphing Matter Lab</a></figcaption></figure></th><td>Embedded printing in a Carbopol bath, after EpoMemory (Zhong et al., CHI 2023). <a class="src" href="https://doi.org/10.1145/3544548.3580638">doi</a></td></tr>
+        <tr><th scope="row">First result</th><td>14 Oct 2026: silicone injected into the gel printed and stayed suspended.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="taught">
+      <h3>What it taught</h3>
+      <p>An arm can bring material into the body, and gel can hold a soft print while it cures. The arm also needs power and a housing, or the mother reads as an appliance, not a body.</p>
+    </div>
+    <p class="next"><b>Then</b>The arm moved inside the mother, and the print became a folded shell that opens with air at birth. That is today's system.</p>
+  </div>
+</section>
+
+<section class="block" aria-labelledby="src-h">
+  <div class="side"><h2 id="src-h">Sources</h2></div>
+  <ol class="refs">
+    <li><figure><a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html"><img src="../assets/img/prototype1_photo.jpg" alt="Printed mother and baby robot shells from the MIT final project." width="1600" height="960" loading="lazy" decoding="async"></a><figcaption><a class="photo-credit" href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html">Ruipeng Wang · MIT Fab class</a></figcaption></figure><div>Wang, R. "Final Project · The Birth of Robots." How to Make (Almost) Anything, MIT, 2025. <a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html">Final project</a>, <a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week14.html">week 14</a>.</div></li>
+    <li><figure><a href="https://ruipengwang.space/born-not-made"><img src="../assets/img/prototype2_diagram.jpg" alt="Drawing of the water muscle, battery and pump inside the second mother robot." width="1600" height="866" loading="lazy" decoding="async"></a><figcaption><a class="photo-credit" href="https://ruipengwang.space/born-not-made">Vera Yu Wu · project drawing</a></figcaption></figure><div>Wang, R. <i>Born, Not Made</i>. Artist's page, with drawings by Vera Yu Wu. <a href="https://ruipengwang.space/born-not-made">ruipengwang.space</a></div></li>
+    <li><figure><a href="https://visap.net/2026/artwork-4.html"><img src="../assets/img/society-ref/visap.webp" alt="Illuminated tank beneath the digital population in Born, Not Made." width="850" height="478" loading="lazy" decoding="async"></a><figcaption><a class="photo-credit" href="https://visap.net/2026/artwork-4.html">Installation image · VISAP 2026</a></figcaption></figure><div>Wang, R., Wu, V. Y., Wang, K., Xu, J. H. "Born, Not Made." NeurIPS 2026 Creative AI track. <a href="https://neurips.cc/virtual/2026/160668">neurips.cc</a></div></li>
+    <li><figure><a href="../log/"><img src="../log/media/1021_s8_render.jpg" alt="The October 21 model of the mother, from the hardware group’s weekly notes." width="840" height="498" loading="lazy" decoding="async"></a><figcaption><a class="photo-credit" href="../log/">Hardware group · October 21 model</a></figcaption></figure><div>Born, Not Made hardware group. Weekly notes, August to October 2026.</div></li>
+    <li><figure><a href="https://morphingmatter.org/projects/epomemory"><img src="../assets/img/society-ref/epomemory.webp" alt="The EpoMemory printer deposits material into a transparent support bath." width="827" height="680" loading="lazy" decoding="async"></a><figcaption><a class="photo-credit" href="https://morphingmatter.org/projects/epomemory">Ke Zhong et al. · Morphing Matter Lab</a></figcaption></figure><div>Zhong, K., Fernandes Minori, A., Wu, D., Yang, H., Islam, M. F., Yao, L. "EpoMemory: Multi-state Shape Memory for Programmable Morphing Interfaces." CHI 2023. <a href="https://doi.org/10.1145/3544548.3580638">doi</a></div></li>
+  </ol>
+</section>
+
+<section class="end" aria-label="Where to go next">
+  <p>Today's printing system, part by part, is on the <a href="../#build" target="_top">Build</a> tab; the full chronology is on the <a href="../#process" target="_top">Process</a> tab.</p>
+</section>
+
+</div></main>
+<footer>Born, Not Made · Ruipeng Wang · MIT Media Lab · <a href="https://github.com/ruipwan/born-not-made">source on GitHub</a></footer>
+<script>
+(function () {
+  var embedded = false, framed = false;
+  try { embedded = window.self !== window.top; } catch (e) { embedded = true; }
+  try { framed = !!(window.frameElement && window.frameElement.closest(".fullframe")); } catch (e) { framed = false; }
+  if (embedded) document.documentElement.classList.add("embedded", framed ? "framed" : "auto");
+
+  // In a frame that grows to fit, tell the parent how tall the page is, so the frame never scrolls.
+  var page = document.getElementById("page");
+  function postHeight() {
+    if (!embedded || framed) return;
+    try { window.parent.postMessage({ bnm: "early-height", h: Math.ceil(page.getBoundingClientRect().height) + 2 }, "*"); } catch (e) {}
+  }
+  if (embedded && !framed) {
+    if ("ResizeObserver" in window) new ResizeObserver(postHeight).observe(page);
+    window.addEventListener("load", postHeight);
+    document.querySelectorAll("img").forEach(function (im) { im.addEventListener("load", postHeight); });
+    postHeight();
+  }
+
+  // Enlarged images open in a new tab, so the record stays in place (also inside the tab frame).
+  document.querySelectorAll('a[href$=".jpg"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
+
+  // In page links: scroll the element into view (this also scrolls the parent page when embedded).
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener("click", function (ev) {
+      var el = document.getElementById(a.getAttribute("href").slice(1));
+      if (!el) return;
+      ev.preventDefault();
+      el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+      if (!embedded) { try { history.replaceState(null, "", a.getAttribute("href")); } catch (e) {} }
+    });
+  });
+
+  // Video facades: nothing loads from Vimeo until the reader presses play.
+  document.querySelectorAll(".vid[data-vimeo]").forEach(function (box) {
+    var btn = box.querySelector("button");
+    btn.addEventListener("click", function () {
+      var f = document.createElement("iframe");
+      f.src = box.getAttribute("data-vimeo");
+      f.title = box.getAttribute("data-title") || "Video";
+      f.allow = "autoplay; fullscreen; picture-in-picture";
+      f.setAttribute("allowfullscreen", "");
+      box.innerHTML = "";
+      box.classList.add("playing");
+      box.appendChild(f);
+      f.focus();
+    });
+  });
+})();
+</script>
+</body></html>

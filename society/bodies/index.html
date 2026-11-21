@@ -66,9 +66,9 @@ h1 { font: 300 clamp(40px, 6vw, 72px)/1 "Cormorant Garamond", Georgia, serif; ma
 <div class="wrap">
   <div class="top"><span class="kicker">Society</span><nav><a href="../">Society</a><a href="../../#society">Home</a></nav></div>
   <h1>Bodies</h1>
-  <p class="intro">The same society as the population page, drawn with the real bodies from the Build page: the hard shell hull, the tail and the baby, floating at the design waterline. Mothers swim slowly, dock by electropermanent magnets, charge, print babies, and raise the babies in turns with other adults. A baby is printed folded, unfolds as the arm brings the baby out, and is born limp and wrinkled. Each baby is printed to a shape of the baby's own, all close to the same size, and fills with air only as adults take turns raising the baby. Each baby is printed from silicone drawn out of the mother's own belly, to a shape set by the mother's state at that moment, with part of the mother's memory written on the skin. Click any body to follow.</p>
+  <p class="intro">The same society as the population page, drawn with the real bodies from the Build page: the hard shell hull, the tail and the newborn, floating at the design waterline. Adult robots swim slowly, dock by electropermanent magnets, charge, print newborns, and raise the newborns in turns with other adults. A newborn is printed folded, unfolds as the arm brings it out, and is born limp and wrinkled. Each newborn is printed to a shape of its own, all close to the same size, and fills with air only as adults take turns raising it. Each newborn is printed from silicone drawn out of the reservoir of the robot that bears it, to a shape set by that robot's state at that moment, with part of that robot's memory written on the skin. Click any body to follow.</p>
   <div class="pond" id="pond">
-    <canvas id="gl" aria-label="Mother, tail and baby robots on a water surface"></canvas>
+    <canvas id="gl" aria-label="Adult, tail and newborn robots on a water surface"></canvas>
     <div class="hud" id="hud"></div>
     <div class="follow" id="follow" aria-live="polite"></div>
     <div class="ev" id="ev"></div>
@@ -82,19 +82,19 @@ h1 { font: 300 clamp(40px, 6vw, 72px)/1 "Cormorant Garamond", Georgia, serif; ma
   </div>
   <ul class="acts">
     <li><b>Dock</b>Two bodies meet at a port, line up, click together, and a small light shows the magnets on. Then they move as one. Undocking runs the other way.</li>
-    <li><b>Charge</b>A mother low on energy docks to another mother or to a charging buoy. The warm fill in the tail rises as energy flows.</li>
-    <li><b>Print</b>The tail opens the way, the arm rides in through the opening and the needle traces a folded baby layer by layer, with silicone drawn from the clear belly at the front of the mother. Then the arm brings the baby out. The baby is born limp and wrinkled, every one printed to a shape of that baby's own and close to the same size.</li>
-    <li><b>Raise</b>Babies dock to the mother and to other adults in turns, take memory from each and fill with air. A baby full of air leaves the pond.</li>
+    <li><b>Charge</b>An adult low on energy docks to another adult or to a charging buoy. The warm fill in the tail rises as energy flows.</li>
+    <li><b>Print</b>The tail opens the way, the arm rides in through the opening and the needle traces a folded newborn layer by layer, with silicone drawn from the clear reservoir at the front of the hull. Then the arm brings the newborn out, born limp and wrinkled, every one printed to a shape of its own and close to the same size.</li>
+    <li><b>Raise</b>Newborns dock to the robot that bore them and to other adults in turns, take memory from each and fill with air. A newborn full of air leaves the pond.</li>
   </ul>
   <section class="cost" id="cost">
-    <h2>What a birth takes from the mother</h2>
+    <h2>What a birth takes from the robot that gives it</h2>
     <ol>
-      <li><b>Made from the mother's body.</b> Every baby is printed from silicone that leaves the clear belly in the mother's hull, so each birth lowers the level in the belly, the lighter mother rides higher in the water, and a mother whose belly can no longer supply one whole baby gives birth no more.</li>
-      <li><b>Shaped by the mother's state at that moment.</b> The print is not a fixed file but is written at the moment of printing from the mother's energy, the water temperature, recent contacts and the recent swim path, so the same mother prints different children at different times, as in the maternal effect of biology, where the condition of a mother shapes the offspring beyond the genes (Mousseau and Fox 1998).</li>
-      <li><b>Carrying part of the mother's memory on the skin.</b> One patch of each baby's skin is printed with a pattern that spells the mother's name and the strongest memory of the mother, so the page can read the skin of any baby and say which mother printed that baby.</li>
+      <li><b>Made from the body that gives birth.</b> Every newborn is printed from silicone that leaves the clear reservoir in the hull, so each birth lowers the level in the reservoir, the lighter hull rides higher in the water, and a robot whose reservoir can no longer supply one whole newborn gives birth no more.</li>
+      <li><b>Shaped by that robot's state at that moment.</b> The print is not a fixed file but is written at the moment of printing from the robot's energy, the water temperature, recent contacts and the recent swim path, so the same robot prints different newborns at different times, as in what biology calls the maternal effect, where the condition of the parent that carries the offspring shapes it beyond the genes (Mousseau and Fox 1998).</li>
+      <li><b>Carrying part of that robot's memory on the skin.</b> One patch of each newborn's skin is printed with a pattern that spells the name and the strongest memory of the robot that printed it, so the page can read the skin of any newborn and say which robot printed it.</li>
     </ol>
-    <p>How the skin is written: on a band of skin near the valve the print path is laid in 28 small patches of parallel lines, where lines leaning one way are a 1, lines leaning the other way are a 0, and a short break in the path keeps the patches apart. The first patch is printed at double spacing to mark where reading starts, then 8 bits name the mother, 15 bits name up to three words of the mother's strongest memory and 4 bits check the whole, while all the other skin keeps the plain path, left for the baby's own growth.</p>
-    <p id="mapText">How the state becomes the print: energy sets the length (365 to 405 mm) and the crest radius (100 to 110 mm); the water temperature, on a daily cycle from 15 to 23 °C, sets the twist (22 to 38 degrees per story) and the skin (1.7 mm in cold water down to 1.3 mm in warm water, where the silicone runs thinner); contacts in the last two minutes set the number of stories (5 to 9); and the turning of the last minute of swimming bends the body by up to 14 degrees toward the same side. The belly holds 3.6 L of silicone. Each baby takes the skin area times the skin thickness, scaled so that the design baby of the Build page takes the planned 0.64 L, so about six births empty the belly; the mother rises by the lost mass divided by the density of water and the waterplane area of hull and tail, about 6 mm from full to empty with the tail docked, read on the orange load line and the draft ticks at the bow every 2.5 mm.</p>
+    <p>How the skin is written: on a band of skin near the valve the print path is laid in 28 small patches of parallel lines, where lines leaning one way are a 1, lines leaning the other way are a 0, and a short break in the path keeps the patches apart. The first patch is printed at double spacing to mark where reading starts, then 8 bits name the robot that printed it, 15 bits name up to three words of that robot's strongest memory and 4 bits check the whole, while all the other skin keeps the plain path, left for the newborn's own growth.</p>
+    <p id="mapText">How the state becomes the print: energy sets the length (365 to 405 mm) and the crest radius (100 to 110 mm); the water temperature, on a daily cycle from 15 to 23 °C, sets the twist (22 to 38 degrees per story) and the skin (1.7 mm in cold water down to 1.3 mm in warm water, where the silicone runs thinner); contacts in the last two minutes set the number of stories (5 to 9); and the turning of the last minute of swimming bends the body by up to 14 degrees toward the same side. The reservoir holds 3.6 L of silicone. Each newborn takes the skin area times the skin thickness, scaled so that the design newborn of the Build page takes the planned 0.64 L, so about six births empty the reservoir; the hull rises by the lost mass divided by the density of water and the waterplane area of hull and tail, about 6 mm from full to empty with the tail docked, read on the orange load line and the draft ticks at the bow every 2.5 mm.</p>
     <p class="ref">Mousseau, T. A., and C. W. Fox. 1998. The adaptive significance of maternal effects. <i>Trends in Ecology and Evolution</i> 13 (10): 403 to 407. <a href="https://doi.org/10.1016/S0169-5347(98)01472-4">doi.org/10.1016/S0169-5347(98)01472-4</a></p>
   </section>
 </div>
@@ -722,7 +722,7 @@ function runDock(A, dt) {
 }
 function dockEvent(A, B, purpose) {
   if (purpose === "charge") event(`${A.name} docks to ${B.kind === "charger" ? "a charging buoy" : B.name} to charge`);
-  else if (purpose === "raise") event(`${A.name} docks to ${B.name}${B.name === A.momName ? ", the mother," : ""} to be raised`);
+  else if (purpose === "raise") event(`${A.name} docks to ${B.name}${B.name === A.momName ? ", the robot that gave birth," : ""} to be raised`);
   else if (purpose === "tail") event(`${A.name} docks to ${B.name}: tail to hull`);
 }
 
@@ -744,7 +744,7 @@ function startPrint(h) {
   const grp = new THREE.Group(); grp.add(m); grp.add(cap); h.bl.add(grp);
   h.print.baby = { grp, m, g, mat, cap, clipP, L: K.Lfold };
   h.hold = 1; h.energy -= 0.05;
-  event(`${h.name} is printing from the belly: ${kp.n} stories, twist ${Math.round(kp.tw)}°, ${(vol * 1000).toFixed(2)} L of silicone`);
+  event(`${h.name} is printing from the reservoir: ${kp.n} stories, twist ${Math.round(kp.tw)}°, ${(vol * 1000).toFixed(2)} L of silicone`);
 }
 const CAP0 = () => [K.cx, 0, K.bed + K.Lfold + 0.012], CAP1 = [-0.2, 0, 0.0];   // the valve on top of the folded print, then held near the opening on the axis
 function capPath(t) {   // where the needle holds the valve, in the hull frame
@@ -775,7 +775,7 @@ function stepPrint(h, dt) {
     rig.q = KIN.solve([K.cx + r * Math.cos(P.phi), r * Math.sin(P.phi), zl + 0.004], rig.q, rig.boom, 4);
     layerZ = zl;
   }
-  else if ((u = seg("armOut")) !== null) { layerZ = 1; h.belly = P.belly0 - P.kid.vol; rig.q = KIN.solve([K.cx, 0, bedTop + K.Lfold + 0.02], rig.q, rig.boom, 6); if (u > 0.98 && !P.hooked) { P.hooked = true; event(`${h.name}: the needle meets the valve of the new baby`); } }
+  else if ((u = seg("armOut")) !== null) { layerZ = 1; h.belly = P.belly0 - P.kid.vol; rig.q = KIN.solve([K.cx, 0, bedTop + K.Lfold + 0.02], rig.q, rig.boom, 6); if (u > 0.98 && !P.hooked) { P.hooked = true; event(`${h.name}: the needle meets the valve of the newborn`); } }
   else if ((u = seg("carry")) !== null) {
     layerZ = 1;
     rig.boom = lerp(SC.stations.front, 0.23, ss(u));   // the carriage draws back so the arm can hold the valve close to the opening
@@ -783,7 +783,7 @@ function stepPrint(h, dt) {
   }
   else if ((u = seg("out")) !== null) {
     layerZ = 1;
-    if (!P.undocked) { P.undocked = true; const g = h.glow.rear; if (g) { g.flash = 0.5; g.level = 0; } event(`${tail.name} unlocks from ${h.name} and backs off, the arm brings the baby out`); }
+    if (!P.undocked) { P.undocked = true; const g = h.glow.rear; if (g) { g.flash = 0.5; g.level = 0; } event(`${tail.name} unlocks from ${h.name} and backs off, the arm brings the newborn out`); }
     tail.rel.off = 0.62 * ss(u);
     if (!P.qOut) P.qOut = rig.q.slice(); rig.q = P.qOut;
   }
@@ -898,7 +898,7 @@ function stepMother(h, dt) {
   if ((h.think -= dt) < 0) {
     h.think = 1;
     h.relN = mothers().filter((o) => o !== h && Math.hypot(o.x - h.x, o.y - h.y) < 6 && relation(h, o) > 0.42).length;
-    if (!h.print) { h.nextVol = printVolume(kresFrom(momState(h))); if (!h.spent && h.belly < h.nextVol) { h.spent = true; event(`${h.name}: the belly cannot supply a whole baby, no more births`); } }
+    if (!h.print) { h.nextVol = printVolume(kresFrom(momState(h))); if (!h.spent && h.belly < h.nextVol) { h.spent = true; event(`${h.name}: the reservoir cannot supply a whole newborn, no more births`); } }
   }
   if (h.parent || h.print) return;
   const busy = Object.keys(h.reserved).length > 0 || h.children.some((c) => c.task && c.task.purpose === "charge");
@@ -1004,7 +1004,7 @@ function manage(dt) {
     const h = makeMother(x, y, Math.atan2(-y, -x), false, b.gen, b.mom, b.genome);
     Object.assign(h, { memory: b.memory.slice(0, 7), momName: b.momName, grownFrom: b.name, energy: 0.8 });
     if (!bodies.some((t) => t.kind === "tail" && !t.parent && !(t.task && t.task.type === "dock"))) { const t = makeBody("tail", clamp(x * 0.9, POND.x0 + 1, POND.x1 - 1), clamp(y * 0.9, POND.y0 + 1, POND.y1 - 1), rnd() * TAU); t.energy = 0; }
-    event(`${b.name} has grown into ${h.name}, a new mother of generation ${h.gen}, and swims in with a full belly`);
+    event(`${b.name} has grown into ${h.name}, an adult of generation ${h.gen} that can bear, and swims in with a full reservoir`);
   }
   // spent mothers age and die into shells; the cluster keeps only the newest shells
   for (const h of mothers()) if (h.spent && !h.print) { h.spentAge = (h.spentAge || 0) + dt; if (!h.spentLife) h.spentLife = lerp(SPENT_LIFE[0], SPENT_LIFE[1], rnd()); if (h.spentAge > h.spentLife) die(h, "old and spent, a clear shell"); }
@@ -1033,7 +1033,7 @@ function setup() {
   const ms = mothers().filter((h) => tailOf(h));
   for (let i = 0; i < 6; i++) { const m = ms[i % ms.length]; const b = makeBody("baby", m.x + 1.2 * Math.cos(i), m.y + 1.2 * Math.sin(i), rnd() * TAU); const kid = inherit(m), st = momState(m); st.e = 0.7 + 0.3 * rnd(); st.T = waterT(-60 * i); st.c = i % 4; st.turn = (rnd() - 0.5) * 160; st.dist = 1.5 + 2 * rnd();   /* printed before the page starts */ const kp = kresFrom(st); b.skin = encodeSkin(m); b.st = st; b.vol = printVolume(kp); giveShape(b, kid.genome, 0.5 * rnd(), kp); m.births.push({ name: b.name, st, kp, vol: b.vol }); Object.assign(b, { ...kid, gen: 1, mom: m, momName: m.name, energy: 0.5 + 0.2 * rnd(), raisedBy: [], age: 40 + 100 * rnd(), life: 900 }); m.babies++; }
   updatePoses();
-  event("The pond starts: twelve hulls, twelve tails, six babies");
+  event("The pond starts: twelve hulls, twelve tails, six newborns");
 }
 
 /* ---------------- follow and pick ---------------- */
@@ -1047,8 +1047,8 @@ function pick(cx, cy) {
 }
 function stateOf(b) {
   if (!b.alive) return b.cluster ? "a clear shell in the cluster" : "dead, drifting to the cluster";
-  if (b.kind === "charger") return "fixed, charging up to two mothers";
-  if (b.print) { const t = b.print.t; return t < TP.open + TP.armIn ? "the arm rides in through the opening" : t < TP.open + TP.armIn + TP.print ? `printing, layer ${Math.round(((t - TP.open - TP.armIn) / TP.print) * 36)} of 36` : t < TP_END - TP.close ? "bringing the baby out, unfolding" : "the tail docks back"; }
+  if (b.kind === "charger") return "fixed, charging up to two adults";
+  if (b.print) { const t = b.print.t; return t < TP.open + TP.armIn ? "the arm rides in through the opening" : t < TP.open + TP.armIn + TP.print ? `printing, layer ${Math.round(((t - TP.open - TP.armIn) / TP.print) * 36)} of 36` : t < TP_END - TP.close ? "bringing the newborn out, unfolding" : "the tail docks back"; }
   const tk = b.task;
   if (tk && tk.type === "dock") return tk.phase === "go" ? `swimming to ${tk.B.kind === "charger" ? "a buoy" : tk.B.name} to dock` : tk.phase === "turn" ? `lining up with ${tk.B.kind === "charger" ? "a buoy" : tk.B.name}` : "closing in, magnets off";
   if (tk && tk.type === "docked") return tk.purpose === "charge" ? "charging" : tk.purpose === "raise" ? "being raised" : "docked";
@@ -1061,20 +1061,20 @@ function stateOf(b) {
 }
 function renderFollow() {
   const b = FOLLOW; if (!b) return;
-  const kind = { hull: "mother", tail: "tail", baby: "baby", charger: "charging buoy" }[b.kind];
+  const kind = { hull: "adult", tail: "tail", baby: "newborn", charger: "charging buoy" }[b.kind];
   const dockedTo = [b.parent ? `${b.parent.kind === "charger" ? "buoy" : b.parent.name} (${b.myPort === "front" ? "tail to hull" : b.task && b.task.purpose ? b.task.purpose : "port"})` : null, ...b.children.map((c) => c.name)].filter(Boolean);
   let h = `<h3>${esc(b.kind === "charger" ? "Charging buoy" : b.name)}</h3><dl><dt>kind</dt><dd>${kind}</dd><dt>now</dt><dd>${esc(stateOf(b))}</dd>`;
-  if (b.kind === "hull" || b.kind === "baby") h += `<dt>mother</dt><dd>${b.momName || (b.mom && b.mom.name) || "first generation"}</dd><dt>age</dt><dd>${fmtT(b.age)}</dd>`;
+  if (b.kind === "hull" || b.kind === "baby") h += `<dt>born of</dt><dd>${b.momName || (b.mom && b.mom.name) || "first generation"}</dd><dt>age</dt><dd>${fmtT(b.age)}</dd>`;
   if (b.kind === "baby") h += `<dt>length</dt><dd>${Math.round(b.L * 1000)} mm, D ${Math.round(b.sh.R * 2000)} mm</dd><dt>air</dt><dd>${Math.round(b.inf * 100)}%${b.inf < 0.05 ? ", limp, waiting" : ""}</dd><dt>raised by</dt><dd>${esc(b.raisedBy.join(", ") || "nobody yet")}</dd>`;
-  if (b.kind === "hull") { const t = tailOf(b); h += `<dt>generation</dt><dd>${b.gen + 1}${b.grownFrom ? `, grown from ${esc(b.grownFrom)}` : ""}</dd><dt>tail</dt><dd>${t ? t.name : "none"}</dd><dt>relations</dt><dd>${b.relN}</dd><dt>babies</dt><dd>${b.babies}</dd>`; }
-  if (b.kind === "hull" && b.print && b.print.baby) h += `<dt>baby length</dt><dd>${Math.round(b.print.baby.L * 1000)} mm</dd>`;
+  if (b.kind === "hull") { const t = tailOf(b); h += `<dt>generation</dt><dd>${b.gen + 1}${b.grownFrom ? `, grown from ${esc(b.grownFrom)}` : ""}</dd><dt>tail</dt><dd>${t ? t.name : "none"}</dd><dt>relations</dt><dd>${b.relN}</dd><dt>newborns</dt><dd>${b.babies}</dd>`; }
+  if (b.kind === "hull" && b.print && b.print.baby) h += `<dt>newborn length</dt><dd>${Math.round(b.print.baby.L * 1000)} mm</dd>`;
   if (b.kind === "hull") {
     const nv = b.print ? b.print.kid.vol : b.nextVol || printVolume(kresFrom(momState(b))), n = b.print ? Math.floor(b.belly / nv) : b.spent ? 0 : Math.floor(b.belly / nv);
-    h += `<dt>belly</dt><dd>${(b.belly * 1000).toFixed(2)} of ${(BELLY.cap * 1000).toFixed(1)} L, births possible ${n}${n === 0 && !b.print ? ", spent" : ""}</dd><dt>rides</dt><dd>${(b.rise * 1000).toFixed(1)} mm above the full belly line</dd>`;
+    h += `<dt>reservoir</dt><dd>${(b.belly * 1000).toFixed(2)} of ${(BELLY.cap * 1000).toFixed(1)} L, births possible ${n}${n === 0 && !b.print ? ", spent" : ""}</dd><dt>rides</dt><dd>${(b.rise * 1000).toFixed(1)} mm above the full reservoir line</dd>`;
   }
   h += `<dt>docked to</dt><dd>${esc(dockedTo.join(", ") || "nothing")}</dd></dl>`;
   if (b.alive && b.kind !== "charger" && b.kind !== "tail") h += `<div class="meter" title="energy"><i style="width:${Math.round(clamp(b.energy, 0, 1) * 100)}%"></i></div>`;
-  if (b.kind === "hull") h += `<div class="meter belly" title="belly"><i style="width:${Math.round(clamp(b.belly / BELLY.cap, 0, 1) * 100)}%"></i></div>`;
+  if (b.kind === "hull") h += `<div class="meter belly" title="reservoir"><i style="width:${Math.round(clamp(b.belly / BELLY.cap, 0, 1) * 100)}%"></i></div>`;
   if (b.kind === "hull" && b.births.length) h += `<div class="from">${b.births.slice(-2).reverse().map((x) => `<b>${esc(x.name)}</b> printed from ${esc(stateText(x.st))}: ${esc(kpText(x.kp))}`).join("<br>")}</div>`;
   if (b.kind === "baby" && b.st) {
     if (!b.read) b.read = readSkin(b);
@@ -1114,7 +1114,7 @@ function frame(now) {
   controls.update();
   renderer.render(scene, camera);
   fpsN++; fpsT += dtR; if (fpsT > 1) { FPS = fpsN / fpsT; fpsN = 0; fpsT = 0; }
-  if ((uiT += dtR) > 0.25) { uiT = 0; if (EVDIRTY) { EVDIRTY = false; renderEvents(); } renderFollow(); const ms = mothers(), bs = bodies.filter((b) => b.kind === "baby" && b.alive).length;  $("#hud").textContent = `${fmtT(simT)} · mothers ${ms.length} · babies ${bs} · printing ${ms.filter((m) => m.print).length} · generations ${Math.min(...ms.map((m) => m.gen + 1))} to ${Math.max(...ms.map((m) => m.gen + 1))} · water ${waterT(simT).toFixed(1)} °C${running && EFF < speed * 0.8 ? ` · running at ${Math.round(EFF)}×` : ""}`; }
+  if ((uiT += dtR) > 0.25) { uiT = 0; if (EVDIRTY) { EVDIRTY = false; renderEvents(); } renderFollow(); const ms = mothers(), bs = bodies.filter((b) => b.kind === "baby" && b.alive).length;  $("#hud").textContent = `${fmtT(simT)} · adults ${ms.length} · newborns ${bs} · printing ${ms.filter((m) => m.print).length} · generations ${Math.min(...ms.map((m) => m.gen + 1))} to ${Math.max(...ms.map((m) => m.gen + 1))} · water ${waterT(simT).toFixed(1)} °C${running && EFF < speed * 0.8 ? ` · running at ${Math.round(EFF)}×` : ""}`; }
   requestAnimationFrame(frame);
 }
 

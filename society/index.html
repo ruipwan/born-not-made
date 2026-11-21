@@ -3,7 +3,7 @@
 <title>Speculative design: a robot giving birth to another · Society</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* A population of mother and baby robots in water. Births depend on relations; memory is inherited with drift; the water feeds only so many. */
+/* A population of adult and newborn robots in water. Births depend on relations; memory is inherited with drift; the water feeds only so many. */
 :root { --bg: #0c0c0d; --panel: #141415; --line: #2a2a2c; --fg: #ecebe6; --muted: #9b9a94; --gel: #9fcdf0; --warm: #f0c48a; --mono: "JetBrains Mono", ui-monospace, monospace; color-scheme: dark; }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--fg); font: 13px/1.5 "Inter", system-ui, sans-serif; }
@@ -31,13 +31,13 @@ canvas.spark { width: 100%; height: 46px; display: block; }
 </style>
 <link rel="stylesheet" href="../assets/css/organic.css"></head><body>
 <div class="wrap">
-  <div class="stage"><canvas id="c" aria-label="population of mother and baby robots"></canvas>
+  <div class="stage"><canvas id="c" aria-label="population of adult and newborn robots"></canvas>
     <div class="hud" id="hud"></div></div>
   <aside>
     <div class="card"><h3>Run</h3>
       <div class="row"><button id="run" class="on">Pause</button><button id="reset">Reset</button><button data-sp="1" class="on">1×</button><button data-sp="3">3×</button><button data-sp="8">8×</button></div>
       <p class="legend"><a href="bodies/">Bodies</a>: the same society with the real robot bodies.</p>
-      <p class="legend"><span><i style="background:#cfd8e3"></i>mother, swells while carrying</span> <span><i style="background:#9fcdf0"></i>baby</span> <span><i style="background:#3b5f80"></i>relation</span></p></div>
+      <p class="legend"><span><i style="background:#cfd8e3"></i>adult, swells while carrying</span> <span><i style="background:#9fcdf0"></i>newborn</span> <span><i style="background:#3b5f80"></i>relation</span></p></div>
     <div class="card"><h3>Conditions</h3>
       <div class="ctl"><label for="inh">Inheritance</label><input type="range" id="inh" min="0" max="1" step="0.01" value="0.7"><output id="inhO"></output></div>
       <div class="ctl"><label for="drift">Drift</label><input type="range" id="drift" min="0" max="0.5" step="0.01" value="0.12"><output id="driftO"></output></div>
