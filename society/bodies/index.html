@@ -20,6 +20,9 @@ h1 { font: 300 clamp(40px, 6vw, 72px)/1 "Cormorant Garamond", Georgia, serif; ma
 .bar button:hover { background: rgba(255,255,255,.09); }
 .bar button.on { background: rgba(156,200,236,.18); border-color: rgba(156,200,236,.45); }
 .bar .sp { width: 10px; }
+.wrap > .bar { flex-direction: row !important; justify-content: flex-start !important; align-items: center !important; gap: 6px !important; padding-top: 12px !important; padding-bottom: 0 !important; }
+.wrap > .bar .hint { flex-basis: 100%; margin: 4px 0 0; }
+@media (min-width: 900px) { .wrap > .bar .hint { flex-basis: auto; margin-left: 6px; } }
 .bar .hint { color: var(--muted); font-size: 13px; margin-left: 6px; }
 .ev { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 16px 12px; background: linear-gradient(transparent, rgba(11,11,12,.85)); pointer-events: none; font-size: 14px; }
 .ev div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -498,7 +501,7 @@ const LEX = ["salt", "current", "fold", "glass", "echo", "shadow", "warmth", "va
 let FIXCAM = false;   // set by the test hook that places the camera by hand
 let bodies = [], nextM = 1, nextB = 1, nextT = 1, simT = 0, speed = 1, running = true, FOLLOW = null, CAMFLY = null, EVENTS = [];
 const P = { inh: 0.7, drift: 0.12, rel: 1 };
-const KEY_EV = /born|dies|belly|leaves|swims in/;
+const KEY_EV = /born|dies|belly|leaves|swims in|grown/;
 let EVDIRTY = false;
 function event(msg) {   // at high speed only the main events reach the line, and the line redraws at most four times a second
   if (speed >= 64 && !KEY_EV.test(msg)) return;
@@ -552,13 +555,13 @@ function makeBody(kind, x, y, th) {
   }
   bodies.push(b); return b;
 }
-function makeMother(x, y, th, withTail = true, gen = 0, mom = null) {
+function makeMother(x, y, th, withTail = true, gen = 0, mom = null, genome = null) {
   const h = makeBody("hull", x, y, th);
-  const gen0 = mom ? inherit(mom).genome : newGenome();
+  const gen0 = genome || (mom ? inherit(mom).genome : newGenome());
   const sy = 0.9 + 0.2 * gen0[2], sz = 0.88 + 0.24 * gen0[3];   // width and height differ a little; length and ports stay
   h.hullMesh.scale.set(1, sy, sz); h.shell.scale.set(1, sy, sz);
   h.shell.material.userData.u.uMark.value.set(K.WL / sz, 0.0025 / sz, 1);   // the load line sits at the water when the belly is full
-  Object.assign(h, { genome: gen0, memory: SEED.map((t) => ({ t, w: 0.5 + 0.5 * rnd(), src: "seed" })), gen, mom, life: 520 + 260 * rnd(), energy: 0.55 + 0.4 * rnd(), babies: 0,
+  Object.assign(h, { genome: gen0, memory: SEED.map((t) => ({ t, w: 0.5 + 0.5 * rnd(), src: "seed" })), gen, mom, life: 2400 + 1200 * rnd(), energy: 0.55 + 0.4 * rnd(), babies: 0,
     sy, belly: BELLY.cap, rise: 0, touches: [], touchT: new Map(), path: [], pathT: 0, births: [] });
   if (withTail) { const t = makeBody("tail", x, y, th); t.energy = 0; attach(t, "front", h, "rear", true); }
   return h;
@@ -709,7 +712,7 @@ function runDock(A, dt) {
   const P = dockPose(A, T.pa, B, T.pb), stand = 0.55;
   const sx = P.x + P.nx * stand, sy = P.y + P.ny * stand;
   T.t += dt;
-  if (T.phase === "go") { const d = moveToward(A, sx, sy, VMAX[A.kind], dt, P.th); if (d < 0.05) T.phase = "turn"; if (T.t > 160) cancelTask(A); }
+  if (T.phase === "go") { const d = moveToward(A, sx, sy, VMAX[A.kind], dt, P.th); if (d < 0.05 || (d < 0.7 && T.t > 30)) T.phase = "turn";   /* close and slow: line up from here */ if (T.t > 160) cancelTask(A); }
   else if (T.phase === "turn") { const dth = wrapA(P.th - A.th); A.th = wrapA(A.th + clamp(dth, -0.5 * dt, 0.5 * dt)); A.x = lerp(A.x, sx, 1 - Math.exp(-dt)); A.y = lerp(A.y, sy, 1 - Math.exp(-dt)); if (Math.abs(dth) < 0.01) { T.phase = "in"; T.d = stand; } }
   else if (T.phase === "in") {
     T.d = Math.max(0, T.d - 0.09 * dt);
@@ -936,7 +939,7 @@ function stepBaby(b, dt) {
   if (b.task && b.task.type === "drift") { b.task.t += dt; const nx = -Math.sin(b.th) * b.task.side, ny = Math.cos(b.th) * b.task.side; b.x += nx * 0.09 * dt; b.y += ny * 0.09 * dt; if (b.task.t > 7) b.task = null; return; }
   if (b.parent) return;
   if (b.task && b.task.type === "dock") { runDock(b, dt); return; }
-  if (b.task && b.task.type === "leave") { const d = moveToward(b, b.task.x, b.task.y, 0.08, dt); if (d < 0.3) b.gone = true; return; }
+  if (b.task && b.task.type === "leave") { const d = moveToward(b, b.task.x, b.task.y, 0.08, dt); if (d < 0.3) { b.gone = true; GROW.push({ at: simT + 25, b, x: b.task.x, y: b.task.y }); } return; }
   if (b.backoff) return;
   if (b.inf >= 1) { const e = edgePoint(b); b.task = { type: "leave", x: e[0], y: e[1] }; event(`${b.name} is full of air and leaves the pond`); return; }
   if (b.energy < 0.7 && (b.think -= dt) < 0) {
@@ -958,10 +961,10 @@ function stepDead(b, dt) {
   if (b.cluster || b.parent) return;
   if (b.dead < 5) return;          // stops first
   const dx = CLUSTER.x - b.x, dy = CLUSTER.y - b.y, d = Math.hypot(dx, dy);
-  b.x += dx / (d || 1) * 0.04 * dt; b.y += dy / (d || 1) * 0.04 * dt; b.th = wrapA(b.th + 0.01 * dt);
+  b.x += dx / (d || 1) * 0.1 * dt; b.y += dy / (d || 1) * 0.1 * dt; b.th = wrapA(b.th + 0.01 * dt);
   const nCl = bodies.filter((o) => o.cluster).length, R = 0.5 + 0.42 * Math.sqrt(nCl);    // the cluster grows as a round raft, not a chain
   const touching = d < R && bodies.some((o) => o.cluster && o !== b && circlesTouch(b, o, 0.03));
-  if (touching || d < 0.25) { b.cluster = true; b.task = null; if (b.kind === "hull" && FOLLOW === b) {} }
+  if (touching || d < Math.max(0.25, R - 0.3) || b.dead > 240) { b.cluster = true; b.task = null; if (b.kind === "hull" && FOLLOW === b) {} }
 }
 function worldCircles(b) {
   const c = Math.cos(b.th), s = Math.sin(b.th);
@@ -990,10 +993,26 @@ function collide() {
   }
   for (const b of list) if (!b.parent && b.kind !== "charger" && !(b.task && b.task.type === "leave")) { b.x = clamp(b.x, POND.x0 + 0.4, POND.x1 - 0.4); b.y = clamp(b.y, POND.y0 + 0.4, POND.y1 - 0.4); }
 }
+const GROW = [];   // babies that left the pond, growing into mothers
+const MOTHER_CAP = 13, CLUSTER_CAP = 14, SPENT_LIFE = [90, 150];
 function manage(dt) {
-  // keep a dozen mothers: when a tail is free and no hull waits, a new hull floats in from the edge
+  // step 10 of the cycle, the baby becomes a mother: a grown baby comes back at hull size with a full belly; a free tail docks to it
+  for (let i = GROW.length - 1; i >= 0; i--) {
+    const g = GROW[i]; if (simT < g.at) continue; GROW.splice(i, 1); const b = g.b;
+    if (mothers().length >= MOTHER_CAP) { event(`${b.name} has grown and lives on outside the pond`); continue; }   // the soft cap
+    const x = clamp(g.x, POND.x0 + 0.8, POND.x1 - 0.8), y = clamp(g.y, POND.y0 + 0.8, POND.y1 - 0.8);
+    const h = makeMother(x, y, Math.atan2(-y, -x), false, b.gen, b.mom, b.genome);
+    Object.assign(h, { memory: b.memory.slice(0, 7), momName: b.momName, grownFrom: b.name, energy: 0.8 });
+    if (!bodies.some((t) => t.kind === "tail" && !t.parent && !(t.task && t.task.type === "dock"))) { const t = makeBody("tail", clamp(x * 0.9, POND.x0 + 1, POND.x1 - 1), clamp(y * 0.9, POND.y0 + 1, POND.y1 - 1), rnd() * TAU); t.energy = 0; }
+    event(`${b.name} has grown into ${h.name}, a new mother of generation ${h.gen}, and swims in with a full belly`);
+  }
+  // spent mothers age and die into shells; the cluster keeps only the newest shells
+  for (const h of mothers()) if (h.spent && !h.print) { h.spentAge = (h.spentAge || 0) + dt; if (!h.spentLife) h.spentLife = lerp(SPENT_LIFE[0], SPENT_LIFE[1], rnd()); if (h.spentAge > h.spentLife) die(h, "old and spent, a clear shell"); }
+  for (const h of mothers()) if (!h.print && h.age > h.life) die(h, "of old age, a clear shell");
+  const cl = bodies.filter((b) => b.cluster); if (cl.length > CLUSTER_CAP) { cl.sort((a, b) => a.dead - b.dead); cl[cl.length - 1].gone = true; }
+  // fallback only: if the pond runs very low, a hull floats in from the edge
   const ms = mothers(), freeTails = bodies.filter((b) => b.kind === "tail" && !b.parent).length, waiting = ms.filter((h) => !tailOf(h)).length;
-  if (ms.length < MOTHERS && freeTails > waiting && rnd() < dt * 0.05) {
+  if (ms.length < 6 && freeTails > waiting && rnd() < dt * 0.05) {
     const e = [[POND.x1 - 0.8, lerp(-3, 3, rnd())], [lerp(-2, 5, rnd()), POND.y0 + 0.8]][Math.floor(rnd() * 2)];
     const h = makeMother(e[0], e[1], rnd() * TAU, false);
     const pool = ms.length ? ms[Math.floor(rnd() * ms.length)] : null; if (pool) h.memory = inherit(pool).memory.concat([{ t: SEED[Math.floor(rnd() * 5)], w: 0.6, src: "seed" }]);
@@ -1005,7 +1024,7 @@ function manage(dt) {
 function setup() {
   for (const [x, y] of CHARGERS) { const c = makeBody("charger", x, y, 0); }
   const spots = [[-3.5, -1.2], [-1.2, 1.6], [1.4, -0.4], [3.6, 0.9], [-4.6, -3.0], [2.2, 2.8], [5.4, -1.6], [-2.4, -2.9], [0.0, 3.4], [4.0, -3.4], [-6.0, 0.0]];
-  for (const [x, y] of spots) { const h = makeMother(x + rnd() * 0.4, y + rnd() * 0.4, rnd() * TAU); h.age = 40 + 200 * rnd(); }
+  for (const [x, y] of spots) { const h = makeMother(x + rnd() * 0.4, y + rnd() * 0.4, rnd() * TAU); h.age = rnd() * 1800; }
   const lone = makeMother(-0.6, -1.6, 0.4, false); lone.energy = 0.8;      // a hull without a tail, and a free tail nearby: the first dock
   const ft = makeBody("tail", 1.4, -2.9, 2.6); ft.energy = 0;
   // a charge early: one mother is low
@@ -1047,7 +1066,7 @@ function renderFollow() {
   let h = `<h3>${esc(b.kind === "charger" ? "Charging buoy" : b.name)}</h3><dl><dt>kind</dt><dd>${kind}</dd><dt>now</dt><dd>${esc(stateOf(b))}</dd>`;
   if (b.kind === "hull" || b.kind === "baby") h += `<dt>mother</dt><dd>${b.momName || (b.mom && b.mom.name) || "first generation"}</dd><dt>age</dt><dd>${fmtT(b.age)}</dd>`;
   if (b.kind === "baby") h += `<dt>length</dt><dd>${Math.round(b.L * 1000)} mm, D ${Math.round(b.sh.R * 2000)} mm</dd><dt>air</dt><dd>${Math.round(b.inf * 100)}%${b.inf < 0.05 ? ", limp, waiting" : ""}</dd><dt>raised by</dt><dd>${esc(b.raisedBy.join(", ") || "nobody yet")}</dd>`;
-  if (b.kind === "hull") { const t = tailOf(b); h += `<dt>tail</dt><dd>${t ? t.name : "none"}</dd><dt>relations</dt><dd>${b.relN}</dd><dt>babies</dt><dd>${b.babies}</dd>`; }
+  if (b.kind === "hull") { const t = tailOf(b); h += `<dt>generation</dt><dd>${b.gen + 1}${b.grownFrom ? `, grown from ${esc(b.grownFrom)}` : ""}</dd><dt>tail</dt><dd>${t ? t.name : "none"}</dd><dt>relations</dt><dd>${b.relN}</dd><dt>babies</dt><dd>${b.babies}</dd>`; }
   if (b.kind === "hull" && b.print && b.print.baby) h += `<dt>baby length</dt><dd>${Math.round(b.print.baby.L * 1000)} mm</dd>`;
   if (b.kind === "hull") {
     const nv = b.print ? b.print.kid.vol : b.nextVol || printVolume(kresFrom(momState(b))), n = b.print ? Math.floor(b.belly / nv) : b.spent ? 0 : Math.floor(b.belly / nv);
@@ -1095,7 +1114,7 @@ function frame(now) {
   controls.update();
   renderer.render(scene, camera);
   fpsN++; fpsT += dtR; if (fpsT > 1) { FPS = fpsN / fpsT; fpsN = 0; fpsT = 0; }
-  if ((uiT += dtR) > 0.25) { uiT = 0; if (EVDIRTY) { EVDIRTY = false; renderEvents(); } renderFollow(); const ms = mothers(), bs = bodies.filter((b) => b.kind === "baby" && b.alive).length;  $("#hud").textContent = `${fmtT(simT)} · mothers ${ms.length} · babies ${bs} · printing ${ms.filter((m) => m.print).length} · water ${waterT(simT).toFixed(1)} °C${running && EFF < speed * 0.8 ? ` · running at ${Math.round(EFF)}×` : ""}`; }
+  if ((uiT += dtR) > 0.25) { uiT = 0; if (EVDIRTY) { EVDIRTY = false; renderEvents(); } renderFollow(); const ms = mothers(), bs = bodies.filter((b) => b.kind === "baby" && b.alive).length;  $("#hud").textContent = `${fmtT(simT)} · mothers ${ms.length} · babies ${bs} · printing ${ms.filter((m) => m.print).length} · generations ${Math.min(...ms.map((m) => m.gen + 1))} to ${Math.max(...ms.map((m) => m.gen + 1))} · water ${waterT(simT).toFixed(1)} °C${running && EFF < speed * 0.8 ? ` · running at ${Math.round(EFF)}×` : ""}`; }
   requestAnimationFrame(frame);
 }
 
