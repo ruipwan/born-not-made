@@ -58,24 +58,24 @@ html.embedded .artist .sig { grid-column: 1 / -1; font-size: 13.5px; }
 .pool-msg p { margin: 0 0 14px; color: var(--water-ink); }
 .pool-cap { font: 13.5px/1.5 var(--sans); color: var(--muted); margin: 10px 2px 0; max-width: 62ch; }
 
-.body { position: absolute; left: 0; top: 0; width: var(--d); height: calc(var(--d) * 0.6); padding: 0; border: 0; margin: 0; background: none; cursor: pointer; border-radius: 50%; will-change: transform; -webkit-tap-highlight-color: transparent; transition: opacity .4s; }
-.body .mem { position: absolute; inset: 0; display: block; transition: transform .6s ease; }
-.body.left .mem { transform: scaleX(-1); }
-.body .mem svg.bot { width: 100%; height: 100%; display: block; overflow: visible; }
-.bot .shell { fill: color-mix(in srgb, var(--c) 22%, #0b0b0c); stroke: var(--c); stroke-width: 1.4; vector-effect: non-scaling-stroke; }
-.bot .pleat { fill: none; stroke: var(--c); stroke-width: 1; opacity: .55; vector-effect: non-scaling-stroke; }
-.bot .tail { fill: none; stroke: var(--c); stroke-width: 1.4; stroke-linecap: round; vector-effect: non-scaling-stroke; transform-box: view-box; transform-origin: 22px 30px; animation: wag var(--dur, 3s) ease-in-out var(--del, 0s) infinite alternate; }
+.body { position: absolute; left: 0; top: 0; width: var(--d); height: calc(var(--d) * 0.66); padding: 0; border: 0; margin: 0; background: none; cursor: pointer; border-radius: 50%; will-change: transform; -webkit-tap-highlight-color: transparent; transition: opacity .4s; }
+.body .mem { position: absolute; inset: 0; display: grid; place-items: center; }
+.body .mem svg.bot { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
+.bot .shell { fill: color-mix(in srgb, var(--c) 16%, #0b0b0c); stroke: var(--c); stroke-width: 1.2; vector-effect: non-scaling-stroke; transition: fill .3s; }
+.bot .pleat { fill: none; stroke: var(--c); stroke-width: 1; opacity: .5; vector-effect: non-scaling-stroke; }
+.bot .port { fill: color-mix(in srgb, var(--c) 16%, #0b0b0c); stroke: var(--c); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
 .bot .eye { fill: var(--ink); }
-@keyframes wag { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
-@media (prefers-reduced-motion: reduce) { .bot .tail { animation: none; } }
+.body .w { position: relative; margin-top: 12%; padding: 0 17%; font: italic 400 calc(var(--d) * 0.095)/1.2 var(--serif); color: var(--ink); text-align: center;
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; max-height: 3.6em; }
+.body.tiny .w { display: none; }
 .body:hover .shell { fill: color-mix(in srgb, var(--c) 40%, #0b0b0c); }
 .body:focus-visible { outline: none; }
 .body:focus-visible .mem { outline: 1px solid var(--ink); outline-offset: 4px; border-radius: 8px; }
 .body.dim { opacity: .18; }
 .body.draft { cursor: default; pointer-events: none; transition: opacity .5s, transform .6s; }
-.body.draft .shell, .body.draft .tail { stroke-dasharray: 3 3; fill: none; }
+.body.draft .shell { stroke-dasharray: 3 3; fill: none; }
 .body.draft.off { opacity: 0; }
-.body.draft.sent .shell, .body.draft.sent .tail { stroke-dasharray: none; }
+.body.draft.sent .shell { stroke-dasharray: none; }
 .body.draft.sent .shell { fill: color-mix(in srgb, var(--c) 22%, #0b0b0c); }
 .draft-label { position: absolute; left: 50%; top: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap; font: 11px var(--mono); color: var(--water-ink); }
 
@@ -166,7 +166,7 @@ legend { font: 500 13.5px/1.4 var(--sans); margin: 0 0 8px; padding: 0; }
 @keyframes flash { 0% { background: var(--gel-soft); } 100% { background: transparent; } }
 .gut { font: 12px/1.5 var(--mono); color: var(--muted); display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
 .gut a { color: var(--muted); }
-.glyph { display: block; width: 46px; height: 28px; }
+.glyph { display: block; width: 44px; height: 29px; }
 .glyph svg { width: 100%; height: 100%; overflow: visible; }
 .v { min-width: 0; border-radius: 12px; }
 .v .ans { font-size: 13.5px; color: var(--muted); margin: 0 0 6px; }
@@ -758,34 +758,32 @@ function renderVoice(v, inDialog) {
   if (inDialog) { const src = el("p", "how"); src.append("Source: "); const a = el("a", null, "issue #" + v.number); a.href = v.url; a.target = "_blank"; a.rel = "noopener"; src.appendChild(a); src.append(", opened " + dateFmt(v.created) + (v.login ? " by @" + v.login : "") + "."); art.appendChild(src); }
   return art;
 }
-/* each voice is born as a small robot: a pleated soft body and a tail, its proportions seeded by the voice */
-function robotSVG(seed, label) {
+/* each voice is born as a small soft robot: a pleated pod with bellows edges, its proportions seeded by the voice; the words sit inside */
+function robotSVG(seed) {
   const r = seeded(seed * 7 + 3);
-  const x0 = 22, x1 = 96, hh = 13 + r() * 9, k = 2 + Math.floor(r() * 3), ph = r() * 6.283, lobe = 0.04 + r() * 0.14, front = 0.45 + r() * 0.3;
-  const n = 40, top = [], bot = [];
-  for (let i = 0; i <= n; i++) {
-    const t = i / n, x = x0 + (x1 - x0) * t;
-    const env = Math.pow(Math.sin(Math.PI * t), t > 0.5 ? front : 0.7);
-    const h = hh * env * (1 + lobe * Math.cos(k * 6.283 * t + ph));
-    top.push([x, 30 - h]); bot.push([x, 30 + h * 0.84]);
+  const a = 47, b = 28 + r() * 3, n = 2.6 + r() * 1.4, m = 0, ridge = 0;
+  const k = 2 + Math.floor(r() * 2), ph = r() * 6.283, lobe = 0.01 + r() * 0.03;
+  const N = 160, pts = [];
+  for (let i = 0; i < N; i++) {
+    const t = (i / N) * 6.283, c = Math.cos(t), s = Math.sin(t);
+    const rr = (1 + lobe * Math.cos(k * t + ph)) * (1 + ridge * Math.cos(m * t) * Math.abs(s));
+    pts.push([50 + a * rr * Math.sign(c) * Math.pow(Math.abs(c), 2 / n), 33 + b * rr * Math.sign(s) * Math.pow(Math.abs(s), 2 / n)]);
   }
-  const f = (q) => q[0].toFixed(1) + " " + q[1].toFixed(1);
-  const shell = "M" + top.map(f).join("L") + "L" + bot.slice().reverse().map(f).join("L") + "Z";
-  const pleats = 3 + Math.floor(r() * 4);
-  let pl = "";
-  for (let j = 1; j <= pleats; j++) {
-    const i = Math.round((n * (0.12 + 0.62 * j / (pleats + 1))));
-    const [x, yt] = top[i], yb = bot[i][1], bend = 3 + r() * 2;
-    pl += "M" + x.toFixed(1) + " " + (yt + 1.5).toFixed(1) + "Q" + (x + bend).toFixed(1) + " 30 " + x.toFixed(1) + " " + (yb - 1.5).toFixed(1);
+  const shell = "M" + pts.map((q) => q[0].toFixed(1) + " " + q[1].toFixed(1)).join("L") + "Z";
+  let pl = "";   // fold lines at the two ends, where the body pleats
+  const folds = 2 + Math.floor(r() * 3);
+  for (const side of [-1, 1]) for (let f = 1; f <= folds; f++) {
+    const x = 50 + side * a * (0.97 - f * 0.07), h = b * Math.sqrt(Math.max(0, 1 - Math.pow((x - 50) / a, n))) * 0.85;
+    pl += "M" + x.toFixed(1) + " " + (33 - h).toFixed(1) + "Q" + (x + side * 3).toFixed(1) + " 33 " + x.toFixed(1) + " " + (33 + h).toFixed(1);
   }
-  const tl = 12 + r() * 10, tc = (r() - 0.5) * 16;
-  const tail = "M" + x0 + " 30Q" + (x0 - tl * 0.5).toFixed(1) + " " + (30 + tc).toFixed(1) + " " + (x0 - tl).toFixed(1) + " " + (30 - tc * 0.4).toFixed(1);
-  const ex = x0 + (x1 - x0) * (0.8 + r() * 0.06), ey = 30 - hh * 0.25;
   const NS = "http://www.w3.org/2000/svg", svg = document.createElementNS(NS, "svg");
-  svg.setAttribute("viewBox", "0 0 100 60"); svg.setAttribute("class", "bot"); svg.setAttribute("aria-hidden", "true");
-  if (label) svg.setAttribute("aria-label", label);
-  for (const [cls, d] of [["tail", tail], ["shell", shell], ["pleat", pl]]) { const pth = document.createElementNS(NS, "path"); pth.setAttribute("class", cls); pth.setAttribute("d", d); svg.appendChild(pth); }
-  const eye = document.createElementNS(NS, "circle"); eye.setAttribute("class", "eye"); eye.setAttribute("cx", ex.toFixed(1)); eye.setAttribute("cy", ey.toFixed(1)); eye.setAttribute("r", "1.6"); svg.appendChild(eye);
+  svg.setAttribute("viewBox", "0 0 100 66"); svg.setAttribute("preserveAspectRatio", "none"); svg.setAttribute("class", "bot"); svg.setAttribute("aria-hidden", "true");
+  // a small port on top, where the mother docks, and two eyes
+  const pw = 6 + r() * 4, py = 33 - b + 1;
+  const port = "M" + (50 - pw / 2).toFixed(1) + " " + py.toFixed(1) + "V" + (py - 4).toFixed(1) + "Q50 " + (py - 7).toFixed(1) + " " + (50 + pw / 2).toFixed(1) + " " + (py - 4).toFixed(1) + "V" + py.toFixed(1);
+  for (const [cls, d] of [["port", port], ["shell", shell], ["pleat", pl]]) { const pth = document.createElementNS(NS, "path"); pth.setAttribute("class", cls); pth.setAttribute("d", d); svg.appendChild(pth); }
+  const gap = 5 + r() * 3, ey = 33 - b * 0.5;
+  for (const sx of [-1, 1]) { const e = document.createElementNS(NS, "ellipse"); e.setAttribute("class", "eye"); e.setAttribute("cx", (50 + sx * gap).toFixed(1)); e.setAttribute("cy", ey.toFixed(1)); e.setAttribute("rx", "1.3"); e.setAttribute("ry", "2"); svg.appendChild(e); }
   return svg;
 }
 function shapeFor(v) { const r = seeded(v.number); return { br: blobShape(r), br2: blobShape(r), r }; }
@@ -885,7 +883,7 @@ function sizePool() {
   cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
   cx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const k = scaleK();
-  for (const b of bodies) { b.d = b.d0 * k; b.r = b.d / 2; b.el.style.setProperty("--d", b.d + "px"); b.el.classList.toggle("tiny", b.d < 66); b.x = Math.min(Math.max(b.r + 8, b.x), W - b.r - 8); b.y = Math.min(Math.max(b.r + 8, b.y), H - b.r - 8); }
+  for (const b of bodies) { b.d = b.d0 * k; b.r = b.d / 2; b.el.style.setProperty("--d", b.d + "px"); b.el.classList.toggle("tiny", b.d < 92); b.x = Math.min(Math.max(b.r + 8, b.x), W - b.r - 8); b.y = Math.min(Math.max(b.r + 8, b.y), H - b.r - 8); }
   placeDraft();
   paint();
 }
@@ -897,16 +895,16 @@ function buildBodies() {
     const s = shapeFor(v), r = s.r;
     const sk = sketchOf(v);
     const len = (v.words || "").length;
-    const d0 = Math.max(38, Math.min(88, 38 + Math.sqrt(len) * 2.1 + (sk ? 20 : 0) + Math.min(12, v.reactions * 2)));
+    const d0 = Math.max(70, Math.min(170, 70 + Math.sqrt(len) * 6 + (sk ? 16 : 0) + Math.min(16, v.reactions * 3)));
     const btn = el("button", "body"); btn.type = "button"; btn.tabIndex = idx === 0 ? 0 : -1;
     btn.setAttribute("aria-label", "Voice by " + who(v) + ", about " + v.topic + ": " + firstWords(v, 90));
     btn.style.setProperty("--c", topicVar(v.topic));
     btn.style.setProperty("--br", s.br); btn.style.setProperty("--br2", s.br2);
-    btn.style.setProperty("--dur", (1.6 + r() * 1.6).toFixed(2) + "s"); btn.style.setProperty("--del", (-r() * 3).toFixed(2) + "s");
     const mem = el("span", "mem");
     mem.appendChild(robotSVG(v.number));
+    const w = el("span", "w", firstWords(v, 90) || (sk ? "a drawing" : "")); w.setAttribute("aria-hidden", "true"); mem.appendChild(w);
     btn.appendChild(mem);
-    const b = { v, el: btn, d0, d: d0, r: d0 / 2, x: 0, y: 0, vx: 0, vy: 0, ph: r() * 6.28, rr: r };
+    const b = { v, el: btn, d0, d: d0, r: d0 / 2, x: 0, y: 0, vx: 0, vy: 0, ph: r() * 6.28, rr: r, sp: 10 + r() * 10 };
     btn.addEventListener("click", () => openVoice(v));
     btn.addEventListener("pointerenter", () => { hovered = b; showWhisper(b); });
     btn.addEventListener("pointerleave", () => { if (hovered === b) hovered = null; hideWhisper(); });
@@ -917,19 +915,19 @@ function buildBodies() {
   });
   if (draft.el) bodiesEl.appendChild(draft.el);
   const k = scaleK();
-  for (const b of bodies) { b.d = b.d0 * k; b.r = b.d / 2; b.el.style.setProperty("--d", b.d.toFixed(1) + "px"); b.el.classList.toggle("tiny", b.d < 66); b.x = b.r + 10 + b.rr() * Math.max(1, W - 2 * b.r - 20); b.y = b.r + 10 + b.rr() * Math.max(1, H - 2 * b.r - 50); }
+  for (const b of bodies) { b.d = b.d0 * k; b.r = b.d / 2; b.el.style.setProperty("--d", b.d.toFixed(1) + "px"); b.el.classList.toggle("tiny", b.d < 92); b.x = b.r + 10 + b.rr() * Math.max(1, W - 2 * b.r - 20); b.y = b.r + 10 + b.rr() * Math.max(1, H - 2 * b.r - 50); }
   for (let i = 0; i < 160; i++) step(0.03, true);
   for (const b of bodies) { b.vx = 0; b.vy = 0; }
   applyDim();
   paint();
   kick();
 }
-// Few voices swim larger, many swim smaller: the robots together take up about a sixth of the water.
+// Few voices are born larger, many smaller: the robots together take up about a third of the water.
 function scaleK() {
   if (!bodies.length || !W || !H) return 1;
   let area = 0;
   for (const b of bodies) area += Math.PI * b.d0 * b.d0 / 4;
-  const k = Math.sqrt(0.16 * W * H / area);
+  const k = Math.sqrt(0.36 * W * H / area);
   const maxD = Math.max(...bodies.map((b) => b.d0));
   return Math.max(0.6, Math.min(2.1, k, Math.min(W, H) * 0.3 / maxD));
 }
@@ -967,46 +965,51 @@ function placeWhisper(b) {
 function hideWhisper() { whisper.classList.remove("on"); }
 
 function step(dt, settling) {
-  const n = bodies.length, pad = 8;
+  const n = bodies.length, pad = 6;
   for (const b of bodies) {
-    if (!settling) {
-      b.ph += dt * (0.18 + b.rr() * 0.02);
-      b.vx += Math.cos(b.ph * 1.3) * 7 * dt;
-      b.vy += Math.sin(b.ph) * 6 * dt;
-    }
-    if (b === hovered) { b.vx *= 0.85; b.vy *= 0.85; }
+    b.cr = b.d * 0.4;
+    if (settling) continue;
+    b.ph += (b.rr() - 0.5) * 2.4 * dt;   // each robot wanders: its heading drifts at random
+    const tx = Math.cos(b.ph) * b.sp, ty = Math.sin(b.ph) * b.sp * 0.8;
+    const pull = b === hovered ? 4 : 0.8;
+    b.vx += ((b === hovered ? 0 : tx) - b.vx) * Math.min(1, pull * dt);
+    b.vy += ((b === hovered ? 0 : ty) - b.vy) * Math.min(1, pull * dt);
   }
-  const obstacles = draft.on ? [{ x: draft.x, y: draft.y, r: draft.d / 2 + 6, fixed: true }] : [];
+  const obstacles = draft.on ? [{ x: draft.x, y: draft.y, cr: draft.d * 0.42, fixed: true }] : [];
   for (let i = 0; i < n; i++) {
     const a = bodies[i];
     for (let j = i + 1; j < n + obstacles.length; j++) {
       const b = j < n ? bodies[j] : obstacles[j - n];
-      let dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 0.01;
-      const min = a.r + b.r + 6;
-      if (d < min) {
-        const push = (min - d) * (settling ? 0.5 : 0.22);
-        dx /= d; dy /= d;
-        if (b.fixed) { a.x -= dx * push; a.y -= dy * push; a.vx -= dx * push * 2; a.vy -= dy * push * 2; }
-        else { a.x -= dx * push / 2; a.y -= dy * push / 2; b.x += dx * push / 2; b.y += dy * push / 2; a.vx -= dx * push; a.vy -= dy * push; b.vx += dx * push; b.vy += dy * push; }
+      // pods are wider than tall: measure the gap in a frame squashed vertically
+      let dx = b.x - a.x, dy = (b.y - a.y) * 1.35, d = Math.hypot(dx, dy) || 0.01;
+      const min = a.cr + b.cr + 4;
+      if (d >= min) continue;
+      const nx = dx / d, ny = dy / d, over = min - d;
+      if (b.fixed) { a.x -= nx * over; a.y -= ny * over / 1.35; const vn = a.vx * nx + a.vy * ny; if (vn > 0) { a.vx -= 2 * vn * nx; a.vy -= 2 * vn * ny; } continue; }
+      a.x -= nx * over / 2; a.y -= ny * over / 2.7; b.x += nx * over / 2; b.y += ny * over / 2.7;
+      if (settling) continue;
+      const rv = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;   // bounce: swap the push along the line between them
+      if (rv < 0) {
+        const ma = a.d * a.d, mb = b.d * b.d, jimp = (-1.8 * rv) / (1 / ma + 1 / mb);
+        a.vx -= (jimp / ma) * nx; a.vy -= (jimp / ma) * ny; b.vx += (jimp / mb) * nx; b.vy += (jimp / mb) * ny;
+        a.ph = Math.atan2(a.vy, a.vx); b.ph = Math.atan2(b.vy, b.vx);
       }
     }
   }
   for (const b of bodies) {
-    const damp = Math.max(0, 1 - 0.9 * dt);
-    b.vx *= damp; b.vy *= damp;
-    const sp = Math.hypot(b.vx, b.vy); if (sp > 60) { b.vx *= 60 / sp; b.vy *= 60 / sp; }
+    const sp = Math.hypot(b.vx, b.vy); if (sp > 70) { b.vx *= 70 / sp; b.vy *= 70 / sp; }
     b.x += b.vx * dt; b.y += b.vy * dt;
-    const minX = b.r + pad, maxX = W - b.r - pad, minY = b.r + pad, maxY = H - b.r - pad - 18;
-    if (b.x < minX) { b.x = minX; b.vx = Math.abs(b.vx) * 0.5; }
-    if (b.x > maxX) { b.x = Math.max(minX, maxX); b.vx = -Math.abs(b.vx) * 0.5; }
-    if (b.y < minY) { b.y = minY; b.vy = Math.abs(b.vy) * 0.5; }
-    if (b.y > maxY) { b.y = Math.max(minY, maxY); b.vy = -Math.abs(b.vy) * 0.5; }
+    const hw = b.d / 2, hh = b.d * 0.33;
+    const minX = hw + pad, maxX = W - hw - pad, minY = hh + pad, maxY = H - hh - pad - 18;
+    if (b.x < minX) { b.x = minX; b.vx = Math.abs(b.vx); b.ph = Math.atan2(b.vy, b.vx); }
+    if (b.x > maxX) { b.x = Math.max(minX, maxX); b.vx = -Math.abs(b.vx); b.ph = Math.atan2(b.vy, b.vx); }
+    if (b.y < minY) { b.y = minY; b.vy = Math.abs(b.vy); b.ph = Math.atan2(b.vy, b.vx); }
+    if (b.y > maxY) { b.y = Math.max(minY, maxY); b.vy = -Math.abs(b.vy); b.ph = Math.atan2(b.vy, b.vx); }
   }
 }
 function paint() {
   for (const b of bodies) {
-    b.el.style.transform = "translate(" + (b.x - b.r).toFixed(1) + "px," + (b.y - b.r * 0.6).toFixed(1) + "px)";
-    if (Math.abs(b.vx) > 1.5) b.el.classList.toggle("left", b.vx < 0);
+    b.el.style.transform = "translate(" + (b.x - b.d / 2).toFixed(1) + "px," + (b.y - b.d * 0.33).toFixed(1) + "px)";
   }
   if (hovered) placeWhisper(hovered);
   cx.clearRect(0, 0, W, H);
@@ -1288,7 +1291,7 @@ function resetComposer() {
 function placeDraft() {
   if (!draft.el) return;
   draft.x = W / 2; draft.y = H - draft.d / 2 - 34;
-  draft.el.style.transform = "translate(" + (draft.x - draft.d / 2).toFixed(1) + "px," + (draft.y - draft.d * 0.3).toFixed(1) + "px)";
+  draft.el.style.transform = "translate(" + (draft.x - draft.d / 2).toFixed(1) + "px," + (draft.y - draft.d * 0.33).toFixed(1) + "px)";
 }
 function updateDraft() {
   if (!draft.el) {
