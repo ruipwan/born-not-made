@@ -312,6 +312,16 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 }
 @media (prefers-reduced-motion: reduce) { #culture * { transition: none !important; } }
 
+/* Nature tab: births in other species, as video. */
+#nature .nat-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; padding: 28px 0 8px; }
+#nature .nat { margin: 0; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+#nature .nat .vid { position: relative; aspect-ratio: 16 / 9; background: #0b0e12; }
+#nature .nat .vid iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+#nature .nat figcaption { padding: 16px 18px 18px; }
+#nature .nat h3 { font: 400 22px/1.2 var(--serif); margin: 0 0 6px; }
+#nature .nat p { margin: 0 0 10px; font-size: 14.5px; }
+#nature .nat .cap a { color: var(--muted); }
+@media (max-width: 900px) { #nature .nat-grid { grid-template-columns: minmax(0, 1fr); } }
 </style>
 <link rel="stylesheet" href="assets/css/organic.css?v=3">
 <link rel="stylesheet" href="assets/css/talk.css">
@@ -1102,6 +1112,25 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 </script>
 </section>
 
+<!-- ============================== NATURE ============================== -->
+<section class="tab" id="nature">
+  <div class="tabhead"><div><p class="kicker">Nature</p><h2>How other species give birth</h2><p>Birth is not one event. It looks different in every body that does it. Who carries, how many are born at once, and how soon the newborn moves all change from species to species.</p></div></div>
+  <div class="nat-grid">
+    <figure class="nat">
+      <div class="vid"><iframe data-yt="https://www.youtube-nocookie.com/embed/LfQgRCg1bNA" title="A lemon shark giving birth" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+      <figcaption><h3>A shark born live</h3><p>A lemon shark gives birth in shallow water. Lemon shark pups grow inside the mother, fed through a placenta, and swim off on their own the moment they are out.</p><p class="cap"><a href="https://www.youtube.com/watch?v=LfQgRCg1bNA" target="_blank" rel="noopener">Lemon Shark Gives Birth · Discovery, Shark Week</a></p></figcaption>
+    </figure>
+    <figure class="nat">
+      <div class="vid"><iframe data-yt="https://www.youtube-nocookie.com/embed/MsHCqrrU-Gk" title="A male seahorse giving birth" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+      <figcaption><h3>A father gives birth</h3><p>In seahorses the female lays her eggs in the male's brood pouch. He carries them, then pushes the young out in bursts, hundreds at a time. Filmed at The Deep aquarium in Hull. <a href="#ideas">Ideas, question 06</a>, asks what this means for the word mother.</p><p class="cap"><a href="https://www.youtube.com/watch?v=MsHCqrrU-Gk" target="_blank" rel="noopener">Male seahorse giving birth · The Deep</a></p></figcaption>
+    </figure>
+    <figure class="nat">
+      <div class="vid"><iframe data-yt="https://www.youtube-nocookie.com/embed/144-ECijfX4" title="A newborn calf takes its first steps" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+      <figcaption><h3>Born ready to walk</h3><p>A calf only minutes old gets onto its wobbly legs and walks to its mother's milk. A human baby needs about a year to walk. A calf should be standing within an hour of birth.</p><p class="cap"><a href="https://www.youtube.com/watch?v=144-ECijfX4" target="_blank" rel="noopener">Newborn calf takes its first steps · Rumble Viral</a></p></figcaption>
+    </figure>
+  </div>
+</section>
+
 <!-- ============================== CULTURE ============================== -->
 <section class="tab" id="culture">
   <div class="tabhead"><div><p class="kicker">Culture</p><h2>From copies to relation</h2><p>How stories, films, games and art have imagined machines that are made, and the few that are raised. Twenty eight works, placed on one line: from a machine as a copy, a servant or a product, to a machine defined by whom it belongs with. Click any point to open its card.</p></div></div>
@@ -1241,7 +1270,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 <script>
 const GROUPS = [
   { g: "work", label: "The Work", tabs: [["work", "The Work"]] },
-  { g: "think", label: "Think", tabs: [["ideas", "Ideas", "questions the work raises"], ["culture", "Culture", "stories, screens and art"]] },
+  { g: "think", label: "Think", tabs: [["ideas", "Ideas", "questions the work raises"], ["culture", "Culture", "stories, screens and art"], ["nature", "Nature", "how other species give birth"]] },
   { g: "make", label: "Make", tabs: [["prototypes", "Prototypes", "versions one to three"], ["build", "Build", "every part, with sources"], ["society", "Society", "reproduction at scale"], ["process", "Process", "how the work changed"]] },
   { g: "sim", label: "Simulator", tabs: [["simulator", "Printing console", "signal, G-code, print, birth"], ["physics", "Physics", "birth and printing, simulated"]] },
   { g: "talk", label: "Talk", tabs: [["conversations", "Conversations", "one to one"], ["voices", "Voices", "open to everyone"]] }];
@@ -1258,6 +1287,8 @@ function show() {
   document.getElementById("subnav").innerHTML = live.length > 1 ? `<span class="gl">${esc(grp.label)}</span>` + live.map((t) => `<a href="#${t[0]}"${t[0] === id ? ' aria-current="page"' : ""}>${esc(t[1])}<span class="d">${esc(t[2] || "")}</span></a>`).join("") : "";
   const f = document.querySelector("#" + id + " iframe[data-src]"); if (f && !f.src) f.src = f.dataset.src;
   document.querySelectorAll("section.tab:not(.on) video").forEach((v) => v.pause());
+  document.querySelectorAll("section.tab:not(.on) iframe[data-yt]").forEach((f) => f.removeAttribute("src"));
+  document.querySelectorAll("#" + id + " iframe[data-yt]").forEach((f) => { if (!f.getAttribute("src")) f.src = f.dataset.yt; });
   if (id === "conversations") loadConversations();
   if (h === "work-precedents") {
     requestAnimationFrame(() => document.getElementById(h).scrollIntoView({ behavior: "instant" }));
