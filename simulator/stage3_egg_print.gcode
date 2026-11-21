@@ -8,11 +8,16 @@ G90
 M83
 M200 D0
 M280 P1 S0 ; tool: needle down
-; ---- place the electronics kit: one pick from the cradle on the port wall, one place on the seat (see kit.moves in stage3_egg.json)
+; ---- tool change 1 at the rack on the docking wall: park the needle module in slot B, pick the suction module from slot A (Rotrics quick release; see tools.change1 in stage3_egg.json)
 M400
-M280 P1 S90 ; tool: fork down
+M888 P2 ; end effector: pneumatic module, 15 mm suction cup on the Air Pump Box
+; ---- place the electronics kit: the cup takes the flat top of the silicone saddle in the cradle, sets the kit on the three seat cups in the gel (see kit.moves)
+M1000 ; pump in: the cup holds the saddle
 M0 ; the kit is placed at X-3.6 Y0.0 Z-246.5
-M280 P1 S0 ; tool: needle down
+M1002 ; release air: the cup lets go
+M1003 ; close all valves
+; ---- tool change 2: park the suction module in slot A, pick the needle module from slot B (see tools.change2); the needle module is a custom module on the same port, E drives the silicone feed
+M280 P1 S0 ; module servo: needle down
 ;LAYER:0 Z-269.25
 G0 X-90.00 Y-0.55 Z-269.25 A-316.9
 G1 X-89.97 Y-0.02 Z-269.25 A-316.9 E0.995
