@@ -128,6 +128,10 @@ dialog::backdrop { background: rgba(21, 23, 26, .82); }
 .source-figure button { width: 100%; }
 .source-figure figcaption { margin: 6px 0 2px; font: 12px/1.5 var(--sans); color: var(--muted); }
 .source-figure figcaption a { color: inherit; }
+.media.one .portrait-source { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 18px; }
+.media.one .portrait-source button { width: auto; max-width: 100%; }
+.media.one .portrait-source img { width: auto; max-width: 100%; height: clamp(220px, 36vh, 308px); aspect-ratio: auto; object-fit: contain; }
+.portrait-source figcaption { flex: 1 1 125px; max-width: 32ch; margin: 0; }
 </style>
 <link rel="stylesheet" href="../assets/css/organic.css"></head><body class="org-doc org-log">
 <div class="wrap">
@@ -253,10 +257,17 @@ function build() {
       e.media.forEach((src, j) => {
         const note = e.mediaNotes?.[j];
         const alt = note?.alt || e.title + (e.media.length > 1 ? `, image ${j + 1} of ${e.media.length}` : "");
-        const button = el("button", { type: "button", "aria-label": "Enlarge: " + alt, onclick: (ev) => openLb(e, j, ev.currentTarget) }, el("img", { src, alt, loading: "lazy", decoding: "async" }));
+        const image = el("img", { src, alt, loading: "lazy", decoding: "async" });
+        const button = el("button", { type: "button", "aria-label": "Enlarge: " + alt, onclick: (ev) => openLb(e, j, ev.currentTarget) }, image);
         if (note) {
           const caption = el("figcaption", {}, el("a", { href: note.source, text: note.credit }));
-          m.append(el("figure", {class:"source-figure"}, button, caption));
+          const figure = el("figure", {class:"source-figure"}, button, caption);
+          if (e.media.length === 1) {
+            const fitSource = () => figure.classList.toggle("portrait-source", image.naturalWidth * 4 < image.naturalHeight * 3);
+            if (image.complete) fitSource();
+            else image.addEventListener("load", fitSource, {once:true});
+          }
+          m.append(figure);
         } else m.append(button);
       });
       card.append(m);

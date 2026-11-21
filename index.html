@@ -76,8 +76,22 @@ h3 { font: 600 15px/1.35 var(--sans); margin: 0 0 6px; }
 .card { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 18px; }
 .card p { margin: 0 0 10px; font-size: 15px; } .card p:last-child { margin: 0; }
 .fig img { width: 100%; border-radius: 6px; border: 1px solid var(--line); background: #141415; }
-.timeline { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
-.timeline .fig img { aspect-ratio: 4 / 3; object-fit: cover; }
+#work-precedents { scroll-margin-top: 132px; }
+.timeline { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 30px 18px; align-content: start; }
+.timeline .fig, .context-figures .fig { min-width: 0; margin: 0; }
+.timeline .note { margin: 6px 0 0; }
+.precedent-thumb { display: block; width: 100%; aspect-ratio: 4 / 3; padding: 0; overflow: hidden; border-radius: 8px; }
+.precedent-thumb:focus-visible { outline: 2px solid var(--gel); outline-offset: 3px; }
+.timeline .precedent-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.timeline .detail img { object-position: center top; }
+.timeline .diagram img { object-fit: contain; background: white; }
+.timeline .model img { object-fit: contain; background: #eeefee; }
+.precedent-context { align-self: start; margin: 0; }
+.context-figures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; width: 100%; max-width: 576px; }
+.context-figures img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; }
+@media (min-width: 901px) and (max-width: 1080px) { .block.precedents { grid-template-columns: minmax(0, 210px) minmax(0, 1fr); } }
+@media (max-width: 675px) { .timeline { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 14px; } .context-figures { gap: 14px; } }
+@media (max-width: 350px) { .context-figures { grid-template-columns: minmax(0, 1fr); } }
 .yr { font: 500 12px var(--mono); color: var(--gel); margin: 10px 0 2px; }
 .timeline .this .yr { color: var(--ink); }
 .pairs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
@@ -102,10 +116,10 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 @media (max-width: 900px) {
   .hero, .block { grid-template-columns: minmax(0, 1fr); gap: 20px; }
   .block > .side h2 { position: static; }
-  .timeline, .grid3, .vids { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid3, .vids { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .pairs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-@media (max-width: 560px) { .timeline, .grid2, .grid3, .vids, .pairs { grid-template-columns: minmax(0, 1fr); } nav.tabs { margin-left: 0; } }
+@media (max-width: 560px) { .grid2, .grid3, .vids, .pairs { grid-template-columns: minmax(0, 1fr); } nav.tabs { margin-left: 0; } }
 
 /* Ideas */
 /* Ideas tab: extra styles. Uses the tokens already on :root in index.html. */
@@ -262,7 +276,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 #culture .cu-card:hover { border-color: #3a3a3d; }
 #culture .cu-card.on { border-color: var(--gel); }
 #culture .cu-fig { margin: 0; background: #0a0a0b; border-bottom: 1px solid var(--line); }
-#culture .cu-fig img { width: 100%; height: 220px; object-fit: contain; background: #0a0a0b; }
+#culture .cu-fig img { width: 100%; height: auto; max-height: clamp(300px, 46vh, 380px); object-fit: contain; background: #0a0a0b; }
 #culture .cu-fig figcaption { font: 11px/1.45 var(--mono); color: var(--muted); padding: 8px 12px; }
 #culture .cu-fig figcaption a { color: var(--muted); }
 #culture .cu-body { padding: 14px 16px 16px; display: flex; flex-direction: column; flex: 1; }
@@ -277,7 +291,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 #culture .cu-meter b { position: absolute; top: -4px; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: var(--gel); }
 #culture .cu-card.big { cursor: default; border-color: var(--gel); display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); }
 #culture .cu-card.big .cu-fig { border-bottom: 0; border-right: 1px solid var(--line); height: 100%; }
-#culture .cu-card.big .cu-fig img { height: 320px; }
+#culture .cu-card.big .cu-fig img { max-height: clamp(340px, 65vh, 580px); }
 #culture .cu-card.big .cu-body { padding: 20px 22px; }
 #culture .cu-card.big h3 { font-size: 30px; }
 #culture .cu-card.big .cu-body > p { font: 400 18px/1.5 var(--serif); }
@@ -292,12 +306,11 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
   #culture .swipe { display: block; }
   #culture .cu-card.big { grid-template-columns: minmax(0, 1fr); }
   #culture .cu-card.big .cu-fig { border-right: 0; border-bottom: 1px solid var(--line); }
-  #culture .cu-card.big .cu-fig img { height: 240px; }
 }
 @media (prefers-reduced-motion: reduce) { #culture * { transition: none !important; } }
 
 </style>
-<link rel="stylesheet" href="assets/css/organic.css">
+<link rel="stylesheet" href="assets/css/organic.css?v=3">
 <link rel="stylesheet" href="assets/css/talk.css">
 <link rel="stylesheet" href="assets/css/bibliography.css?v=2"></head><body class="org-doc">
 <header class="top"><div class="bar">
@@ -379,21 +392,59 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
     </div>
   </div>
 
-  <div class="block">
-    <div class="side"><h2>Where this work stands</h2><p class="note">Other robots already make robots. None of them makes the baby inside a parent, and none gives birth.</p><p class="note">Before them, cybernetics (Wiener, 1948) built machines that steer themselves, like Grey Walter’s robot tortoises (1948 to 1949), and machines that relate: in Gordon Pask’s <i>Colloquy of Mobiles</i> (Cybernetic Serendipity, London, 1968) “male” and “female” mobiles courted each other with light. Cyberfeminism later took its name from that word.</p></div>
-    <div class="timeline">
+  <section class="block precedents" aria-labelledby="work-precedents">
+    <div class="side">
+      <h2 id="work-precedents">Where this work stands</h2>
+      <p class="note">Other robots already make robots. None of them makes the baby inside a parent, and none gives birth.</p>
+    </div>
+    <ol class="timeline" role="list" aria-label="Seven precedents and Born, Not Made">
+      <li class="fig">
+        <a class="precedent-thumb detail" href="assets/img/von_neumann_1948.jpg" target="_blank" rel="noopener" aria-label="View full image of von Neumann"><img src="assets/img/von_neumann_1948.jpg" alt="von Neumann universal constructor diagram" loading="lazy" decoding="async"></a>
+        <p class="yr">1948 · von Neumann</p>
+        <p class="note">A machine gathers floating parts and builds another machine like itself.</p>
+      </li>
+      <li class="fig">
+        <a class="precedent-thumb diagram" href="assets/img/game_of_life_1970.gif" target="_blank" rel="noopener" aria-label="View full image of Conway"><img src="assets/img/game_of_life_1970.gif" alt="Game of Life glider gun" loading="lazy" decoding="async"></a>
+        <p class="yr">1970 · Conway</p>
+        <p class="note">Simple rules on a grid; a glider gun, found by Bill Gosper the same year, keeps producing gliders.</p>
+      </li>
+      <li class="fig">
+        <a class="precedent-thumb" href="assets/img/sims_galapagos_1997.jpg" target="_blank" rel="noopener" aria-label="View full image of Sims, Galápagos"><img src="assets/img/sims_galapagos_1997.jpg" alt="Karl Sims, Galápagos installation" loading="lazy" decoding="async"></a>
+        <p class="yr">1997 · Sims, Galápagos</p>
+        <p class="note">Viewers choose which virtual organisms survive, mate and mutate, on screens.</p>
+      </li>
+      <li class="fig">
+        <a class="precedent-thumb" href="assets/img/iida_2015.jpg" target="_blank" rel="noopener" aria-label="View full image of Iida, Cambridge"><img src="assets/img/iida_2015.jpg" alt="Iida mother robot" loading="lazy" decoding="async"></a>
+        <p class="yr">2015 · Iida, Cambridge</p>
+        <p class="note">A mother robot arm glues cube children together, outside any body.</p>
+      </li>
+      <li class="fig">
+        <a class="precedent-thumb" href="assets/img/eiben_robot_baby_2017.jpg" target="_blank" rel="noopener" aria-label="View full image of Eiben, Robot Baby"><img src="assets/img/eiben_robot_baby_2017.jpg" alt="Eiben robot baby" loading="lazy" decoding="async"></a>
+        <p class="yr">2017 · Eiben, Robot Baby</p>
+        <p class="note">Two robots mate; the child is printed and assembled by hand, outside the parents.</p>
+      </li>
+      <li class="fig">
+        <a class="precedent-thumb diagram" href="assets/img/horibe_2021.jpg" target="_blank" rel="noopener" aria-label="View full image of Horibe, Walker, Risi"><img src="assets/img/horibe_2021.jpg" alt="Horibe soft robots regrowing" loading="lazy" decoding="async"></a>
+        <p class="yr">2021 · Horibe, Walker, Risi</p>
+        <p class="note">Soft robots grow cell by cell and regrow damaged parts, in simulation.</p>
+      </li>
+      <li class="fig">
+        <a class="precedent-thumb diagram" href="assets/img/cba_voxel_2022.jpg" target="_blank" rel="noopener" aria-label="View full image of MIT CBA"><img src="assets/img/cba_voxel_2022.jpg" alt="MIT CBA voxel robots" loading="lazy" decoding="async"></a>
+        <p class="yr">2022 · MIT CBA</p>
+        <p class="note">Voxel robots build more robots from parts fed in.</p>
+      </li>
+      <li class="fig this">
+        <a class="precedent-thumb model" href="assets/img/this_work_2026.jpg" target="_blank" rel="noopener" aria-label="View full image of Born, Not Made"><img src="assets/img/this_work_2026.jpg" alt="Born, Not Made" loading="lazy" decoding="async"></a>
+        <p class="yr">2026 · This work</p>
+        <p class="note">A robot mother prints the baby inside the body, in gel, then gives birth in water.</p>
+      </li>
+    </ol>
+    <p class="note precedent-context">Before them, cybernetics (Wiener, 1948) built machines that steer themselves, like Grey Walter’s robot tortoises (1948 to 1949), and machines that relate: in Gordon Pask’s <i>Colloquy of Mobiles</i> (Cybernetic Serendipity, London, 1968) “male” and “female” mobiles courted each other with light. Cyberfeminism later took its name from that word.</p>
+    <div class="context-figures">
       <figure class="fig"><img src="assets/img/references/walter.webp" width="726" height="576" loading="lazy" decoding="async" alt="Grey Walter’s cybernetic tortoise, its wheels and sensor visible beneath its clear shell"><figcaption class="cap">One of Grey Walter’s later tortoises. © The Board of Trustees of the Science Museum. <a href="https://collection.sciencemuseumgroup.org.uk/objects/co531614/cybernetic-tortoise-developed-to-help-with-studies-on-brain-function" target="_blank" rel="noopener">Science Museum Group</a> · <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a></figcaption></figure>
       <figure class="fig"><img src="assets/img/references/pask.webp" width="740" height="556" loading="lazy" decoding="async" alt="Hanging mobiles with illuminated, curved bodies in the reconstructed installation"><figcaption class="cap">Reconstruction of The Colloquy of Mobiles. © Estate Gordon Pask. Photo by Paul Pangaro. <a href="https://zkm.de/en/artworks/the-colloquy-of-mobiles" target="_blank" rel="noopener">ZKM</a></figcaption></figure>
-      <div class="fig"><img src="assets/img/von_neumann_1948.jpg" alt="von Neumann universal constructor diagram" loading="lazy"><p class="yr">1948 · von Neumann</p><p class="note">A machine gathers floating parts and builds another machine like itself.</p></div>
-      <div class="fig"><img src="assets/img/game_of_life_1970.gif" alt="Game of Life glider gun" loading="lazy"><p class="yr">1970 · Conway</p><p class="note">Simple rules on a grid; a glider gun, found by Bill Gosper the same year, keeps producing gliders.</p></div>
-      <div class="fig"><img src="assets/img/sims_galapagos_1997.jpg" alt="Karl Sims, Galápagos installation" loading="lazy"><p class="yr">1997 · Sims, Galápagos</p><p class="note">Viewers choose which virtual organisms survive, mate and mutate, on screens.</p></div>
-      <div class="fig"><img src="assets/img/iida_2015.jpg" alt="Iida mother robot" loading="lazy"><p class="yr">2015 · Iida, Cambridge</p><p class="note">A mother robot arm glues cube children together, outside any body.</p></div>
-      <div class="fig"><img src="assets/img/eiben_robot_baby_2017.jpg" alt="Eiben robot baby" loading="lazy"><p class="yr">2017 · Eiben, Robot Baby</p><p class="note">Two robots mate; the child is printed and assembled by hand, outside the parents.</p></div>
-      <div class="fig"><img src="assets/img/horibe_2021.jpg" alt="Horibe soft robots regrowing" loading="lazy"><p class="yr">2021 · Horibe, Walker, Risi</p><p class="note">Soft robots grow cell by cell and regrow damaged parts, in simulation.</p></div>
-      <div class="fig"><img src="assets/img/cba_voxel_2022.jpg" alt="MIT CBA voxel robots" loading="lazy"><p class="yr">2022 · MIT CBA</p><p class="note">Voxel robots build more robots from parts fed in.</p></div>
-      <div class="fig this"><img src="assets/img/this_work_2026.jpg" alt="Born, Not Made" loading="lazy"><p class="yr">2026 · This work</p><p class="note">A robot mother prints the baby inside the body, in gel, then gives birth in water.</p></div>
     </div>
-  </div>
+  </section>
 
   <div class="block">
     <div class="side"><h2>Why it prints</h2></div>
@@ -1205,7 +1256,11 @@ function show() {
   const f = document.querySelector("#" + id + " iframe[data-src]"); if (f && !f.src) f.src = f.dataset.src;
   document.querySelectorAll("section.tab:not(.on) video").forEach((v) => v.pause());
   if (id === "conversations") loadConversations();
-  window.scrollTo({ top: 0 }); requestAnimationFrame(() => window.scrollTo({ top: 0 }));
+  if (h === "work-precedents") {
+    requestAnimationFrame(() => document.getElementById(h).scrollIntoView({ behavior: "instant" }));
+  } else {
+    window.scrollTo({ top: 0 }); requestAnimationFrame(() => window.scrollTo({ top: 0 }));
+  }
 }
 /* conversations: data in conversations/data/conversations.json */
 let CONV = null, convFilter = "all", convKind = "conversation";

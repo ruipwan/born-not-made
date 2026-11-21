@@ -52,7 +52,9 @@ figure img { width: 100%; border-radius: 6px; border: 1px solid var(--line); bac
 figure.wide { margin-top: 18px; }
 figcaption, .cap { font: 12px/1.5 var(--mono); color: var(--muted); margin: 8px 0 0; }
 .gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 4px; }
-.gallery img { aspect-ratio: 4 / 5; object-fit: cover; background: #1c1c1e; }
+.gallery figure { min-width: 0; }
+.gallery figure > a { display: block; }
+.gallery img { aspect-ratio: 4 / 3; max-height: 220px; object-fit: contain; background: #1c1c1e; }
 ol.steps { list-style: none; counter-reset: s; margin: 0; padding: 0; max-width: 70ch; }
 ol.steps li { counter-increment: s; display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
 ol.steps li::before { content: counter(s, decimal-leading-zero); font: 500 12px/1.9 var(--mono); color: var(--gel); }
@@ -137,16 +139,19 @@ html.embedded.auto .side .stick { position: static; }
   .cmp tbody tr:last-child td:last-child { padding-bottom: 12px; border-bottom: 1px solid var(--line); }
 }
 
-.recs .record-thumb { display: grid; grid-template-columns: 56px minmax(0,1fr); align-items: center; gap: 10px; margin: 8px 0; }
-.record-thumb img { width: 56px; height: 40px; object-fit: contain; background: #171a1e; border-radius: 4px; }
-.refs { list-style: none; padding: 0; }
-.refs li { display: grid; grid-template-columns: minmax(96px, 31%) minmax(0,1fr); align-items: center; gap: 18px; padding: 13px 0; border-top: 1px solid var(--line); font-size: 15px; }
+.recs .record-thumb { margin: 8px 0; }
+.record-thumb > a { display: grid; grid-template-columns: clamp(82px, 30%, 108px) minmax(0,1fr); align-items: center; gap: 12px; }
+.record-thumb img { width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: contain; background: #171a1e; border-radius: 4px; }
+.org-doc.org-early .refs { list-style: none; padding: 0; }
+.refs li { display: grid; grid-template-columns: clamp(135px, 31%, 230px) minmax(0,1fr); align-items: center; gap: 18px; padding: 13px 0; border-top: 1px solid var(--line); font-size: 15px; }
+.refs figure > a { display:block; }
 .refs figure img { display:block; aspect-ratio: 16 / 10; object-fit: contain; background:#171a1e; height: auto; }
 .photo-credit { color: var(--muted); text-decoration-thickness: 1px; font: 11px/1.4 var(--sans); }
 .component-thumb { margin-top: 8px; max-width: 142px; }
 .component-thumb img { display: block; width: 100%; height: 76px; object-fit: contain; }
 @media (max-width:560px) {
-  .refs li { grid-template-columns: 94px minmax(0,1fr); gap: 12px; align-items: start; }
+  .refs li { grid-template-columns: minmax(116px, 35%) minmax(0,1fr); gap: 12px; align-items: start; }
+  .refs figcaption { line-height: 1.35; }
   .component-thumb { float: right; margin: 0 0 4px 8px; width: 90px; }
   table.spec th::after { content:""; display:block; clear:both; }
 }
@@ -203,10 +208,10 @@ html.embedded.auto .side .stick { position: static; }
       <div><dt>When</dt><dd>Fall 2025. First birth filmed in December 2025.</dd></div>
       <div><dt>Context</dt><dd>Final project, How to Make (Almost) Anything, MIT. The record calls the two bodies parent (Commander) and baby (Receiver).</dd></div>
       <div><dt>Records</dt><dd><ul class="recs">
-        <li class="record-thumb"><img src="../assets/img/prototype1_photo.jpg" alt="Printed mother and baby robot shells from the MIT final project." width="1600" height="960" loading="lazy" decoding="async"><span><a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html">Fab class record: final project</a></span></li>
-        <li class="record-thumb"><img src="media/v1_tpu_bags.jpg" alt="Water-inflatable TPU bags used to push the baby robot." width="960" height="1280" loading="lazy" decoding="async"><span><a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week14.html">Fab class record: water inflatables</a></span></li>
-        <li class="record-thumb"><img src="../assets/img/prototype2_diagram.jpg" alt="Drawing of the water muscle, battery and pump inside the second mother robot." width="1600" height="866" loading="lazy" decoding="async"><span><a href="https://ruipengwang.space/born-not-made">Artist's page</a></span></li>
-        <li class="record-thumb"><img src="media/v1_birth_in_tank.jpg" alt="Still of the first prototype in the tank." width="1400" height="788" loading="lazy" decoding="async"><span><a href="https://vimeo.com/1147548218">Film: first birth (Vimeo)</a></span></li>
+        <li class="record-thumb"><a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html"><img src="../assets/img/prototype1_photo.jpg" alt="Printed mother and baby robot shells from the MIT final project." width="1600" height="960" loading="lazy" decoding="async"><span>Fab class record: final project</span></a></li>
+        <li class="record-thumb"><a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week14.html"><img src="media/v1_tpu_bags.jpg" alt="Water-inflatable TPU bags used to push the baby robot." width="960" height="1280" loading="lazy" decoding="async"><span>Fab class record: water inflatables</span></a></li>
+        <li class="record-thumb"><a href="https://ruipengwang.space/born-not-made"><img src="../assets/img/prototype2_diagram.jpg" alt="Drawing of the water muscle, battery and pump inside the second mother robot." width="1600" height="866" loading="lazy" decoding="async"><span>Artist's page</span></a></li>
+        <li class="record-thumb"><a href="https://vimeo.com/1147548218"><img src="media/v1_birth_in_tank.jpg" alt="Still of the first prototype in the tank." width="1400" height="788" loading="lazy" decoding="async"><span>Film: first birth (Vimeo)</span></a></li>
       </ul></dd></div>
     </dl>
   </div></div>
@@ -295,10 +300,10 @@ html.embedded.auto .side .stick { position: static; }
       <div><dt>When</dt><dd>2026. Film released June 2026.</dd></div>
       <div><dt>Team</dt><dd>Ruipeng Wang. 3D printing and hardware fabrication: Richard Haoxi Zhang. Drawings: Vera Yu Wu.</dd></div>
       <div><dt>Records</dt><dd><ul class="recs">
-        <li class="record-thumb"><img src="media/v2_touch_loop.jpg" alt="Drawing of the touch-sensing circuit around the water tank." width="1400" height="777" loading="lazy" decoding="async"><span><a href="https://ruipengwang.space/born-not-made">Artist's page, with the touch loop drawing</a></span></li>
-        <li class="record-thumb"><img src="../assets/img/society-ref/june-film.webp" alt="The title frame of the June film shows a clear robot in a hand." width="850" height="478" loading="lazy" decoding="async"><span><a href="https://vimeo.com/1202399561/7ac02ffdc8">Film, June 2026 (Vimeo)</a></span></li>
-        <li class="record-thumb"><img src="../assets/img/prototype1_photo.jpg" alt="Printed mother and baby robot shells from the MIT final project." width="1600" height="960" loading="lazy" decoding="async"><span><a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html">Fab class record, where the water muscle and jet began</a></span></li>
-        <li class="record-thumb"><img src="../assets/img/society-ref/visap.webp" alt="Illuminated tank beneath the digital population in Born, Not Made." width="850" height="478" loading="lazy" decoding="async"><span><a href="https://neurips.cc/virtual/2026/160668">NeurIPS 2026 Creative AI paper</a></span></li>
+        <li class="record-thumb"><a href="https://ruipengwang.space/born-not-made"><img src="media/v2_touch_loop.jpg" alt="Drawing of the touch-sensing circuit around the water tank." width="1400" height="777" loading="lazy" decoding="async"><span>Artist's page, with the touch loop drawing</span></a></li>
+        <li class="record-thumb"><a href="https://vimeo.com/1202399561/7ac02ffdc8"><img src="../assets/img/society-ref/june-film.webp" alt="The title frame of the June film shows a clear robot in a hand." width="850" height="478" loading="lazy" decoding="async"><span>Film, June 2026 (Vimeo)</span></a></li>
+        <li class="record-thumb"><a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html"><img src="../assets/img/prototype1_photo.jpg" alt="Printed mother and baby robot shells from the MIT final project." width="1600" height="960" loading="lazy" decoding="async"><span>Fab class record, where the water muscle and jet began</span></a></li>
+        <li class="record-thumb"><a href="https://neurips.cc/virtual/2026/160668"><img src="../assets/img/society-ref/visap.webp" alt="Illuminated tank beneath the digital population in Born, Not Made." width="850" height="478" loading="lazy" decoding="async"><span>NeurIPS 2026 Creative AI paper</span></a></li>
       </ul></dd></div>
     </dl>
   </div></div>
@@ -371,9 +376,9 @@ html.embedded.auto .side .stick { position: static; }
       <div><dt>When</dt><dd>September to October 2026.</dd></div>
       <div><dt>Team</dt><dd>With collaborators at MIT CSAIL and Northwestern University. Material and arm: Di Wu. Arm control: Kexin Wang.</dd></div>
       <div><dt>Records</dt><dd><ul class="recs">
-        <li class="record-thumb"><img src="../assets/img/prototype2_diagram.jpg" alt="Drawing of the water muscle, battery and pump inside the second mother robot." width="1600" height="866" loading="lazy" decoding="async"><span><a href="https://ruipengwang.space/born-not-made">Artist's page, credits</a></span></li>
-        <li class="record-thumb"><img src="../assets/img/society-ref/epomemory.webp" alt="The EpoMemory printer deposits material into a transparent support bath." width="827" height="680" loading="lazy" decoding="async"><span><a href="https://doi.org/10.1145/3544548.3580638">EpoMemory, CHI 2023 (the gel method)</a></span></li>
-        <li class="record-thumb"><img src="../assets/img/society-ref/so101.webp" alt="The white and black configurations of the SO-ARM101." width="680" height="680" loading="lazy" decoding="async"><span><a href="https://www.hiwonder.com/products/lerobot-so-101">SO-ARM101 arm</a></span></li>
+        <li class="record-thumb"><a href="https://ruipengwang.space/born-not-made"><img src="../assets/img/prototype2_diagram.jpg" alt="Drawing of the water muscle, battery and pump inside the second mother robot." width="1600" height="866" loading="lazy" decoding="async"><span>Artist's page, credits</span></a></li>
+        <li class="record-thumb"><a href="https://doi.org/10.1145/3544548.3580638"><img src="../assets/img/society-ref/epomemory.webp" alt="The EpoMemory printer deposits material into a transparent support bath." width="827" height="680" loading="lazy" decoding="async"><span>EpoMemory, CHI 2023 (the gel method)</span></a></li>
+        <li class="record-thumb"><a href="https://www.hiwonder.com/products/lerobot-so-101"><img src="../assets/img/society-ref/so101.webp" alt="The white and black configurations of the SO-ARM101." width="680" height="680" loading="lazy" decoding="async"><span>SO-ARM101 arm</span></a></li>
       </ul></dd></div>
     </dl>
   </div></div>
@@ -411,11 +416,11 @@ html.embedded.auto .side .stick { position: static; }
 <section class="block" aria-labelledby="src-h">
   <div class="side"><h2 id="src-h">Sources</h2></div>
   <ol class="refs">
-    <li><figure><img src="../assets/img/prototype1_photo.jpg" alt="Printed mother and baby robot shells from the MIT final project." width="1600" height="960" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html">Ruipeng Wang · MIT Fab class</a></figcaption></figure><div>Wang, R. "Final Project · The Birth of Robots." How to Make (Almost) Anything, MIT, 2025. <a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html">Final project</a>, <a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week14.html">week 14</a>.</div></li>
-    <li><figure><img src="../assets/img/prototype2_diagram.jpg" alt="Drawing of the water muscle, battery and pump inside the second mother robot." width="1600" height="866" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://ruipengwang.space/born-not-made">Vera Yu Wu · project drawing</a></figcaption></figure><div>Wang, R. <i>Born, Not Made</i>. Artist's page, with drawings by Vera Yu Wu. <a href="https://ruipengwang.space/born-not-made">ruipengwang.space</a></div></li>
-    <li><figure><img src="../assets/img/society-ref/visap.webp" alt="Illuminated tank beneath the digital population in Born, Not Made." width="850" height="478" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://visap.net/2026/artwork-4.html">Installation image · VISAP 2026</a></figcaption></figure><div>Wang, R., Wu, V. Y., Wang, K., Xu, J. H. "Born, Not Made." NeurIPS 2026 Creative AI track. <a href="https://neurips.cc/virtual/2026/160668">neurips.cc</a></div></li>
-    <li><figure><img src="../log/media/1021_s8_render.jpg" alt="The October 21 model of the mother, from the hardware group’s weekly notes." width="840" height="498" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="../log/">Hardware group · October 21 model</a></figcaption></figure><div>Born, Not Made hardware group. Weekly notes, August to October 2026.</div></li>
-    <li><figure><img src="../assets/img/society-ref/epomemory.webp" alt="The EpoMemory printer deposits material into a transparent support bath." width="827" height="680" loading="lazy" decoding="async"><figcaption><a class="photo-credit" href="https://morphingmatter.org/projects/epomemory">Ke Zhong et al. · Morphing Matter Lab</a></figcaption></figure><div>Zhong, K., Fernandes Minori, A., Wu, D., Yang, H., Islam, M. F., Yao, L. "EpoMemory: Multi-state Shape Memory for Programmable Morphing Interfaces." CHI 2023. <a href="https://doi.org/10.1145/3544548.3580638">doi</a></div></li>
+    <li><figure><a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html"><img src="../assets/img/prototype1_photo.jpg" alt="Printed mother and baby robot shells from the MIT final project." width="1600" height="960" loading="lazy" decoding="async"></a><figcaption><a class="photo-credit" href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html">Ruipeng Wang · MIT Fab class</a></figcaption></figure><div>Wang, R. "Final Project · The Birth of Robots." How to Make (Almost) Anything, MIT, 2025. <a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html">Final project</a>, <a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week14.html">week 14</a>.</div></li>
+    <li><figure><a href="https://ruipengwang.space/born-not-made"><img src="../assets/img/prototype2_diagram.jpg" alt="Drawing of the water muscle, battery and pump inside the second mother robot." width="1600" height="866" loading="lazy" decoding="async"></a><figcaption><a class="photo-credit" href="https://ruipengwang.space/born-not-made">Vera Yu Wu · project drawing</a></figcaption></figure><div>Wang, R. <i>Born, Not Made</i>. Artist's page, with drawings by Vera Yu Wu. <a href="https://ruipengwang.space/born-not-made">ruipengwang.space</a></div></li>
+    <li><figure><a href="https://visap.net/2026/artwork-4.html"><img src="../assets/img/society-ref/visap.webp" alt="Illuminated tank beneath the digital population in Born, Not Made." width="850" height="478" loading="lazy" decoding="async"></a><figcaption><a class="photo-credit" href="https://visap.net/2026/artwork-4.html">Installation image · VISAP 2026</a></figcaption></figure><div>Wang, R., Wu, V. Y., Wang, K., Xu, J. H. "Born, Not Made." NeurIPS 2026 Creative AI track. <a href="https://neurips.cc/virtual/2026/160668">neurips.cc</a></div></li>
+    <li><figure><a href="../log/"><img src="../log/media/1021_s8_render.jpg" alt="The October 21 model of the mother, from the hardware group’s weekly notes." width="840" height="498" loading="lazy" decoding="async"></a><figcaption><a class="photo-credit" href="../log/">Hardware group · October 21 model</a></figcaption></figure><div>Born, Not Made hardware group. Weekly notes, August to October 2026.</div></li>
+    <li><figure><a href="https://morphingmatter.org/projects/epomemory"><img src="../assets/img/society-ref/epomemory.webp" alt="The EpoMemory printer deposits material into a transparent support bath." width="827" height="680" loading="lazy" decoding="async"></a><figcaption><a class="photo-credit" href="https://morphingmatter.org/projects/epomemory">Ke Zhong et al. · Morphing Matter Lab</a></figcaption></figure><div>Zhong, K., Fernandes Minori, A., Wu, D., Yang, H., Islam, M. F., Yao, L. "EpoMemory: Multi-state Shape Memory for Programmable Morphing Interfaces." CHI 2023. <a href="https://doi.org/10.1145/3544548.3580638">doi</a></div></li>
   </ol>
 </section>
 
