@@ -37,10 +37,23 @@ h1 { font: 300 clamp(40px, 6vw, 72px)/1 "Cormorant Garamond", Georgia, serif; ma
 .acts li { font-size: 13.5px; color: var(--muted); }
 .acts b { display: block; color: var(--ink); font: italic 400 19px/1.3 "Cormorant Garamond", Georgia, serif; }
 .err { position: absolute; inset: 0; display: none; place-items: center; color: var(--muted); padding: 20px; text-align: center; }
+.follow { max-height: calc(100% - 24px); overflow-y: auto; }
+.follow .meter.belly i { background: linear-gradient(90deg, #b9a27e, #efdcb8); }
+.follow .from { color: var(--muted); font-size: 12px; margin-top: 8px; line-height: 1.45; }
+.follow .from b { color: var(--ink); font-weight: 500; }
+.follow .skin { margin-top: 6px; font-size: 12.5px; color: var(--gel); }
+.cost { margin: 34px 0 0; max-width: 78ch; }
+.cost h2 { font: 300 clamp(28px, 4vw, 40px)/1.1 "Cormorant Garamond", Georgia, serif; margin: 0 0 12px; }
+.cost ol { margin: 0 0 14px; padding-left: 1.3em; }
+.cost li { margin: 0 0 8px; }
+.cost li b { font-weight: 500; }
+.cost p { color: var(--muted); margin: 0 0 10px; font-size: 14px; }
+.cost .ref { font-size: 13px; }
+.cost a { color: var(--gel); overflow-wrap: anywhere; }
 @media (max-width: 900px) { .acts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) {
   .pond { height: 64vh; min-height: 380px; }
-  .follow { left: 10px; right: 10px; top: auto; bottom: 64px; width: auto; padding: 10px 12px; }
+  .follow { left: 10px; right: 10px; top: auto; bottom: 64px; width: auto; padding: 10px 12px; max-height: 52%; }
   .follow h3 { font-size: 20px; } .follow .mem { display: none; }
   .acts { grid-template-columns: minmax(0, 1fr); }
   .hud { font-size: 11.5px; }
@@ -50,7 +63,7 @@ h1 { font: 300 clamp(40px, 6vw, 72px)/1 "Cormorant Garamond", Georgia, serif; ma
 <div class="wrap">
   <div class="top"><span class="kicker">Society</span><nav><a href="../">Society</a><a href="../../#society">Home</a></nav></div>
   <h1>Bodies</h1>
-  <p class="intro">The same society as the population page, drawn with the real bodies from the Build page: the hard shell hull, the tail and the baby, floating at the design waterline. Mothers swim slowly, dock by electropermanent magnets, charge, print babies, and raise the babies in turns with other adults. A baby is printed folded, unfolds as the arm brings it out, and is born limp and wrinkled. Each baby is printed to its own shape, all close to the same size, and fills with air only as adults take turns raising it. Click any body to follow.</p>
+  <p class="intro">The same society as the population page, drawn with the real bodies from the Build page: the hard shell hull, the tail and the baby, floating at the design waterline. Mothers swim slowly, dock by electropermanent magnets, charge, print babies, and raise the babies in turns with other adults. A baby is printed folded, unfolds as the arm brings the baby out, and is born limp and wrinkled. Each baby is printed to a shape of the baby's own, all close to the same size, and fills with air only as adults take turns raising the baby. Each baby is printed from silicone drawn out of the mother's own belly, to a shape set by the mother's state at that moment, with part of the mother's memory written on the skin. Click any body to follow.</p>
   <div class="pond" id="pond">
     <canvas id="gl" aria-label="Mother, tail and baby robots on a water surface"></canvas>
     <div class="hud" id="hud"></div>
@@ -67,9 +80,20 @@ h1 { font: 300 clamp(40px, 6vw, 72px)/1 "Cormorant Garamond", Georgia, serif; ma
   <ul class="acts">
     <li><b>Dock</b>Two bodies meet at a port, line up, click together, and a small light shows the magnets on. Then they move as one. Undocking runs the other way.</li>
     <li><b>Charge</b>A mother low on energy docks to another mother or to a charging buoy. The warm fill in the tail rises as energy flows.</li>
-    <li><b>Print</b>The tail opens the way, the arm rides in through the opening and the needle traces a folded baby layer by layer. Then the arm brings the baby out. The baby is born limp and wrinkled, every one printed to its own shape and close to the same size.</li>
+    <li><b>Print</b>The tail opens the way, the arm rides in through the opening and the needle traces a folded baby layer by layer, with silicone drawn from the clear belly at the front of the mother. Then the arm brings the baby out. The baby is born limp and wrinkled, every one printed to a shape of that baby's own and close to the same size.</li>
     <li><b>Raise</b>Babies dock to the mother and to other adults in turns, take memory from each and fill with air. A baby full of air leaves the pond.</li>
   </ul>
+  <section class="cost" id="cost">
+    <h2>What a birth takes from the mother</h2>
+    <ol>
+      <li><b>Made from the mother's body.</b> Every baby is printed from silicone that leaves the clear belly in the mother's hull, so each birth lowers the level in the belly, the lighter mother rides higher in the water, and a mother whose belly can no longer supply one whole baby gives birth no more.</li>
+      <li><b>Shaped by the mother's state at that moment.</b> The print is not a fixed file but is written at the moment of printing from the mother's energy, the water temperature, recent contacts and the recent swim path, so the same mother prints different children at different times, as in the maternal effect of biology, where the condition of a mother shapes the offspring beyond the genes (Mousseau and Fox 1998).</li>
+      <li><b>Carrying part of the mother's memory on the skin.</b> One patch of each baby's skin is printed with a pattern that spells the mother's name and the strongest memory of the mother, so the page can read the skin of any baby and say which mother printed that baby.</li>
+    </ol>
+    <p>How the skin is written: on a band of skin near the valve the print path is laid in 28 small patches of parallel lines, where lines leaning one way are a 1, lines leaning the other way are a 0, and a short break in the path keeps the patches apart. The first patch is printed at double spacing to mark where reading starts, then 8 bits name the mother, 15 bits name up to three words of the mother's strongest memory and 4 bits check the whole, while all the other skin keeps the plain path, left for the baby's own growth.</p>
+    <p id="mapText">How the state becomes the print: energy sets the length (365 to 405 mm) and the crest radius (100 to 110 mm); the water temperature, on a daily cycle from 15 to 23 °C, sets the twist (22 to 38 degrees per story) and the skin (1.7 mm in cold water down to 1.3 mm in warm water, where the silicone runs thinner); contacts in the last two minutes set the number of stories (5 to 9); and the turning of the last minute of swimming bends the body by up to 14 degrees toward the same side. The belly holds 3.6 L of silicone. Each baby takes the skin area times the skin thickness, scaled so that the design baby of the Build page takes the planned 0.64 L, so about six births empty the belly; the mother rises by the lost mass divided by the density of water and the waterplane area of hull and tail, about 6 mm from full to empty with the tail docked, read on the orange load line and the draft ticks at the bow every 2.5 mm.</p>
+    <p class="ref">Mousseau, T. A., and C. W. Fox. 1998. The adaptive significance of maternal effects. <i>Trends in Ecology and Evolution</i> 13 (10): 403 to 407. <a href="https://doi.org/10.1016/S0169-5347(98)01472-4">doi.org/10.1016/S0169-5347(98)01472-4</a></p>
+  </section>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>
@@ -89,6 +113,12 @@ const POND = { x0: -7.5, x1: 7.5, y0: -4.6, y1: 4.6 };
 const CLUSTER = { x: -5.0, y: 2.7 };
 const CHARGERS = [[5.2, 2.6], [0.6, -3.4]];
 const MOTHERS = 12, BABY_CAP = 32, PRINT_CAP = 3;
+/* the belly: silicone stored in the mother, semi axes along x, y, z in m (about 3.6 L, five or six babies) */
+const V_DESIGN = 0.64e-3;   // m3 of silicone in one baby of the design fold (build/data/physics.json, swelling: printing)
+const BELLY = { c: [0.2, 0, 0.02], a: 0.08, b: 0.12, h: 0.09 };
+BELLY.cap = (4 / 3) * Math.PI * BELLY.a * BELLY.b * BELLY.h;   // m3
+const RHO_W = 1000, RHO_SI = 1070;   // fresh water; Dragon Skin 10 NV, specific gravity 1.07
+const DAY = 480;                     // one simulated day of water temperature, in sim seconds
 let SC = null;
 
 /* ---------------- water: the same three wave sum in JS and GLSL, small and slow ---------------- */
@@ -151,9 +181,41 @@ function buildWater() {
 
 /* ---------------- materials: white clay, with water tint below the line, an energy fill and a dead state ---------------- */
 const LIGHT_GLSL = "vec3 shade(vec3 base, vec3 n){ float hemi = 0.5 + 0.5 * n.y; vec3 amb = mix(vec3(0.10, 0.11, 0.13), vec3(0.78), hemi); float d = max(dot(n, normalize(vec3(-0.45, 0.78, 0.45))), 0.0) * 0.72 + max(dot(n, normalize(vec3(0.6, 0.3, -0.55))), 0.0) * 0.22; return base * (amb * 0.8 + d * vec3(1.0, 0.98, 0.95)); }\n";
+/* memory on the skin: a band near the valve, 4 rows by 7 columns of small patches of parallel print lines.
+   A patch leaning along x + y is a 1, along x - y is a 0, a break of plain skin keeps patches apart, the first patch has double spacing. */
+const SKIN = { cells: 28, rows: 4, cols: 7, u0: 0.1, u1: 0.46, A: 0.85, pitch: 0.007, gap: 0.14 };
+const f3 = (x) => x.toFixed(4);
+const SKIN_GLSL = `float skinLine(vec3 p, out float inBand){
+  inBand = 0.0;
+  float L = uSk.x, R = uSk.y, u = p.x / L + 0.5;
+  float yy = p.y - 0.5 * uSk.z * (p.x * p.x - 0.25 * L * L);
+  float ang = atan(p.z, yy), a0 = 1.5708 - ${f3(SKIN.A)}, a1 = 1.5708 + ${f3(SKIN.A)};
+  if (u < ${f3(SKIN.u0)} || u > ${f3(SKIN.u1)} || ang < a0 || ang > a1) return 0.0;
+  inBand = 1.0;
+  float fr = (u - ${f3(SKIN.u0)}) / ${f3(SKIN.u1 - SKIN.u0)} * ${SKIN.rows}.0, fc = (ang - a0) / (a1 - a0) * ${SKIN.cols}.0;
+  vec2 q = vec2(fract(fr), fract(fc));
+  if (q.x < ${f3(SKIN.gap)} || q.x > ${f3(1 - SKIN.gap)} || q.y < ${f3(SKIN.gap)} || q.y > ${f3(1 - SKIN.gap)}) return 0.0;
+  int k = int(floor(fr)) * ${SKIN.cols} + int(floor(fc));
+  float bit = 0.0; for (int i = 0; i < ${SKIN.cells}; i++) { if (i == k) bit = uBits[i]; }
+  float pitch = (k == 0 ? 2.0 : 1.0) * ${f3(SKIN.pitch)};
+  float s = bit > 0.5 ? p.x + ang * R : p.x - ang * R;
+  float st = abs(fract(s / (pitch * 1.41421)) - 0.5) * 2.0;
+  return smoothstep(0.5, 0.8, st);
+}
+`;
+/* the same pattern in JS: what the skin shows at body length x and angle ang (top of the body is ang = pi/2) */
+function skinAt(bits, L, R, x, ang) {
+  const u = x / L + 0.5, a0 = PI / 2 - SKIN.A, a1 = PI / 2 + SKIN.A;
+  if (u < SKIN.u0 || u > SKIN.u1 || ang < a0 || ang > a1) return 0;
+  const fr = (u - SKIN.u0) / (SKIN.u1 - SKIN.u0) * SKIN.rows, fc = (ang - a0) / (a1 - a0) * SKIN.cols, qx = fr % 1, qy = fc % 1, g = SKIN.gap;
+  if (qx < g || qx > 1 - g || qy < g || qy > 1 - g) return 0;
+  const k = Math.floor(fr) * SKIN.cols + Math.floor(fc), pitch = (k === 0 ? 2 : 1) * SKIN.pitch;
+  const s = bits[k] > 0.5 ? x + ang * R : x - ang * R, f = s / (pitch * Math.SQRT2), st = Math.abs(f - Math.floor(f) - 0.5) * 2;
+  return ss((st - 0.5) / 0.3);
+}
 function bodyMat(kind, o = {}) {
   const base = { clay: 0xf1efe9, shell: 0xf4f2ec, dark: 0x8e939a, silicone: 0xf0e7d6 }[kind];
-  const u = { uColor: { value: new THREE.Color(base).convertSRGBToLinear() }, uDead: { value: 0 }, uFillZ: { value: -9 }, uFillOn: { value: o.fill ? 1 : 0 }, uA0: { value: o.a0 ?? 1 }, uA1: { value: o.a1 ?? 0 }, uFlat: { value: o.flat ? 1 : 0 }, uPr: { value: new THREE.Vector4(0, 0, 1, 0) }, uTime: UT };
+  const u = { uColor: { value: new THREE.Color(base).convertSRGBToLinear() }, uDead: { value: 0 }, uFillZ: { value: -9 }, uFillOn: { value: o.fill ? 1 : 0 }, uA0: { value: o.a0 ?? 1 }, uA1: { value: o.a1 ?? 0 }, uFlat: { value: o.flat ? 1 : 0 }, uPr: { value: new THREE.Vector4(0, 0, 1, 0) }, uSk: { value: new THREE.Vector4(1, 0.1, 0, 0) }, uBits: { value: new Float32Array(SKIN.cells) }, uMark: { value: new THREE.Vector3(0, 0.005, 0) }, uTime: UT };
   const m = new THREE.ShaderMaterial({ uniforms: u, side: o.side || THREE.FrontSide, clipping: true,
     vertexShader: `#include <common>
 #include <clipping_planes_pars_vertex>
@@ -170,8 +232,9 @@ varying vec3 vN; varying vec3 vW; varying vec3 vL; varying vec3 vC; varying floa
     fragmentShader: `#include <common>
 #include <clipping_planes_pars_fragment>
 uniform vec4 uPr; uniform vec3 uColor; uniform float uDead; uniform float uFillZ; uniform float uFillOn; uniform float uA0; uniform float uA1; uniform float uFlat;
+uniform vec4 uSk; uniform float uBits[${SKIN.cells}]; uniform vec3 uMark;
 varying vec3 vN; varying vec3 vW; varying vec3 vL; varying vec3 vC; varying float vDW;
-` + LIGHT_GLSL + `void main(){
+` + LIGHT_GLSL + SKIN_GLSL + `void main(){
 #include <clipping_planes_fragment>
   vec3 n = uFlat > 0.5 ? normalize(cross(dFdx(vW), dFdy(vW))) : normalize(vN);
   vec3 v = normalize(cameraPosition - vW);
@@ -179,7 +242,15 @@ varying vec3 vN; varying vec3 vW; varying vec3 vL; varying vec3 vC; varying floa
   vec3 col = shade(uColor * vC, n);
   float fr = pow(1.0 - abs(dot(n, v)), 2.4);
   float a = clamp(uA0 + uA1 * fr, 0.0, 1.0);
-  if (uPr.w > 0.0) {   // print texture: faint toolpath lines, each body its own direction, pitch and strength
+  float inB = 0.0, ln = 0.0;
+  if (uSk.w > 0.5) ln = skinLine(vL, inB);
+  if (inB > 0.5) { col *= 0.95; col = mix(col, col * vec3(0.52, 0.47, 0.43), ln * 0.85); }
+  if (uMark.z > 0.5) {   // the load line at the full belly waterline, with draft ticks every 2.5 mm below it at the bow
+    float m = 1.0 - smoothstep(0.0008, 0.0016, abs(vL.z - uMark.x));
+    for (int i = 1; i <= 4; i++) { float zk = uMark.x - uMark.y * float(i); float x0 = (i == 2 || i == 4) ? 0.1 : 0.17; m = max(m, (1.0 - smoothstep(0.0004, 0.0009, abs(vL.z - zk))) * step(x0, vL.x) * step(vL.x, 0.31)); }
+    col = mix(col, vec3(0.86, 0.42, 0.26), m * 0.92); a = max(a, m * 0.95);
+  }
+  if (uPr.w > 0.0 && inB < 0.5) {   // print texture: faint toolpath lines, each body its own direction, pitch and strength
     float ang = atan(vL.z, vL.y), arc = ang * 0.2;
     float sc = uPr.x < 0.5 ? vL.x : uPr.x < 1.5 ? vL.x * cos(uPr.y) + arc * sin(uPr.y) : arc + 0.04 * sin(vL.x * 9.0 + uPr.y);
     float ridge = pow(1.0 - abs(fract(sc / uPr.z) - 0.5) * 2.0, 5.0);
@@ -225,20 +296,22 @@ const Tm = (x, y, z) => new THREE.Matrix4().makeTranslation(x, y, z);
 function prim(g, M) { g.applyMatrix4(M); g.deleteAttribute("uv"); return g; }
 /* the baby: a spindle printed with oblique Kresling style twist pleats; folds flat to 54 mm, grows only in length to 385 mm */
 const BABY = { m: 9, n: 7, R: 0.105 };
-function babyPositions(L, f, arr) {
-  const { m, n, R } = BABY, rings = 2 * n + 1; let q = 0;
-  const valley = lerp(0.56, 0.86, ss(f)), twist = (PI / m) * (0.3 + 0.7 * (1 - f));
+/* kp: the Kresling parameters of one baby (stories n, twist tw in degrees per story, crest radius R, deployed length L, skin t in mm, bend in degrees) */
+const kpDefault = () => ({ m: BABY.m, n: BABY.n, R: BABY.R, tw: 20, L: K.Ldep, t: 1.5, bend: 0 });
+function babyPositions(L, f, arr, kp = kpDefault()) {
+  const { m, n, R } = kp, rings = 2 * n + 1; let q = 0;
+  const valley = lerp(0.56, 0.86, ss(f)), twist = kp.tw * D2R * (0.3 + 0.7 * (1 - f)), kap = (kp.bend * D2R / Math.max(L, 1e-3)) * f;
   for (let k = 0; k <= rings + 1; k++) {
-    const u = k / (rings + 1), x = u * L - L / 2;
+    const u = k / (rings + 1), x = u * L - L / 2, dy = 0.5 * kap * (x * x - 0.25 * L * L);
     let env = Math.pow(Math.max(0, 1 - Math.pow(2 * u - 1, 2)), 0.62 - 0.22 * f);
     if (k === 0 || k === rings + 1) env = 0;
     const r = R * env * (k % 2 === 0 && k > 0 && k <= rings ? valley : 1), rot = k * twist;
-    for (let j = 0; j < m; j++) { const t = rot + (j * TAU) / m; arr[q++] = x; arr[q++] = r * Math.cos(t); arr[q++] = r * Math.sin(t); }
+    for (let j = 0; j < m; j++) { const t = rot + (j * TAU) / m; arr[q++] = x; arr[q++] = r * Math.cos(t) + dy; arr[q++] = r * Math.sin(t); }
   }
   return arr;
 }
-function babyGeometry(L, f) {
-  const { m, n } = BABY, rings = 2 * n + 1, pos = babyPositions(L, f, new Float32Array((rings + 2) * m * 3)), idx = [];
+function babyGeometry(L, f, kp = kpDefault()) {
+  const { m, n } = kp, rings = 2 * n + 1, pos = babyPositions(L, f, new Float32Array((rings + 2) * m * 3), kp), idx = [];
   for (let k = 0; k <= rings; k++) for (let j = 0; j < m; j++) { const a = k * m + j, b = k * m + ((j + 1) % m), c = (k + 1) * m + j, d = (k + 1) * m + ((j + 1) % m); idx.push(a, d, b, a, c, d); }
   const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); g.computeBoundingSphere(); return g;
 }
@@ -246,24 +319,27 @@ function babyGeometry(L, f) {
    f is inflation: 0 is limp and wrinkled, waiting for air; 1 is full and smooth. */
 const WB = { m: 36, n: 30 };
 const BORN = { L: 0.72, R: 0.25 };   // a baby is about the size of a mother; individuals differ in shape, not much in size
-function shapeOf(g) {
-  // size stays close (length within 5%, width within 6%); the form is what differs
+function shapeOf(g, kp = kpDefault()) {
+  // the genome gives the form; the print parameters of that moment (kp, from the mother's state) give size, stories, twist, skin and bend.
+  // size stays close: length and girth within 5% of the design
   const h = (i, a) => (g[i] * 7.31 + a) % 1;
-  return { L: BORN.L * (0.95 + 0.1 * g[0]), R: BORN.R * (0.94 + 0.12 * g[1]), k: 2 + Math.floor(h(2, 0.1) * 3.99), ph: g[3] * TAU, lobe: 0.06 + 0.2 * h(4, 0.3),
-    p: 0.32 + 0.66 * h(0, 0.5), tex: Math.floor(h(0, 0.37) * 2.999), tang: (h(3, 0.81) - 0.5) * 1.4, pitch: 0.004 + 0.007 * h(1, 0.23), tamt: 0.35 + 0.45 * h(4, 0.64), bulge: (h(1, 0.7) - 0.5) * 1.0, waist: Math.max(0, h(3, 0.2) - 0.45) * 0.75, ell: 0.68 + 0.32 * h(2, 0.6), tw: (h(4, 0.9) - 0.5) * 2.4, seed: rnd() * 100 };
+  return { L: BORN.L * kp.L / K.Ldep, R: BORN.R * kp.R / K.Rb, k: 2 + Math.floor(h(2, 0.1) * 3.99), ph: g[3] * TAU, lobe: 0.05 + 0.14 * h(4, 0.3),
+    p: 0.32 + 0.66 * h(0, 0.5), tex: Math.floor(h(0, 0.37) * 2.999), tang: (h(3, 0.81) - 0.5) * 1.4, pitch: 0.003 + 0.0045 * kp.t, tamt: 0.35 + 0.45 * h(4, 0.64), bulge: (h(1, 0.7) - 0.5) * 0.8, waist: Math.max(0, h(3, 0.2) - 0.45) * 0.6, ell: 0.68 + 0.32 * h(2, 0.6),
+    tw: (kp.tw - 30) / 8 * 1.1, n: kp.n, twk: kp.tw / 30, rib: 0.03 + 0.03 * (kp.t - 1.3) / 0.4, bend: kp.bend * D2R, seed: rnd() * 100 };
 }
 function wrinklePositions(sh, f, L, arr) {
-  const { m, n } = WB; let q = 0; const w = 1 - f, squash = lerp(0.42, 1, ss(f)), shrink = lerp(0.86, 1, ss(f));
+  const { m, n } = WB; let q = 0; const w = 1 - f, squash = lerp(0.42, 1, ss(f)), shrink = lerp(0.86, 1, ss(f)), kap = sh.bend / L;
   for (let k = 0; k <= n + 1; k++) {
-    const u = k / (n + 1), x = u * L - L / 2, uu = clamp(u - sh.bulge * u * (1 - u) * 2, 0, 1);
+    const u = k / (n + 1), x = u * L - L / 2, uu = clamp(u - sh.bulge * u * (1 - u) * 2, 0, 1), dy = 0.5 * kap * (x * x - 0.25 * L * L);
     let env = Math.pow(Math.max(0, 1 - Math.pow(2 * uu - 1, 2)), sh.p) * (1 - sh.waist * Math.exp(-Math.pow((u - 0.5) / 0.13, 2)));
     if (k === 0 || k === n + 1) env = 0;
     for (let j = 0; j < m; j++) {
       const t = (j * TAU) / m + sh.tw * u;
       const lobes = 1 + sh.lobe * Math.cos(sh.k * t + sh.ph);
       const crease = Math.sin(t * 7 + u * 26 + sh.seed) * 0.6 + Math.sin(t * 4 - u * 15 + sh.seed * 1.7) * 0.4;
-      const r = sh.R * env * lobes * shrink * (1 + w * 0.17 * crease);
-      arr[q++] = x; arr[q++] = r * Math.cos(t); arr[q++] = r * Math.sin(t) * squash * sh.ell;
+      const story = 1 - sh.rib * (1 - 0.55 * f) * Math.pow(0.5 + 0.5 * Math.cos(TAU * u * sh.n + t * sh.twk), 3);   // one soft ring per printed story, leaning with the twist
+      const r = sh.R * env * lobes * shrink * story * (1 + w * 0.17 * crease);
+      arr[q++] = x; arr[q++] = r * Math.cos(t) + dy; arr[q++] = r * Math.sin(t) * squash * sh.ell;
     }
   }
   return arr;
@@ -275,7 +351,8 @@ function wrinkleGeometry(sh, f, L) {
 }
 function setWrinkle(g, sh, f, L) { wrinklePositions(sh, f, L, g.attributes.position.array); g.attributes.position.needsUpdate = true; g.computeVertexNormals(); g.computeBoundingSphere(); }
 function setPrintTex(mat, sh) { mat.userData.u.uPr.value.set(sh.tex, sh.tang, sh.pitch, sh.tamt); }
-function setInflation(b, f) { setPrintTex(b.fillMat, b.sh); b.inf = clamp(f, 0, 1); b.infShown = b.inf; setWrinkle(b.mesh.geometry, b.sh, b.inf, b.L); }
+function setSkin(mat, skin, sh, L) { const u = mat.userData.u; if (!skin) { u.uSk.value.w = 0; return; } u.uBits.value.set(skin.bits); u.uSk.value.set(L, sh.R, sh.bend / L, 1); }
+function setInflation(b, f) { setPrintTex(b.fillMat, b.sh); setSkin(b.fillMat, b.skin, b.sh, b.L); b.inf = clamp(f, 0, 1); b.infShown = b.inf; setWrinkle(b.mesh.geometry, b.sh, b.inf, b.L); }
 function setBabyLen(g, L) { babyPositions(L, (L - K.Lfold) / (K.Ldep - K.Lfold), g.attributes.position.array); g.attributes.position.needsUpdate = true; g.computeVertexNormals(); g.computeBoundingSphere(); }
 /* vertex clustering: snap to a grid, merge, drop collapsed triangles. Keeps a dozen mothers light enough to run in a browser without a GPU. */
 function decimate(geo, cell) {
@@ -318,7 +395,7 @@ async function loadModel() {
   K.WL = SC.waterZ ?? K.WL; K.dockX = SC.dockX ?? K.dockX; K.bed = SC.printMin ? SC.printMin[2] : K.bed;
   const bin = Uint8Array.from(atob(b64.trim()), (c) => c.charCodeAt(0));
   const gltf = await new Promise((res, rej) => new THREE.GLTFLoader().parse(bin.buffer, "", res, rej));
-  const src = {}; gltf.scene.traverse((o) => { if (o.isMesh) { const nm = o.name.replace(/\.\d+$/, ""); let g = o.geometry; g.deleteAttribute("uv"); if (nm === "W_B0_Skin") { HW = g.attributes.position.array.slice(); src.W_FrontCap = capFront(g); } const cell = CELL[nm] || (nm.startsWith("A_") ? 0.009 : 0); if (cell) g = decimate(g, cell); else g.computeVertexNormals(); src[nm] = g; } });
+  const src = {}; gltf.scene.traverse((o) => { if (o.isMesh) { const nm = o.name.replace(/\.\d+$/, ""); let g = o.geometry; g.deleteAttribute("uv"); if (nm === "W_B0_Skin") { HW = g.attributes.position.array.slice(); src.W_FrontCap = capFront(g); } if (nm === "W_T1_TailShell") TAILP = g.attributes.position.array.slice(); const cell = CELL[nm] || (nm.startsWith("A_") ? 0.009 : 0); if (cell) g = decimate(g, cell); else g.computeVertexNormals(); src[nm] = g; } });
   // ports on the hull: the plain opening with three magnets at the rear; flank pads for charging (widest line) and for babies (lower, 55 mm above water)
   const wc = halfWidth(-0.05, 0.0) + 0.006, wb = halfWidth(0.1, -0.09) + 0.006;
   Object.assign(PORTS, { wc, wb });
@@ -343,6 +420,18 @@ async function loadModel() {
   G.charger = mergeGeos(cp);
   const cap = G.capsule.clone().applyMatrix4(Tm(-K.Ldep / 2 + 0.035, 0, 0)); G.babyDep = mergeGeos([babyGeometry(K.Ldep, 1), { g: cap, c: 0.6 }]);
   G.lamp = new THREE.SphereGeometry(0.05, 16, 10);
+  // waterplane areas at the design waterline, from the skins, for the buoyancy of a mother that grows lighter
+  WP.hull = waterplane(HW, K.WL); WP.tail = TAILP ? waterplane(TAILP, K.WL) : 0;
+  // the belly: a clear ellipsoid at the front of the hull, feeding the print through a line to the rear opening
+  G.belly = new THREE.SphereGeometry(1, 32, 20); G.bellyTop = new THREE.CircleGeometry(1, 40);
+  G.feed = new THREE.TubeGeometry(new THREE.CatmullRomCurve3([[BELLY.c[0] - 0.02, 0.05, BELLY.c[2] - BELLY.h * 0.9], [0.02, 0.19, -0.06], [-0.2, 0.21, -0.03], [-0.33, 0.13, 0.0]].map((p) => new THREE.Vector3(...p))), 40, 0.006, 8, false);
+  G.feed.deleteAttribute("uv");
+}
+let TAILP = null; const WP = { hull: 0.42, tail: 0 };
+function waterplane(P, z) {   // the same half width search as halfWidth(), stepped along the length every 10 mm
+  let x0 = 1e9, x1 = -1e9; for (let i = 0; i < P.length; i += 3) if (Math.abs(P[i + 2] - z) < 0.03) { x0 = Math.min(x0, P[i]); x1 = Math.max(x1, P[i]); }
+  let A = 0; for (let x = x0; x <= x1; x += 0.01) { let w = 0; for (let i = 0; i < P.length; i += 3) if (Math.abs(P[i] - x) < 0.02 && Math.abs(P[i + 2] - z) < 0.03) w = Math.max(w, Math.abs(P[i + 1])); A += 2 * w * 0.01; }
+  return A;
 }
 
 /* ---------------- DexArm kinematics, ported from the simulator page ---------------- */
@@ -406,6 +495,7 @@ function glowSprite() {
 /* ---------------- bodies ---------------- */
 const SEED = ["slow tide", "three pulses", "an open ring", "light above", "the low pump"];
 const LEX = ["salt", "current", "fold", "glass", "echo", "shadow", "warmth", "valve", "pressure", "silt", "hum", "drift"];
+let FIXCAM = false;   // set by the test hook that places the camera by hand
 let bodies = [], nextM = 1, nextB = 1, nextT = 1, simT = 0, speed = 1, running = true, FOLLOW = null, CAMFLY = null, EVENTS = [];
 const P = { inh: 0.7, drift: 0.12, rel: 2 };
 function event(msg) { EVENTS.push({ t: simT, msg }); if (EVENTS.length > 3) EVENTS.shift(); renderEvents(); }
@@ -419,7 +509,7 @@ function portsOf(b) {
   const o = {}; for (let i = 0; i < 2; i++) { const a = (90 + 180 * i) * D2R; o["p" + i] = { x: 0.376 * Math.cos(a), y: 0.376 * Math.sin(a), n: a, z: 0.145 }; } return o;
 }
 const CIRC = { hull: [[0.02, 0, 0.37]], tail: [[-0.18, 0, 0.235], [-0.45, 0, 0.2]], baby: [[-0.1, 0, 0.1], [0.1, 0, 0.1]], charger: [[0, 0, 0.39]] };
-function giveShape(b, genome, inf) { b.sh = shapeOf(genome); b.L = b.sh.L; b.cap.position.x = -b.L / 2 + 0.035; setInflation(b, inf); }
+function giveShape(b, genome, inf, kp) { b.sh = shapeOf(genome, kp); b.kp = kp; b.L = b.sh.L; b.cap.position.x = -b.L / 2 + 0.035; setInflation(b, inf); }
 function newGenome() { return Array.from({ length: 5 }, () => rnd()); }
 function makeBody(kind, x, y, th) {
   const b = { kind, x, y, th, v: 0, w: 0, parent: null, rel: null, docks: {}, reserved: {}, children: [], alive: true, dead: 0, cluster: false, energy: 1, age: 0, task: null, hold: 0, ph: rnd() * TAU, near: new Map(), relN: 0, wander: null, think: rnd() };
@@ -431,6 +521,14 @@ function makeBody(kind, x, y, th) {
     b.bl.position.y = -K.WL;
     b.hullMesh = add(G.hullClay, bodyMat("clay", { vc: true }));
     b.shell = add(G.skin, bodyMat("shell", { a0: 0.36, a1: 0.55, vc: true }), 6);
+    // the belly: clear wall, silicone inside up to the level, a surface at the level, and the feed line to the rear opening
+    b.bellyClip = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+    const bw = add(G.belly, bodyMat("shell", { a0: 0.1, a1: 0.5, side: THREE.DoubleSide }), 5); bw.scale.set(BELLY.a + 0.004, BELLY.b + 0.004, BELLY.h + 0.004); bw.position.set(...BELLY.c);
+    const fillM = bodyMat("silicone", { a0: 0.78, a1: 0.2, side: THREE.DoubleSide, clip: [b.bellyClip] }); fillM.userData.u.uColor.value.set(0xe9cfa4).convertSRGBToLinear();
+    b.bellyFill = add(G.belly, fillM, 4); b.bellyFill.scale.set(BELLY.a, BELLY.b, BELLY.h); b.bellyFill.position.set(...BELLY.c);
+    const topM = bodyMat("silicone", { a0: 0.85, a1: 0.1, side: THREE.DoubleSide }); topM.userData.u.uColor.value.set(0xf2dcb4).convertSRGBToLinear();
+    b.bellyTop = add(G.bellyTop, topM, 4);
+    add(G.feed, bodyMat("silicone", { vc: false }), 4);
     b.name = "M" + nextM++;
   } else if (kind === "tail") {
     b.bl.position.y = -K.WL;
@@ -453,7 +551,9 @@ function makeMother(x, y, th, withTail = true, gen = 0, mom = null) {
   const gen0 = mom ? inherit(mom).genome : newGenome();
   const sy = 0.9 + 0.2 * gen0[2], sz = 0.88 + 0.24 * gen0[3];   // width and height differ a little; length and ports stay
   h.hullMesh.scale.set(1, sy, sz); h.shell.scale.set(1, sy, sz);
-  Object.assign(h, { genome: gen0, memory: SEED.map((t) => ({ t, w: 0.5 + 0.5 * rnd(), src: "seed" })), gen, mom, life: 520 + 260 * rnd(), energy: 0.55 + 0.4 * rnd(), babies: 0 });
+  h.shell.material.userData.u.uMark.value.set(K.WL / sz, 0.0025 / sz, 1);   // the load line sits at the water when the belly is full
+  Object.assign(h, { genome: gen0, memory: SEED.map((t) => ({ t, w: 0.5 + 0.5 * rnd(), src: "seed" })), gen, mom, life: 520 + 260 * rnd(), energy: 0.55 + 0.4 * rnd(), babies: 0,
+    sy, belly: BELLY.cap, rise: 0, touches: [], touchT: new Map(), path: [], pathT: 0, births: [] });
   if (withTail) { const t = makeBody("tail", x, y, th); t.energy = 0; attach(t, "front", h, "rear", true); }
   return h;
 }
@@ -470,7 +570,7 @@ function attach(A, pa, B, pb, silent) {
   A.parent = B; A.rel = { x: c * dx - s * dy, y: s * dx + c * dy, th: wrapA(T.th - B.th), off: 0 }; A.myPort = pa; A.theirPort = pb;
   B.children.push(A); A.docks[pa] = B; B.docks[pb] = A; delete B.reserved[pb];
   Object.assign(A, { x: T.x, y: T.y, th: T.th, v: 0, w: 0 });
-  if (!silent) { glowAt(B, pb, 1); }
+  if (!silent) { glowAt(B, pb, 1); touch(A, B); touch(B, A); }
   else glowAt(B, pb, 0.35);
 }
 function detach(A, silent) {
@@ -493,7 +593,8 @@ function updatePoses() {
   const place = (b, Mp) => {
     if (Mp) {
       const off = b.rel.off || 0, pn = portsOf(b.parent)[b.theirPort].n;   // off: the tail backs off along the port normal during a birth
-      b.obj.matrix.copy(Mp).multiply(Tm(b.rel.x + Math.cos(pn) * off, 0, -(b.rel.y + Math.sin(pn) * off))).multiply(R.makeRotationY(b.rel.th));
+      const dr = b.kind === "hull" ? (b.rise || 0) - (b.parent.rise || 0) : 0;   // a docked hull keeps its own float height; a tail rides with its hull
+      b.obj.matrix.copy(Mp).multiply(Tm(b.rel.x + Math.cos(pn) * off, dr, -(b.rel.y + Math.sin(pn) * off))).multiply(R.makeRotationY(b.rel.th));
       const pc = Math.cos(b.parent.th), ps = Math.sin(b.parent.th), rx = b.rel.x + Math.cos(pn) * off, ry = b.rel.y + Math.sin(pn) * off;
       b.x = b.parent.x + pc * rx - ps * ry; b.y = b.parent.y + ps * rx + pc * ry; b.th = wrapA(b.parent.th + b.rel.th);
     } else {
@@ -501,7 +602,7 @@ function updatePoses() {
       const h = eta(b.x, b.y, simT) * amp * 0.9 + Math.sin(simT * 0.9 + b.ph) * 0.004 * amp;
       const pitch = (Math.sin(simT * 0.71 + b.ph) * 1.2 + (eta(b.x + 0.4 * Math.cos(b.th), b.y + 0.4 * Math.sin(b.th), simT) - eta(b.x, b.y, simT)) * 60) * D2R * amp;
       const roll = Math.sin(simT * 0.57 + b.ph * 1.7) * 1.1 * D2R * amp;
-      b.obj.matrix.makeTranslation(b.x, h + (b.sink || 0), -b.y).multiply(R.makeRotationY(b.th)).multiply(M.makeRotationX(roll)).multiply(new THREE.Matrix4().makeRotationZ(pitch));
+      b.obj.matrix.makeTranslation(b.x, h + (b.sink || 0) + (b.rise || 0), -b.y).multiply(R.makeRotationY(b.th)).multiply(M.makeRotationX(roll)).multiply(new THREE.Matrix4().makeRotationZ(pitch));
     }
     b.obj.matrixWorldNeedsUpdate = true;
     for (const c of b.children) place(c, b.obj.matrix);
@@ -520,6 +621,62 @@ function inherit(m) {
 }
 const mothers = () => bodies.filter((b) => b.kind === "hull" && b.alive);
 const tailOf = (h) => h.docks.rear && h.docks.rear.kind === "tail" ? h.docks.rear : null;
+
+/* ---------------- 1. made from the mother's body: belly volume, mass and waterline ---------------- */
+function meshArea(g) { const P = g.attributes.position.array, I = g.index.array, a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3(); let A = 0; for (let t = 0; t < I.length; t += 3) { a.fromArray(P, 3 * I[t]); b.fromArray(P, 3 * I[t + 1]).sub(a); c.fromArray(P, 3 * I[t + 2]).sub(a); A += b.cross(c).length() / 2; } return A; }
+function skinArea(kp) { const g = babyGeometry(kp.L, 1, kp), A = meshArea(g); g.dispose(); return A; }
+let A_DESIGN = 0;
+function printVolume(kp) { if (!A_DESIGN) A_DESIGN = skinArea(kpDefault()); return V_DESIGN * (skinArea(kp) / A_DESIGN) * (kp.t / 1.5); }   // m3: skin area times skin thickness, scaled to the design baby
+function bellyFrac(s) { return (3 * s - s * s * s + 2) / 4; }   // share of the ellipsoid below height s, s from -1 to 1
+function bellyLevel(V) { let lo = -1, hi = 1; const f = clamp(V / BELLY.cap, 0, 1); for (let i = 0; i < 30; i++) { const m = (lo + hi) / 2; if (bellyFrac(m) < f) lo = m; else hi = m; } return (lo + hi) / 2; }
+function riseOf(h) {   // lighter by the silicone used; the rise is the lost mass over water density and waterplane area (hull, plus tail when docked)
+  const dm = (BELLY.cap - h.belly) * RHO_SI, A = WP.hull * (h.sy || 1) + (tailOf(h) ? WP.tail : 0);
+  return dm / (RHO_W * A);
+}
+function drawBelly(h) {
+  const s = bellyLevel(h.belly), z = BELLY.c[2] + BELLY.h * s, k = Math.sqrt(Math.max(0, 1 - s * s));
+  h.bellyTop.scale.set(Math.max(1e-4, BELLY.a * k), Math.max(1e-4, BELLY.b * k), 1); h.bellyTop.position.set(BELLY.c[0], 0, z); h.bellyTop.visible = h.belly > 1e-6;
+  h.bellyClip.normal.set(0, 0, -1); h.bellyClip.constant = z;
+  const M = new THREE.Matrix4().multiplyMatrices(h.obj.matrix, h.bl.matrix); h.bellyClip.applyMatrix4(M);
+}
+
+/* ---------------- 2. maternal effect: the print is written from the mother's state at that moment ---------------- */
+function waterT(t) { return 19 - 4 * Math.cos(TAU * t / DAY); }   // 15 °C at the start of each day, 23 °C half a day later
+function touch(h, o) { if (!h || h.kind !== "hull" || !h.touches) return; const k = o.name; if (simT - (h.touchT.get(k) ?? -1e9) < 15) return; h.touchT.set(k, simT); h.touches.push(simT); if (h.touches.length > 40) h.touches.shift(); }
+function pathOf(h) { const p = h.path || []; let turn = 0, dist = 0; for (let i = 1; i < p.length; i++) { turn += wrapA(p[i][2] - p[i - 1][2]); dist += Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]); } return { turn: turn / D2R, dist }; }
+function momState(h) { const p = pathOf(h); return { e: clamp(h.energy, 0, 1), T: waterT(simT), c: (h.touches || []).filter((t) => simT - t < 120).length, turn: p.turn, dist: p.dist }; }
+function kresFrom(s) {   // documented on the page; every value is clamped to the safe range of the fold
+  const e = clamp((s.e - 0.7) / 0.3, 0, 1), w = clamp((s.T - 15) / 8, 0, 1);
+  return { m: BABY.m, n: 5 + Math.min(4, s.c), tw: 22 + 16 * w, L: K.Ldep * (0.948 + 0.104 * e), R: K.Rb * (0.952 + 0.095 * e), t: 1.7 - 0.4 * w, bend: clamp(s.turn * 0.08, -14, 14) };
+}
+const pathText = (s) => Math.abs(s.turn) < 15 ? `nearly straight, ${Math.round(s.dist * 100)} cm` : `turning ${s.turn > 0 ? "left" : "right"} ${Math.round(Math.abs(s.turn))}° over ${Math.round(s.dist * 100)} cm`;
+const stateText = (s) => `energy ${s.e.toFixed(2)}, water ${s.T.toFixed(1)}\u00a0°C, contacts ${s.c}, path ${pathText(s)}`;
+const kpText = (k, vol) => `${k.n} stories, twist ${Math.round(k.tw)}°, ${Math.round(k.L * 1000)} mm, crest R ${Math.round(k.R * 1000)} mm, skin ${k.t.toFixed(2)} mm, bend ${Math.abs(k.bend) < 0.5 ? "none" : Math.abs(k.bend).toFixed(1) + "° " + (k.bend > 0 ? "left" : "right")}${vol ? `, ${(vol * 1000).toFixed(2)} L` : ""}`;
+
+/* ---------------- 3. memory written on the skin ---------------- */
+const DICT = [...new Set([...SEED.join(" ").split(" "), ...LEX])];   // 24 words, 5 bits each; 31 means no word
+function strongest(h) { return h.memory.slice().sort((a, b) => b.w - a.w)[0]; }
+function encodeSkin(h) {
+  const id = (parseInt(h.name.slice(1), 10) || 0) % 256, m = strongest(h), words = m ? m.t.split(" ").slice(0, 3) : [];
+  const ix = [0, 1, 2].map((i) => (words[i] !== undefined && DICT.indexOf(words[i]) >= 0 ? DICT.indexOf(words[i]) : 31));
+  const chk = (id + 3 * ix[0] + 5 * ix[1] + 7 * ix[2]) % 16, bits = [1];
+  const put = (v, n) => { for (let i = n - 1; i >= 0; i--) bits.push((v >> i) & 1); };
+  put(id, 8); ix.forEach((v) => put(v, 5)); put(chk, 4);
+  return { bits, id, phrase: m ? m.t : "" };
+}
+function readSkin(b) {   // reads the pattern back from the skin itself: in each patch, the lines run where the skin does not change
+  const u = b.fillMat.userData.u, bits = u.uBits.value, L = u.uSk.value.x, R = u.uSk.value.y; if (u.uSk.value.w < 0.5) return null;
+  const out = [], a0 = PI / 2 - SKIN.A, du = (SKIN.u1 - SKIN.u0) / SKIN.rows, da = (2 * SKIN.A) / SKIN.cols; let startPitch = 0;
+  for (let k = 0; k < SKIN.cells; k++) {
+    const r = Math.floor(k / SKIN.cols), c = k % SKIN.cols, x0 = (SKIN.u0 + (r + 0.5) * du - 0.5) * L, ang0 = a0 + (c + 0.5) * da;
+    const vari = (dx, dy) => { const v = []; for (let i = -12; i <= 12; i++) { const s = i * 0.0011; v.push(skinAt(bits, L, R, x0 + dx * s, ang0 + (dy * s) / R)); } const mu = v.reduce((p, q) => p + q, 0) / v.length; return v.reduce((p, q) => p + (q - mu) ** 2, 0); };
+    out.push(vari(1, -1) < vari(1, 1) ? 1 : 0);   // lines along (1, -1) means the stripes follow x + y: a 1
+    if (k === 0) { let n = 0, prev = null; for (let i = -40; i <= 40; i++) { const on = skinAt(bits, L, R, x0 + i * 0.0005, ang0) > 0.5; if (prev !== null && on && !prev) n++; prev = on; } startPitch = n ? 0.04 / n : 0; }
+  }
+  const val = (i, n) => out.slice(i, i + n).reduce((p, q) => p * 2 + q, 0);
+  const id = val(1, 8), ix = [val(9, 5), val(14, 5), val(19, 5)], chk = val(24, 4), ok = out[0] === 1 && startPitch > 1.5 * SKIN.pitch * Math.SQRT2 && chk === (id + 3 * ix[0] + 5 * ix[1] + 7 * ix[2]) % 16;
+  return { from: "M" + id, words: ix.filter((i) => i < DICT.length).map((i) => DICT[i]), ok, startPitch };
+}
 
 /* ---------------- tasks ---------------- */
 function sideFree(B, side) { return !["c" + side, "b" + side].some((k) => B.docks[k] || B.reserved[k]); }
@@ -565,18 +722,20 @@ const TP = { open: 3, armIn: 5, print: 22, armOut: 3, carry: 4, out: 12, release
 const TP_END = Object.values(TP).reduce((a, b) => a + b, 0);
 function startPrint(h) {
   const t = tailOf(h); if (!t) return;
-  const kid = inherit(h); kid.sh = shapeOf(kid.genome);
-  h.print = { t: 0, tail: t, kid, rig: makeRig(h.bl), q: PASS_Q.slice(), phi: 0 };
+  const st = momState(h), kp = kresFrom(st), vol = printVolume(kp);
+  if (h.belly < vol) return;   // the belly cannot supply a whole baby: no birth
+  const kid = inherit(h); Object.assign(kid, { st, kp, vol, sh: shapeOf(kid.genome, kp), skin: encodeSkin(h) });
+  h.print = { t: 0, tail: t, kid, rig: makeRig(h.bl), q: PASS_Q.slice(), phi: 0, belly0: h.belly }; h.riseBefore = riseOf(h);
   t.boomMesh.visible = false;
   // folded baby standing on the bed, nose down, valve on top; revealed layer by layer
   const clipP = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0);
   const mat = bodyMat("silicone", { flat: true, side: THREE.DoubleSide, clip: [clipP] }); setPrintTex(mat, kid.sh);
-  const g = babyGeometry(K.Lfold, 0), m = new THREE.Mesh(g, mat); m.renderOrder = 3;
+  const g = babyGeometry(K.Lfold, 0, kp), m = new THREE.Mesh(g, mat); m.renderOrder = 3;
   const cap = new THREE.Mesh(G.capsule, bodyMat("clay", { clip: [clipP], vc: true }));
   const grp = new THREE.Group(); grp.add(m); grp.add(cap); h.bl.add(grp);
   h.print.baby = { grp, m, g, mat, cap, clipP, L: K.Lfold };
   h.hold = 1; h.energy -= 0.05;
-  event(`${h.name} is printing`);
+  event(`${h.name} is printing from the belly: ${kp.n} stories, twist ${Math.round(kp.tw)}°, ${(vol * 1000).toFixed(2)} L of silicone`);
 }
 const CAP0 = () => [K.cx, 0, K.bed + K.Lfold + 0.012], CAP1 = [-0.2, 0, 0.0];   // the valve on top of the folded print, then held near the opening on the axis
 function capPath(t) {   // where the needle holds the valve, in the hull frame
@@ -600,13 +759,14 @@ function stepPrint(h, dt) {
   else if ((u = seg("armIn")) !== null) { rig.boom = SC.stations.front * ss(u); rig.tilt = 180 * (1 - ss((u - 0.6) / 0.4)); rig.q = PASS_Q.map((q, i) => lerp(q, [0, 55 * D2R, 42 * D2R][i], ss((u - 0.6) / 0.4))); }
   else if ((u = seg("print")) !== null) {
     rig.boom = SC.stations.front; rig.tilt = 0;
-    const L = K.Lfold, zl = bedTop + L * u, k = u * (2 * BABY.n + 1), valley = k % 2 < 1 ? lerp(1, 0.56, k % 1) : lerp(0.56, 1, k % 1);
+    const kp = P.kid.kp, L = K.Lfold, zl = bedTop + L * u, k = u * (2 * kp.n + 1), valley = k % 2 < 1 ? lerp(1, 0.56, k % 1) : lerp(0.56, 1, k % 1);
     const env = Math.pow(Math.max(0, 1 - Math.pow(2 * u - 1, 2)), 0.62);
-    P.phi += dt * 9; const r = BABY.R * env * valley * 0.96;
+    P.phi += dt * 9; const r = kp.R * env * valley * 0.96;
+    h.belly = P.belly0 - P.kid.vol * u;   // what is laid in the gel leaves the belly
     rig.q = KIN.solve([K.cx + r * Math.cos(P.phi), r * Math.sin(P.phi), zl + 0.004], rig.q, rig.boom, 4);
     layerZ = zl;
   }
-  else if ((u = seg("armOut")) !== null) { layerZ = 1; rig.q = KIN.solve([K.cx, 0, bedTop + K.Lfold + 0.02], rig.q, rig.boom, 6); if (u > 0.98 && !P.hooked) { P.hooked = true; event(`${h.name}: the needle meets the valve of the new baby`); } }
+  else if ((u = seg("armOut")) !== null) { layerZ = 1; h.belly = P.belly0 - P.kid.vol; rig.q = KIN.solve([K.cx, 0, bedTop + K.Lfold + 0.02], rig.q, rig.boom, 6); if (u > 0.98 && !P.hooked) { P.hooked = true; event(`${h.name}: the needle meets the valve of the new baby`); } }
   else if ((u = seg("carry")) !== null) {
     layerZ = 1;
     rig.boom = lerp(SC.stations.front, 0.23, ss(u));   // the carriage draws back so the arm can hold the valve close to the opening
@@ -632,7 +792,7 @@ function stepPrint(h, dt) {
     const uc = clamp((t - tCarry) / TP.carry, 0, 1), uo = clamp((t - tOut) / TP.out, 0, 1);
     // the folded print unfolds to full length while the arm draws it to the opening; it stays limp and wrinkled
     if (!pb.wr) { pb.wr = true; pb.g.dispose(); pb.g = wrinkleGeometry(P.kid.sh, 0, K.Lfold); pb.m.geometry = pb.g; setPrintTex(pb.mat, P.kid.sh); }
-    const L = lerp(K.Lfold, P.kid.sh.L, ss(uc)); if (Math.abs(L - pb.L) > 0.0005) { setWrinkle(pb.g, P.kid.sh, 0, L); pb.L = L; }
+    const L = lerp(K.Lfold, P.kid.sh.L, ss(uc)); if (Math.abs(L - pb.L) > 0.0005) { setWrinkle(pb.g, P.kid.sh, 0, L); pb.L = L; setSkin(pb.mat, P.kid.skin, P.kid.sh, L); }
     const rotY = lerp(PI / 2, 0, ss(uc));   // from nose down to valve end facing -x
     pb.grp.rotation.set(0, rotY, 0);
     const c = Math.cos(rotY), sn = Math.sin(rotY);   // local x after rotY about y: (c, 0, -sn)
@@ -651,11 +811,11 @@ function releaseBaby(h) {
   const dirW = new THREE.Vector3(1, 0, 0).transformDirection(pb.grp.matrixWorld);
   h.bl.remove(pb.grp); pb.g.dispose();
   const b = makeBody("baby", wp.x, -wp.z, Math.atan2(-dirW.z, dirW.x));
-  b.sh = P.kid.sh; b.L = b.sh.L; b.cap.position.x = -b.L / 2 + 0.035; setInflation(b, 0);
+  b.sh = P.kid.sh; b.L = b.sh.L; b.cap.position.x = -b.L / 2 + 0.035; b.skin = P.kid.skin; b.kp = P.kid.kp; b.st = P.kid.st; b.vol = P.kid.vol; setInflation(b, 0);
   Object.assign(b, { genome: P.kid.genome, memory: P.kid.memory, gen: h.gen + 1, mom: h, momName: h.name, energy: 0.45, raisedBy: [], sink: 0.09, drop: 1, life: 900 });
   b.task = { type: "drift", t: 0, side: rnd() < 0.5 ? 1 : -1 };
-  h.babies++; h.lastBirth = simT;
-  event(`${b.name} is born to ${h.name}, limp and wrinkled, waiting for air`);
+  h.babies++; h.lastBirth = simT; h.births.push({ name: b.name, st: b.st, kp: b.kp, vol: b.vol }); if (h.births.length > 6) h.births.shift();
+  event(`${b.name} is born to ${h.name}, limp and wrinkled, waiting for air; ${h.name} rides ${((riseOf(h) - (h.riseBefore || 0)) * 1000).toFixed(1)} mm higher`);
 }
 function endPrint(h) {
   const P = h.print; if (!P) return;
@@ -721,12 +881,15 @@ function wander(b, dt, v) {
 function stepMother(h, dt) {
   const t = tailOf(h);
   h.energy -= dt * (t ? 0.0022 : 0.0016);
+  if ((h.pathT -= dt) <= 0) { h.pathT = 2; h.path.push([h.x, h.y, h.th]); if (h.path.length > 31) h.path.shift(); }   // the last minute of swimming
+  h.rise = lerp(h.rise, riseOf(h), 1 - Math.exp(-dt * 0.6));
   if (h.print) { stepPrint(h, dt); }
   if (h.print) h.energy = Math.max(0.02, h.energy);
   if (h.energy < 0.03) h.energy = 0.03;      // nobody dies: a mother that runs low drifts slowly until it finds a charge
   if ((h.think -= dt) < 0) {
     h.think = 1;
     h.relN = mothers().filter((o) => o !== h && Math.hypot(o.x - h.x, o.y - h.y) < 6 && relation(h, o) > 0.42).length;
+    if (!h.print) { h.nextVol = printVolume(kresFrom(momState(h))); if (!h.spent && h.belly < h.nextVol) { h.spent = true; event(`${h.name}: the belly cannot supply a whole baby, no more births`); } }
   }
   if (h.parent || h.print) return;
   const busy = Object.keys(h.reserved).length > 0 || h.children.some((c) => c.task && c.task.purpose === "charge");
@@ -735,7 +898,7 @@ function stepMother(h, dt) {
   if (h.backoff) return;
   if (h.energy < 0.3 && rnd() < dt * (h.energy < 0.1 ? 3 : 0.5)) { seekCharge(h); if (h.task) return; }
   const printing = mothers().filter((m) => m.print).length, babies = bodies.filter((b) => b.kind === "baby" && b.alive).length;
-  if (t && h.energy > 0.7 && h.relN >= P.rel && printing < PRINT_CAP && babies < BABY_CAP && (!h.lastBirth || simT - h.lastBirth > 120) && h.children.filter((c) => c.kind === "baby").length === 0 && rnd() < dt * 0.012) { startPrint(h); return; }
+  if (t && !h.spent && h.energy > 0.7 && h.relN >= P.rel && printing < PRINT_CAP && babies < BABY_CAP && (!h.lastBirth || simT - h.lastBirth > 120) && h.children.filter((c) => c.kind === "baby").length === 0 && rnd() < dt * 0.012) { startPrint(h); return; }
   wander(h, dt, t ? 0.09 : 0.05);
 }
 function seekCharge(h) {
@@ -813,6 +976,7 @@ function collide() {
     for (const p of A.c) for (const q of B.c) {
       const dx = q[0] - p[0], dy = q[1] - p[1], d = Math.hypot(dx, dy) || 1e-6, o = p[2] + q[2] - d;
       if (o <= 0) continue;
+      touch(A.r, B.r); touch(B.r, A.r);   // a bump counts as a touch, once per pair in 15 s
       const nx = dx / d, ny = dy / d, wa = fa && fb ? 0.5 : fa ? 0 : fb ? 1 : 0.5;
       if (fa && fb && (A.r.kind === "charger" || A.r.cluster) && (B.r.kind === "charger" || B.r.cluster)) continue;
       A.r.x -= nx * o * wa; A.r.y -= ny * o * wa; B.r.x += nx * o * (1 - wa); B.r.y += ny * o * (1 - wa);
@@ -835,20 +999,20 @@ function manage(dt) {
 function setup() {
   for (const [x, y] of CHARGERS) { const c = makeBody("charger", x, y, 0); }
   const spots = [[-3.5, -1.2], [-1.2, 1.6], [1.4, -0.4], [3.6, 0.9], [-4.6, -3.0], [2.2, 2.8], [5.4, -1.6], [-2.4, -2.9], [0.0, 3.4], [4.0, -3.4], [-6.0, 0.0]];
-  for (const [x, y] of spots) { const h = makeMother(x + rnd() * 0.4, y + rnd() * 0.4, rnd() * TAU); h.age = 40 + 200 * rnd(); }
+  for (const [x, y] of spots) { const h = makeMother(x + rnd() * 0.4, y + rnd() * 0.4, rnd() * TAU); h.age = 40 + 200 * rnd(); h.belly = BELLY.cap * (0.1 + 0.8 * rnd()); h.rise = riseOf(h); }
   const lone = makeMother(-0.6, -1.6, 0.4, false); lone.energy = 0.8;      // a hull without a tail, and a free tail nearby: the first dock
   const ft = makeBody("tail", 1.4, -2.9, 2.6); ft.energy = 0;
   // a charge early: one mother is low
   bodies.find((b) => b.kind === "hull").energy = 0.26;
   // a few babies already in the water
   const ms = mothers().filter((h) => tailOf(h));
-  for (let i = 0; i < 6; i++) { const m = ms[i % ms.length]; const b = makeBody("baby", m.x + 1.2 * Math.cos(i), m.y + 1.2 * Math.sin(i), rnd() * TAU); const kid = inherit(m); giveShape(b, kid.genome, 0.5 * rnd()); Object.assign(b, { ...kid, gen: 1, mom: m, momName: m.name, energy: 0.5 + 0.2 * rnd(), raisedBy: [], age: 40 + 100 * rnd(), life: 900 }); m.babies++; }
+  for (let i = 0; i < 6; i++) { const m = ms[i % ms.length]; const b = makeBody("baby", m.x + 1.2 * Math.cos(i), m.y + 1.2 * Math.sin(i), rnd() * TAU); const kid = inherit(m), st = momState(m); st.e = 0.7 + 0.3 * rnd(); st.T = waterT(-60 * i); st.c = i % 4; st.turn = (rnd() - 0.5) * 160; st.dist = 1.5 + 2 * rnd();   /* printed before the page starts */ const kp = kresFrom(st); b.skin = encodeSkin(m); b.st = st; b.vol = printVolume(kp); giveShape(b, kid.genome, 0.5 * rnd(), kp); m.births.push({ name: b.name, st, kp, vol: b.vol }); Object.assign(b, { ...kid, gen: 1, mom: m, momName: m.name, energy: 0.5 + 0.2 * rnd(), raisedBy: [], age: 40 + 100 * rnd(), life: 900 }); m.babies++; }
   updatePoses();
   event("The pond starts: twelve hulls, twelve tails, six babies");
 }
 
 /* ---------------- follow and pick ---------------- */
-function follow(b) { FOLLOW = b; CAMFLY = { t: 0, p0: camera.position.clone(), t0: controls.target.clone(), follow: true, dist: b.kind === "baby" ? 2.0 : b.kind === "charger" ? 3.0 : 3.2 }; $("#follow").style.display = "block"; renderFollow(); }
+function follow(b) { FOLLOW = b; FIXCAM = false; CAMFLY = { t: 0, p0: camera.position.clone(), t0: controls.target.clone(), follow: true, dist: b.kind === "baby" ? 2.0 : b.kind === "charger" ? 3.0 : 3.2 }; $("#follow").style.display = "block"; renderFollow(); }
 function unfollow() { FOLLOW = null; $("#follow").style.display = "none"; }
 function bodyCenter(b) { const v = new THREE.Vector3(); v.setFromMatrixPosition(b.obj.matrix); v.y += 0.12; if (b.kind === "hull" && tailOf(b)) { const c = Math.cos(b.th), s = Math.sin(b.th); v.x -= c * 0.3; v.z += s * 0.3; } return v; }
 function pick(cx, cy) {
@@ -879,8 +1043,20 @@ function renderFollow() {
   if (b.kind === "baby") h += `<dt>length</dt><dd>${Math.round(b.L * 1000)} mm, D ${Math.round(b.sh.R * 2000)} mm</dd><dt>air</dt><dd>${Math.round(b.inf * 100)}%${b.inf < 0.05 ? ", limp, waiting" : ""}</dd><dt>raised by</dt><dd>${esc(b.raisedBy.join(", ") || "nobody yet")}</dd>`;
   if (b.kind === "hull") { const t = tailOf(b); h += `<dt>tail</dt><dd>${t ? t.name : "none"}</dd><dt>relations</dt><dd>${b.relN}</dd><dt>babies</dt><dd>${b.babies}</dd>`; }
   if (b.kind === "hull" && b.print && b.print.baby) h += `<dt>baby length</dt><dd>${Math.round(b.print.baby.L * 1000)} mm</dd>`;
+  if (b.kind === "hull") {
+    const nv = b.print ? b.print.kid.vol : b.nextVol || printVolume(kresFrom(momState(b))), n = b.print ? Math.floor(b.belly / nv) : b.spent ? 0 : Math.floor(b.belly / nv);
+    h += `<dt>belly</dt><dd>${(b.belly * 1000).toFixed(2)} of ${(BELLY.cap * 1000).toFixed(1)} L, births possible ${n}${n === 0 && !b.print ? ", spent" : ""}</dd><dt>rides</dt><dd>${(b.rise * 1000).toFixed(1)} mm above the full belly line</dd>`;
+  }
   h += `<dt>docked to</dt><dd>${esc(dockedTo.join(", ") || "nothing")}</dd></dl>`;
   if (b.alive && b.kind !== "charger" && b.kind !== "tail") h += `<div class="meter" title="energy"><i style="width:${Math.round(clamp(b.energy, 0, 1) * 100)}%"></i></div>`;
+  if (b.kind === "hull") h += `<div class="meter belly" title="belly"><i style="width:${Math.round(clamp(b.belly / BELLY.cap, 0, 1) * 100)}%"></i></div>`;
+  if (b.kind === "hull" && b.births.length) h += `<div class="from">${b.births.slice(-2).reverse().map((x) => `<b>${esc(x.name)}</b> printed from ${esc(stateText(x.st))}: ${esc(kpText(x.kp))}`).join("<br>")}</div>`;
+  if (b.kind === "baby" && b.st) {
+    if (!b.read) b.read = readSkin(b);
+    const r = b.read;
+    h += `<div class="from"><b>printed from</b> ${esc(stateText(b.st))}<br><b>print</b> ${esc(kpText(b.kp, b.vol))}</div>`;
+    if (r) h += `<div class="skin">skin reads: from ${esc(r.from)}, '${esc(r.words.join(" "))}'${r.ok ? "" : " (check fails)"}</div>`;
+  }
   if (b.memory && b.memory.length) h += `<div class="mem">memory: ${esc(b.memory.slice(0, 4).map((m) => m.t).join(", "))}</div>`;
   $("#follow").innerHTML = h;
 }
@@ -892,6 +1068,7 @@ function frame(now) {
   if (running) { let rem = dtR * speed; while (rem > 1e-6) { const h = Math.min(1 / 30, rem); step(h); rem -= h; } }
   // visuals tied to state: tail fill, mother fill
   for (const b of bodies) {
+    if (b.kind === "hull") drawBelly(b);
     if (b.kind === "tail") { const h = b.parent && b.parent.kind === "hull" ? b.parent : null; const e = h ? h.energy : 0.15; b.fillMat.userData.u.uFillZ.value = lerp(-0.283, 0.2, clamp(e, 0, 1)); b.fillMat.userData.u.uFillOn.value = b.alive ? 1 : 0; }
   }
   if (FOLLOW && FOLLOW.gone) unfollow();
@@ -902,13 +1079,13 @@ function frame(now) {
       controls.target.lerpVectors(CAMFLY.t0, c, u); camera.position.lerpVectors(CAMFLY.p0, c.clone().add(dir.multiplyScalar(CAMFLY.dist)), u);
     } else if (!CAMFLY.follow) { controls.target.lerpVectors(CAMFLY.t0, CAMFLY.t1, u); camera.position.lerpVectors(CAMFLY.p0, CAMFLY.p1, u); }
     if (CAMFLY.t >= 1) CAMFLY = null;
-  } else if (FOLLOW) {
+  } else if (FOLLOW && !FIXCAM) {
     const c = bodyCenter(FOLLOW), d = c.sub(controls.target).multiplyScalar(Math.min(1, dtR * 3)); controls.target.add(d); camera.position.add(d);
   }
   controls.update();
   renderer.render(scene, camera);
   fpsN++; fpsT += dtR; if (fpsT > 1) { FPS = fpsN / fpsT; fpsN = 0; fpsT = 0; }
-  if ((uiT += dtR) > 0.25) { uiT = 0; renderFollow(); const ms = mothers(), bs = bodies.filter((b) => b.kind === "baby" && b.alive).length;  $("#hud").textContent = `${fmtT(simT)} · mothers ${ms.length} · babies ${bs} · printing ${ms.filter((m) => m.print).length}`; }
+  if ((uiT += dtR) > 0.25) { uiT = 0; renderFollow(); const ms = mothers(), bs = bodies.filter((b) => b.kind === "baby" && b.alive).length;  $("#hud").textContent = `${fmtT(simT)} · mothers ${ms.length} · babies ${bs} · printing ${ms.filter((m) => m.print).length} · water ${waterT(simT).toFixed(1)} °C`; }
   requestAnimationFrame(frame);
 }
 
@@ -925,6 +1102,7 @@ window.BNM = {
   get bodies() { return bodies; }, get fps() { return FPS; }, get t() { return simT; }, follow: (n) => { const b = bodies.find((x) => x.name === n); if (b) follow(b); return !!b; },
   advance(sec) { const n = Math.round(sec * 30); for (let i = 0; i < n; i++) step(1 / 30); }, die: (n) => { const b = bodies.find((x) => x.name === n); if (b) die(b); }, print: (n) => { const b = bodies.find((x) => x.name === n); if (b && tailOf(b) && !b.print && !b.parent) { cancelTask(b); startPrint(b); } return !!(b && b.print); },
   _G: () => G, _scene: () => scene, _renderer: () => renderer, _r: () => renderer.render(scene, camera), _gl: () => renderer.getContext(), _info: () => ({ tri: Object.fromEntries(Object.entries(G).filter(([k, g]) => g && g.index).map(([k, g]) => [k, g.index.count / 3])), calls: renderer.info.render.calls, tris: renderer.info.render.triangles, px: renderer.getPixelRatio() }),
+  pose: () => updatePoses(), cam(p, t, fov) { CAMFLY = null; FIXCAM = true; camera.fov = fov || 34; camera.updateProjectionMatrix(); camera.position.set(...p); controls.target.set(...t); controls.update(); }, readSkin: (n) => { const b = bodies.find((x) => x.name === n); return b && readSkin(b); },
   setSpeed(s) { speed = s; }, pause(v) { running = !v; }, overview: () => { unfollow(); overview(true); },
 };
 (async () => {
