@@ -148,7 +148,7 @@ button:focus-visible, input:focus-visible, a:focus-visible, .track:focus-visible
   <header class="area top">
     <div class="logo" aria-hidden="true"></div>
     <span class="file">Printing simulator</span>
-    <span class="sub">Born, Not Made · Stage 3 · one egg: the tail docks to the womb, gel in, the DexArm comes out of the tail, prints, pushes, birth, swim</span>
+    <span class="sub">Born, Not Made · Stage 3 · one egg: dock, gel into the trough, the DexArm prints, pushes while inflating, the newborn grows to full size</span>
     <span class="sp"></span>
     <a class="home eco" href="eco62/" title="The ECO62 design, a separate simulation">ECO62 version</a>
     <a class="home s2" href="old_/stage2/">Stage 2</a>
@@ -209,30 +209,29 @@ button:focus-visible, input:focus-visible, a:focus-visible, .track:focus-visible
 
 <section class="doc" id="how">
   <h2>How this is simulated</h2>
-  <p>The mother robot is one clear egg made of two parts held by magnets: the womb, the wide end that holds the gel, and the tail, the narrow end with the folded Rotrics DexArm inside. The shapes are the v2 design (the same meshes as the Stage 2 console and the build page). Following the decisions of 20 November 2026, the womb is a hard shell with no belly pleats, no top ring, no petals, no lips and no sock canal. The birth opening at the stern of the womb is a plain opening, and the docking face is a different place, at the other end of the womb. Two water pumps sit under the womb, and the tail keeps two, so the womb can swim. The gel simply fills the bottom of the shell; there is no gel cylinder. The DexArm comes out of the tail first and fills the womb with gel through a wide nozzle on the head, then places one electronics kit, prints the folded Kresling baby around the kit, then pushes the baby along the gel and up one smooth chute and out of the stern opening while air goes in through the needle. There are no contractions. The newborn drops into the water, floats and swims on two jets.</p>
-  <p>Every number on this page comes from <code>stage3_egg.json</code>, written by a Python script (<code>bnm_design/stage3_egg/physics_egg.py</code>) that reads the same mesh file the page draws. The browser replays and interpolates. The clock shows real process time; the view runs as a time lapse, with a different rate in every stage.</p>
+  <p>The mother robot is one clear egg made of two parts held by magnets: the womb, the wide end, and the tail, the narrow end with the folded Rotrics DexArm inside. The shapes are the v2 design (the same meshes as the Stage 2 console and the build page). Following the decisions of 20 and 21 November 2026, the womb is a hard shell with no belly pleats, no top ring, no petals, no lips and no sock canal. The birth opening at the stern is a plain opening with a thin 3 mm lip and no magnets; the docking face is at the other end of the womb, with a thin 4 mm lip and the three magnets. As in the artist's sketch of 21 November, the gel sits only in a small trough under the womb, sized to the folded baby, and comes from the tail through a bottom channel; the rest of the womb stays air. The arm comes out of the tail, places one electronics kit, prints the folded baby around the kit, then pushes the baby up a smooth chute and out of the stern opening while air goes in through the needle. Each segment of the body opens only after the segment has passed out through the opening, and in the water the whole skin stretches smooth to full size, about 0.53 m long and 0.38 m across. There are no contractions.</p>
+  <p>Every number on this page comes from <code>stage3_egg.json</code>, written by a Python script (<code>bnm_design/stage3_egg/physics_egg.py</code>) that reads the same mesh file the page draws. The body is designed in <code>bnm_design/baby_fullsize/</code> (a design study with figures). The browser replays and interpolates. The clock shows real process time; the view runs as a time lapse, slower during the birth.</p>
   <h4>Floating and trim</h4>
-  <p>The womb and the tail float as one egg once docked. The script rasterizes the bottom of each exported hull on a 4 mm grid and integrates the volume under a tilted water plane, so the script finds the waterline and the trim where buoyancy equals weight and the center of buoyancy lies under the center of gravity. The masses are itemized (the v2 budget, without the parts the simplification removed, plus the hard top, the chute, two pumps under the womb and their battery, the gel and the trim tank). The gel is the volume of the inner shell under the gel surface. Ballast in the womb would sit too close to the center to help, so the tail floods a small trim tank in the tail's aft end after the gel goes in, which levels the docked egg with the arm folded. The same solve gives the trim at every later state: the arm out on the boom, the baby at the lip, after the birth. The gel is treated as a solid mass while the egg tilts, because the gel's yield stress holds the gel's shape at these small angles. Waves are drawn but do not move the hulls.</p>
+  <p>The womb and the tail float as one egg once docked. The script rasterizes the bottom of each exported hull on a 4 mm grid and integrates the volume under a tilted water plane, so the script finds the waterline and the trim where buoyancy equals weight and the center of buoyancy lies under the center of gravity. Before the tail comes, the womb takes water into two ballast bags beside the trough, so the womb floats at the same height as the tail and the docking faces meet. While gel comes into the trough the bags let out as much water, so the egg keeps that height. A small trim tank in the tail end, run by the tail pump, holds the egg level as the arm moves out on the boom. Waves are drawn but do not move the hulls.</p>
+  <h4>Gel trough</h4>
+  <p>The trough is a box, 270 by 180 mm inside, around the folded print, with a flat floor that hangs a little below the curved hull like a shallow keel. The gel covers the print by 15 mm: 6.9 L of gel instead of about 30 L to fill the bottom of the womb to the same level. A gel pump and a 1 L buffer in the tail push the gel through a 12 mm line in the bottom channel into the floor of the trough (Bingham flow, yield stress 25 Pa, an estimated plastic viscosity of 0.3 Pa s); the buffer is topped up through the dock line, because carrying all the gel would sink the tail below the docking height. The trough fills from below in about 3.5 minutes and levels by itself. The DexArm cannot pass through a low channel, so the arm still comes out through the docking bore and reaches down into the trough.</p>
   <h4>Docking</h4>
-  <p>Planar motion of the tail (surge, sway, yaw) with added mass, quadratic drag, two pump thrusts from a pump curve, a speed loop and line of sight steering. A 37.5 degree cone in the docking face centers the collar in the last 30 mm. The three FluxGrip electropermanent magnets switch on after contact (250 N each on the steel pads, per the manual), so the tail arrives at the slow speed of the loop and nothing snaps the tail in. The womb recoils freely.</p>
-  <h4>Gel in by the arm</h4>
-  <p>The gel reaches the womb through the arm. A 10 mm line runs from a gel pump and a 1 L buffer low in the tail, along the boom and up to a wide nozzle beside the stem on the head. The tail cannot carry the whole 30.9 L: with that load the tail alone would float with the water far over the bore. So the buffer is topped up through the dock line from a shore tank, and the pump, buffer and line take the place of the v2 trim ballast, so the tail still floats at the docking height. The line pressure comes from Bingham flow (yield stress 25 Pa, an estimated plastic viscosity of 0.3 Pa s): 2 L/min needs about 0.9 bar, so the womb fills in about 15 minutes. The nozzle visits the floor spot by spot on a 60 mm grid, layer by layer, 20 mm over the rising surface; every pose is checked for reach and for 10 mm clearance like the print. Spots near the docking wall and under the chute are out of reach, and the script checks that a gel this deep stays level, within the slope the gel yield stress allows, all the way to those corners. The ballast bags empty through the womb pumps while the gel comes in, and the script solves the waterline and trim at each step of the fill.</p>
+  <p>Planar motion of the tail (surge, sway, yaw) with added mass, quadratic drag, two small pump thrusts from the datasheet values of the DFRobot FIT0800, a speed loop and line of sight steering. A 37.5 degree cone in the docking face centers the collar in the last 30 mm. The three FluxGrip electropermanent magnets switch on after contact (250 N each on the steel pads, per the manual). The small pumps make the egg slow: the readouts give the speed and the turning rate.</p>
   <h4>The arm in the tail</h4>
-  <p>The DexArm stands on the tail's boom. A second telescopic stage lets the boom carry the arm out through the docking bore and on over the gel, as on the sheet. Forward kinematics are those of the Stage 2 meshes, and the inverse kinematics keep every joint inside the official ranges of the DexArm (base plus or minus 110, J1 0 to 110, J2 0 to 85 degrees); how J1 and J2 map onto the mesh angles is an assumption, written in the data file. The boom is a fourth axis (A in the G-code), placed so the arm works near the middle of the arm's reach. For every printed point, every kit move and every push step the script poses all arm links and the tool and measures the distance to the shell, the docking wall, the bore ring, the stern plate, the opening rim, the chute, the cradle and the parts in the tail; the target is 10 mm. The needle in the work is left out of that count.</p>
-  <h4>Printing</h4>
-  <p>The baby body comes from the body plan of the electronics study: an eight sided Kresling spindle with a smooth waist band for the kit. Each Kresling story has two stress free states, printed short and deployed long. The folded body lies in the gel, nose toward the stern, and is sliced into 1.5 mm layers; the G-code is that slicing. The kit goes in once, before the first layer: the fork on the head takes the kit from a cradle on the port wall and sets the saddle feet into three cups on a post from the hull floor. The saddle is the belly of the waist band, so the skin under the kit is not printed. The skin is then printed bottom up around the kit. Every pass of the stem was checked against the kit parts.</p>
-  <h4>Push and inflate</h4>
-  <p>Inflation uses a bar and hinge model of the folded skin (Dragon Skin 10 NV, E 319 kPa, 1.6 mm wall) with isothermal air, as in the first Stage 3 script; stories still in the gel pay the work of pushing gel aside, and the air follows the share of the body that has left the gel. The body is cut into 40 slices. A slice in the gel weighs almost nothing, because the folded body is mostly gel, and costs only the yield drag of the gel. A slice resting on the chute in air costs the slice's weight times the sine of the slope plus friction times the cosine. The sum is the force at the needle. A force loop slows the push near 85 percent of the 500 g payload. The arm lets go when the center of gravity passes the lowest point of the opening; the baby then tips over the lip and drops into the water.</p>
+  <p>The DexArm stands on the tail's boom. A second telescopic stage lets the boom carry the arm out through the docking bore and on over the trough. Forward kinematics are those of the Stage 2 meshes, and the inverse kinematics keep every joint inside the official ranges of the DexArm (base plus or minus 110, J1 0 to 110, J2 0 to 85 degrees); how J1 and J2 map onto the mesh angles is an assumption, written in the data file. The boom is a fourth axis (A in the G-code). For every printed point, every kit move and every push step the script poses all arm links and the tool and measures the distance to the shell, the trough walls, the docking wall and lips, the stern plate, the opening rim, the chute, the cradle and the parts in the tail; the target is 10 mm. The needle in the work is left out of that count.</p>
+  <h4>The full size body and printing</h4>
+  <p>The baby is printed folded, 200 mm long and 120 mm across, so the baby fits the trough and the arm's reach and passes the 280 mm opening. Each of eight segments is a Kresling story with sixteen radial star pleats, and the middle segment is a waist band whose belly carries the kit saddle. Opening the folds gives a design size of about 0.42 by 0.30 m; a 25 percent stretch of the skin then takes the creases out and gives the full size. The stretch stays below the limit point of the Dragon Skin 10 NV membrane (stretch 1.38 in the neo-Hookean model), so the body grows evenly instead of bulging in one place. The size is limited by how much skin packs into the printed envelope: folds closer than a wall plus 2 mm of gel cannot be printed. The G-code is the slicing of the folded body into 1.5 mm layers around the kit.</p>
+  <h4>Push while inflating</h4>
+  <p>The body is cut into slices. A slice in the gel weighs almost nothing, because the folded body is mostly gel, and costs only the yield drag of the gel. A slice on the chute in air costs the slice's weight times the sine of the slope plus friction times the cosine. The air pump (12 L/min through the 12G needle) is metered by the push position: only the segments outside the opening get air, at the pressure that opens the folds, and the push waits for the air, so the segments open one by one, front first. An opened segment outside is wider than the rim, so the pressure on the rim pulls the body out and the arm force falls. When the center of gravity passes the lip the arm lets go; the needle stays in the septum on its air line while the body slides off the lip into the water. There all segments stretch together to full size.</p>
   <h4>Newborn</h4>
-  <p>The drop and the settling use buoyancy, added mass and drag on the inflated body. The newborn floats where the water displaced by the body equals skin, kit and the gel trapped inside, and swims on two jets: thrust is mass flow times jet speed, with the flow where the pump curve meets the jet head.</p>
+  <p>The full size newborn floats very high, so the kit pumps take water into a belly pocket until the pumps sit 50 mm under water; the kit and the water keep the newborn upright. The newborn swims on the two kit jets: thrust is mass flow times jet speed, with the flow where the pump curve meets the jet head.</p>
   <h4>Limits</h4>
   <ul>
     <li>Part masses, pump curves and drag coefficients are estimates of the part class, marked in the data file. The tail mass and the tail's center of gravity are those of the v2 design.</li>
-    <li>Friction of wet silicone on the chute is not measured. The push passes at 0.3; the Birth panel shows where the push stops passing.</li>
-    <li>The joint mapping of J1 and J2, the second boom stage and the head with the needle, the fork and the gel nozzle, the gel pump class and the plastic viscosity of the gel are assumptions. Boom deflection is estimated, not corrected in the G-code.</li>
+    <li>The folding of the full size body is drawn and sliced as a simplified fold; a fold that packs the skin this tightly needs a bench test. The pressure to open the folds (300 Pa) is an estimate.</li>
+    <li>The heavier full size body makes the climb up the chute the hard part of the birth: the Checks panel shows the arm force against the payload, and the friction case shows how much margin is left.</li>
+    <li>The joint mapping of J1 and J2, the second boom stage, the head with the needle and the fork, the gel pump class and the plastic viscosity of the gel are assumptions. Boom deflection is estimated, not corrected in the G-code.</li>
     <li>Clearances use points sampled every 6 mm on the meshes, so a figure can be about 3 mm off.</li>
-    <li>The inflation path between the two stress free states is a straight line in story height and twist; the order of opening is indicative.</li>
-    <li>Gel yield is a single yield stress (25 Pa) with no rate effect.</li>
   </ul>
   <h4>Files</h4>
   <p><a href="stage3_egg_print.gcode">stage3_egg_print.gcode</a> · <a href="stage3_egg.json">stage3_egg.json</a> · <a href="eco62/">ECO62 version</a> (a separate design) · <a href="old_/stage2/">Stage 2 console</a> · <a href="old_/stage3_sphere/">earlier Stage 3 draft</a>, kept for reference.</p>
@@ -335,7 +334,7 @@ function resize() {
 
 /* ================================================================ the egg from the v2 meshes */
 const PARTS = {};
-const HIDE = new Set(["W_V2_BellyPleats", "W_V2_TrayWall", "W_V2_Chute", "W_V2_Gel", "W_B0_SkinInner"]);   // removed by the simplification of 20 November, or redrawn here
+const HIDE = new Set(["W_V2_BellyPleats", "W_V2_TrayWall", "W_V2_Chute", "W_V2_Gel", "W_B0_SkinInner", "W_B0_RingA", "W_V2_BoreRing", "W_V2_Collar", "W_V2_LipSeal", "W_V2_Thrusters"]);   // removed by the simplification of 20 November, or redrawn here
 async function loadEgg(b64) {
   const bin = Uint8Array.from(atob(b64.trim()), (c) => c.charCodeAt(0));
   const gltf = await new Promise((res, rej) => new THREE.GLTFLoader().parse(bin.buffer, "", res, rej));
@@ -416,19 +415,37 @@ function jetPlume(r0, len) {
   return new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0xcfe6fa, transparent: true, opacity: 0, depthWrite: false }));
 }
 function setJet(j, k, t) { j.material.opacity = 0.45 * k * (0.75 + 0.25 * Math.sin(t * 23 + j.id)); j.scale.set(Math.max(0.05, k), 1, 1); j.visible = k > 0.01; }
+function torusAt(c, n, R, r, mat, parent) {     // thin rim on a circle (center c, normal n, radius R, tube radius r)
+  const g = new THREE.TorusGeometry(R, r, 8, 96), m = new THREE.Mesh(g, mat); const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), new THREE.Vector3(...n).normalize());
+  m.quaternion.copy(q); m.position.set(...c); parent.add(m); return m;
+}
+function smallPump(parent, x, y, z, dir = -1) {   // DFRobot FIT0800 at real size: body 46 mm long, 23.5 mm across, 5 mm ports, 4 mm jet
+  const g = new THREE.Group(); g.position.set(x, y, z); parent.add(g);
+  g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.01175, 0.01175, 0.046, 20).rotateZ(Math.PI / 2), clayMat(0x55585e, { sub: 0.8 })));
+  g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.0025, 0.014, 10).rotateZ(Math.PI / 2).translate(dir * 0.029, 0, 0), clayMat(0x8d9097, { sub: 0.8 })));
+  g.add(new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.008, 0.008).translate(0, 0, 0.014), clayMat(0xd4d6d8, { sub: 0.8 })));
+  const jet = jetPlume(0.004, 0.18); jet.position.set(dir * 0.036, 0, 0); if (dir > 0) jet.rotation.z = Math.PI; g.add(jet); return jet;
+}
 function buildWombParts() {
   const P = J.layout.pump; PARTS.wPumps = [];
-  for (const s of [1, -1]) {
-    const g = new THREE.Group(); g.position.set(P.x, s * P.y, P.z); R3.womb.add(g);
-    g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.11, 24).rotateZ(Math.PI / 2), clayMat(0xd4d6d8, { sub: 0.8 })));
-    g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.016, 0.045, 20).rotateZ(-Math.PI / 2).translate(-0.077, 0, 0), clayMat(0xc9cbce, { sub: 0.8 })));
-    g.add(new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.014, 0.03).translate(0, 0, 0.027), clayMat(0xd4d6d8, { sub: 0.8 })));
-    const jet = jetPlume(0.009, 0.32); jet.position.set(-0.1, 0, 0); g.add(jet); PARTS.wPumps.push(jet);
-  }
-  // tail thrusters: jets aft
-  PARTS.tJets = []; for (const s of [1, -1]) { const j = jetPlume(0.012, 0.32); j.position.set(-0.86, s * 0.2, -0.215); R3.tail.add(j); PARTS.tJets.push(j); }
+  for (const s of [1, -1]) PARTS.wPumps.push(smallPump(R3.womb, P.x, s * P.y, P.z));
+  PARTS.tJets = []; for (const s of [1, -1]) PARTS.tJets.push(smallPump(R3.tail, -0.80, s * 0.12, -0.255));
+  // thin rims: 3 mm lip at the birth opening (no magnets), 4 mm lips on both faces of the docking bore, bosses behind the three steel pads
+  const rimM = clayMat(0xdedcd5, { sub: 0.5 }), L = J.layout, n = L.open_n;
+  torusAt([L.open_c[0] + 0.003 * n[0], 0, L.open_c[2] + 0.003 * n[2]], n, L.open_R + J.rims.open_t / 2, J.rims.open_t / 2, rimM, R3.womb);
+  torusAt([-0.381, 0, 0], [1, 0, 0], L.bore_R + J.rims.bore_t / 2, J.rims.bore_t / 2, rimM, R3.womb);
+  torusAt([-0.389, 0, 0], [1, 0, 0], L.bore_R + J.rims.bore_t / 2, J.rims.bore_t / 2, rimM, R3.tail);
+  // gel trough: a box around the folded print, floor flat, open at the top, with the bottom channel from the docking face
+  const T = J.gel.trough, tm = clayMat(0xe9e7e1, { opacity: 0.42, side: THREE.DoubleSide, clip: [SECT], sub: 0.5 }), H = J.layout.gel_z - T.floor + 0.004;
+  const wall = (w, d, h, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, d, h).translate(x, y, z), tm); m.renderOrder = 4; R3.womb.add(m); edgeLines(m, 30, 0.3, 0xdfe3ea, [SECT]); };
+  const xm = (T.x0 + T.x1) / 2, lx = T.x1 - T.x0;
+  wall(lx + 0.006, 2 * T.y + 0.006, 0.003, xm, 0, T.floor - 0.0015);
+  wall(lx + 0.006, 0.003, H, xm, T.y + 0.0015, T.floor + H / 2); wall(lx + 0.006, 0.003, H, xm, -T.y - 0.0015, T.floor + H / 2);
+  wall(0.003, 2 * T.y, H, T.x0 - 0.0015, 0, T.floor + H / 2); wall(0.003, 2 * T.y, H, T.x1 + 0.0015, 0, T.floor + H / 2);
+  const ch = new THREE.Mesh(new THREE.BoxGeometry(T.x0 + 0.376, 0.03, 0.022).translate((T.x0 - 0.376) / 2, 0, T.floor + 0.011 + 0.02), clayMat(0xc9cbce, { opacity: 0.7, clip: [SECT], sub: 0.6 }));
+  R3.womb.add(ch); edgeLines(ch, 30, 0.4); PARTS.channel = ch;
   // kit seat: a post from the floor with three cups
-  const kc = J.kit.centre, R = Math.max(...J.body.R), top = J.layout.z_axis - R - 0.004, bot = J.layout.floor_at_kit + 0.002, m = clayMat(0xe2e0da, { sub: 0.4, clip: [SECT] });
+  const kc = J.kit.centre, R = Math.max(...J.body.params.Ro), top = J.layout.z_axis - R - 0.002, bot = J.gel.trough.floor, m = clayMat(0xe2e0da, { sub: 0.4, clip: [SECT] });
   R3.womb.add(new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.012, top - bot, 16).rotateX(Math.PI / 2).translate(kc[0], 0, (top + bot) / 2), m));
   R3.womb.add(new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.034, 0.004).translate(kc[0], 0, top - 0.002), m));
   for (const [fx, fy] of [[-0.018, 0.012], [-0.018, -0.012], [0.018, 0]]) R3.womb.add(new THREE.Mesh(new THREE.CylinderGeometry(0.0035, 0.003, 0.003, 12).rotateX(Math.PI / 2).translate(kc[0] + fx, fy, top + 0.0015), m));
@@ -462,35 +479,43 @@ function buildWater() {
 
 /* ================================================================ baby: Kresling spindle from the body plan, printed folded, nose toward the stern */
 const BB = { mesh: null, edges: null, key: "", u: [], th: [], L: 0 };
-function babyGeo(lam) {
-  const P = J.body, N = P.N, R = P.R; const u = [P.tail_cap], th = [0]; let j = 0;
-  P.gaps.forEach((g, i) => { if (g[0] === "k") { const l = lam[j++], tw = P.twist[i], c = (P.chir || [])[i] ?? 1; u.push(u[u.length - 1] + g[1] + l * (g[2] - g[1])); th.push(th[th.length - 1] + c * (tw[0] + l * (tw[1] - tw[0]))); } else { u.push(u[u.length - 1] + g[1]); th.push(th[th.length - 1] + Math.PI / N); } });
+function babyGeo(lam) {      // port of baby_fullsize/geom_full.py: segments with Kresling stories and radial star pleats, unfolded then stretched
+  const P = J.body.params, n = P.NSEG, M = 2 * P.NP, LD = P.LAM_D;
+  lam = lam.map((l) => clamp(l, 0, 1));
+  const st = (l) => (l <= LD ? [l / LD, 0] : [1, (l - LD) / (1 - LD)]);
+  const rl = [lam[0]]; for (let k = 1; k < n; k++) rl.push(Math.max(lam[k - 1], lam[k])); rl.push(lam[n - 1]);
+  const hseg = (k) => { const [a, b] = st(lam[k]); return P.hf[k] + a * (P.hd[k] - P.hf[k]) + b * (P.hF[k] - P.hd[k]); };
+  const tw = (k) => { const [a] = st(lam[k]); return P.chir[k] * (P.tw_f[k] + a * (P.tw_d[k] - P.tw_f[k])); };
+  const capl = (l) => { const [a, b] = st(l); return P.cap_f + a * (P.cap_d - P.cap_f) + b * (P.cap_F - P.cap_d); };
+  const u = [capl(lam[0])], th = [0]; for (let k = 0; k < n; k++) { u.push(u[k] + hseg(k)); th.push(th[k] + tw(k)); }
   const V = [], T = [];
-  for (let k = 0; k < R.length; k++) for (let i = 0; i < N; i++) { const a = th[k] + 2 * Math.PI * i / N; V.push([u[k], R[k] * Math.cos(a), R[k] * Math.sin(a)]); }
-  for (let k = 0; k < R.length - 1; k++) for (let i = 0; i < N; i++) { const b0 = k * N + i, b1 = k * N + (i + 1) % N, t0 = (k + 1) * N + i, t1 = (k + 1) * N + (i + 1) % N; if (((P.chir || [])[k] ?? 1) > 0) T.push([b0, b1, t0], [b1, t1, t0]); else T.push([b0, b1, t1], [t1, t0, b0]); }
-  const base = V.length; for (let i = 0; i < N; i++) { const a = 2 * Math.PI * i / N; V.push([0, P.boss_r * Math.cos(a), P.boss_r * Math.sin(a)]); }
-  V.push([0, 0, 0]); const cB = V.length - 1;
-  for (let i = 0; i < N; i++) { const jn = (i + 1) % N; T.push([base + i, base + jn, i], [base + jn, jn, i], [cB, base + jn, base + i]); }
-  const nb = V.length, un = u[u.length - 1], last = (R.length - 1) * N, tl = th[th.length - 1];
-  for (let i = 0; i < N; i++) { const a = tl + 2 * Math.PI * i / N + Math.PI / N; V.push([un + 0.6 * P.nose_cap, 0.62 * R[R.length - 1] * Math.cos(a), 0.62 * R[R.length - 1] * Math.sin(a)]); }
-  V.push([un + P.nose_cap, 0, 0]); const tip = V.length - 1;
-  for (let i = 0; i < N; i++) { const jn = (i + 1) % N; T.push([last + i, last + jn, nb + i], [last + jn, nb + jn, nb + i], [nb + i, nb + jn, tip]); }
-  return { V, T, u, th, L: un + P.nose_cap };
+  const ring = (uk, thk, ro, ri, saddle) => { for (let i = 0; i < M; i++) { const ang = thk + 2 * Math.PI * i / M; let r = i % 2 === 0 ? ro : ri; if (saddle && Math.cos(ang + Math.PI / 2) > Math.cos(Math.PI / 4)) r = ro; V.push([uk, r * Math.cos(ang), r * Math.sin(ang)]); } };
+  const radii = (k, l) => { const [a, b] = st(l); const s_ = 1 + b * (P.STRETCH - 1); return [(P.Ro[k] + a * (P.Rd[k] - P.Ro[k])) * s_, (P.Ri[k] + a * (P.Rd[k] - P.Ri[k])) * s_]; };
+  let nr = 0;
+  for (let k = 0; k <= n; k++) {
+    ring(u[k], th[k], ...radii(k, rl[k]), k === P.BAND || k === P.BAND + 1); nr++;
+    if (k < n && k !== P.BAND) { const [a] = st(lam[k]), f = P.MID + a * (1 - P.MID), r0 = radii(k, lam[k]), r1 = radii(k + 1, lam[k]), Z = P.ZF;
+      for (let j = 1; j < 2 * Z; j++) { const w = j / (2 * Z); let rm = [(1 - w) * r0[0] + w * r1[0], (1 - w) * r0[1] + w * r1[1]]; if (j % 2 === 1) rm = rm.map((x) => x * f); ring((1 - w) * u[k] + w * u[k + 1], (1 - w) * th[k] + w * th[k + 1], rm[0], rm[1], false); nr++; } }
+  }
+  for (let k = 0; k < nr - 1; k++) for (let i = 0; i < M; i++) { const b0 = k * M + i, b1 = k * M + (i + 1) % M, t0 = (k + 1) * M + i, t1 = (k + 1) * M + (i + 1) % M; T.push([b0, b1, t0], [b1, t1, t0]); }
+  const tb = V.length; V.push([0, 0, 0]); for (let i = 0; i < M; i++) T.push([tb, (i + 1) % M, i]);
+  const nt = V.length, last = (nr - 1) * M; V.push([u[n] + capl(lam[n - 1]), 0, 0]); for (let i = 0; i < M; i++) T.push([last + i, last + (i + 1) % M, nt]);
+  return { V, T, u, th, L: u[n] + capl(lam[n - 1]), rb: radii(P.BAND, rl[P.BAND])[0] };
 }
 function babyMeshUpdate(lam) {
   const key = lam.map((l) => l.toFixed(3)).join(","); if (key === BB.key) return; BB.key = key;
-  const { V, T, u, th, L } = babyGeo(lam); BB.u = u; BB.th = th; BB.L = L;
+  const { V, T, u, th, L, rb } = babyGeo(lam); BB.u = u; BB.th = th; BB.L = L; BB.rb = rb; BB.rmax = Math.max(...V.map((v) => Math.hypot(v[1], v[2])));
   const pos = new Float32Array(T.length * 9); let k = 0; for (const t of T) for (const vi of t) { pos[k++] = V[vi][0]; pos[k++] = V[vi][1]; pos[k++] = V[vi][2]; }
   const g = BB.mesh.geometry; g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.computeVertexNormals(); g.computeBoundingSphere();
-  const eg = new THREE.EdgesGeometry(g, 8); BB.edges.geometry.dispose(); BB.edges.geometry = eg;
+  const eg = new THREE.EdgesGeometry(g, 25); BB.edges.geometry.dispose(); BB.edges.geometry = eg;
 }
 function buildBaby() {
   const clip = [PRINTCLIP];
-  const mat = new THREE.MeshPhongMaterial({ color: new THREE.Color(0xf3f1ec).convertSRGBToLinear(), shininess: 14, specular: 0x222222, flatShading: true, side: THREE.DoubleSide, transparent: true, opacity: 0.88, depthWrite: true, clippingPlanes: clip });
+  const mat = new THREE.MeshPhongMaterial({ color: new THREE.Color(0xf3f1ec).convertSRGBToLinear(), shininess: 14, specular: 0x222222, flatShading: false, side: THREE.DoubleSide, transparent: true, opacity: 0.88, depthWrite: true, clippingPlanes: clip });
   mat.onBeforeCompile = (sh) => addWater(sh, { line: 1.0, sub: 0.85 }); mat.customProgramCacheKey = () => "baby";
   BB.mesh = new THREE.Mesh(new THREE.BufferGeometry(), mat); BB.mesh.renderOrder = 6; R3.baby.add(BB.mesh);
   BB.edges = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0x8c949c, transparent: true, opacity: 0.32, clippingPlanes: clip })); BB.edges.renderOrder = 7; BB.mesh.add(BB.edges);
-  BB.jets = []; for (const s of [1, -1]) { const j = jetPlume(0.0045, 0.26); j.position.set(0.02, s * 0.026, -0.03); BB.mesh.add(j); BB.jets.push(j); }
+  BB.jets = []; for (const s of [1, -1]) { const j = jetPlume(0.0045, 0.26); BB.mesh.add(j); BB.jets.push(j); }
   BB.lam0 = new Array(J.body.nseg).fill(0); babyMeshUpdate(BB.lam0); BB.u0 = BB.u.slice();
   const pos = []; for (const s of GC.segs) pos.push(...s.a, ...s.b);
   const bg = new THREE.BufferGeometry(); bg.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
@@ -500,7 +525,7 @@ function buildBaby() {
   for (const p of K.parts) { if (!p.size || !p.rel || p.id === "encap") continue;
     const pump = /pump/i.test(p.id + p.name), geo = pump ? new THREE.CylinderGeometry(p.size[1] / 2, p.size[1] / 2, p.size[0], 20).rotateZ(Math.PI / 2) : new THREE.BoxGeometry(...p.size);
     const b = new THREE.Mesh(geo, clayMat(pump ? 0xd4d6d8 : /lipo|batt/i.test(p.id) ? 0xb7c9d6 : 0xe0c08a, { sub: 0.4 })); b.position.set(-p.rel[0], -p.rel[1], p.rel[2] - K.z); g.add(b); edgeLines(b, 25, 0.5, 0x5a4a2c); }
-  if (K.saddle) { const R = Math.max(...J.body.R) - 0.0005, sg = new THREE.CylinderGeometry(R, R, 0.05, 24, 1, true, Math.PI - Math.PI / 4, Math.PI / 2).rotateZ(Math.PI / 2);
+  if (K.saddle) { const R = Math.max(...J.body.params.Ro) - 0.0005, sg = new THREE.CylinderGeometry(R, R, 0.05, 24, 1, true, Math.PI - Math.PI / 4, Math.PI / 2).rotateZ(Math.PI / 2);
     const sad = new THREE.Mesh(sg, clayMat(0xe9d9b8, { sub: 0.4, side: THREE.DoubleSide, opacity: 0.9 })); sad.position.z = -K.z; g.add(sad);
     for (const [fx, fy] of [[-0.018, 0.012], [-0.018, -0.012], [0.018, 0]]) { const f = new THREE.Mesh(new THREE.CylinderGeometry(0.002, 0.002, 0.006, 10).rotateX(Math.PI / 2), clayMat(0xe9d9b8, { sub: 0.4 })); f.position.set(fx, fy, -R - 0.002 - K.z); g.add(f); } }
   g.add(new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.004, 0.006).translate(0, 0, K.size[2] / 2 + 0.003), clayMat(0xe3b36a, { sub: 0.4 })));
@@ -558,12 +583,7 @@ function buildTool() {      // head block under the wrist, 6 mm push tube with t
   for (const s of [1, -1]) fork.add(new THREE.Mesh(new THREE.BoxGeometry(0.004, 0.003, 0.03).translate(0.009, s * 0.008, 0), dark));
   fork.add(new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.022, 0.006).translate(0.009, 0, 0.016), dark));
   piv.add(new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.012, 0.02).translate(0.013, 0, 0.07), dark));
-  // wide gel nozzle beside the stem: outlet 60 mm above the needle tip, fed by the gel line
-  const noz = new THREE.Mesh(new THREE.CylinderGeometry(0.0065, 0.008, L - 0.06, 16).rotateX(Math.PI / 2).translate(-0.013, 0, 0.06 + (L - 0.06) / 2), clayMat(0xc9d6e2, { sub: 0.5 })); piv.add(noz);
-  const strand = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.0055, 1, 12).rotateX(Math.PI / 2).translate(0, 0, -0.5), new THREE.MeshPhongMaterial({ color: new THREE.Color(0x4f8fcf).convertSRGBToLinear(), transparent: true, opacity: 0.5, depthWrite: false }));
-  strand.position.set(-0.013, 0, 0.06); strand.visible = false; g.add(strand);
-  const hose = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()]), new THREE.LineBasicMaterial({ color: 0x9cc8ec, transparent: true, opacity: 0.8 })); hose.frustumCulled = false; R3.arm.add(hose);
-  return { g, piv, fork, strand, hose };
+  return { g, piv, fork };
 }
 function poseArm() {
   const [yaw, a, b] = ARM.q, S = SC.PV_S, E = SC.PV_E, W = SC.PV_W;
@@ -579,11 +599,6 @@ function poseArm() {
   const pz = J.layout.stem + 0.025; ARM.tool.piv.position.set(0, 0, pz); ARM.tool.piv.rotation.x = -ARM.tilt; ARM.tool.piv.children.forEach((c) => { c.position.z = -pz; });
   ARM.tool.fork.position.z = -pz + (ARM.mode === "fork" ? 0.008 : 0.075); ARM.tool.fork.rotation.z = ARM.latch * Math.PI / 2;
   ARM.tip = KIN.tip(ARM.q, ARM.xb);
-  // gel line from the front of the boom to the head; the strand of gel while the arm fills the womb
-  const hp = new THREE.Vector3(-0.013, 0, J.layout.stem + 0.05).applyMatrix4(ARM.tool.g.matrix), hb = new THREE.Vector3(ARM.xb + 0.06, -0.03, J.layout.root_z + 0.01);
-  const hm = new THREE.Vector3((hp.x + hb.x) / 2, (hp.y + hb.y) / 2 - 0.04, Math.min(hp.z, hb.z) + 0.02 * 0); const hpos = ARM.tool.hose.geometry.attributes.position; hpos.setXYZ(0, hb.x, hb.y, hb.z); hpos.setXYZ(1, hm.x, hm.y, hm.z); hpos.setXYZ(2, hp.x, hp.y, hp.z); hpos.needsUpdate = true;
-  ARM.tool.hose.visible = ARM.tilt < 0.1;
-  const st = ARM.tool.strand; st.visible = !!ARM.dispense && ARM.tilt < 0.05; if (st.visible) st.scale.z = Math.max(0.005, ARM.tip[2] + 0.06 - ARM.dispense);
   // boom: the first stage runs on the rails up to the v2 front station, the second stage carries the base further
   const off1 = Math.min(ARM.xb, SC.armRoot[0][3]) - SC.armRoot[0][3]; PARTS.boom1.position.x = off1;
   const x0 = -0.300 + off1, x1 = ARM.xb + 0.07; PARTS.boom2.visible = x1 - x0 > 0.01; PARTS.boom2.scale.x = Math.max(0.01, x1 - x0); PARTS.boom2.position.x = (x0 + x1) / 2;
@@ -613,13 +628,13 @@ function buildStages() {
   TL.stages = [
     { k: "approach", n: 1, name: "The tail comes in", real: tc - 3, disp: 9 },
     { k: "dock", n: 2, name: "Dock by magnets", real: t_end - tc + 3, disp: 7 },
-    { k: "out", n: 3, name: "Arm out of the tail", real: OUT_T, disp: 7 },
-    { k: "gel", n: 3, name: "Gel in by the arm", real: GF[GF.length - 1][0], disp: 11 },
+    { k: "gel", n: 3, name: "Gel into the trough", real: GF[GF.length - 1][0], disp: 8 },
+    { k: "out", n: 4, name: "Arm out of the tail", real: OUT_T, disp: 7 },
     { k: "kit", n: 4, name: "Place the kit", real: J.kit.total, disp: 12 },
     { k: "print", n: 5, name: "Print the baby", real: P.total_s, disp: 22 },
     { k: "cure", n: 5, name: "Cure", real: P.cure_s, disp: 4 },
-    { k: "push", n: 6, name: "Blow and push", real: B.t_release, disp: 20 },
-    { k: "birth", n: 7, name: "Birth", real: 3.0, disp: 7 },
+    { k: "push", n: 6, name: "Blow and push", real: B.t_release, disp: 34 },
+    { k: "birth", n: 7, name: "Birth, full size", real: B.t_end - B.t_release, disp: 26 },
     { k: "float", n: 8, name: "Float", real: 8, disp: 6 },
     { k: "swim", n: 8, name: "Swim away", real: 20, disp: 10 },
     { k: "mswim", n: 0, name: "Mother swims", real: 6, disp: 8 },
@@ -662,26 +677,22 @@ function evalState(T) {
   } else {
     S.tail = { x: 0, y: 0, yaw: 0, v: 0, TL: 0, TR: 0, gap: 0, Fm: D.hold_N, wx: 0, Fc: 0 }; S.docked = true;
     if (k === "gel") { const GF = J.gel.fill;
-      S.gel = at(GF, tau, 2); S.gelL = at(GF, tau, 1); S.fl = { ...ST.docked_gel, WL: at(GF, tau, 3), trim_deg: at(GF, tau, 4), mass: lerp(ST.docked_empty.mass, ST.docked_gel.mass, tau / GF[GF.length - 1][0]), name: "Docked, gel coming in" }; }
-    else if (k === "out") { S.gel = -1; S.gelL = 0; S.fl = ST.docked_empty; }
+      S.gel = at(GF, tau, 2); S.gelL = at(GF, tau, 1); S.fl = { ...ST.docked_gel, WL: at(GF, tau, 3), trim_deg: at(GF, tau, 4), mass: at(GF, tau, 6), name: "Docked, gel coming into the trough" }; }
     else { S.gel = L.gel_z; S.gelL = J.gel.V_L;
-      S.fl = (k === "kit" || k === "print" || k === "cure") ? ST.arm_print : k === "push" ? lerpState(ST.arm_print, ST.baby_lip, clamp(tau / B.t_release, 0, 1)) : k === "birth" ? lerpState(ST.baby_lip, ST.after_birth, mj(tau / 3)) : ST.after_birth; }
+      S.fl = k === "out" ? lerpState(ST.docked_gel, ST.arm_print, mj(tau / OUT_T)) : (k === "kit" || k === "print" || k === "cure") ? ST.arm_print : k === "push" ? lerpState(ST.arm_print, ST.baby_lip, clamp(tau / B.t_release, 0, 1)) : k === "birth" ? lerpState(ST.baby_lip, ST.after_birth, mj(tau / 20)) : ST.after_birth; }
   }
   // arm: boom position, joint seed, tool
   const pass = L.pass_q, park = [L.x_e0 - 0.02, 0, L.gel_z + 0.03];
   S.armMode = "ik"; S.tilt = 0; ARM.mode = "needle"; ARM.latch = 0; let tip = park, xb = boomFor(park);
   S.line = -1; S.layer = -1; S.printed = 0; S.ext = 0; S.lam = BB.lam0; S.babyVis = false; S.clipZ = 100; S.kit = "cradle";
   S.bx = L.x_e0; S.bz = L.z_axis; S.pitch = 0; S.bWorld = false;
-  const kitT = J.kit.moves, DR = J.gel.dispense.rows, outPoseX = DR[0][5];
+  const kitT = J.kit.moves, outPoseX = kitT[0][7];
   if (!atLeast("out")) { S.armMode = "fixed"; ARM.q = pass.slice(); S.tilt = L.pass_tilt; xb = L.root_home; }
   else if (k === "out") {
     const u1 = mj(tau / (OUT_T * 0.6)), u2 = mj((tau - OUT_T * 0.6) / (OUT_T * 0.4));
     xb = lerp(L.root_home, outPoseX, u1);
     if (u2 <= 0) { S.armMode = "fixed"; ARM.q = pass.slice(); S.tilt = L.pass_tilt; }
-    else { S.armMode = "blend"; S.blend = u2; S.tilt = L.pass_tilt * (1 - u2); tip = DR[0].slice(1, 4); ARM.mode = "gel"; }
-  } else if (k === "gel") {
-    const tt = tau * DR[DR.length - 1][0] / J.gel.fill[J.gel.fill.length - 1][0];
-    tip = [at(DR, tt, 1), at(DR, tt, 2), Math.max(at(DR, tt, 3), S.gel + 0.02)]; xb = at(DR, tt, 5); ARM.mode = "gel"; S.dispensing = true;
+    else { S.armMode = "blend"; S.blend = u2; S.tilt = L.pass_tilt * (1 - u2); tip = kitT[0].slice(1, 4); ARM.mode = "fork"; }
   } else if (k === "kit") {
     const M = kitT; let i = 0; while (i < M.length - 1 && M[i + 1][0] <= tau) i++;
     const a = M[i], b = M[Math.min(i + 1, M.length - 1)], u = mj((tau - a[0]) / ((b[0] - a[0]) || 1));
@@ -702,35 +713,34 @@ function evalState(T) {
     S.printed = GC.segs.length; S.babyVis = true; S.kit = "placed"; S.line = GC.lines.length - 2; S.ext = GC.pts[GC.pts.length - 1].ext;
     const boss = [L.x_e0 - 0.001, 0, L.z_axis]; const u = mj((tau - P.cure_s + 120) / 100); tip = [lerp(park[0], boss[0], u), 0, lerp(park[2], boss[2], u)]; xb = boomFor(tip);
   } else if (k === "push") {
-    const bt = B.track; S.babyVis = true; S.kit = "baby"; S.ext = GC.pts[GC.pts.length - 1].ext; S.printed = GC.segs.length;
-    S.bx = at(bt, tau, 2); S.bz = at(bt, tau, 3); S.pitch = at(bt, tau, 4); S.lam = at(bt, tau, 5); S.bV = at(bt, tau, 6); S.bp = at(bt, tau, 7); S.air = at(bt, tau, 8);
-    S.F = at(bt, tau, 9); S.Fch = at(bt, tau, 10); S.Fgel = at(bt, tau, 11); S.outF = at(bt, tau, 12); S.gate = at(bt, tau, 13); S.xcg = at(bt, tau, 14); S.Lb = at(bt, tau, 16);
+    readBirth(S, tau); S.babyVis = true; S.kit = "baby"; S.ext = GC.pts[GC.pts.length - 1].ext; S.printed = GC.segs.length;
     tip = [S.bx - 0.001, 0, S.bz]; xb = boomFor(tip);
   } else {   // birth and after: the newborn is outside; the arm folds home
-    const last = B.track[B.track.length - 1]; S.babyVis = true; S.kit = "baby"; S.printed = GC.segs.length;
-    S.lam = nb.lam_surface; S.bV = nb.V_surface_L; S.bp = nb.p_surface_rel;
-    const rel = [last[2], last[3]]; S.bWorld = true;
+    const last = B.track[B.track.length - 1], pr = B.track.filter((r) => r[18] === 0).pop(); S.babyVis = true; S.kit = "baby"; S.printed = GC.segs.length;
+    S.bWorld = true;
     if (k === "birth") {
-      const u = clamp(tau / 3, 0, 1), dr = nb.drop, zc = at(dr, tau * 0.5, 1);
-      // the body tips over the lip and drops: pivots about the lip, then falls flat into the water
-      const L0 = last[16], cg = Math.hypot(last[14] - last[2], last[15] - last[3]);
-      const lip = L.lip, ang = lerp(last[4], -0.35, mj(u * 1.6)) * (1 - mj((u - 0.55) / 0.45)) ;
-      S.pitch = ang; S.bx = lip[0] + 0.05 * u - cg * Math.cos(ang) + 0.12 * mj((u - 0.4) / 0.6); S.bz = lerp(last[3] + 0.0, zc, mj(u)) ;
-      S.dropZ = zc; S.armHome = mj((tau - 0.5) / 2.5);
+      readBirth(S, B.t_release + tau); S.armHome = mj(tau / Math.max(8, (B.t_end - B.t_release) * 0.3));
     } else {
-      const rise = nb.drop, tr = k === "float" ? tau + 1.5 : 1e9; const zc = at(rise, Math.min(tr, rise[rise.length - 1][0]), 1);
-      S.bx = L.lip[0] + 0.17 - (nb.length * 0.45); S.bz = zc; S.pitch = 0; S.armHome = 1;
+      S.lam = nb.lam_surface; S.bV = nb.V_surface_L; S.bp = nb.p_surface_rel;
+      const rise = nb.rise, tr = k === "float" ? tau : 1e9; const zc = at(rise, Math.min(tr, rise[rise.length - 1][0]), 1);
+      S.bx = last[2]; S.bz = zc; S.pitch = lerp(last[4], 0, mj(k === "float" ? tau / 4 : 1)); S.armHome = 1;
       if (after2(S, "float")) { const sw = nb.swim, ts = k === "swim" ? tau : 20, s = at(sw, Math.min(ts, sw[sw.length - 1][0]), 1); S.swimS = s; S.swimV = at(sw, Math.min(ts, sw[sw.length - 1][0]), 2); S.swimming = k === "swim";
         let x = 0, y = 0; const n = 40; for (let j = 0; j < n; j++) { const h = 1.3 * mj((s * (j + 0.5) / n) / 1.4); x += Math.cos(h) * s / n; y += Math.sin(h) * s / n; }   // turns to port, clear of the mother
         S.bx += x; S.by = y; S.yawB = 1.3 * mj(s / 1.4); }
     }
     // arm folds home along the reverse of the way out
-    const h = S.armHome; if (h < 1) { tip = [lerp(last[2] - 0.02, park[0], mj(h * 1.4)), 0, lerp(last[3] + 0.02, park[2] + 0.04, mj(h * 1.4))]; xb = boomFor(tip); if (h > 0.7) { S.armMode = "blend"; S.blend = 1 - mj((h - 0.7) / 0.3); xb = lerp(L.root_home, boomFor(tip), S.blend); S.tilt = L.pass_tilt * (1 - S.blend); } }
+    const h = S.armHome; if (h < 1) { tip = [lerp(pr[2] - 0.02, park[0], mj(h * 1.4)), 0, lerp(pr[3] + 0.02, park[2] + 0.04, mj(h * 1.4))]; xb = boomFor(tip); if (h > 0.7) { S.armMode = "blend"; S.blend = 1 - mj((h - 0.7) / 0.3); xb = lerp(L.root_home, boomFor(tip), S.blend); S.tilt = L.pass_tilt * (1 - S.blend); } }
     else { S.armMode = "fixed"; ARM.q = pass.slice(); S.tilt = L.pass_tilt; xb = L.root_home; }
   }
   if (k === "mswim") { const M = J.swim.track; S.mx = at(M, tau, 1); S.mv = at(M, tau, 2); } else S.mx = 0;
   S.tip = tip; S.xb = xb;
   return S;
+}
+function readBirth(S, tt) {
+  const bt = J.birth.track;
+  S.bx = at(bt, tt, 2); S.bz = at(bt, tt, 3); S.pitch = at(bt, tt, 4); S.lam = at(bt, tt, 5); S.bV = at(bt, tt, 6); S.bp = at(bt, tt, 7); S.air = at(bt, tt, 8);
+  S.F = at(bt, tt, 9); S.Fch = at(bt, tt, 10); S.Fgel = at(bt, tt, 11); S.outF = at(bt, tt, 12); S.gate = at(bt, tt, 13); S.xcg = at(bt, tt, 14); S.Lb = at(bt, tt, 16); S.Fext = at(bt, tt, 17);
+  const [i] = track(bt, tt); S.phase = bt[i][18]; S.nOpen = bt[i][19]; S.nOut = bt[i][20]; S.Fres = bt[i][21];
 }
 function rTab(arr, z) { const L = J.layout, zs = L.rz; let i = clamp(Math.floor((z - zs[0]) / (zs[1] - zs[0])), 0, zs.length - 2); let a = arr[i], b = arr[i + 1]; if (a === null) a = b; if (b === null) b = a; const u = clamp((z - zs[i]) / (zs[1] - zs[0]), 0, 1); return lerp(a, b, u); }
 function boomFor(p, margin = 0.025) { const L = J.layout, zr = p[2] - L.root_z; const r = Math.min(Math.max(rTab(L.rmin, zr) + margin, Math.abs(p[1]) + 0.03), rTab(L.rmax, zr) - 0.01); return p[0] - Math.sqrt(Math.max(r * r - p[1] * p[1], 0.0004)); }
@@ -752,7 +762,7 @@ function applyState(S, now) {
   // gel
   setGel(S.gel < -0.5 ? -9 : S.gel);
   // arm
-  ARM.xb = S.xb; ARM.tilt = S.tilt; ARM.dispense = S.dispensing ? S.gel : 0;
+  ARM.xb = S.xb; ARM.tilt = S.tilt;
   if (S.armMode === "fixed") { }
   else { let q = KIN.solve(S.tip, ARM.q, ARM.xb); const e = KIN.tip(q, ARM.xb); if (Math.hypot(e[0] - S.tip[0], e[1] - S.tip[1], e[2] - S.tip[2]) > 0.002) { for (const sd of [[Math.atan2(S.tip[1], S.tip[0] - ARM.xb), 0.9, 0.5], [Math.atan2(S.tip[1], S.tip[0] - ARM.xb), 0.4, 0.9], [0, 1.3, 0.3]]) { const q2 = KIN.solve(S.tip, sd, ARM.xb), e2 = KIN.tip(q2, ARM.xb); if (Math.hypot(e2[0] - S.tip[0], e2[1] - S.tip[1], e2[2] - S.tip[2]) < Math.hypot(e[0] - S.tip[0], e[1] - S.tip[1], e[2] - S.tip[2])) { q = q2; break; } } }
     ARM.q = S.armMode === "blend" ? J.layout.pass_q.map((p, i) => lerp(p, q[i], S.blend)) : q; }
@@ -772,7 +782,8 @@ function applyState(S, now) {
   if (S.kit === "cradle") BB.kitG.matrix.copy(R3.womb.matrixWorld).multiply(Tm([c[0], c[1], c[2] + K.size[2] / 2]));
   else if (S.kit === "carried") { R3.arm.updateMatrixWorld(true); const p = new THREE.Vector3(...ARM.tip).applyMatrix4(R3.tail.matrixWorld); BB.kitG.matrix.makeTranslation(p.x, p.y, p.z - K.size[2] / 2 - 0.004); }
   else if (S.kit === "placed") BB.kitG.matrix.copy(R3.womb.matrixWorld).multiply(Tm(kc));
-  else { const uc0 = 0.5 * (BB.u0[J.body.band[0]] + BB.u0[J.body.band[1]]), uc = 0.5 * (BB.u[J.body.band[0]] + BB.u[J.body.band[1]]); BB.kitG.matrix.copy(R3.baby.matrix).multiply(Tm([kc[0] - J.layout.x_e0 + (uc - uc0), 0, kc[2] - J.layout.z_axis])); }
+  else { const uc = 0.5 * (BB.u[J.body.band[0]] + BB.u[J.body.band[1]]), kz = -BB.rb + 0.004 + K.size[2] / 2; BB.kitG.matrix.copy(R3.baby.matrix).multiply(Tm([uc, 0, kz]));
+    BB.jets.forEach((j, i) => j.position.set(uc - 0.03, (i ? -1 : 1) * 0.026, kz - 0.02)); }
   UW.uTime.value = now;
 }
 
@@ -786,12 +797,13 @@ function buildLabels() {
   mk("Tail", "", () => Tt([-0.72, 0, 0.25]));
   mk("Docking face, three magnets", "", () => ["approach", "dock"].includes(STATE.k) || CAM === "section" ? W([-0.384, 0, 0.27]) : null);
   mk("Birth opening", "", () => W([0.33, 0, 0.25]));
-  mk("Gel", "w", () => STATE.gel > -0.5 ? W([0.16, -0.16, STATE.gel + 0.006]) : null);
+  mk("Gel trough", "w", () => ["gel", "out", "kit", "print", "cure"].includes(STATE.k) ? W([0.0, -0.09, J.layout.gel_z + 0.01]) : null);
+  mk("Bottom channel", "", () => ["gel", "dock"].includes(STATE.k) ? W([-0.27, -0.02, J.gel.trough.floor + 0.05]) : null);
   mk("Waterline", "w", () => [0.75 + (STATE.mx || 0), -0.25, J.WL]);
   mk("Electronics kit", "k", () => ["kit", "print", "cure"].includes(STATE.k) ? new THREE.Vector3().setFromMatrixPosition(BB.kitG.matrix).add(new THREE.Vector3(0, 0, 0.05)).toArray() : null);
   mk("Two pumps under the womb", "", () => ["mswim", "approach"].includes(STATE.k) ? W([J.layout.pump.x, -J.layout.pump.y, J.layout.pump.z - 0.05]) : null);
   mk("Chute", "", () => ["push", "cure"].includes(STATE.k) ? W([0.24, -0.1, -0.06]) : null);
-  mk("Newborn", "", () => after2(STATE, "push") ? new THREE.Vector3(0.14, 0, 0.08).applyMatrix4(R3.baby.matrix).toArray() : null);
+  mk("Newborn", "", () => after2(STATE, "birth") ? new THREE.Vector3(0.26, 0, 0.22).applyMatrix4(R3.baby.matrix).toArray() : null);
 }
 function updateLabels() {
   const w = R3.host.clientWidth, h = R3.host.clientHeight, ov = $(".ov").getBoundingClientRect(), hr = R3.host.getBoundingClientRect(), ox0 = ov.left - hr.left, ox1 = ov.right - hr.left, oy1 = ov.bottom - hr.top + 14;
@@ -806,16 +818,17 @@ const CAMS = {
   section: () => ({ p: [-0.15, -2.35, 0.42], t: [-0.15, 0, -0.08] }),
   print: () => ({ p: [-0.05, -1.15, 0.28], t: [-0.06, 0, -0.17] }),
   kitcam: () => ({ p: [-0.18, -1.25, 0.55], t: [-0.15, 0.05, -0.12] }),
-  push: () => ({ p: [0.10, -1.55, 0.28], t: [0.08, 0, -0.10] }),
+  push: () => ({ p: [0.42, -1.65, 0.30], t: [0.30, 0, -0.05] }),
+  birthcam: () => ({ p: [0.62, -2.05, 0.42], t: [0.48, 0, -0.06] }),
   opening: () => ({ p: [1.55, -1.75, 0.55], t: [0.35, 0, -0.06] }),
   swim: () => { const b = new THREE.Vector3().setFromMatrixPosition(R3.baby.matrix); return { p: [b.x + 0.1, b.y - 1.6, 0.45], t: [b.x + 0.1, b.y, J.WL] }; },
   mswim: () => ({ p: [-0.3, -3.4, 1.0], t: [-0.3, 0, -0.05] }),
 };
 let camGoal = null;
-function setCam(name, snap = false) { CAM = name; const c = CAMS[name](); camGoal = c; SECT.constant = ["section", "print", "kitcam", "push"].includes(name) ? 0 : 100; document.querySelectorAll("[data-cam]").forEach((b) => b.classList.toggle("on", b.dataset.cam === name)); if (snap) { R3.camera.position.set(...c.p); R3.controls.target.set(...c.t); } }
+function setCam(name, snap = false) { CAM = name; const c = CAMS[name](); camGoal = c; SECT.constant = ["section", "print", "kitcam", "push", "birthcam"].includes(name) ? 0 : 100; document.querySelectorAll("[data-cam]").forEach((b) => b.classList.toggle("on", b.dataset.cam === name)); if (snap) { R3.camera.position.set(...c.p); R3.controls.target.set(...c.t); } }
 function setAuto(v) { AUTO = v; $("#autoCam").classList.toggle("on", v); $("#autoCam").setAttribute("aria-pressed", String(v)); }
 function autoCam(S) {
-  const want = { approach: "wide", dock: "overview", gel: "kitcam", out: "section", kit: "kitcam", print: "print", cure: "section", push: "push", birth: "opening", float: "opening", swim: "swim", mswim: "mswim" }[S.k];
+  const want = { approach: "wide", dock: "overview", gel: "kitcam", out: "section", kit: "kitcam", print: "print", cure: "section", push: "push", birth: "birthcam", float: "birthcam", swim: "swim", mswim: "mswim" }[S.k];
   if (want !== CAM) setCam(want);
 }
 function stepCam(dt, S) {
@@ -831,13 +844,13 @@ const bar = (f, warn) => `<div class="bar${warn ? " w" : ""}"><i style="width:${
 const STEP = {
   approach: "The tail, a clear arm unit with the DexArm folded inside, swims toward the docking face of the womb on two pumps, steering by line of sight.",
   dock: "A cone centers the collar in the docking face. After contact the three magnets switch on and hold the tail and the womb together as one egg.",
-  gel: "The DexArm fills the womb through the wide gel nozzle on the head, fed by the gel pump in the tail. The nozzle moves over the floor spot by spot, so the gel rises evenly to 10 mm under the docking bore while the ballast bags empty.",
-  out: "The boom slides the folded arm out of the tail, through the docking bore and over the empty womb. The head turns the stem down.",
+  gel: "Gel goes from the tail through the bottom channel into the floor of the trough under the womb and rises evenly; the rest of the womb stays air. The ballast bags let out as much water as gel comes in.",
+  out: "The boom slides the folded arm out of the tail, through the docking bore and over the trough. The head turns the stem down.",
   kit: "", print: "The skin is printed around the kit, bottom up, layer by layer, from the real G-code. The boom moves with the arm (axis A).",
   cure: "Dragon Skin 10 NV cures in the gel for 75 minutes. Then the needle goes into the septum in the tail cap.",
-  push: "", birth: "The center of gravity passes the lip. The needle lets go, and the baby tips over the lip of the stern opening and drops into the water.",
-  float: "The newborn settles at the floating draft beside the stern. The arm is folded back in the tail.",
-  swim: "The newborn swims away on two jets from the kit pumps.", mswim: "The mother robot swims on: two pumps under the womb and two in the tail.",
+  push: "", birth: "",
+  float: "The full size newborn settles beside the stern; the kit pumps take water into a belly pocket so the jets sit 50 mm under water. The arm is folded back in the tail.",
+  swim: "The newborn swims away on two jets from the kit pumps.", mswim: "The mother robot swims on, slowly: two small pumps under the womb and two in the tail.",
 };
 function renderReadouts(S) {
   const F = S.fl, B = J.birth, nb = J.newborn, lim = B.F_lim;
@@ -848,24 +861,25 @@ function renderReadouts(S) {
   h += `<div class="rg"><h4>Tail and dock</h4>${rr("dock", S.docked ? "docked, three magnets hold " + f0(J.dock.hold_N) + " N" : `gap ${f0(Math.max(0, T.gap))} mm`, "", !S.docked)}${rr("tail speed", f0(Math.abs(T.v) * 1000), "mm/s")}${rr("thrust port / starboard", `${f2(Math.abs(T.TL))} / ${f2(Math.abs(T.TR))}`, "N")}${S.k === "dock" || S.k === "approach" ? rr("lateral offset", f1(T.y * 1000), "mm") + rr("contact force", f0(T.Fc), "N") : ""}</div>`;
   h += `<div class="rg"><h4>Gel</h4>${rr("volume", f1(S.gel > -0.5 ? S.gelL : 0), "L", S.k === "gel")}${rr("surface z", S.gel > -0.5 ? f0(S.gel * 1000) : "empty", S.gel > -0.5 ? "mm" : "")}${rr("yield stress", f0(J.constants.tau_y), "Pa")}${rr("supply", "dock line, 1 L buffer in the tail")}${rr("arm line flow / pressure", `${f1(J.gel.Q_L_min)} L/min / ${f0(J.gel.dp_kPa)} kPa`)}${rr("ballast bags", S.gel < -0.5 ? f1(J.gel.bag_L) + " L full" : S.k === "gel" ? f1(J.gel.bag_L * (1 - S.gelL / J.gel.V_L)) + " L" : "empty", "", S.k === "gel")}</div>`;
   const off = [ARM.q[0] / D2R, ARM.q[1] / D2R + J.arm.a_rest, ARM.q[2] / D2R + J.arm.b_rest];
-  h += `<div class="rg"><h4>Arm, Rotrics DexArm in the tail</h4>${rr("boom, base x (axis A)", f0(ARM.xb * 1000), "mm", S.k === "out")}${rr("base, J1, J2 (official ranges)", off.map((x) => x.toFixed(0)).join(", "), "deg")}${rr("head", ARM.tilt > 0.1 ? "stem turned forward for the bore" : ARM.mode === "gel" ? "gel nozzle, dispensing" : ARM.mode === "fork" ? `fork, latch ${ARM.latch > 0.5 ? "closed" : "open"}` : "needle and push tube")}${rr("tip off target", f1(ARM.err), "mm", ARM.err > 1)}${rr("push force", S.k === "push" ? f2(S.F || 0) : "0.00", "N", S.k === "push")}${S.k === "push" ? bar((S.F || 0) / lim, (S.F || 0) > 0.7 * lim) : ""}${rr("payload limit", f2(lim), "N")}</div>`;
+  h += `<div class="rg"><h4>Arm, Rotrics DexArm in the tail</h4>${rr("boom, base x (axis A)", f0(ARM.xb * 1000), "mm", S.k === "out")}${rr("base, J1, J2 (official ranges)", off.map((x) => x.toFixed(0)).join(", "), "deg")}${rr("head", ARM.tilt > 0.1 ? "stem turned forward for the bore" : ARM.mode === "fork" ? `fork, latch ${ARM.latch > 0.5 ? "closed" : "open"}` : "needle and push tube")}${rr("tip off target", f1(ARM.err), "mm", ARM.err > 1)}${rr("push force", S.k === "push" ? f2(S.F || 0) : "0.00", "N", S.k === "push")}${S.k === "push" ? bar((S.F || 0) / lim, (S.F || 0) > 0.7 * lim) : ""}${rr("payload limit", f2(lim), "N")}</div>`;
   const lay = S.layer >= 0 ? S.layer + 1 : (after2(S, "print") ? GC.layers : 0);
   h += `<div class="rg"><h4>Print</h4>${rr("layer", `${lay} / ${GC.layers}`)}${rr("silicone laid", f1((S.ext || 0) / 1000), "ml")}${rr("print time", S.k === "print" ? hms(S.printT) : after2(S, "print") ? hms(GC.total) : "0:00:00")}${rr("kit", S.kit === "cradle" ? "in the cradle" : S.kit === "carried" ? "on the fork" : S.kit === "placed" ? "on the seat in the gel" : "inside the baby")}</div>`;
-  const V = S.bV ?? J.body.vol_folded_L, m = J.body.mass_kg;
-  h += `<div class="rg"><h4>Baby robot</h4>${rr("stories open", `${S.lam.filter((l) => l > 0.95).length} / ${S.lam.length}`)}${rr("length", f0(BB.L * 1000), "mm")}${rr("pressure above outside", f0(S.bp ?? 0), "Pa", S.k === "push")}${rr("inner volume", f3(V), "L", S.k === "push")}${rr("mass with trapped gel", f3(m), "kg")}${S.k === "push" ? rr("share out of the gel", f0((S.outF || 0) * 100), "%") + rr("chute / gel resistance", `${f2(S.Fch || 0)} / ${f2(S.Fgel || 0)}`, "N") + rr("air in", f3(S.air || 0), "L") : ""}${after2(S, "push") ? rr("floats with", f0(nb.freeboard_mm), "mm above water") + rr("under water", f0(nb.sub_frac * 100), "%") : ""}${S.k === "swim" ? rr("jet thrust, two jets", f3(nb.thrust), "N", true) + rr("speed", f3(S.swimV || 0), "m/s", true) : ""}</div>`;
+  const V = S.bV ?? J.body.vol_folded_L, m = J.body.mass_kg, inBirth = S.k === "push" || S.k === "birth";
+  h += `<div class="rg"><h4>Baby robot</h4>${rr("segments out / open", `${S.nOut ?? 0} / ${S.nOpen ?? 0} of ${J.body.nseg}`, "", inBirth)}${rr("length", f0(BB.L * 1000), "mm", inBirth)}${rr("diameter", f0(2 * (BB.rmax || 0) * 1000), "mm", inBirth)}${rr("pressure above outside", f0(S.bp ?? 0), "Pa", inBirth)}${rr("volume", f1(V), "L", inBirth)}${rr("mass with trapped gel", f2(m), "kg")}${inBirth ? rr("arm force / resistance", `${f2(S.F || 0)} / ${f2(S.Fres || 0)}`, "N", S.k === "push") + rr("pressure on the rim pulls out", f1(S.Fext || 0), "N") + rr("air in, at 1 atm", f1(S.air || 0), "L") : ""}${after2(S, "birth") ? rr("full size", `${f0(J.newborn.length * 1000)} x ${f0(J.newborn.diameter * 1000)}`, "mm") + rr("water in the belly pocket", f1(nb.ballast_L), "L") + rr("draft", f0(nb.draft_mm), "mm") : ""}${S.k === "swim" ? rr("jet thrust, two jets", f3(nb.thrust), "N", true) + rr("speed", f3(S.swimV || 0), "m/s", true) : ""}</div>`;
   $("#ro").innerHTML = h;
 }
 function renderOverlay(S) {
   $("#ovStage").textContent = (S.st.s.n ? S.st.s.n + ". " : "") + S.st.s.name;
   let step = STEP[S.k] || "";
   if (S.k === "kit") step = "One pick and place before any print: " + (S.kitStep || "") + ". CodeCell C6 Drive, LiPo and two jet pumps in one silicone saddle, 108 g.";
-  if (S.k === "push") step = `The arm pushes the baby along the gel and up the chute toward the stern opening while air goes in through the needle. ${S.lam.filter((l) => l > 0.95).length} of ${S.lam.length} stories open.`;
+  if (S.k === "push") step = `Push while inflating: the arm pushes the folded baby out of the trough and up the chute; each segment opens only once the segment is out of the stern opening. ${S.nOut ?? 0} of ${J.body.nseg} segments out, ${S.nOpen ?? 0} open.`;
+  if (S.k === "birth") step = S.phase === 2 ? `In the water the whole skin stretches smooth to full size: ${f2(BB.L)} m long, ${f0(S.bp || 0)} Pa.` : `The arm lets go; the needle stays in on its air line. The opened part pulls on the rim and the body slides out, the last segments opening as they pass the rim. ${S.nOut ?? 0} of ${J.body.nseg} out.`;
   $("#ovStep").textContent = step;
   $("#ovClock").innerHTML = `${hms(S.clock)} <span>process clock</span>`;
   $("#tlClock").textContent = hms(S.clock) + " / " + hms(TL.realTotal);
   const notes = [];
   if (ARM.err > 1) notes.push(`<b>DexArm</b> tip ${f1(ARM.err)} mm off target`);
-  if (S.k === "push") notes.push(`Push limited to 85 percent of the ${f2(J.birth.F_lim)} N payload by a force loop. Friction on the chute ${f1(J.constants.mu)}.`);
+  if (S.k === "push") notes.push(`Arm force ${f2(S.F || 0)} N of the ${f2(J.birth.F_lim)} N payload${(S.F || 0) > J.birth.F_lim ? " <b>over the payload</b>" : ""}. Friction on the chute ${f1(J.constants.mu)}.`);
   if (S.k === "gel") notes.push(`Gel ${f1(J.gel.V_L)} L at ${f1(J.gel.Q_L_min)} L/min: dock line, 1 L buffer and pump in the tail, ${f0(J.gel.dp_kPa)} kPa in the line to the arm. No gel cylinder: the gel fills the bottom of the shell.`);
   $("#notes").innerHTML = notes.map((n) => `<div>${n}</div>`).join("");
 }
@@ -878,8 +892,8 @@ function renderProps() {
     renderLiveChecks();
   } else if (TAB === "birth") {
     const B = J.birth, fr = J.friction;
-    el.innerHTML = `<div class="pnl"><h3>Blow and push, DexArm</h3><canvas id="chart" width="700" height="184"></canvas><div class="leg"><span><i style="background:#9cc8ec"></i>pressure, 0 to 1 kPa</span><span><i style="background:#e3b36a"></i>arm force, 0 to the payload</span><span><i style="background:#9fd29a"></i>share out of the gel</span></div>
-      <dl class="kv"><dt>push speed, free</dt><dd>${f0(B.v0 * 1000)} mm/s</dd><dt>air flow at the needle</dt><dd>${f1(B.Q0_L_min)} L/min</dd><dt>peak arm force</dt><dd>${f2(B.F_peak)} of ${f2(B.F_lim)} N</dd><dt>time to release</dt><dd>${f0(B.t_release)} s</dd><dt>chute, steepest</dt><dd>${f1(J.layout.chute.slope_max_deg)} deg</dd><dt>whole body on the steepest part, friction 0.2 / 0.3 / 0.4 / 0.6</dt><dd>${fr["0.2"]} / ${fr["0.3"]} / ${fr["0.4"]} / ${fr["0.6"]} N</dd><dt>folded / deployed length</dt><dd>${f0(J.body.len_folded * 1000)} / ${f0(J.body.len_deployed * 1000)} mm</dd><dt>folded / deployed volume</dt><dd>${f2(J.body.vol_folded_L)} / ${f2(J.body.vol_deployed_L)} L</dd><dt>drop to the water</dt><dd>${f0(J.newborn.drop_h_mm)} mm</dd><dt>newborn swim speed</dt><dd>${f2(J.newborn.v_terminal)} m/s</dd></dl></div>`;
+    el.innerHTML = `<div class="pnl"><h3>Push while inflating, DexArm</h3><canvas id="chart" width="700" height="200"></canvas><div class="leg"><span><i style="background:#9cc8ec"></i>pressure, 0 to 1.2 kPa</span><span><i style="background:#9fd29a"></i>volume, 0 to ${f0(J.body.vol_deployed_L)} L</span><span><i style="background:#e3b36a"></i>arm force, 0 to the payload</span><span><i style="background:#d58a7a"></i>pull of the pressure on the rim, 0 to ${f0(Math.max(...B.track.map((r) => r[17])))} N</span><span><i style="background:#ecebe6"></i>arm lets go</span></div>
+      <dl class="kv"><dt>push speed, free</dt><dd>${f0(B.v0 * 1000)} mm/s, waits for the air</dd><dt>air pump through the needle</dt><dd>${f1(B.Q_air_L_min)} L/min</dd><dt>pressure to open the folds / at full size</dt><dd>${f0(B.p_unfold)} / ${f0(B.p_full)} Pa</dd><dt>first segment out of the opening</dt><dd>${f0(B.t_first_out || 0)} s</dd><dt>arm lets go</dt><dd>${f0(B.t_release)} s</dd><dt>full size in the water</dt><dd>${f0(B.t_end)} s</dd><dt>peak arm force</dt><dd>${f2(B.F_peak)} of ${f2(B.F_lim)} N</dd><dt>folded part to the rim</dt><dd>${f0(B.rim_clear_mm)} mm</dd><dt>whole folded body on the steepest chute, friction 0.2 / 0.3 / 0.4 / 0.6</dt><dd>${fr["0.2"]} / ${fr["0.3"]} / ${fr["0.4"]} / ${fr["0.6"]} N</dd><dt>printed / full length</dt><dd>${f0(J.body.len_folded * 1000)} / ${f0(J.body.len_deployed * 1000)} mm</dd><dt>printed / full diameter</dt><dd>${f0(J.body.d_folded * 1000)} / ${f0(J.body.d_deployed * 1000)} mm</dd><dt>folded / full volume</dt><dd>${f2(J.body.vol_folded_L)} / ${f1(J.body.vol_deployed_L)} L</dd><dt>newborn swim speed</dt><dd>${f2(J.newborn.v_terminal)} m/s</dd></dl></div>`;
     drawChart();
   } else if (TAB === "masses") {
     const st = J.states, rows = Object.values(st);
@@ -894,11 +908,13 @@ function renderProps() {
   }
 }
 function drawChart() {
-  const c = $("#chart"); if (!c) return; const g = c.getContext("2d"), W = c.width, H = c.height, B = J.birth, tr = B.track, T1 = tr[tr.length - 1][0];
+  const c = $("#chart"); if (!c) return; const g = c.getContext("2d"), W = c.width, H = c.height, B = J.birth, tr = B.track, T1 = tr[tr.length - 1][0], Fx = Math.max(...tr.map((r) => r[17]), 1);
   g.clearRect(0, 0, W, H); g.strokeStyle = "#2a2a2c"; g.lineWidth = 1; for (let i = 1; i < 4; i++) { g.beginPath(); g.moveTo(0, H * i / 4); g.lineTo(W, H * i / 4); g.stroke(); }
   const line = (col, f) => { g.strokeStyle = col; g.lineWidth = 2; g.beginPath(); tr.forEach((r, i) => { const x = r[0] / T1 * W, y = H - 4 - clamp(f(r), 0, 1) * (H - 8); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); };
-  line("#9cc8ec", (r) => r[7] / 1000); line("#e3b36a", (r) => r[9] / B.F_lim); line("#9fd29a", (r) => r[12]);
-  if (STATE.k === "push") { const x = Math.min(STATE.tau, T1) / T1 * W; g.strokeStyle = "#ecebe6"; g.lineWidth = 1; g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
+  line("#9cc8ec", (r) => r[7] / 1200); line("#9fd29a", (r) => r[6] / J.body.vol_deployed_L); line("#e3b36a", (r) => r[9] / B.F_lim); line("#d58a7a", (r) => r[17] / Fx);
+  g.strokeStyle = "#ecebe6"; g.setLineDash([4, 4]); g.beginPath(); g.moveTo(B.t_release / T1 * W, 0); g.lineTo(B.t_release / T1 * W, H); g.stroke(); g.setLineDash([]);
+  const tt = STATE.k === "push" ? STATE.tau : STATE.k === "birth" ? B.t_release + STATE.tau : null;
+  if (tt !== null) { const x = Math.min(tt, T1) / T1 * W; g.strokeStyle = "#ecebe6"; g.lineWidth = 1; g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
 }
 let LIVE = null;
 function renderLiveChecks() { const el = $("#liveChk"); if (!el || !LIVE) return; el.innerHTML = LIVE.map((c) => `<div class="chk ${c.ok ? "" : "no"}"><i>${c.ok ? "ok" : "no"}</i><span>${esc(c.text)}</span></div>`).join(""); }
