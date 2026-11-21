@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Academia Research | Born, Not Made</title>
+<meta name="description" content="A visual research atlas of artistic and scientific work related to Born, Not Made and Baby Robot: artificial life, soft robotics, embodied AI, fabrication and more-than-human care.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#0c0c0d;--paper:#141415;--ink:#ecebe6;--muted:#9b9a94;--line:#2a2a2c;--gel:#9cc8ec;--soft:#15283a}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-underline-offset:3px}button,input{font:inherit}
+main{margin:0 auto;max-width:1180px;padding:0 4px 70px}
+.eyebrow{color:var(--gel);font:500 11px/1.4 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase}
+.hero{padding:38px 0 38px;display:grid;grid-template-columns:1.3fr .7fr;gap:30px;align-items:end;border-bottom:1px solid var(--line)}
+h1{font:400 clamp(46px,7vw,86px)/.92 "Cormorant Garamond",Georgia,serif;letter-spacing:-.03em;margin:12px 0 18px}
+.lead{font:400 clamp(19px,2vw,24px)/1.4 "Cormorant Garamond",Georgia,serif;max-width:720px;margin:0;color:#cfcecb}
+.hero-note{border-left:1px solid #3a3b3e;padding-left:23px}.hero-note p{margin:0 0 9px}
+.hero-note small{color:var(--muted);font:11px/1.7 "JetBrains Mono",monospace}
+.toolbar{position:sticky;top:0;z-index:4;background:rgba(12,12,13,.96);backdrop-filter:blur(12px);padding:13px 0;border-bottom:1px solid var(--line);display:grid;gap:11px}
+.controls{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.controls button{appearance:none;border:1px solid #39393d;color:#c4c3c1;background:#171719;border-radius:999px;padding:7px 12px;cursor:pointer;font-size:12px}
+.controls button[aria-pressed="true"]{color:#101820;background:var(--gel);border-color:var(--gel)}.controls button:hover{border-color:#a0c6df}
+.search-row{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.search-row input{flex:1;min-width:230px;max-width:480px;background:#171719;border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:10px 13px;outline:none}
+.search-row input:focus{border-color:var(--gel)}.counter{font:11px "JetBrains Mono",monospace;color:var(--muted)}
+.section-heading{display:flex;align-items:baseline;gap:16px;margin:32px 0 20px}.section-heading h2{font:400 29px/1.1 "Cormorant Garamond",Georgia,serif;margin:0}.section-heading p{margin:0;color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.research-card{background:var(--paper);border:1px solid var(--line);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.research-card[hidden]{display:none!important}
+.research-image{display:block;position:relative;aspect-ratio:1.52;overflow:hidden;text-decoration:none;background:linear-gradient(140deg,#132232,#1b1d21 60%,#241c23);border-bottom:1px solid var(--line)}
+.research-image>img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.82);transition:transform .35s,filter .35s}
+.research-image:hover>img{transform:scale(1.035);filter:saturate(1)}
+.image-annotation{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.79));padding:40px 14px 10px;font-size:12px;color:white}
+.image-placeholder{display:none;position:absolute;inset:0;align-items:flex-start;justify-content:flex-end;flex-direction:column;padding:22px;gap:6px}
+.image-missing .image-placeholder{display:flex}
+.image-placeholder span{position:absolute;top:12px;right:15px;font:12px "JetBrains Mono",monospace;color:#7195ab}
+.image-placeholder b{font:400 35px/1 "Cormorant Garamond",Georgia,serif}
+.image-placeholder small{max-width:230px;color:#a3aeb7;line-height:1.35}
+.image-missing .image-annotation{display:none}
+.card-body{display:flex;flex:1;flex-direction:column;padding:18px 18px 15px}
+.card-label{display:flex;justify-content:space-between;gap:8px;color:#819caf;font:9px/1.5 "JetBrains Mono",monospace;letter-spacing:.04em;text-transform:uppercase}
+.card-label span:last-child{text-align:right}
+.card-body h2{font:400 33px/1.05 "Cormorant Garamond",Georgia,serif;letter-spacing:-.02em;margin:16px 0 3px}
+.lab{margin:0;color:#c8c6c0;font-size:12px}
+.people{margin:4px 0 16px;color:#9ac8eb;font-size:12px}
+.focus{font:500 11px/1.5 "JetBrains Mono",monospace;color:#c9d9e3;border-left:2px solid #6d9fc0;padding-left:10px;margin:0 0 10px}
+.why{font-size:13px;line-height:1.65;color:#c5c4c0;margin:0 0 12px;min-height:90px}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 14px}
+.tags span{font:10px/1.4 "JetBrains Mono",monospace;color:#a7a5a1;border:1px solid #39393b;border-radius:999px;padding:3px 7px}
+.status{border-top:1px solid var(--line);padding-top:12px;margin:auto 0 0;font-size:11px;color:#a4a4a0;line-height:1.55}
+.status strong{color:#d0cec9;display:block;font:500 10px/1.6 "JetBrains Mono",monospace;text-transform:uppercase}
+.links{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0 0}.links a{text-decoration:none;font-size:11px;color:var(--gel)}.links a:hover{text-decoration:underline}
+.credit{font:10px/1.5 "JetBrains Mono",monospace;color:#777;margin:12px 0 0}
+.empty{display:none;text-align:center;margin:50px auto;color:var(--muted)}.empty.on{display:block}
+.bottom{border-top:1px solid var(--line);padding:22px 0 8px;margin-top:35px;color:#8d8e8b;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:start}
+.bottom p{margin:0;max-width:750px}.bottom a{color:var(--gel)}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{grid-template-columns:1fr}.hero-note{border-left:0;border-top:1px solid var(--line);padding:15px 0 0}}
+@media(max-width:600px){main{padding-bottom:42px}.hero{padding:22px 0}.grid{grid-template-columns:1fr;gap:15px}.research-image{aspect-ratio:1.65}.why{min-height:0}.toolbar{padding-top:10px}.section-heading{display:block}.section-heading p{margin-top:6px}.bottom{display:block}.bottom p+p{margin-top:12px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+<script src="data.js" defer></script>
+<script src="render.js" defer></script>
+</head>
+<body><main>
+<header class="hero">
+<div><p class="eyebrow">Born, Not Made / Research Atlas / 2026–27</p><h1>Academia Research</h1>
+<p class="lead">Studying the birth of artificial life through robotic bodies, material fabrication, artistic practice, and more-than-human care.</p></div>
+<aside class="hero-note"><p class="eyebrow">Two connected purposes</p>
+<p><b>Research references</b> — artworks, experiments, publications and material precedents.</p>
+<p><b>Doctoral pathways</b> — ambitious universities, exceptional specialist labs and relevant advisors.</p>
+<small>Curated 21 Nov 2026. Research fit is an interpretive connection, not an admissions offer.</small></aside>
+</header>
+<div class="toolbar">
+<div class="controls" id="tierFilters" aria-label="Institution type">
+<button type="button" data-tier="all" aria-pressed="true">All institutions</button>
+<button type="button" data-tier="top" aria-pressed="false">Leading universities & art schools</button>
+<button type="button" data-tier="exception" aria-pressed="false">Specialist exceptions</button>
+</div>
+<div class="controls" id="kindFilters" aria-label="Research approach">
+<button type="button" data-kind="all" aria-pressed="true">All approaches</button>
+<button type="button" data-kind="art" aria-pressed="false">Art practice</button>
+<button type="button" data-kind="robotics" aria-pressed="false">Embodied robotics</button>
+<button type="button" data-kind="fabrication" aria-pressed="false">Material fabrication</button>
+</div>
+<div class="search-row"><input id="q" type="search" placeholder="Search schools, people, works, keywords…" aria-label="Search academia research">
+<span class="counter" id="count" aria-live="polite"></span></div>
+</div>
+<div class="section-heading"><h2>Projects, people, doctoral possibilities</h2>
+<p>Click an image to open the original work; each card links to research and the relevant doctoral route.</p></div>
+<div class="grid" id="grid"></div>
+<div class="empty" id="empty">No references match these filters. Try a broader search.</div>
+<footer class="bottom">
+<p>Image and project credits remain with their respective artists, laboratories, photographers and publishers. Illustrations and doctoral notes are a dated working research index, not a live admissions database; always recheck eligibility, deadlines, supervision and funding.</p>
+<p><a href="https://github.com/ruipwan/born-not-made/tree/main/academia" target="_blank" rel="noopener noreferrer">Source & updates ↗</a></p>
+</footer>
+</main></body></html>
