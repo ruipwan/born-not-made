@@ -331,7 +331,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 <header class="top"><div class="bar">
   <a class="brand" href="#work">Speculative design: a robot giving birth to another</a>
   <nav class="tabs" aria-label="Sections">
-    <a href="#work" data-g="work">The Work</a><a href="#ideas" data-g="think">Think</a><a href="#prototypes" data-g="make">Make</a><a href="#simulator" data-g="sim">Simulator</a><a href="#conversations" data-g="talk" class="voices">Talk</a><a href="#academia" data-g="academia">Academia Research</a>
+    <a href="#work" data-g="work">The Work</a><a href="#ideas" data-g="think">Think</a><a href="#prototypes" data-g="make">Make</a><a href="#simulator" data-g="sim">Simulator</a><a href="#conversations" data-g="talk" class="voices">Talk</a>
   </nav>
 </div><nav class="sub" id="subnav" aria-label="Pages in this section"></nav></header>
 <main>
@@ -1281,11 +1281,10 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 <script>
 const GROUPS = [
   { g: "work", label: "The Work", tabs: [["work", "The Work"]] },
-  { g: "think", label: "Think", tabs: [["ideas", "Ideas", "questions the work raises"], ["culture", "Culture", "stories, screens and art"], ["nature", "Nature", "how other species give birth"]] },
+  { g: "think", label: "Think", tabs: [["ideas", "Ideas", "questions the work raises"], ["culture", "Culture", "stories, screens and art"], ["nature", "Nature", "how other species give birth"], ["academia", "Academia Research", "labs, works and PhD paths"]] },
   { g: "make", label: "Make", tabs: [["prototypes", "Prototypes", "versions one to three"], ["build", "Build", "every part, with sources"], ["society", "Society", "reproduction at scale"], ["process", "Process", "how the work changed"]] },
   { g: "sim", label: "Simulator", tabs: [["simulator", "Printing console", "signal, G-code, print, birth"], ["physics", "Physics", "birth and printing, simulated"]] },
   { g: "talk", label: "Talk", tabs: [["conversations", "Conversations", "one to one"], ["voices", "Voices", "open to everyone"]] },
-  { g: "academia", label: "Academia Research", tabs: [["academia", "Research Atlas", "labs, works and PhD paths"]] }
 ];
 const TABS = GROUPS.flatMap((x) => x.tabs.map((t) => t[0]));
 const ALIAS = { trunk: "work", branches: "ideas", questions: "ideas", early: "prototypes", log: "process", think: "ideas", make: "prototypes", talk: "conversations" };
