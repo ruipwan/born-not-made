@@ -322,6 +322,30 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 #nature .nat p { margin: 0 0 10px; font-size: 14.5px; }
 #nature .nat .cap a { color: var(--muted); }
 @media (max-width: 900px) { #nature .nat-grid { grid-template-columns: minmax(0, 1fr); } }
+#machines .mb-lead { margin: 28px 0 8px; max-width: 760px; }
+#machines .mb-lead img { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 0; }
+#machines .mb-group { border-top: 1px solid var(--line); padding: 34px 0 12px; margin-top: 26px; }
+#machines .mb-head { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 0 14px; align-items: baseline; margin-bottom: 18px; }
+#machines .mb-n { font: 500 12px var(--mono); color: var(--muted); letter-spacing: .06em; }
+#machines .mb-t { font: 400 28px/1.2 var(--serif); margin: 0; }
+#machines .mb-d { grid-column: 2; margin: 6px 0 0; font-size: 14.5px; color: var(--muted); }
+#machines .mb-d b { color: var(--ink); font-weight: 500; }
+#machines .mb-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; align-items: start; }
+#machines .mb { margin: 0; background: var(--paper); border: 1px solid var(--line); border-radius: 0; overflow: hidden; }
+#machines .mb-img { display: block; aspect-ratio: 4 / 3; background: #000; border-bottom: 1px solid var(--line); }
+#machines .mb-img img { display: block; width: 100%; height: 100%; object-fit: cover; }
+#machines .mb-img.diagram { aspect-ratio: 16 / 9; }
+#machines .mb-img.diagram img, #machines .mb-img.contain img { object-fit: contain; }
+#machines .mb-img.tall img { object-position: center 30%; }
+#machines .mb figcaption { padding: 16px 18px 18px; }
+#machines .mb h3 { font: 400 21px/1.25 var(--serif); margin: 0 0 6px; }
+#machines .mb p { margin: 0 0 10px; font: 400 14.5px/1.6 var(--sans); font-style: normal; color: var(--ink); }
+#machines .mb .cap { margin: 0; font: italic 400 14.5px/1.45 var(--serif); color: var(--muted); }
+#machines .mb .cap a { color: var(--muted); }
+#machines .mb-take { margin-top: 40px; }
+#machines .mb-take h3 { font: 400 21px/1.25 var(--serif); margin: 0 0 8px; }
+@media (max-width: 1100px) { #machines .mb-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) { #machines .mb-grid { grid-template-columns: minmax(0, 1fr); } #machines .mb-head { grid-template-columns: 36px minmax(0, 1fr); } }
 </style>
 <link rel="stylesheet" href="assets/css/organic.css?v=3">
 <link rel="stylesheet" href="assets/css/talk.css">
@@ -410,7 +434,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
   <section class="block precedents" aria-labelledby="work-precedents">
     <div class="side">
       <h2 id="work-precedents">Where this work stands</h2>
-      <p class="note">Other robots already make robots. None of them forms the new robot inside another robot's body, and none gives birth.</p>
+      <p class="note">Other robots already make robots. None of them forms the new robot inside another robot's body, and none gives birth. <a href="#machines">What birth has meant for machines</a>.</p>
     </div>
     <ol class="timeline" role="list" aria-label="Seven precedents and Born, Not Made">
       <li class="fig">
@@ -894,6 +918,10 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
     <p>Fiction got here first, from <i>Frankenstein</i> to an android called Mother. The novels, films and artworks around this work now live in their own tab.</p>
     <a class="btn" href="#culture">Go to Culture</a>
   </div>
+  <div class="pointer">
+    <p>Machines have been called born before: by a rule, a division, a printer, a power switch, a launch, a registry and a simulator. None of them was formed inside another machine and left it.</p>
+    <a class="btn" href="#machines">Go to Machines</a>
+  </div>
 
   <!-- REFERENCES -->
   <div class="block">
@@ -1132,6 +1160,164 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
   </div>
 </section>
 
+<!-- ============================== MACHINES ============================== -->
+<section class="tab" id="machines">
+  <div class="tabhead"><div><p class="kicker">Machines</p><h2>What birth has meant for machines</h2><p>Science, engineering, industry and art have all called something a machine's birth. Each use keeps one part of birth and drops the rest: a rule, a division, a printer, a power switch, a launch, a registry, a simulator. Set side by side, they show where this work stands. As far as this search reached, no machine has yet formed inside another, left it, and gone on as a new individual that inherits.</p></div></div>
+
+  <figure class="mb-lead">
+    <a href="assets/img/machines/where_this_work_sits.svg" target="_blank" rel="noopener"><img src="assets/img/machines/where_this_work_sits.svg" width="760" height="640" loading="lazy" decoding="async" alt="Three overlapping circles: a body that delivers, a new individual that inherits, and a cut that ends the parent's writing. This work sits where all three overlap."></a>
+    <figcaption class="cap">Three precedents, each with one part of birth: a robotic patient that delivers (Gaumard), robots that make new robots outside a body (Eiben, Iida, RepRap), and a program whose birth is the moment the parent can no longer write to the child (Ray). Diagram by the artist.</figcaption>
+  </figure>
+
+  <div class="mb-group">
+    <div class="mb-head"><span class="mb-n">01</span><h3 class="mb-t">A rule</h3><p class="mb-d"><b>Birth means</b> an empty cell turns on. <b>Missing</b> a body and a parent.</p></div>
+    <div class="mb-grid">
+      <figure class="mb">
+        <a class="mb-img diagram" href="assets/img/machines/life_birth_rule.svg" target="_blank" rel="noopener"><img src="assets/img/machines/life_birth_rule.svg" width="624" height="330" loading="lazy" decoding="async" alt="Two three by three grids. On the left an empty centre cell has three live neighbours; on the right the centre cell is alive."></a>
+        <figcaption><h3>Game of Life, 1970</h3><p>Martin Gardner reported John Conway's rules as genetic laws. The third is called Births: an empty cell with exactly three live neighbours comes alive in the next generation. The notation B3/S23 still carries the word. Three neighbours share the birth; nobody carries it.</p><p class="cap">Gardner, "Mathematical Games," <i>Scientific American</i> 223(4), 1970, p. 120 · <a href="https://doi.org/10.1038/scientificamerican1070-120" target="_blank" rel="noopener">doi</a> · diagram by the artist</p></figcaption>
+      </figure>
+      <figure class="mb">
+        <a class="mb-img diagram" href="assets/img/machines/lenia_growth.svg" target="_blank" rel="noopener"><img src="assets/img/machines/lenia_growth.svg" width="760" height="330" loading="lazy" decoding="async" alt="Left: Life's rule as bars, with birth a single bar at three neighbours. Right: Lenia's smooth bell shaped growth curve."></a>
+        <figcaption><h3>Lenia, 2019 to 2020</h3><p>Bert Chan rewrites Life's rule as one map, with survival at 0, birth at +1 and death at −1, then replaces it with a smooth growth function. In Lenia birth stops being an event and becomes part of a curve. A later variant, Glaberish (2022), splits growth back into genesis and persistence.</p><p class="cap">Chan, "Lenia and Expanded Universe," ALIFE 2020 · <a href="https://arxiv.org/abs/2005.03742" target="_blank" rel="noopener">arXiv</a> · Glaberish, <a href="https://arxiv.org/abs/2205.10463" target="_blank" rel="noopener">arXiv</a> · diagram by the artist</p></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="mb-group">
+    <div class="mb-head"><span class="mb-n">02</span><h3 class="mb-t">A division</h3><p class="mb-d"><b>Birth means</b> the parent loses the right to write. <b>Missing</b> matter.</p></div>
+    <div class="mb-grid">
+      <figure class="mb">
+        <a class="mb-img diagram" href="assets/img/machines/tierra_divide.svg" target="_blank" rel="noopener"><img src="assets/img/machines/tierra_divide.svg" width="760" height="380" loading="lazy" decoding="async" alt="Before DIVIDE the mother cell writes into the daughter cell; after DIVIDE the write arrow is cut and the daughter has its own pointer."></a>
+        <figcaption><h3>Tierra, 1991</h3><p>Thomas Ray's digital creatures copy themselves into new memory. While a copy is under way he counts the daughter as gestating. After the instruction DIVIDE the mother can no longer write to the daughter, which gets its own processor and is called the newborn. It is the only machine system found here that defines birth as a separation.</p><p class="cap">Ray, "An Approach to the Synthesis of Life," <i>Artificial Life II</i>, 1991 · <a href="https://tomray.me/pubs/alife2/Ray1991AnApproachToTheSynthesisOfLife.pdf" target="_blank" rel="noopener">pdf</a> · diagram by the artist</p></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="mb-group">
+    <div class="mb-head"><span class="mb-n">03</span><h3 class="mb-t">Built outside the body</h3><p class="mb-d"><b>Birth means</b> a new robot is put together. <b>Missing</b> a body around it, and a moment of leaving.</p></div>
+    <div class="mb-grid">
+      <figure class="mb">
+        <a class="mb-img photo" href="assets/img/eiben_robot_baby_2017.jpg" target="_blank" rel="noopener"><img src="assets/img/eiben_robot_baby_2017.jpg" width="634" height="344" loading="lazy" decoding="async" alt="A modular wheeled robot offspring with green and blue parts"></a>
+        <figcaption><h3>Triangle of Life and Robot Baby, 2013 to 2016</h3><p>Eiben's Triangle of Life is the one robotics framework that names a stage Birth: the time between a genome switching on and the body being complete, perhaps in a central birth clinic. In 2016 two robots at VU Amsterdam combined their genomes, and a printer and technicians built the child. The university writes that a robot baby was "born", in quotation marks.</p><p class="cap">Eiben et al., ECAL 2013 · <a href="https://www.cs.vu.nl/~gusz/papers/2013-Eiben-etal-Triangle-of-Life.pdf" target="_blank" rel="noopener">pdf</a> · <a href="https://vu.nl/en/research/are-the-robots-taking-over" target="_blank" rel="noopener">VU Amsterdam</a> · image: Jelisavcic et al., <a href="https://doi.org/10.1162/ARTL_a_00231" target="_blank" rel="noopener">Artificial Life, 2017</a></p></figcaption>
+      </figure>
+      <figure class="mb">
+        <a class="mb-img photo" href="assets/img/iida_2015.jpg" target="_blank" rel="noopener"><img src="assets/img/iida_2015.jpg" width="590" height="288" loading="lazy" decoding="async" alt="An industrial arm assembles a modular offspring on a work surface"></a>
+        <figcaption><h3>A mother robot that builds, 2015</h3><p>The paper calls a UR5 arm a mother robot. It glues cubes into children, measures how far each one moves, and breeds the best; people take each child apart after its test. The paper never says birth. Engadget wrote that the arm was giving birth to its children, then corrected itself in the same sentence: "or more correctly, building".</p><p class="cap">Brodbeck, Hauser, Iida, <i>PLOS ONE</i> 10(6), 2015 · <a href="https://doi.org/10.1371/journal.pone.0128444" target="_blank" rel="noopener">doi</a> · <a href="https://www.engadget.com/2015/08/14/university-of-cambride-mother-robot/" target="_blank" rel="noopener">Engadget</a></p></figcaption>
+      </figure>
+      <figure class="mb">
+        <a class="mb-img photo tall" href="assets/img/machines/reprap_first_machine.webp" target="_blank" rel="noopener"><img src="assets/img/machines/reprap_first_machine.webp" width="700" height="1170" loading="lazy" decoding="async" alt="An early RepRap 3D printer frame with threaded rods and green printed parts, in a museum case"></a>
+        <figcaption><h3>RepRap, 2008</h3><p>On 29 May 2008 the open source printer RepRap printed the parts of its first complete working child. The project speaks of parent, child and grandchild machines, but never of birth: the child is assembled by hand from printed parts.</p><p class="cap"><a href="https://reprap.org/wiki/About" target="_blank" rel="noopener">reprap.org</a> · photo: the first RepRap at the Science Museum, London, by Adrianreprap, <a href="https://commons.wikimedia.org/wiki/File:The_First_RepRap_at_the_London_Science_Museum.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a></p></figcaption>
+      </figure>
+      <figure class="mb">
+        <a class="mb-img photo" href="assets/img/machines/xenobot_2020.webp" target="_blank" rel="noopener"><img src="assets/img/machines/xenobot_2020.webp" width="900" height="675" loading="lazy" decoding="async" alt="A xenobot, a small cluster of frog cells, seen under a microscope"></a>
+        <figcaption><h3>Xenobots, 2021</h3><p>Kriegman and colleagues open their paper by listing how living things go on: growth in or on the body, then splitting, budding or birth. Their xenobots do none of these. They push loose cells together into new xenobots, outside their bodies. Birth is named as the one thing they do not do.</p><p class="cap">Kriegman, Blackiston, Levin, Bongard, <i>PNAS</i> 118(49), 2021 · <a href="https://doi.org/10.1073/pnas.2112672118" target="_blank" rel="noopener">doi</a> · photo: a xenobot from the team's 2020 study, <a href="https://commons.wikimedia.org/wiki/File:Xenobot.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a></p></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="mb-group">
+    <div class="mb-head"><span class="mb-n">04</span><h3 class="mb-t">Switched on</h3><p class="mb-d"><b>Birth means</b> a program starts to run. <b>Missing</b> a parent.</p></div>
+    <div class="mb-grid">
+      <figure class="mb text">
+        <figcaption><h3>Autonomous mental development, 2001</h3><p>In Juyang Weng's developmental robotics, a robot's birth is the moment its developmental program starts. The tasks it will meet are unknown before birth, so the program cannot be written for any one task; after birth the robot learns only by living in its world.</p><p class="cap">Weng et al., "Autonomous Mental Development by Robots and Animals," <i>Science</i> 291, 2001 · <a href="https://doi.org/10.1126/science.291.5504.599" target="_blank" rel="noopener">doi</a> · <a href="https://cse.msu.edu/~weng/research/LM.html" target="_blank" rel="noopener">Weng lab</a></p></figcaption>
+      </figure>
+      <figure class="mb text">
+        <figcaption><h3>A simulated fetus, 2006 to 2016</h3><p>Yasuo Kuniyoshi's group in Tokyo simulates a fetal body moving inside a model of a uterine membrane and the fluid around it, to study how movement develops before and after birth. The womb exists in the computer; leaving it is not simulated.</p><p class="cap">Kuniyoshi and Sangawa, <i>Biological Cybernetics</i>, 2006 · Yamada et al., <i>Scientific Reports</i>, 2016 · <a href="https://doi.org/10.1038/srep27893" target="_blank" rel="noopener">doi</a></p></figcaption>
+      </figure>
+      <figure class="mb">
+        <a class="mb-img photo" href="assets/img/machines/sophia_2017.webp" target="_blank" rel="noopener"><img src="assets/img/machines/sophia_2017.webp" width="900" height="675" loading="lazy" decoding="async" alt="The humanoid robot Sophia speaking on stage in front of a blue screen"></a>
+        <figcaption><h3>Sophia, 2016</h3><p>Hanson Robotics' humanoid was first switched on on 14 February 2016, and that date is given as her beginning. Saudi Arabia granted her citizenship in 2017. Her birthday is an activation date; her citizenship was given, not born.</p><p class="cap"><a href="https://en.wikipedia.org/wiki/Sophia_(robot)" target="_blank" rel="noopener">Wikipedia</a> · photo: ITU, AI for Good Global Summit, Geneva, 2017, <a href="https://commons.wikimedia.org/wiki/File:Sophia_(robot)_2.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>, <a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noopener">CC BY 2.0</a></p></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="mb-group">
+    <div class="mb-head"><span class="mb-n">05</span><h3 class="mb-t">Unboxed</h3><p class="mb-d"><b>Birth means</b> a product leaves its box. <b>Missing</b> a parent and an inheritance.</p></div>
+    <div class="mb-grid">
+      <figure class="mb text">
+        <figcaption><h3>aibo's Birthday Ceremony, 2018</h3><p>On 11 January 2018, the day the new aibo went on sale, Sony held an aibo Birthday Ceremony at its headquarters. The robot dog woke up inside a case Sony calls a cocoon, and Sony's release calls it the moment of birth (誕生の時).</p><p class="cap">Sony release, January 2018 · <a href="https://www.nikkan.co.jp/releases/view/19808" target="_blank" rel="noopener">Nikkan Kogyo</a></p></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="mb-group">
+    <div class="mb-head"><span class="mb-n">06</span><h3 class="mb-t">Registered</h3><p class="mb-d"><b>Birth means</b> a place in the records. <b>Missing</b> everything except the papers.</p></div>
+    <div class="mb-grid">
+      <figure class="mb text">
+        <figcaption><h3>Astro Boy, 2003</h3><p>Osamu Tezuka set Astro Boy's birthday at 7 April 2003. On that day Niiza, the city where Tezuka Productions works, issued him a special resident card. In 2010 Shinjuku enrolled him as a special child of the ward, and he attended a primary school entrance ceremony with children born in 2003.</p><p class="cap"><a href="https://www.city.niiza.lg.jp/uploaded/attachment/58250.pdf" target="_blank" rel="noopener">Niiza City</a> · <a href="https://www.city.shinjuku.lg.jp/kanko/soumu01_001001.html" target="_blank" rel="noopener">Shinjuku City</a></p></figcaption>
+      </figure>
+      <figure class="mb">
+        <a class="mb-img photo" href="assets/img/machines/paro_2005.webp" target="_blank" rel="noopener"><img src="assets/img/machines/paro_2005.webp" width="900" height="675" loading="lazy" decoding="async" alt="Two white robotic seal pups lying on a table, one being stroked"></a>
+        <figcaption><h3>Paro, as reported in 2016</h3><p>In a 2016 lecture the anthropologist Jennifer Robertson said the therapeutic seal robot Paro had been entered in a Japanese family register, with its inventor named as father. The original record has not been found, so this stays a report.</p><p class="cap"><a href="https://adn.com/article/20160306/hometown-u-bringing-robots-home" target="_blank" rel="noopener">Anchorage Daily News, 2016</a> · photo: Aaron Biggs, 2005, <a href="https://commons.wikimedia.org/wiki/File:Paro_robot.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>, <a href="https://creativecommons.org/licenses/by-sa/2.0/" target="_blank" rel="noopener">CC BY-SA 2.0</a></p></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="mb-group">
+    <div class="mb-head"><span class="mb-n">07</span><h3 class="mb-t">Simulated childbirth</h3><p class="mb-d"><b>Birth means</b> a robotic body delivers a robotic newborn. <b>Missing</b> anyone new.</p></div>
+    <div class="mb-grid">
+      <figure class="mb">
+        <a class="mb-img diagram" href="assets/img/machines/noelle_loop.svg" target="_blank" rel="noopener"><img src="assets/img/machines/noelle_loop.svg" width="760" height="400" loading="lazy" decoding="async" alt="A robotic patient delivers a newborn; a dashed arrow shows the instructor putting the same newborn back in."></a>
+        <figcaption><h3>NOELLE and VICTORIA, Gaumard</h3><p>Robotic patients with a birth canal and a cervix, built to train doctors and midwives. Each delivers a robotic newborn with a heartbeat and vital signs. One has given birth dozens of times, minutes apart, in front of hundreds of students. It is the only case found of a robot giving birth to a robot, and it never produces anyone new: the same newborn goes back in.</p><p class="cap"><a href="https://www.uv.es/hospitalv/files/Victoria-S2200-User-Guide-20.06.01.pdf" target="_blank" rel="noopener">VICTORIA user guide</a> · <a href="https://www.theengineer.co.uk/content/news/robot-labours-for-medical-students" target="_blank" rel="noopener">The Engineer</a> · diagram by the artist</p></figcaption>
+      </figure>
+      <figure class="mb text">
+        <figcaption><h3>A hoax, 2025</h3><p>In August 2025 a story spread that a Chinese company was building a humanoid "pregnancy robot" to carry a human fetus to birth. Fact checkers found no such project, and the images were made with AI. It was a robot giving birth to a human, which this work is not.</p><p class="cap"><a href="https://www.livescience.com/health/fertility-pregnancy-birth/pregnancy-robot-from-china-is-fake-but-is-the-technology-behind-it-possible" target="_blank" rel="noopener">Live Science</a></p></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="mb-group">
+    <div class="mb-head"><span class="mb-n">08</span><h3 class="mb-t">A figure of speech</h3><p class="mb-d"><b>Birth means</b> something appears. <b>Missing</b> a body.</p></div>
+    <div class="mb-grid">
+      <figure class="mb text">
+        <figcaption><h3>Birth of a Transformer, 2023</h3><p>A study of how one mechanism, the induction head, appears while a language model trains. In AI research birth names a capability coming into being, not an individual.</p><p class="cap">Bietti et al., NeurIPS 2023 · <a href="https://proceedings.neurips.cc/paper_files/paper/2023/hash/0561738a239a995c8cd2ef0e50cfa4fd-Abstract.html" target="_blank" rel="noopener">proceedings</a></p></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="mb-group">
+    <div class="mb-head"><span class="mb-n">09</span><h3 class="mb-t">In art</h3><p class="mb-d">The word moves from a title to a body of water.</p></div>
+    <div class="mb-grid">
+      <figure class="mb">
+        <a class="mb-img photo contain" href="assets/img/machines/picabia_1915.webp" target="_blank" rel="noopener"><img src="assets/img/machines/picabia_1915.webp" width="330" height="472" loading="lazy" decoding="async" alt="Francis Picabia's line drawing of a machine, wheels and rods, titled Girl Born Without a Mother"></a>
+        <figcaption><h3>Girl Born Without a Mother, 1915</h3><p>Francis Picabia draws a machine and calls it a girl born without a mother. The same year Paul Haviland wrote in the magazine <i>291</i> that the machine is a "daughter born without a mother". The machine is imagined as born of men and industry alone, with no one who carries it.</p><p class="cap">Picabia, Musée d'Orsay, public domain, <a href="https://commons.wikimedia.org/wiki/File:Francis_Picabia,_1915,_Fille_n%C3%A9e_sans_m%C3%A8re_(Girl_Born_Without_a_Mother),_work_on_paper,_47.4_x_31.7_cm,_Mus%C3%A9e_d%27Orsay.jpg" target="_blank" rel="noopener">Wikimedia Commons</a> · Haviland via <a href="https://tate.org.uk/research/tate-papers/28/picabia-fig-leaf" target="_blank" rel="noopener">Tate Papers 28</a></p></figcaption>
+      </figure>
+      <figure class="mb text">
+        <figcaption><h3>The Bachelor Machines, 1954 to 1975</h3><p>Michel Carrouges took the bachelor machine from Duchamp's <i>Large Glass</i>: a machine that runs and cannot reproduce. Harald Szeemann's 1975 exhibition gathered such machines. Szeemann later planned an exhibition called <i>La Mamma</i>, which never opened.</p><p class="cap"><a href="https://www.artforum.com/features/a-conspiracy-of-bachelors-214093/" target="_blank" rel="noopener">Artforum, 1976</a> · Rigolo, <i>Getty Research Journal</i> 7, 2015 · <a href="https://doi.org/10.1086/680748" target="_blank" rel="noopener">doi</a></p></figcaption>
+      </figure>
+      <figure class="mb text">
+        <figcaption><h3>The Birth of the Robot, 1936</h3><p>Len Lye's colour puppet film for Shell, with colour by Humphrey Jennings and music from Holst's <i>The Planets</i>. Its climax is the birth of Shell's logo, a robot figure, fed by motor oil. The earliest artwork found with a robot's birth in its title; what is born is a brand.</p><p class="cap"><a href="https://www.lenlyefoundation.com/films/23/" target="_blank" rel="noopener">Len Lye Foundation</a> · <a href="https://ilcinemaritrovato.it/en/film/the-birth-of-a-robot/" target="_blank" rel="noopener">Il Cinema Ritrovato</a></p></figcaption>
+      </figure>
+      <figure class="mb text">
+        <figcaption><h3>A-Volve, 1994, and Life Spacies, 1997</h3><p>In Christa Sommerer and Laurent Mignonneau's <i>A-Volve</i>, virtual creatures are born in a pool of water, and offspring inherit both parents' code. In <i>Life Spacies</i> text typed by a visitor becomes the genes of a new creature. Water and birth appear together; it is the closest ancestor of this work.</p><p class="cap"><a href="https://interface.ufg.ac.at/christa-laurent/A-Volve.html" target="_blank" rel="noopener">A-Volve</a> · <a href="https://interface.ufg.ac.at/christa-laurent/LifeSpacies.html" target="_blank" rel="noopener">Life Spacies</a></p></figcaption>
+      </figure>
+      <figure class="mb">
+        <a class="mb-img photo" href="assets/img/machines/strandbeest_kerkrade_2013.webp" target="_blank" rel="noopener"><img src="assets/img/machines/strandbeest_kerkrade_2013.webp" width="760" height="570" loading="lazy" decoding="async" alt="A large Strandbeest walking machine made of pale yellow tubes, on a paved square with onlookers"></a>
+        <figcaption><h3>Strandbeest, since 1990</h3><p>Theo Jansen speaks of each new beach animal as born, one generation after another. People around the world now build them from his drawings, which he describes as the beasts reproducing behind his back. Birth here is a new design each year.</p><p class="cap"><a href="https://www.dezeen.com/2014/12/12/strandbeests-theo-jansen-interview-wind-powered-machines-new-species/" target="_blank" rel="noopener">Dezeen interview, 2014</a> · photo: Romaine, Kerkrade, 2013, <a href="https://commons.wikimedia.org/wiki/File:Kerkrade-Strandbeest_(1).jpg" target="_blank" rel="noopener">Wikimedia Commons</a>, CC0</p></figcaption>
+      </figure>
+      <figure class="mb text">
+        <figcaption><h3>BOB, 2018</h3><p>Ian Cheng's artificial creatures at the Serpentine. The gallery wrote that a BOB litter began life in parallel on 6 March 2018: a litter with a birth date, and no body that bore it.</p><p class="cap"><a href="https://www.serpentinegalleries.org/whats-on/ian-cheng-bob/" target="_blank" rel="noopener">Serpentine</a></p></figcaption>
+      </figure>
+      <figure class="mb text">
+        <figcaption><h3>Spawn, 2019</h3><p>Holly Herndon and Mat Dryhurst announced that they had given birth to an AI baby called Spawn, and trained it in public at the Martin Gropius Bau in Berlin. Birth is making the model; raising is training it. It is the nearest art precedent for a newborn that inherits a mind, but it has no body.</p><p class="cap"><a href="https://4ad.com/news/1001" target="_blank" rel="noopener">4AD</a> · <a href="https://www.nvidia.com/en-us/research/ai-art-gallery/artists/holly-herndon/" target="_blank" rel="noopener">NVIDIA AI Art Gallery</a></p></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="block mb-take">
+    <div class="side"><h2>What the work takes from this</h2></div>
+    <div class="prose">
+      <div class="grid2">
+        <div class="card"><h3>The newborn</h3><p>Calling the printed robot the newborn is not borrowed from human birth. In 1991 Ray already called his digital daughters gestating while they were copied, and newborn once they divided.</p></div>
+        <div class="card"><h3>The cut</h3><p>Tierra's test is whether the parent can still write. The robot passes part of its memory to the newborn. If that passing goes on after the newborn leaves, has the birth finished? Perhaps the passing ends at the cut, or after it becomes teaching that the newborn may refuse.</p></div>
+        <div class="card"><h3>The one who carries</h3><p>Picabia's machine is born without a mother: the one who carries is taken away. This work takes away the gender and keeps the body that carries and delivers. Neither has a mother. They point in opposite directions.</p></div>
+        <div class="card"><h3>Once, and new</h3><p>The robotic patient gives birth dozens of times and never produces anyone new. Here each birth happens once and leaves a robot that did not exist before, and that may bear another in turn.</p></div>
+      </div>
+      <p class="note" style="margin-top:18px">Found in a search of science, engineering, industry and art in November 2026. Anything unconfirmed is marked in its card. Stories, films and games are in <a href="#culture">Culture</a>.</p>
+    </div>
+  </div>
+</section>
+
 <!-- ============================== CULTURE ============================== -->
 <section class="tab" id="culture">
   <div class="tabhead"><div><p class="kicker">Culture</p><h2>From copies to relation</h2><p>How stories, films, games and art have imagined machines that are made, and the few that are raised. Thirty works, placed on one line: from a machine as a copy, a servant or a product, to a machine defined by whom it belongs with. Click any point to open its card.</p></div></div>
@@ -1281,7 +1467,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 <script>
 const GROUPS = [
   { g: "work", label: "The Work", tabs: [["work", "The Work"]] },
-  { g: "think", label: "Think", tabs: [["ideas", "Ideas", "questions the work raises"], ["culture", "Culture", "stories, screens and art"], ["nature", "Nature", "how other species give birth"], ["academia", "Academia Research", "labs, works and PhD paths"]] },
+  { g: "think", label: "Think", tabs: [["ideas", "Ideas", "questions the work raises"], ["culture", "Culture", "stories, screens and art"], ["machines", "Machines", "what birth has meant for machines"], ["nature", "Nature", "how other species give birth"], ["academia", "Academia Research", "labs, works and PhD paths"]] },
   { g: "make", label: "Make", tabs: [["prototypes", "Prototypes", "versions one to three"], ["build", "Build", "every part, with sources"], ["society", "Society", "reproduction at scale"], ["process", "Process", "how the work changed"]] },
   { g: "sim", label: "Simulator", tabs: [["simulator", "Printing console", "signal, G-code, print, birth"], ["physics", "Physics", "birth and printing, simulated"]] },
   { g: "talk", label: "Talk", tabs: [["conversations", "Conversations", "one to one"], ["voices", "Voices", "open to everyone"]] },
