@@ -90,6 +90,12 @@ ul.plain { padding-left: 18px; } ul.plain li { margin: 0 0 8px; max-width: 80ch;
 .trace-values dd { margin: 3px 0 0; font: 16px var(--mono); }
 .case-force { display:block; width:72px; height:6px; margin:5px 0; }
 @media (max-width:550px) { .trace-chart text { font-size: 22px; } }
+/* embedded in the home page: no scroll inside the page's scroll; the side panel flows and the page scrolls as a whole */
+html.bnm-embed .app { height: auto; min-height: 0; align-items: start; }
+html.bnm-embed .view { height: 760px; }
+html.bnm-embed aside { min-height: 760px; }
+html.bnm-embed .pane { overflow: visible; flex: none; }
+@media (max-width: 920px) { html.bnm-embed .view { height: 540px; } html.bnm-embed aside { max-height: none; min-height: 0; } }
 </style>
 <link rel="stylesheet" href="../assets/css/organic.css">
 <link rel="stylesheet" href="reference-media.css"><link rel="stylesheet" href="../assets/css/monochrome.css">

@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Speculative design: a robot giving birth to another · Society</title>
-<meta name="description" content="Born, Not Made at the scale of a population: many simplified bodies in one long glass tank under a searchlight. Two robots that relate touch at the opening; a body with a tail prints the newborn in its gel chamber; the newborn is born wrinkled and fills with air. Tail or no tail is inherited.">
+<meta name="description" content="Born, Not Made at the scale of a population: many simplified bodies in one glass tank, close to square, under small fixed spot lights. Two robots that relate touch at the opening; a body with a tail prints the newborn in its gel chamber; the newborn is born wrinkled and fills with air. Tail or no tail is inherited.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Society, simplified bodies: one long tank in a black room, one searchlight above that follows the encounters and the births. */
+/* Society, simplified bodies: a tank close to square in a black room, nine small fixed spot lights above. */
 :root { --bg: #000; --panel: #0b0b0c; --line: #262628; --ink: #ecebe6; --muted: #9b9a94; --dim: #67665f; --mono: "JetBrains Mono", ui-monospace, monospace; --serif: "Cormorant Garamond", Georgia, serif; color-scheme: dark; }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 12.5px/1.45 "Inter", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
@@ -40,34 +40,38 @@ canvas.spark { width: 100%; height: 40px; display: block; margin-bottom: 8px; }
 a { color: var(--ink); }
 .links { font-size: 12px; color: var(--muted); }
 @media (max-width: 860px) { .app { grid-template-columns: minmax(0, 1fr); height: auto; } .view { height: 68vh; } aside { border-left: 0; border-top: 1px solid var(--line); } }
+/* embedded in the home page: no scroll inside the page's scroll; the controls sit below the tank in columns and the page scrolls as a whole */
+html.bnm-embed .app { grid-template-columns: minmax(0, 1fr); height: auto; min-height: 0; }
+html.bnm-embed .view { height: 720px; }
+html.bnm-embed aside { display: block; overflow: visible; border-left: 0; border-top: 1px solid var(--line); columns: 3 260px; column-gap: 28px; padding: 16px 16px 24px; }
+html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
 </style>
 <link rel="stylesheet" href="../assets/css/monochrome.css">
 </head><body>
 <div class="app">
   <div class="view">
-    <canvas id="c" aria-label="Many robots in one long tank under a searchlight"></canvas>
+    <canvas id="c" aria-label="Many robots in one tank under small spot lights"></canvas>
     <div class="grain" id="grain"></div><div class="vig"></div>
     <div id="labs"></div>
-    <div class="cap"><h1>Society</h1><p>Many bodies share one tank. Two that relate touch at the opening. A body with a tail holds the arm, so it prints the newborn in its gel chamber. The newborn is born wrinkled, fills with air and swims off. Tail or no tail is inherited.</p>
+    <div class="cap"><h1>Society</h1><p>It starts with two robots and a few loose tails. Two that relate touch at the opening. A body with a tail holds the arm, so it prints the newborn in its gel chamber. The newborn is born wrinkled, fills with air and swims off. A head without a tail can take a loose tail from behind and become whole.</p>
       <div class="hud" id="hud"></div></div>
-    <div class="views" id="views"><button data-cam="tank" class="on">Whole tank</button><button data-cam="follow">Follow the light</button><button data-cam="above">Above</button></div>
+    <div class="views" id="views"><button data-cam="tank" class="on">Whole tank</button><button data-cam="follow">Follow births</button><button data-cam="above">Above</button></div>
     <div class="ev" id="ev"></div>
   </div>
   <aside>
     <div><h3>Run</h3>
       <div class="row"><button id="run" class="on">Pause</button><button id="reset">Reset</button><span style="width:8px"></span><button data-sp="1" class="on">1×</button><button data-sp="3">3×</button><button data-sp="8">8×</button></div></div>
     <div><h3>Light</h3>
-      <div class="row"><button data-lamp="follow" class="on">Follows touch and birth</button><button data-lamp="fixed">Fixed above</button></div>
-      <div class="ctl"><label for="room">Room light</label><input type="range" id="room" min="0" max="1" step="0.01" value="0.12"><output id="roomO"></output></div>
+            <div class="ctl"><label for="room">Room light</label><input type="range" id="room" min="0" max="1" step="0.01" value="0.12"><output id="roomO"></output></div>
       <div class="row"><button id="relBtn" class="on">Relations shown</button></div></div>
     <div><h3>Conditions</h3>
-      <div class="ctl"><label for="tails">Tails at start</label><input type="range" id="tails" min="0.1" max="1" step="0.05" value="0.6"><output id="tailsO"></output></div>
+      <div class="ctl"><label for="loose">Loose tails</label><input type="range" id="loose" min="0" max="10" step="1" value="4"><output id="looseO"></output></div>
       <div class="ctl"><label for="inh">Inheritance</label><input type="range" id="inh" min="0" max="1" step="0.01" value="0.7"><output id="inhO"></output></div>
       <div class="ctl"><label for="drift">Drift</label><input type="range" id="drift" min="0" max="0.5" step="0.01" value="0.12"><output id="driftO"></output></div>
       <div class="ctl"><label for="rel">Relations to bear</label><input type="range" id="rel" min="0" max="5" step="1" value="1"><output id="relO"></output></div>
       <div class="ctl"><label for="cap">Water feeds</label><input type="range" id="cap" min="20" max="160" step="5" value="90"><output id="capO"></output></div>
       <div class="ctl"><label for="gest">Gestation, s</label><input type="range" id="gest" min="6" max="40" step="1" value="14"><output id="gestO"></output></div>
-      <p class="note">Tails at start applies on Reset.</p></div>
+      <p class="note">Loose tails sets how many float in the water at the start; it applies on Reset.</p></div>
     <div><h3>Send a signal into the water</h3>
       <div class="row"><input type="text" id="sig" placeholder="a word or a phrase" maxlength="40"><button id="send">Send</button></div>
       <p class="note">Births soon after carry it as a memory trace.</p></div>
@@ -76,7 +80,7 @@ a { color: var(--ink); }
       <h3>Body diversity</h3><canvas class="spark" id="sp3"></canvas>
       <h3>Seed memory still carried</h3><canvas class="spark" id="sp4"></canvas></div>
     <div><h3>Selected</h3><div id="insp" class="note">Click a robot in the tank.</div></div>
-    <div><h3>Rules</h3><p class="note">Relation is shared memory, likeness of body and time spent near each other. A robot ready to bear looks for the one it relates to most; at least one of the two has a tail. They touch opening to opening and exchange memory and form. The one with a tail carries: the arm prints the newborn in gel, layer by layer, then inflates it a little inside the chamber and pushes it out. Each newborn mixes both bodies, with drift. If both have tails the newborn mostly has one; with one tail, half the time. Nobody dies; the water feeds only so many, so births slow as the tank fills.</p></div>
+    <div><h3>Rules</h3><p class="note">Relation is shared memory, likeness of body and time spent near each other. A robot ready to bear looks for the one it relates to most; at least one of the two has a tail. They touch opening to opening and exchange memory and form. The one with a tail carries: the arm prints the newborn in gel, layer by layer, then inflates it a little inside the chamber and pushes it out. Each newborn mixes both bodies, with drift. If both have tails the newborn mostly has one; with one tail, half the time. Sometimes the one that carried also prints a loose tail. A head without a tail swims to a loose tail and docks it from behind, so over time more bodies are whole. Nobody dies; the water feeds only so many, so births slow as the tank fills.</p></div>
     <p class="links"><a href="bodies/">Bodies</a>: the same society with the earlier v2 bodies. <a href="old_/">Earlier 2D version</a>. <a href="../simulator/simple/">Printing simulator, simplified</a>. <a href="../">Home</a></p>
   </aside>
 </div>
@@ -89,17 +93,20 @@ const rnd = Math.random, clamp = (x, a, b) => Math.max(a, Math.min(b, x)), lerp 
 const angLerp = (a, b, t) => { let d = ((b - a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI; return a + d * t; };
 
 /* ---------- the room: meters, y up; tank inner floor at y = 0 ---------- */
-const TX = 4.5, TZ = 1.8, WL = 0.5, TH = 0.72, GL = 0.02, PLINTH = 0.9;      // tank 9 x 3.6 m, water 0.5 m deep
+const TX = 3.4, TZ = 3.0, WL = 0.5, TH = 0.72, GL = 0.02, PLINTH = 0.9;      // tank 6.8 x 6 m, close to square, water 0.5 m deep
+// small fixed spot lights in a 3 x 3 grid, each throwing its own pool; the robots drift in and out of the light
+const LH = 4.0, POOL = 0.85, LAMPS = []; for (const z of [-1.85, 0, 1.85]) for (const x of [-2.05, 0, 2.05]) LAMPS.push(new THREE.Vector3(x, LH, z));
+const SPOT_A = Math.atan(POOL / LH);
 const MAXPOP = 160;
 const P = {};
-for (const id of ["tails", "inh", "drift", "rel", "cap", "gest", "room"]) { const el = $("#" + id), o = $("#" + id + "O"); const up = () => { P[id] = +el.value; o.textContent = el.value; }; el.oninput = up; up(); }
+for (const id of ["loose", "inh", "drift", "rel", "cap", "gest", "room"]) { const el = $("#" + id), o = $("#" + id + "O"); const up = () => { P[id] = +el.value; o.textContent = el.value; }; el.oninput = up; up(); }
 
 const cv = $("#c");
 const R3 = {};
-const U = { uTime: { value: 0 }, uLamp: { value: new THREE.Vector3(0, 6, 0) }, uTgt: { value: new THREE.Vector3(0, 0, 0) }, uCos: { value: new THREE.Vector2(0.9, 0.97) }, uWL: { value: WL },
+const U = { uTime: { value: 0 }, uLamps: { value: LAMPS }, uCos: { value: new THREE.Vector2(Math.cos(SPOT_A), Math.cos(SPOT_A * 0.45)) }, uWL: { value: WL },
   uRip: { value: Array.from({ length: 10 }, () => new THREE.Vector4(0, 0, -99, 0)) } };
-const GLSL_SPOT = `uniform vec3 uLamp; uniform vec3 uTgt; uniform vec2 uCos; uniform float uTime; uniform float uWL;
-float spotK(vec3 p) { vec3 d = normalize(p - uLamp); return smoothstep(uCos.x, uCos.y, dot(d, normalize(uTgt - uLamp))); }
+const GLSL_SPOT = `uniform vec3 uLamps[9]; uniform vec2 uCos; uniform float uTime; uniform float uWL;
+float spotK(vec3 p) { float k = 0.0; for (int i = 0; i < 9; i++) { vec3 d = normalize(p - uLamps[i]); k = max(k, smoothstep(uCos.x, uCos.y, -d.y)); } return k; }
 float causK(vec2 p, float t) { vec2 q = p * 2.6; float c = 0.0;
   for (int i = 0; i < 3; i++) { float fi = float(i); q += 0.55 * vec2(sin(q.y * 1.31 + t * 0.55 + fi * 1.7), cos(q.x * 1.17 - t * 0.47 + fi * 2.3)); c += abs(sin(q.x) + sin(q.y)); }
   c /= 3.0; return pow(max(0.0, 1.0 - 0.62 * c), 3.0) * 2.4; }`;
@@ -107,21 +114,21 @@ float causK(vec2 p, float t) { vec2 q = p * 2.6; float c = 0.0;
 function initThree() {
   const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true, powerPreference: "high-performance" });
   r.setPixelRatio(Math.min(2, devicePixelRatio || 1)); r.outputEncoding = THREE.sRGBEncoding; r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.05;
-  r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.localClippingEnabled = true;
+  r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFShadowMap; r.localClippingEnabled = true;
   const sc = new THREE.Scene(); sc.background = new THREE.Color(0x000000); sc.fog = new THREE.FogExp2(0x000000, 0.035);
   const cam = new THREE.PerspectiveCamera(30, 1, 0.05, 120); cam.position.set(0.9, 5.4, 13.8);
   const ctl = new THREE.OrbitControls(cam, cv); ctl.target.set(0, 0.0, 0); ctl.enableDamping = true; ctl.dampingFactor = 0.08; ctl.maxPolarAngle = Math.PI * 0.49; ctl.minDistance = 1.2; ctl.maxDistance = 26;
   Object.assign(R3, { r, sc, cam, ctl });
-  // lights: the searchlight, a weak hemisphere for the room
-  const spot = new THREE.SpotLight(0xfff4e6, 3.2, 0, 0.3, 0.55, 0); spot.castShadow = true; spot.shadow.mapSize.set(2048, 2048); spot.shadow.camera.near = 1; spot.shadow.camera.far = 14; spot.shadow.bias = -0.0004; spot.shadow.radius = 3;
-  sc.add(spot); sc.add(spot.target); R3.spot = spot;
+  // lights: nine small fixed spots straight down, a weak hemisphere for the room
+  R3.spots = LAMPS.map((L) => { const sp = new THREE.SpotLight(0xfff4e6, 2.6, 0, SPOT_A * 1.05, 0.55, 0); sp.position.copy(L); sp.target.position.set(L.x, 0, L.z);
+    sp.castShadow = true; sp.shadow.mapSize.set(512, 512); sp.shadow.camera.near = 1.5; sp.shadow.camera.far = 7; sp.shadow.bias = -0.0006; sc.add(sp); sc.add(sp.target); return sp; });
   R3.hemi = new THREE.HemisphereLight(0xc8d2da, 0x0a0a0a, 0.3); sc.add(R3.hemi);
   R3.fill = new THREE.DirectionalLight(0xdfe6ee, 0.2); R3.fill.position.set(-3, 6, 4); sc.add(R3.fill);
   buildRoom(); buildWater(); buildBeam(); buildRelLines();
   addEventListener("resize", resize); new ResizeObserver(resize).observe(cv.parentElement); resize();
 }
 function resize() { const b = cv.parentElement.getBoundingClientRect(); R3.r.setSize(b.width, b.height, false); cv.style.width = b.width + "px"; cv.style.height = b.height + "px"; R3.cam.aspect = b.width / Math.max(1, b.height); R3.cam.updateProjectionMatrix(); if (typeof camMode !== "undefined" && camMode === "tank" && !R3.moved) tankCam(); }
-function tankCam() { const k = Math.max(1, 1.5 / R3.cam.aspect); R3.cam.position.set(0.8 * k, 4.8 * k, 12.2 * k); R3.ctl.target.set(0, -0.2, 0); }
+function tankCam() { const k = Math.max(1, 1.2 / R3.cam.aspect); R3.cam.position.set(0.7 * k, 7.6 * k, 12.4 * k); R3.ctl.target.set(0, -0.4, 0); }
 
 /* a standard material that knows the waterline: darker and cooler below, a thin bright line at the surface */
 function waterAware(m, opt = {}) {
@@ -168,12 +175,12 @@ function buildRoom() {
   const edges = new THREE.LineSegments(new THREE.EdgesGeometry(box), new THREE.LineBasicMaterial({ color: 0xd8dee2, transparent: true, opacity: 0.42 })); sc.add(edges);
   const wlBox = new THREE.BoxGeometry(2 * TX, 0.001, 2 * TZ); wlBox.translate(0, WL, 0);
   sc.add(new THREE.LineSegments(new THREE.EdgesGeometry(wlBox), new THREE.LineBasicMaterial({ color: 0x9fb0bb, transparent: true, opacity: 0.25 })));
-  // the lamp housing, moved with the light
-  const can = new THREE.Group();
-  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.095, 0.34, 32), std(0x0a0a0a, 0.5)); body.position.y = 0.17; can.add(body);
-  const lens = new THREE.Mesh(new THREE.CircleGeometry(0.085, 32), new THREE.MeshBasicMaterial({ color: new THREE.Color(9, 8.6, 8) })); lens.rotation.x = Math.PI / 2; lens.position.y = -0.001; can.add(lens);
-  const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 6, 8), std(0x111111, 0.6)); rod.position.y = 3.3; can.add(rod);
-  sc.add(can); R3.can = can;
+  // a small housing over each spot
+  const canBody = new THREE.CylinderGeometry(0.07, 0.06, 0.22, 24), lensG = new THREE.CircleGeometry(0.052, 24), rodG = new THREE.CylinderGeometry(0.006, 0.006, 6, 6);
+  const canM = std(0x0a0a0a, 0.5), lensM = new THREE.MeshBasicMaterial({ color: new THREE.Color(9, 8.6, 8) }), rodM = std(0x111111, 0.6);
+  for (const L of LAMPS) { const can = new THREE.Group(); const b = new THREE.Mesh(canBody, canM); b.position.y = 0.11; can.add(b);
+    const l = new THREE.Mesh(lensG, lensM); l.rotation.x = Math.PI / 2; l.position.y = -0.001; can.add(l); const rod = new THREE.Mesh(rodG, rodM); rod.position.y = 3.2; can.add(rod);
+    can.position.copy(L); sc.add(can); }
 }
 function buildWater() {
   const m = new THREE.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: false, side: THREE.DoubleSide,
@@ -188,8 +195,8 @@ function buildWater() {
         return g; }
       void main() { vec2 g = grad(vW.xz, uTime); vec3 n = normalize(vec3(-g.x, 1.0, -g.y));
         vec3 V = normalize(cameraPosition - vW); float fr = 0.02 + 0.98 * pow(1.0 - max(dot(n, V), 0.0), 5.0);
-        vec3 L = normalize(uLamp - vW); vec3 H = normalize(L + V); float s = spotK(vW);
-        float sp = pow(max(dot(n, H), 0.0), 600.0) * s * 9.0 + pow(max(dot(n, H), 0.0), 60.0) * s * 0.25;
+        float s = spotK(vW), sp = 0.0;
+        for (int i = 0; i < 9; i++) { vec3 L = normalize(uLamps[i] - vW); vec3 H = normalize(L + V); float k = smoothstep(uCos.x, uCos.y, -normalize(vW - uLamps[i]).y); sp += pow(max(dot(n, H), 0.0), 600.0) * k * 9.0 + pow(max(dot(n, H), 0.0), 60.0) * k * 0.25; }
         float ring = 0.0; for (int i = 0; i < 10; i++) { vec4 r = uRip[i]; float age = uTime - r.z; if (age < 0.0 || age > 6.0) continue;
           float x = length(vW.xz - r.xy) - 0.35 * age; ring += r.w * exp(-x * x * 900.0) * exp(-age * 0.6); }
         vec3 c = vec3(0.40, 0.47, 0.52) * (0.03 + 0.22 * s) + vec3(0.80, 0.86, 0.90) * fr * (0.12 + 0.35 * s) + vec3(1.0) * sp + vec3(0.7, 0.8, 0.86) * ring * (0.25 + s);
@@ -202,14 +209,14 @@ function buildWater() {
 }
 function buildBeam() {
   const geo = new THREE.ConeGeometry(1, 1, 64, 1, true); geo.translate(0, -0.5, 0);      // apex at the origin, opening downward
-  const m = new THREE.ShaderMaterial({ uniforms: { uI: { value: 0.11 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+  const m = new THREE.ShaderMaterial({ uniforms: { uI: { value: 0.09 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
     vertexShader: `varying float vH; varying vec3 vN; varying vec3 vV; void main() { vH = -position.y; vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position, 1.0); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }`,
     fragmentShader: `uniform float uI; varying float vH; varying vec3 vN; varying vec3 vV;
       void main() { float rim = pow(abs(dot(normalize(vN), normalize(vV))), 2.2); float a = uI * rim * (1.0 - 0.75 * vH) * smoothstep(0.0, 0.06, vH) * smoothstep(1.0, 0.92, vH);
         gl_FragColor = vec4(vec3(1.0, 0.97, 0.92) * a, 1.0); }` });
-  const beam = new THREE.Mesh(geo, m); beam.renderOrder = 30; beam.frustumCulled = false; R3.sc.add(beam); R3.beam = beam;
+  const len = LH + 0.15, br = len * Math.tan(SPOT_A), beams = LAMPS.map((L) => { const b = new THREE.Mesh(geo, m); b.renderOrder = 30; b.frustumCulled = false; b.position.copy(L); b.scale.set(br, len, br); R3.sc.add(b); return b; });
   // dust in the beam
-  const N = 900, pos = new Float32Array(N * 3), seed = new Float32Array(N);
+  const N = 160, pos = new Float32Array(N * 3), seed = new Float32Array(N);
   for (let i = 0; i < N; i++) { const h = Math.pow(rnd(), 0.8), a = rnd() * 6.283, rr = Math.sqrt(rnd()); pos.set([Math.cos(a) * rr, -h, Math.sin(a) * rr], i * 3); seed[i] = rnd(); }
   const pg = new THREE.BufferGeometry(); pg.setAttribute("position", new THREE.BufferAttribute(pos, 3)); pg.setAttribute("seed", new THREE.BufferAttribute(seed, 1));
   const pm = new THREE.ShaderMaterial({ uniforms: { uTime: U.uTime, uSc: { value: new THREE.Vector3(1, 1, 1) } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
@@ -218,7 +225,7 @@ function buildBeam() {
         p.xz *= -p.y; vec4 mv = modelViewMatrix * vec4(p, 1.0); gl_Position = projectionMatrix * mv;
         gl_PointSize = (0.6 + 1.2 * seed) * 6.0 / -mv.z * 0.5 * 4.0; vA = (0.25 + 0.75 * fract(seed * 7.3 + uTime * 0.05)) * smoothstep(0.0, 0.1, -p.y) * (1.0 - length(p.xz) / max(-p.y, 1e-3)); }`,
     fragmentShader: `varying float vA; void main() { vec2 c = gl_PointCoord - 0.5; float d = dot(c, c); if (d > 0.25) discard; gl_FragColor = vec4(vec3(1.0, 0.96, 0.9) * vA * 0.35 * (1.0 - d * 4.0), 1.0); }` });
-  const pts = new THREE.Points(pg, pm); pts.frustumCulled = false; pts.renderOrder = 31; beam.add(pts); R3.dust = pts;
+  for (const b of beams) { const pts = new THREE.Points(pg, pm); pts.frustumCulled = false; pts.renderOrder = 31; b.add(pts); }
 }
 function buildRelLines() {
   const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(MAXPOP * 12 * 6), 3)); g.setAttribute("color", new THREE.BufferAttribute(new Float32Array(MAXPOP * 12 * 6), 3));
@@ -276,7 +283,7 @@ function bodyMesh(r) {
 /* ---------- the society ---------- */
 const SEED = ["slow tide", "three pulses", "an open ring", "light above", "the low pump"];
 const LEX = ["salt", "current", "fold", "glass", "echo", "shadow", "warmth", "valve", "pressure", "silt", "hum", "drift"];
-let robots = [], nextId = 1, simT = 0, speed = 1, running = true, broadcast = null, selected = null, events = [], births = 0, ripI = 0, lampMode = "follow", camMode = "tank", showRel = true;
+let loose = [], robots = [], nextId = 1, simT = 0, speed = 1, running = true, broadcast = null, selected = null, events = [], births = 0, ripI = 0, lampMode = "follow", camMode = "tank", showRel = true;
 const hist = { pop: [], tail: [], div: [], seed: [] };
 const pickable = [];
 function newRobot(o) {
@@ -285,15 +292,32 @@ function newRobot(o) {
   r.glow = glow(0xffc890, 0.5); r.glow.position.set(0, 0, 0); r.grp.add(r.glow);
   R3.sc.add(r.grp); pickable.push(r.mesh); robots.push(r); return r;
 }
+/* a loose tail: the arm module on its own, floating, open at the front where a head docks */
+function tailGeometry(s) {
+  const g = bodyGeometry(s, true), gr = g.groups[0], M = 36, base = 18 * M;
+  const index = Array.from(g.index.array.slice(gr.start, gr.start + gr.count)), pos = Array.from(g.attributes.position.array), c = pos.length / 3;
+  pos.push(-s.Lh / 2 + 0.004, 0, 0); for (let j = 0; j < M; j++) index.push(base + j, c, base + (j + 1) % M);
+  const t = new THREE.BufferGeometry(); t.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); t.setIndex(index); t.computeVertexNormals(); g.dispose(); return t;
+}
+function newLoose(o) {
+  const T = Object.assign({ id: nextId++, x: 0, z: 0, vx: 0, vz: 0, h: rnd() * 6.283, bob: rnd() * 6.283, claim: null }, o);
+  T.s = shapeOf(T.g); const m = new THREE.Mesh(tailGeometry(T.s), MAT.clay); m.castShadow = true; m.position.x = T.s.Lh / 2 + T.s.Lt / 2; m.renderOrder = 5;
+  T.grp = new THREE.Group(); T.grp.add(m); T.mesh = m; R3.sc.add(T.grp); loose.push(T); return T;
+}
+function disposeLoose(T) { R3.sc.remove(T.grp); T.mesh.geometry.dispose(); loose = loose.filter((x) => x !== T); }
+function rebuildBody(r) { const i = pickable.indexOf(r.mesh); r.grp.remove(r.mesh); r.mesh.geometry.dispose(); r.mesh = bodyMesh(r); r.len = r.mesh.geometry.userData.len; r.mesh.morphTargetInfluences[0] = 1 - r.inflate; r.grp.add(r.mesh); if (i >= 0) pickable[i] = r.mesh; else pickable.push(r.mesh); }
+function attachTail(r, T) {
+  r.g = r.g.slice(); r.g[6] = T.g[6]; r.g[7] = T.g[7]; r.s = shapeOf(r.g); r.tail = true; rebuildBody(r); disposeLoose(T); r.dock = null; r.dockT = 0;
+  ripple(r.x, r.z, 0.8); log(`#${r.id} takes a loose tail from behind and is whole`); focusOn(r, 5);
+}
 function disposeRobot(r) { R3.sc.remove(r.grp); r.mesh.geometry.dispose(); if (r.baby) { r.baby.geometry.dispose(); r.baby.material.forEach((m) => m.dispose()); } r.glow.material.dispose(); }
 function reset() {
-  robots.forEach(disposeRobot); robots = []; pickable.length = 0; nextId = 1; simT = 0; births = 0; events = []; selected = null; for (const k in hist) hist[k] = [];
-  const n = 28;
-  for (let i = 0; i < n; i++) {
-    const r = newRobot({ g: Array.from({ length: 9 }, () => rnd()), tail: i < Math.round(n * P.tails), memory: SEED.map((t) => ({ t, w: 0.5 + 0.5 * rnd() })), energy: 0.5 + 0.7 * rnd(), age: 30 + 30 * rnd(), cool: 3 + 40 * rnd() });
-    let ok = false; for (let k = 0; k < 60 && !ok; k++) { r.x = (rnd() * 2 - 1) * (TX - 0.7); r.z = (rnd() * 2 - 1) * (TZ - 0.6); ok = robots.every((o) => o === r || Math.hypot(o.x - r.x, o.z - r.z) > 0.8); }
-  }
-  log("28 robots in the water, " + robots.filter((r) => r.tail).length + " with a tail");
+  robots.forEach(disposeRobot); robots = []; [...loose].forEach(disposeLoose); loose = []; pickable.length = 0; nextId = 1; simT = 0; births = 0; events = []; selected = null; for (const k in hist) hist[k] = [];
+  // it begins small: two whole robots and a few loose tails floating in the water
+  const mk = (x, z, h, cool) => { const r = newRobot({ g: Array.from({ length: 9 }, () => rnd()), tail: true, memory: SEED.map((t) => ({ t, w: 0.6 + 0.4 * rnd() })), energy: 1.1, age: 40, cool }); r.x = x; r.z = z; r.h = h; return r; };
+  mk(-0.6, 0.15, 0.3, 2); mk(0.7, -0.2, Math.PI - 0.2, 4);
+  for (let i = 0; i < P.loose; i++) { const L = LAMPS[(i * 4 + 1) % LAMPS.length], j = rnd() * 6.283; newLoose({ g: Array.from({ length: 9 }, () => rnd()), x: L.x + Math.cos(j) * 0.4, z: L.z + Math.sin(j) * 0.4 }); }
+  log(`two robots and ${P.loose} loose tails in the water`);
 }
 function log(t) { events.push({ t: simT, text: t }); if (events.length > 5) events.shift(); $("#ev").innerHTML = events.map((e) => `<div>${fmt(e.t)}  ${esc(e.text)}</div>`).join(""); }
 const fmt = (t) => { const m = Math.floor(t / 60), s = Math.floor(t % 60); return m + ":" + String(s).padStart(2, "0"); };
@@ -304,7 +328,7 @@ function overlap(a, b) { const ma = a.mm || new Map(a.map((x) => [x.t, x.w])), m
 function like(a, b) { let s = 0; for (let i = 0; i < a.length; i++) s += (a[i] - b[i]) ** 2; return 1 - Math.sqrt(s / a.length); }
 function relation(a, b) { a.memory.mm = a.memory.mm || new Map(a.memory.map((x) => [x.t, x.w])); b.memory.mm = b.memory.mm || new Map(b.memory.map((x) => [x.t, x.w])); return 0.5 * overlap(a.memory, b.memory) + 0.3 * like(a.g, b.g) + 0.2 * Math.min(1, (a.near.get(b.id) || 0) / 10) + (a.tail !== b.tail ? 0.03 : 0); }
 const reach = (r) => r.mesh.geometry.userData.front;     // center to opening, along the body
-const ready = (r) => r.adult && !r.carry && !r.pair && r.cool <= 0 && r.energy > 0.8;
+const ready = (r) => r.adult && !r.carry && !r.pair && !r.dock && r.cool <= 0 && r.energy > 0.8;
 
 function conceive(bearer, other) {
   const g = bearer.g.map((v, i) => clamp((rnd() < 0.5 ? v : other.g[i]) * 0.8 + lerp(v, other.g[i], 0.5) * 0.2 + (rnd() - 0.5) * 2 * P.drift, 0, 1));
@@ -327,11 +351,12 @@ function giveBirth(m) {
   kid.x = m.x + c * d; kid.z = m.z + s * d; kid.vx = c * 0.3; kid.vz = s * 0.3;
   m.grp.remove(baby); baby.geometry.dispose(); baby.material.forEach((x) => x.dispose()); m.baby = null; m.babySpec = null;
   m.carry = 0; m.birthT = 0; m.energy -= 0.5; m.cool = 12; births++;
+  if (m.tail && loose.length < 14 && rnd() < 0.35) { const T = newLoose({ g: m.g.map((v) => clamp(v + (rnd() - 0.5) * 2 * P.drift, 0, 1)), h: m.h + 0.6 }); T.x = m.x + c * (d + 0.15) + s * 0.45; T.z = m.z + s * (d + 0.15) - c * 0.45; T.vx = c * 0.1; T.vz = s * 0.1; log(`#${m.id} also prints a loose tail`); }
   ripple(kid.x, kid.z, 1.0); log(`#${kid.id} born from #${sp.parents[0]} and #${sp.parents[1]}, generation ${kid.gen}, ${kid.tail ? "with a tail" : "no tail"}`);
   focusOn(kid, 7);
 }
 
-/* the searchlight chooses what to look at */
+/* what the follow camera looks at */
 let focus = null, focusUntil = 0;
 function focusOn(r, hold) { if (simT < focusUntil && focus && focus !== r && focus.robot !== r) return; focus = r; focusUntil = simT + hold; }
 
@@ -344,15 +369,15 @@ function step(dt) {
     if (r.inflate < 1) r.inflate = Math.min(1, r.inflate + dt / 12);
     if (!r.adult && r.age > 30) { r.adult = true; }
     const sc = lerp(0.42, 1, r.inflate), rad = r.len * 0.5 * sc;
-    if (!r.home || simT > r.homeT) { r.home = [(rnd() * 2 - 1) * (TX - 0.8), (rnd() * 2 - 1) * (TZ - 0.6)]; r.homeT = simT + 25 + 30 * rnd(); }
-    let ax = Math.sin(simT * 0.21 + r.id * 1.3) * 0.04 + clamp((r.home[0] - r.x) * 0.02, -0.05, 0.05), az = Math.cos(simT * 0.17 + r.id * 2.1) * 0.04 + clamp((r.home[1] - r.z) * 0.02, -0.05, 0.05);
+    if (!r.home || simT > r.homeT) { const L = LAMPS[Math.floor(rnd() * LAMPS.length)], j = rnd() * 6.283, d = Math.sqrt(rnd()) * 0.9; r.home = [L.x + Math.cos(j) * d, L.z + Math.sin(j) * d]; r.homeT = simT + 30 + 40 * rnd(); }      // drift from one pool of light to another
+    let ax = Math.sin(simT * 0.21 + r.id * 1.3) * 0.03 + clamp((r.home[0] - r.x) * 0.04, -0.07, 0.07), az = Math.cos(simT * 0.17 + r.id * 2.1) * 0.03 + clamp((r.home[1] - r.z) * 0.04, -0.07, 0.07);
     for (const o of robots) {
       if (o === r) continue; const dx = o.x - r.x, dz = o.z - r.z, d = Math.hypot(dx, dz) || 1e-3;
       if (d < 1.4) r.near.set(o.id, (r.near.get(o.id) || 0) + dt);
       if (r.pair === o) continue;
       const minD = rad + o.len * 0.5 * lerp(0.42, 1, o.inflate) + 0.08;
       if (d < minD) { const k = (minD - d) / minD; ax -= dx / d * 2.4 * k; az -= dz / d * 2.4 * k; if (d < minD * 0.6) { r.x -= dx / d * (minD * 0.6 - d) * 0.5; r.z -= dz / d * (minD * 0.6 - d) * 0.5; } }
-      else if (!r.pair && d < 1.6) { const v = r.relTo.get(o) || 0; if (v > 0.42) { const k = 0.012 * v * (d - minD - 0.25); ax += dx / d * k; az += dz / d * k; } }
+      else if (!r.pair && d < 1.6) { const v = r.relTo.get(o) || 0; if (v > 0.42) { const k = 0.006 * v * (d - minD - 0.25); ax += dx / d * k; az += dz / d * k; } }
     }
     // pairing: a robot ready to bear looks for the one it relates to most; at least one of the two has a tail
     if (ready(r) && r.rel >= P.rel && N + robots.filter((q) => q.carry).length < Math.min(P.cap, MAXPOP) && rnd() < dt * 0.12 * Math.max(0, room) * 2) {
@@ -385,14 +410,40 @@ function step(dt) {
       if (r.carry < 1) { r.carry = Math.min(1, r.carry + dt / P.gest); if (r.carry >= 1) { r.birthT = 0.0001; focusOn(r, 8); } }
       else { r.birthT += dt / 3.5; r.vx *= 0.9; r.vz *= 0.9; if (r.birthT >= 1) giveBirth(r); }
     }
+    for (const T of loose) { if (r.dock === T) continue; const dx = T.x - r.x, dz = T.z - r.z, d = Math.hypot(dx, dz) || 1e-3, minD = rad + 0.2; if (d < minD) { const k = (minD - d) / minD; ax -= dx / d * 1.6 * k; az -= dz / d * 1.6 * k; } }
+    // a head without a tail looks for a loose tail and docks it from behind
+    if (!r.tail && r.adult && !r.pair && !r.carry && r.inflate >= 1) {
+      if (r.dock && !loose.includes(r.dock)) r.dock = null;
+      if (!r.dock) { let best = null, bd = 4.5; for (const T of loose) { const d = Math.hypot(T.x - r.x, T.z - r.z); if (!T.claim && d < bd) { best = T; bd = d; } } if (best) { r.dock = best; best.claim = r; r.dockT = 0; log(`#${r.id} swims to a loose tail`); } }
+      if (r.dock) {
+        const T = r.dock, dx = T.x - r.x, dz = T.z - r.z, d = Math.hypot(dx, dz) || 1e-3;
+        if (!r.dockT && d > 0.85) { ax += dx / d * 0.16; az += dz / d * 0.16; }
+        else {
+          r.dockT = (r.dockT || 0) + dt; r.vx *= 0.92; r.vz *= 0.92; const k = Math.min(1, dt * 1.4), c = Math.cos(r.h), sn = Math.sin(r.h), off = r.s.Lh / 2 + T.s.Lt / 2 + 0.005;
+          T.x = lerp(T.x, r.x - c * off, k); T.z = lerp(T.z, r.z - sn * off, k); T.h = angLerp(T.h, r.h, k); T.vx = T.vz = 0;
+          if (r.dockT > 1.5 && Math.hypot(T.x - (r.x - c * off), T.z - (r.z - sn * off)) < 0.03) attachTail(r, T);
+          else if (r.dockT > 6) attachTail(r, T);
+        }
+      }
+    }
     // walls
-    const m = 0.6; if (r.x < -TX + m) ax += (-TX + m - r.x) * 0.8; if (r.x > TX - m) ax -= (r.x - TX + m) * 0.8; if (r.z < -TZ + m) az += (-TZ + m - r.z) * 0.8; if (r.z > TZ - m) az -= (r.z - TZ + m) * 0.8;
+    const m = 0.45; if (r.x < -TX + m) ax += (-TX + m - r.x) * 0.8; if (r.x > TX - m) ax -= (r.x - TX + m) * 0.8; if (r.z < -TZ + m) az += (-TZ + m - r.z) * 0.8; if (r.z > TZ - m) az -= (r.z - TZ + m) * 0.8;
     const slow = r.birthT ? 0.2 : r.carry ? 0.7 : 1, max = (0.12 + 0.12 * r.g[4]) * slow * (r.energy < 0 ? 0.6 : 1);
     r.vx = (r.vx + ax * dt) * (1 - dt * 0.5); r.vz = (r.vz + az * dt) * (1 - dt * 0.5);
     const v = Math.hypot(r.vx, r.vz); if (v > max) { r.vx *= max / v; r.vz *= max / v; }
     r.x = clamp(r.x + r.vx * dt, -TX + 0.15, TX - 0.15); r.z = clamp(r.z + r.vz * dt, -TZ + 0.15, TZ - 0.15);
     if (v > 0.015) r.h = angLerp(r.h, Math.atan2(r.vz, r.vx), Math.min(1, dt * 1.2));
     r.energy = clamp(r.energy + dt * (0.03 * share - 0.022 - (r.carry ? 0.01 : 0)), -1, 1.4);
+  }
+  for (const T of loose) {
+    if (T.claim && (!robots.includes(T.claim) || T.claim.dock !== T)) T.claim = null;
+    if (T.claim && T.claim.dockT) continue;
+    let ax = Math.sin(simT * 0.11 + T.id) * 0.015, az = Math.cos(simT * 0.09 + T.id * 1.7) * 0.015;
+    for (const o of robots) { if (o === T.claim) continue; const dx = T.x - o.x, dz = T.z - o.z, d = Math.hypot(dx, dz) || 1e-3, minD = 0.22 + o.len * 0.5 * lerp(0.42, 1, o.inflate); if (d < minD) { const k = (minD - d) / minD; ax += dx / d * 0.9 * k; az += dz / d * 0.9 * k; } }
+    for (const Q of loose) { if (Q === T) continue; const dx = T.x - Q.x, dz = T.z - Q.z, d = Math.hypot(dx, dz) || 1e-3; if (d < 0.5) { ax += dx / d * 0.4 * (0.5 - d); az += dz / d * 0.4 * (0.5 - d); } }
+    const m = 0.4; if (T.x < -TX + m) ax += 0.3 * (-TX + m - T.x); if (T.x > TX - m) ax -= 0.3 * (T.x - TX + m); if (T.z < -TZ + m) az += 0.3 * (-TZ + m - T.z); if (T.z > TZ - m) az -= 0.3 * (T.z - TZ + m);
+    T.vx = (T.vx + ax * dt) * (1 - dt * 0.6); T.vz = (T.vz + az * dt) * (1 - dt * 0.6); const v = Math.hypot(T.vx, T.vz); if (v > 0.07) { T.vx *= 0.07 / v; T.vz *= 0.07 / v; }
+    T.x = clamp(T.x + T.vx * dt, -TX + 0.2, TX - 0.2); T.z = clamp(T.z + T.vz * dt, -TZ + 0.2, TZ - 0.2); T.h += Math.sin(simT * 0.05 + T.id) * dt * 0.05;
   }
 }
 
@@ -421,26 +472,13 @@ function updateScene(dtReal) {
     r.glow.material.opacity = lerp(r.glow.material.opacity, gI, Math.min(1, dtReal * 4)); r.glow.visible = r.glow.material.opacity > 0.01;
     r.glow.position.set(touching ? reach(r) : 0, -0.02, 0); r.glow.scale.setScalar(touching ? 0.35 : 0.55);
   }
-  // searchlight
-  let tgt;
-  if (lampMode === "fixed") tgt = new THREE.Vector3(0, 0, 0);
-  else {
-    if (focus && (focus.robot ? !robots.includes(focus.robot) || (!focus.robot.pair && !focus.robot.carry && simT > focusUntil) : !robots.includes(focus))) focus = null;
-    if (!focus || simT > focusUntil) { const c = robots.filter((r) => r.birthT > 0)[0] || robots.find((r) => r.phase === "touch") || robots.filter((r) => r.carry).sort((a, b) => b.carry - a.carry)[0]; if (c) { focus = c.phase === "touch" ? { robot: c } : c; focusUntil = simT + 5; } }
-    const f = focus ? (focus.robot || focus) : null;
-    if (f) { tgt = new THREE.Vector3(f.x, 0, f.z); if (focus.robot && f.pair) tgt.set((f.x + f.pair.x) / 2, 0, (f.z + f.pair.z) / 2); }
-    else tgt = new THREE.Vector3(Math.sin(t * 0.05) * TX * 0.6, 0, Math.sin(t * 0.07) * TZ * 0.5);
-  }
+  for (const T of loose) { T.grp.position.set(T.x, WL + T.s.B * 0.1 + Math.sin(t * 0.7 + T.bob) * 0.006, T.z); T.grp.rotation.set(Math.sin(t * 0.5 + T.bob) * 0.03, -T.h, Math.sin(t * 0.6 + T.bob * 1.3) * 0.025, "YXZ"); }
+  // what the follow camera looks at: a birth, a touch, or whoever is carrying
+  if (focus && (focus.robot ? !robots.includes(focus.robot) || (!focus.robot.pair && !focus.robot.carry && simT > focusUntil) : !robots.includes(focus))) focus = null;
+  if (!focus || simT > focusUntil) { const c = robots.filter((r) => r.birthT > 0)[0] || robots.find((r) => r.phase === "touch") || robots.filter((r) => r.carry).sort((a, b) => b.carry - a.carry)[0]; if (c) { focus = c.phase === "touch" ? { robot: c } : c; focusUntil = simT + 5; } }
+  const f = focus ? (focus.robot || focus) : null, tgt = new THREE.Vector3(0, 0, 0);
+  if (f) { tgt.set(f.x, 0, f.z); if (focus.robot && f.pair) tgt.set((f.x + f.pair.x) / 2, 0, (f.z + f.pair.z) / 2); }
   R3.lampT = R3.lampT || tgt.clone(); R3.lampT.lerp(tgt, Math.min(1, dtReal * 0.9));
-  const fixed = lampMode === "fixed", H = fixed ? 6.2 : 5.2, rad = fixed ? TX * 1.02 : 1.35;
-  const lamp = new THREE.Vector3(R3.lampT.x * (fixed ? 0 : 0.92), H, R3.lampT.z * (fixed ? 0 : 0.92)), aim = fixed ? new THREE.Vector3(0, 0, 0) : R3.lampT.clone();
-  const ang = Math.atan(rad / H); R3.spot.angle = lerp(R3.spot.angle, ang, Math.min(1, dtReal * 2)); R3.spot.intensity = fixed ? 1.6 : 3.2;
-  R3.spot.position.copy(lamp); R3.spot.target.position.copy(aim); R3.spot.target.updateMatrixWorld();
-  U.uLamp.value.copy(lamp); U.uTgt.value.copy(aim); U.uCos.value.set(Math.cos(R3.spot.angle), Math.cos(R3.spot.angle * (1 - R3.spot.penumbra * 0.9)));
-  R3.can.position.copy(lamp); R3.can.lookAt(aim); R3.can.rotateX(-Math.PI / 2);
-  const dir = aim.clone().sub(lamp), len = dir.length() + PLINTH * 0.2; dir.normalize();
-  R3.beam.position.copy(lamp); R3.beam.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), dir); const br = len * Math.tan(R3.spot.angle); R3.beam.scale.set(br, len, br);
-  R3.beam.material.uniforms.uI.value = fixed ? 0.05 : 0.11;
   R3.hemi.intensity = 0.04 + 0.5 * P.room; R3.fill.intensity = 0.3 * P.room;
   // relations, drawn at the waterline
   const pa = R3.rel.geometry.attributes.position.array, ca = R3.rel.geometry.attributes.color.array; let n = 0; const cap = pa.length / 6;
@@ -467,7 +505,7 @@ function labels() {
 }
 function hud() {
   const tails = robots.filter((r) => r.tail).length, carrying = robots.filter((r) => r.carry).length, gens = robots.reduce((m, r) => Math.max(m, r.gen), 0);
-  $("#hud").innerHTML = `t <b>${fmt(simT)}</b> · robots <b>${robots.length}</b> · with a tail <b>${tails}</b> · carrying <b>${carrying}</b> · births <b>${births}</b> · generation <b>${gens}</b>${broadcast && simT - broadcast.t < 25 ? ` · signal: <b>${esc(broadcast.text)}</b>` : ""}`;
+  $("#hud").innerHTML = `t <b>${fmt(simT)}</b> · robots <b>${robots.length}</b> · with a tail <b>${tails}</b> · loose tails <b>${loose.length}</b> · carrying <b>${carrying}</b> · births <b>${births}</b> · generation <b>${gens}</b>${broadcast && simT - broadcast.t < 25 ? ` · signal: <b>${esc(broadcast.text)}</b>` : ""}`;
 }
 function sample() {
   if (!robots.length) return; const N = robots.length, mean = new Array(9).fill(0);
@@ -505,10 +543,9 @@ function loop(now) {
   acc += dtR * (running ? speed : 0); if (acc > 0.5) { acc = 0; sample(); spark("#sp1", hist.pop); spark("#sp2", hist.tail, 1); spark("#sp3", hist.div); spark("#sp4", hist.seed, 1); inspect(); hud(); }
   requestAnimationFrame(loop);
 }
-const CAMS = { tank: [[0.9, 5.4, 13.8], [0, 0.0, 0]], above: [[0, 12.5, 0.01], [0, 0, 0]] };
+const CAMS = { tank: [[0.9, 5.4, 13.8], [0, 0.0, 0]], above: [[0, 15.5, 0.01], [0, 0, 0]] };
 document.querySelectorAll("[data-cam]").forEach((b) => (b.onclick = () => { camMode = b.dataset.cam; document.querySelectorAll("[data-cam]").forEach((x) => x.classList.toggle("on", x === b));
   R3.moved = false; if (camMode === "tank") tankCam(); else if (CAMS[camMode]) { R3.cam.position.set(...CAMS[camMode][0]); R3.ctl.target.set(...CAMS[camMode][1]); } else { R3.cam.position.set(R3.lampT.x + 1.6, 2.4, R3.lampT.z + 3.9); R3.ctl.target.set(R3.lampT.x, 0.25, R3.lampT.z); } }));
-document.querySelectorAll("[data-lamp]").forEach((b) => (b.onclick = () => { lampMode = b.dataset.lamp; document.querySelectorAll("[data-lamp]").forEach((x) => x.classList.toggle("on", x === b)); }));
 $("#relBtn").onclick = () => { showRel = !showRel; $("#relBtn").classList.toggle("on", showRel); $("#relBtn").textContent = showRel ? "Relations shown" : "Relations hidden"; };
 $("#run").onclick = () => { running = !running; $("#run").textContent = running ? "Pause" : "Run"; $("#run").classList.toggle("on", running); };
 $("#reset").onclick = reset;
@@ -517,7 +554,8 @@ $("#send").onclick = () => { const t = $("#sig").value.trim().toLowerCase().slic
 $("#sig").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#send").click(); });
 let downAt = null; cv.addEventListener("pointerdown", (e) => (downAt = [e.clientX, e.clientY]));
 cv.addEventListener("pointerup", (e) => { if (!downAt || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 5) return; const b = cv.getBoundingClientRect(); const rc = new THREE.Raycaster(); rc.setFromCamera({ x: (e.clientX - b.left) / b.width * 2 - 1, y: -(e.clientY - b.top) / b.height * 2 + 1 }, R3.cam); const hit = rc.intersectObjects(pickable, false)[0]; selected = hit ? hit.object.userData.robot : null; inspect(); });
-initThree(); tankCam(); R3.ctl.addEventListener("start", () => (R3.moved = true)); reset(); requestAnimationFrame(loop);
+initThree(); tankCam(); R3.ctl.addEventListener("start", () => (R3.moved = true));
+const embedSync = () => { const e = document.documentElement.classList.contains("bnm-embed"); R3.ctl.enableZoom = !e; }; embedSync(); new MutationObserver(embedSync).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] }); reset(); requestAnimationFrame(loop);
 window.__society = { get robots() { return robots; }, get simT() { return simT; }, R3, setSpeed: (s) => (speed = s), step, newRobot, conceive, disposeRobot, clear: () => { robots.forEach(disposeRobot); robots = []; pickable.length = 0; } };
 </script>
 </body></html>

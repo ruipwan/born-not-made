@@ -1468,8 +1468,8 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 
 <!-- ============================== SOCIETY ============================== -->
 <section class="tab" id="society">
-  <div class="tabhead"><div><p class="kicker">Society</p><h2>When reproduction runs at scale</h2><p>Many robots share one long tank under a searchlight. Two that relate touch at the opening. A body with a tail holds the arm, so it prints the newborn in its gel chamber; the newborn is born wrinkled and fills with air. Each newborn mixes both bodies, with drift, and tail or no tail is inherited. The water feeds only so many. Send a signal and follow how far it travels.</p></div><a class="btn" href="society/" target="_blank" rel="noopener">Open full screen</a> <a class="btn" href="society/bodies/" target="_blank" rel="noopener">Bodies</a></div>
-  <div class="fullframe"><iframe data-src="society/" title="Society simulation: many robots in one tank under a searchlight"></iframe></div>
+  <div class="tabhead"><div><p class="kicker">Society</p><h2>When reproduction runs at scale</h2><p>It starts with two robots and four loose tails in one tank, close to square, under small fixed spot lights, and slowly fills. Two that relate touch at the opening. A body with a tail holds the arm, so it prints the newborn in its gel chamber; the newborn is born wrinkled and fills with air. Each newborn mixes both bodies, with drift, and tail or no tail is inherited; a head without a tail can dock a loose tail from behind and become whole. The water feeds only so many. Send a signal and follow how far it travels.</p></div><a class="btn" href="society/" target="_blank" rel="noopener">Open full screen</a> <a class="btn" href="society/bodies/" target="_blank" rel="noopener">Bodies</a></div>
+  <div class="fullframe"><iframe data-src="society/" title="Society simulation: many robots in one tank under small spot lights"></iframe></div>
 </section>
 
 <!-- ============================== ACADEMIA RESEARCH ============================== -->
@@ -1586,6 +1586,26 @@ addEventListener("message", (e) => {
     }
   }
 });
+/* embeds: a page inside a page never scrolls on its own. Each same-origin frame is sized to its full content and the home page scrolls as a whole;
+   dialogs inside a tall frame open where the reader is looking. */
+const EMBED_CSS = `html.bnm-embed, html.bnm-embed body { overflow: hidden !important; height: auto !important; }
+html.bnm-embed dialog[open] { position: fixed !important; top: calc(var(--bnm-top, 0px) + 16px) !important; bottom: auto !important; margin: 0 auto !important; max-height: calc(var(--bnm-vh, 100vh) - 32px) !important; overflow: auto; }`;
+function fitEmbed(f) {
+  let d; try { d = f.contentDocument; } catch (e) { return; }
+  if (!d || !d.documentElement || !d.body || f.dataset.fit === d.URL) return;
+  f.dataset.fit = d.URL; const root = d.documentElement; root.classList.add("bnm-embed");
+  if (!d.getElementById("bnm-embed-css")) { const st = d.createElement("style"); st.id = "bnm-embed-css"; st.textContent = EMBED_CSS; d.head.appendChild(st); }
+  f.setAttribute("scrolling", "no");
+  const box = f.closest(".fullframe") || f; let last = 0, grew = 0;
+  const fit = () => { if (!d.body) return; const h = Math.ceil(Math.max(root.scrollHeight, d.body.scrollHeight)); if (Math.abs(h - last) < 2) return; if (last && h > last && ++grew > 30) return; last = h; box.style.height = Math.min(h, 60000) + "px"; if (box !== f) f.style.height = "100%"; };
+  try { new f.contentWindow.ResizeObserver(fit).observe(d.body); } catch (e) {}
+  fit(); [300, 1200, 3000].forEach((t) => setTimeout(fit, t)); syncEmbedView();
+}
+function syncEmbedView() {
+  document.querySelectorAll("iframe[data-fit]").forEach((f) => { try { const r = f.getBoundingClientRect(), st = f.contentDocument.documentElement.style; st.setProperty("--bnm-top", Math.max(0, -r.top) + "px"); st.setProperty("--bnm-vh", innerHeight + "px"); } catch (e) {} });
+}
+document.querySelectorAll(".fullframe iframe").forEach((f) => { f.addEventListener("load", () => fitEmbed(f)); if (f.contentDocument && f.contentDocument.readyState === "complete" && f.src) fitEmbed(f); });
+addEventListener("scroll", syncEmbedView, { passive: true }); addEventListener("resize", syncEmbedView);
 addEventListener("hashchange", show); show();
 </script>
 <script src="assets/js/map.js" defer></script>

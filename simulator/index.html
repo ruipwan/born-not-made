@@ -157,6 +157,11 @@ button:focus-visible, input:focus-visible, a:focus-visible, .track:focus-visible
   .cams .btn { padding: 3px 7px; font-size: 11px; }
   .lab { font-size: 9.5px; }
 }
+/* embedded in the home page: no scroll inside the page's scroll; panels grow, the page scrolls as a whole */
+html.bnm-embed .app { grid-template-rows: 40px 560px 200px 78px auto; grid-template-areas: "top top" "view side" "bottom side" "time side" ". side"; }
+html.bnm-embed .side, html.bnm-embed .side .area { overflow: visible; min-height: 0; }
+html.bnm-embed .ro, html.bnm-embed .props { overflow: visible; max-height: none; flex: none; }
+html.bnm-embed .bottom .area, html.bnm-embed .info { overflow: visible; }
 </style>
 <link rel="stylesheet" href="../assets/css/monochrome.css">
 </head><body>
