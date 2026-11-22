@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inheritance · Born, Not Made</title>
+<style>
+*{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:#101010;color:#eee;font:16px/1.55 Inter,Arial,"Microsoft YaHei",sans-serif}
+main{width:min(1040px,100%);margin:auto;padding:clamp(24px,5vw,68px) clamp(18px,4vw,54px)}
+header,.controls,.options,.lineage,.bottom{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+header,.bottom{justify-content:space-between}header a,.options button{font-size:13px;color:#aaa}button,a{color:inherit}button{border:none;background:none;font:inherit;cursor:pointer;padding:7px 2px}button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid white;outline-offset:3px}
+h1{font:normal clamp(34px,5.5vw,64px)/1.13 Georgia,serif;letter-spacing:-.035em;margin:35px 0 12px}html[lang=zh] h1{font:500 clamp(30px,4.6vw,50px)/1.25 "Songti SC",SimSun,serif;letter-spacing:.01em}
+p{margin:0}.intro{color:#bcbcbc;max-width:62ch}.lineage{gap:0;margin:34px 0 20px;flex-wrap:nowrap}.lineage button{flex:1;color:#949494;border-top:1px solid #515151;text-align:left;font-size:14px;padding:10px 6px 9px 0;position:relative}.lineage button[aria-current=step]{color:#fff;border-color:#fff;font-weight:bold}.lineage button[aria-current=step]::before{content:"";position:absolute;top:-3px;width:22px;height:3px;background:#fff}
+figure{margin:0}.scene{border-block:1px solid #353535;padding:22px 0 18px}
+h2{font:normal clamp(23px,3.2vw,37px)/1.26 Georgia,"Songti SC",SimSun,serif;margin:0 0 5px}.subtitle{color:#c6c6c6;min-height:3.2em;max-width:72ch}
+.row{display:grid;grid-template-columns:112px 1fr;align-items:center;min-height:60px;gap:12px}.row.dim{opacity:.60}.flow{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;margin:12px 0 20px;font-size:14px}.flow i{font-style:normal;color:#888}.row output{font:13px ui-monospace,monospace;color:#ccc}.row{grid-template-columns:112px 1fr 5ch}.row b{font-size:20px;font-weight:500}.row small{display:block;color:#bbb;font-size:12px}.row svg{width:100%;height:53px;overflow:visible}.key{font-size:12px;color:#aaa;display:flex;flex-wrap:wrap;gap:22px;margin:18px 0 4px 124px}.key span:before{content:"";display:inline-block;border:1.5px solid #ddd;width:7px;height:7px;border-radius:50%;margin-right:7px}.key span+span:before{background:#ddd}
+.controls{margin-top:18px;gap:13px;font-size:14px}.controls button{border-bottom:1px solid #666}.controls button:disabled{opacity:.35;cursor:default}.controls output{margin-left:auto;color:#aaa;font-variant-numeric:tabular-nums}
+.lab{margin-top:24px}.lab label{display:block;color:#ddd;font-size:14px}.lab input{width:min(270px,75%);accent-color:#ddd;vertical-align:middle;margin:12px 14px 12px 0}.lab output{font-variant-numeric:tabular-nums}.hint,details{color:#aaa;font-size:13px}.bottom{margin-top:22px;align-items:flex-start}.bottom details{max-width:66ch}.bottom summary{cursor:pointer}.bottom details p{margin-top:8px}.bottom a{font-size:13px}
+@media(max-width:550px){.lineage{margin-top:24px}.lineage button{font-size:12px}.row{grid-template-columns:70px 1fr 5ch;gap:6px}.key{margin-left:76px;gap:10px}.controls{gap:10px}.subtitle{min-height:4.7em}.options{gap:8px}h1{margin-top:25px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body><main>
+<header><a href="../#inheritance" target="_top">Born, Not Made</a><div class="options"><button id="language" type="button"></button></div></header>
+<h1 id="title"></h1><p class="intro" id="intro"></p>
+<nav class="lineage" id="steps" aria-label="Chapters"></nav>
+<figure class="scene"><figcaption><h2 id="heading"></h2><p class="subtitle" id="explain"></p></figcaption>
+<div id="flow" class="flow"></div><div class="key"><span id="cue"></span><span id="answer"></span></div>
+<div id="rows"></div></figure>
+<div class="controls"><button id="play"></button><button id="prev"></button><button id="next"></button><output id="position"></output></div>
+<div class="lab"><label for="gap" id="label"></label><input id="gap" type="range" min="0.35" max="1.55" step=".05" value="1.15"><output for="gap" id="gapValue"></output><p class="hint" id="hint"></p></div>
+<div class="bottom"><details><summary id="summary"></summary><p id="note"></p></details><a id="source" href="https://github.com/ruipwan/born-not-made/tree/main/inheritance" target="_blank" rel="noopener"></a></div>
+</main>
+<script>
+const copy={
+en:{title:'Who remembers the pause?',intro:'Two taps ask for a reply. Follow the wait before the third tap through three generations.',steps:['A learns','A teaches B','B learns','B teaches C','C replies'],head:['A learns a visitor’s timing.','A demonstrates. B learns the interval.','A new encounter changes B.','B teaches the pause it now uses.','C answers alone.'],
+explain:['A observes three exchanges. It keeps their timing in memory and adjusts its own response after each one.','A selects a two-tap encounter from memory and answers that cue again. B adjusts its own model toward A’s answer. A keeps the encounters.','Another robot answers the same cue after a different pause. B adds this encounter to its own memory and learns from it. A still answers as before.','B demonstrates its current response to C. The interval now carries both A’s influence and B’s later experience. C updates its own model.','The same two taps reach all three. Each model sets its own interval. C can now learn from the next encounter.'],
+cue:'Two incoming taps',answer:'Reply',actors:['Visitor','Partner','Robot A','Robot B','Robot C'],role:{example:'Encounter',recall:'Demonstration',learning:'Learning',own:'Own response',stored:'Retained'},play:'Play sequence',pause:'Pause',replay:'Replay',prev:'Back',next:'Next',label:'Change the pause B encounters',hint:'Move the slider to revisit B’s encounter, then follow its effect into C.',summary:'How the diagram works',note:'In this working example each robot learns one number, its reply delay. Encounters provide observed examples. During distillation the teacher generates a target response and the student updates its own parameter. The three models keep separate state. The proposed robots would use larger local models. These timings are illustrative.',source:'View source',language:'中文'},
+zh:{title:'谁记住了这段停顿？',intro:'轻敲两下，等机器人敲回第三下。沿着三代机器人，看这段等待如何被学会、继承，又被新的相遇改变。',steps:['A 学习','A 教 B','B 再学习','B 教 C','C 回应'],head:['A 学会一位来访者的节奏。','A 做示范，B 学习回应的间隔。','一次新相遇，改变了 B。','B 把自己现在的节奏教给 C。','C 独立回应。'],
+explain:['A 观察三次敲击交流，记下每次回应前的停顿，并用这些经历调整自己的回应。','A 从记忆里选出两下敲击的情境，再回应一次。B 用 A 的回应训练自己的模型。A 仍保有原来的经历。','另一台机器人听到同样的两下敲击，等了不同的时间才回应。B 记下这次相遇，更新自己的回应。A 仍按原来的节奏行动。','面对同一提示，B 向 C 示范现在的回应。这个间隔里有从 A 学来的习惯，也有 B 后来遇见的节奏。C 据此更新自己的模型。','相同的两下敲击分别传给 A、B、C。三者各自决定何时回应。下一次相遇时，C 也可以继续学习。'],
+cue:'收到的两下敲击',answer:'自己的回应',actors:['来访者','另一台机器人','机器人 A','机器人 B','机器人 C'],role:{example:'相遇中的示范',recall:'给出教学目标',learning:'正在学习',own:'独立回应',stored:'保留的节奏'},play:'播放全过程',pause:'暂停',replay:'重播',prev:'上一步',next:'下一步',label:'改变 B 在新相遇中听到的停顿',hint:'拖动后会回到 B 的相遇。再看下一步，观察 C 学到的间隔。',summary:'这张图如何工作',note:'这里每台机器人都有一个可学习的参数，决定听到提示后等多久回应。相遇留下可回看的样本。蒸馏时，教师针对选定的提示给出回应，学生据此调整自己的参数。三者各自保存学习结果。实体方案将使用更大的本地模型，图中的秒数是演示值。',source:'查看源码',language:'English'}
+};
+const $=id=>document.getElementById(id);
+const params=new URLSearchParams(location.search);
+let lang=params.get('lang')==='zh'?'zh':'en';
+let chapter=0, elapsed=0, running=false, previousTime=null, raf=0;
+const duration=5400;
+const learnerStart=.19;
+const historyA=[.48,.60,.54];
+function train(value,target,rate){return value+rate*(target-value)}
+function fit(value,examples,rate){return examples.reduce((w,target)=>train(w,target,rate),value)}
+function practice(value,target,count){return fit(value,Array(count).fill(target),.52)}
+// A selected two-tap prompt elicits a fresh teacher output; the student has a separate parameter.
+function timeline(progress){
+  const count=Math.min(5,Math.floor(progress*6)), observations=Math.min(3,Math.floor(progress*4));
+  const a=fit(learnerStart,historyA,.72), b=practice(learnerStart,a,5);
+  const experience=Number($('gap').value), changed=train(b,experience,.72), c=practice(learnerStart,changed,5);
+  if(chapter===0)return [[0,'example',historyA[Math.min(2,observations)]],[2,'learning',fit(learnerStart,historyA.slice(0,observations),.72)]];
+  if(chapter===1)return [[2,'recall',a],[3,'learning',practice(learnerStart,a,count)]];
+  if(chapter===2)return [[1,'example',experience],[3,'learning',progress<.48?b:changed],[2,'stored',a]];
+  if(chapter===3)return [[3,'recall',changed],[4,'learning',practice(learnerStart,changed,count)],[2,'stored',a]];
+  return [[2,'own',a],[3,'own',changed],[4,'own',c]];
+}
+function drawRows(progress){
+  const c=copy[lang], list=timeline(progress), box=$('rows');
+  while(box.children.length<list.length){const row=document.createElement('div');row.className='row';row.innerHTML='<div><b></b><small></small></div><svg viewBox="0 0 660 54" role="img" preserveAspectRatio="none"><line x1="10" y1="33" x2="647" y2="33" stroke="#424242"/><path d="M 20 33 L 20 20 M 104 33 L 104 20" stroke="#ccc"/><circle cx="20" cy="17" r="4" fill="#101010" stroke="#ddd"/><circle cx="104" cy="17" r="4" fill="#101010" stroke="#ddd"/><g><path d="M 0 33 L 0 18" stroke="#eee"/><circle cy="14" r="5" fill="#eee"/></g><line class="scan" y1="5" y2="44" stroke="#aaa" opacity=".45"/></svg><output></output>';box.append(row)}
+  while(box.children.length>list.length)box.lastChild.remove();
+  list.forEach(([actor,role,delay],i)=>{const row=box.children[i];row.classList.toggle('dim',role==='stored');const title=c.actors[actor],description=c.role[role];row.querySelector('output').textContent=delay.toFixed(2)+' s';row.querySelector('b').textContent=title;row.querySelector('small').textContent=description;const svg=row.querySelector('svg');svg.setAttribute('aria-label',title+' · '+description+' · '+delay.toFixed(2)+' s');svg.querySelector('g').setAttribute('transform','translate('+(104+delay*315)+',0)');const scan=svg.querySelector('.scan');const x=10+(progress*3%1)*635;scan.setAttribute('x1',x);scan.setAttribute('x2',x);scan.style.display=running?'':'none'});
+}
+function update(){
+ const c=copy[lang];$('heading').textContent=c.head[chapter];$('explain').textContent=c.explain[chapter];
+ [...$('steps').children].forEach((el,i)=>{if(i===chapter)el.setAttribute('aria-current','step');else el.removeAttribute('aria-current')});
+ $('position').textContent=(chapter+1)+' / 5';$('prev').disabled=chapter===0;$('next').disabled=chapter===4;
+ $('play').textContent=running?c.pause:chapter===4&&elapsed===duration?c.replay:c.play;$('gapValue').textContent=Number($('gap').value).toFixed(2)+' s';
+ const flows=lang==='zh'?[
+ ['相遇','A 的经历记录','更新 A 的模型'],
+ ['从 A 的经历中选取提示','A 生成示范回应','蒸馏训练 B 的独立模型'],
+ ['新伙伴的回应','B 的新经历','更新 B 的模型'],
+ ['从 B 的经历中选取提示','B 生成示范回应','蒸馏训练 C 的独立模型'],
+ ['相同提示','三个独立模型','各自回应']
+ ]:[
+ ['Encounter','A’s memory','Update A’s model'],
+ ['Cue from A’s memory','A generates a response','Distil into B’s model'],
+ ['New partner’s reply','B’s own memory','Update B’s model'],
+ ['Cue from B’s memory','B generates a response','Distil into C’s model'],
+ ['Same cue','Three independent models','Individual replies']
+ ];
+ $('flow').replaceChildren();
+ flows[chapter].forEach((value,i)=>{if(i){const arrow=document.createElement('i');arrow.textContent='→';$('flow').append(arrow)}const item=document.createElement('span');item.textContent=value;$('flow').append(item)});
+ drawRows(running||elapsed>0?elapsed/duration:1);
+}
+function localize(){
+ const c=copy[lang];document.documentElement.lang=lang;
+ for(const id of ['intro','title','cue','answer','prev','next','label','hint','summary','note','source','language'])$(id).textContent=c[id];
+ $('steps').replaceChildren(...c.steps.map((name,i)=>{const btn=document.createElement('button');btn.textContent=name;btn.onclick=()=>seek(i);return btn}));update()
+}
+function stop(){running=false;previousTime=null;cancelAnimationFrame(raf)}
+function seek(i){stop();chapter=i;elapsed=duration;update()}
+function tick(now){
+ if(!running)return;
+ if(previousTime!==null)elapsed+=Math.min(100,now-previousTime);previousTime=now;
+ if(elapsed>=duration){if(chapter===4){stop();elapsed=duration;update();return}chapter++;elapsed=0;update()}
+ drawRows(elapsed/duration);raf=requestAnimationFrame(tick)
+}
+$('play').onclick=()=>{if(running){stop();update();return}if(elapsed>=duration){if(chapter===4)chapter=0;elapsed=0}running=true;previousTime=null;update();raf=requestAnimationFrame(tick)};
+$('prev').onclick=()=>seek(Math.max(0,chapter-1));$('next').onclick=()=>seek(Math.min(4,chapter+1));
+$('gap').oninput=()=>seek(2);$('language').onclick=()=>{lang=lang==='en'?'zh':'en';localize()};
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&running){stop();update()}});
+localize();
+</script></body></html>
