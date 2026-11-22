@@ -1,0 +1,196 @@
+{
+ "tail": {
+  "file": "bnm_simple_tail.stl",
+  "watertight": true,
+  "winding": true,
+  "bodies": 1,
+  "volume_cm3": 808.3,
+  "mass_kg": 1.03,
+  "hours": 23.4,
+  "box": [
+   336.0,
+   314.0,
+   305.4
+  ],
+  "margin": [
+   4.0,
+   6.0,
+   34.6
+  ],
+  "faces": 85378,
+  "orientations": {
+   "on the docking face": {
+    "box": [
+     336.0,
+     314.0,
+     305.4
+    ],
+    "fits": true,
+    "margin": [
+     4.0,
+     6.0,
+     34.6
+    ],
+    "overhang_cm2": 1126.0,
+    "bed_cm2": 0.0
+   },
+   "on the floor": {
+    "box": [
+     305.4,
+     314.0,
+     336.0
+    ],
+    "fits": true,
+    "margin": [
+     34.6,
+     6.0,
+     4.0
+    ],
+    "overhang_cm2": 561.0,
+    "bed_cm2": 378.0
+   },
+   "on the side": {
+    "box": [
+     305.4,
+     336.0,
+     314.0
+    ],
+    "fits": true,
+    "margin": [
+     4.0,
+     14.6,
+     26.0
+    ],
+    "overhang_cm2": 1429.0,
+    "bed_cm2": 0.0
+   }
+  },
+  "choice": "on the docking face"
+ },
+ "head": {
+  "file": "bnm_simple_head.stl",
+  "watertight": true,
+  "winding": true,
+  "bodies": 1,
+  "volume_cm3": 716.0,
+  "mass_kg": 0.91,
+  "hours": 20.7,
+  "box": [
+   336.0,
+   314.0,
+   335.1
+  ],
+  "margin": [
+   4.0,
+   6.0,
+   4.9
+  ],
+  "faces": 56980,
+  "orientations": {
+   "on the docking face": {
+    "box": [
+     336.0,
+     314.0,
+     335.1
+    ],
+    "fits": true,
+    "margin": [
+     4.0,
+     6.0,
+     4.9
+    ],
+    "overhang_cm2": 201.0,
+    "bed_cm2": 47.0
+   },
+   "on the floor": {
+    "box": [
+     335.1,
+     314.0,
+     336.0
+    ],
+    "fits": true,
+    "margin": [
+     4.9,
+     6.0,
+     4.0
+    ],
+    "overhang_cm2": 922.0,
+    "bed_cm2": 219.0
+   },
+   "on the side": {
+    "box": [
+     335.1,
+     336.0,
+     314.0
+    ],
+    "fits": false,
+    "margin": [
+     4.0,
+     -16.0,
+     26.0
+    ],
+    "overhang_cm2": 1583.0,
+    "bed_cm2": 0.0
+   }
+  },
+  "choice": "on the docking face"
+ },
+ "_meta": {
+  "flow_mm3_s": 12.0,
+  "density": 1.27,
+  "wall_mm": 3.0,
+  "magnets": [
+   [
+    32.0,
+    140.3,
+    215.0
+   ],
+   [
+    32.0,
+    -140.3,
+    215.0
+   ],
+   [
+    32.0,
+    0.0,
+    319.5
+   ]
+  ],
+  "pins": [
+   [
+    32.0,
+    146.2,
+    150.0
+   ],
+   [
+    32.0,
+    -146.2,
+    150.0
+   ]
+  ],
+  "base_holes": [
+   [
+    -65.0,
+    45.0
+   ],
+   [
+    -65.0,
+    -45.0
+   ],
+   [
+    -165.0,
+    45.0
+   ],
+   [
+    -165.0,
+    -45.0
+   ]
+  ],
+  "flange": {
+   "width_mm": 10.0,
+   "thick_mm": 4.0,
+   "up_to_mm": 102.4
+  },
+  "dock_x": 0.032
+ }
+}
