@@ -80,7 +80,7 @@ html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
       <h3>Body diversity</h3><canvas class="spark" id="sp3"></canvas>
       <h3>Seed memory still carried</h3><canvas class="spark" id="sp4"></canvas></div>
     <div><h3>Selected</h3><div id="insp" class="note">Click a robot in the tank.</div></div>
-    <div><h3>Rules</h3><p class="note">Relation is shared memory, likeness of body and time spent near each other. A robot ready to bear looks for the one it relates to most; at least one of the two has a tail. They touch opening to opening and exchange memory and form. The one with a tail carries: the arm prints the newborn in gel, layer by layer, then inflates it a little inside the chamber and pushes it out. Each newborn mixes both bodies, with drift. If both have tails the newborn mostly has one; with one tail, half the time. Sometimes the one that carried also prints a loose tail. A head without a tail swims to a loose tail and docks it from behind, so over time more bodies are whole. Nobody dies; the water feeds only so many, so births slow as the tank fills.</p></div>
+    <div><h3>Rules</h3><p class="note">Relation is shared memory, likeness of body and time spent near each other. Every body is printed a little differently: its proportions, rings around the body, a crest, fins on the tail, a lobed section and the tone of the clay are inherited and drift. A robot ready to bear looks for the one it relates to most; at least one of the two has a tail. They touch opening to opening and exchange memory and form. The one with a tail carries: the arm prints the newborn in gel, layer by layer, then inflates it a little inside the chamber and pushes it out. Each newborn mixes both bodies, with drift. If both have tails the newborn mostly has one; with one tail, half the time. Sometimes the one that carried also prints a loose tail. A head without a tail swims to a loose tail and docks it from behind, so over time more bodies are whole. Nobody dies; the water feeds only so many, so births slow as the tank fills.</p></div>
     <p class="links"><a href="bodies/">Bodies</a>: the same society with the earlier v2 bodies. <a href="old_/">Earlier 2D version</a>. <a href="../simulator/simple/">Printing simulator, simplified</a>. <a href="../">Home</a></p>
   </aside>
 </div>
@@ -148,7 +148,7 @@ function waterAware(m, opt = {}) {
   return m;
 }
 const MAT = {
-  clay: waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xdcdad4), roughness: 0.62, metalness: 0 })),
+  clay: waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xe4e2dc), roughness: 0.62, metalness: 0, vertexColors: true })),
   shell: waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xe6ebee), roughness: 0.07, metalness: 0, transparent: true, opacity: 0.07, depthWrite: false }), { fres: "0.5", line: "0.7" }),
   mouth: waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0x8a8a8c), roughness: 0.45, metalness: 0, side: THREE.DoubleSide })),
 };
@@ -237,22 +237,33 @@ function glow(color, size) { const s = new THREE.Sprite(new THREE.SpriteMaterial
 
 /* ---------- bodies: the simplified design, round 7: a blunt rounded tail holding the arm, and a clear head that narrows in a curve to a small slanted nose ---------- */
 // genome g[0..8] in 0..1. Every printed form differs a little; all are about the same size.
+const GENES = 14;
 function shapeOf(g) {
-  const A = 0.135 + 0.03 * g[1], B = 0.15 + 0.025 * g[2];
-  return { Lh: 0.25 + 0.06 * g[0], A, B, n: 2.6 + 2.0 * g[3], As: 0.072 + 0.03 * g[5], q: 1.6 + 1.4 * g[4], Ln: 0.04 + 0.035 * g[8],
-    Lt: 0.2 + 0.09 * g[6], tp: 2.2 + 2.0 * g[7], drop: -(0.01 + 0.025 * g[2]), R: 0.05 + 0.03 * g[6] };
+  // proportions vary widely, then the whole body is scaled so every robot keeps about the same length
+  const A = 0.11 + 0.065 * g[1], B = 0.12 + 0.065 * g[2], Lh = 0.2 + 0.14 * g[0], Lt = 0.14 + 0.2 * g[6], Ln = 0.02 + 0.07 * g[8];
+  const k = 0.6 / (Lh + Lt + Ln);
+  return { Lh: Lh * k, A: A * k, B: B * k, n: 1.9 + 3.6 * g[3], As: (0.35 + 0.45 * g[5]) * A * k, q: 1.1 + 2.6 * g[4], Ln: Ln * k, Lt: Lt * k, tp: 1.5 + 3.5 * g[7], drop: -(0.03 * g[2] - 0.01) * k, R: (0.04 + 0.05 * g[6]) * k,
+    // printed features: rings around the body, a crest along the back, fins on the tail, a lobed section, clay tone
+    ribN: 2 + Math.floor(g[9] * 6), ribD: g[9] > 0.35 ? 0.03 + 0.06 * (g[9] - 0.35) / 0.65 : 0,
+    crest: g[10] > 0.5 ? (0.02 + 0.1 * (g[10] - 0.5) * 2) * k : 0, fin: g[11] > 0.45 ? 0.25 + 1.1 * (g[11] - 0.45) / 0.55 : 0,
+    lobeN: 3 + Math.floor(g[12] * 4), lobeD: g[12] > 0.4 ? 0.03 + 0.06 * (g[12] - 0.4) / 0.6 : 0, tone: 0.72 + 0.28 * g[13] };
 }
 function bodyGeometry(s, tail) {
-  const M = 36, st = [];
-  const x0 = -s.Lh / 2;
-  if (tail) { const NT = 18; for (let i = 0; i <= NT; i++) { const t = i / NT, f = Math.pow(1 - Math.pow(1 - t, s.tp), 1 / s.tp); st.push({ x: x0 - s.Lt * (1 - t), a: s.A * f, b: s.B * Math.pow(f, 0.95), zc: s.drop * (1 - t) * (1 - t), tail: 1 }); } }
-  else { const NR = 10; for (let i = 0; i <= NR; i++) { const t = i / NR, ph = t * Math.PI / 2; st.push({ x: x0 - s.R * Math.cos(ph), a: s.A * Math.sin(ph), b: s.B * Math.sin(ph), zc: 0, tail: 0 }); } }
-  const NH = 14; for (let i = 1; i <= NH; i++) { const u = i / NH; st.push({ x: x0 + s.Lh * u, a: s.As + (s.A - s.As) * (1 - Math.pow(u, s.q)), b: s.B * (1 - 0.12 * Math.pow(u, 4)), zc: 0.01 * u }); }
+  const M = 40, st = [];
+  const x0 = -s.Lh / 2, NT = 26;
+  if (tail) { for (let i = 0; i <= NT; i++) { const t = i / NT, f = Math.pow(1 - Math.pow(1 - t, s.tp), 1 / s.tp); st.push({ x: x0 - s.Lt * (1 - t), a: s.A * f, b: s.B * Math.pow(f, 0.95), zc: s.drop * (1 - t) * (1 - t), tail: 1, f }); } }
+  else { const NR = 10; for (let i = 0; i <= NR; i++) { const t = i / NR, ph = t * Math.PI / 2; st.push({ x: x0 - s.R * Math.cos(ph), a: s.A * Math.sin(ph), b: s.B * Math.sin(ph), zc: 0, tail: 0, f: Math.sin(ph) }); } }
+  const NH = 26; for (let i = 1; i <= NH; i++) { const u = i / NH; st.push({ x: x0 + s.Lh * u, a: s.As + (s.A - s.As) * (1 - Math.pow(u, s.q)), b: s.B * (1 - 0.12 * Math.pow(u, 4)), zc: 0.01 * u, f: 1 }); }
   const E = st[st.length - 1];
-  for (let i = 1; i <= 4; i++) { const v = i / 4; st.push({ x: E.x + s.Ln * v, a: E.a * (1 - 0.1 * v), b: E.b * (1 - 0.45 * v), zc: E.zc - E.b * 0.45 * v }); }
-  const e = 2 / s.n, pos = [], wr = [], ang = [];
+  for (let i = 1; i <= 4; i++) { const v = i / 4; st.push({ x: E.x + s.Ln * v, a: E.a * (1 - 0.1 * v), b: E.b * (1 - 0.45 * v), zc: E.zc - E.b * 0.45 * v, f: 1 - 0.5 * v }); }
+  const e = 2 / s.n, pos = [], wr = [], ang = [], xmin0 = st[0].x, xmax0 = st[st.length - 1].x;
   const ring = (k) => { const S = st[k]; for (let j = 0; j < M; j++) { const th = j / M * Math.PI * 2, c = Math.cos(th), sn = Math.sin(th);
-    const y = S.zc + S.b * Math.sign(sn) * Math.pow(Math.abs(sn), e), z = S.a * Math.sign(c) * Math.pow(Math.abs(c), e); pos.push(S.x, y, z); ang.push(th, k); } };
+    const u = (S.x - xmin0) / (xmax0 - xmin0), env = Math.sin(Math.PI * clamp(u, 0, 1));
+    const rad = 1 + s.ribD * Math.pow(Math.max(0, Math.sin(u * Math.PI * 2 * s.ribN)), 2) * env + s.lobeD * Math.cos(s.lobeN * th) * S.f;
+    let y = S.zc + S.b * rad * Math.sign(sn) * Math.pow(Math.abs(sn), e), z = S.a * rad * Math.sign(c) * Math.pow(Math.abs(c), e);
+    y += s.crest * Math.pow(Math.max(0, sn), 10) * env * S.f;                                   // crest along the back
+    if (S.tail) z *= 1 + s.fin * Math.pow(Math.abs(c), 10) * Math.sin(Math.PI * (1 - S.f) * 0.95) * (1 - Math.abs(sn));   // fins flare toward the tail end
+    pos.push(S.x, y, z); ang.push(th, k); } };
   for (let k = 0; k < st.length; k++) ring(k);
   const idx = [[], [], []], V = (k, j) => k * M + (j % M);
   for (let k = 0; k < st.length - 1; k++) { const grp = st[k + 1].tail ? 0 : 1; for (let j = 0; j < M; j++) idx[grp].push(V(k, j), V(k + 1, j), V(k + 1, j + 1), V(k, j), V(k + 1, j + 1), V(k, j + 1)); }
@@ -262,6 +273,7 @@ function bodyGeometry(s, tail) {
   pos.push(S.x - 0.012, S.zc, 0); ang.push(0, -1);
   for (let j = 0; j < M; j++) idx[2].push(base + j, base + M, base + (j + 1) % M);
   const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute("color", new THREE.Float32BufferAttribute(new Float32Array(pos.length).fill(s.tone), 3));     // each print a slightly different clay
   const all = idx[0].concat(idx[1], idx[2]); g.setIndex(all); g.addGroup(0, idx[0].length, 0); g.addGroup(idx[0].length, idx[1].length, 1); g.addGroup(idx[0].length + idx[1].length, idx[2].length, 2);
   g.computeVertexNormals();
   // folded: the printed newborn before air goes in, about 0.4 of the length, with wrinkles
@@ -272,7 +284,7 @@ function bodyGeometry(s, tail) {
     wr.push(x * 0.4, (zc + ry * (1 + w)) * 0.44, z * (1 + w) * 0.44); }
   const tmp = new THREE.BufferGeometry(); tmp.setAttribute("position", new THREE.Float32BufferAttribute(wr, 3)); tmp.setIndex(all); tmp.computeVertexNormals();
   g.morphAttributes.position = [tmp.getAttribute("position")]; g.morphAttributes.normal = [tmp.getAttribute("normal")];
-  g.userData = { len: xmax - xmin, front: xmax, back: xmin };
+  g.userData = { len: xmax - xmin, front: xmax, back: xmin, tailRing: tail ? NT * M : -1, M };
   return g;
 }
 function bodyMesh(r) {
@@ -294,10 +306,10 @@ function newRobot(o) {
 }
 /* a loose tail: the arm module on its own, floating, open at the front where a head docks */
 function tailGeometry(s) {
-  const g = bodyGeometry(s, true), gr = g.groups[0], M = 36, base = 18 * M;
+  const g = bodyGeometry(s, true), gr = g.groups[0], M = g.userData.M, base = g.userData.tailRing;
   const index = Array.from(g.index.array.slice(gr.start, gr.start + gr.count)), pos = Array.from(g.attributes.position.array), c = pos.length / 3;
   pos.push(-s.Lh / 2 + 0.004, 0, 0); for (let j = 0; j < M; j++) index.push(base + j, c, base + (j + 1) % M);
-  const t = new THREE.BufferGeometry(); t.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); t.setIndex(index); t.computeVertexNormals(); g.dispose(); return t;
+  const t = new THREE.BufferGeometry(); t.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); t.setAttribute("color", new THREE.Float32BufferAttribute(new Float32Array(pos.length).fill(s.tone), 3)); t.setIndex(index); t.computeVertexNormals(); g.dispose(); return t;
 }
 function newLoose(o) {
   const T = Object.assign({ id: nextId++, x: 0, z: 0, vx: 0, vz: 0, h: rnd() * 6.283, bob: rnd() * 6.283, claim: null }, o);
@@ -314,9 +326,9 @@ function disposeRobot(r) { R3.sc.remove(r.grp); r.mesh.geometry.dispose(); if (r
 function reset() {
   robots.forEach(disposeRobot); robots = []; [...loose].forEach(disposeLoose); loose = []; pickable.length = 0; nextId = 1; simT = 0; births = 0; events = []; selected = null; for (const k in hist) hist[k] = [];
   // it begins small: two whole robots and a few loose tails floating in the water
-  const mk = (x, z, h, cool) => { const r = newRobot({ g: Array.from({ length: 9 }, () => rnd()), tail: true, memory: SEED.map((t) => ({ t, w: 0.6 + 0.4 * rnd() })), energy: 1.1, age: 40, cool }); r.x = x; r.z = z; r.h = h; return r; };
+  const mk = (x, z, h, cool) => { const r = newRobot({ g: Array.from({ length: GENES }, () => rnd()), tail: true, memory: SEED.map((t) => ({ t, w: 0.6 + 0.4 * rnd() })), energy: 1.1, age: 40, cool }); r.x = x; r.z = z; r.h = h; return r; };
   mk(-0.6, 0.15, 0.3, 2); mk(0.7, -0.2, Math.PI - 0.2, 4);
-  for (let i = 0; i < P.loose; i++) { const L = LAMPS[(i * 4 + 1) % LAMPS.length], j = rnd() * 6.283; newLoose({ g: Array.from({ length: 9 }, () => rnd()), x: L.x + Math.cos(j) * 0.4, z: L.z + Math.sin(j) * 0.4 }); }
+  for (let i = 0; i < P.loose; i++) { const L = LAMPS[(i * 4 + 1) % LAMPS.length], j = rnd() * 6.283; newLoose({ g: Array.from({ length: GENES }, () => rnd()), x: L.x + Math.cos(j) * 0.4, z: L.z + Math.sin(j) * 0.4 }); }
   log(`two robots and ${P.loose} loose tails in the water`);
 }
 function log(t) { events.push({ t: simT, text: t }); if (events.length > 5) events.shift(); $("#ev").innerHTML = events.map((e) => `<div>${fmt(e.t)}  ${esc(e.text)}</div>`).join(""); }
@@ -508,7 +520,7 @@ function hud() {
   $("#hud").innerHTML = `t <b>${fmt(simT)}</b> · robots <b>${robots.length}</b> · with a tail <b>${tails}</b> · loose tails <b>${loose.length}</b> · carrying <b>${carrying}</b> · births <b>${births}</b> · generation <b>${gens}</b>${broadcast && simT - broadcast.t < 25 ? ` · signal: <b>${esc(broadcast.text)}</b>` : ""}`;
 }
 function sample() {
-  if (!robots.length) return; const N = robots.length, mean = new Array(9).fill(0);
+  if (!robots.length) return; const N = robots.length, mean = new Array(GENES).fill(0);
   robots.forEach((r) => r.g.forEach((v, i) => (mean[i] += v / N))); let vr = 0; robots.forEach((r) => r.g.forEach((v, i) => (vr += (v - mean[i]) ** 2 / N)));
   const seed = robots.reduce((a, r) => a + r.memory.filter((m) => SEED.includes(m.t)).length / SEED.length, 0) / N;
   const push = (k, v) => { hist[k].push(v); if (hist[k].length > 240) hist[k].shift(); };
