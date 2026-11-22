@@ -4,9 +4,9 @@
   "watertight": true,
   "winding": true,
   "bodies": 1,
-  "volume_cm3": 808.3,
-  "mass_kg": 1.03,
-  "hours": 23.4,
+  "volume_cm3": 856.2,
+  "mass_kg": 1.09,
+  "hours": 24.8,
   "box": [
    336.0,
    314.0,
@@ -17,7 +17,7 @@
    6.0,
    34.6
   ],
-  "faces": 85378,
+  "faces": 82034,
   "orientations": {
    "on the docking face": {
     "box": [
@@ -31,7 +31,7 @@
      6.0,
      34.6
     ],
-    "overhang_cm2": 1126.0,
+    "overhang_cm2": 1147.0,
     "bed_cm2": 0.0
    },
    "on the floor": {
@@ -46,8 +46,8 @@
      6.0,
      4.0
     ],
-    "overhang_cm2": 561.0,
-    "bed_cm2": 378.0
+    "overhang_cm2": 664.0,
+    "bed_cm2": 431.0
    },
    "on the side": {
     "box": [
@@ -61,8 +61,8 @@
      14.6,
      26.0
     ],
-    "overhang_cm2": 1429.0,
-    "bed_cm2": 0.0
+    "overhang_cm2": 1482.0,
+    "bed_cm2": 18.0
    }
   },
   "choice": "on the docking face"
@@ -72,9 +72,9 @@
   "watertight": true,
   "winding": true,
   "bodies": 1,
-  "volume_cm3": 716.0,
-  "mass_kg": 0.91,
-  "hours": 20.7,
+  "volume_cm3": 732.6,
+  "mass_kg": 0.93,
+  "hours": 21.2,
   "box": [
    336.0,
    314.0,
@@ -85,7 +85,7 @@
    6.0,
    4.9
   ],
-  "faces": 56980,
+  "faces": 34844,
   "orientations": {
    "on the docking face": {
     "box": [
@@ -99,8 +99,8 @@
      6.0,
      4.9
     ],
-    "overhang_cm2": 201.0,
-    "bed_cm2": 47.0
+    "overhang_cm2": 226.0,
+    "bed_cm2": 41.0
    },
    "on the floor": {
     "box": [
@@ -114,7 +114,7 @@
      6.0,
      4.0
     ],
-    "overhang_cm2": 922.0,
+    "overhang_cm2": 1096.0,
     "bed_cm2": 219.0
    },
    "on the side": {
@@ -129,8 +129,8 @@
      -16.0,
      26.0
     ],
-    "overhang_cm2": 1583.0,
-    "bed_cm2": 0.0
+    "overhang_cm2": 1520.0,
+    "bed_cm2": 33.0
    }
   },
   "choice": "on the docking face"
@@ -142,12 +142,12 @@
   "magnets": [
    [
     32.0,
-    140.3,
+    142.1,
     215.0
    ],
    [
     32.0,
-    -140.3,
+    -142.1,
     215.0
    ],
    [
@@ -159,12 +159,12 @@
   "pins": [
    [
     32.0,
-    146.2,
+    148.0,
     150.0
    ],
    [
     32.0,
-    -146.2,
+    -148.0,
     150.0
    ]
   ],

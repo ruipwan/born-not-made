@@ -1,4 +1,4 @@
-# Print plan for the Bambu Lab H2S: simplified Born, Not Made, round 8
+# Print plan for the Bambu Lab H2S: simplified Born, Not Made, round 9
 
 Two printed parts, each in one piece: the tail and the head. Both files are in millimeters, watertight, already oriented as they lie on the plate (docking face down, centered, lowest point at z = 0).
 
@@ -6,14 +6,16 @@ Two printed parts, each in one piece: the tail and the head. Both files are in m
 
 | Part | File | Watertight (trimesh) | Bodies | Plastic, cm3 | Mass, kg | Time, h | Box on the plate, mm | Margin to 340 x 320 x 340, mm |
 |---|---|---|---|---|---|---|---|---|
-| Tail | `bnm_simple_tail.stl` | yes | 1 | 808 | 1.03 | 23 | 336 x 314 x 305 | 4, 6, 35 |
-| Head | `bnm_simple_head.stl` | yes | 1 | 716 | 0.91 | 21 | 336 x 314 x 335 | 4, 6, 5 |
+| Tail | `bnm_simple_tail.stl` | yes | 1 | 856 | 1.09 | 25 | 336 x 314 x 305 | 4, 6, 35 |
+| Head | `bnm_simple_head.stl` | yes | 1 | 733 | 0.93 | 21 | 336 x 314 x 335 | 4, 6, 5 |
 
 Files: `/home/claude/bnm_design/simple/print/` and, published, `simulator/simple/print/`. The script is `print_pkg.py` (run as `BNM_DBG0=print_pkg.py python3 design.py`); the numbers above are in `print/print_report.json`.
 
 How the solids are made: the simulated inner surface is kept exactly. The 3 mm wall is grown outward from it, section by section, so the space the arm works in is the simulated one. The ridge of the tail shell that ends the gel is a solid rib (the outside floor runs flat under it). Checked with trimesh after writing and reading the STL again: watertight, consistent winding, one body, volume, bounding box.
 
 Mass is mesh volume times 1.27 g per cm3 (PETG). Time is mesh volume divided by a flow of 12 mm3 per second, times 1.25 for travel and slow outer walls. The slicer gives the real numbers; supports are not in these figures (allow about 10 to 15 percent more plastic for the tail).
+
+Round 9: the plan outline is now one convex curve across the docking plane (the flare behind the seam is gone), so both shells are a little fuller than in round 8. The files were exported again and checked again; the boxes on the plate did not change.
 
 ## What is in each print
 
@@ -27,16 +29,16 @@ Nothing else is printed. No baffle, no ballast block, no separate mouth piece.
 
 | Part | Orientation | Box, mm | Fits | Margin, mm | Overhang beyond 45 degrees, cm2 |
 |---|---|---|---|---|---|
-| Tail | on the docking face | 336 x 314 x 305 | yes | 4, 6, 35 | 1126 |
-| Tail | on the floor | 305 x 314 x 336 | yes | 35, 6, 4 | 561 |
-| Tail | on the side | 305 x 336 x 314 | yes | 4, 15, 26 | 1429 |
-| Head | on the docking face | 336 x 314 x 335 | yes | 4, 6, 5 | 201 |
-| Head | on the floor | 335 x 314 x 336 | yes | 5, 6, 4 | 922 |
-| Head | on the side | 335 x 336 x 314 | no | 4, -16, 26 | 1583 |
+| Tail | on the docking face | 336 x 314 x 305 | yes | 4, 6, 35 | 1147 |
+| Tail | on the floor | 305 x 314 x 336 | yes | 35, 6, 4 | 664 |
+| Tail | on the side | 305 x 336 x 314 | yes | 4, 15, 26 | 1482 |
+| Head | on the docking face | 336 x 314 x 335 | yes | 4, 6, 5 | 226 |
+| Head | on the floor | 335 x 314 x 336 | yes | 5, 6, 4 | 1096 |
+| Head | on the side | 335 x 336 x 314 | no | 4, -16, 26 | 1520 |
 
 Choice for both: on the docking face.
 
-Reasons, tail. All three fit. On the docking face the seam face, the magnet pockets, the pins and the flange are printed on the plate, so the face that must seal is the flattest surface of the part. The layers are rings round the body axis: the water pressure on the shell and the pull of the magnets load each layer in its own plane, not across the bond between layers. The overhang is the largest in area of the three, but it lies where it harms least: the inside of the taper near the tip (dry, behind the arm, at the far end of the view), the underside of the saddles and the kit tray, and the ridge. On the floor the overhang is half as large, but it is the whole inside of the roof, the clearest and most visible surface, with supports 300 mm tall standing on the floor between the saddles; and the seam face would be built from layer edges. On the side the overhang is the largest and one whole flank carries supports.
+Reasons, tail. All three fit. On the docking face the seam face, the magnet pockets, the pins and the flange are printed on the plate, so the face that must seal is the flattest surface of the part. The layers are rings round the body axis: the water pressure on the shell and the pull of the magnets load each layer in its own plane, not across the bond between layers. The overhang is the largest in area of the three, but it lies where it harms least: the inside of the taper near the tip (dry, behind the arm, at the far end of the view), the underside of the saddles and the kit tray, and the ridge. On the floor the overhang is smaller (about six tenths), but it is the whole inside of the roof, the clearest and most visible surface, with supports 300 mm tall standing on the floor between the saddles; and the seam face would be built from layer edges. On the side the overhang is the largest and one whole flank carries supports.
 
 Reasons, head. On the docking face the head is a bell that closes upward toward the mouth with walls steeper than 45 degrees nearly everywhere: the overhang is the smallest by far, mainly the shoulder where the lower shell meets the wide upper shell (a ledge about 50 to 100 mm wide at each side, 105 mm above the floor of the body) and the underside of the lower lip. Supports stand outside the gel volume or on the lip, not inside the bowl walls. The mouth rim is printed last, as a clean open edge. On the floor the inside of the whole roof needs support and the gel floor is printed on the plate (good for tightness, bad for the roof). On the side the head does not fit (336 mm across the 320 mm axis).
 
