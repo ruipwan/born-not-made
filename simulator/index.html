@@ -522,32 +522,6 @@ function babyGeo(lam) {      // port of baby_fullsize/geom_full.py: segments wit
   const nt = V.length, last = (nr - 1) * M; V.push([u[n] + capl(lam[n - 1]), 0, 0]); for (let i = 0; i < M; i++) T.push([last + i, last + (i + 1) % M, nt]);
   return { V, T, u, th, L: u[n] + capl(lam[n - 1]), rb: radii(P.BAND, rl[P.BAND])[0] };
 }
-/* the soft body bake (bake_soft.py): PCA basis and coefficients per frame, played back on the push and birth timeline */
-const SOFT = { ok: false };
-function b64f32(s) { const b = Uint8Array.from(atob(s), (c) => c.charCodeAt(0)); return new Float32Array(b.buffer); }
-function b64i16(s) { const b = Uint8Array.from(atob(s), (c) => c.charCodeAt(0)); return new Int16Array(b.buffer); }
-function b64u32(s) { const b = Uint8Array.from(atob(s), (c) => c.charCodeAt(0)); return new Uint32Array(b.buffer); }
-function buildSoft(d) {
-  const n3 = d.nv * 3, K = d.K, bs = b64f32(d.bscale), bq = b64i16(d.basis);
-  SOFT.mean = b64f32(d.mean); SOFT.coef = b64f32(d.coef); SOFT.K = K; SOFT.n3 = n3; SOFT.times = d.times; SOFT.meas = d.measured; SOFT.kit = d.kit;
-  SOFT.basis = new Float32Array(K * n3); for (let k = 0; k < K; k++) { const f = bs[k] / 32767; for (let i = 0; i < n3; i++) SOFT.basis[k * n3 + i] = bq[k * n3 + i] * f; }
-  const g = new THREE.BufferGeometry(); SOFT.pos = new Float32Array(n3); g.setAttribute("position", new THREE.BufferAttribute(SOFT.pos, 3)); g.setIndex(new THREE.BufferAttribute(b64u32(d.tri), 1));
-  const mat = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(0xf2eee6).convertSRGBToLinear(), roughness: 0.5, metalness: 0, transmission: 0.3, thickness: 0.004, ior: 1.41, sheen: 0.5, sheenRoughness: 0.6, sheenColor: new THREE.Color(0xffffff), clearcoat: 0.2, clearcoatRoughness: 0.5, side: THREE.DoubleSide, transparent: true, opacity: 0.94 });
-  mat.onBeforeCompile = (sh) => addWater(sh, { line: 1.0, sub: 0.85 }); mat.customProgramCacheKey = () => "softbody";
-  SOFT.mesh = new THREE.Mesh(g, mat); SOFT.mesh.renderOrder = 6; SOFT.mesh.frustumCulled = false; SOFT.mesh.visible = false; R3.baby.add(SOFT.mesh);
-  SOFT.ok = true; SOFT.last = -1;
-}
-function softFrame(tt) {
-  const T = SOFT.times; let lo = 0, hi = T.length - 1;
-  if (tt <= T[0]) hi = 0; else if (tt >= T[hi]) lo = hi; else while (hi - lo > 1) { const m = (lo + hi) >> 1; if (T[m] <= tt) lo = m; else hi = m; }
-  const f = hi === lo ? 0 : (tt - T[lo]) / (T[hi] - T[lo]), key = lo * 1000 + Math.round(f * 999);
-  if (key === SOFT.last) return; SOFT.last = key;
-  const K = SOFT.K, n3 = SOFT.n3, c = new Float32Array(K); for (let k = 0; k < K; k++) c[k] = SOFT.coef[lo * K + k] * (1 - f) + SOFT.coef[hi * K + k] * f;
-  const p = SOFT.pos; p.set(SOFT.mean); for (let k = 0; k < K; k++) { const ck = c[k], o = k * n3; if (Math.abs(ck) < 1e-7) continue; for (let i = 0; i < n3; i++) p[i] += ck * SOFT.basis[o + i]; }
-  const g = SOFT.mesh.geometry; g.attributes.position.needsUpdate = true; g.computeVertexNormals();
-  const m = SOFT.meas, i = Math.min(m.length - 1, lo), j = Math.min(m.length - 1, hi); SOFT.V = lerp(m[i][1], m[j][1], f); SOFT.L = lerp(m[i][2], m[j][2], f); SOFT.D = lerp(m[i][3], m[j][3], f);
-  let cx = 0, cy = 0, cz = 0; for (const v of SOFT.kit) { cx += p[3 * v]; cy += p[3 * v + 1]; cz += p[3 * v + 2]; } const nk = SOFT.kit.length; SOFT.kitC = [cx / nk, cy / nk, cz / nk];
-}
 function babyMeshUpdate(lam) {
   const key = lam.map((l) => l.toFixed(3)).join(","); if (key === BB.key) return; BB.key = key;
   const { V, T, u, th, L, rb } = babyGeo(lam); BB.u = u; BB.th = th; BB.L = L; BB.rb = rb; BB.rmax = Math.max(...V.map((v) => Math.hypot(v[1], v[2])));
@@ -716,12 +690,11 @@ function renderDerivation() {
 
 /* ================================================================ load */
 async function loadAll() {
-  const [j, gtxt, sc, b64, soft] = await Promise.all([getJSON("stage3_egg.json"), fetch("stage3_egg_print.gcode", { cache: "no-cache" }).then((r) => r.text()), getJSON("scene_v2.json"), fetch("scene_v2_glb.txt").then((r) => r.text()), getJSON("stage3_egg_soft.json")]);
+  const [j, gtxt, sc, b64] = await Promise.all([getJSON("stage3_egg.json"), fetch("stage3_egg_print.gcode", { cache: "no-cache" }).then((r) => r.text()), getJSON("scene_v2.json"), fetch("scene_v2_glb.txt").then((r) => r.text())]);
   if (!j || !sc) throw new Error("stage3_egg.json or scene_v2.json missing");
   J = j; SC = sc; GC = parseGcode(gtxt); UW.uWL.value = J.WL; KIN.LIM = J.arm.lim_deg.map((r) => r.map((d) => d * D2R));
   await loadEgg(b64); ARM.tool = buildTool();
-  buildGel(); buildChute(); buildWombParts(); buildRack(); renderDerivation();
-  if (soft) buildSoft(soft); buildWater(); buildBaby(); buildLabels();
+  buildGel(); buildChute(); buildWombParts(); buildRack(); renderDerivation(); buildWater(); buildBaby(); buildLabels();
   const st = J.states;
   log(`egg docked with gel: ${f1(st.docked_gel.mass)} kg, waterline z ${f0(st.docked_gel.WL * 1000)} mm, trim ${f2(st.docked_gel.trim_deg)} deg, gel ${f1(J.gel.V_L)} L`);
   log(`G-code: ${GC.lines.length} lines, ${GC.layers} layers, ${f1(J.print.path_m)} m of bead, ${f0(J.print.silicone_ml)} ml, print time ${hms(GC.total)}`);
@@ -888,10 +861,7 @@ function applyState(S, now) {
   updateAirLine(S, now);
   // baby: inside the womb it moves with the egg; once born it is in the world
   babyMeshUpdate(S.lam.map((l) => clamp(l, 0, 1.2)));
-  const useSoft = SOFT.ok && ["drain", "push", "birth", "float", "swim"].includes(S.k);
-  if (useSoft) softFrame(S.k === "drain" ? 0 : S.k === "push" ? S.tau : S.k === "birth" ? J.birth.t_release + S.tau : 1e9);
-  S.soft = useSoft;
-  BB.mesh.visible = S.babyVis && !useSoft; if (SOFT.ok) SOFT.mesh.visible = S.babyVis && useSoft; R3.vessel.updateMatrixWorld(true);
+  BB.mesh.visible = S.babyVis; R3.vessel.updateMatrixWorld(true);
   const bm = new THREE.Matrix4().makeTranslation(S.bx, S.by || 0, S.bz).multiply(new THREE.Matrix4().makeRotationZ(S.yawB || 0)).multiply(new THREE.Matrix4().makeRotationY(-S.pitch));
   if (!S.bWorld) bm.premultiply(R3.womb.matrixWorld);
   R3.baby.matrixAutoUpdate = false; R3.baby.matrix.copy(bm);
@@ -904,7 +874,6 @@ function applyState(S, now) {
   if (S.kit === "cradle") BB.kitG.matrix.copy(R3.womb.matrixWorld).multiply(Tm([c[0], c[1], c[2] + K.size[2] / 2]));
   else if (S.kit === "carried") { R3.arm.updateMatrixWorld(true); const p = new THREE.Vector3(...ARM.tip).applyMatrix4(R3.tail.matrixWorld); BB.kitG.matrix.makeTranslation(p.x, p.y, p.z - K.size[2] / 2 - 0.002); }
   else if (S.kit === "placed") BB.kitG.matrix.copy(R3.womb.matrixWorld).multiply(Tm(kc));
-  else if (S.soft && SOFT.kitC) { const k = SOFT.kitC, r = Math.hypot(k[1], k[2]) || 1, d = K.size[2] / 2 + 0.004; BB.kitG.matrix.copy(R3.baby.matrix).multiply(Tm([k[0], k[1] - k[1] / r * d, k[2] - k[2] / r * d])); }
   else { const uc = 0.5 * (BB.u[J.body.band[0]] + BB.u[J.body.band[1]]), kz = -BB.rb + 0.004 + K.size[2] / 2; BB.kitG.matrix.copy(R3.baby.matrix).multiply(Tm([uc, 0, kz]));
     BB.jets.forEach((j, i) => j.position.set(uc - 0.03, (i ? -1 : 1) * 0.026, kz - 0.02)); }
   UW.uTime.value = now;
@@ -995,8 +964,7 @@ function renderReadouts(S) {
   h += `<div class="rg"><h4>Tools, rack and suction cup</h4>${rr("rack slot A, suction module", ARM.mod === "cup" ? "empty" : "parked", "", toolStage)}${rr("rack slot B, needle module", ARM.mod === "needle" ? "empty" : "parked", "", toolStage)}${rr("vacuum", S.vac ? f0(SU.p_vac_kPa) : "0", "kPa", S.k === "kit")}${rr("holding force", S.vac ? f2(SU.F_hold) : "0.00", "N", S.k === "kit")}${rr("load on the cup", carried ? (load < 0 ? `${f2(-load)} N pushing in` : `${f2(load)} N pulling`) : "none", "", S.k === "kit")}${rr("margin, worst case", `${f1(SU.sf)}×`, "", S.k === "kit")}${S.k === "kit" && carried ? bar(Math.max(load, 0) / SU.F_hold, false) : ""}${rr("module and kit on the arm", f0(J.kit.payload_kg * 1000), "g of 500")}</div>`;
   const lay = S.layer >= 0 ? S.layer + 1 : (after2(S, "print") ? GC.layers : 0);
   h += `<div class="rg"><h4>Print</h4>${rr("layer", `${lay} / ${GC.layers}`)}${rr("silicone laid", f1((S.ext || 0) / 1000), "ml")}${rr("print time", S.k === "print" ? hms(S.printT) : after2(S, "print") ? hms(GC.total) : "0:00:00")}${rr("kit", S.kit === "cradle" ? "in the cradle" : S.kit === "carried" ? "on the suction cup" : S.kit === "placed" ? "on the seat in the gel" : "inside the newborn")}</div>`;
-  const V = S.soft ? SOFT.V : (S.bV ?? J.body.vol_folded_L), m = J.body.mass_kg, inBirth = S.k === "push" || S.k === "birth";
-  if (S.soft) { BB.L = SOFT.L; BB.rmax = SOFT.D / 2; }
+  const V = S.bV ?? J.body.vol_folded_L, m = J.body.mass_kg, inBirth = S.k === "push" || S.k === "birth";
   h += `<div class="rg"><h4>Newborn robot</h4>${rr("segments out / open", (after2(S, "birth") && !inBirth ? `${J.body.nseg} / ${J.body.nseg} of ${J.body.nseg}` : `${S.nOut ?? 0} / ${S.nOpen ?? 0} of ${J.body.nseg}`), "", inBirth)}${rr("length", f0(BB.L * 1000), "mm", inBirth)}${rr("diameter", f0(2 * (BB.rmax || 0) * 1000), "mm", inBirth)}${rr("pressure above outside", f0(S.bp ?? 0), "Pa", inBirth)}${rr("volume", f1(V), "L", inBirth)}${rr("mass with trapped gel", f2(m), "kg")}${inBirth ? rr("arm force / resistance", `${f2(S.F || 0)} / ${f2(S.Fres || 0)}`, "N", S.k === "push") + rr("pressure on the rim pulls out", f1(S.Fext || 0), "N") + rr("air in, at 1 atm", f1(S.air || 0), "L") : ""}${after2(S, "birth") ? rr("full size", `${f0(J.newborn.length * 1000)} x ${f0(J.newborn.diameter * 1000)}`, "mm") + rr("water in the belly pocket", f1(nb.ballast_L), "L") + rr("draft", f0(nb.draft_mm), "mm") : ""}${S.k === "swim" ? rr("jet thrust, two jets", f3(nb.thrust), "N", true) + rr("speed", f3(S.swimV || 0), "m/s", true) : ""}</div>`;
   $("#ro").innerHTML = h;
 }
