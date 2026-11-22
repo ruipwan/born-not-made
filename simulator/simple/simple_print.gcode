@@ -1,4 +1,5 @@
 ; Born, Not Made, simplified version: the folded newborn, 60 layers of 1.5 mm, Dragon Skin 10 NV in Carbopol gel
+; SCHEMATIC: these are the contours of the smooth envelope of the folded body only; the pleat flanks between them are not in this file. The whole skin needs about 119 m of bead (220 mL); this file holds the envelope part
 ; frame: X toward the opening, Y port, Z up, mm, origin on the docking plane on the tank floor
 ; E is the bead volume in cubic millimeters
 G21
