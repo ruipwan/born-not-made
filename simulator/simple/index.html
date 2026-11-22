@@ -234,7 +234,7 @@ button:focus-visible, input:focus-visible, a:focus-visible, .track:focus-visible
 
 <section class="doc" id="how">
   <h2>A simplified parent body, after the sketch</h2>
-  <p>The sketches ask for two printed parts only: a tail that holds the arm, the rack, the tools, the kit store and every other part, and a gel chamber that is a bare shell, with one opening on a slant at the upper front. The gel lies in one small bowl in the lower body, with a near vertical rear wall at the docking plane and one straight ramp up to the lip. The tail ends in a point. The Rotrics DexArm stands on a fixed base in the tail and reaches into the gel chamber. Nothing slides. The parent body may rest on the tank floor; only the newborn floats. This page follows that logic and calculates every dimension: the reach and the payload of the arm, the forces, the inflation and the print volume of the Bambu Lab H2S. Where the sketch does not hold, the page says so and shows the smallest change that works.</p>
+  <p>The sketches ask for two printed parts: a tail with the arm at its very front, the rack, the tools and the kit store, and every other part at its pointed end; and a head, the gel chamber, that is a bare shell with a mouth. The gel lies in one small bowl in the head, with a flat surface and one straight ramp up to the lower lip of the mouth. The docking seam is dry. The Rotrics DexArm stands on a fixed base in the tail and reaches into the gel chamber. Nothing slides. The parent body may rest on the tank floor; only the newborn floats. This page follows that logic and calculates every dimension: the reach and the payload of the arm, the forces, the inflation and the print volume of the Bambu Lab H2S. Where the sketch does not hold, the page says so and shows the smallest change that works.</p>
   <h4>Does the sketch make sense</h4>
   <table id="verdict"></table>
   <h4>How each dimension is set</h4>
@@ -649,12 +649,12 @@ function buildBody() {
   const rbox = (sx, sy, sz, r) => { const sh = new THREE.Shape(), w = sx / 2 - r, h = sz / 2 - r; sh.absarc(w, h, r, 0, Math.PI / 2); sh.absarc(-w, h, r, Math.PI / 2, Math.PI); sh.absarc(-w, -h, r, Math.PI, 1.5 * Math.PI); sh.absarc(w, -h, r, 1.5 * Math.PI, 2 * Math.PI);
     return new THREE.ExtrudeGeometry(sh, { depth: sy - 2 * r * 0.5, bevelEnabled: true, bevelThickness: r * 0.5, bevelSize: r * 0.5, bevelSegments: 3, curveSegments: 8 }).translate(0, 0, -(sy - r) / 2).rotateX(Math.PI / 2); };
   for (const e of J.equip) { let g, mat = softM(0xe9ebe8);
-    if (/inflator/.test(e.name)) { g = rbox(e.size[0], e.size[1], e.size[2], 0.008); mat = softM(0xc9ccd0, 0.8); }
-    else if (/Raspberry/.test(e.name)) { g = new THREE.BoxGeometry(e.size[0], 0.0016, e.size[2]); mat = softM(0x9fc7b4, 0.85); }
+    if (/inflator/.test(e.name)) { g = rbox(e.size[1], e.size[0], e.size[2], 0.008).rotateZ(Math.PI / 2); mat = softM(0xc9ccd0, 0.8); }
+    else if (/Raspberry/.test(e.name)) { g = new THREE.BoxGeometry(0.0016, e.size[1], e.size[2]); mat = softM(0x9fc7b4, 0.85); }
     else if (e.kind === "box") g = rbox(e.size[0], e.size[1], e.size[2], 0.003);
-    else { g = new THREE.CylinderGeometry(e.size[0], e.size[0], e.size[1], 24); if (e.axis === "x") g.rotateZ(Math.PI / 2); else g.rotateX(Math.PI / 2); if (/Battery/.test(e.name)) mat = softM(0xbfdcd2, 0.8); else if (/Silicone/.test(e.name)) mat = softM(0xf4f4f0, 0.55); }
+    else { g = new THREE.CylinderGeometry(e.size[0], e.size[0], e.size[1], 24); if (e.axis === "x") g.rotateZ(Math.PI / 2); else if (e.axis === "z") g.rotateX(Math.PI / 2); if (/Battery/.test(e.name)) mat = softM(0xbfdcd2, 0.8); else if (/Silicone/.test(e.name)) mat = softM(0xf4f4f0, 0.55); }
     const m = new THREE.Mesh(g, mat); m.position.set(...e.c); m.renderOrder = 6.3; R3.tail.add(m); edgeLines(m, 40, 0.25, 0xaab0b8, clip);
-    if (/Raspberry/.test(e.name)) for (const [dx, dz, w, h] of [[-0.02, 0.008, 0.016, 0.016], [0.012, -0.006, 0.012, 0.012], [0.034, 0.012, 0.014, 0.02]]) { const c = new THREE.Mesh(new THREE.BoxGeometry(w, 0.004, h), softM(0xd9dadd, 0.9)); c.position.set(e.c[0] + dx, e.c[1] - Math.sign(e.c[1]) * 0.003, e.c[2] + dz); R3.tail.add(c); } }
+    if (/Raspberry/.test(e.name)) for (const [dx, dz, w, h] of [[-0.02, 0.008, 0.016, 0.016], [0.012, -0.006, 0.012, 0.012], [0.034, 0.012, 0.014, 0.02]]) { const c = new THREE.Mesh(new THREE.BoxGeometry(0.004, w, h), softM(0xd9dadd, 0.9)); c.position.set(e.c[0] - 0.003, e.c[1] + dx, e.c[2] + dz); R3.tail.add(c); } }
   // parked modules at the two forks, in the tail
   PARTS.parkP = moduleGroup("cup"); PARTS.parkN = moduleGroup("needle");
   for (const [g, s] of [[PARTS.parkP, J.slots.P], [PARTS.parkN, J.slots.N]]) { g.position.set(...s.o); g.rotation.z = s.yaw; R3.tail.add(g); }
@@ -663,9 +663,9 @@ function buildBody() {
   PARTS.gelTop = new THREE.Mesh(gg, clayMat(0xdfeaf0, { opacity: 0.42, side: THREE.DoubleSide, sub: 0.2, rough: 0.25, clip })); PARTS.gelTop.renderOrder = 6; R3.chamber.add(PARTS.gelTop);
   GELCLIP.constant = 0; PARTS.gelBody = meshOf(H.chamber.v, H.chamber.t, clayMat(0xd5e3ec, { opacity: 0.2, side: THREE.DoubleSide, sub: 0.2, clip: [GELCLIP, SECT] })); PARTS.gelBody.renderOrder = 4; PARTS.gelBody.scale.set(1, 0.985, 1); R3.chamber.add(PARTS.gelBody);
   // gel channels in the front of the tail: the neck of the kit store and one narrow well for each hanging tool, printed walls up to the rim, gel inside
-  PARTS.chanGel = []; const wallM = clayMat(0xeef0ee, { opacity: 0.22, side: THREE.DoubleSide, sub: 0.4, clip }), gelM = clayMat(0xd5e3ec, { opacity: 0.32, sub: 0.2, clip }), R_ = J.read, XD_ = R_.dock_x;
-  const trough = (cx, cy, len, wid, ang, zf) => { const w = new THREE.Mesh(new THREE.BoxGeometry(len + 0.004, wid + 0.004, R_.sill_z - zf + 0.002), wallM); w.position.set(cx, cy, (R_.sill_z + zf - 0.002) / 2); w.rotation.z = ang; w.renderOrder = 4.5; R3.tail.add(w); edgeLines(w, 30, 0.35, 0xdfe3ea, clip);
-    const g = new THREE.Mesh(new THREE.BoxGeometry(len, wid, 1), gelM); g.position.set(cx, cy, zf); g.rotation.z = ang; g.renderOrder = 4.2; R3.tail.add(g); PARTS.chanGel.push({ g, zf }); };
+  PARTS.chanGel = []; const wallM = clayMat(0xeef0ee, { opacity: 0.22, side: THREE.DoubleSide, sub: 0.4, clip }), gelM = clayMat(0xd5e3ec, { opacity: 0.32, sub: 0.2, clip }), R_ = J.read, XD_ = R_.bowl_x;
+  const trough = (cx, cy, len, wid, ang, zf) => { const w = new THREE.Mesh(new THREE.BoxGeometry(len + 0.004, wid + 0.004, R_.sill_z - zf + 0.002), wallM); w.position.set(cx, cy, (R_.sill_z + zf - 0.002) / 2); w.rotation.z = ang; w.renderOrder = 4.5; R3.chamber.add(w); edgeLines(w, 30, 0.35, 0xdfe3ea, clip);
+    const g = new THREE.Mesh(new THREE.BoxGeometry(len, wid, 1), gelM); g.position.set(cx, cy, zf); g.rotation.z = ang; g.renderOrder = 4.2; R3.chamber.add(g); PARTS.chanGel.push({ g, zf }); };
   trough((R_.neck[0] + XD_) / 2, 0, XD_ - R_.neck[0], 2 * R_.neck[1], 0, 0.001);
   for (const c of J.chan) for (let i = 0; i < c.pts.length - 1; i++) { const a = c.pts[i], b = c.pts[i + 1]; let bx = b[0], by = b[1]; if (bx > XD_) { const t = (XD_ - a[0]) / (bx - a[0]); bx = XD_; by = a[1] + t * (by - a[1]); } const len = Math.hypot(bx - a[0], by - a[1]); if (len > 0.004) trough((a[0] + bx) / 2, (a[1] + by) / 2, len + 2 * c.w * 0.6, 2 * c.w, Math.atan2(by - a[1], bx - a[0]), c.zf); }
 }
@@ -721,8 +721,8 @@ function poseArm(q, tool, S, now) {
   // the lines along the arm: air (blue) and gel (pale), from the tail equipment to the head
   const [js, je, jw] = ARM.joints, head = new THREE.Vector3(o[0], o[1], o[2] + A.HEAD.h + 0.006), side = new THREE.Vector3(-s, c, 0);
   for (let k = 0; k < 2; k++) { if (PARTS.lines[k]) { R3.arm.remove(PARTS.lines[k]); PARTS.lines[k].geometry.dispose(); }
-    const off = side.clone().multiplyScalar(k ? -0.012 : 0.012), src = k ? new THREE.Vector3(-0.1, 0.1, 0.24) : new THREE.Vector3(-0.067, -0.1, 0.155);
-    const pts = [src, new THREE.Vector3(J.base[0] - 0.02, k ? 0.07 : -0.07, 0.2), js.clone().add(off).add(new THREE.Vector3(-0.02 * c, -0.02 * s, 0.03)), je.clone().add(off).add(new THREE.Vector3(0, 0, 0.03)), jw.clone().add(off).add(new THREE.Vector3(0, 0, 0.038)), k ? jw.clone().add(off).add(new THREE.Vector3(0.03 * c, 0.03 * s, -0.012)) : head];
+    const off = side.clone().multiplyScalar(k ? -0.012 : 0.012), src = k ? new THREE.Vector3(-0.235, 0.02, 0.078) : new THREE.Vector3(-0.2, -0.02, 0.15);
+    const pts = [src, new THREE.Vector3(J.base[0] - 0.085, k ? 0.03 : -0.03, 0.2), js.clone().add(off).add(new THREE.Vector3(-0.02 * c, -0.02 * s, 0.03)), je.clone().add(off).add(new THREE.Vector3(0, 0, 0.03)), jw.clone().add(off).add(new THREE.Vector3(0, 0, 0.038)), k ? jw.clone().add(off).add(new THREE.Vector3(0.03 * c, 0.03 * s, -0.012)) : head];
     const curve = new THREE.CatmullRomCurve3(pts, false, "catmullrom", 0.3); const m = new THREE.Mesh(new THREE.TubeGeometry(curve, 40, k ? 0.004 : 0.0028, 6, false), PARTS.lineMat[k]); R3.arm.add(m); PARTS.lines[k] = m;
     if (k === 0) PARTS.dots.forEach((d, i) => { const on = S.air > 0.5; d.visible = on; if (on) { const u = (now * 0.5 + i / 5) % 1; d.position.copy(curve.getPointAt(u)); } });
   }
@@ -852,7 +852,7 @@ function evalState(T) {
 }
 const kitM = M4();
 function applyState(S, now) {
-  CLOCK = S.clock; R3.tail.position.x = S.dock; WMASK.uTF.value.x = S.dock; const wl = J.read.wl[S.i]; UW.uWL.value = wl; J.WL = Math.max(wl, 0.002); WATER.surf.visible = wl > 0.003;
+  CLOCK = S.clock; R3.tail.position.z = -S.dock; const wl = J.read.wl[S.i]; UW.uWL.value = wl; J.WL = Math.max(wl, 0.002); WATER.surf.visible = wl > 0.003;
   poseArm([S.q0, S.q1, S.q2], S.tool, S, now);
   PARTS.parkP.visible = !!S.pP; PARTS.parkN.visible = !!S.pN; setGel(S.gel);
   const nb = S.nv > 0.5; R3.baby.visible = nb;
@@ -861,7 +861,7 @@ function applyState(S, now) {
   const K = J.kit;
   if (nb && S.k !== "print") { const uc = 0.5 * (BB.u[J.body.params.BAND] + BB.u[J.body.params.BAND + 1]), kz = -BB.rb + 0.0065 + K.size[2] / 2; BB.kitG.matrix.copy(R3.baby.matrix).multiply(Tm([uc, 0, kz])); if (BB.sadFit) BB.sadFit(BB.rb);
     BB.jets.forEach((j, i) => { j.position.set(uc + BB.jetEnd[i][0] - 0.004, BB.jetEnd[i][1], kz + BB.jetEnd[i][2]); setJet(j, S.jets, now); }); }
-  else { BB.kitG.matrix.copy(Tm([S.kx + (S.kit === 0 ? S.dock : 0), S.ky, S.kz + 0.003])).multiply(M4().makeRotationZ(S.kyaw)); if (BB.jets) BB.jets.forEach((j) => { j.visible = false; }); }
+  else { BB.kitG.matrix.copy(Tm([S.kx, S.ky, S.kz + 0.003 - (S.kit === 0 ? S.dock : 0)])).multiply(M4().makeRotationZ(S.kyaw)); if (BB.jets) BB.jets.forEach((j) => { j.visible = false; }); }
   BB.kitG.matrixWorldNeedsUpdate = true;
   UW.uTime.value = now; STATE = S;
 }
@@ -870,18 +870,17 @@ const LABELS = [], ws = new THREE.Vector3();
 function buildLabels() {
   const mk = (txt, cls, fn) => { const d = document.createElement("div"); d.className = "lab " + cls; d.textContent = txt; $("#vp").appendChild(d); LABELS.push({ d, fn }); };
   const inS = (...ks) => ks.includes(STATE.k);
-  mk("Tail", "", () => [-0.12 + STATE.dock, 0, 0.36]); mk("Gel chamber", "", () => [0.16, 0, 0.36]);
-  mk("Docking ring, three magnets, seal", "", () => inS("dock") ? [J.read.dock_x, 0, 0.3] : null);
-  mk("Birth opening", "", () => inS("dock", "gel", "push", "fill") ? [J.mouth.top[0] + 0.02, 0, J.mouth.top[2] + 0.02] : null);
+  mk("Tail", "", () => [-0.12, 0, 0.36]); mk("Gel chamber", "", () => [0.16, 0, 0.36]);
+  mk("Docking ring, three magnets, dry", "", () => inS("dock") ? [J.read.dock_x, 0, 0.3] : null);
+  mk("Mouth", "", () => inS("dock", "gel", "push", "fill") ? [J.mouth.top[0] + 0.02, 0, J.mouth.top[2] + 0.02] : null);
   mk("Gel bowl", "w", () => inS("gel", "kit", "print") ? [0.16, -0.06, STATE.gel + 0.005] : null);
   mk("Ramp to the lip", "", () => inS("gel", "push") ? [J.read.ramp_x0 + 0.03, -0.05, 0.05] : null);
-  mk("Rack in the tail: holder, magnet and ball needle", "", () => inS("kit") ? [J.slots.P.o[0], J.slots.P.o[1], J.slots.P.o[2] + 0.07] : null);
-  mk("Rack in the tail: print needle", "", () => inS("change", "cure") ? [J.slots.N.o[0], J.slots.N.o[1], J.slots.N.o[2] + 0.07] : null);
-  mk("Kit store in the tail", "", () => inS("gel") ? [J.kit.store[0], 0, J.kit.store[2] + 0.07] : null);
+  mk("Rack, an arm of the tail: holder, magnet and ball needle", "", () => inS("kit") ? [J.slots.P.o[0], J.slots.P.o[1], J.slots.P.o[2] + 0.07] : null);
+  mk("Rack, an arm of the tail: print needle", "", () => inS("change", "cure") ? [J.slots.N.o[0], J.slots.N.o[1], J.slots.N.o[2] + 0.07] : null);
+  mk("Kit cradle, hung from the rack", "", () => inS("gel") ? [J.kit.store[0], 0, J.kit.store[2] + 0.07] : null);
   mk("Electronics kit", "k", () => inS("kit", "change") ? new THREE.Vector3().setFromMatrixPosition(BB.kitG.matrix).add(new THREE.Vector3(0, 0, 0.04)).toArray() : null);
   mk("Waterline", "w", () => J.read.wl[STATE.i] > 0.01 ? [0.75, -0.26, J.read.wl[STATE.i]] : null);
-  mk("Pocket: battery, Raspberry Pi 5, gel pump", "", () => inS("gel") ? [-0.12 + STATE.dock, 0.11, 0.3] : null);
-  mk("Pocket: inflator, silicone", "", () => inS("gel") ? [-0.12 + STATE.dock, -0.11, 0.26] : null);
+  mk("At the tail end: battery, inflator, Raspberry Pi 5, pump, silicone", "", () => inS("dock", "gel") ? [-0.22, 0, 0.26] : null);
   mk("Newborn", "", () => inS("fill", "float", "swim") ? new THREE.Vector3(BB.L * 0.5, 0, BB.rmax + 0.03).applyMatrix4(R3.baby.matrix).toArray() : null);
 }
 function updateLabels() {
@@ -903,8 +902,9 @@ const CAMS = {
   birthcam: () => ({ p: [0.72, -1.15, 0.36], t: [0.4, 0, 0.14] }),
   swimcam: () => { const b = nbPos(); return { p: [0.45 + 0.55 * b.x, -1.9, 0.62], t: [0.25 + 0.55 * b.x, 0.02, 0.1] }; },
   newborn: () => { const b = nbPos(), d = 0.42 + 2.2 * (BB.rmax || 0.05); return { p: [b.x - 0.2 * d, b.y - d, b.z + 0.35 * d], t: [b.x, b.y, b.z] }; },
-  tailcam: () => ({ p: [-0.72 + STATE.dock, -0.7, 0.46], t: [-0.08 + STATE.dock, 0, 0.15] }),
-  sidecam: () => ({ p: [0.1, -1.25, 0.16], t: [0.1, 0, 0.15] }),
+  tailcam: () => ({ p: [-0.85, -0.62, 0.42], t: [-0.12, 0, 0.15] }),
+  sidecam: () => ({ p: [0.02, -1.3, 0.16], t: [0.02, 0, 0.15] }),
+  mouthcam: () => ({ p: [0.72, -0.5, 0.3], t: [0.28, 0, 0.15] }),
   fullcam: () => { const b = nbPos(); return { p: [b.x * 0.5 + 0.3, -2.2, 0.75], t: [b.x * 0.5 + 0.15, 0, 0.12] }; },
   kit: () => { const b = new THREE.Vector3().setFromMatrixPosition(BB.kitG.matrix); return { p: [b.x - 0.05, b.y - 0.34, b.z + 0.12], t: [b.x, b.y, b.z] }; },
 };
@@ -988,7 +988,7 @@ function renderDoc() {
   $("#sources").innerHTML = Object.values(J.sources).map((s) => `<li><a href="${esc(s.u)}">${esc(s.t)}</a>${s.note ? " " + esc(s.note) : ""}</li>`).join("");
   $("#tankp").textContent = J.read.tank_text; $("#limits").innerHTML = J.limits.map((l) => `<li>${esc(l)}</li>`).join("");
   // side section from the same numbers
-  const P = J.hull.prof, sx = (x) => 40 + (x + 0.24) * 600, sy = (z) => 218 - z * 600, pth = (xs, zs) => xs.map((x, i) => (i ? "L" : "M") + sx(x).toFixed(1) + " " + sy(zs[i]).toFixed(1)).join(" ");
+  const P = J.hull.prof, sx = (x) => 8 + (x + 0.30) * 600, sy = (z) => 218 - z * 600, pth = (xs, zs) => xs.map((x, i) => (i ? "L" : "M") + sx(x).toFixed(1) + " " + sy(zs[i]).toFixed(1)).join(" ");
   const m = J.mouth, G_ = J.read; let s = `<rect x="0" y="0" width="400" height="230" fill="#f3f2ef"/>`;
   s += `<rect x="0" y="${sy(G_.wlz)}" width="400" height="${sy(-0.003) - sy(G_.wlz)}" fill="#cfe2ee"/>`;
   const gi = P.x.map((x, i) => [x, P.zb[i]]).filter((p) => p[0] > G_.sill_x && p[1] < G_.gel_z); s += `<path d="M${sx(gi[0][0])} ${sy(G_.gel_z)} ${gi.map((p) => "L" + sx(p[0]).toFixed(1) + " " + sy(p[1]).toFixed(1)).join(" ")} L${sx(gi[gi.length - 1][0])} ${sy(G_.gel_z)} Z" fill="#ead9a0"/>`;
