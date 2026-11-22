@@ -176,7 +176,7 @@ button:focus-visible, input:focus-visible, a:focus-visible, .track:focus-visible
     <div class="ahead"><b>3D Viewport</b><span class="opt">glass tank, one lamp above</span><span class="sp"></span>
       <div class="cams inner" role="group" aria-label="Inner light"><span class="tl2" id="innerLbl">Inner light:</span><button class="btn on" data-inner="off" aria-pressed="true" aria-describedby="innerLbl">off</button><span class="bar2" aria-hidden="true">|</span><button class="btn" data-inner="on" aria-pressed="false" aria-describedby="innerLbl">on</button></div>
       <div class="cams" role="group" aria-label="Camera">
-        <button class="btn" data-cam="overview">Side</button><button class="btn" data-cam="section">Section</button><button class="btn" data-cam="print">Print</button><button class="btn" data-cam="opening">Opening</button>
+        <button class="btn" data-cam="overview">Side</button><button class="btn" data-cam="section">Section</button><button class="btn" data-cam="print">Print</button><button class="btn" data-cam="opening">Opening</button><button class="btn" data-cam="newborn">Newborn</button><button class="btn" data-cam="kit">Kit</button>
       </div>
       <button class="btn on" id="autoCam" aria-pressed="true" title="Camera follows the process">Auto</button>
     </div>
@@ -604,30 +604,75 @@ function babyMeshUpdate(lam) {
   const key = lam.map((l) => l.toFixed(3)).join(","); if (key === BB.key) return; BB.key = key;
   const { V, T, u, th, L, rb } = babyGeo(lam); BB.u = u; BB.th = th; BB.L = L; BB.rb = rb; BB.rmax = Math.max(...V.map((v) => Math.hypot(v[1], v[2])));
   const pos = new Float32Array(T.length * 9); let k = 0; for (const t of T) for (const vi of t) { pos[k++] = V[vi][0]; pos[k++] = V[vi][1]; pos[k++] = V[vi][2]; }
-  const g = BB.mesh.geometry; g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.computeVertexNormals(); g.computeBoundingSphere();
+  const g = BB.mesh.geometry; g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.computeVertexNormals(); g.computeBoundingSphere(); if (BB.vent) BB.vent.position.x = L;
   const eg = new THREE.EdgesGeometry(g, 25); BB.edges.geometry.dispose(); BB.edges.geometry = eg;
 }
 function buildBaby() {
   const clip = [PRINTCLIP];
-  // cast silicone, still wet: a soft sheen, a thin clear coat, and light passing through the skin
-  const mat = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(0xf3f1ec).convertSRGBToLinear(), roughness: 0.46, metalness: 0, clearcoat: 0.45, clearcoatRoughness: 0.22, sheen: 0.6, sheenRoughness: 0.5, sheenColor: new THREE.Color(0.9, 0.9, 0.92), side: THREE.DoubleSide, transparent: true, opacity: 0.9, depthWrite: true, clippingPlanes: clip });
-  mat.onBeforeCompile = (sh) => addWater(sh, { line: 1.0, sub: 0.85, sss: 0.4, sssi: 0.55 }); mat.customProgramCacheKey = () => "baby";
-  BB.mesh = new THREE.Mesh(new THREE.BufferGeometry(), mat); BB.mesh.renderOrder = 6; R3.baby.add(BB.mesh);
-  BB.edges = new THREE.LineSegments(new THREE.BufferGeometry(), litLine(new THREE.LineBasicMaterial({ color: 0x8c949c, transparent: true, opacity: 0.32, clippingPlanes: clip }), 0.8, 0.1)); BB.edges.renderOrder = 7; BB.mesh.add(BB.edges);
+  // printed silicone, milky and clear: the back of the skin is drawn first, then the front, so what is inside shows through; the skin is denser where the view runs along the wall (rims and folds), as a thick sheet of silicone is
+  const skin = (side, dw) => { const mat = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(0xf4f6f4).convertSRGBToLinear(), roughness: 0.34, metalness: 0, clearcoat: 0.55, clearcoatRoughness: 0.2, side, transparent: true, opacity: 1, depthWrite: dw, clippingPlanes: clip });
+    mat.onBeforeCompile = (sh) => addWater(sh, { line: 1.0, sub: 0.7, sss: 0.75, sssi: 0.8, grain: 0.05, pre: `{ float frB = pow(1.0 - abs(dot(normal, normalize(vViewPosition))), 1.7);
+      float aB = clamp(${side === THREE.BackSide ? "0.16 + 0.5" : "0.2 + 0.62"} * frB, 0.0, 0.92);
+      gl_FragColor.rgb = gl_FragColor.rgb * (0.8 + 0.5 * frB) + vec3(0.86, 0.93, 0.96) * spotK(vWPw) * uLI * 0.006 * (0.3 + frB) + innerGlow(vWPw) * 0.03; gl_FragColor.a = aB; }\n` });
+    mat.customProgramCacheKey = () => "babyskin" + side; return mat; };
+  BB.back = new THREE.Mesh(new THREE.BufferGeometry(), skin(THREE.BackSide, false)); BB.back.renderOrder = 9.4; R3.baby.add(BB.back);
+  BB.mesh = new THREE.Mesh(BB.back.geometry, skin(THREE.FrontSide, true)); BB.mesh.renderOrder = 9.6; R3.baby.add(BB.mesh);
+  BB.edges = new THREE.LineSegments(new THREE.BufferGeometry(), litLine(new THREE.LineBasicMaterial({ color: 0xcfd6dc, transparent: true, opacity: 0.42, depthWrite: false, clippingPlanes: clip }), 0.8, 0.1)); BB.edges.renderOrder = 9.7; BB.mesh.add(BB.edges);
   BB.jets = []; for (const s of [1, -1]) { const j = jetPlume(0.0045, 0.26); BB.mesh.add(j); BB.jets.push(j); }
   BB.lam0 = new Array(J.body.nseg).fill(0); babyMeshUpdate(BB.lam0); BB.u0 = BB.u.slice();
   const pos = []; for (const s of GC.segs) pos.push(...s.a, ...s.b);
   const bg = new THREE.BufferGeometry(); bg.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
   BB.bead = new THREE.LineSegments(bg, litLine(new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9 }), 3.0, 0.12)); BB.bead.frustumCulled = false; BB.bead.renderOrder = 8; R3.womb.add(BB.bead);
-  // the electronics kit: every part of the kit file, in kit coordinates (x toward the stern, z up, origin at the kit center)
-  const g = new THREE.Group(); R3.scene.add(g); BB.kitG = g; const K = J.kit;
-  for (const p of K.parts) { if (!p.size || !p.rel || p.id === "encap") continue;
-    const pump = /pump/i.test(p.id + p.name), geo = pump ? new THREE.CylinderGeometry(p.size[1] / 2, p.size[1] / 2, p.size[0], 20).rotateZ(Math.PI / 2) : new THREE.BoxGeometry(...p.size);
-    const b = new THREE.Mesh(geo, clayMat(pump ? 0xd4d6d8 : /lipo|batt/i.test(p.id) ? 0xb7c9d6 : 0xe0c08a, { sub: 0.4 })); b.position.set(-p.rel[0], -p.rel[1], p.rel[2] - K.z); g.add(b); edgeLines(b, 25, 0.5, 0x5a4a2c); }
-  if (K.saddle) { const R = Math.max(...J.body.params.Ro) - 0.0005, sg = new THREE.CylinderGeometry(R, R, 0.05, 24, 1, true, Math.PI - Math.PI / 4, Math.PI / 2).rotateZ(Math.PI / 2);
-    const sad = new THREE.Mesh(sg, clayMat(0xe9d9b8, { sub: 0.4, side: THREE.DoubleSide, opacity: 0.9 })); sad.position.z = -K.z; g.add(sad);
-    for (const [fx, fy] of [[-0.018, 0.012], [-0.018, -0.012], [0.018, 0]]) { const f = new THREE.Mesh(new THREE.CylinderGeometry(0.002, 0.002, 0.006, 10).rotateX(Math.PI / 2), clayMat(0xe9d9b8, { sub: 0.4 })); f.position.set(fx, fy, -R - 0.002 - K.z); g.add(f); } }
-  g.add(new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.004, 0.006).translate(0, 0, K.size[2] / 2 + 0.003), clayMat(0xe3b36a, { sub: 0.4 })));
+  // the electronics kit, seen through the skin: every part of the kit file at the published size and place (stage3_electronics/options.json), in kit coordinates (x toward the stern, z up, origin at the kit center)
+  const g = new THREE.Group(); R3.scene.add(g); BB.kitG = g; const K = J.kit, kp = (id) => K.parts.find((q) => q.id === id), at = (r) => new THREE.Vector3(-r[0], -r[1], r[2] - K.z);
+  const part = (geo, hex, pos, o = {}) => { const m = new THREE.Mesh(geo, clayMat(hex, Object.assign({ sub: 0.3, sss: 0.25, sssi: 0.5, grain: 0.04 }, o))); m.position.copy(pos); g.add(m); return m; };
+  const tube = (pts, r, hex, o) => part(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map((q) => new THREE.Vector3(...q))), 20, r, 8, false), hex, new THREE.Vector3(), o);
+  // CodeCell C6 Drive, 22.5 x 18.5 x 9.4 mm: board, radio can, sensor, two bridge chips, the antenna pointing up
+  const cc = kp("codecell"), cp = at(cc.rel), cs = cc.size, bz = cp.z - cs[2] / 2;
+  edgeLines(part(new THREE.BoxGeometry(cs[0], cs[1], 0.0016), 0x1c5a43, new THREE.Vector3(cp.x, cp.y, bz + 0.0008)), 25, 0.6, 0xd6b25e);
+  part(new THREE.BoxGeometry(0.009, 0.0075, 0.0026), 0xc9ccd0, new THREE.Vector3(cp.x + 0.004, cp.y, bz + 0.0029), { rough: 0.3 });
+  for (const sy of [1, -1]) part(new THREE.BoxGeometry(0.004, 0.003, 0.0012), 0x18191b, new THREE.Vector3(cp.x - 0.006, cp.y + sy * 0.005, bz + 0.0022));
+  part(new THREE.BoxGeometry(0.003, 0.003, 0.001), 0x2b2c30, new THREE.Vector3(cp.x - 0.001, cp.y + 0.006, bz + 0.0021));
+  part(new THREE.BoxGeometry(0.0012, 0.008, 0.0052), 0xd6b25e, new THREE.Vector3(cp.x + 0.0085, cp.y, bz + cs[2] - 0.0026 + 0.0052 / 2 + 0.0026));
+  // LiPo 500 mAh, 36 x 29 x 4.75 mm: foil pouch, tape at the tab end, lead to the board
+  const lp = kp("lipo"), lpp = at(lp.rel);
+  edgeLines(part(new THREE.BoxGeometry(...lp.size), 0xb9c0c8, lpp, { rough: 0.35 }), 25, 0.45, 0x6c7680);
+  part(new THREE.BoxGeometry(0.005, lp.size[1] + 0.0004, lp.size[2] + 0.0004), 0xd9a441, new THREE.Vector3(lpp.x - lp.size[0] / 2 + 0.0025, lpp.y, lpp.z));
+  // two pumps, 46 x 23.5 mm, side by side, axes along the body; 5 mm ports
+  const pumps = [kp("pump_L"), kp("pump_R")]; BB.jetEnd = [];
+  for (const pu of pumps) { const c = at(pu.rel), sy = Math.sign(c.y) || 1, r = pu.size[1] / 2;
+    edgeLines(part(new THREE.CylinderGeometry(r, r, pu.size[0] - 0.012, 22).rotateZ(Math.PI / 2), 0xe9eaec, c, { rough: 0.4 }), 30, 0.5, 0x7a828c);
+    part(new THREE.CylinderGeometry(r, r, 0.012, 22).rotateZ(Math.PI / 2), 0x34363b, new THREE.Vector3(c.x + pu.size[0] / 2 - 0.006, c.y, c.z));       // motor end, toward the stern
+    part(new THREE.CylinderGeometry(r * 0.72, r * 0.72, 0.0015, 22).rotateZ(Math.PI / 2), 0x8d9097, new THREE.Vector3(c.x - pu.size[0] / 2 - 0.0007, c.y, c.z));
+    // intake: a 5 mm stub straight down through the saddle; jet: from the outlet round to a 3.6 mm nozzle through the skin, pointing aft and 5 degrees outward
+    const ix = -0.012, iy = sy * 0.010, zs = -K.size[2] / 2 - 0.004;      // the skin under the kit
+    tube([[c.x - 0.004, c.y, c.z - r + 0.002], [ix, iy + sy * 0.001, c.z - r - 0.002], [ix, iy, zs + 0.002], [ix, iy, zs - 0.006]], 0.0035, 0xdfe6e8, { opacity: 0.8, depthWrite: true });
+    part(new THREE.TorusGeometry(0.0046, 0.0011, 8, 20), 0xf2f4f2, new THREE.Vector3(ix, iy, zs - 0.0005));
+    const jy = sy * 0.026, je = [-0.021 - 0.022, jy + sy * 0.002, zs - 0.004];
+    tube([[c.x - pu.size[0] / 2 + 0.006, c.y + sy * (r - 0.001), c.z - 0.003], [c.x - pu.size[0] / 2 + 0.002, jy, c.z - 0.008], [-0.021 - 0.006, jy, zs + 0.004], [-0.021 - 0.015, jy + sy * 0.0012, zs - 0.002], je], 0.0034, 0xdfe6e8, { opacity: 0.8, depthWrite: true });
+    part(new THREE.CylinderGeometry(0.0026, 0.0034, 0.007, 12).rotateZ(Math.PI / 2), 0x8d9097, new THREE.Vector3(je[0] - 0.002, je[1], je[2]));
+    part(new THREE.TorusGeometry(0.0046, 0.0011, 8, 20).rotateY(Math.PI / 2.6), 0xf2f4f2, new THREE.Vector3(-0.021 - 0.013, jy + sy * 0.001, zs - 0.0005));
+    BB.jetEnd.push(je);
+    // flex circuit from a bridge output on the board, over the cell, down to the motor end
+    const fx = c.x + pu.size[0] / 2 - 0.004;
+    tube([[cp.x - 0.006, cp.y + sy * 0.005, bz + 0.002], [cp.x - 0.012, sy * 0.012, bz + 0.003], [lpp.x - lp.size[0] / 2 - 0.003, sy * 0.016, lpp.z], [fx - 0.004, sy * 0.02, c.z + r * 0.75], [fx, c.y + sy * 0.004, c.z + r * 0.55]], 0.0009, 0xd9862f, { rough: 0.4 });
+    tube([[cp.x - 0.006, cp.y + sy * 0.0035, bz + 0.002], [cp.x - 0.0125, sy * 0.0105, bz + 0.003], [lpp.x - lp.size[0] / 2 - 0.0035, sy * 0.0145, lpp.z], [fx - 0.0045, sy * 0.0185, c.z + r * 0.78], [fx, c.y + sy * 0.0025, c.z + r * 0.6]], 0.0006, 0x26272b); }
+  // cell lead: red and black from the tab end up to the board
+  for (const [dy, hex] of [[0.0012, 0xb3261e], [-0.0012, 0x1b1c1f]]) tube([[lpp.x - lp.size[0] / 2, dy * 3, lpp.z], [lpp.x - lp.size[0] / 2 - 0.004, dy * 2, lpp.z + 0.004], [cp.x - cs[0] / 2 - 0.002, dy, bz + 0.004], [cp.x - cs[0] / 2 + 0.002, dy, bz + 0.002]], 0.0007, hex);
+  // the cast saddle: clear silicone round the kit, the belly of the newborn over the kit, on three feet
+  if (K.saddle) { const R = Math.max(...J.body.params.Ro) - 0.0005, sadGeo = (r) => { const a = Math.asin(Math.min(1, R * Math.SQRT1_2 / r)); return new THREE.CylinderGeometry(r, r, 0.05, 24, 1, true, Math.PI - a, 2 * a).rotateZ(Math.PI / 2); }, sg = sadGeo(R);
+    BB.sadFit = (rb) => { const r = rb - 0.0005; if (Math.abs(r - BB.sadR) < 0.0005) return; BB.sadR = r; BB.saddle.geometry.dispose(); BB.saddle.geometry = sadGeo(r); BB.saddle.position.z = r - R - K.z; }; BB.sadR = R;      // the saddle keeps the same width and follows the belly as the body opens
+    const sad = new THREE.Mesh(sg, clayMat(0xeef1ee, { sub: 0.4, side: THREE.DoubleSide, opacity: 0.3, sss: 0.6, sssi: 0.6 })); sad.position.z = -K.z; sad.renderOrder = 9.2; g.add(sad); BB.saddle = sad; 
+    for (const [fx, fy] of [[-0.018, 0.012], [-0.018, -0.012], [0.018, 0]]) part(new THREE.CylinderGeometry(0.002, 0.002, 0.006, 10).rotateX(Math.PI / 2), 0xeef1ee, new THREE.Vector3(fx, fy, -R - 0.002 - K.z)); }
+  // air valve: the septum boss in the tail cap, 20 mm below the axis, where the needle brings the air in; and the 6 mm duckbill vent in the nose
+  const vg = new THREE.Group(); R3.baby.add(vg); BB.valve = vg; const bossR = J.body.params.boss_r;
+  const vm = (geo, hex, x, z, o) => { const m = new THREE.Mesh(geo, clayMat(hex, Object.assign({ sub: 0.3, sss: 0.3, sssi: 0.5, clip }, o))); m.position.set(x, 0, z); vg.add(m); return m; };
+  edgeLines(vm(new THREE.CylinderGeometry(bossR, bossR, 0.008, 24).rotateZ(Math.PI / 2), 0xdfe3e2, 0.004, -J.boss_dz, { opacity: 0.85, depthWrite: true }), 30, 0.5, 0x7a828c);
+  vm(new THREE.CylinderGeometry(0.0045, 0.0045, 0.0125, 16).rotateZ(Math.PI / 2), 0xc24a2c, 0.005, -J.boss_dz);
+  vm(new THREE.TorusGeometry(0.0062, 0.0012, 8, 24).rotateY(Math.PI / 2), 0xb9c0c8, -0.0012, -J.boss_dz, { rough: 0.3 });
+  BB.vent = new THREE.Group(); vg.add(BB.vent);
+  const dv = new THREE.Mesh(new THREE.CylinderGeometry(0.0022, 0.005, 0.012, 14).rotateZ(-Math.PI / 2), clayMat(0x3f8fa8, { sub: 0.3, clip })); dv.position.x = 0.004; dv.scale.y = 0.55; BB.vent.add(dv);
+  const dvr = new THREE.Mesh(new THREE.TorusGeometry(0.0058, 0.0012, 8, 24).rotateY(Math.PI / 2), clayMat(0xb9c0c8, { rough: 0.3, clip })); BB.vent.add(dvr);
 }
 
 /* ================================================================ G-code: parse the real file, time every move */
@@ -846,7 +891,7 @@ function setInner(v, save = true) { INNER.on = !!v; document.querySelectorAll("[
   if (save) { try { localStorage.setItem("bnm.sim.innerLight", INNER.on ? "on" : "off"); } catch (e) { /* storage may be blocked */ } } }
 function setShadows() {      // solid parts cast, everything lit receives; the clear shell, the water and the glass let the light through
   R3.vessel.traverse((o) => { if (o.isMesh && o.material && o.material.isMeshStandardMaterial) { o.receiveShadow = true; o.castShadow = !o.material.transparent || o.material.opacity > 0.7; } });
-  BB.mesh.castShadow = true; BB.mesh.receiveShadow = true; BB.kitG.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  BB.mesh.castShadow = true; BB.mesh.receiveShadow = true; BB.back.receiveShadow = true; BB.kitG.traverse((o) => { if (o.isMesh) { o.castShadow = !o.material.transparent; o.receiveShadow = false; } });      // the skin passes the light, so the kit inside is lit, not in the skin's shadow
   for (const k of ["W_B0_Skin", "W_T1_TailShell"]) if (PARTS[k]) { PARTS[k].castShadow = false; PARTS[k].layers.enable(1); }
 }
 
@@ -1143,7 +1188,7 @@ function applyState(S, now) {
   updateAirLine(S, now);
   // baby: inside the womb it moves with the egg; once born it is in the world
   babyMeshUpdate(S.lam.map((l) => clamp(l, 0, 1.2)));
-  BB.mesh.visible = S.babyVis; R3.vessel.updateMatrixWorld(true);
+  BB.mesh.visible = BB.back.visible = BB.valve.visible = S.babyVis; R3.vessel.updateMatrixWorld(true);
   const bm = new THREE.Matrix4().makeTranslation(S.bx, S.by || 0, S.bz).multiply(new THREE.Matrix4().makeRotationZ(S.yawB || 0)).multiply(new THREE.Matrix4().makeRotationY(-S.pitch)).multiply(new THREE.Matrix4().makeRotationX(S.rollB || 0));
   if (!S.bWorld) bm.premultiply(R3.womb.matrixWorld);
   R3.baby.matrixAutoUpdate = false; R3.baby.matrix.copy(bm);
@@ -1153,11 +1198,12 @@ function applyState(S, now) {
   // kit
   const K = J.kit, kc = K.centre, c = J.layout.cradle;
   BB.kitG.matrixAutoUpdate = false;
+  if (BB.sadFit) BB.sadFit(S.kit === "baby" ? BB.rb : Math.max(...J.body.params.Ro));
   if (S.kit === "cradle") BB.kitG.matrix.copy(R3.womb.matrixWorld).multiply(Tm([c[0], c[1], c[2] + K.size[2] / 2]));
   else if (S.kit === "carried") { R3.arm.updateMatrixWorld(true); const p = new THREE.Vector3(...ARM.tip).applyMatrix4(R3.tail.matrixWorld); BB.kitG.matrix.makeTranslation(p.x, p.y, p.z - K.size[2] / 2 - 0.002); }
   else if (S.kit === "placed") BB.kitG.matrix.copy(R3.womb.matrixWorld).multiply(Tm(kc));
   else { const uc = 0.5 * (BB.u[J.body.band[0]] + BB.u[J.body.band[1]]), kz = -BB.rb + 0.004 + K.size[2] / 2; BB.kitG.matrix.copy(R3.baby.matrix).multiply(Tm([uc, 0, kz]));
-    BB.jets.forEach((j, i) => j.position.set(uc - 0.03, (i ? -1 : 1) * 0.026, kz - 0.02)); }
+    BB.jets.forEach((j, i) => j.position.set(uc + BB.jetEnd[i][0] - 0.004, BB.jetEnd[i][1], kz + BB.jetEnd[i][2])); }
   UW.uTime.value = now;
 }
 
@@ -1199,6 +1245,10 @@ const CAMS = {
   push: () => ({ p: [0.42, -1.65, 0.30], t: [0.30, 0, -0.05] }),
   birthcam: () => ({ p: [0.62, -2.05, 0.42], t: [0.48, 0, -0.06] }),
   opening: () => ({ p: [1.55, -1.75, 0.55], t: [0.35, 0, -0.06] }),
+  newborn: () => {      // close on the newborn, or on the kit before the skin is printed: near enough to read the parts through the skin
+    const kit = STATE.kit !== "baby", b = kit ? new THREE.Vector3().setFromMatrixPosition(BB.kitG.matrix) : new THREE.Vector3(BB.L / 2, 0, 0).applyMatrix4(R3.baby.matrix), d = kit ? 0.42 : 0.4 + 2.3 * (BB.rmax || 0.06);
+    return { p: [b.x - 0.25 * d, b.y - d, b.z + 0.4 * d], t: [b.x, b.y, b.z - (kit ? 0 : 0.25 * (BB.rmax || 0.06))] }; },
+  kit: () => { const b = new THREE.Vector3().setFromMatrixPosition(BB.kitG.matrix); return { p: [b.x - 0.07, b.y - 0.2, b.z + 0.035], t: [b.x - 0.004, b.y, b.z - 0.004] }; },      // the kit at arm's length: board, cell, pumps, flex circuit, tubes through the skin
   swim: () => { const b = new THREE.Vector3().setFromMatrixPosition(R3.baby.matrix); return { p: [b.x + 0.1, b.y - 1.6, 0.56], t: [b.x + 0.1, b.y, J.WL] }; },
   mswim: () => { const f = STATE.k === "mswim" ? mj(STATE.st.f) : 0; return { p: [lerp(-0.3, 1.6, f), lerp(-3.4, -7.6, f), lerp(1.0, 2.0, f)], t: [lerp(-0.3, -0.35, f), lerp(0, 0.4, f), lerp(-0.05, -0.7, f)] }; },   // cranes back out to the room
 };
@@ -1362,7 +1412,7 @@ function wireUI() {
   tr.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") TL.T = Math.min(TL.total - 0.01, TL.T + 1); else if (e.key === "ArrowLeft") TL.T = Math.max(0, TL.T - 1); else return; e.preventDefault(); });
   document.querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { TAB = b.dataset.tab; document.querySelectorAll("[data-tab]").forEach((x) => x.setAttribute("aria-selected", String(x === b))); renderProps(); }));
 }
-window.BNM = { go(k, f = 0.5) { const s = TL.stages.find((x) => x.k === k); if (s) { TL.T = s.d0 + s.disp * f; TL.playing = false; $("#play").textContent = "Play"; } }, stages: () => TL.stages.map((s) => s.k), state: () => STATE, setAuto, setCam, setInner, settle: () => { CAMSNAP = true; }, quality: () => CINE.q };
+window.BNM = { go(k, f = 0.5) { const s = TL.stages.find((x) => x.k === k); if (s) { TL.T = s.d0 + s.disp * f; TL.playing = false; $("#play").textContent = "Play"; } }, stages: () => TL.stages.map((s) => s.k), state: () => STATE, setAuto, setCam, setInner, settle: () => { CAMSNAP = true; }, view: (v) => { setAuto(false); CAMMOVE = false; R3.camera.position.set(v[0], v[1], v[2]); R3.controls.target.set(v[3], v[4], v[5]); CINE.focus = R3.camera.position.distanceTo(R3.controls.target); }, quality: () => CINE.q };
 (async function main() {
   try {
     initThree(); await loadAll(); wireUI();
