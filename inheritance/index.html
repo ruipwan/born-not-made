@@ -2,14 +2,15 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Inheritance · Born, Not Made</title>
 <style>
 *{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:#0c0c0c;color:#eee;font:15px/1.5 Inter,Arial,sans-serif}main{max-width:1400px;margin:auto;padding:18px clamp(12px,3vw,44px)}header,footer{display:flex;align-items:center;gap:20px}header{justify-content:space-between;padding:0 0 14px}a,button{color:inherit;font:inherit}a{text-underline-offset:4px}header a{text-decoration:none}header span,time{font-size:13px;color:#aaa}canvas{width:100%;display:block;aspect-ratio:16/9;background:#090909}footer{padding:13px 0;gap:14px}button{background:transparent;border:0;padding:5px 0;cursor:pointer}input{accent-color:#ddd;min-width:32px;flex:1}time{font-variant-numeric:tabular-nums;white-space:nowrap}.mobile{display:none}footer a{font-size:13px}@media(max-width:600px){main{padding:12px}.mobile{display:block;min-height:3.2em;margin:12px 0 0;font:19px Georgia,serif}footer{gap:9px;font-size:13px}time{display:none}}@media(min-width:601px){main{padding-bottom:0}}
-.mobile-repertoire{display:none}details{color:#bdbdb7;font-size:14px;max-width:75ch;margin:14px 0 0}summary{cursor:pointer}details p{margin:8px 0}@media(max-width:600px){.mobile-repertoire{display:block;white-space:pre-line;line-height:1.8;font-size:13px;color:#c5c5c1}}</style></head><body><main><header><a href="../#inheritance" target="_top">Born, Not Made</a><span>Inheritance</span></header><canvas width="1600" height="900" aria-label="Three egg-shaped robots inherit memory through model distillation"></canvas><p class="mobile"></p><div class="mobile-repertoire"></div><footer><button id="play">Pause</button><input id="seek" type="range" min="0" max="32" step=".05" value="0" aria-label="Film position"><time></time><button id="again">Replay</button><a href="inheritance.mp4?v=repertoire-1" download>MP4</a></footer><details><summary>How the patterns are counted</summary>
-<p>Each model has five possible actions for each cue. Encounters in this study specify a preferred action. During distillation, the next model sees selected cues and fits its own action probabilities to the previous model’s outputs. The source keeps its responses. The particles visualize those output probabilities.</p>
-<p>Each count is one distinct cue–response pair. In this simulation a pair enters the count when its action reaches 60% probability on that cue. Its origin records how that generation acquired it. For example, “visitor lingers → stay beside” originates in I and appears as inherited in II and III. “Visitor returns → approach” originates in II and appears as inherited in III.</p>
-<p>The encounters, cue selection, and threshold are design choices. The displayed values come from this small simulation. The Raspberry Pi is the proposed onboard computer.</p>
+.mobile-repertoire{display:none}details{color:#bdbdb7;font-size:14px;max-width:75ch;margin:14px 0 0}summary{cursor:pointer}details p{margin:8px 0}@media(max-width:600px){.mobile-repertoire{display:block;white-space:pre-line;line-height:1.8;font-size:13px;color:#c5c5c1}}.mobile-tech{display:none}.chapters{display:flex;flex-wrap:wrap;gap:18px;font-size:13px;color:#b7b7b4}.chapters button:hover{text-decoration:underline}@media(max-width:600px){.mobile-tech{display:block;font-size:13px;color:#bcbcb7}.chapters{gap:10px}} </style></head><body><main><header><a href="../#inheritance" target="_top">Born, Not Made</a><span>Inheritance</span></header><canvas width="1600" height="900" aria-label="Three egg-shaped robots inherit memory through model distillation"></canvas><p class="mobile"></p><p class="mobile-tech"></p><div class="mobile-repertoire"></div><footer><button id="play">Pause</button><input id="seek" type="range" min="0" max="68" step=".05" value="0" aria-label="Film position"><time></time><button id="again">Replay</button><a href="inheritance.mp4?v=lifetimes-1" download>MP4</a></footer><nav class="chapters" aria-label="Film chapters"><button data-time="0">Encounters</button><button data-time="9">Selection</button><button data-time="20">A life of its own</button><button data-time="45">Partial inheritance</button><button data-time="56">The next life</button></nav>
+<details><summary>Inside the learning simulation</summary>
+<p>Each generation has its own seven-cue, seven-action softmax policy. The film uses fictional conversations, peer messages and water conditions. Each encounter specifies a cue and an observed response. A short context window biases an immediate reply. A separate episode record can be replayed later to update the model’s own weights. Model revisions mark training batches.</p>
+<p>Here, memory compression means summarizing repeated encounters through learned response distributions and passing on a limited repertoire. All three policies have the same parameter count. The two-cue selection budget preserves one inherited pattern when possible and fills available places with frequently observed local patterns. On each selected cue, the previous model produces probabilities over all seven actions. The successor updates its own weights to match those probabilities.</p>
+<p>A response is counted when its probability from weights alone reaches 60% on its cue. Counts track the origin of distinct cue–response patterns. The simulated probabilities, time-compressed life stages and encounter counts describe this example. The proposed onboard computer is a Raspberry Pi 5.</p>
 <a href="https://arxiv.org/abs/1503.02531">Distilling the Knowledge in a Neural Network</a></details></main>
 <script>
 const cv=document.querySelector('canvas'), g=cv.getContext('2d');
-const tau=Math.PI*2, duration=32;
+const tau=Math.PI*2, duration=68;
 const clamp=x=>Math.min(1,Math.max(0,x));
 function ease(t,a,b){let x=clamp((t-a)/(b-a));return x*x*(3-2*x)}
 function lerp(a,b,u){return a+(b-a)*u}
@@ -65,52 +66,192 @@ function water(t){
 // Board-to-shell ratio: 85 mm PCB / 723.3 mm main chamber.
 // Board width in drawing units is 103; the chamber silhouette spans about 374.
 // The tail assembly is outside this schematic. Depth changes screen size, not the ratio.
-const actions=['Stay beside','Wait','Turn','Approach','Drift'];
-const cues=['A visitor lingers','A visitor leaves','A wake crosses','A visitor returns','The water settles'];
-const generations=['I','II','III'];
-// Each row is an independent categorical policy for one cue, with five possible actions.
-// For a local encounter the target is a stipulated outcome; for inheritance it is the
-// prior model's full probability vector. Gradient descent fits softmax cross-entropy.
-const events=[
- {gen:0,cue:0,begin:.1,end:2.4}, {gen:0,cue:1,begin:1.2,end:3.4}, {gen:0,cue:2,begin:2.5,end:4.7},
- {gen:1,cue:0,from:0,begin:7,end:10.5}, {gen:1,cue:1,from:0,begin:10.4,end:13.4},
- {gen:1,cue:3,begin:14.5,end:18.5},
- {gen:2,cue:0,from:1,begin:20.6,end:23.4}, {gen:2,cue:3,from:1,begin:23.5,end:27},
- {gen:2,cue:4,begin:28,end:30.5}
-];
-function softmax(logits){
- const z=Math.max(...logits), exp=logits.map(v=>Math.exp(v-z)),sum=exp.reduce((a,b)=>a+b,0);
- return exp.map(v=>v/sum);
-}
-const uniform=actions.map(()=>1/actions.length);
-for(const e of events){
- const parent=e.from===undefined?null:events.find(v=>v.gen===e.from&&v.cue===e.cue);
- const target=parent?parent.steps.at(-1):actions.map((_,i)=>i === e.cue ? .86 : .035);
- const logits=actions.map(()=>0);e.steps=[uniform];
- for(let n=0;n<36;n++){
-  const predicted=e.steps.at(-1);
-  logits.forEach((_,k)=>logits[k]+=.38*(target[k]-predicted[k]));
-  e.steps.push(softmax(logits));
- }
-}
-function response(e,t){
- const step=36*ease(t,e.begin,e.end),lo=Math.floor(step),hi=Math.min(36,lo+1);
- return e.steps[lo].map((v,i)=>lerp(v,e.steps[hi][i],step-lo));
-}
-function repertoire(gen,t){
- return events.filter(e=>e.gen===gen&&response(e,t)[e.cue]>=.60);
-}
-const shots=[
- [0,'Encounter','A visitor stays a little longer. So does the first robot.'],
- [4.8,'Selection','Staying and waiting carry forward. Turning with a wake stays with I.'],
- [7,'Distillation','On the same cue, II comes to favor staying close.'],
- [10.5,'Distillation','II also inherits the tendency to wait when someone leaves.'],
- [13.6,'New encounter','A visitor returns. This time, II moves closer.'],
- [19,'Selection','II passes on staying close and approaching a returning visitor.'],
- [23.5,'Distillation','III inherits a response to a return it has never witnessed.'],
- [27.4,'New encounter','The water settles around III. It learns to drift.'],
- [30.6,'Inheritance','The encounter belongs to one life. A response can outlive it.']
-];
+/*
+ * A seven-cue, seven-action softmax policy. Each generation has an independent
+ * weight matrix. A cue activates one row. Local training targets come from the
+ * scripted observed encounters. Inheritance fits soft targets on selected cues.
+ * World cues, outcomes, retention threshold, and time compression are authored.
+ *
+ * growthState(seconds) is deterministic and seekable. It returns counts,
+ * selected cues, action distributions, and the active stage for the film.
+ */
+const growthState = (() => {
+  const patterns = [
+    {id:'company', cue:'Someone asks for company', action:'Stay close'},
+    {id:'pause', cue:'A peer asks for a pause', action:'Wait'},
+    {id:'wake', cue:'A crossing wake arrives', action:'Yield'},
+    {id:'return', cue:'A visitor returns', action:'Approach'},
+    {id:'call', cue:'Another robot calls', action:'Answer'},
+    {id:'current', cue:'A steady current forms', action:'Follow'},
+    {id:'still', cue:'The water settles', action:'Drift'}
+  ];
+  const n = patterns.length;
+  const stages = [
+    [0,5,0,'encounter','Encounters become memories','Context + episode buffer'],
+    [5,9,0,'update','Experience becomes a tendency','Local weight update'],
+    [9,13,0,'select','Some memories are selected','Representative cue selection'],
+    [13,20,0,'distill','Only part is inherited','Soft-target distillation'],
+    [20,31,1,'encounter','A life of its own','New context + local episodes'],
+    [31,37,1,'update','Experience changes the model','Local weight update'],
+    [37,41,1,'encounter','Life continues','New context + local episodes'],
+    [41,45,1,'update','A tendency deepens','Second local weight update'],
+    [45,49,1,'select','Memory is compressed again','Representative cue selection'],
+    [49,56,1,'distill','What survives another life','Soft-target distillation'],
+    [56,60,2,'encounter','A new life begins','New context + local episodes'],
+    [60,63,2,'update','A new response takes root','Local weight update'],
+    [63,64,2,'hold','Inheritance continues','Independent local models']
+  ].map(([start,end,gen,phase,title,tech])=>({start,end,gen,phase,title,tech}));
+  const inputs = [
+    [0.15,0,'human','“Stay a moment.”','company'],
+    [0.82,0,'machine','“Wait for me.”','pause'],
+    [1.51,0,'water','A wake crosses from the left.','wake'],
+    [2.13,0,'human','“Will you stay here?”','company'],
+    [2.84,0,'machine','“Hold here with me.”','pause'],
+    [3.54,0,'water','A second wake crosses.','wake'],
+    [4.27,0,'human','“A little longer.”','company'],
+    [20.4,1,'human','“I came back.”','return'],
+    [21.8,1,'machine','“Can you hear me?”','call'],
+    [23.1,1,'water','A current carries past.','current'],
+    [24.6,1,'human','“Here I am again.”','return'],
+    [26.0,1,'machine','“Are you there?”','call'],
+    [27.4,1,'water','The current gathers again.','current'],
+    [29.3,1,'human','“Do you remember me?”','return'],
+    [37.35,1,'human','“It’s me again.”','return'],
+    [38.6,1,'machine','“I’m still here.”','call'],
+    [39.85,1,'human','“I found you.”','return'],
+    [56.25,2,'water','The surface falls still.','still'],
+    [57.3,2,'water','Ripples settle nearby.','still'],
+    [58.7,2,'water','Still water surrounds it.','still']
+  ].map(([at,gen,kind,label,pattern])=>{
+    const key=patterns.findIndex(p=>p.id===pattern);
+    return {at,gen,kind,label,pattern,key,action:patterns[key].action};
+  });
+
+  const epochs=24, keepThreshold=.60;
+  const freshMatrix=()=>Array.from({length:n},()=>Array(n).fill(0));
+  const copyMatrix=m=>m.map(row=>row.slice());
+  function distribution(logits){
+    const max=Math.max(...logits);
+    const exps=logits.map(v=>Math.exp(v-max));
+    const sum=exps.reduce((a,b)=>a+b,0);
+    return exps.map(v=>v/sum);
+  }
+  const neutral=Array(n).fill(1/n);
+  function countEpisodes(gen,cutoff){
+    const counts=Array(n).fill(0);
+    for(const e of inputs)if(e.gen===gen && e.at<=cutoff)counts[e.key]++;
+    return counts;
+  }
+  function selection(gen,weights,cutoff,inheritedKeys){
+    const counts=countEpisodes(gen,cutoff);
+    const available=patterns.map((_,i)=>i).filter(i=>distribution(weights[i])[i]>=keepThreshold);
+    const local=available.filter(i=>counts[i]>0 && !inheritedKeys.includes(i));
+    const rank=(a,b)=>counts[b]-counts[a] || a-b;
+    local.sort(rank);
+    // A two-cue budget. Keep one inherited anchor where available, then
+    // fill the remaining slots with recurrent local cues (index breaks ties).
+    const anchor=available.find(i=>inheritedKeys.includes(i));
+    const selected=(anchor===undefined?local:[anchor,...local]).slice(0,2);
+    return {selected,available,episodeCount:counts.reduce((a,b)=>a+b,0)};
+  }
+  const batches=[];
+  const finalWeights=[freshMatrix(),freshMatrix(),freshMatrix()];
+  const inheritedKeys=[[],[],[]];
+  const selections=new Map();
+  const provenance=Array.from({length:3},()=>Array(n).fill(null));
+
+  for(const s of stages){
+    if(s.phase==='select'){
+      selections.set(s.gen,selection(s.gen,finalWeights[s.gen],s.start,inheritedKeys[s.gen]));
+      continue;
+    }
+    if(s.phase!=='update' && s.phase!=='distill')continue;
+    const distilling=s.phase==='distill';
+    const gen=s.gen+Number(distilling);
+    const localEpisodes=inputs.filter(e=>e.gen===gen && e.at<s.start);
+    // Each local phase replays that individual's accumulated episodes.
+    const samples=distilling?selections.get(s.gen).selected.map(key=>({
+      key,target:distribution(finalWeights[s.gen][key])
+    })):localEpisodes.map(e=>({
+      key:e.key,target:patterns.map((_,j)=>j===e.key ? .86 : .14/(n-1))
+    }));
+    const weights=copyMatrix(finalWeights[gen]);
+    const history=[copyMatrix(weights)];
+    for(const sample of samples){
+      if(provenance[gen][sample.key]===null)provenance[gen][sample.key]=distilling?'inherited':'acquired';
+    }
+    // Full-policy optimization. Only the active one-hot cue has a nonzero
+    // gradient. distillation never writes to the source model.
+    for(let epoch=0;epoch<epochs;epoch++){
+      for(const {key,target} of samples){
+        const pred=distribution(weights[key]);
+        for(let j=0;j<n;j++)weights[key][j]+=.55*(target[j]-pred[j]);
+      }
+      history.push(copyMatrix(weights));
+    }
+    if(distilling)inheritedKeys[gen]=samples.map(e=>e.key);
+    finalWeights[gen]=weights;
+    batches.push({gen,start:s.start,end:s.end,distilling,history,sampleCount:samples.length,
+      trainedEpisodes:distilling?0:localEpisodes.length});
+  }
+
+  function stateAt(seconds){
+    const t=Math.max(0,Math.min(64,Number(seconds)||0));
+    const stage=stages.find(s=>t<s.end)||stages[stages.length-1];
+    const matrix=[freshMatrix(),freshMatrix(),freshMatrix()];
+    const versions=[0,0,0],updates=[0,0,0],trained=[0,0,0];
+    for(const b of batches){
+      if(t<b.start)break;
+      const epoch=Math.min(epochs,Math.floor(epochs*(t-b.start)/(b.end-b.start)));
+      matrix[b.gen]=b.history[epoch];
+      updates[b.gen]+=epoch*b.sampleCount;
+      if(epoch>0)versions[b.gen]++;
+      if(epoch>0 && !b.distilling)trained[b.gen]=b.trainedEpisodes;
+    }
+    const models=matrix.map((m,i)=>{
+      const acquiredNames=[],inheritedNames=[];
+      m.forEach((row,k)=>{
+        if(distribution(row)[k]<keepThreshold)return;
+        (provenance[i][k]==='inherited'?inheritedNames:acquiredNames).push(patterns[k].action);
+      });
+      const episodes=inputs.filter(e=>e.gen===i&&e.at<=t).length;
+      return {inherited:inheritedNames.length,acquired:acquiredNames.length,
+        episodes,trainedEpisodes:trained[i],updates:updates[i],version:versions[i],acquiredNames,inheritedNames};
+    });
+    const progress=(t-stage.start)/(stage.end-stage.start);
+    let transfer=null;
+    if(stage.phase==='select'||stage.phase==='distill'){
+      const src=stage.gen,dst=src+1,s=selections.get(src);
+      const idx=Math.min(s.selected.length-1,Math.floor(progress*s.selected.length)),key=s.selected[idx];
+      const sourceDist=distribution(matrix[src][key]),targetDist=distribution(matrix[dst][key]);
+      transfer={src,dst,selected:s.selected.map(k=>patterns[k].action),available:s.available.map(k=>patterns[k].action),
+        omitted:s.available.filter(k=>!s.selected.includes(k)).map(k=>patterns[k].action),
+        episodeCount:s.episodeCount,selectedCount:s.selected.length,availableCount:s.available.length,
+        cue:patterns[key].cue,action:patterns[key].action,sourceProb:sourceDist[key],targetProb:targetDist[key],
+        sourceDist,targetDist,progress};
+    }
+    const seen=inputs.filter(e=>e.at<=t);
+    const latest=seen.filter(e=>e.gen===stage.gen).at(-1);
+    const key=latest?.key??0;
+    const localDist=distribution(matrix[stage.gen][key]),localProb=localDist[key];
+    // A transient demonstration in a short context can bias the immediate reply.
+    // This readout never modifies logits or contributes to the retention count.
+    const context=seen.filter(e=>e.gen===stage.gen && t-e.at<2.5).slice(-2);
+    const contextMatch=context.some(e=>e.key===key);
+    const contextDist=contextMatch?localDist.map((p,j)=>.55*p+.45*Number(j===key)):localDist.slice();
+    const contextProb=contextDist[key];
+    return {t,stage,generation:stage.gen,phase:stage.phase,models,inputs:seen,transfer,
+      latest:latest||null,pattern:latest?.action||null,localProb,localDist,contextProb,contextDist,context,progress};
+  }
+  stateAt.stages=stages;
+  stateAt.inputs=inputs;
+  stateAt.patterns=patterns;
+  stateAt.retentionThreshold=keepThreshold;
+  stateAt.neutral=neutral;
+  return stateAt;
+})();
+if(typeof module!=='undefined'&&module.exports)module.exports=growthState;
+
 function pointOnArc(start,end,u,lift){
  const x=lerp(start[0],end[0],u),y=lerp(start[1],end[1],u)-4*lift*u*(1-u);
  return [x,y];
@@ -144,89 +285,171 @@ function profile(x,y,values,amount){
  values.forEach((v,i)=>{const h=v*23*amount;rect(i*7,-h,4,h,ink(.80))});
  g.restore();
 }
-function encounter(t,x,y,start){
- const f=ease(t,start,start+.65),v=1-ease(t,start+2.2,start+3.1);
- if(f*v<.01)return;
- const a=[x+35,y-47],b=[x,y],u=ease(t,start+.2,start+1.25);
- label('Encounters',x+30,y-63,17,ink(.8*f*v));
- arc(a,b,u,5,.7*f*v);
+const spans=[
+ [0,5,'A life begins in company.','Incoming context · human voices, peer messages and water conditions'],
+ [5,9,'Some encounters leave a habit behind.','Local learning · replay recorded encounters and update model I’s weights'],
+ [9,13,'Seven encounters are compressed into two inheritable responses.','Memory selection · condense repeated encounters into selected response patterns'],
+ [13,20,'II inherits how to stay close and how to wait.','Knowledge distillation · fit II’s weights to I’s response probabilities on selected cues'],
+ [20,25,'Now II has a life of its own. People come back.','Fresh context · new conversations enter II’s own encounter record'],
+ [25,31,'Other robots call. The current pulls at its body.','Experience collection · keep a local record across separate encounters'],
+ [31,37,'Even after a voice falls silent, II can answer differently.','Local training · the interaction ends; the updated weights persist'],
+ [37,41,'Another return. Another exchange. Time to grow.','New context · later encounters join the same lifetime record'],
+ [41,45,'What II has lived changes what it can pass on.','Continual learning · a second local update revises II’s own parameters'],
+ [45,49,'Memory is selected again. Only part of II’s life travels on.','Partial inheritance · select one inherited response and one acquired by II'],
+ [49,56,'III carries a way of greeting someone it has never met.','Soft-target distillation · II’s selected outputs shape III’s independent model'],
+ [56,60,'The water around III grows quiet.','New environmental input · III begins its own experience record'],
+ [60,63,'Drifting is something III learns for itself.','Local training · III updates its response to still water'],
+ [63,68,'An encounter belongs to one life. A way of responding can travel.','Memory inheritance · selected responses persist across generations']
+];
+const numerals=['I','II','III'];
+const envColumns=[
+ {kind:'human',title:'Human conversations',x:275},
+ {kind:'machine',title:'Machine conversations',x:805},
+ {kind:'water',title:'Water conditions',x:1330}
+];
+function centered(text,x,y,size,color,face='Arial'){
+ g.save();g.textAlign='center';label(text,x,y,size,color,face);g.restore();
 }
-function ledger(gen,t,center){
- const kept=repertoire(gen,t),x=center-178;
- const inherited=kept.filter(e=>e.from!==undefined),local=kept.filter(e=>e.from===undefined);
- for(const [i,group] of [inherited,local].entries()){
-  const y=605+i*36;
-  g.save();
-  if(i===0){g.fillStyle='#d5d5d1';g.fillRect(x,y-11,8,8)}
-  else{g.strokeStyle='#c8c8c4';g.lineWidth=1.2;g.strokeRect(x+.5,y-10.5,7,7)}
-  label(String(group.length),x+16,y-1,20,'#eee');
-  label(i?'From encounters':'Inherited',x+40,y-1,16,'#c0c0bd');
-  label(group.length?group.map(e=>actions[e.cue]).join(' · '):'—',x+40,y+15,14,'#b1b1ad');
-  g.restore();
+function curve(p0,p1,p2,p3,u){
+ const v=1-u;
+ return [0,1].map(i=>v*v*v*p0[i]+3*v*v*u*p1[i]+3*v*u*u*p2[i]+u*u*u*p3[i]);
+}
+function arrowAt(point,amount,alpha,width=1.5,head=10){
+ if(amount<=0||alpha<.01)return;
+ g.beginPath();g.moveTo(...point(0));
+ for(let i=1;i<=46;i++)g.lineTo(...point(amount*i/46));
+ g.lineWidth=width;g.strokeStyle=ink(alpha);g.stroke();
+ const tip=point(amount),prev=point(Math.max(0,amount-.015));
+ direction(tip[0],tip[1],Math.atan2(tip[1]-prev[1],tip[0]-prev[0]),alpha,head);
+}
+function inputField(t,state,anchor){
+ const gen=state.generation;
+ const local=state.inputs.filter(e=>e.gen===gen&&e.at<=t);
+ const use=state.phase==='encounter'?1:.62;
+ for(const f of envColumns){
+  const matching=local.filter(e=>e.kind===f.kind);
+  const latest=matching.at(-1);
+  const ids=matching.length;
+  const speaker=latest&&f.kind==='human'?['Visitor A','Visitor B','Visitor A','Visitor C','Visitor B'][(ids-1)%5]:latest&&f.kind==='machine'?['Peer 01','Peer 02','Peer 01'][(ids-1)%3]:'';
+  centered(speaker?f.title+'  /  '+speaker:f.title,f.x,110,17,ink(latest && latest.at >= t-4 ? .88 : .46));
+  if(latest){
+   let words=latest.label;
+   if(f.kind!=='water'&&!words.includes('“')&&!words.includes('"'))words='“'+words+'”';
+   centered(words,f.x,143,22,ink(.90*use),'Georgia');
+  }
+  // Each visible strand starts at a separately recorded input of the same modality.
+  for(const [j,e] of matching.slice(-4).entries()){
+   const start=[f.x+(j-1)*11,159],end=[anchor[0]+(j-1)*5,anchor[1]-27];
+   const point=u=>curve(start,[start[0],start[1]+40+j*8],[lerp(start[0],end[0],.79),end[1]-110-j*9],end,u);
+   const age=t-e.at,alpha=(.16+.62*(1-ease(age,.8,3.6)))*use;
+   arrowAt(point,ease(age,0,.72),alpha,1.15,7);
+  }
  }
 }
-function matchReadout(t,e){
- if(!e||e.from===undefined)return;
- const src=events.find(v=>v.gen===e.from&&v.cue===e.cue);
- const a=response(src,t),b=response(e,t);
- const x=530,y=113;
- label('SAME CUE',x,y,14,'#a7a7a3');
- label(cues[e.cue],x,y+29,24,'#e2e2df','Georgia');
- const caption='Probability of '+actions[e.cue].toLowerCase();
- label(caption,x+278,y,16,'#c2c2bd');
- for(const [i,probs] of [a,b].entries()){
-  const xx=x+278+i*141,p=probs[e.cue];
-  label(generations[i?e.gen:e.from],xx,y+29,18,'#e2e2df','Georgia');
-  rect(xx+27,y+19,58,3,'#464646');rect(xx+27,y+19,58*p,3,'#e3e3e0');
-  label(Math.round(100*p)+'%',xx+92,y+26,15,'#d4d4d0');
+function recordSelection(t,state){
+ const f=state.transfer;if(!f)return;
+ const leftBehind=f.available.filter(n=>!f.selected.includes(n));
+ const begin=state.stage.start,end=state.stage.end,u=ease(t,begin+.25,Math.min(end,begin+2.8));
+ const n=f.episodeCount,mid=774;
+ label('LOCAL EPISODES',133,106,15,'#aaa');label(n+' encounters',132,143,26,'#e0dfdd','Georgia');
+ label('SELECTED PATTERNS',mid-100,106,15,'#aaa');label(f.selected.join('  ·  '),mid-100,143,25,'#e8e7e5','Georgia');
+ label('REMAIN WITH '+numerals[f.src],1120,106,15,'#aaa');label(leftBehind.join('  ·  '),1120,143,23,'#c8c8c5','Georgia');
+ const start=326,stop=633;
+ // Many encounter marks converge on a narrower set of outputs, while the record stays at source.
+ for(let i=0;i<n;i++){
+  const y=161+i*4,sy=163+(i%Math.max(1,f.selectedCount))*13;
+  const point=p=>curve([start,y],[start+95,y],[stop-70,sy],[stop,sy],p);
+  rect(start-12,y-1,6,1.4,ink(.53));
+  arrowAt(point,u,.24,1,0);
+ }
+ for(let j=0;j<f.selectedCount;j++)rect(stop+4,161+j*13,13,3,ink(.85*u));
+}
+function probabilities(t,f){
+ if(!f)return;
+ const prob=p=>Math.round(p*100)+'%';
+ label('SAME CUE',105,107,15,'#aaa');label(f.cue,105,142,24,'#e4e4e0','Georgia');
+ label('RESPONSE',572,107,15,'#aaa');label(f.action,572,142,24,'#eee','Georgia');
+ label('PROBABILITY IN EACH MODEL',875,107,15,'#aaa');
+ for(const [n,p] of [[f.src,f.sourceProb],[f.dst,f.targetProb]]){
+  const x=875+(n===f.dst?255:0);
+  label(numerals[n],x,141,20,'#dededb','Georgia');
+  rect(x+38,131,104,4,'#373737');rect(x+38,131,p*104,4,'#d7d7d3');
+  label(prob(p),x+158,139,17,'#d8d8d4');
+ }
+}
+function totals(m){
+ return m.inherited+' inherited  /  '+m.acquired+' from encounters';
+}
+function lifeRecord(i,m,x,active){
+ const c=active?'#e5e5e1':'#adada9';
+ centered(numerals[i],x,529,24,c,'Georgia');
+ centered(totals(m),x,570,21,c);
+ centered(m.episodes+' encounters   /   model v'+m.version,x,600,16,active?'#c5c5c0':'#91918e');
+ const known=[...m.inheritedNames,...m.acquiredNames];
+ centered(known.length?known.join(' · '):'—',x,631,15,active?'#c2c2bd':'#888885');
+}
+function generationLink(t,i,start,end,begin,finish,inFlight){
+ const point=u=>pointOnArc(start,end,u,i?89:97);
+ arrowAt(point,ease(t,begin,begin+1),inFlight ? .91 : .34,1.7,12);
+ if(t<=begin)return;
+ const p=point(.49);centered('Model distillation',p[0],p[1]-17,17,ink(ease(t,begin,begin+1)*(inFlight ? .93 : .56)));
+ if(inFlight){
+  for(const offset of [0,.42,.84]){
+   const u=(t-begin-offset) / 2.55;
+   if(u>=0)packet(start,end,u%1,i?89:97,inFlight.sourceDist);
+  }
  }
 }
 function frame(t){
- const shot=shots.findLast(s=>t>=s[0])||shots[0];water(t);
- const x=[312,840,1344],y=[381,332,320].map((p,i)=>p+2*Math.sin(t*.43+i)),scale=[1.05,1.08,.85],tilt=[-.105,-.095,-.065];
- const anchors=x.map((v,i)=>[v-60*scale[i]*Math.cos(tilt[i]),y[i]-60*scale[i]*Math.sin(tilt[i])]);
- for(let i=0;i<3;i++)body(t,x[i],y[i],scale[i],tilt[i],0,0,0);
- const start=i=>[anchors[i][0]+23*scale[i],anchors[i][1]-5];
- const end=i=>[anchors[i][0]-25*scale[i],anchors[i][1]-4];
- const pending=events.find(e=>e.from!==undefined&&t>=e.begin-.1&&t<e.end+.35);
- const showCue=pending?.cue??(t<13.6?0:t<27.4?3:t<30.6?4:0);
- anchors.forEach(([px,py],i)=>{
-  const own=events.find(e=>e.gen===i&&e.cue===showCue);
-  if(own&&t>=own.begin-.3)profile(px+25,py-22,response(own,t),1);
- });
- for(const [i,begin,lift] of [[0,5,92],[1,19,90]]){
-  arc(start(i),end(i+1),ease(t,begin,begin+1.1),lift,pending?.from === i ? .91 : .42);
-  const pos=pointOnArc(start(i),end(i+1),.48,lift);g.save();g.textAlign='center';
-  label('Model distillation',pos[0],pos[1]-17,18,ink(.9*ease(t,begin,begin+1)));g.restore();
- }
- for(const e of events.filter(e=>e.from!==undefined)){
-  const source=events.find(v=>v.gen===e.from&&v.cue===e.cue);
-  const span=(e.end-e.begin)*.66;
-  for(const lag of [0,.28,.55])packet(start(e.from),end(e.gen),(t-e.begin-lag)/span,e.from?90:92,source.steps.at(-1));
- }
- for(const [gen,begin] of [[0,0],[1,13.7],[2,27.4]])encounter(t,x[gen]-40,y[gen]-scale[gen]*104,begin);
+ const s=growthState(Math.min(t,64)),f=s.transfer;
+ const shot=spans.findLast(e=>t>=e[0])||spans[0];
+ water(t);
+ const x=[302,820,1324],y=[367,354,334].map((v,i)=>v+2.2*Math.sin(t*.36+i)),sc=[1,1.025,.88],rt=[-.095,-.08,-.065];
+ const anchors=x.map((v,i)=>[v-60*sc[i]*Math.cos(rt[i]),y[i]-60*sc[i]*Math.sin(rt[i])]);
  for(let i=0;i<3;i++){
-  g.save();g.textAlign='center';label(['I','II','III'][i],x[i]-12,y[i]+117*scale[i]+22,26,'#dededb','Georgia');g.restore();
-  ledger(i,t,x[i]);
+  const visible=i===0?1:i===1?(.45+.55*ease(t,9,20)):(.38+.62*ease(t,45,56));
+  body(t,x[i],y[i],sc[i],rt[i],0,0,0,visible);
  }
- const px=anchors[0][0],py=anchors[0][1];path('M'+px+' '+(py+17)+' l-50 89 h-83',null,ink(.45),1);
- label('Pi 5 · 85 × 56 mm',px-159,py+126,16,'#cfcfca');
- label('BORN, NOT MADE',75,62,16,'#acacaa');g.save();g.textAlign='right';label('Inheritance',1526,62,21,'#ccc','Georgia');g.restore();
- matchReadout(t,pending);
- label('RESPONSE PATTERNS  /  SIMULATED',75,565,14,'#aaa');
- label(shot[1].toUpperCase(),76,739,17,'#aaa');label(shot[2],74,802,36,'#e8e8e5','Georgia');
+ for(let i=0;i<2;i++)generationLink(t,i,[anchors[i][0]+23,anchors[i][1]-7],[anchors[i+1][0]-22,anchors[i+1][1]-7],i?49:13,i?56:20,s.phase==='distill'&&f?.src===i?f:null);
+ if(s.phase==='encounter'||s.phase==='update'){
+  inputField(t,s,anchors[s.generation]);
+ }else if(s.phase==='select')recordSelection(t,s);
+ else if(s.phase==='distill'){
+  probabilities(t,f);
+  if(f){for(const [gen,dist] of [[f.src,f.sourceDist],[f.dst,f.targetDist]])profile(anchors[gen][0]+24,anchors[gen][1]-21,dist,1)}
+ }else{
+  centered('Partial inheritance',790,137,27,'#d8d8d4','Georgia');
+ }
+ for(let i=0;i<3;i++)lifeRecord(i,s.models[i],x[i],s.phase==='hold'||i===s.generation);
+ const p=anchors[0];path('M'+p[0]+' '+(p[1]+15)+' l-63 66 h-62',null,ink(.39),1);label('Pi 5 · 85 × 56 mm',p[0]-154,p[1]+103,15,'#bbb');
+ if(s.phase==='encounter'&&s.context.length&&s.latest){
+  const chance=v=>Math.round(v*100)+'%';
+  centered('P('+s.pattern.toLowerCase()+')    with current context  '+chance(s.contextProb)+'     /     from weights alone  '+chance(s.localProb),800,680,17,'#c8c8c4');
+ }
+ if(s.phase==='update'&&s.latest){
+  const m=s.models[s.generation],prob=Math.round(s.localProb*100);
+  centered('Local replay   ·   '+m.trainedEpisodes+' encounters   /   P('+s.pattern.toLowerCase()+')  '+prob+'%',800,680,17,'#dededb');
+ }
+ label('BORN, NOT MADE',72,52,15,'#aaa');g.save();g.textAlign='right';label('Memory inheritance',1528,52,20,'#ccc','Georgia');g.restore();
+ g.save();g.font='40px Georgia';const w=g.measureText(shot[2]).width;g.restore();
+ label(shot[2],70,774,Math.min(40,40*1450/w),'#ecece8','Georgia');
+ label(shot[3],72,824,20,'#bdbdb8');
  document.querySelector('.mobile').textContent=shot[2];
- const live=document.querySelector('.mobile-repertoire');
- live.textContent=generations.map((name,i)=>{const r=repertoire(i,t);return name+'   '+r.filter(e=>e.from!==undefined).length+' inherited  ·  '+r.filter(e=>e.from===undefined).length+' from encounters'}).join('\n');
+ document.querySelector('.mobile-tech').textContent=shot[3];
+ document.querySelector('.mobile-repertoire').textContent=numerals.map((v,i)=>v+'   '+totals(s.models[i])).join('\n');
 }
 let t=0,run=false,last=0,id=0;
 const play=document.getElementById('play'),seek=document.getElementById('seek'),clock=document.querySelector('time');
-function show(){frame(t);seek.value=t;clock.textContent='0:'+String(Math.floor(t)).padStart(2,'0')+' / 0:32';play.textContent=run?'Pause':t>=duration?'Replay':'Play'}
+function show(){frame(t);seek.value=t;clock.textContent=Math.floor(t/60)+':'+String(Math.floor(t)%60).padStart(2,'0')+' / 1:08';play.textContent=run?'Pause':t>=duration?'Replay':'Play'}
 function tick(now){if(!run)return;t=Math.min(duration,t+(now-last)/1000);last=now;if(t>=duration)run=false;show();if(run)id=requestAnimationFrame(tick)}
 function start(){cancelAnimationFrame(id);run=true;last=performance.now();show();id=requestAnimationFrame(tick)}
 function pause(){run=false;cancelAnimationFrame(id);show()}
 play.onclick=()=>{if(run)pause();else{if(t>=duration)t=0;start()}};document.getElementById('again').onclick=()=>{t=0;start()};
+document.querySelectorAll('.chapters button').forEach(button=>button.onclick=()=>{t=Number(button.dataset.time);start()});
 seek.oninput=()=>{t=Number(seek.value);pause()};
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&run)pause()});
-if(matchMedia('(prefers-reduced-motion: reduce)').matches){t=31.5;show()}else start();
+const requestedTime=new URLSearchParams(location.search).get('t');
+if(requestedTime!==null&&requestedTime.trim()!==''&&Number.isFinite(Number(requestedTime))){
+ t=Math.max(0,Math.min(duration,Number(requestedTime)));show();
+}else if(matchMedia('(prefers-reduced-motion: reduce)').matches){t=66;show()}else start();
 </script></body></html>
