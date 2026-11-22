@@ -5,6 +5,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
+@layer cinema, monochrome;
 /* Stage 3 workspace on the site's black: 3D viewport, readouts and panels on the right, G-code and log below, a scrubbable timeline across the bottom. */
 :root {
   --bg: #0c0c0d; --region: #141415; --header: #19191b; --panel: #1d1d20; --field: #0f0f10; --line: #2a2a2c;
@@ -44,6 +45,13 @@ body { font: 12.5px/1.45 var(--sans); -webkit-font-smoothing: antialiased; overf
 .lab { position: absolute; left: 0; top: 0; pointer-events: none; font: 500 10.5px var(--sans); color: #dfe7ee; background: #0c0c0dc0; border: 1px solid #33404b; border-radius: 3px; padding: 1px 5px; white-space: nowrap; transform: translate(-50%, -130%); }
 .lab.w { color: #9cc8ec; border-color: #2c4a63; }
 .lab.k { color: #e3b36a; border-color: #5a4a2c; }
+/* the labels sit on the picture like film captions: no boxes, small letterspaced type, a hairline down to the part */
+@layer cinema {
+  .app .lab { background: none !important; color: rgb(255 255 255 / 72%) !important; font: 500 9.5px/1 var(--mono); letter-spacing: .09em; text-transform: uppercase; text-shadow: 0 0 5px #000, 0 0 2px #000; padding: 0 0 12px; }
+  .app .lab::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 1px; height: 9px; background: rgb(255 255 255 / 40%); }
+  .app .ov { background: linear-gradient(90deg, rgb(0 0 0 / 62%), rgb(0 0 0 / 38%) 70%, rgb(0 0 0 / 0%)) !important; }
+  .app .notes div { background: rgb(0 0 0 / 50%) !important; }
+}
 .cams { display: inline-flex; gap: 0; }
 .btn { font: 500 11.5px var(--sans); color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; cursor: pointer; white-space: nowrap; }
 .btn:hover { background: #26262a; }
@@ -52,6 +60,9 @@ body { font: 12.5px/1.45 var(--sans); -webkit-font-smoothing: antialiased; overf
 .cams .btn { border-radius: 0; margin-left: -1px; }
 .cams .btn:first-child { border-radius: 999px 0 0 999px; margin-left: 0; }
 .cams .btn:last-child { border-radius: 0 999px 999px 0; }
+.cams.inner { align-items: center; gap: 2px; margin-right: 6px; }
+.cams.inner .tl2 { color: var(--muted); font-size: 11.5px; margin-right: 2px; }
+.cams.inner .bar2 { color: var(--dim); }
 button:focus-visible, input:focus-visible, a:focus-visible, .track:focus-visible { outline: 1px solid var(--gel); outline-offset: 1px; }
 .side { grid-area: side; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 2px; min-height: 0; }
 .ro { padding: 8px 10px 10px; display: grid; grid-template-columns: 1fr; gap: 6px; overflow: auto; max-height: 56vh; }
@@ -162,7 +173,8 @@ button:focus-visible, input:focus-visible, a:focus-visible, .track:focus-visible
   </header>
 
   <section class="area view" aria-label="3D viewport">
-    <div class="ahead"><b>3D Viewport</b><span class="opt">white clay, Rotrics DexArm</span><span class="sp"></span>
+    <div class="ahead"><b>3D Viewport</b><span class="opt">glass tank, one lamp above</span><span class="sp"></span>
+      <div class="cams inner" role="group" aria-label="Inner light"><span class="tl2" id="innerLbl">Inner light:</span><button class="btn on" data-inner="off" aria-pressed="true" aria-describedby="innerLbl">off</button><span class="bar2" aria-hidden="true">|</span><button class="btn" data-inner="on" aria-pressed="false" aria-describedby="innerLbl">on</button></div>
       <div class="cams" role="group" aria-label="Camera">
         <button class="btn" data-cam="overview">Side</button><button class="btn" data-cam="section">Section</button><button class="btn" data-cam="print">Print</button><button class="btn" data-cam="opening">Opening</button>
       </div>
@@ -216,6 +228,7 @@ button:focus-visible, input:focus-visible, a:focus-visible, .track:focus-visible
 <section class="doc" id="how">
   <h2>How this is simulated</h2>
   <p>The parent body is one clear body made of two parts held by magnets: the gel chamber, with a flat floor and the gel trough under it, and the tail, a tapering shell with the folded Rotrics DexArm inside. The hull follows the logic of the artist's side section and every dimension is calculated (see How each dimension is set); the arm, the parts in the tail and the magnets are those of the v2 design. Following the decisions of 20 and 21 November 2026, the gel chamber is a hard shell with no belly pleats, no top ring, no petals, no lips and no sock canal. The birth opening in the vertical front face is a plain opening with a thin 3 mm lip and no magnets; the docking face is at the other end of the gel chamber, with a thin 4 mm lip and the three magnets. As in the artist's sketch of 21 November, the gel sits only in a small trough under the gel chamber, sized to the folded newborn, and comes from the tail through a bottom channel; the rest of the gel chamber stays air. The arm comes out of the tail, changes the needle module for the suction module at a small rack, places one electronics kit with the suction cup, changes back to the needle module, prints the folded newborn around the kit, then pushes the newborn up a smooth chute and out of the birth opening. All the air comes through the arm: a pump in the tail, an air line along the boom and the arm, the needle in the newborn's valve. While the arm pushes, each segment opens only after the segment has passed out through the opening; at full reach the arm holds the needle in until the body is full, about 0.53 m long and 0.38 m across, then lets go. There are no contractions.</p>
+  <p>The staging: the whole cycle is shown inside one square glass tank on a dark plinth in a black room, under a single lamp straight above, the way a museum lights a vitrine, so the birth is watched in a pool of light with the room and the people in the dark. The mood follows tank and aquarium works and artists' films, among them Pierre Huyghe's aquariums, Philippe Parreno's lit rooms, Liam Young's film worlds and Ian Cheng's live simulations; nothing is copied from them. The light is one spotlight with soft shadows; the ripples on the water throw moving caustics on the parent body, the tank floor and the glass, and the picture is finished like film (ACES tone mapping, bloom, a little grain, a shallow focus when the camera is close). The switch above the view adds a few slow inner lights in the parent body and the newborn, which grow stronger at the birth. None of this changes the physics.</p>
   <p>Every number on this page comes from <code>stage3_egg.json</code>, written by a Python script (<code>bnm_design/stage3_egg/physics_egg.py</code>) that reads the same mesh file the page draws. The body is designed in <code>bnm_design/baby_fullsize/</code> (a design study with figures). The browser replays and interpolates. The clock shows real process time; the view runs as a time lapse, slower during the birth.</p>
   <h4>How each dimension is set</h4>
   <div class="derivfig"><figure><img src="sketch_section.jpg" alt="The artist's side section sketch" loading="lazy"><figcaption>The artist's sketch: the logic the design follows (flat floored gel chamber, trough under the floor, low channel, vertical seam, tapering tail, opening at the front). No dimension is traced from the drawing.</figcaption></figure>
@@ -287,63 +300,116 @@ function log(msg, cls = "") {
 /* ================================================================ three.js: z up, meters, womb frame of scene_v2 */
 let R3 = null;
 const UW = { uTime: { value: 0 }, uWL: { value: -0.13 } };
+/* the gallery: one square glass tank on a dark plinth, one spotlight straight above. CU holds what every shader needs to know about the light, the tank and the inner lights. */
+const TANK = { x0: -2.75, x1: 2.05, y0: -2.4, y1: 2.4, zf: -0.62, zt: 0.42, th: 0.045, zr: -1.3, lamp: [-0.35, 0, 3.4] };
+const CU = { uLP: { value: new THREE.Vector3(...TANK.lamp) }, uLD: { value: new THREE.Vector3(0, 0, -1) }, uLC: { value: new THREE.Vector2(Math.cos(0.95), Math.cos(0.95 * 0.19)) }, uLI: { value: 62 },
+  uTank: { value: new THREE.Vector4(TANK.x0, TANK.y0, TANK.x1, TANK.y1) }, uTankZ: { value: TANK.zf }, uCaus: { value: 1 }, uLineK: { value: 0.05 },
+  uIL: { value: [0, 1, 2, 3].map(() => new THREE.Vector4(0, 0, 0, 0)) }, uILc: { value: new THREE.Color(1.0, 0.62, 0.34) } };
+const GLSL_CINE = `
+uniform vec3 uLP; uniform vec3 uLD; uniform vec2 uLC; uniform float uLI; uniform vec4 uTank; uniform float uTankZ; uniform float uCaus; uniform float uLineK; uniform vec4 uIL[4]; uniform vec3 uILc;
+float spotK(vec3 p) { vec3 d = p - uLP; float r2 = dot(d, d); float c = dot(d, uLD) * inversesqrt(r2); return smoothstep(uLC.x, uLC.y, c) / max(r2, 0.3); }
+float inTank(vec3 p) { return step(uTank.x, p.x) * step(p.x, uTank.z) * step(uTank.y, p.y) * step(p.y, uTank.w) * step(uTankZ - 0.03, p.z); }
+/* caustics: seven slow ripples on the surface bend the light; the brightness on a plane below is one over the determinant of the map from the surface to that plane */
+float causW(vec2 p, float t, float g) {
+  p *= 1.45; p += 0.035 * sin(p.yx * vec2(5.3, 4.7) + t * vec2(0.31, -0.27));
+  float sxx = 0.0, syy = 0.0, sxy = 0.0;
+  for (int i = 0; i < 7; i++) { float fi = float(i); float th = 0.3 + 1.63 * fi + 0.11 * fi * fi; float k = 9.0 + 2.2 * fi + 0.45 * fi * fi; float s = 0.42 - 0.026 * fi;
+    vec2 d = vec2(cos(th), sin(th)); float a = g * s * sin(k * dot(d, p) - 0.33 * sqrt(9.81 * k) * t + 1.7 * fi);
+    sxx += a * d.x * d.x; syy += a * d.y * d.y; sxy += a * d.x * d.y; }
+  float det = (1.0 + sxx) * (1.0 + syy) - sxy * sxy;
+  return min(1.0 / ((abs(det) + 0.16) * (0.55 + 0.85 * g)), 3.4);
+}
+float shaftW(vec2 p, float t) { float a = sin(7.0 * p.x + 3.1 * p.y - 0.7 * t) + sin(-4.3 * p.x + 8.2 * p.y + 0.5 * t) + sin(11.0 * p.x - 9.0 * p.y - 0.9 * t + 1.3); return smoothstep(-1.2, 2.6, a); }
+vec3 ripN(vec3 p, float t) { vec3 g = vec3(0.0);
+  for (int i = 0; i < 4; i++) { float fi = float(i); vec3 k = vec3(sin(1.7 * fi + 0.4), cos(2.3 * fi), sin(0.9 * fi + 1.1)) * (22.0 + 13.0 * fi); g += k * cos(dot(k, p) - (0.9 + 0.35 * fi) * t) / (22.0 + 13.0 * fi); }
+  return g * 0.25; }
+vec3 innerGlow(vec3 p) { vec3 s = vec3(0.0); for (int i = 0; i < 4; i++) { vec3 d = p - uIL[i].xyz; s += uILc * uIL[i].w / (dot(d, d) + 0.006); } return s; }
+vec3 innerLit(vec3 p, vec3 nV) { vec3 s = vec3(0.0); for (int i = 0; i < 4; i++) { vec3 d = uIL[i].xyz - p; vec3 dv = normalize((viewMatrix * vec4(d, 0.0)).xyz); s += uILc * uIL[i].w / (dot(d, d) + 0.006) * (0.25 + 0.75 * abs(dot(nV, dv))); } return s; }
+float vnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); vec4 h = fract(sin(vec4(dot(i, vec2(127.1, 311.7)), dot(i + vec2(1.0, 0.0), vec2(127.1, 311.7)), dot(i + vec2(0.0, 1.0), vec2(127.1, 311.7)), dot(i + vec2(1.0, 1.0), vec2(127.1, 311.7)))) * 43758.5453); return mix(mix(h.x, h.y, f.x), mix(h.z, h.w, f.x), f.y); }
+float fbm(vec2 p) { return 0.5 * vnoise(p) + 0.25 * vnoise(p * 2.03 + 7.1) + 0.125 * vnoise(p * 4.1 + 3.3) + 0.0625 * vnoise(p * 8.3 + 1.7); }
+`;
 const WAVES = [[0.0018, 0.62, 0.1, 2.46, 0.0], [0.0007, 2.4, 1.1, 4.8, 1.3]];
 const GLSL_ETA = "uniform float uTime; uniform float uWL;\nfloat etaB(vec2 p){ return 0.0018 * sin(0.62 * p.x + 0.1 * p.y - 2.46 * uTime) + 0.0007 * sin(2.4 * p.x + 1.1 * p.y - 4.8 * uTime + 1.3); }\n";
 function addWater(sh, opt) {
-  Object.assign(sh.uniforms, UW); sh.uniforms.uLine = { value: opt.line ?? 0.9 }; sh.uniforms.uSub = { value: opt.sub ?? 0 };
-  sh.vertexShader = "varying vec3 vWPw;\n" + sh.vertexShader.replace("#include <project_vertex>", "#include <project_vertex>\nvWPw = (modelMatrix * vec4(transformed, 1.0)).xyz;");
-  const tail = "{ float dW = vWPw.z - (uWL + etaB(vWPw.xy)); float fwW = max(fwidth(dW), 1e-5);\n float lineW = 1.0 - smoothstep(0.7, 1.9, abs(dW) / fwW); float belowW = smoothstep(0.0, 0.006, -dW);\n gl_FragColor.rgb = mix(gl_FragColor.rgb, gl_FragColor.rgb * vec3(0.36, 0.48, 0.6) + vec3(0.0, 0.015, 0.035), belowW * uSub);\n gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.80, 0.92, 1.0), lineW * uLine); gl_FragColor.a = max(gl_FragColor.a, lineW * uLine * 0.85); }\n";
-  sh.fragmentShader = "varying vec3 vWPw; uniform float uLine; uniform float uSub;\n" + GLSL_ETA + sh.fragmentShader.replace("#include <output_fragment>", "#include <output_fragment>\n" + (opt.pre || "") + tail);
+  Object.assign(sh.uniforms, UW, CU); sh.uniforms.uLine = { value: opt.line ?? 0.9 }; sh.uniforms.uSub = { value: opt.sub ?? 0 }; sh.uniforms.uSSS = { value: opt.sss ?? 0.08 }; sh.uniforms.uSSSi = { value: opt.sssi ?? 0.1 }; sh.uniforms.uGrain = { value: opt.grain ?? 0.16 };
+  sh.vertexShader = "varying vec3 vWPw; varying vec3 vOPw;\n" + sh.vertexShader.replace("#include <project_vertex>", "#include <project_vertex>\nvWPw = (modelMatrix * vec4(transformed, 1.0)).xyz; vOPw = transformed;");
+  // under water the direct light is redistributed by the caustics; thin translucent parts also pass some light to the side turned away from the lamp, and glow a little round the inner lights
+  const light = `#include <lights_fragment_end>
+  { float dWc = vWPw.z - uWL; float und = smoothstep(0.004, -0.02, dWc) * inTank(vWPw); float dep = clamp(-dWc / 0.4, 0.0, 1.0);
+    float cm = mix(1.0, causW(vWPw.xy, uTime, 0.75 + 0.8 * dep), und * uCaus);
+    reflectedLight.directDiffuse *= cm; reflectedLight.directSpecular *= cm;
+    vec3 Lv = normalize((viewMatrix * vec4(normalize(uLP - vWPw), 0.0)).xyz);
+    float back = clamp(0.4 - 0.6 * dot(normal, Lv), 0.0, 1.0);
+    reflectedLight.directDiffuse += diffuseColor.rgb * RECIPROCAL_PI * (uSSS * back * spotK(vWPw) * uLI * cm + uSSSi * innerLit(vWPw, normal)); }\n`;
+  const grain = "#include <color_fragment>\n if (uGrain > 0.0) { float gn = fbm(vOPw.xy * 3.1 + vOPw.z * 2.3) * 0.6 + fbm(vOPw.xy * 37.0 + vOPw.z * 29.0) * 0.4; diffuseColor.rgb *= 1.0 + uGrain * (gn - 0.47) * 2.0; }\n";
+  const tail = "{ float dW = vWPw.z - (uWL + etaB(vWPw.xy)); float fwW = max(fwidth(dW), 1e-5);\n float lineW = (1.0 - smoothstep(0.7, 1.9, abs(dW) / fwW)) * inTank(vWPw); float belowW = smoothstep(0.0, 0.006, -dW) * inTank(vWPw);\n gl_FragColor.rgb = mix(gl_FragColor.rgb, gl_FragColor.rgb * vec3(0.62, 0.76, 0.84), belowW * uSub);\n gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.80, 0.92, 1.0) * (0.02 + uLineK * spotK(vWPw) * uLI), lineW * uLine); gl_FragColor.a = max(gl_FragColor.a, lineW * uLine * 0.85); }\n";
+  let fs = sh.fragmentShader;
+  if (opt.rip) fs = fs.replace("#include <normal_fragment_maps>", "#include <normal_fragment_maps>\n normal = normalize(normal + " + opt.rip.toFixed(3) + " * (viewMatrix * vec4(ripN(vWPw, uTime), 0.0)).xyz);\n");
+  fs = fs.replace("#include <color_fragment>", grain).replace("#include <lights_fragment_end>", light).replace("#include <output_fragment>", "#include <output_fragment>\n" + (opt.pre || "") + tail);
+  sh.fragmentShader = "varying vec3 vWPw; varying vec3 vOPw; uniform float uLine; uniform float uSub; uniform float uSSS; uniform float uSSSi; uniform float uGrain;\n" + GLSL_ETA + GLSL_CINE + fs;
 }
 const SECT = new THREE.Plane(new THREE.Vector3(0, 1, 0), 100);      // section view: hides the near half (y < 0) when the constant is 0
 const PRINTCLIP = new THREE.Plane(new THREE.Vector3(0, 0, -1), 100);
-function clayMat(hex, o = {}) {
-  const m = new THREE.MeshPhongMaterial({ color: new THREE.Color(hex).convertSRGBToLinear(), shininess: o.shine ?? 8, specular: 0x111111, side: o.side || THREE.FrontSide, flatShading: !!o.flat });
+function clayMat(hex, o = {}) {      // white clay as a physically based material: rough, with a little light passing through
+  const m = new THREE.MeshStandardMaterial({ color: new THREE.Color(hex).convertSRGBToLinear(), roughness: o.rough ?? 0.6, metalness: 0, side: o.side || THREE.FrontSide, flatShading: !!o.flat });
   if (o.opacity !== undefined && o.opacity < 1) { m.transparent = true; m.opacity = o.opacity; m.depthWrite = !!o.depthWrite; }
   if (o.clip) m.clippingPlanes = o.clip;
-  m.onBeforeCompile = (sh) => addWater(sh, o); m.customProgramCacheKey = () => "clay" + (o.line ?? 0.9) + (o.sub ?? 0);
+  m.onBeforeCompile = (sh) => addWater(sh, o); m.customProgramCacheKey = () => "clay" + (o.line ?? 0.9) + (o.sub ?? 0) + (o.sss ?? "") + (o.sssi ?? "") + (o.grain ?? "") + (o.rip ?? "");
   return m;
 }
-function shellMat(a0, a1, clip) {
-  const m = new THREE.MeshPhongMaterial({ color: 0xffffff, transparent: true, depthWrite: false, side: THREE.DoubleSide });
+function shellMat(a0, a1, clip) {    // the clear shell: a thin wall, so what passes is the scene behind, less the Fresnel reflection; the highlights, the rim and the ripple shimmer are added on top
+  const m = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(0xe6ecee).convertSRGBToLinear(), roughness: 0.13, metalness: 0, transparent: true, depthWrite: false, side: THREE.DoubleSide,
+    blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor });
   if (clip) m.clippingPlanes = clip;
   m.onBeforeCompile = (sh) => {
     sh.uniforms.uA0 = { value: a0 }; sh.uniforms.uA1 = { value: a1 };
     sh.fragmentShader = "uniform float uA0; uniform float uA1;\n" + sh.fragmentShader;
-    addWater(sh, { line: 1.0, sub: 0.5, pre: "{ float fr = pow(1.0 - abs(dot(normalize(vNormal), normalize(vViewPosition))), 2.4); gl_FragColor = vec4(mix(vec3(0.86, 0.85, 0.82), vec3(0.92, 0.94, 0.97), fr), uA0 + uA1 * fr); }\n" });
+    addWater(sh, { line: 1.0, sub: 0.5, sss: 0.3, sssi: 0.0, rip: 0.11, pre: `{ float fr = pow(1.0 - abs(dot(normal, normalize(vViewPosition))), 2.6); float aS = clamp(uA0 * 0.55 + uA1 * 0.75 * fr, 0.0, 1.0);
+      float litS = spotK(vWPw) * uLI; float shS = causW(vWPw.xy * 1.3 + vWPw.z * vec2(0.9, 0.5), uTime, 0.95);
+      vec3 milkS = totalDiffuse * (0.04 + 0.4 * aS) * (0.55 + 0.45 * shS);
+      vec3 rimS = vec3(0.92, 0.96, 1.0) * litS * (0.016 * fr + 0.004 * max(shS - 0.8, 0.0));
+      vec3 glowS = innerGlow(vWPw) * (0.012 + 0.05 * fr);
+      gl_FragColor = vec4(milkS + totalSpecular + rimS + glowS, aS); }\n` });
   };
   m.customProgramCacheKey = () => "shell" + a0 + a1;
   return m;
 }
+function litLine(mat, gain = 1, glow = 0.02) {     // crease and bead lines are lit by the lamp and fade into the dark instead of drawing at one brightness
+  mat.onBeforeCompile = (sh) => { Object.assign(sh.uniforms, UW, CU);
+    sh.vertexShader = "varying vec3 vWPw;\n" + sh.vertexShader.replace("#include <project_vertex>", "#include <project_vertex>\nvWPw = (modelMatrix * vec4(transformed, 1.0)).xyz;");
+    sh.fragmentShader = "varying vec3 vWPw;\n" + GLSL_ETA + GLSL_CINE + sh.fragmentShader.replace("#include <output_fragment>", "#include <output_fragment>\n gl_FragColor.rgb = gl_FragColor.rgb * " + gain.toFixed(3) + " * (0.012 + 0.2 * spotK(vWPw) * uLI) + innerGlow(vWPw) * " + glow.toFixed(3) + ";\n"); };
+  mat.customProgramCacheKey = () => "litline" + gain + "_" + glow; return mat;
+}
 function edgeLines(mesh, ang = 35, op = 0.22, hex = 0xdfe3ea, clip) {
-  const mat = new THREE.LineBasicMaterial({ color: hex, transparent: true, opacity: op, depthWrite: false }); if (clip) mat.clippingPlanes = clip;
+  const mat = litLine(new THREE.LineBasicMaterial({ color: hex, transparent: true, opacity: op, depthWrite: false })); if (clip) mat.clippingPlanes = clip;
   const e = new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry, ang), mat); e.raycast = () => {}; e.renderOrder = mesh.renderOrder + 1; mesh.add(e); return e;
 }
 function initThree() {
   const host = $("#vp");
-  const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
-  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); renderer.outputEncoding = THREE.sRGBEncoding; renderer.localClippingEnabled = true;
+  const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: true, powerPreference: "high-performance" });
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); renderer.outputEncoding = THREE.LinearEncoding;   /* the last film pass writes sRGB */ renderer.localClippingEnabled = true;
   host.prepend(renderer.domElement);
-  const scene = new THREE.Scene(); scene.background = new THREE.Color(0x070708);
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(0x000000);
   const camera = new THREE.PerspectiveCamera(32, 1, 0.01, 60); camera.up.set(0, 0, 1);
   const controls = new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping = true; controls.dampingFactor = 0.1;
-  controls.addEventListener("start", () => { if (AUTO) setAuto(false); });
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x2a2c31, 0.8).translateZ(1));
-  const key = new THREE.DirectionalLight(0xffffff, 0.8); key.position.set(1.0, -2.4, 3.0); scene.add(key);
-  const key2 = new THREE.DirectionalLight(0xffffff, 0.3); key2.position.set(-1.6, 2.0, 1.4); scene.add(key2);
-  const fill = new THREE.DirectionalLight(0xa9c3dc, 0.3); fill.position.set(-2.4, -1.6, -0.9); scene.add(fill);
+  controls.addEventListener("start", () => { if (AUTO) setAuto(false); CAMMOVE = false; });
+  // one lamp straight above the tank; the dim hemisphere stands for that lamp's light coming back off the floor and the water
+  const spot = new THREE.SpotLight(0xfff2e0, CU.uLI.value, 0, 0.95, 0.81, 2); spot.position.set(...TANK.lamp); spot.target.position.set(TANK.lamp[0], TANK.lamp[1], -1); scene.add(spot); scene.add(spot.target);
+  spot.castShadow = true; spot.shadow.mapSize.set(2048, 2048); spot.shadow.camera.near = 1.5; spot.shadow.camera.far = 9.5; spot.shadow.bias = -0.0005; spot.shadow.normalBias = 0.004;
+  const bounce = new THREE.HemisphereLight(0xffffff, 0xffffff, 1); bounce.color.setRGB(0.035, 0.036, 0.04); bounce.groundColor.setRGB(0.27, 0.29, 0.32); bounce.position.set(0, 0, 1); scene.add(bounce);
   const vessel = new THREE.Group(); scene.add(vessel);                 // the egg: moves with heave, trim and when the mother swims
   const womb = new THREE.Group(); vessel.add(womb);
   const tailP = new THREE.Group(); vessel.add(tailP);                  // tail pivot at the docking face
   const tail = new THREE.Group(); tail.position.x = 0.3835; tailP.add(tail);   // tail parts and the arm, in womb frame coordinates when docked
   const arm = new THREE.Group(); tail.add(arm);
   const baby = new THREE.Group(); scene.add(baby);
-  R3 = { renderer, scene, camera, controls, vessel, womb, tailP, tail, arm, baby, host };
-  new ResizeObserver(resize).observe(host); resize();
+  R3 = { renderer, scene, camera, controls, vessel, womb, tailP, tail, arm, baby, host, spot, bounce };
+  cineInit(); new ResizeObserver(resize).observe(host); resize();
 }
 function resize() {
   const { renderer, camera, host } = R3; const w = host.clientWidth, h = host.clientHeight; if (!w || !h) return;
   renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+  if (CINE.Q) { const s = renderer.getDrawingBufferSize(new THREE.Vector2()); if (s.x !== CINE.w || s.y !== CINE.h) cineTargets(s.x, s.y); }
 }
 
 /* ================================================================ the egg from the v2 meshes */
@@ -398,10 +464,10 @@ function buildGel() {
   }
   for (const i of [0, ns - 1]) for (let k = 0; k < n - 1; k++) { const a = (i * n + k) * 2, b = (i * n + k + 1) * 2; idx.push(a, b, a + 1, b, b + 1, a + 1); }
   const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setIndex(idx);
-  const m = new THREE.MeshPhongMaterial({ color: new THREE.Color(0x4f8fcf).convertSRGBToLinear(), transparent: true, opacity: 0.22, depthWrite: false, side: THREE.DoubleSide, shininess: 40, specular: 0x334455, clippingPlanes: [SECT] });
+  const m = clayMat(0x6fa3d6, { opacity: 0.26, side: THREE.DoubleSide, clip: [SECT], rough: 0.16, sss: 0.5, sssi: 0.9, line: 0 });
   const mesh = new THREE.Mesh(g, m); mesh.renderOrder = 5; mesh.frustumCulled = false; R3.womb.add(mesh);
   const lg = new THREE.BufferGeometry(); lg.setAttribute("position", new THREE.BufferAttribute(new Float32Array(ns * 2 * 3), 3));
-  const line = new THREE.LineLoop(lg, new THREE.LineBasicMaterial({ color: 0x9cc8ec, transparent: true, opacity: 0.85, clippingPlanes: [SECT] })); line.frustumCulled = false; R3.womb.add(line);
+  const line = new THREE.LineLoop(lg, litLine(new THREE.LineBasicMaterial({ color: 0x9cc8ec, transparent: true, opacity: 0.85, clippingPlanes: [SECT] }), 1.6, 0.05)); line.frustumCulled = false; R3.womb.add(line);
   GEL = { mesh, line, secs, n, ns, level: null };
 }
 function setGel(level) {
@@ -434,7 +500,7 @@ function buildChute() {
 function jetPlume(r0, len) {
   const pos = []; const n = 14; for (let i = 0; i < n; i++) { const a = i / n * 2 * Math.PI, b = r0 * 0.8; pos.push(0, b * Math.cos(a), b * Math.sin(a), -len, 2.6 * b * Math.cos(a + 0.3), 2.6 * b * Math.sin(a + 0.3)); }
   const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
-  return new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0xcfe6fa, transparent: true, opacity: 0, depthWrite: false }));
+  return new THREE.LineSegments(g, litLine(new THREE.LineBasicMaterial({ color: 0xcfe6fa, transparent: true, opacity: 0, depthWrite: false }), 2.2));
 }
 function setJet(j, k, t) { j.material.opacity = 0.45 * k * (0.75 + 0.25 * Math.sin(t * 23 + j.id)); j.scale.set(Math.max(0.05, k), 1, 1); j.visible = k > 0.01; }
 function torusAt(c, n, R, r, mat, parent) {     // thin rim on a circle (center c, normal n, radius R, tube radius r)
@@ -478,23 +544,35 @@ function buildWombParts() {
 /* ================================================================ water: surface with waves, masked inside the two waterplanes */
 let WATER = null;
 const WMASK = { uMB: { value: new Array(64).fill(-1) }, uTB: { value: new Array(64).fill(-1) }, uMF: { value: new THREE.Vector4(0, 0, 0, 1) }, uTF: { value: new THREE.Vector4(0, 0, 0, 1) } };
-function buildWater() {
-  const WL = J.WL, cx = 0.2, W = 10, Hh = 7, D = 0.9;
+function buildWater() {      // the water fills the tank to the waterline; the surface keeps the two waterplane cut outs and the drawn swell, and gets ripples, Fresnel and the mirror image of what stands above
+  const WL = J.WL, T = TANK, W = T.x1 - T.x0, Hh = T.y1 - T.y0;
   const m0 = J.scene.wp_womb, t0 = J.scene.wp_tail; WMASK.uMB.value = m0.b.slice(); WMASK.uTB.value = t0.b.slice(); WMASK.uMF.value.set(0, 0, m0.x0, m0.dx); WMASK.uTF.value.set(0, 0, t0.x0, t0.dx);
-  const g = new THREE.PlaneGeometry(W, Hh, 220, 150); g.translate(cx, 0, 0);
-  const m = new THREE.MeshPhongMaterial({ color: new THREE.Color(0x0f2a3f).convertSRGBToLinear(), specular: 0x7f9bb3, shininess: 70, transparent: true, opacity: 0.5, depthWrite: false, side: THREE.DoubleSide, clippingPlanes: [SECT] });
-  m.onBeforeCompile = (sh) => {
-    Object.assign(sh.uniforms, UW, WMASK);
-    sh.fragmentShader = "uniform float uMB[64]; uniform float uTB[64]; uniform vec4 uMF; uniform vec4 uTF; varying vec2 vXY;\nfloat hbM(float x) { float u = (x - uMF.z) / uMF.w; if (u < 0.0 || u > 63.0) return -1.0; int i = int(floor(u)); return mix(uMB[i], uMB[min(i + 1, 63)], u - float(i)); }\nfloat hbT(float x) { float u = (x - uTF.z) / uTF.w; if (u < 0.0 || u > 63.0) return -1.0; int i = int(floor(u)); return mix(uTB[i], uTB[min(i + 1, 63)], u - float(i)); }\n"
-      + sh.fragmentShader.replace("void main() {", "void main() {\n if (abs(vXY.y - uMF.y) < hbM(vXY.x - uMF.x) - 0.002) discard;\n if (abs(vXY.y - uTF.y) < hbT(vXY.x - uTF.x) - 0.002) discard;");
-    sh.vertexShader = "varying vec2 vXY;\n" + GLSL_ETA + sh.vertexShader.replace("#include <begin_vertex>", "vec3 transformed = vec3(position.xy, uWL + etaB(position.xy)); vXY = position.xy;");
-  };
+  const g = new THREE.PlaneGeometry(W, Hh, 200, 200); g.translate((T.x0 + T.x1) / 2, (T.y0 + T.y1) / 2, 0);
+  const m = new THREE.ShaderMaterial({ uniforms: Object.assign({ tRefl: { value: null }, uReflM: { value: new THREE.Matrix4() }, uReflOn: { value: 0 } }, UW, CU, WMASK), transparent: true, depthWrite: false, side: THREE.DoubleSide,
+    blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
+    vertexShader: "varying vec2 vXY; varying vec3 vW; varying vec4 vRf; uniform mat4 uReflM;\n" + GLSL_ETA + "void main() { vec3 p = vec3(position.xy, uWL + etaB(position.xy)); vXY = position.xy; vW = p; vRf = uReflM * vec4(p.xy, uWL, 1.0); gl_Position = projectionMatrix * viewMatrix * vec4(p, 1.0); }",
+    fragmentShader: "uniform float uMB[64]; uniform float uTB[64]; uniform vec4 uMF; uniform vec4 uTF; uniform sampler2D tRefl; uniform float uReflOn; varying vec2 vXY; varying vec3 vW; varying vec4 vRf;\n" + GLSL_ETA + GLSL_CINE + `
+float hbM(float x) { float u = (x - uMF.z) / uMF.w; if (u < 0.0 || u > 63.0) return -1.0; int i = int(floor(u)); return mix(uMB[i], uMB[min(i + 1, 63)], u - float(i)); }
+float hbT(float x) { float u = (x - uTF.z) / uTF.w; if (u < 0.0 || u > 63.0) return -1.0; int i = int(floor(u)); return mix(uTB[i], uTB[min(i + 1, 63)], u - float(i)); }
+void main() {
+  float eM = abs(vXY.y - uMF.y) - (hbM(vXY.x - uMF.x) - 0.002), eT = abs(vXY.y - uTF.y) - (hbT(vXY.x - uTF.x) - 0.002);
+  if (eM < 0.0) discard; if (eT < 0.0) discard;
+  vec2 gr = vec2(0.0);
+  for (int i = 0; i < 6; i++) { float fi = float(i); float th = 0.3 + 1.63 * fi + 0.11 * fi * fi; float k = 9.0 + 2.2 * fi + 0.45 * fi * fi; vec2 d = vec2(cos(th), sin(th)); gr += d * cos(k * dot(d, vXY) - 0.33 * sqrt(9.81 * k) * uTime + 1.7 * fi) * (0.026 - 0.002 * fi); }
+  gr += 0.008 * vec2(cos(61.0 * vXY.x + 23.0 * vXY.y - 2.1 * uTime), cos(-37.0 * vXY.x + 53.0 * vXY.y + 1.7 * uTime));
+  vec3 V = normalize(cameraPosition - vW); float sg = V.z < 0.0 ? -1.0 : 1.0; vec3 N = normalize(vec3(-gr, 1.0)) * sg;
+  float ndv = clamp(dot(N, V), 0.0, 1.0), F = 0.02 + 0.98 * pow(1.0 - ndv, 5.0);
+  float lit = spotK(vW) * uLI; vec3 H = normalize(normalize(uLP - vW) + V);
+  float spec = pow(max(dot(N, H), 0.0), 700.0) * lit * 5.0;
+  vec2 ru = vRf.xy / vRf.w + N.xy * 0.04; vec2 rb = vec2(0.0018, 0.0026);
+  vec3 refl = (texture2D(tRefl, ru + rb).rgb + texture2D(tRefl, ru - rb).rgb + texture2D(tRefl, ru + vec2(rb.x, -rb.y)).rgb + texture2D(tRefl, ru - vec2(rb.x, -rb.y)).rgb) * 0.25 * uReflOn * (sg > 0.0 ? 1.0 : 0.0);
+  float men = (1.0 - smoothstep(0.0, 0.012, min(eM, eT))) + (1.0 - smoothstep(0.0, 0.014, min(min(vXY.x - uTank.x, uTank.z - vXY.x), min(vXY.y - uTank.y, uTank.w - vXY.y))));   // meniscus at the hull and at the glass
+  float sl = length(gr);
+  vec3 col = F * refl + vec3(spec) + vec3(0.75, 0.9, 1.0) * lit * (0.0016 + 0.02 * sl * sl * 30.0 * (1.0 - ndv) + 0.012 * men);
+  gl_FragColor = vec4(col, clamp(F + 0.015 + 0.35 * sl + 0.1 * men, 0.0, 0.96));
+}` });
   const surf = new THREE.Mesh(g, m); surf.renderOrder = 9; surf.frustumCulled = false; R3.scene.add(surf);
-  const side = new THREE.MeshBasicMaterial({ color: new THREE.Color(0x061522).convertSRGBToLinear(), transparent: true, opacity: 0.36, depthWrite: false, side: THREE.DoubleSide, clippingPlanes: [SECT] });
-  const box = new THREE.BoxGeometry(W, Hh, D); box.translate(cx, 0, WL - D / 2);
-  const idx = box.index.array, keep = []; for (let i = 0; i < idx.length; i += 3) { const zs = [idx[i], idx[i + 1], idx[i + 2]].map((k) => box.attributes.position.getZ(k)); if (!zs.every((z) => Math.abs(z - WL) < 1e-6)) keep.push(idx[i], idx[i + 1], idx[i + 2]); }
-  box.setIndex(keep); const vol = new THREE.Mesh(box, side); vol.renderOrder = 8; R3.scene.add(vol);
-  WATER = { surf, vol };
+  WATER = { surf };
 }
 
 /* ================================================================ baby: Kresling spindle from the body plan, printed folded, nose toward the stern */
@@ -531,15 +609,16 @@ function babyMeshUpdate(lam) {
 }
 function buildBaby() {
   const clip = [PRINTCLIP];
-  const mat = new THREE.MeshPhongMaterial({ color: new THREE.Color(0xf3f1ec).convertSRGBToLinear(), shininess: 14, specular: 0x222222, flatShading: false, side: THREE.DoubleSide, transparent: true, opacity: 0.88, depthWrite: true, clippingPlanes: clip });
-  mat.onBeforeCompile = (sh) => addWater(sh, { line: 1.0, sub: 0.85 }); mat.customProgramCacheKey = () => "baby";
+  // cast silicone, still wet: a soft sheen, a thin clear coat, and light passing through the skin
+  const mat = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(0xf3f1ec).convertSRGBToLinear(), roughness: 0.46, metalness: 0, clearcoat: 0.45, clearcoatRoughness: 0.22, sheen: 0.6, sheenRoughness: 0.5, sheenColor: new THREE.Color(0.9, 0.9, 0.92), side: THREE.DoubleSide, transparent: true, opacity: 0.9, depthWrite: true, clippingPlanes: clip });
+  mat.onBeforeCompile = (sh) => addWater(sh, { line: 1.0, sub: 0.85, sss: 0.4, sssi: 0.55 }); mat.customProgramCacheKey = () => "baby";
   BB.mesh = new THREE.Mesh(new THREE.BufferGeometry(), mat); BB.mesh.renderOrder = 6; R3.baby.add(BB.mesh);
-  BB.edges = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0x8c949c, transparent: true, opacity: 0.32, clippingPlanes: clip })); BB.edges.renderOrder = 7; BB.mesh.add(BB.edges);
+  BB.edges = new THREE.LineSegments(new THREE.BufferGeometry(), litLine(new THREE.LineBasicMaterial({ color: 0x8c949c, transparent: true, opacity: 0.32, clippingPlanes: clip }), 0.8, 0.1)); BB.edges.renderOrder = 7; BB.mesh.add(BB.edges);
   BB.jets = []; for (const s of [1, -1]) { const j = jetPlume(0.0045, 0.26); BB.mesh.add(j); BB.jets.push(j); }
   BB.lam0 = new Array(J.body.nseg).fill(0); babyMeshUpdate(BB.lam0); BB.u0 = BB.u.slice();
   const pos = []; for (const s of GC.segs) pos.push(...s.a, ...s.b);
   const bg = new THREE.BufferGeometry(); bg.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
-  BB.bead = new THREE.LineSegments(bg, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9 })); BB.bead.frustumCulled = false; BB.bead.renderOrder = 8; R3.womb.add(BB.bead);
+  BB.bead = new THREE.LineSegments(bg, litLine(new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9 }), 3.0, 0.12)); BB.bead.frustumCulled = false; BB.bead.renderOrder = 8; R3.womb.add(BB.bead);
   // the electronics kit: every part of the kit file, in kit coordinates (x toward the stern, z up, origin at the kit center)
   const g = new THREE.Group(); R3.scene.add(g); BB.kitG = g; const K = J.kit;
   for (const p of K.parts) { if (!p.size || !p.rel || p.id === "encap") continue;
@@ -648,7 +727,7 @@ function poseArm() {
 /* the air line: a pump in the tail, along the boom and the arm to the module on the head; pulses show the flow */
 const AIR = { mesh: null, dots: [], mat: null };
 function updateAirLine(S, now) {
-  if (!AIR.mat) { AIR.mat = clayMat(0x9cc8ec, { opacity: 0.85 }); for (let i = 0; i < 6; i++) { const d = new THREE.Mesh(new THREE.SphereGeometry(0.0042, 10, 8), new THREE.MeshBasicMaterial({ color: 0xe8f6ff })); R3.arm.add(d); AIR.dots.push(d); } }
+  if (!AIR.mat) { AIR.mat = clayMat(0x9cc8ec, { opacity: 0.85 }); for (let i = 0; i < 6; i++) { const d = new THREE.Mesh(new THREE.SphereGeometry(0.0042, 10, 8), new THREE.MeshBasicMaterial({ color: new THREE.Color(1.6, 1.9, 2.0) })); R3.arm.add(d); AIR.dots.push(d); } }
   const on = ARM.mod !== "none" && ARM.joints;
   if (AIR.mesh) { R3.arm.remove(AIR.mesh); AIR.mesh.geometry.dispose(); AIR.mesh = null; }
   AIR.dots.forEach((d) => { d.visible = false; });
@@ -688,13 +767,209 @@ function renderDerivation() {
   ].join("");
 }
 
+/* ================================================================ the gallery: tank, plinth, room, lamp, people, suspended particles, inner lights */
+const GAL = { walls: [], figures: [] };
+const INNER = { on: false, mix: 0, lights: [], glows: [] };
+function buildGallery() {
+  const T = TANK, sc = R3.scene, cx = (T.x0 + T.x1) / 2, cy = (T.y0 + T.y1) / 2, W = T.x1 - T.x0, D = T.y1 - T.y0, th = T.th;
+  const std = (hex, rough, o = {}) => clayMat(hex, Object.assign({ rough, sss: 0, sssi: 0.05, line: 0 }, o));
+  // room floor: dark polished concrete, so the lamp leaves a soft pool of light round the plinth
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(70, 70), std(0x98989b, 0.62, { grain: 0.5 })); floor.position.set(cx, cy, T.zr); floor.receiveShadow = true; sc.add(floor);
+  const pl = new THREE.Mesh(new THREE.BoxGeometry(W + 2 * th - 0.06, D + 2 * th - 0.06, T.zf - th - T.zr), std(0x3c3c3f, 0.55, { grain: 0.35 })); pl.position.set(cx, cy, (T.zf - th + T.zr) / 2); pl.castShadow = true; pl.receiveShadow = true; sc.add(pl);
+  const tf = new THREE.Mesh(new THREE.BoxGeometry(W + 2 * th, D + 2 * th, th), std(0x212225, 0.8, { grain: 0.4 })); tf.position.set(cx, cy, T.zf - th / 2); tf.castShadow = true; tf.receiveShadow = true; sc.add(tf); GAL.floor = tf;
+  // glass walls with real thickness: Fresnel, a faint smear of dust, caustics below the waterline, and edges that carry the light
+  const glass = new THREE.ShaderMaterial({ uniforms: Object.assign({}, UW, CU), transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
+    vertexShader: "attribute vec3 hs; varying vec3 vW; varying vec3 vN; varying vec3 vL; varying vec3 vH; void main() { vL = position; vH = hs; vN = normalize(mat3(modelMatrix) * normal); vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }",
+    fragmentShader: "varying vec3 vW; varying vec3 vN; varying vec3 vL; varying vec3 vH;\n" + GLSL_ETA + GLSL_CINE + `
+void main() {
+  vec3 V = normalize(cameraPosition - vW); vec3 N = normalize(vN); if (dot(N, V) < 0.0) N = -N;
+  float ndv = dot(N, V), F = 0.04 + 0.96 * pow(1.0 - ndv, 5.0);
+  vec3 q = vH - abs(vL); float e = q.x + q.y + q.z - min(q.x, min(q.y, q.z)) - max(q.x, max(q.y, q.z));    // distance to the nearest edge of the pane
+  float edge = 1.0 - smoothstep(0.0, 0.03, e), hair = 1.0 - smoothstep(0.0, 0.004, e);
+  float lit = spotK(vW) * uLI; vec3 H = normalize(normalize(uLP - vW) + V);
+  float spec = pow(max(dot(N, H), 0.0), 400.0) * lit * 2.0;
+  float along = abs(N.x) > 0.5 ? vW.y : vW.x;
+  float und = step(vW.z, uWL) * step(uTankZ, vW.z);
+  float cau = causW(vec2(along, vW.z * 0.42 + 3.0), uTime, 1.15) * und;
+  float dust = fbm(vec2(along, vW.z) * 2.3) * 0.6 + fbm(vec2(along * 31.0, vW.z * 7.0)) * 0.4;
+  float dW = vW.z - uWL; float line = 1.0 - smoothstep(0.0, 0.006, abs(dW));
+  vec3 col = vec3(0.74, 1.0, 0.93) * lit * (0.2 * edge + 0.28 * hair) * (0.7 + 0.6 * dust) + vec3(spec) + vec3(0.8, 0.95, 1.0) * lit * (0.0045 * cau + 0.0022 * dust + 0.03 * line) + innerGlow(vW) * 0.004;
+  gl_FragColor = vec4(col, clamp(0.5 * F + 0.012 + 0.3 * edge + 0.02 * und, 0.0, 0.9));
+}` });
+  const wall = (sx, sy, x, y) => { const sz = T.zt - T.zf + th, g = new THREE.BoxGeometry(sx, sy, sz); const n = g.attributes.position.count, hs = new Float32Array(n * 3); for (let i = 0; i < n; i++) hs.set([sx / 2, sy / 2, sz / 2], i * 3); g.setAttribute("hs", new THREE.BufferAttribute(hs, 3));
+    const m = new THREE.Mesh(g, glass); m.position.set(x, y, (T.zt + T.zf - th) / 2); sc.add(m); GAL.walls.push(m); };
+  wall(W + 2 * th, th, cx, T.y0 - th / 2); wall(W + 2 * th, th, cx, T.y1 + th / 2); wall(th, D, T.x0 - th / 2, cy); wall(th, D, T.x1 + th / 2, cy);
+  // the lamp
+  const L = T.lamp, can = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.085, 0.3, 24).rotateX(Math.PI / 2), std(0x0a0a0a, 0.5)); can.position.set(L[0], L[1], L[2] + 0.16); sc.add(can);
+  const lens = new THREE.Mesh(new THREE.CircleGeometry(0.07, 32), new THREE.MeshBasicMaterial({ color: new THREE.Color(60, 56, 50), side: THREE.DoubleSide })); lens.position.set(L[0], L[1], L[2] + 0.008); sc.add(lens);
+  // people watching, dark against the pool of light
+  const prof = [[0.13, 0], [0.16, 0.04], [0.175, 0.5], [0.185, 0.95], [0.2, 1.22], [0.205, 1.34], [0.17, 1.42], [0.075, 1.47], [0.058, 1.5], [0.062, 1.54], [0.092, 1.59], [0.104, 1.66], [0.098, 1.73], [0.066, 1.785], [0, 1.8]].map((p) => new THREE.Vector2(p[0], p[1]));
+  const fg = new THREE.LatheGeometry(prof, 28).rotateX(Math.PI / 2), fm = std(0x18181a, 0.85);
+  for (const [x, y, h, yaw] of [[-1.7, T.y1 + 1.0, 1.0, 0.2], [-1.15, T.y1 + 1.35, 0.94, -0.3], [0.7, T.y1 + 0.9, 1.03, 0.1], [1.9, T.y1 + 1.6, 0.97, 0.5], [-2.9, T.y1 + 2.0, 0.96, 0.0]]) {
+    const f = new THREE.Mesh(fg, fm); f.scale.set(0.92, 0.56, h); f.rotation.z = yaw; f.position.set(x, y, T.zr); f.castShadow = true; f.receiveShadow = true; sc.add(f); GAL.figures.push(f); }
+  // particles: fine matter suspended in the water, dust in the light above
+  const NP = 2600, pos = new Float32Array(NP * 3), seed = new Float32Array(NP * 2); let s = 7; const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+  for (let i = 0; i < NP; i++) { const air = i >= 2100, r = Math.sqrt(rnd()) * (air ? 1.9 : 2.5), a = rnd() * 2 * Math.PI;
+    pos[3 * i] = clamp(L[0] + r * Math.cos(a), T.x0 + 0.05, T.x1 - 0.05); pos[3 * i + 1] = clamp(L[1] + r * Math.sin(a), T.y0 + 0.05, T.y1 - 0.05); pos[3 * i + 2] = air ? J.WL + 0.05 + rnd() * 1.7 : T.zf + 0.02 + rnd() * (J.WL - T.zf - 0.04);
+    seed[2 * i] = rnd(); seed[2 * i + 1] = air ? 1 : 0; }
+  const pg = new THREE.BufferGeometry(); pg.setAttribute("position", new THREE.BufferAttribute(pos, 3)); pg.setAttribute("seed", new THREE.BufferAttribute(seed, 2));
+  const pm = new THREE.ShaderMaterial({ uniforms: Object.assign({ uPx: { value: 800 }, uFocus: { value: 2 }, uCoc: { value: 0 } }, UW, CU), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    vertexShader: "attribute vec2 seed; uniform float uPx; uniform float uFocus; uniform float uCoc; varying float vB; varying float vS;\n" + GLSL_ETA + GLSL_CINE + `
+void main() { float s = seed.x * 6.2831; vec3 p = position + vec3(sin(uTime * 0.11 + s * 3.0), cos(uTime * 0.09 + s * 5.0), sin(uTime * 0.07 + s * 7.0)) * (seed.y > 0.5 ? 0.09 : 0.035);
+  if (seed.y < 0.5) p.z = min(p.z, uWL - 0.012);
+  vec4 mv = viewMatrix * vec4(p, 1.0); float d = -mv.z; gl_Position = projectionMatrix * mv;
+  float base = (seed.y > 0.5 ? 0.0016 : 0.0026) * (0.5 + seed.x) * uPx / d; float coc = uCoc * abs(d - uFocus) / (d * uFocus);
+  float sz = max(base, 1.1) + coc; gl_PointSize = min(sz, 40.0);
+  float tw = 0.55 + 0.45 * sin(uTime * (0.6 + seed.x) + s * 11.0);
+  float cz = seed.y > 0.5 ? 1.0 : 0.6 + 0.5 * causW(p.xy, uTime, 1.0);
+  vB = spotK(p) * uLI * tw * cz * (seed.y > 0.5 ? 0.012 : 0.03) * (base * base) / (sz * sz) * min(1.0, base * base / 1.2); vS = sz; }`,
+    fragmentShader: "varying float vB; varying float vS; void main() { vec2 c = gl_PointCoord - 0.5; float r = length(c) * 2.0; float a = vS > 4.0 ? smoothstep(1.0, 0.82, r) * (0.75 + 0.25 * r) : exp(-r * r * 3.0); gl_FragColor = vec4(vec3(0.9, 0.97, 1.0) * vB * a * 4.0, 1.0); }" });
+  GAL.pts = new THREE.Points(pg, pm); GAL.pts.frustumCulled = false; GAL.pts.renderOrder = 11; sc.add(GAL.pts);
+  // inner lights: three in the parent body and one in the newborn, off unless the toggle is on
+  const tex = (() => { const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d"), gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, "rgba(255,255,255,0.42)"); gr.addColorStop(0.3, "rgba(255,255,255,0.2)"); gr.addColorStop(0.65, "rgba(255,255,255,0.05)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
+  const mk = (parent, p, base, period, size) => { const l = new THREE.PointLight(0xffb070, 0, 2.2, 2); l.position.set(...p); parent.add(l);
+    const gl = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, color: 0xffb070, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0 })); gl.scale.setScalar(size); gl.renderOrder = 6; l.add(gl);
+    INNER.lights.push({ l, gl, base, period, ph: INNER.lights.length * 1.9 }); };
+  mk(R3.womb, [0.03, 0, 0.05], 0.085, 8.0, 0.5); mk(R3.womb, [-0.01, 0, -0.215], 0.05, 7.2, 0.3); mk(R3.tail, [-0.66, 0, 0.0], 0.06, 9.1, 0.4); mk(R3.baby, [0.1, 0, 0], 0.07, 6.6, 0.34);
+}
+function birthBoost(S) { const k = S.k, f = S.st.f; return k === "push" ? 1 + 1.5 * f * f : k === "birth" ? 3.1 - 0.9 * mj(f) : k === "float" ? 2.2 - 0.8 * f : k === "swim" ? 1.4 - 0.4 * f : 1; }
+const wv = new THREE.Vector3();
+function stepInner(S, now, dt) {
+  INNER.mix += ((INNER.on ? 1 : 0) - INNER.mix) * (1 - Math.exp(-dt * 1.6)); const boost = birthBoost(S);
+  INNER.lights.forEach((o, i) => { const br = 0.5 - 0.5 * Math.cos(2 * Math.PI * now / o.period + o.ph); let I = o.base * (0.45 + 0.55 * br) * INNER.mix;
+    if (i === 3) { const lam = S.lam.reduce((a, b) => a + b, 0) / S.lam.length; I *= S.babyVis && S.k !== "print" ? (0.35 + 0.65 * clamp(lam, 0, 1)) * boost : 0; o.l.position.x = (BB.L || 0.2) / 2; o.gl.scale.setScalar(0.2 + 0.3 * clamp(lam, 0, 1)); }
+    else I *= 0.6 + 0.4 * boost;
+    o.l.intensity = I; o.gl.material.opacity = Math.min(1, I * 3.2); o.gl.visible = I > 1e-4;
+    o.l.getWorldPosition(wv); CU.uIL.value[i].set(wv.x, wv.y, wv.z, I); });
+}
+function setInner(v, save = true) { INNER.on = !!v; document.querySelectorAll("[data-inner]").forEach((b) => { const on = (b.dataset.inner === "on") === INNER.on; b.classList.toggle("on", on); b.setAttribute("aria-pressed", String(on)); });
+  if (save) { try { localStorage.setItem("bnm.sim.innerLight", INNER.on ? "on" : "off"); } catch (e) { /* storage may be blocked */ } } }
+function setShadows() {      // solid parts cast, everything lit receives; the clear shell, the water and the glass let the light through
+  R3.vessel.traverse((o) => { if (o.isMesh && o.material && o.material.isMeshStandardMaterial) { o.receiveShadow = true; o.castShadow = !o.material.transparent || o.material.opacity > 0.7; } });
+  BB.mesh.castShadow = true; BB.mesh.receiveShadow = true; BB.kitG.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  for (const k of ["W_B0_Skin", "W_T1_TailShell"]) if (PARTS[k]) { PARTS[k].castShadow = false; PARTS[k].layers.enable(1); }
+}
+
+/* ================================================================ film pipeline: HDR scene, mirror image for the water, light in the air and in the water, depth of field, bloom, ACES, vignette, grain */
+const CINE = { q: 2, lock: false, ft: 0, n: 0, rt: null, w: 0, h: 0, focus: 2.5, on: true };
+const QUAL = [{ pr: 1, msaa: 0, dof: false, bdiv: 4, hazeN: 8, sh: 1024, refl: false }, { pr: 1.25, msaa: 4, dof: false, bdiv: 4, hazeN: 12, sh: 2048, refl: true }, { pr: 2, msaa: 4, dof: true, bdiv: 2, hazeN: 22, sh: 2048, refl: true }];
+const FSV = "varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }";
+function fsMat(fs, uniforms, extra = {}) { return new THREE.ShaderMaterial(Object.assign({ vertexShader: FSV, fragmentShader: fs, uniforms, depthTest: false, depthWrite: false }, extra)); }
+function cineInit() {
+  const r = R3.renderer, C = CINE;
+  try { const q = new URLSearchParams(location.search).get("q"); if (q) { C.q = { low: 0, mid: 1, high: 2 }[q] ?? 2; C.lock = true; } } catch (e) { /* default quality */ }
+  r.physicallyCorrectLights = true; r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.shadowMap.autoUpdate = false; r.toneMapping = THREE.NoToneMapping;    // ACES is applied in the last pass, after the bloom
+  C.half = r.capabilities.isWebGL2 || r.extensions.has("OES_texture_half_float") ? THREE.HalfFloatType : THREE.UnsignedByteType;
+  C.fs = { scene: new THREE.Scene(), cam: new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1), mesh: new THREE.Mesh(new THREE.PlaneGeometry(2, 2)) }; C.fs.mesh.frustumCulled = false; C.fs.scene.add(C.fs.mesh);
+  C.depthMat = new THREE.MeshBasicMaterial({ colorWrite: false, side: THREE.DoubleSide, clippingPlanes: [SECT] });
+  C.vcam = new THREE.PerspectiveCamera(); C.reflM = new THREE.Matrix4();
+  C.haze = fsMat("uniform sampler2D tDepth; uniform mat4 uPI; uniform mat4 uCW; uniform vec3 uCam; uniform int uN; uniform float uAir; uniform float uWat; uniform float uRoomZ; varying vec2 vUv;\n" + GLSL_ETA + GLSL_CINE + `
+vec2 boxT(vec3 ro, vec3 rd, vec3 a, vec3 b) { vec3 t0 = (a - ro) / rd, t1 = (b - ro) / rd; vec3 mn = min(t0, t1), mx = max(t0, t1); return vec2(max(max(mn.x, mn.y), mn.z), min(min(mx.x, mx.y), mx.z)); }
+float ign(vec2 p) { return fract(52.9829189 * fract(dot(p, vec2(0.06711056, 0.00583715)))); }
+void main() {
+  float d = texture2D(tDepth, vUv).x; vec4 v = uPI * vec4(vUv * 2.0 - 1.0, d * 2.0 - 1.0, 1.0); v /= v.w; vec3 wp = (uCW * vec4(v.xyz, 1.0)).xyz; vec3 rd = wp - uCam; float tS = length(rd); rd /= tS; if (d > 0.999995) tS = 60.0;
+  rd += vec3(1e-5); float j = ign(gl_FragCoord.xy); vec3 acc = vec3(0.0);
+  vec2 tw = boxT(uCam, rd, vec3(uTank.xy, uTankZ), vec3(uTank.zw, uWL)); tw.x = max(tw.x, 0.0); tw.y = min(tw.y, tS);
+  if (tw.y > tw.x) { float dt = (tw.y - tw.x) / float(uN);
+    for (int i = 0; i < 24; i++) { if (i >= uN) break; vec3 p = uCam + rd * (tw.x + (float(i) + j) * dt); float sh = shaftW(p.xy, uTime); acc += vec3(0.6, 0.88, 1.0) * (spotK(p) * uLI * (0.3 + 1.5 * sh * sh) * exp(-(uWL - p.z) * 0.8) * dt * uWat); } }
+  vec2 ta = boxT(uCam, rd, vec3(uLP.xy - 5.2, uRoomZ), vec3(uLP.xy + 5.2, uLP.z - 0.02)); ta.x = max(ta.x, 0.0); ta.y = min(ta.y, tS);
+  if (ta.y > ta.x) { float dt = (ta.y - ta.x) / float(uN);
+    for (int i = 0; i < 24; i++) { if (i >= uN) break; vec3 p = uCam + rd * (ta.x + (float(i) + j) * dt); float w = 1.0 - step(p.z, uWL) * inTank(p); float dn = 0.75 + 0.5 * vnoise(p.xy * 1.7 + vec2(p.z * 1.3 - uTime * 0.03, uTime * 0.02)); acc += vec3(1.0, 0.96, 0.9) * (spotK(p) * uLI * w * dn * dt * uAir * (0.1 + 0.9 * smoothstep(0.3, 1.6, p.z))); } }
+  gl_FragColor = vec4(acc, 1.0);
+}`, Object.assign({ tDepth: { value: null }, uPI: { value: new THREE.Matrix4() }, uCW: { value: new THREE.Matrix4() }, uCam: { value: new THREE.Vector3() }, uN: { value: 22 }, uAir: { value: 0.016 }, uWat: { value: 0.0034 }, uRoomZ: { value: TANK.zr } }, UW, CU));
+  C.dof = fsMat(`uniform sampler2D tColor; uniform sampler2D tDepth; uniform vec2 uPx; uniform float uFocus; uniform float uAp; uniform float uMaxR; uniform float uNear; uniform float uFar; varying vec2 vUv;
+float dist(vec2 uv) { float d = texture2D(tDepth, uv).x; return (uNear * uFar) / (uFar - d * (uFar - uNear)); }
+float coc(float z) { return clamp(uAp * abs(z - uFocus) / (z * uFocus), 0.0, 1.0) * uMaxR; }
+void main() { float zc = dist(vUv), cc = coc(zc); vec3 acc = texture2D(tColor, vUv).rgb; float tot = 1.0;
+  float a0 = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715)))) * 6.2831;
+  for (int i = 1; i <= 44; i++) { float fi = float(i); float r = sqrt(fi / 44.0) * uMaxR; float an = fi * 2.39996 + a0; vec2 uv = vUv + vec2(cos(an), sin(an)) * r * uPx;
+    float zs = dist(uv); float cs = coc(zs); if (zs > zc) cs = min(cs, cc * 2.0);
+    float m = smoothstep(r - 0.5, r + 0.5, cs); acc += mix(acc / tot, texture2D(tColor, uv).rgb, m); tot += 1.0; }
+  gl_FragColor = vec4(acc / tot, 1.0); }`, { tColor: { value: null }, tDepth: { value: null }, uPx: { value: new THREE.Vector2() }, uFocus: { value: 2 }, uAp: { value: 1.45 }, uMaxR: { value: 10 }, uNear: { value: 0.01 }, uFar: { value: 60 } });
+  C.pre = fsMat("uniform sampler2D tColor; uniform sampler2D tHaze; uniform float uExp; varying vec2 vUv; void main() { vec3 c = min((texture2D(tColor, vUv).rgb + texture2D(tHaze, vUv).rgb) * uExp, vec3(24.0)); float br = max(c.r, max(c.g, c.b)); float w = clamp(br - 0.85, 0.0, 0.7); w = w * w / 1.4; gl_FragColor = vec4(c * max(w, br - 1.2) / max(br, 1e-4), 1.0); }", { tColor: { value: null }, tHaze: { value: null }, uExp: { value: 1 } });
+  C.down = fsMat("uniform sampler2D t; uniform vec2 hp; varying vec2 vUv; void main() { vec3 s = texture2D(t, vUv).rgb * 4.0 + texture2D(t, vUv - hp).rgb + texture2D(t, vUv + hp).rgb + texture2D(t, vUv + vec2(hp.x, -hp.y)).rgb + texture2D(t, vUv - vec2(hp.x, -hp.y)).rgb; gl_FragColor = vec4(s / 8.0, 1.0); }", { t: { value: null }, hp: { value: new THREE.Vector2() } });
+  C.up = fsMat("uniform sampler2D t; uniform vec2 hp; uniform float k; varying vec2 vUv; void main() { vec3 s = texture2D(t, vUv + vec2(-hp.x * 2.0, 0.0)).rgb + texture2D(t, vUv + vec2(-hp.x, hp.y)).rgb * 2.0 + texture2D(t, vUv + vec2(0.0, hp.y * 2.0)).rgb + texture2D(t, vUv + hp).rgb * 2.0 + texture2D(t, vUv + vec2(hp.x * 2.0, 0.0)).rgb + texture2D(t, vUv + vec2(hp.x, -hp.y)).rgb * 2.0 + texture2D(t, vUv + vec2(0.0, -hp.y * 2.0)).rgb + texture2D(t, vUv - hp).rgb * 2.0; gl_FragColor = vec4(s / 12.0 * k, 1.0); }", { t: { value: null }, hp: { value: new THREE.Vector2() }, k: { value: 1 } }, { blending: THREE.AdditiveBlending, transparent: true });
+  C.fin = fsMat(`uniform sampler2D tColor; uniform sampler2D tHaze; uniform sampler2D tBloom; uniform float uExp; uniform float uBloom; uniform float uVig; uniform float uGrainK; uniform float uT; uniform vec2 uRes; varying vec2 vUv;
+vec3 fit(vec3 v) { vec3 a = v * (v + 0.0245786) - 0.000090537; vec3 b = v * (0.983729 * v + 0.4329510) + 0.238081; return a / b; }
+vec3 aces(vec3 c) { c *= 1.0 / 0.6; c = mat3(0.59719, 0.07600, 0.02840, 0.35458, 0.90834, 0.13383, 0.04823, 0.01566, 0.83777) * c; c = fit(c); c = mat3(1.60475, -0.10208, -0.00327, -0.53108, 1.10813, -0.07276, -0.07367, -0.00605, 1.07602) * c; return clamp(c, 0.0, 1.0); }
+float h21(vec2 p) { vec3 q = fract(vec3(p.xyx) * 0.1031); q += dot(q, q.yzx + 33.33); return fract((q.x + q.y) * q.z); }
+void main() { vec2 cu = vUv - 0.5; float r2 = dot(cu * vec2(1.0, uRes.y / uRes.x * 1.25), cu * vec2(1.0, uRes.y / uRes.x * 1.25));
+  vec2 ca = cu * r2 * 0.012;                                             // a trace of lens color fringe toward the corners
+  vec3 c = vec3(texture2D(tColor, vUv - ca).r, texture2D(tColor, vUv).g, texture2D(tColor, vUv + ca).b);
+  vec2 ht = 1.0 / uRes; vec3 hz = (texture2D(tHaze, vUv + ht).rgb + texture2D(tHaze, vUv - ht).rgb + texture2D(tHaze, vUv + vec2(ht.x, -ht.y)).rgb + texture2D(tHaze, vUv + vec2(-ht.x, ht.y)).rgb) * 0.25;
+  c = (c + hz) * uExp + texture2D(tBloom, vUv).rgb * uBloom;
+  c *= 1.0 - uVig * smoothstep(0.08, 0.62, r2);
+  c = aces(c);
+  c = mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, c));
+  float g = (h21(gl_FragCoord.xy + floor(uT * 24.0) * 37.0) + h21(gl_FragCoord.xy * 0.5 + floor(uT * 24.0) * 11.0) - 1.0);
+  c += g * uGrainK * (0.35 + 0.65 * (1.0 - dot(c, vec3(0.33))));
+  gl_FragColor = vec4(c, 1.0); }`, { tColor: { value: null }, tHaze: { value: null }, tBloom: { value: null }, uExp: { value: 0.62 }, uBloom: { value: 0.11 }, uVig: { value: 0.55 }, uGrainK: { value: 0.03 }, uT: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) } });
+  document.addEventListener("visibilitychange", () => { C.n = 0; });
+  cineQuality(C.q);
+}
+function cineQuality(q) {
+  const C = CINE, Q = QUAL[q], r = R3.renderer; C.q = q; C.Q = Q;
+  r.setPixelRatio(Math.min(Q.pr, window.devicePixelRatio || 1));
+  if (R3.spot) { const s = R3.spot.shadow; if (s.mapSize.x !== Q.sh) { s.mapSize.set(Q.sh, Q.sh); if (s.map) { s.map.dispose(); s.map = null; } } }
+  C.haze.uniforms.uN.value = Q.hazeN; if (GAL.pts) GAL.pts.geometry.setDrawRange(0, q ? 2600 : 1200);
+  C.w = 0; resize();
+}
+function cineTargets(w, h) {
+  const C = CINE, Q = C.Q, mk = (ww, hh, o = {}) => new THREE.WebGLRenderTarget(Math.max(2, Math.round(ww)), Math.max(2, Math.round(hh)), Object.assign({ type: C.half, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false }, o));
+  if (C.rt) for (const t of [C.rt.scene, C.rt.dof, C.rt.haze, C.rt.refl, ...C.rt.bloom]) if (t) { if (t.depthTexture) t.depthTexture.dispose(); t.dispose(); }
+  const dt = new THREE.DepthTexture(w, h); dt.type = THREE.UnsignedIntType; dt.minFilter = dt.magFilter = THREE.NearestFilter;
+  const rt = { scene: mk(w, h, { depthBuffer: true, depthTexture: dt, samples: R3.renderer.capabilities.isWebGL2 ? Q.msaa : 0 }), dof: Q.dof ? mk(w, h) : null, haze: mk(w / 2, h / 2), refl: Q.refl ? mk(w / 2, h / 2, { depthBuffer: true }) : null, bloom: [] };
+  for (let i = 0, bw = w / Q.bdiv, bh = h / Q.bdiv; i < 6 && bw > 8 && bh > 8; i++, bw /= 2, bh /= 2) rt.bloom.push(mk(bw, bh));
+  C.rt = rt; C.w = w; C.h = h;
+}
+const _rp = new THREE.Vector3(), _rt = new THREE.Vector3(), _pl = new THREE.Plane(), _cp = new THREE.Vector4(), _q4 = new THREE.Vector4();
+function cineMirror() {      // the scene above the water, seen from the camera's mirror image below the surface
+  const C = CINE, cam = R3.camera, v = C.vcam, WL = J.WL, r = R3.renderer, wu = WATER.surf.material.uniforms;
+  if (!C.rt.refl || cam.position.z <= WL + 0.01) { wu.uReflOn.value = 0; return; }
+  _rp.copy(cam.position); _rp.z = 2 * WL - _rp.z; cam.getWorldDirection(_rt); _rt.z = -_rt.z; _rt.add(_rp);
+  v.position.copy(_rp); v.up.set(0, 0, -1); v.lookAt(_rt); v.fov = cam.fov; v.aspect = cam.aspect; v.near = cam.near; v.far = cam.far; v.updateProjectionMatrix(); v.updateMatrixWorld(true); v.matrixWorldInverse.copy(v.matrixWorld).invert();
+  wu.uReflM.value.set(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1).multiply(v.projectionMatrix).multiply(v.matrixWorldInverse);
+  _pl.set(new THREE.Vector3(0, 0, 1), -WL - 0.004).applyMatrix4(v.matrixWorldInverse); _cp.set(_pl.normal.x, _pl.normal.y, _pl.normal.z, _pl.constant);
+  const pe = v.projectionMatrix.elements; _q4.set((Math.sign(_cp.x) + pe[8]) / pe[0], (Math.sign(_cp.y) + pe[9]) / pe[5], -1, (1 + pe[10]) / pe[14]); _cp.multiplyScalar(2 / _cp.dot(_q4));
+  pe[2] = _cp.x; pe[6] = _cp.y; pe[10] = _cp.z + 1; pe[14] = _cp.w;
+  WATER.surf.visible = false; GAL.pts.visible = false; r.setRenderTarget(C.rt.refl); r.render(R3.scene, v); WATER.surf.visible = true; GAL.pts.visible = true;
+  wu.tRefl.value = C.rt.refl.texture; wu.uReflOn.value = 1;
+}
+function cineRender(now, dt) {
+  const C = CINE, r = R3.renderer, cam = R3.camera, sc = R3.scene, rt = C.rt, Q = C.Q; if (!rt) return;
+  // focus on what the camera looks at; the nearer the camera, the shallower the field
+  const fd = cam.position.distanceTo(R3.controls.target); C.focus += (fd - C.focus) * (1 - Math.exp(-dt * 3));
+  for (const m of GAL.walls) { const o = m.position, far = Math.abs(o.x - TANK.x0) < 0.1 ? cam.position.x > o.x : Math.abs(o.x - TANK.x1) < 0.1 ? cam.position.x < o.x : o.y < 0 ? cam.position.y > o.y : cam.position.y < o.y; m.renderOrder = far ? 2 : 14; }
+  const pu = GAL.pts.material.uniforms; pu.uPx.value = C.h / (2 * Math.tan(cam.fov * D2R / 2)); pu.uFocus.value = C.focus; pu.uCoc.value = Q.dof ? 0.012 * C.h : 0;
+  r.shadowMap.needsUpdate = true;
+  cineMirror();
+  r.setRenderTarget(rt.scene); r.render(sc, cam);
+  // the clear shell writes depth after the picture is drawn, so the focus and the light in the air take the shell as a surface
+  r.autoClear = false; cam.layers.set(1); sc.overrideMaterial = C.depthMat; const bg = sc.background; sc.background = null; r.render(sc, cam); sc.background = bg; sc.overrideMaterial = null; cam.layers.set(0); r.autoClear = true;
+  const hz = C.haze.uniforms; hz.tDepth.value = rt.scene.depthTexture; hz.uPI.value.copy(cam.projectionMatrixInverse); hz.uCW.value.copy(cam.matrixWorld); hz.uCam.value.copy(cam.position);
+  cinePass(C.haze, rt.haze);
+  let src = rt.scene;
+  if (Q.dof && rt.dof) { const u = C.dof.uniforms; u.tColor.value = rt.scene.texture; u.tDepth.value = rt.scene.depthTexture; u.uPx.value.set(1 / C.w, 1 / C.h); u.uFocus.value = C.focus; u.uMaxR.value = 0.012 * C.h; u.uNear.value = cam.near; u.uFar.value = cam.far; cinePass(C.dof, rt.dof); src = rt.dof; }
+  const B = rt.bloom, exp = C.fin.uniforms.uExp.value;
+  C.pre.uniforms.tColor.value = src.texture; C.pre.uniforms.tHaze.value = rt.haze.texture; C.pre.uniforms.uExp.value = exp; cinePass(C.pre, B[0]);
+  for (let i = 1; i < B.length; i++) { C.down.uniforms.t.value = B[i - 1].texture; C.down.uniforms.hp.value.set(0.5 / B[i - 1].width, 0.5 / B[i - 1].height); cinePass(C.down, B[i]); }
+  r.autoClear = false; for (let i = B.length - 2; i >= 0; i--) { C.up.uniforms.t.value = B[i + 1].texture; C.up.uniforms.hp.value.set(0.5 / B[i + 1].width, 0.5 / B[i + 1].height); C.up.uniforms.k.value = 1.0; cinePass(C.up, B[i]); } r.autoClear = true;
+  const f = C.fin.uniforms; f.tColor.value = src.texture; f.tHaze.value = rt.haze.texture; f.tBloom.value = B[0].texture; f.uT.value = now; f.uRes.value.set(C.w, C.h);
+  cinePass(C.fin, null);
+  // quality fallback: if the frames come slowly, drop the depth of field and halve the bloom, then drop further
+  if (!C.lock && C.q > 0 && !document.hidden) { const tn = performance.now() / 1000; C.n++;
+    if (C.n === 12) C.t0 = tn;                                   // the first frames compile shaders and do not count
+    else if (C.n > 12 && (C.n >= 100 || tn - C.t0 > 5) && C.n >= 16) { C.ft = (tn - C.t0) / (C.n - 12); if (C.ft > 0.036) { cineQuality(C.q - 1); log("frame time " + f0(C.ft * 1000) + " ms: picture quality set to " + ["low", "medium"][C.q], "w"); } C.n = 0; } }
+}
+function cinePass(mat, target) { const C = CINE; C.fs.mesh.material = mat; R3.renderer.setRenderTarget(target); R3.renderer.render(C.fs.scene, C.fs.cam); }
+
 /* ================================================================ load */
 async function loadAll() {
   const [j, gtxt, sc, b64] = await Promise.all([getJSON("stage3_egg.json"), fetch("stage3_egg_print.gcode", { cache: "no-cache" }).then((r) => r.text()), getJSON("scene_v2.json"), fetch("scene_v2_glb.txt").then((r) => r.text())]);
   if (!j || !sc) throw new Error("stage3_egg.json or scene_v2.json missing");
   J = j; SC = sc; GC = parseGcode(gtxt); UW.uWL.value = J.WL; KIN.LIM = J.arm.lim_deg.map((r) => r.map((d) => d * D2R));
   await loadEgg(b64); ARM.tool = buildTool();
-  buildGel(); buildChute(); buildWombParts(); buildRack(); renderDerivation(); buildWater(); buildBaby(); buildLabels();
+  buildGel(); buildChute(); buildWombParts(); buildRack(); renderDerivation(); buildWater(); buildBaby(); buildLabels(); buildGallery(); setShadows();
   const st = J.states;
   log(`egg docked with gel: ${f1(st.docked_gel.mass)} kg, waterline z ${f0(st.docked_gel.WL * 1000)} mm, trim ${f2(st.docked_gel.trim_deg)} deg, gel ${f1(J.gel.V_L)} L`);
   log(`G-code: ${GC.lines.length} lines, ${GC.layers} layers, ${f1(J.print.path_m)} m of bead, ${f0(J.print.silicone_ml)} ml, print time ${hms(GC.total)}`);
@@ -908,14 +1183,15 @@ function buildLabels() {
 }
 function updateLabels() {
   const w = R3.host.clientWidth, h = R3.host.clientHeight, ov = $(".ov").getBoundingClientRect(), hr = R3.host.getBoundingClientRect(), ox0 = ov.left - hr.left, ox1 = ov.right - hr.left, oy1 = ov.bottom - hr.top + 14;
-  for (const L of LABELS) { const p = L.fn(); if (!p) { L.d.style.display = "none"; continue; } ws.set(...p).project(R3.camera); const px = (ws.x + 1) / 2 * w, py = (1 - ws.y) / 2 * h; const on = ws.z < 1 && Math.abs(ws.x) < 1.0 && Math.abs(ws.y) < 1.0 && !(px > ox0 - 40 && px < ox1 + 40 && py < oy1); L.d.style.display = on ? "" : "none"; if (on) L.d.style.transform = `translate(${px.toFixed(0)}px, ${py.toFixed(0)}px) translate(-50%, -130%)`; }
+  const farCam = R3.camera.position.distanceTo(R3.controls.target) > 4.3;   // no captions on the wide shots of the room
+  for (const L of LABELS) { const p = farCam ? null : L.fn(); if (!p) { L.d.style.display = "none"; continue; } ws.set(...p).project(R3.camera); const px = (ws.x + 1) / 2 * w, py = (1 - ws.y) / 2 * h; const on = ws.z < 1 && Math.abs(ws.x) < 1.0 && Math.abs(ws.y) < 1.0 && !(px > ox0 - 40 && px < ox1 + 40 && py < oy1); L.d.style.display = on ? "" : "none"; if (on) L.d.style.transform = `translate(${px.toFixed(0)}px, ${py.toFixed(0)}px) translate(-50%, -130%)`; }
 }
 
 /* ================================================================ cameras: side views like the sheet, from port (y < 0), tail on the left */
 let AUTO = true, CAM = "overview";
 const CAMS = {
   overview: () => ({ p: [-0.25, -2.5, 0.55], t: [-0.25, 0, -0.06] }),
-  wide: () => ({ p: [-0.45, -2.75, 0.62], t: [-0.45, 0, -0.08] }),
+  wide: () => { const f = STATE.k === "approach" ? mj(STATE.st.f * 1.2) : 1; return { p: [lerp(-2.4, -0.45, f), lerp(-7.6, -2.75, f), lerp(2.0, 0.62, f)], t: [lerp(-0.35, -0.45, f), lerp(0.4, 0, f), lerp(-0.7, -0.08, f)] }; },   // opens on the whole tank in the room, then a long dolly in
   section: () => ({ p: [-0.15, -2.35, 0.42], t: [-0.15, 0, -0.08] }),
   print: () => ({ p: [-0.05, -1.15, 0.28], t: [-0.06, 0, -0.17] }),
   kitcam: () => ({ p: [-0.18, -1.25, 0.55], t: [-0.15, 0.05, -0.12] }),
@@ -923,21 +1199,30 @@ const CAMS = {
   push: () => ({ p: [0.42, -1.65, 0.30], t: [0.30, 0, -0.05] }),
   birthcam: () => ({ p: [0.62, -2.05, 0.42], t: [0.48, 0, -0.06] }),
   opening: () => ({ p: [1.55, -1.75, 0.55], t: [0.35, 0, -0.06] }),
-  swim: () => { const b = new THREE.Vector3().setFromMatrixPosition(R3.baby.matrix); return { p: [b.x + 0.1, b.y - 1.6, 0.45], t: [b.x + 0.1, b.y, J.WL] }; },
-  mswim: () => ({ p: [-0.3, -3.4, 1.0], t: [-0.3, 0, -0.05] }),
+  swim: () => { const b = new THREE.Vector3().setFromMatrixPosition(R3.baby.matrix); return { p: [b.x + 0.1, b.y - 1.6, 0.56], t: [b.x + 0.1, b.y, J.WL] }; },
+  mswim: () => { const f = STATE.k === "mswim" ? mj(STATE.st.f) : 0; return { p: [lerp(-0.3, 1.6, f), lerp(-3.4, -7.6, f), lerp(1.0, 2.0, f)], t: [lerp(-0.3, -0.35, f), lerp(0, 0.4, f), lerp(-0.05, -0.7, f)] }; },   // cranes back out to the room
 };
 let camGoal = null;
-function setCam(name, snap = false) { CAM = name; const c = CAMS[name](); camGoal = c; SECT.constant = ["section", "print", "kitcam", "push", "birthcam"].includes(name) ? 0 : 100; document.querySelectorAll("[data-cam]").forEach((b) => b.classList.toggle("on", b.dataset.cam === name)); if (snap) { R3.camera.position.set(...c.p); R3.controls.target.set(...c.t); } }
+function setCam(name, snap = false) { CAM = name; const c = CAMS[name](); camGoal = c; SECT.constant = ["section", "print", "kitcam", "push", "birthcam"].includes(name) ? 0 : 100; document.querySelectorAll("[data-cam]").forEach((b) => b.classList.toggle("on", b.dataset.cam === name)); if (snap) CAMSNAP = true; }
 function setAuto(v) { AUTO = v; $("#autoCam").classList.toggle("on", v); $("#autoCam").setAttribute("aria-pressed", String(v)); }
 function autoCam(S) {
   const want = { approach: "wide", dock: "overview", gel: "kitcam", out: "section", tool1: "rackcam", kit: "kitcam", tool2: "rackcam", drain: "push", print: "print", cure: "section", push: "push", birth: "birthcam", float: "birthcam", swim: "swim", mswim: "mswim" }[S.k];
   if (want !== CAM) setCam(want);
 }
+let CAMMOVE = false, CAMSNAP = false;
+const CAMV = { p: new THREE.Vector3(), t: new THREE.Vector3(), gp: new THREE.Vector3(), gt: new THREE.Vector3(), d: new THREE.Vector3() };
+function damp(cur, goal, vel, tau, dt) {      // critically damped: the camera eases off and arrives without a stop
+  for (const a of ["x", "y", "z"]) { const om = 2 / (a === "z" ? tau * 1.35 : tau), x = om * dt, ex = 1 / (1 + x + 0.48 * x * x + 0.235 * x * x * x), ch = cur[a] - goal[a], tmp = (vel[a] + om * ch) * dt; vel[a] = (vel[a] - om * tmp) * ex; cur[a] = goal[a] + (ch + tmp) * ex; }
+}
 function stepCam(dt, S) {
-  if (!camGoal) return; const c = R3.camera, tg = R3.controls.target, k = 1 - Math.exp(-dt * 1.8);
-  if (CAM === "swim") camGoal = CAMS.swim();
-  const off = CAM === "mswim" ? (S.mx || 0) : 0;
-  if (AUTO) { c.position.lerp(ws.set(camGoal.p[0] + off, camGoal.p[1], camGoal.p[2]), k); tg.lerp(ws.set(camGoal.t[0] + off, camGoal.t[1], camGoal.t[2]), k); }
+  if (!camGoal) return; const c = R3.camera, tg = R3.controls.target, V = CAMV;
+  if (!(AUTO || CAMMOVE || CAMSNAP)) return;
+  camGoal = CAMS[CAM](); const off = CAM === "mswim" ? (S.mx || 0) : 0;
+  V.gp.set(camGoal.p[0] + off, camGoal.p[1], camGoal.p[2]); V.gt.set(camGoal.t[0] + off, camGoal.t[1], camGoal.t[2]);
+  if (AUTO && !["wide", "mswim", "swim"].includes(CAM)) { const u = S.st.f - 0.5; V.d.subVectors(V.gt, V.gp); const len = V.d.length(); V.gp.addScaledVector(V.d, 0.1 * u); V.gp.x += 0.05 * len * u; V.gp.z += 0.045 * len * u; }   // within a stage: a slow dolly in, a little crane up and a slight arc
+  if (CAMSNAP) { c.position.copy(V.gp); tg.copy(V.gt); V.p.set(0, 0, 0); V.t.set(0, 0, 0); CAMSNAP = false; CINE.focus = c.position.distanceTo(tg); return; }
+  damp(c.position, V.gp, V.p, 1.5, dt); damp(tg, V.gt, V.t, 1.2, dt);
+  if (CAMMOVE && !AUTO && c.position.distanceTo(V.gp) < 0.003 && V.p.length() < 0.003) CAMMOVE = false;
 }
 
 /* ================================================================ readouts, panels, G-code view */
@@ -1058,12 +1343,15 @@ function frame() {
   if (S.st.i !== TL.lastStage) { TL.lastStage = S.st.i; log("stage: " + (S.st.s.n ? S.st.s.n + ". " : "") + S.st.s.name, "a"); }
   applyState(S, now);
   if (AUTO) autoCam(S); stepCam(dt, S);
-  R3.controls.update(); R3.renderer.render(R3.scene, R3.camera); updateLabels();
+  R3.controls.update(); stepInner(S, now, dt); cineRender(now, dt); updateLabels();
   if (now - lastRO > 0.12) { lastRO = now; renderReadouts(S); renderOverlay(S); renderCode(S); updateTrack(S.st); if (TAB === "birth") drawChart(); }
 }
 let DRAG = false;
 function wireUI() {
-  document.querySelectorAll("[data-cam]").forEach((b) => b.addEventListener("click", () => { setAuto(false); setCam(b.dataset.cam); }));
+  document.querySelectorAll("[data-cam]").forEach((b) => b.addEventListener("click", () => { setAuto(false); setCam(b.dataset.cam); CAMMOVE = true; }));
+  document.querySelectorAll("[data-inner]").forEach((b) => b.addEventListener("click", () => setInner(b.dataset.inner === "on")));
+  let inner0 = false; try { inner0 = localStorage.getItem("bnm.sim.innerLight") === "on"; } catch (e) { /* storage may be blocked */ }
+  setInner(inner0, false); INNER.mix = inner0 ? 1 : 0;
   $("#autoCam").addEventListener("click", () => setAuto(!AUTO));
   $("#play").addEventListener("click", () => { TL.playing = !TL.playing; $("#play").textContent = TL.playing ? "Pause" : "Play"; $("#play").setAttribute("aria-pressed", String(TL.playing)); });
   document.querySelectorAll("[data-speed]").forEach((b) => b.addEventListener("click", () => { TL.speed = +b.dataset.speed; document.querySelectorAll("[data-speed]").forEach((x) => x.classList.toggle("on", x === b)); }));
@@ -1074,7 +1362,7 @@ function wireUI() {
   tr.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") TL.T = Math.min(TL.total - 0.01, TL.T + 1); else if (e.key === "ArrowLeft") TL.T = Math.max(0, TL.T - 1); else return; e.preventDefault(); });
   document.querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { TAB = b.dataset.tab; document.querySelectorAll("[data-tab]").forEach((x) => x.setAttribute("aria-selected", String(x === b))); renderProps(); }));
 }
-window.BNM = { go(k, f = 0.5) { const s = TL.stages.find((x) => x.k === k); if (s) { TL.T = s.d0 + s.disp * f; TL.playing = false; $("#play").textContent = "Play"; } }, stages: () => TL.stages.map((s) => s.k), state: () => STATE, setAuto, setCam };
+window.BNM = { go(k, f = 0.5) { const s = TL.stages.find((x) => x.k === k); if (s) { TL.T = s.d0 + s.disp * f; TL.playing = false; $("#play").textContent = "Play"; } }, stages: () => TL.stages.map((s) => s.k), state: () => STATE, setAuto, setCam, setInner, settle: () => { CAMSNAP = true; }, quality: () => CINE.q };
 (async function main() {
   try {
     initThree(); await loadAll(); wireUI();
