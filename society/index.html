@@ -80,7 +80,7 @@ html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
       <h3>Body diversity</h3><canvas class="spark" id="sp3"></canvas>
       <h3>Seed memory still carried</h3><canvas class="spark" id="sp4"></canvas></div>
     <div><h3>Selected</h3><div id="insp" class="note">Click a robot in the tank.</div></div>
-    <div><h3>Rules</h3><p class="note">Relation is shared memory, likeness of body and time spent near each other. Every body is printed a little differently: its proportions, rings around the body, a crest, fins on the tail, a lobed section and the tone of the clay are inherited and drift. A robot ready to bear looks for the one it relates to most; at least one of the two has a tail. They touch opening to opening and exchange memory and form. The one with a tail carries: the arm prints the newborn in gel, layer by layer, then inflates it a little inside the chamber and pushes it out. Each newborn mixes both bodies, with drift. If both have tails the newborn mostly has one; with one tail, half the time. Sometimes the one that carried also prints a loose tail. A head without a tail swims to a loose tail and docks it from behind, so over time more bodies are whole. Nobody dies; the water feeds only so many, so births slow as the tank fills.</p></div>
+    <div><h3>Rules</h3><p class="note">Relation is shared memory, likeness of body and time spent near each other. Every body is printed a little differently: its proportions, rings around the body, a crest, fins on the tail, a lobed section, the tone of the clay, the print texture (straight layers, a spiral, crosshatch, waves, dimples or smooth, with its own pitch and depth) and how clear or frosted the silicone head is are inherited and drift. A robot ready to bear looks for the one it relates to most; at least one of the two has a tail. They touch opening to opening and exchange memory and form. The one with a tail carries: the arm prints the newborn in gel, layer by layer, then inflates it a little inside the chamber and pushes it out. Each newborn mixes both bodies, with drift. If both have tails the newborn mostly has one; with one tail, half the time. Sometimes the one that carried also prints a loose tail. A head without a tail swims to a loose tail and docks it from behind, so over time more bodies are whole. Nobody dies; the water feeds only so many, so births slow as the tank fills.</p></div>
     <p class="links"><a href="bodies/">Bodies</a>: the same society with the earlier v2 bodies. <a href="old_/">Earlier 2D version</a>. <a href="../simulator/simple/">Printing simulator, simplified</a>. <a href="../">Home</a></p>
   </aside>
 </div>
@@ -134,8 +134,30 @@ function tankCam() { const k = Math.max(1, 1.2 / R3.cam.aspect); R3.cam.position
 function waterAware(m, opt = {}) {
   m.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, U);
-    sh.vertexShader = "varying vec3 vWP;\n" + sh.vertexShader.replace("#include <project_vertex>", "#include <project_vertex>\n vWP = (modelMatrix * vec4(transformed, 1.0)).xyz;");
+    sh.vertexShader = "varying vec3 vWP;\n" + (opt.print ? "attribute vec4 aTex; attribute vec4 aSil; varying vec4 vTex; varying vec4 vSil; varying vec3 vObj;\n" : "") + sh.vertexShader.replace("#include <project_vertex>", "#include <project_vertex>\n vWP = (modelMatrix * vec4(transformed, 1.0)).xyz;" + (opt.print ? " vTex = aTex; vSil = aSil; vObj = transformed;" : ""));
     let fs = "varying vec3 vWP;\n" + GLSL_SPOT + "\n" + sh.fragmentShader;
+    if (opt.print) {
+      // the printed surface: pattern type, pitch, depth, angle in aTex; silicone opacity and frost in aSil
+      fs = "varying vec4 vTex; varying vec4 vSil; varying vec3 vObj;\n" + `
+float tri(float x) { return 1.0 - 2.0 * abs(fract(x) - 0.5); }
+float printH(vec3 p, vec4 t) {
+  float k = t.y, ty = t.x;
+  if (ty < 0.5) return tri(p.y / k);                                                   // straight layers
+  if (ty < 1.5) return tri((p.y * cos(t.w) + p.x * sin(t.w)) / k);                     // spiral, layers at an angle
+  if (ty < 2.5) return max(tri((p.y + p.x) / k), tri((p.y - p.x + p.z) / k));           // crosshatch
+  if (ty < 3.5) return tri((p.y + 0.35 * k * sin(p.x / k * 1.7 + p.z / k * 0.9)) / k); // waves
+  if (ty < 4.5) { vec2 q = vec2(p.x + p.z * 0.7, p.y) / (k * 1.6); vec2 f = fract(q) - 0.5; return 1.0 - smoothstep(0.15, 0.42, length(f)); }   // dimples
+  return 0.0;                                                                           // smooth
+}
+vec3 bumpN(vec3 sp, vec3 n, vec2 dH, float fd) { vec3 sx = dFdx(sp), sy = dFdy(sp); vec3 r1 = cross(sy, n), r2 = cross(n, sx); float det = dot(sx, r1) * fd; vec3 g = sign(det) * (dH.x * r1 + dH.y * r2); return normalize(abs(det) * n - g); }
+` + fs;
+      fs = fs.replace("#include <color_fragment>", "#include <color_fragment>\n" + (opt.sil ? "diffuseColor.a = vSil.x;\n" : ""));
+      fs = fs.replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\n" + (opt.sil ? "roughnessFactor = vSil.y;\n" : ""));
+      fs = fs.replace("#include <normal_fragment_maps>", `#include <normal_fragment_maps>
+  float pH = printH(vObj, vTex); float fade = 1.0 - smoothstep(0.2, 0.55, fwidth(vObj.y / vTex.y) + fwidth(vObj.x / vTex.y));
+  float hh = pH * vTex.z * fade; normal = bumpN(-vViewPosition, normal, vec2(dFdx(hh), dFdy(hh)), faceDirection);
+  diffuseColor.rgb *= 1.0 - 0.16 * (1.0 - pH) * fade * step(0.001, vTex.z);`);
+    }
     if (opt.caus) fs = fs.replace("#include <lights_fragment_end>", "#include <lights_fragment_end>\n reflectedLight.directDiffuse *= 0.45 + 1.25 * causK(vWP.xz, uTime) * step(vWP.y, uWL);");
     let tail = `{ float dW = vWP.y - uWL; float fw = max(fwidth(dW), 1e-4);
       float und = smoothstep(0.002, -0.02, dW);
@@ -144,12 +166,13 @@ function waterAware(m, opt = {}) {
     if (opt.fres) tail += `{ vec3 nV = normalize(normal); float fr = pow(1.0 - abs(dot(nV, normalize(vViewPosition))), 3.0); gl_FragColor.a = clamp(gl_FragColor.a + fr * ${opt.fres}, 0.0, 1.0); }`;
     sh.fragmentShader = fs.replace("#include <output_fragment>", "#include <output_fragment>\n" + tail);
   };
-  m.customProgramCacheKey = () => "wa" + JSON.stringify(opt);
+  m.customProgramCacheKey = () => "wa2" + JSON.stringify(opt);
   return m;
 }
 const MAT = {
-  clay: waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xe4e2dc), roughness: 0.62, metalness: 0, vertexColors: true })),
-  shell: waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xe6ebee), roughness: 0.07, metalness: 0, transparent: true, opacity: 0.07, depthWrite: false }), { fres: "0.5", line: "0.7" }),
+  clay: waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xe4e2dc), roughness: 0.62, metalness: 0, vertexColors: true }), { print: true }),
+  // the head is printed silicone: translucent and milky, not glass; how clear and how frosted varies by print
+  shell: waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xf1efe9), roughness: 0.45, metalness: 0, transparent: true, opacity: 0.55, depthWrite: false, vertexColors: true, side: THREE.DoubleSide }), { fres: "0.22", line: "0.7", print: true, sil: true }),
   mouth: waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0x8a8a8c), roughness: 0.45, metalness: 0, side: THREE.DoubleSide })),
 };
 
@@ -237,7 +260,7 @@ function glow(color, size) { const s = new THREE.Sprite(new THREE.SpriteMaterial
 
 /* ---------- bodies: the simplified design, round 7: a blunt rounded tail holding the arm, and a clear head that narrows in a curve to a small slanted nose ---------- */
 // genome g[0..8] in 0..1. Every printed form differs a little; all are about the same size.
-const GENES = 14;
+const GENES = 19;
 function shapeOf(g) {
   // proportions vary widely, then the whole body is scaled so every robot keeps about the same length
   const A = 0.11 + 0.065 * g[1], B = 0.12 + 0.065 * g[2], Lh = 0.2 + 0.14 * g[0], Lt = 0.14 + 0.2 * g[6], Ln = 0.02 + 0.07 * g[8];
@@ -246,8 +269,11 @@ function shapeOf(g) {
     // printed features: rings around the body, a crest along the back, fins on the tail, a lobed section, clay tone
     ribN: 2 + Math.floor(g[9] * 6), ribD: g[9] > 0.35 ? 0.03 + 0.06 * (g[9] - 0.35) / 0.65 : 0,
     crest: g[10] > 0.5 ? (0.02 + 0.1 * (g[10] - 0.5) * 2) * k : 0, fin: g[11] > 0.45 ? 0.25 + 1.1 * (g[11] - 0.45) / 0.55 : 0,
-    lobeN: 3 + Math.floor(g[12] * 4), lobeD: g[12] > 0.4 ? 0.03 + 0.06 * (g[12] - 0.4) / 0.6 : 0, tone: 0.72 + 0.28 * g[13] };
+    lobeN: 3 + Math.floor(g[12] * 4), lobeD: g[12] > 0.4 ? 0.03 + 0.06 * (g[12] - 0.4) / 0.6 : 0, tone: 0.72 + 0.28 * g[13],
+    // print texture: pattern (layers, spiral, crosshatch, waves, dimples, smooth), pitch, ridge depth, angle; silicone opacity and frost
+    tex: [Math.min(5, Math.floor(g[14] * 6)), 0.006 + 0.014 * g[15], g[16] < 0.15 ? 0 : 0.0008 + 0.0025 * g[16], 0.3 + 0.9 * g[17]], sil: [0.32 + 0.4 * g[18], 0.25 + 0.6 * (1 - g[18]) * 0.9 + 0.1 * g[16], 0, 0] };
 }
+function printAttrs(g, s, n) { const a = new Float32Array(n * 4), b = new Float32Array(n * 4); for (let i = 0; i < n; i++) { a.set(s.tex, i * 4); b.set(s.sil, i * 4); } g.setAttribute("aTex", new THREE.BufferAttribute(a, 4)); g.setAttribute("aSil", new THREE.BufferAttribute(b, 4)); }
 function bodyGeometry(s, tail) {
   const M = 40, st = [];
   const x0 = -s.Lh / 2, NT = 26;
@@ -274,6 +300,7 @@ function bodyGeometry(s, tail) {
   for (let j = 0; j < M; j++) idx[2].push(base + j, base + M, base + (j + 1) % M);
   const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
   g.setAttribute("color", new THREE.Float32BufferAttribute(new Float32Array(pos.length).fill(s.tone), 3));     // each print a slightly different clay
+  printAttrs(g, s, pos.length / 3);
   const all = idx[0].concat(idx[1], idx[2]); g.setIndex(all); g.addGroup(0, idx[0].length, 0); g.addGroup(idx[0].length, idx[1].length, 1); g.addGroup(idx[0].length + idx[1].length, idx[2].length, 2);
   g.computeVertexNormals();
   // folded: the printed newborn before air goes in, about 0.4 of the length, with wrinkles
@@ -309,7 +336,7 @@ function tailGeometry(s) {
   const g = bodyGeometry(s, true), gr = g.groups[0], M = g.userData.M, base = g.userData.tailRing;
   const index = Array.from(g.index.array.slice(gr.start, gr.start + gr.count)), pos = Array.from(g.attributes.position.array), c = pos.length / 3;
   pos.push(-s.Lh / 2 + 0.004, 0, 0); for (let j = 0; j < M; j++) index.push(base + j, c, base + (j + 1) % M);
-  const t = new THREE.BufferGeometry(); t.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); t.setAttribute("color", new THREE.Float32BufferAttribute(new Float32Array(pos.length).fill(s.tone), 3)); t.setIndex(index); t.computeVertexNormals(); g.dispose(); return t;
+  const t = new THREE.BufferGeometry(); t.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); t.setAttribute("color", new THREE.Float32BufferAttribute(new Float32Array(pos.length).fill(s.tone), 3)); printAttrs(t, s, pos.length / 3); t.setIndex(index); t.computeVertexNormals(); g.dispose(); return t;
 }
 function newLoose(o) {
   const T = Object.assign({ id: nextId++, x: 0, z: 0, vx: 0, vz: 0, h: rnd() * 6.283, bob: rnd() * 6.283, claim: null }, o);
