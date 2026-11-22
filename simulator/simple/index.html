@@ -243,7 +243,7 @@ button:focus-visible, input:focus-visible, a:focus-visible, .track:focus-visible
   <ul id="deriv"></ul>
   <h4>How this is simulated</h4>
   <p>A Python script (<code>bnm_design/simple/design.py</code>) builds the hull, the newborn and the arm, plans every move of the cycle, and writes <code>simple.json</code>; the browser replays and interpolates. The arm uses the link meshes and the kinematics of the Stage 2 DexArm model with the official joint ranges; each pose on the timeline is solved by inverse kinematics, and a pose outside the ranges is reported as a failed check. The newborn is the folded body of the full size study, resized: Kresling stories with sixteen radial star pleats, opened by air and finished by a 25 percent stretch of the skin. While the arm pushes, the body is a rigid body on a pin at the valve: the pitch is the smallest pitch at which the body clears the gel chamber and the rim, and the part outside droops until the water carries that part or the hull stops the droop, with a lag. Each segment opens after the segment has passed the opening, with a lag as well. After the nozzle lets go, the newborn is a rigid body in the vertical plane with gravity, buoyancy from forty slices, drag in heave, pitch and surge, a contact at the lip, the thrust of the two kit pumps and the ballast water; the roll is a damped oscillator with the righting moment of the calculated metacentric height. The clock shows process time; the view is a time lapse.</p>
-  <p>Colliders: the two shells (the inner surface as a function, the wall as a 3 mm band), the rim of the opening, the rack forks, the kit store, the seat, the two pockets in the tail with their parts, the eight arm links (their mesh vertices), the module head, stem and cup, the parked modules, the kit as a box, and the newborn as a dense point set in every state. Every frame of the timeline is tested for every pair; the Checks panel lists the deepest overlap of each pair. The nozzle in the valve, the needle in the work, the cup on the kit and the kit in the newborn are contacts by design and are left out.</p>
+  <p>Colliders: the two shells (the inner surface as a function, the wall as a 3 mm band), the rim of the opening, the rack forks, the kit store, the seat, the two pockets in the tail with their parts, the eight arm links (their mesh vertices), the module head and stem, the magnet, the parked modules, the kit as a box, and the newborn as a dense point set in every state. Every frame of the timeline is tested for every pair; the Checks panel lists the deepest overlap of each pair. The ball needle in the valve and in the well of the kit, the print needle in the work, the magnet on the kit and the kit in the newborn are contacts by design and are left out.</p>
   <h4>The tank</h4>
   <p id="tankp"></p>
   <h4>Staging</h4>
@@ -673,10 +673,13 @@ const rxv = (v, t) => { const c = Math.cos(t), s = Math.sin(t); return [v[0], c 
 function moduleGroup(kind) {      // origin at the head underside on the stem axis, x forward
   const A = J.arm, Ls = A.tools[kind], g = new THREE.Group(), m = clayMat(kind === "cup" ? 0xdfe4ea : 0xe2e0da, { sub: 0.5 }), dark = clayMat(0x8d9097, { sub: 0.5 });
   const head = new THREE.Mesh(new THREE.BoxGeometry(A.HEAD.f, A.HEAD.w, A.HEAD.h).translate(0, 0, A.HEAD.h / 2), m); g.add(head); edgeLines(head, 30, 0.3);
-  if (kind === "cup") {
-    g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, Ls - 0.012, 12).rotateX(Math.PI / 2).translate(0, 0, -(Ls - 0.012) / 2), m));
-    g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.0075, 0.012, 20).rotateX(Math.PI / 2).translate(0, 0, -Ls + 0.006), clayMat(0x6f7a86, { sub: 0.4 })));
-    g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.0012, 0.0012, 0.008, 8).rotateX(Math.PI / 2).translate(0, 0, -Ls + 0.002), dark));
+  if (kind === "cup") {      // the holder: a ball inflation needle on the stem, and a 20 mm electromagnet on a bracket behind the needle
+    const M = A.MAG;
+    g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, Ls - 0.03, 12).rotateX(Math.PI / 2).translate(0, 0, -(Ls - 0.03) / 2), m));
+    g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.001, 0.001, 0.03, 8).rotateX(Math.PI / 2).translate(0, 0, -Ls + 0.015), clayMat(0xc9ccd0, { rough: 0.25 })));
+    const mag = new THREE.Mesh(new THREE.CylinderGeometry(M.r, M.r, M.h, 24).rotateX(Math.PI / 2).translate(-M.off, 0, -Ls + M.P + M.h / 2), clayMat(0xb9bcc2, { rough: 0.3, sub: 0.4 })); g.add(mag); edgeLines(mag, 30, 0.4, 0x6c7680);
+    g.add(new THREE.Mesh(new THREE.BoxGeometry(M.off, 0.008, 0.003).translate(-M.off / 2, 0, -Ls + M.P + M.h + 0.0015), m));
+    g.add(new THREE.Mesh(new THREE.BoxGeometry(0.003, 0.008, Ls - M.P - M.h).translate(-M.off, 0, -(Ls - M.P - M.h) / 2), m));
   } else {
     g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, Ls - 0.025, 12).rotateX(Math.PI / 2).translate(0, 0, -(Ls - 0.025) / 2), m));
     g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.0014, 0.0009, 0.025, 8).rotateX(Math.PI / 2).translate(0, 0, -Ls + 0.0125), dark));
@@ -688,6 +691,7 @@ function buildArm() {
   for (const n in ARMD.parts) { const p = ARMD.parts[n]; const m = meshOf(b64f32(p.p), b64u32(p.i), mat); m.matrixAutoUpdate = false; R3.arm.add(m); PARTS["A_" + n] = m; }
   PARTS.toolG = new THREE.Group(); R3.arm.add(PARTS.toolG); PARTS.toolCup = moduleGroup("cup"); PARTS.toolNeedle = moduleGroup("needle"); PARTS.toolG.add(PARTS.toolCup); PARTS.toolG.add(PARTS.toolNeedle);
   PARTS.lineMat = [clayMat(0x9cc8ec, { opacity: 0.9 }), clayMat(0xe8e2c8, { opacity: 0.9 })]; PARTS.lines = [null, null];
+  PARTS.stopcock = new THREE.Group(); PARTS.stopcock.matrixAutoUpdate = false; R3.arm.add(PARTS.stopcock); { const cm = clayMat(0xe6f0f4, { opacity: 0.8, sub: 0.3 }); const b = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.03, 0.012), cm); PARTS.stopcock.add(b); edgeLines(b, 30, 0.5, 0x7a828c); PARTS.stopcock.add(new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.022, 10).rotateX(Math.PI / 2).translate(0, 0, 0.01), cm)); PARTS.stopcock.add(new THREE.Mesh(new THREE.BoxGeometry(0.004, 0.02, 0.004).translate(0, 0.004, 0.022), clayMat(0x3f8fa8, { sub: 0.3 }))); }   // the three way luer stopcock on the forearm, set by hand
   PARTS.dots = []; for (let i = 0; i < 5; i++) { const d = new THREE.Mesh(new THREE.SphereGeometry(0.0038, 10, 8), new THREE.MeshBasicMaterial({ color: new THREE.Color(1.6, 1.9, 2.0) })); R3.arm.add(d); PARTS.dots.push(d); }
 }
 const ARM = { joints: [], tip: [0, 0, 0], wrist: [0, 0, 0] };
@@ -699,6 +703,7 @@ function poseArm(q, tool, S, now) {
   const mats = { B_Fix: M4(), B_Rot: M4(), In_1: about(Sv, a), Join: Tm(dE), In_2: Tm(dE).multiply(about(E, b)), EE: Tm([W2[0] - W[0], W2[1] - W[1], W2[2] - W[2]]), Out_1: about(Lp, a), Out_2: Tm(dE).multiply(about(A.O2, b)) };
   const base = Tm(J.base).multiply(M4().makeRotationZ(Math.PI / 2)), yb = base.clone().multiply(M4().makeRotationZ(q[0]));
   for (const n in mats) { const o = PARTS["A_" + n]; if (o) o.matrix.copy(n === "B_Fix" ? base : yb.clone().multiply(mats[n])); }
+  PARTS.stopcock.matrix.copy(yb).multiply(mats.In_2).multiply(Tm([0.024, -0.1, 0.262])); PARTS.stopcock.matrixWorldNeedsUpdate = true;
   const rw = A.SF + A.L1 * Math.sin(q[1]) + A.L2 * Math.cos(q[2]), zw = A.SZ + A.L1 * Math.cos(q[1]) - A.L2 * Math.sin(q[2]), c = Math.cos(q[0]), s = Math.sin(q[0]);
   const r = rw + A.STEM_F, o = [J.base[0] + r * c, J.base[1] + r * s, J.base[2] + zw + A.HEAD_BOT];
   PARTS.toolG.position.set(...o); PARTS.toolG.rotation.z = q[0]; PARTS.toolCup.visible = tool === 1; PARTS.toolNeedle.visible = tool === 2;
@@ -707,10 +712,10 @@ function poseArm(q, tool, S, now) {
   // the lines along the arm: air (blue) and gel (pale), from the tail equipment to the head
   const [js, je, jw] = ARM.joints, head = new THREE.Vector3(o[0], o[1], o[2] + A.HEAD.h + 0.006), side = new THREE.Vector3(-s, c, 0);
   for (let k = 0; k < 2; k++) { if (PARTS.lines[k]) { R3.arm.remove(PARTS.lines[k]); PARTS.lines[k].geometry.dispose(); }
-    const off = side.clone().multiplyScalar(k ? -0.012 : 0.012), src = k ? new THREE.Vector3(-0.12, 0.1, 0.24) : new THREE.Vector3(-0.13, -0.1, 0.235);
+    const off = side.clone().multiplyScalar(k ? -0.012 : 0.012), src = k ? new THREE.Vector3(-0.1, 0.1, 0.24) : new THREE.Vector3(-0.067, -0.1, 0.155);
     const pts = [src, new THREE.Vector3(J.base[0] - 0.02, k ? 0.07 : -0.07, 0.2), js.clone().add(off).add(new THREE.Vector3(-0.02 * c, -0.02 * s, 0.03)), je.clone().add(off).add(new THREE.Vector3(0, 0, 0.03)), jw.clone().add(off).add(new THREE.Vector3(0, 0, 0.038)), k ? jw.clone().add(off).add(new THREE.Vector3(0.03 * c, 0.03 * s, -0.012)) : head];
     const curve = new THREE.CatmullRomCurve3(pts, false, "catmullrom", 0.3); const m = new THREE.Mesh(new THREE.TubeGeometry(curve, 40, k ? 0.004 : 0.0028, 6, false), PARTS.lineMat[k]); R3.arm.add(m); PARTS.lines[k] = m;
-    if (k === 0) PARTS.dots.forEach((d, i) => { const on = S.air > 0.5 || S.vac > 0.5; d.visible = on; if (on) { const u = S.vac > 0.5 ? 1 - ((now * 0.5 + i / 5) % 1) : (now * 0.5 + i / 5) % 1; d.position.copy(curve.getPointAt(u)); } });
+    if (k === 0) PARTS.dots.forEach((d, i) => { const on = S.air > 0.5; d.visible = on; if (on) { const u = (now * 0.5 + i / 5) % 1; d.position.copy(curve.getPointAt(u)); } });
   }
 }
 /* ---------------------------------------------------------------- the newborn: Kresling stories with star pleats, unfolded then stretched (same function as the Python script), with a soft droop where the body leaves the opening */
@@ -860,12 +865,13 @@ function buildLabels() {
   mk("Docking ring, three magnets, seal", "", () => inS("dock") ? [J.read.dock_x, 0, 0.3] : null);
   mk("Birth opening", "", () => inS("dock", "gel", "push", "fill") ? [J.mouth.top[0] + 0.02, 0, J.mouth.top[2] + 0.02] : null);
   mk("Gel bowl", "w", () => inS("gel", "kit", "print") ? [0.2, -0.07, STATE.gel + 0.005] : null);
-  mk("Rack in the tail: pneumatic module, on the kit", "", () => inS("kit") ? [J.slots.P.o[0], J.slots.P.o[1], J.slots.P.o[2] + 0.07] : null);
+  mk("Rack in the tail: holder, magnet and ball needle", "", () => inS("kit") ? [J.slots.P.o[0], J.slots.P.o[1], J.slots.P.o[2] + 0.07] : null);
   mk("Rack in the tail: print needle", "", () => inS("change", "cure") ? [J.slots.N.o[0], J.slots.N.o[1], J.slots.N.o[2] + 0.07] : null);
+  mk("Kit store in the tail", "", () => inS("gel") ? [J.kit.store[0], 0, J.kit.store[2] + 0.07] : null);
   mk("Electronics kit", "k", () => inS("kit", "change") ? new THREE.Vector3().setFromMatrixPosition(BB.kitG.matrix).add(new THREE.Vector3(0, 0, 0.04)).toArray() : null);
   mk("Waterline", "w", () => J.read.wl[STATE.i] > 0.01 ? [0.75, -0.26, J.read.wl[STATE.i]] : null);
   mk("Pocket: battery, Raspberry Pi 5, gel pump", "", () => inS("gel") ? [-0.12 + STATE.dock, 0.11, 0.3] : null);
-  mk("Pocket: inflator, stopcock, silicone", "", () => inS("gel") ? [-0.12 + STATE.dock, -0.11, 0.26] : null);
+  mk("Pocket: inflator, silicone", "", () => inS("gel") ? [-0.12 + STATE.dock, -0.11, 0.26] : null);
   mk("Newborn", "", () => inS("fill", "float", "swim") ? new THREE.Vector3(BB.L * 0.5, 0, BB.rmax + 0.03).applyMatrix4(R3.baby.matrix).toArray() : null);
 }
 function updateLabels() {
@@ -924,11 +930,11 @@ function setShadows() {
 /* ---------------------------------------------------------------- readouts, panels */
 const rr = (l, v, u, hot) => `<div class="rr${hot ? " hot" : ""}"><span>${l}</span><span>${v}${u ? `<em>${u}</em>` : ""}</span></div>`;
 const bar = (f, warn) => `<div class="bar${warn ? " w" : ""}"><i style="width:${(clamp(f, 0, 1) * 100).toFixed(0)}%"></i></div>`;
-const TOOLN = ["none (bare quick release)", "pneumatic module: cup and ball needle", "print needle"], KITN = ["on the shelf, under the cup", "held by the cup", "on the seat in the gel", "in the newborn"];
+const TOOLN = ["none (bare quick release)", "holder: electromagnet and ball needle", "print needle"], KITN = ["in the kit store in the tail", "held by the magnet", "on the seat in the gel", "in the newborn"];
 function renderReadouts(S) {
   const R = J.read, D = 180 / Math.PI, mm = (x) => f0(x * 1000); let h = "";
   h += `<div class="rg"><h4>Arm, fixed base</h4>${rr("Base, J1, J2", `${f1(S.q0 * D)}, ${f1(S.q1 * D)}, ${f1(S.q2 * D)}`, "deg")}${rr("Tool tip x, y, z", `${mm(ARM.tip[0])}, ${mm(ARM.tip[1])}, ${mm(ARM.tip[2])}`, "mm")}${rr("Tool", TOOLN[S.tool])}`;
-  if (S.vac) h += rr("Cup holds", f2(R.suction_N), "N", true) + rr("Kit weight, margin", `${f2(R.kit_N)} N, ${f1(R.suction_N / R.kit_N)} x`) ;
+  if (S.vac) h += rr("Magnet lifts", f2(R.suction_N), "N", true) + rr("Kit weight, margin", `${f2(R.kit_N)} N, ${f1(R.suction_N / R.kit_N)} x`) ;
   if (["drain", "push", "fill"].includes(S.k)) h += rr("Force on the valve", f2(S.F), "N", true) + bar(S.F / R.payload_N, S.F > R.payload_N) + rr("Limit (payload 500 g)", f2(R.payload_N), "N");
   h += `</div><div class="rg"><h4>Gel chamber</h4>${rr("Gel level", mm(S.gel), "mm")}${rr("Gel volume", f2(R.gel_L * gelFrac(S.gel)), "L of " + f2(R.gel_L))}${rr("Lip above the gel, the water", `${mm(R.lip_z - R.gel_z)}, ${mm(R.lip_z - R.wlz)}`, "mm")}${rr("Kit", KITN[S.nv > 0.5 && S.k !== "print" ? 3 : S.kit])}</div>`;
   if (S.k === "print") h += `<div class="rg"><h4>Print</h4>${rr("Progress", f0(S.pr * 100), "%", true)}${bar(S.pr)}${rr("Layer height z", f1(S.pz * 1000), "mm")}${rr("Bead, silicone", `${f0(R.bead_m)} m, ${f2(R.sil_L)} L`)}</div>`;
@@ -951,7 +957,7 @@ function renderProps() {
       `<div class="pnl"><h3>Penetration, every pair, every frame</h3><dl class="kv">${J.pairs.map((p) => `<dt>${esc(p.name)}</dt><dd>${f2(p.mm)} mm</dd>`).join("")}</dl><p>${J.fr.pen.length} frames tested. Limit 1 mm.</p></div>`; }
   else if (TAB === "birth") { el.innerHTML = `<div class="pnl"><h3>Force of the nozzle on the valve</h3><canvas id="chart" width="700" height="200"></canvas><div class="leg"><span><i style="background:#9cc8ec"></i>force, N</span><span><i style="background:#e3b36a"></i>limit, payload 500 g</span></div><p>${esc(J.read.birth_text)}</p></div>`; drawChart(); }
   else if (TAB === "masses") { const M = J.masses; el.innerHTML = M.map((g) => `<div class="pnl"><h3>${esc(g.name)}</h3><dl class="kv">${g.rows.map((r) => `<dt>${esc(r[0])}</dt><dd>${esc(r[1])}</dd>`).join("")}</dl>${g.note ? `<p>${esc(g.note)}</p>` : ""}</div>`).join(""); }
-  else { const K = J.kit; el.innerHTML = `<div class="pnl"><h3>${esc(K.name)}, ${f0(K.mass * 1000)} g</h3><dl class="kv">${K.parts.map((p) => `<dt>${p.url ? `<a href="${esc(p.url)}" style="color:inherit">${esc(p.name)}</a>` : esc(p.name)}</dt><dd>${f1(p.mass * 1000)} g</dd>`).join("")}</dl><p>Picked once by the suction cup, placed in the gel before printing, then printed around. The parts stay visible through the clear skin. The two water pumps are the DFRobot FIT0800. The air valve of the newborn is a black rubber ball inflation valve core, which closes when the needle leaves.</p></div><div class="pnl"><h3>Parts in the tail</h3><dl class="kv">${[...new Map(J.equip.map((e) => [e.grp, e])).values()].map((e) => `<dt>${esc(e.name)}${e.est ? " (estimate)" : ""}<br><span style="color:var(--dim);font-size:11px">${esc(e.src)}</span></dt><dd>${f0(1000 * J.equip.filter((q) => q.grp === e.grp).reduce((a, q) => a + q.kg, 0))} g</dd>`).join("")}</dl></div>`; }
+  else { const K = J.kit; el.innerHTML = `<div class="pnl"><h3>${esc(K.name)}, ${f0(K.mass * 1000)} g</h3><dl class="kv">${K.parts.map((p) => `<dt>${p.url ? `<a href="${esc(p.url)}" style="color:inherit">${esc(p.name)}</a>` : esc(p.name)}</dt><dd>${f1(p.mass * 1000)} g</dd>`).join("")}</dl><p>Picked once by the electromagnet on the steel disk, placed in the gel before printing, then printed around. The ball needle of the holder stands in a well at the front end of the kit while the magnet holds. The parts stay visible through the clear skin. The two water pumps are the DFRobot FIT0800. The air valve of the newborn is a black rubber ball inflation valve core, which closes when the needle leaves.</p></div><div class="pnl"><h3>Parts in the tail</h3><dl class="kv">${[...new Map(J.equip.map((e) => [e.grp, e])).values()].map((e) => `<dt>${esc(e.name)}${e.est ? " (estimate)" : ""}<br><span style="color:var(--dim);font-size:11px">${esc(e.src)}</span></dt><dd>${f0(1000 * J.equip.filter((q) => q.grp === e.grp).reduce((a, q) => a + q.kg, 0))} g</dd>`).join("")}</dl></div>`; }
 }
 function drawChart() {
   const c = $("#chart"); if (!c) return; const g = c.getContext("2d"), W = c.width, H = c.height, F = J.fr.F, i0 = J.read.force_i0, i1 = J.read.force_i1, mx = Math.max(J.read.payload_N * 1.15, ...F.slice(i0, i1));
