@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Speculative design: a robot giving birth to another · Society</title>
-<meta name="description" content="Born, Not Made at the scale of a population: many simplified bodies in one glass tank, close to square, under small fixed spot lights. Two robots that relate touch at the opening; a body with a tail prints the newborn in its gel chamber; the newborn is born wrinkled and fills with air. Only the silicone head is born; the tails, with the arm inside, are a fixed number, never born, and pass from head to head after each birth.">
+<meta name="description" content="Born, Not Made at the scale of a population: many simplified bodies in one glass tank, close to square, under small fixed spot lights. Two robots that relate touch at the opening; a body with a tail prints the newborn in its gel chamber; the newborn fills with air as it is pushed out and leaves the body full size. Only the silicone head is born; the tails, with the arm inside, are a fixed number, never born, and pass from head to head after each birth.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 /* Society, simplified bodies: a tank close to square in a black room, nine small fixed spot lights above. */
@@ -53,7 +53,7 @@ html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
     <canvas id="c" aria-label="Many robots in one tank under small spot lights"></canvas>
     <div class="grain" id="grain"></div><div class="vig"></div>
     <div id="labs"></div>
-    <div class="cap"><h1>Society</h1><p>It starts with two robots and a few loose tails. Two that relate touch at the opening. A body with a tail holds the arm, so it prints the newborn in its gel chamber. Only the translucent silicone head is born: wrinkled, it fills with air and swims off. The tails, with the arm inside, are a fixed number and are never born. After a birth the tail lets go, and another head takes it from behind, so the few arms pass from body to body.</p>
+    <div class="cap"><h1>Society</h1><p>It starts with two robots and a few loose tails. Two that relate touch at the opening. A body with a tail holds the arm, so it prints the newborn in its gel chamber. Only the translucent silicone head is born: it fills with air like a balloon as it is pushed out through the opening, leaves the body already full size and swims off. The tails, with the arm inside, are a fixed number and are never born. After a birth the tail lets go, and another head takes it from behind, so the few arms pass from body to body.</p>
       <div class="hud" id="hud"></div></div>
     <div class="views" id="views"><button data-cam="tank" class="on">Whole tank</button><button data-cam="follow">Follow births</button><button data-cam="above">Above</button></div>
     <div class="ev" id="ev"></div>
@@ -80,7 +80,7 @@ html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
       <h3>Body diversity</h3><canvas class="spark" id="sp3"></canvas>
       <h3>Seed memory still carried</h3><canvas class="spark" id="sp4"></canvas></div>
     <div><h3>Selected</h3><div id="insp" class="note">Click a robot in the tank.</div></div>
-    <div><h3>Rules</h3><p class="note">Relation is shared memory, likeness of body and time spent near each other. Every body is printed a little differently: its proportions, rings around the body, a crest, a lobed section, the tone of the clay, the print texture (straight layers, a spiral, crosshatch, waves, dimples or smooth, with its own pitch and depth) and how clear or frosted the silicone head is are inherited and drift. A robot ready to bear looks for the one it relates to most; at least one of the two has a tail. They touch opening to opening and exchange memory and form. The one with a tail carries: the arm prints the newborn in gel, layer by layer, then inflates it a little inside the chamber and pushes it out. Each newborn mixes both bodies, with drift. Only the translucent silicone head is born. The tail holds the arm and is never born: there is a fixed number of tails in the tank, two on the first robots and the loose ones. A head without a tail swims to a loose tail and docks it from behind. After a birth the tail lets go of the one that carried and floats free, and another head takes it, so the few arms are shared around the tank and whoever holds one can carry next. Nobody dies; the water feeds only so many, so births slow as the tank fills.</p></div>
+    <div><h3>Rules</h3><p class="note">Relation is shared memory, likeness of body and time spent near each other. Every body is printed a little differently: its proportions, rings around the body, a crest, a lobed section, the tone of the clay, the print texture (straight layers, a spiral, crosshatch, waves, dimples or smooth, with its own pitch and depth) and how clear or frosted the silicone head is are inherited and drift. A robot ready to bear looks for the one it relates to most; at least one of the two has a tail. They touch opening to opening and exchange memory and form. The one with a tail carries: the arm prints the newborn in gel, layer by layer, then pushes it out through the opening while filling it with air, so it leaves the body full size and does not grow afterwards. Each newborn mixes both bodies, with drift. Only the translucent silicone head is born. The tail holds the arm and is never born: there is a fixed number of tails in the tank, two on the first robots and the loose ones. A head without a tail swims to a loose tail and docks it from behind. After a birth the tail lets go of the one that carried and floats free, and another head takes it, so the few arms are shared around the tank and whoever holds one can carry next. Nobody dies; the water feeds only so many, so births slow as the tank fills.</p></div>
     <p class="links"><a href="bodies/">Bodies</a>: the same society with the earlier v2 bodies. <a href="old_/">Earlier 2D version</a>. <a href="../simulator/simple/">Printing simulator, simplified</a>. <a href="../">Home</a></p>
   </aside>
 </div>
@@ -385,9 +385,9 @@ function conceive(bearer, other) {
 }
 function giveBirth(m) {
   const sp = m.babySpec, baby = m.baby;
-  const c = Math.cos(m.h), s = Math.sin(m.h), d = reach(m) + 0.12;
-  const kid = newRobot({ g: sp.g, tail: sp.tail, memory: sp.memory, gen: sp.gen, parents: sp.parents, age: 0, adult: false, inflate: 0, energy: 0.4, h: m.h, cool: 30 });
-  kid.x = m.x + c * d; kid.z = m.z + s * d; kid.vx = c * 0.3; kid.vz = s * 0.3;
+  const c = Math.cos(m.h), s = Math.sin(m.h), d = reach(m) - m.baby.userData.back + 0.01;      // where the full size newborn sits as it leaves the opening
+  const kid = newRobot({ g: sp.g, tail: sp.tail, memory: sp.memory, gen: sp.gen, parents: sp.parents, age: 0, adult: false, inflate: 1, energy: 0.4, h: m.h, cool: 30 });
+  kid.x = m.x + c * d; kid.z = m.z + s * d; kid.vx = c * 0.2; kid.vz = s * 0.2;
   m.grp.remove(baby); baby.geometry.dispose(); baby.material.forEach((x) => x.dispose()); m.baby = null; m.babySpec = null;
   m.carry = 0; m.birthT = 0; m.energy -= 0.5; m.cool = 12; births++;
   ripple(kid.x, kid.z, 1.0); log(`#${kid.id} born from #${sp.parents[0]} and #${sp.parents[1]}, generation ${kid.gen}, a head without a tail`);
@@ -453,7 +453,7 @@ function step(dt) {
     }
     if (r.carry) {
       if (r.carry < 1) { r.carry = Math.min(1, r.carry + dt / P.gest); if (r.carry >= 1) { r.birthT = 0.0001; focusOn(r, 8); } }
-      else { r.birthT += dt / 3.5; r.vx *= 0.9; r.vz *= 0.9; if (r.birthT >= 1) giveBirth(r); }
+      else { r.birthT += dt / 7; r.vx *= 0.9; r.vz *= 0.9; if (r.birthT >= 1) giveBirth(r); }
     }
     for (const T of loose) { if (r.dock === T) continue; const dx = T.x - r.x, dz = T.z - r.z, d = Math.hypot(dx, dz) || 1e-3, minD = rad + 0.2; if (d < minD) { const k = (minD - d) / minD; ax -= dx / d * 1.6 * k; az -= dz / d * 1.6 * k; } }
     // a head without a tail looks for a loose tail and docks it from behind
@@ -505,9 +505,11 @@ function updateScene(dtReal) {
     // the newborn inside: printed bottom up, then a little air, then pushed out through the opening
     if (r.baby) {
       const b = r.baby, pr = clamp(r.carry / 0.75, 0, 1), inf = sstep(0.75, 1, r.carry), out = r.birthT;
-      b.morphTargetInfluences[0] = 1 - 0.25 * inf - 0.15 * out;
-      const bl = b.userData.len * 0.4, start = -0.01, end = reach(r) + bl * 0.5 + 0.08;
-      b.position.set(lerp(start, end, sstep(0, 1, out)), -r.s.B * 0.28, 0);
+      // pushed out through the opening and filled with air on the way, like a balloon: it leaves the body already full size
+      const e1 = sstep(0, 0.3, out), u = sstep(0.2, 1, out), w = lerp(1 - 0.25 * inf, 0, u), sx = 1 - 0.6 * w;
+      b.morphTargetInfluences[0] = w;
+      const exitX = reach(r) - b.userData.back * sx + 0.01 - 0.12 * (1 - u);
+      b.position.set(lerp(-0.01, exitX, e1), lerp(-r.s.B * 0.28, 0, u), 0);
       b.updateMatrixWorld(true);
       const y0 = r.grp.position.y - r.s.B * 0.6, y1 = r.grp.position.y + 0.02;
       b.userData.plane.constant = out > 0 ? 10 : lerp(y0, y1, pr);
@@ -601,6 +603,6 @@ let downAt = null; cv.addEventListener("pointerdown", (e) => (downAt = [e.client
 cv.addEventListener("pointerup", (e) => { if (!downAt || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 5) return; const b = cv.getBoundingClientRect(); const rc = new THREE.Raycaster(); rc.setFromCamera({ x: (e.clientX - b.left) / b.width * 2 - 1, y: -(e.clientY - b.top) / b.height * 2 + 1 }, R3.cam); const hit = rc.intersectObjects(pickable, false)[0]; selected = hit ? hit.object.userData.robot : null; inspect(); });
 initThree(); tankCam(); R3.ctl.addEventListener("start", () => (R3.moved = true));
 const embedSync = () => { const e = document.documentElement.classList.contains("bnm-embed"); R3.ctl.enableZoom = !e; }; embedSync(); new MutationObserver(embedSync).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] }); reset(); requestAnimationFrame(loop);
-window.__society = { get robots() { return robots; }, get simT() { return simT; }, R3, setSpeed: (s) => (speed = s), step, newRobot, conceive, disposeRobot, clear: () => { robots.forEach(disposeRobot); robots = []; pickable.length = 0; } };
+window.__society = { get robots() { return robots; }, get simT() { return simT; }, R3, setSpeed: (s) => (speed = s), step, newRobot, conceive, disposeRobot, clear: () => { robots.forEach(disposeRobot); robots = []; [...loose].forEach(disposeLoose); loose = []; pickable.length = 0; } };
 </script>
 </body></html>
