@@ -172,7 +172,7 @@ button:focus-visible, input:focus-visible, a:focus-visible, .track:focus-visible
   <header class="area top">
     <div class="logo" aria-hidden="true"></div>
     <span class="file">Printing simulator, simplified</span>
-    <span class="sub">Born, Not Made · two printed parts, a fixed arm, one opening · after the artist's sketch</span>
+    <span class="sub">Born, Not Made · two printed parts, a fixed arm, everything in the tail, a bare gel chamber · after the artist's sketches</span>
     <span class="sp"></span>
     <a class="home s2" href="../">Full version</a>
     <a class="home" href="../../">Home</a>
@@ -234,7 +234,7 @@ button:focus-visible, input:focus-visible, a:focus-visible, .track:focus-visible
 
 <section class="doc" id="how">
   <h2>A simplified parent body, after the sketch</h2>
-  <p>The sketch asks for two printed parts only: a tail that holds the arm and the equipment, and a gel chamber whose lower part holds the gel, with one opening on a slant at the upper front. The Rotrics DexArm stands on a fixed base in the tail and reaches into the gel chamber. Nothing slides. The parent body may rest on the tank floor; only the newborn floats. This page follows that logic and calculates every dimension: the reach and the payload of the arm, the forces, the inflation and the print volume of the Bambu Lab H2S. Where the sketch does not hold, the page says so and shows the smallest change that works.</p>
+  <p>The sketches ask for two printed parts only: a tail that holds the arm, the rack, the tools, the kit store and every other part, and a gel chamber that is a bare shell, with one opening on a slant at the upper front. The gel lies in one rounded bowl in the lower body. The Rotrics DexArm stands on a fixed base in the tail and reaches into the gel chamber. Nothing slides. The parent body may rest on the tank floor; only the newborn floats. This page follows that logic and calculates every dimension: the reach and the payload of the arm, the forces, the inflation and the print volume of the Bambu Lab H2S. Where the sketch does not hold, the page says so and shows the smallest change that works.</p>
   <h4>Does the sketch make sense</h4>
   <table id="verdict"></table>
   <h4>How each dimension is set</h4>
@@ -243,11 +243,11 @@ button:focus-visible, input:focus-visible, a:focus-visible, .track:focus-visible
   <ul id="deriv"></ul>
   <h4>How this is simulated</h4>
   <p>A Python script (<code>bnm_design/simple/design.py</code>) builds the hull, the newborn and the arm, plans every move of the cycle, and writes <code>simple.json</code>; the browser replays and interpolates. The arm uses the link meshes and the kinematics of the Stage 2 DexArm model with the official joint ranges; each pose on the timeline is solved by inverse kinematics, and a pose outside the ranges is reported as a failed check. The newborn is the folded body of the full size study, resized: Kresling stories with sixteen radial star pleats, opened by air and finished by a 25 percent stretch of the skin. While the arm pushes, the body is a rigid body on a pin at the valve: the pitch is the smallest pitch at which the body clears the gel chamber and the rim, and the part outside droops until the water carries that part or the hull stops the droop, with a lag. Each segment opens after the segment has passed the opening, with a lag as well. After the nozzle lets go, the newborn is a rigid body in the vertical plane with gravity, buoyancy from forty slices, drag in heave, pitch and surge, a contact at the lip, the thrust of the two kit pumps and the ballast water; the roll is a damped oscillator with the righting moment of the calculated metacentric height. The clock shows process time; the view is a time lapse.</p>
-  <p>Colliders: the two shells (the inner surface as a function, the wall as a 3 mm band), the rim of the opening, the docking ring, the rack forks, the kit shelf, the seat, the tail equipment, the eight arm links (their mesh vertices), the module head, stem and cup, the parked modules, the kit as a box, and the newborn as a dense point set in every state. Every frame of the timeline is tested for every pair; the Checks panel lists the deepest overlap of each pair. The nozzle in the valve, the needle in the work, the cup on the kit and the kit in the newborn are contacts by design and are left out.</p>
+  <p>Colliders: the two shells (the inner surface as a function, the wall as a 3 mm band), the rim of the opening, the rack forks, the kit store, the seat, the two pockets in the tail with their parts, the eight arm links (their mesh vertices), the module head, stem and cup, the parked modules, the kit as a box, and the newborn as a dense point set in every state. Every frame of the timeline is tested for every pair; the Checks panel lists the deepest overlap of each pair. The nozzle in the valve, the needle in the work, the cup on the kit and the kit in the newborn are contacts by design and are left out.</p>
   <h4>The tank</h4>
   <p id="tankp"></p>
   <h4>Staging</h4>
-  <p>One glass tank on a dark plinth in a black room, one lamp straight above. The water is nearly still: faint, slow caustics and a quiet surface. The switch above the view adds a few slow inner lights in the parent body and the newborn; the default is off. None of this changes the physics.</p>
+  <p>One long glass tank on a dark plinth in a black room, one lamp straight above. The water is nearly still: faint, slow caustics and a quiet surface. The switch above the view adds a few slow inner lights in the parent body and the newborn; the default is off. None of this changes the physics.</p>
   <h4>Limits</h4>
   <ul id="limits"></ul>
   <h4>Sources</h4>
@@ -289,8 +289,8 @@ function log(msg, cls = "") {
 
 const UW = { uTime: { value: 0 }, uWL: { value: -0.13 } };
 /* the gallery: one square glass tank on a dark plinth, one spotlight straight above. CU holds what every shader needs to know about the light, the tank and the inner lights. */
-const TANK = { x0: -0.400, x1: 0.776, y0: -0.288, y1: 0.288, zf: -0.003, zt: 0.345, th: 0.012, zr: -0.95, lamp: [0.16, 0, 2.35] };   /* UNS 120S, inner size */
-const LAMP_ANG = 0.5;
+const TANK = { x0: -0.400, x1: 1.070, y0: -0.285, y1: 0.285, zf: -0.003, zt: 0.582, th: 0.015, zr: -0.95, lamp: [0.32, 0, 2.6] };   /* UNS 150U, inner size */
+const LAMP_ANG = 0.56;
 /* the tank as drawn is made to order: no stock aquarium found is wide enough. Clear acrylic 1190 kg/m3; the volume is the water up to the waterline, the weight is that water plus the four walls. */
 const TANKF = () => { const T = TANK, W = T.x1 - T.x0, D = T.y1 - T.y0, dep = J.WL - T.zf, V = W * D * dep, walls = (2 * (W + 2 * T.th) + 2 * D) * T.th * (T.zt - T.zf) * 1190; return { W, D, dep, L: V * 1000, kg: V * 1000 + walls }; };
 const CU = { uLP: { value: new THREE.Vector3(...TANK.lamp) }, uLD: { value: new THREE.Vector3(0, 0, -1) }, uLC: { value: new THREE.Vector2(Math.cos(LAMP_ANG), Math.cos(LAMP_ANG * 0.19)) }, uLI: { value: 17 },
@@ -456,11 +456,11 @@ void main() {
   // people watching, dark against the pool of light
   const prof = [[0.13, 0], [0.16, 0.04], [0.175, 0.5], [0.185, 0.95], [0.2, 1.22], [0.205, 1.34], [0.17, 1.42], [0.075, 1.47], [0.058, 1.5], [0.062, 1.54], [0.092, 1.59], [0.104, 1.66], [0.098, 1.73], [0.066, 1.785], [0, 1.8]].map((p) => new THREE.Vector2(p[0], p[1]));
   const fg = new THREE.LatheGeometry(prof, 28).rotateX(Math.PI / 2), fm = std(0x18181a, 0.85);
-  for (const [x, y, h, yaw] of [[-0.75, T.y1 + 1.0, 1.0, 0.2], [-0.2, T.y1 + 1.4, 0.94, -0.3], [0.9, T.y1 + 0.95, 1.03, 0.1], [1.7, T.y1 + 1.6, 0.97, 0.5]]) {
+  for (const [x, y, h, yaw] of [[-0.75, T.y1 + 1.0, 1.0, 0.2], [-0.2, T.y1 + 1.4, 0.94, -0.3], [1.0, T.y1 + 0.95, 1.03, 0.1], [2.1, T.y1 + 1.6, 0.97, 0.5]]) {
     const f = new THREE.Mesh(fg, fm); f.scale.set(0.92, 0.56, h); f.rotation.z = yaw; f.position.set(x, y, T.zr); f.castShadow = true; f.receiveShadow = true; sc.add(f); GAL.figures.push(f); }
   // particles: fine matter suspended in the water, dust in the light above
   const NP = 2600, pos = new Float32Array(NP * 3), seed = new Float32Array(NP * 2); let s = 7; const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
-  for (let i = 0; i < NP; i++) { const air = i >= 2100, r = Math.sqrt(rnd()) * (air ? 0.9 : 0.75), a = rnd() * 2 * Math.PI;
+  for (let i = 0; i < NP; i++) { const air = i >= 2100, r = Math.sqrt(rnd()) * (air ? 1.1 : 1.0), a = rnd() * 2 * Math.PI;
     pos[3 * i] = clamp(L[0] + r * Math.cos(a), T.x0 + 0.05, T.x1 - 0.05); pos[3 * i + 1] = clamp(L[1] + r * Math.sin(a), T.y0 + 0.05, T.y1 - 0.05); pos[3 * i + 2] = air ? J.WL + 0.05 + rnd() * 1.4 : T.zf + 0.02 + rnd() * (J.WL - T.zf - 0.04);
     seed[2 * i] = rnd(); seed[2 * i + 1] = air ? 1 : 0; }
   const pg = new THREE.BufferGeometry(); pg.setAttribute("position", new THREE.BufferAttribute(pos, 3)); pg.setAttribute("seed", new THREE.BufferAttribute(seed, 2));
@@ -635,26 +635,36 @@ function buildBody() {
   }
   const rimM = clayMat(0xe6e4dd, { sub: 0.5 });
   PARTS.rim = loopTube(H.rim, 0.0015, rimM, R3.chamber);
-  const dk = H.dock.slice(), dk2 = H.dock.slice(); for (let i = 0; i < dk.length; i += 3) { dk[i] = 0.002; dk2[i] = -0.002; }
+  const dk = H.dock.slice(), dk2 = H.dock.slice(), XD = J.read.dock_x; for (let i = 0; i < dk.length; i += 3) { dk[i] = XD + 0.002; dk2[i] = XD - 0.002; }
   loopTube(dk, 0.002, rimM, R3.chamber); loopTube(dk2, 0.002, rimM, R3.tail);
-  for (const mg of J.magnets) { const a = new THREE.Mesh(new THREE.CylinderGeometry(0.0095, 0.0095, 0.0032, 20).rotateZ(Math.PI / 2), clayMat(0x9aa0a8, { rough: 0.3 })); a.position.set(-0.0036, mg.c[1], mg.c[2]); R3.tail.add(a);
-    const s = new THREE.Mesh(new THREE.CylinderGeometry(0.0095, 0.0095, 0.002, 20).rotateZ(Math.PI / 2), clayMat(0xc9ccd0, { rough: 0.35 })); s.position.set(0.003, mg.c[1], mg.c[2]); R3.chamber.add(s); }
+  for (const mg of J.magnets) { const a = new THREE.Mesh(new THREE.CylinderGeometry(0.0095, 0.0095, 0.0032, 20).rotateZ(Math.PI / 2), clayMat(0x9aa0a8, { rough: 0.3 })); a.position.set(mg.c[0] - 0.0036, mg.c[1], mg.c[2]); R3.tail.add(a);
+    const s = new THREE.Mesh(new THREE.CylinderGeometry(0.0095, 0.0095, 0.002, 20).rotateZ(Math.PI / 2), clayMat(0xc9ccd0, { rough: 0.35 })); s.position.set(mg.c[0] + 0.003, mg.c[1], mg.c[2]); R3.chamber.add(s); }
   const white = clayMat(0xe9e7e1, { sub: 0.4, clip }), soft = clayMat(0xe4e9ee, { opacity: 0.5, sub: 0.4, clip, side: THREE.DoubleSide });
-  PARTS.equip = [];
-  for (const b of J.boxes) { const eq = b.grp === "equip", bag = eq && /bag/i.test(b.name); const m = boxMesh(b, bag ? soft : white, eq ? R3.tail : R3.chamber); if (bag) m.renderOrder = 4; edgeLines(m, 30, 0.3, 0xdfe3ea, clip); if (eq) PARTS.equip.push(m); }
-  // parked modules at the two forks
+  // rack forks and kit store: printed with the tail; kit seat bumps: printed with the gel chamber
+  for (const b of J.boxes) { const m = boxMesh(b, white, b.grp === "seat" ? R3.chamber : R3.tail); edgeLines(m, 30, 0.3, 0xdfe3ea, clip); }
+  // the two pockets: swellings of the side walls of the tail, with the parts of the tail inside
+  const podM = clayMat(0xeef0ee, { opacity: 0.5, side: THREE.DoubleSide, sub: 0.4, clip, rough: 0.35 });
+  for (const p of J.pods) { const m = meshOf(p.v, p.t, podM); m.renderOrder = 6; R3.tail.add(m); }
+  const pm = { cyl: clayMat(0xcfd3d9, { sub: 0.4, clip }), box: clayMat(0x2f6b52, { sub: 0.4, clip }), ell: clayMat(0xdfeaf0, { opacity: 0.6, sub: 0.3, clip }) };
+  for (const e of J.equip) { let g;
+    if (e.kind === "box") g = new THREE.BoxGeometry(e.size[0], e.size[1], e.size[2]);
+    else if (e.kind === "ell") g = new THREE.SphereGeometry(1, 20, 14).scale(e.size[0], e.size[1], e.size[2]);
+    else { g = new THREE.CylinderGeometry(e.size[0], e.size[0], e.size[1], 20); if (e.axis === "x") g.rotateZ(Math.PI / 2); else g.rotateX(Math.PI / 2); }
+    const m = new THREE.Mesh(g, /Battery/.test(e.name) ? clayMat(0x7fb7a4, { sub: 0.4, clip }) : /inflator/.test(e.name) ? clayMat(0x2a2b2e, { sub: 0.4, clip, rough: 0.5 }) : /valve/.test(e.name) ? clayMat(0xe6f0f4, { opacity: 0.7, sub: 0.3, clip }) : /Silicone/.test(e.name) ? clayMat(0xf1f1ec, { opacity: 0.75, sub: 0.3, clip }) : pm[e.kind]); m.position.set(...e.c); R3.tail.add(m); edgeLines(m, 30, 0.35, 0x8d9097, clip); }
+  // parked modules at the two forks, in the tail
   PARTS.parkP = moduleGroup("cup"); PARTS.parkN = moduleGroup("needle");
-  for (const [g, s] of [[PARTS.parkP, J.slots.P], [PARTS.parkN, J.slots.N]]) { g.position.set(...s.o); g.rotation.z = s.yaw; R3.chamber.add(g); }
+  for (const [g, s] of [[PARTS.parkP, J.slots.P], [PARTS.parkN, J.slots.N]]) { g.position.set(...s.o); g.rotation.z = s.yaw; R3.tail.add(g); }
   // gel: the lower lobe of the gel chamber up to the level, with the level as a surface
   const G_ = H.gel, nx = G_.x.length; const gg = new THREE.BufferGeometry(); gg.setAttribute("position", new THREE.BufferAttribute(new Float32Array(nx * 2 * 3), 3)); const idx = []; for (let i = 0; i < nx - 1; i++) idx.push(2 * i, 2 * i + 1, 2 * i + 2, 2 * i + 1, 2 * i + 3, 2 * i + 2); gg.setIndex(idx);
   PARTS.gelTop = new THREE.Mesh(gg, clayMat(0xdfeaf0, { opacity: 0.42, side: THREE.DoubleSide, sub: 0.2, rough: 0.25, clip })); PARTS.gelTop.renderOrder = 6; R3.chamber.add(PARTS.gelTop);
-  GELCLIP.constant = 0; PARTS.gelBody = meshOf(H.chamber.v, H.chamber.t, clayMat(0xd5e3ec, { opacity: 0.2, side: THREE.DoubleSide, sub: 0.2, clip: [GELCLIP, SECT] })); PARTS.gelBody.renderOrder = 4; PARTS.gelBody.scale.set(0.992, 0.985, 1); R3.chamber.add(PARTS.gelBody);
+  GELCLIP.constant = 0; PARTS.gelBody = meshOf(H.chamber.v, H.chamber.t, clayMat(0xd5e3ec, { opacity: 0.2, side: THREE.DoubleSide, sub: 0.2, clip: [GELCLIP, SECT] })); PARTS.gelBody.renderOrder = 4; PARTS.gelBody.scale.set(1, 0.985, 1); R3.chamber.add(PARTS.gelBody);
+  PARTS.gelBody2 = meshOf(H.tail.v, H.tail.t, PARTS.gelBody.material); PARTS.gelBody2.renderOrder = 4; PARTS.gelBody2.scale.set(1, 0.985, 1); R3.tail.add(PARTS.gelBody2);
 }
 const GELCLIP = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
 function setGel(z) {
   const G_ = J.hull.gel, p = PARTS.gelTop.geometry.attributes.position, zs = G_.z; let k = 0; while (k < zs.length - 2 && zs[k + 1] < z) k++; const f = clamp((z - zs[k]) / (zs[k + 1] - zs[k]), 0, 1);
   for (let i = 0; i < G_.x.length; i++) { const w = lerp(G_.hw[k][i], G_.hw[k + 1][i], f) * 0.985; p.setXYZ(2 * i, G_.x[i], w, z); p.setXYZ(2 * i + 1, G_.x[i], -w, z); }
-  p.needsUpdate = true; PARTS.gelTop.geometry.computeVertexNormals(); PARTS.gelTop.visible = z > 0.004; PARTS.gelBody.visible = z > 0.004; GELCLIP.constant = z;
+  p.needsUpdate = true; PARTS.gelTop.geometry.computeVertexNormals(); PARTS.gelTop.visible = z > 0.004; PARTS.gelBody.visible = z > 0.004; PARTS.gelBody2.visible = z > 0.004; GELCLIP.constant = z;
 }
 /* ---------------------------------------------------------------- the arm: Stage 2 link meshes on a fixed base, tool modules on the front of the end effector */
 const M4 = () => new THREE.Matrix4(), Tm = (v) => M4().makeTranslation(v[0], v[1], v[2]);
@@ -697,8 +707,8 @@ function poseArm(q, tool, S, now) {
   // the lines along the arm: air (blue) and gel (pale), from the tail equipment to the head
   const [js, je, jw] = ARM.joints, head = new THREE.Vector3(o[0], o[1], o[2] + A.HEAD.h + 0.006), side = new THREE.Vector3(-s, c, 0);
   for (let k = 0; k < 2; k++) { if (PARTS.lines[k]) { R3.arm.remove(PARTS.lines[k]); PARTS.lines[k].geometry.dispose(); }
-    const off = side.clone().multiplyScalar(k ? -0.012 : 0.012), src = k ? new THREE.Vector3(-0.2, -0.075, 0.24) : new THREE.Vector3(-0.2, -0.033, 0.19);
-    const pts = [src, new THREE.Vector3(J.base[0] - 0.07, off.y * 2, 0.13), js.clone().add(off).add(new THREE.Vector3(-0.02 * c, -0.02 * s, 0.03)), je.clone().add(off).add(new THREE.Vector3(0, 0, 0.03)), jw.clone().add(off).add(new THREE.Vector3(0, 0, 0.038)), k ? jw.clone().add(off).add(new THREE.Vector3(0.03 * c, 0.03 * s, -0.012)) : head];
+    const off = side.clone().multiplyScalar(k ? -0.012 : 0.012), src = k ? new THREE.Vector3(-0.12, 0.1, 0.24) : new THREE.Vector3(-0.13, -0.1, 0.235);
+    const pts = [src, new THREE.Vector3(J.base[0] - 0.02, k ? 0.07 : -0.07, 0.2), js.clone().add(off).add(new THREE.Vector3(-0.02 * c, -0.02 * s, 0.03)), je.clone().add(off).add(new THREE.Vector3(0, 0, 0.03)), jw.clone().add(off).add(new THREE.Vector3(0, 0, 0.038)), k ? jw.clone().add(off).add(new THREE.Vector3(0.03 * c, 0.03 * s, -0.012)) : head];
     const curve = new THREE.CatmullRomCurve3(pts, false, "catmullrom", 0.3); const m = new THREE.Mesh(new THREE.TubeGeometry(curve, 40, k ? 0.004 : 0.0028, 6, false), PARTS.lineMat[k]); R3.arm.add(m); PARTS.lines[k] = m;
     if (k === 0) PARTS.dots.forEach((d, i) => { const on = S.air > 0.5 || S.vac > 0.5; d.visible = on; if (on) { const u = S.vac > 0.5 ? 1 - ((now * 0.5 + i / 5) % 1) : (now * 0.5 + i / 5) % 1; d.position.copy(curve.getPointAt(u)); } });
   }
@@ -797,7 +807,7 @@ function buildBaby() {
   // the valve boss on the tail cap (the nozzle enters from above) and the duckbill vent in the nose
   const vm = (geo, hex, o) => new THREE.Mesh(geo, clayMat(hex, Object.assign({ sub: 0.3, sss: 0.3, sssi: 0.5, clip }, o)));
   BB.valve = new THREE.Group(); R3.baby.add(BB.valve); const boss = vm(new THREE.CylinderGeometry(0.008, 0.01, 0.012, 20).rotateX(Math.PI / 2).translate(0, 0, 0.006), 0xe6eae8, { opacity: 0.85, depthWrite: true }); BB.valve.add(boss); edgeLines(boss, 30, 0.5, 0x7a828c);
-  BB.valve.add(vm(new THREE.CylinderGeometry(0.0035, 0.0035, 0.004, 14).rotateX(Math.PI / 2).translate(0, 0, 0.0105), 0xc24a2c));
+  BB.valve.add(vm(new THREE.CylinderGeometry(0.005, 0.0055, 0.007, 16).rotateX(Math.PI / 2).translate(0, 0, 0.0095), 0x121214));   // the black rubber ball valve core
   BB.vent = new THREE.Group(); R3.baby.add(BB.vent); const dv = vm(new THREE.CylinderGeometry(0.0022, 0.005, 0.012, 14).rotateZ(-Math.PI / 2), 0x3f8fa8); dv.position.x = 0.004; dv.scale.y = 0.55; BB.vent.add(dv);
   babyMeshUpdate(new Array(J.body.params.NSEG).fill(0), 0, 0);
 }
@@ -828,7 +838,7 @@ function evalState(T) {
 }
 const kitM = M4();
 function applyState(S, now) {
-  CLOCK = S.clock; R3.tail.position.x = S.dock; WMASK.uTF.value.x = S.dock;
+  CLOCK = S.clock; R3.tail.position.x = S.dock; WMASK.uTF.value.x = S.dock; const wl = J.read.wl[S.i]; UW.uWL.value = wl; J.WL = Math.max(wl, 0.002); WATER.surf.visible = wl > 0.003;
   poseArm([S.q0, S.q1, S.q2], S.tool, S, now);
   PARTS.parkP.visible = !!S.pP; PARTS.parkN.visible = !!S.pN; setGel(S.gel);
   const nb = S.nv > 0.5; R3.baby.visible = nb;
@@ -837,7 +847,7 @@ function applyState(S, now) {
   const K = J.kit;
   if (nb && S.k !== "print") { const uc = 0.5 * (BB.u[J.body.params.BAND] + BB.u[J.body.params.BAND + 1]), kz = -BB.rb + 0.0065 + K.size[2] / 2; BB.kitG.matrix.copy(R3.baby.matrix).multiply(Tm([uc, 0, kz])); if (BB.sadFit) BB.sadFit(BB.rb);
     BB.jets.forEach((j, i) => { j.position.set(uc + BB.jetEnd[i][0] - 0.004, BB.jetEnd[i][1], kz + BB.jetEnd[i][2]); setJet(j, S.jets, now); }); }
-  else { BB.kitG.matrix.copy(Tm([S.kx, S.ky, S.kz + 0.003])).multiply(M4().makeRotationZ(S.kyaw)); if (BB.jets) BB.jets.forEach((j) => { j.visible = false; }); }
+  else { BB.kitG.matrix.copy(Tm([S.kx + (S.kit === 0 ? S.dock : 0), S.ky, S.kz + 0.003])).multiply(M4().makeRotationZ(S.kyaw)); if (BB.jets) BB.jets.forEach((j) => { j.visible = false; }); }
   BB.kitG.matrixWorldNeedsUpdate = true;
   UW.uTime.value = now; STATE = S;
 }
@@ -846,16 +856,16 @@ const LABELS = [], ws = new THREE.Vector3();
 function buildLabels() {
   const mk = (txt, cls, fn) => { const d = document.createElement("div"); d.className = "lab " + cls; d.textContent = txt; $("#vp").appendChild(d); LABELS.push({ d, fn }); };
   const inS = (...ks) => ks.includes(STATE.k);
-  mk("Tail", "", () => [-0.2 + STATE.dock, 0, 0.36]); mk("Gel chamber", "", () => [0.1, 0, 0.36]);
-  mk("Docking ring, three magnets", "", () => inS("dock") ? [0, 0, 0.3] : null);
+  mk("Tail", "", () => [-0.12 + STATE.dock, 0, 0.36]); mk("Gel chamber", "", () => [0.16, 0, 0.36]);
+  mk("Docking ring, three magnets, seal", "", () => inS("dock") ? [J.read.dock_x, 0, 0.3] : null);
   mk("Birth opening", "", () => inS("dock", "gel", "push", "fill") ? [J.mouth.top[0] + 0.02, 0, J.mouth.top[2] + 0.02] : null);
-  mk("Gel", "w", () => inS("gel", "kit", "print") ? [0.2, -0.06, STATE.gel + 0.005] : null);
-  mk("Rack: pneumatic module, on the kit", "", () => inS("kit", "change") ? [J.slots.P.o[0], J.slots.P.o[1], J.slots.P.o[2] + 0.07] : null);
-  mk("Rack: print needle", "", () => inS("change", "cure") ? [J.slots.N.o[0], J.slots.N.o[1], J.slots.N.o[2] + 0.07] : null);
+  mk("Gel bowl", "w", () => inS("gel", "kit", "print") ? [0.2, -0.07, STATE.gel + 0.005] : null);
+  mk("Rack in the tail: pneumatic module, on the kit", "", () => inS("kit") ? [J.slots.P.o[0], J.slots.P.o[1], J.slots.P.o[2] + 0.07] : null);
+  mk("Rack in the tail: print needle", "", () => inS("change", "cure") ? [J.slots.N.o[0], J.slots.N.o[1], J.slots.N.o[2] + 0.07] : null);
   mk("Electronics kit", "k", () => inS("kit", "change") ? new THREE.Vector3().setFromMatrixPosition(BB.kitG.matrix).add(new THREE.Vector3(0, 0, 0.04)).toArray() : null);
-  mk("Waterline", "w", () => [0.62, -0.26, J.WL]);
-  mk("Battery, air pump, silicone, controller", "", () => inS("dock", "gel") ? [-0.25 + STATE.dock, -0.05, 0.31] : null);
-  mk("Gel bags", "", () => inS("gel") ? [-0.125, -0.13, 0.26] : null);
+  mk("Waterline", "w", () => J.read.wl[STATE.i] > 0.01 ? [0.75, -0.26, J.read.wl[STATE.i]] : null);
+  mk("Pocket: battery, Raspberry Pi 5, gel pump", "", () => inS("gel") ? [-0.12 + STATE.dock, 0.11, 0.3] : null);
+  mk("Pocket: inflator, stopcock, silicone", "", () => inS("gel") ? [-0.12 + STATE.dock, -0.11, 0.26] : null);
   mk("Newborn", "", () => inS("fill", "float", "swim") ? new THREE.Vector3(BB.L * 0.5, 0, BB.rmax + 0.03).applyMatrix4(R3.baby.matrix).toArray() : null);
 }
 function updateLabels() {
@@ -867,15 +877,15 @@ function updateLabels() {
 let AUTO = true, CAM = "overview", camGoal = null, CAMMOVE = false, CAMSNAP = false;
 const nbPos = () => R3.baby.visible ? new THREE.Vector3(BB.L / 2, 0, 0).applyMatrix4(R3.baby.matrix) : new THREE.Vector3(0.18, 0, 0.06);
 const CAMS = {
-  wide: () => ({ p: [0.25, -3.3, 0.95], t: [0.2, 0, 0.05] }),
-  overview: () => ({ p: [0.12, -1.7, 0.42], t: [0.12, 0, 0.14] }),
-  section: () => ({ p: [0.0, -1.45, 0.3], t: [0.0, 0, 0.16] }),
-  rack: () => ({ p: [0.62, -0.72, 0.62], t: [0.1, 0, 0.16] }),
+  wide: () => ({ p: [0.5, -3.9, 1.05], t: [0.48, 0, 0.08] }),
+  overview: () => ({ p: [0.05, -1.55, 0.3], t: [0.05, 0, 0.15] }),
+  section: () => ({ p: [0.03, -1.3, 0.2], t: [0.03, 0, 0.16] }),
+  rack: () => ({ p: [0.5, -0.62, 0.5], t: [0.03, 0, 0.12] }),
   print: () => ({ p: [0.24, -0.62, 0.2], t: [0.17, 0, 0.075] }),
   push: () => ({ p: [0.42, -0.95, 0.28], t: [0.26, 0, 0.14] }),
   opening: () => ({ p: [1.0, -0.7, 0.4], t: [0.3, 0, 0.16] }),
   birthcam: () => ({ p: [0.72, -1.15, 0.36], t: [0.4, 0, 0.14] }),
-  swimcam: () => ({ p: [0.62, -1.5, 0.6], t: [0.45, 0.02, 0.1] }),
+  swimcam: () => { const b = nbPos(); return { p: [0.45 + 0.55 * b.x, -1.9, 0.62], t: [0.25 + 0.55 * b.x, 0.02, 0.1] }; },
   newborn: () => { const b = nbPos(), d = 0.42 + 2.2 * (BB.rmax || 0.05); return { p: [b.x - 0.2 * d, b.y - d, b.z + 0.35 * d], t: [b.x, b.y, b.z] }; },
   kit: () => { const b = new THREE.Vector3().setFromMatrixPosition(BB.kitG.matrix); return { p: [b.x - 0.05, b.y - 0.34, b.z + 0.12], t: [b.x, b.y, b.z] }; },
 };
@@ -914,13 +924,13 @@ function setShadows() {
 /* ---------------------------------------------------------------- readouts, panels */
 const rr = (l, v, u, hot) => `<div class="rr${hot ? " hot" : ""}"><span>${l}</span><span>${v}${u ? `<em>${u}</em>` : ""}</span></div>`;
 const bar = (f, warn) => `<div class="bar${warn ? " w" : ""}"><i style="width:${(clamp(f, 0, 1) * 100).toFixed(0)}%"></i></div>`;
-const TOOLN = ["none (bare quick release)", "pneumatic module: cup and nozzle", "print needle"], KITN = ["on the shelf, under the cup", "held by the cup", "on the seat in the gel", "in the newborn"];
+const TOOLN = ["none (bare quick release)", "pneumatic module: cup and ball needle", "print needle"], KITN = ["on the shelf, under the cup", "held by the cup", "on the seat in the gel", "in the newborn"];
 function renderReadouts(S) {
   const R = J.read, D = 180 / Math.PI, mm = (x) => f0(x * 1000); let h = "";
   h += `<div class="rg"><h4>Arm, fixed base</h4>${rr("Base, J1, J2", `${f1(S.q0 * D)}, ${f1(S.q1 * D)}, ${f1(S.q2 * D)}`, "deg")}${rr("Tool tip x, y, z", `${mm(ARM.tip[0])}, ${mm(ARM.tip[1])}, ${mm(ARM.tip[2])}`, "mm")}${rr("Tool", TOOLN[S.tool])}`;
   if (S.vac) h += rr("Cup holds", f2(R.suction_N), "N", true) + rr("Kit weight, margin", `${f2(R.kit_N)} N, ${f1(R.suction_N / R.kit_N)} x`) ;
   if (["drain", "push", "fill"].includes(S.k)) h += rr("Force on the valve", f2(S.F), "N", true) + bar(S.F / R.payload_N, S.F > R.payload_N) + rr("Limit (payload 500 g)", f2(R.payload_N), "N");
-  h += `</div><div class="rg"><h4>Gel chamber</h4>${rr("Gel level", mm(S.gel), "mm")}${rr("Gel volume", f2(R.gel_L * gelFrac(S.gel)), "L of " + f2(R.gel_L))}${rr("Lip above the gel, the water", `${mm(R.lip_z - R.gel_z)}, ${mm(R.lip_z - J.WL)}`, "mm")}${rr("Kit", KITN[S.nv > 0.5 && S.k !== "print" ? 3 : S.kit])}</div>`;
+  h += `</div><div class="rg"><h4>Gel chamber</h4>${rr("Gel level", mm(S.gel), "mm")}${rr("Gel volume", f2(R.gel_L * gelFrac(S.gel)), "L of " + f2(R.gel_L))}${rr("Lip above the gel, the water", `${mm(R.lip_z - R.gel_z)}, ${mm(R.lip_z - R.wlz)}`, "mm")}${rr("Kit", KITN[S.nv > 0.5 && S.k !== "print" ? 3 : S.kit])}</div>`;
   if (S.k === "print") h += `<div class="rg"><h4>Print</h4>${rr("Progress", f0(S.pr * 100), "%", true)}${bar(S.pr)}${rr("Layer height z", f1(S.pz * 1000), "mm")}${rr("Bead, silicone", `${f0(R.bead_m)} m, ${f2(R.sil_L)} L`)}</div>`;
   if (S.nv > 0.5 && S.k !== "print") { const full = S.fill > 0, p = S.k === "drain" ? 450 : full ? lerp(R.p_unfold, R.p_full, S.fill) : (S.air ? R.p_unfold : 0);
     h += `<div class="rg"><h4>Newborn</h4>${rr("Length, diameter", `${mm(BB.L)}, ${mm(2 * BB.rmax)}`, "mm", true)}${rr("Of the gel chamber (length, width)", `${f0(BB.L / R.ch_L * 100)} %, ${f0(2 * BB.rmax / R.ch_W * 100)} %`)}${rr("Pressure", f0(p), "Pa")}${rr("Pitch, droop", `${f1(S.th * D)}, ${f1(S.bend * D)}`, "deg")}`;
@@ -941,7 +951,7 @@ function renderProps() {
       `<div class="pnl"><h3>Penetration, every pair, every frame</h3><dl class="kv">${J.pairs.map((p) => `<dt>${esc(p.name)}</dt><dd>${f2(p.mm)} mm</dd>`).join("")}</dl><p>${J.fr.pen.length} frames tested. Limit 1 mm.</p></div>`; }
   else if (TAB === "birth") { el.innerHTML = `<div class="pnl"><h3>Force of the nozzle on the valve</h3><canvas id="chart" width="700" height="200"></canvas><div class="leg"><span><i style="background:#9cc8ec"></i>force, N</span><span><i style="background:#e3b36a"></i>limit, payload 500 g</span></div><p>${esc(J.read.birth_text)}</p></div>`; drawChart(); }
   else if (TAB === "masses") { const M = J.masses; el.innerHTML = M.map((g) => `<div class="pnl"><h3>${esc(g.name)}</h3><dl class="kv">${g.rows.map((r) => `<dt>${esc(r[0])}</dt><dd>${esc(r[1])}</dd>`).join("")}</dl>${g.note ? `<p>${esc(g.note)}</p>` : ""}</div>`).join(""); }
-  else { const K = J.kit; el.innerHTML = `<div class="pnl"><h3>${esc(K.name)}, ${f0(K.mass * 1000)} g</h3><dl class="kv">${K.parts.map((p) => `<dt>${p.url ? `<a href="${esc(p.url)}" style="color:inherit">${esc(p.name)}</a>` : esc(p.name)}</dt><dd>${f1(p.mass * 1000)} g</dd>`).join("")}</dl><p>Picked once by the suction cup, placed in the gel before printing, then printed around. The parts stay visible through the clear skin.</p></div>`; }
+  else { const K = J.kit; el.innerHTML = `<div class="pnl"><h3>${esc(K.name)}, ${f0(K.mass * 1000)} g</h3><dl class="kv">${K.parts.map((p) => `<dt>${p.url ? `<a href="${esc(p.url)}" style="color:inherit">${esc(p.name)}</a>` : esc(p.name)}</dt><dd>${f1(p.mass * 1000)} g</dd>`).join("")}</dl><p>Picked once by the suction cup, placed in the gel before printing, then printed around. The parts stay visible through the clear skin. The two water pumps are the DFRobot FIT0800. The air valve of the newborn is a black rubber ball inflation valve core, which closes when the needle leaves.</p></div><div class="pnl"><h3>Parts in the tail</h3><dl class="kv">${[...new Map(J.equip.map((e) => [e.grp, e])).values()].map((e) => `<dt>${esc(e.name)}${e.est ? " (estimate)" : ""}<br><span style="color:var(--dim);font-size:11px">${esc(e.src)}</span></dt><dd>${f0(1000 * J.equip.filter((q) => q.grp === e.grp).reduce((a, q) => a + q.kg, 0))} g</dd>`).join("")}</dl></div>`; }
 }
 function drawChart() {
   const c = $("#chart"); if (!c) return; const g = c.getContext("2d"), W = c.width, H = c.height, F = J.fr.F, i0 = J.read.force_i0, i1 = J.read.force_i1, mx = Math.max(J.read.payload_N * 1.15, ...F.slice(i0, i1));
@@ -959,23 +969,23 @@ function renderDoc() {
   $("#sources").innerHTML = Object.values(J.sources).map((s) => `<li><a href="${esc(s.u)}">${esc(s.t)}</a>${s.note ? " " + esc(s.note) : ""}</li>`).join("");
   $("#tankp").textContent = J.read.tank_text; $("#limits").innerHTML = J.limits.map((l) => `<li>${esc(l)}</li>`).join("");
   // side section from the same numbers
-  const P = J.hull.prof, sx = (x) => 20 + (x + 0.34) * 560, sy = (z) => 215 - z * 560, pth = (xs, zs) => xs.map((x, i) => (i ? "L" : "M") + sx(x).toFixed(1) + " " + sy(zs[i]).toFixed(1)).join(" ");
+  const P = J.hull.prof, sx = (x) => 40 + (x + 0.24) * 600, sy = (z) => 218 - z * 600, pth = (xs, zs) => xs.map((x, i) => (i ? "L" : "M") + sx(x).toFixed(1) + " " + sy(zs[i]).toFixed(1)).join(" ");
   const m = J.mouth, G_ = J.read; let s = `<rect x="0" y="0" width="400" height="230" fill="#f3f2ef"/>`;
-  s += `<rect x="${sx(-0.34)}" y="${sy(J.WL)}" width="${sx(0.36) - sx(-0.34)}" height="${sy(-0.003) - sy(J.WL)}" fill="#cfe2ee"/>`;
-  const gi = P.x.map((x, i) => [x, P.zb[i]]).filter((p) => p[0] > 0 && p[1] < G_.gel_z); s += `<path d="M${sx(gi[0][0])} ${sy(G_.gel_z)} ${gi.map((p) => "L" + sx(p[0]).toFixed(1) + " " + sy(p[1]).toFixed(1)).join(" ")} L${sx(gi[gi.length - 1][0])} ${sy(G_.gel_z)} Z" fill="#ead9a0"/>`;
+  s += `<rect x="0" y="${sy(G_.wlz)}" width="400" height="${sy(-0.003) - sy(G_.wlz)}" fill="#cfe2ee"/>`;
+  const gi = P.x.map((x, i) => [x, P.zb[i]]).filter((p) => p[0] > G_.sill_x && p[1] < G_.gel_z); s += `<path d="M${sx(gi[0][0])} ${sy(G_.gel_z)} ${gi.map((p) => "L" + sx(p[0]).toFixed(1) + " " + sy(p[1]).toFixed(1)).join(" ")} L${sx(gi[gi.length - 1][0])} ${sy(G_.gel_z)} Z" fill="#ead9a0"/>`;
   s += `<path d="${pth(P.x, P.zb)}" fill="none" stroke="#222" stroke-width="1.4"/><path d="${pth(P.x, P.zt)}" fill="none" stroke="#222" stroke-width="1.4"/>`;
-  s += `<line x1="${sx(0)}" y1="${sy(G_.sill_z)}" x2="${sx(0)}" y2="${sy(0.334)}" stroke="#3a9a3a" stroke-width="2"/>`;
+  s += `<line x1="${sx(G_.dock_x)}" y1="${sy(0)}" x2="${sx(G_.dock_x)}" y2="${sy(0.33)}" stroke="#3a9a3a" stroke-width="2"/>`;
   s += `<line x1="${sx(m.lip[0])}" y1="${sy(m.lip[1])}" x2="${sx(m.top[0])}" y2="${sy(m.top[2])}" stroke="#d2452f" stroke-width="2" stroke-dasharray="4 3"/>`;
-  s += `<ellipse cx="${sx(G_.print_x + 0.075)}" cy="${sy(G_.axis_z)}" rx="${0.075 * 560}" ry="${0.045 * 560}" fill="#e9d6d2" stroke="#8a3a5a"/>`;
-  s += `<rect x="${sx(J.base[0] - 0.077)}" y="${sy(J.base[2] + 0.314)}" width="${0.174 * 560}" height="${0.314 * 560}" fill="none" stroke="#555" stroke-dasharray="3 3"/>`;
-  s += `<g font-family="Inter,sans-serif" font-size="8" fill="#333"><text x="${sx(-0.3)}" y="12">tail, one print</text><text x="${sx(0.03)}" y="12">gel chamber, one print</text><text x="${sx(J.base[0] - 0.07)}" y="${sy(0.17)}">DexArm, folded</text><text x="${sx(0.3)}" y="${sy(J.WL) + 9}">water</text><text x="${sx(0.12)}" y="${sy(0.012)}">gel</text><text x="${sx(m.top[0]) + 4}" y="${sy(m.top[2]) - 3}" fill="#d2452f">opening</text></g>`;
+  s += `<ellipse cx="${sx(G_.print_x + 0.075)}" cy="${sy(G_.axis_z)}" rx="${0.075 * 600}" ry="${0.045 * 600}" fill="#e9d6d2" stroke="#8a3a5a"/>`;
+  s += `<rect x="${sx(J.base[0] - 0.077)}" y="${sy(J.base[2] + 0.314)}" width="${0.174 * 600}" height="${0.314 * 600}" fill="none" stroke="#555" stroke-dasharray="3 3"/>`;
+  s += `<g font-family="Inter,sans-serif" font-size="8" fill="#333"><text x="${sx(-0.3)}" y="12">tail, one print</text><text x="${sx(0.07)}" y="12">gel chamber, one print</text><text x="${sx(J.base[0] - 0.07)}" y="${sy(0.17)}">DexArm, folded</text><text x="${sx(0.3)}" y="${sy(G_.wlz) + 9}">water</text><text x="${sx(0.12)}" y="${sy(0.012)}">gel</text><text x="${sx(m.top[0]) + 4}" y="${sy(m.top[2]) - 3}" fill="#d2452f">opening</text></g>`;
   $("#secSvg").innerHTML = s;
 }
 /* ---------------------------------------------------------------- load, loop, UI */
 async function loadAll() {
   const [j, a, g] = await Promise.all([getJSON("simple.json"), getJSON("arm.json"), fetch("simple_print.gcode").then((r) => r.ok ? r.text() : "").catch(() => "")]);
   if (!j || !a) { $("#ovStage").textContent = "The data files did not load"; throw new Error("data"); }
-  J = j; UW.uWL.value = J.WL; Object.assign(ARMD, a); GCL = g.split("\n").filter((l) => l.length);
+  J = j; J.read.wlz = J.WL; UW.uWL.value = J.WL; Object.assign(ARMD, a); GCL = g.split("\n").filter((l) => l.length);
   buildWater(); buildBody(); buildArm(); buildBaby(); buildGallery(); setShadows(); buildLabels(); renderDoc();
   log("simple.json: " + J.fr.q0.length + " frames, " + J.checks.length + " checks", "a"); const bad = J.checks.filter((c) => !c.ok); for (const c of bad) log("fails: " + c.name, "w");
   log("penetration test: worst pair " + f2(J.read.pen_max * 1000) + " mm over " + J.fr.pen.length + " frames", J.read.pen_max > 0.001 ? "w" : "a");
