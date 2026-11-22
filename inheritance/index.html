@@ -2,10 +2,10 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Inheritance · Born, Not Made</title>
 <style>
 *{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:#0c0c0c;color:#eee;font:15px/1.5 Inter,Arial,sans-serif}main{max-width:1400px;margin:auto;padding:18px clamp(12px,3vw,44px)}header,footer{display:flex;align-items:center;gap:20px}header{justify-content:space-between;padding:0 0 14px}a,button{color:inherit;font:inherit}a{text-underline-offset:4px}header a{text-decoration:none}header span,time{font-size:13px;color:#aaa}canvas{width:100%;display:block;aspect-ratio:16/9;background:#090909}footer{padding:13px 0;gap:14px}button{background:transparent;border:0;padding:5px 0;cursor:pointer}input{accent-color:#ddd;min-width:32px;flex:1}time{font-variant-numeric:tabular-nums;white-space:nowrap}.mobile{display:none}footer a{font-size:13px}@media(max-width:600px){main{padding:12px}.mobile{display:block;min-height:3.2em;margin:12px 0 0;font:19px Georgia,serif}footer{gap:9px;font-size:13px}time{display:none}}@media(min-width:601px){main{padding-bottom:0}}
-</style></head><body><main><header><a href="../#inheritance" target="_top">Born, Not Made</a><span>Inheritance</span></header><canvas width="1600" height="900" aria-label="An animated cutaway of three generations of egg-shaped robots carrying independent Raspberry Pi 5 computers"></canvas><p class="mobile"></p><footer><button id="play">Pause</button><input id="seek" type="range" min="0" max="34" step=".05" value="0" aria-label="Film position"><time></time><button id="again">Replay</button><a href="inheritance.mp4?v=egg" download>MP4</a></footer></main>
+</style></head><body><main><header><a href="../#inheritance" target="_top">Born, Not Made</a><span>Inheritance</span></header><canvas width="1600" height="900" aria-label="Three egg-shaped robots inherit memory through model distillation"></canvas><p class="mobile"></p><footer><button id="play">Pause</button><input id="seek" type="range" min="0" max="20" step=".05" value="0" aria-label="Film position"><time></time><button id="again">Replay</button><a href="inheritance.mp4?v=outputs-3" download>MP4</a></footer></main>
 <script>
 const cv=document.querySelector('canvas'), g=cv.getContext('2d');
-const tau=Math.PI*2, duration=34;
+const tau=Math.PI*2, duration=20;
 const clamp=x=>Math.min(1,Math.max(0,x));
 function ease(t,a,b){let x=clamp((t-a)/(b-a));return x*x*(3-2*x)}
 function lerp(a,b,u){return a+(b-a)*u}
@@ -27,12 +27,6 @@ function board(){
  for(const x of [-38,-17,0]){rect(x,26,11,6,'#a4a4a2');rect(x+2,29,7,3,'#414141')}
  g.restore();
 }
-function memory(seed,count,alpha,add=0){
- for(let i=0;i<count;i++){const a=i*2.39996+seed,r=5.5*Math.sqrt(i+.3);let x=Math.cos(a)*r,y=Math.sin(a)*r*.64;
- if(i>=12){x+=add;y-=6}
- ellipse(x,y,1.65+(i%3)*.35,1.65+(i%3)*.35,ink(alpha*(.55+(i%4)*.13)));
- }
-}
 const shell='M 157 -46 C 119 -103 36 -121 -45 -108 C -132 -94 -194 -36 -207 4 C -197 32 -143 74 -83 96 C -4 126 110 98 157 45 C 170 29 170 -25 157 -46Z';
 function body(t,x,y,scale,rot,kind,opening,mem,alpha=1){
  g.save();g.translate(x,y);g.rotate(rot);g.scale(scale,scale);g.globalAlpha*=alpha;
@@ -44,8 +38,8 @@ function body(t,x,y,scale,rot,kind,opening,mem,alpha=1){
  for(let j=0;j<5;j++)path('M-182 '+(29+j*2)+' Q-40 '+(156-j*3)+' 157 '+(44-j*2),null,ink(.21-j*.029),1.05);
  for(let j=0;j<8;j++){const u=j/7,xx=lerp(-100,105,u);path('M'+xx+' '+(-87-14*Math.sin(u*Math.PI))+' Q'+(xx+24)+' -10 '+(xx-6)+' '+(85+14*Math.sin(u*Math.PI)),null,ink(kind? .115:.065),1)}
  path('M-99 36 Q-47 60 0 40 L24 28',null,ink(.3),2);
- g.save();g.translate(-60,0);board();g.restore();
- g.save();g.translate(4,-52);memory(.3,Math.round(mem),.96,kind?3:0);g.restore();
+ g.save();g.translate(-60,0);g.scale(0.425,0.425);board();g.restore();
+ 
  // Recessed front chamber remains visible through the near wall.
  ellipse(70,6,58,47,'rgba(5,5,5,.38)',ink(.23),1);
  path('M20 33 Q70 56 134 23',null,ink(.21),1.1);
@@ -63,59 +57,99 @@ function water(t){
  for(const [x,y,z] of stars)ellipse((x+t*(.5+z))%1630-12,y+3*Math.sin(t*.30+z*8),.6+z,.6+z,ink(.08+z*.17));
  for(let j=0;j<6;j++){g.beginPath();for(let x=0;x<=1600;x+=8){const y=104+j*4+9*Math.sin(x*.004+t*.13)+4*Math.sin(x*.016+j*.2+t*.2);if(x)g.lineTo(x,y);else g.moveTo(x,y)}g.strokeStyle=ink(.05-j*.005);g.lineWidth=.8;g.stroke()}
 }
+
+// Board-to-shell ratio: 85 mm PCB / 723.3 mm main chamber.
+// Board width in drawing units is 103; the chamber silhouette spans about 374.
+// The tail assembly is outside this schematic. Depth changes screen size, not the ratio.
 const shots=[
- [0,'Memory','Encounters leave a memory in the first robot.'],
- [5,'Distillation','Part of that memory takes shape in a new model.'],
- [11,'Birth','The second robot slips free, carrying its own model.'],
- [17,'Experience','A new encounter changes what the second robot carries.'],
- [23,'Inheritance','Its inherited and acquired memories shape the next generation.'],
- [28,'Birth','A third robot enters the water.']
+ [0,'Experience','Encounters shape the first model’s responses.'],
+ [3,'Distillation','The next model inherits a pattern of responses.'],
+ [8,'Experience','New encounters change the second model’s responses.'],
+ [11.5,'Distillation','That changed pattern passes to the third generation.'],
+ [17,'Inheritance','Three independent models, each with its own memory.']
 ];
-function callout(text,x,y,offset,opacity){
- if(opacity<.01)return;g.save();g.globalAlpha*=opacity;
- const endX=x-82,endY=y+offset;
- path('M'+x+' '+y+' L'+(x-32)+' '+endY+' H'+(endX-120),null,ink(.55),1.2);
- label(text,endX-120,endY+24,18,'#d4d4d2');g.restore();
+function pointOnArc(start,end,u,lift){
+ const x=lerp(start[0],end[0],u),y=lerp(start[1],end[1],u)-4*lift*u*(1-u);
+ return [x,y];
 }
-function seeds(t,a,b,u,alpha){
- if(alpha<.01)return;
- for(let i=0;i<10;i++){const v=(u+i*.096)%1,spread=Math.sin(v*Math.PI);ellipse(lerp(a[0],b[0],v),lerp(a[1],b[1],v)+spread*(9*Math.sin(3*i)-15),1.5,1.5,ink(alpha*spread))}
+function direction(x,y,angle,alpha,size){
+ g.save();g.translate(x,y);g.rotate(angle);
+ path('M-'+size+' '+(-size*.42)+' L0 0 L-'+size+' '+size*.42,null,ink(alpha),2.2);
+ g.restore();
+}
+function arc(start,end,extent,lift,opacity){
+ if(extent<.002)return;
+ g.beginPath();g.moveTo(...start);
+ for(let i=1;i<=64;i++)g.lineTo(...pointOnArc(start,end,extent*i/64,lift));
+ g.lineWidth=1.8;g.strokeStyle=ink(opacity);g.stroke();
+ const tip=pointOnArc(start,end,extent,lift),near=pointOnArc(start,end,extent-.012,lift);
+ direction(...tip,Math.atan2(tip[1]-near[1],tip[0]-near[0]),opacity,12);
+}
+// Small packets encode a qualitative response profile. Only the selected link is active.
+function packet(start,end,u,lift,weights){
+ if(u<=0||u>=1)return;
+ const fade=Math.sin(Math.PI*u)**.45;
+ weights.forEach((v,i)=>{
+   const f=clamp(u-.010*i),[x,y]=pointOnArc(start,end,f,lift);
+   const h=(i-2)*2.8*Math.sin(Math.PI*f);
+   ellipse(x,y+h,1.5+v*2.3,1.5+v*2.3,ink(fade*(.46+.50*v)));
+ });
+}
+function link(t,start,end,begin,finish,lift,weights){
+ const extent=ease(t,begin,begin+1.2);
+ arc(start,end,extent,lift,.28+.61*(1-ease(t,finish,finish+1)));
+ for(const shift of [0,.92,1.84])packet(start,end,(t-begin-.65-shift)/(finish-begin-2.3),lift,weights);
+}
+function profile(x,y,values,amount){
+ if(amount<.001)return;
+ g.save();g.translate(x,y);
+ values.forEach((v,i)=>{const h=v*23*amount;rect(i*7,-h,4,h,ink(.80))});
+ g.restore();
+}
+function encounter(t,x,y,start){
+ const f=ease(t,start,start+.65),v=1-ease(t,start+2.2,start+3.1);
+ if(f*v<.01)return;
+ const a=[x+35,y-47],b=[x,y],u=ease(t,start+.2,start+1.25);
+ label('Encounters',x+30,y-63,17,ink(.8*f*v));
+ arc(a,b,u,5,.7*f*v);
 }
 function frame(t){
- const k=Math.max(0,shots.findLastIndex(s=>t>=s[0])), shot=shots[k];water(t);
- const zoom=ease(t,1,5)*(1-ease(t,12,18)),follow=ease(t,14,20),wide=ease(t,23,30);
- const ax=670+60*zoom-399*follow-15*wide,ay=360+5*Math.sin(t*.54),as=1.32+.49*zoom-.41*follow-.10*wide;
- const rot=-.04+.019*Math.sin(t*.71);
- const bOut=ease(t,11,16),bRise=ease(t,15,20);
- const bx=ax+as*lerp(73,300,bOut)+follow*181,by=ay-6+rot*(bx-ax)-26*bRise+6*Math.sin(t*.70)*bOut;
- const bs=(.21+.10*zoom)*(1-bRise)+(.90-.06*wide)*bRise;
- const br=lerp(rot,-.15+.046*Math.sin(t*.88),bOut);
- const bop=ease(t,4.9,8.4),co=ease(t,22.4,25.5),cOut=ease(t,27,32);
- const cx=bx+Math.cos(br)*bs*lerp(64,350,cOut)+cOut*56,cy=by+Math.sin(br)*bs*lerp(64,350,cOut)+cOut*(38+7*Math.sin(t*.8));
- const cs=.175+.47*ease(t,29,33.2);
- const ambient=ease(t,17,19)*(1-ease(t,21,23));
- if(ambient)body(t,lerp(1510,1060,ease(t,16,20))+110*ease(t,20,24),by-130+11*Math.sin(t*.5),.34,.16,1,0,9,.52*ambient);
- body(t,ax,ay,as,rot,0,ease(t,9,12)*(1-ease(t,14,16)),4+14*ease(t,.4,4.5));
- if(bop)body(t,bx,by,bs,br,1,ease(t,25.5,27.8)*(1-ease(t,30,32)),4+8*ease(t,6,10)+8*ease(t,18.5,22.2),bop);
- if(co)body(t,cx,cy,cs,.03+.07*Math.sin(t*.68)*cOut,2,0,3+12*ease(t,23.5,27),co);
- seeds(t,[ax,ay-53*as],[bx,by-8],t*.34,ease(t,5,6)*(1-ease(t,10,11)));
- seeds(t,[bx,by-48*bs],[cx,cy-6],t*.34,ease(t,22.8,24)*(1-ease(t,26.5,27.6)));
- seeds(t,[bx+243,by-102],[bx+8,by-42],t*.25,ambient*.85);
- callout('Raspberry Pi 5  /  8 GB',ax-62*as,ay+13*as,115,ease(t,.3,1.4)*(1-ease(t,4.6,5.7)));
- callout('Independent local model',bx-38*bs,by+19*bs,100,ease(t,15.4,16.3)*(1-ease(t,17.8,18.8)));
- if(t>30){const alpha=ease(t,30,31.7);for(const [name,x,y,s] of [['I',ax,ay,as],['II',bx,by,bs],['III',cx,cy,cs]]){g.save();g.textAlign='center';label(name,x,y+121*s+20,20,ink(alpha*.85),'Georgia');g.restore()}}
- label('BORN, NOT MADE',75,62,16,'#a7a7a5');g.save();g.textAlign='right';label('Inheritance',1526,62,20,'#ccc','Georgia');g.restore();
- g.save();g.globalAlpha=.52+.48*ease(t,shot[0],shot[0]+.8);label(shot[1].toUpperCase(),77,745,18,'#aaa');label(shot[2],74,807,38,'#e3e3df','Georgia');g.restore();
+ const shot=shots[Math.max(0,shots.findLastIndex(s=>t>=s[0]))];
+ water(t);
+ // A single held shot, composed like the annotated final frame.
+ const x=[312,840,1344],y=[453,375,352].map((p,i)=>p+2*Math.sin(t*.43+i)),scale=[1.05,1.08,.85],tilt=[-.105,-.095,-.065];
+ const anchors=x.map((v,i)=>[v-60*scale[i]*Math.cos(tilt[i]),y[i]-60*scale[i]*Math.sin(tilt[i])]);
+ for(let i=0;i<3;i++)body(t,x[i],y[i],scale[i],tilt[i],0,0,0);
+ const a=[.51,.91,.32,.63,.23],b=[.51,.77,.40,.62,.27],changed=[.32,.65,.88,.52,.36],c=[.35,.65,.80,.55,.35];
+ const learnt=ease(t,8.8,11.2),blend=b.map((w,i)=>lerp(w,changed[i],learnt));
+ const weights=[a,blend,c],reveals=[ease(t,.6,2.7),ease(t,4.7,7.8),ease(t,13.8,16.8)];
+ anchors.forEach(([px,py],i)=>profile(px+25,py-22,weights[i],reveals[i]));
+ const start=i=>[anchors[i][0]+23*scale[i],anchors[i][1]-5];
+ const end=i=>[anchors[i][0]-25*scale[i],anchors[i][1]-4];
+ link(t,start(0),end(1),3,8,107,a);
+ link(t,start(1),end(2),11.5,17,103,changed);
+ for(const [i,begin,lift] of [[0,3,107],[1,11.5,103]]){
+   const pos=pointOnArc(start(i),end(i+1),.53,lift);g.save();g.textAlign='center';
+   label('Model distillation',pos[0],pos[1]-18,18,ink(.86*ease(t,begin+.35,begin+1.3)));g.restore();
+ }
+ encounter(t,x[0]-45,y[0]-108,0);encounter(t,x[1]-38,y[1]-110,8);encounter(t,x[2]-30,y[2]-86,17);
+ for(let i=0;i<3;i++){
+   g.save();g.textAlign='center';label(['I','II','III'][i],x[i]-12,y[i]+117*scale[i]+25,26,'#e2e2df','Georgia');g.restore();
+ }
+ const px=anchors[0][0],py=anchors[0][1];path('M'+px+' '+(py+20)+' l-39 102 h-82',null,ink(.43),1);
+ label('Raspberry Pi 5',px-152,py+145,18,'#cececc');label('85 × 56 mm PCB',px-152,py+167,15,'#aaa');
+ label('BORN, NOT MADE',75,64,16,'#acacaa');g.save();g.textAlign='right';label('Inheritance',1526,64,21,'#ccc','Georgia');g.restore();
+ label(shot[1].toUpperCase(),77,744,17,'#aaa');label(shot[2],74,808,40,'#e8e8e5','Georgia');
  document.querySelector('.mobile').textContent=shot[2];
 }
 let t=0,run=false,last=0,id=0;
 const play=document.getElementById('play'),seek=document.getElementById('seek'),clock=document.querySelector('time');
-function show(){frame(t);seek.value=t;clock.textContent='0:'+String(Math.floor(t)).padStart(2,'0')+' / 0:34';play.textContent=run?'Pause':t>=duration?'Replay':'Play'}
+function show(){frame(t);seek.value=t;clock.textContent='0:'+String(Math.floor(t)).padStart(2,'0')+' / 0:20';play.textContent=run?'Pause':t>=duration?'Replay':'Play'}
 function tick(now){if(!run)return;t=Math.min(duration,t+(now-last)/1000);last=now;if(t>=duration)run=false;show();if(run)id=requestAnimationFrame(tick)}
 function start(){cancelAnimationFrame(id);run=true;last=performance.now();show();id=requestAnimationFrame(tick)}
 function pause(){run=false;cancelAnimationFrame(id);show()}
 play.onclick=()=>{if(run)pause();else{if(t>=duration)t=0;start()}};document.getElementById('again').onclick=()=>{t=0;start()};
 seek.oninput=()=>{t=Number(seek.value);pause()};
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&run)pause()});
-if(matchMedia('(prefers-reduced-motion: reduce)').matches){t=32.5;show()}else start();
+if(matchMedia('(prefers-reduced-motion: reduce)').matches){t=19.5;show()}else start();
 </script></body></html>
