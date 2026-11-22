@@ -4,7 +4,7 @@
 <meta name="description" content="Born, Not Made at the scale of a population: many simplified bodies in one glass tank, close to square, under small fixed spot lights. Two robots that relate touch at the opening; a body with a tail prints the newborn in its gel chamber; the newborn fills with air as it is pushed out and leaves the body full size. Only the silicone head is born; the tails, with the arm inside, are a fixed number, never born, and pass from head to head after each birth.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Society, simplified bodies: a tank close to square in a black room, nine small fixed spot lights above. */
+/* Society, simplified bodies: a tank close to square in a black room, sixteen small fixed spot lights above, close enough that their pools overlap. */
 :root { --bg: #000; --panel: #0b0b0c; --line: #262628; --ink: #ecebe6; --muted: #9b9a94; --dim: #67665f; --mono: "JetBrains Mono", ui-monospace, monospace; --serif: "Cormorant Garamond", Georgia, serif; color-scheme: dark; }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 12.5px/1.45 "Inter", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
@@ -95,7 +95,9 @@ const angLerp = (a, b, t) => { let d = ((b - a + Math.PI) % (2 * Math.PI) + 2 * 
 /* ---------- the room: meters, y up; tank inner floor at y = 0 ---------- */
 const TX = 3.4, TZ = 3.0, WL = 0.5, TH = 0.72, GL = 0.02, PLINTH = 0.9;      // tank 6.8 x 6 m, close to square, water 0.5 m deep
 // small fixed spot lights in a 3 x 3 grid, each throwing its own pool; the robots drift in and out of the light
-const LH = 4.0, POOL = 0.85, LAMPS = []; for (const z of [-1.85, 0, 1.85]) for (const x of [-2.05, 0, 2.05]) LAMPS.push(new THREE.Vector3(x, LH, z));
+// a denser 4 x 4 grid: each pool a little wider than the spacing, so neighbouring pools overlap and no single circle stands out
+const LH = 4.0, POOL = 1.05, LAMPS = []; for (const z of [-2.25, -0.75, 0.75, 2.25]) for (const x of [-2.55, -0.85, 0.85, 2.55]) LAMPS.push(new THREE.Vector3(x, LH, z));
+const NL = LAMPS.length;
 const SPOT_A = Math.atan(POOL / LH);
 const MAXPOP = 160;
 const P = {};
@@ -103,10 +105,10 @@ for (const id of ["loose", "inh", "drift", "rel", "cap", "gest", "room"]) { cons
 
 const cv = $("#c");
 const R3 = {};
-const U = { uTime: { value: 0 }, uLamps: { value: LAMPS }, uCos: { value: new THREE.Vector2(Math.cos(SPOT_A), Math.cos(SPOT_A * 0.45)) }, uWL: { value: WL },
+const U = { uTime: { value: 0 }, uLamps: { value: LAMPS }, uCos: { value: new THREE.Vector2(Math.cos(SPOT_A), Math.cos(SPOT_A * 0.15)) }, uWL: { value: WL },
   uRip: { value: Array.from({ length: 10 }, () => new THREE.Vector4(0, 0, -99, 0)) } };
-const GLSL_SPOT = `uniform vec3 uLamps[9]; uniform vec2 uCos; uniform float uTime; uniform float uWL;
-float spotK(vec3 p) { float k = 0.0; for (int i = 0; i < 9; i++) { vec3 d = normalize(p - uLamps[i]); k = max(k, smoothstep(uCos.x, uCos.y, -d.y)); } return k; }
+const GLSL_SPOT = `uniform vec3 uLamps[${NL}]; uniform vec2 uCos; uniform float uTime; uniform float uWL;
+float spotK(vec3 p) { float k = 0.0; for (int i = 0; i < ${NL}; i++) { vec3 d = normalize(p - uLamps[i]); k = max(k, smoothstep(uCos.x, uCos.y, -d.y)); } return k; }
 float causK(vec2 p, float t) { vec2 q = p * 2.6; float c = 0.0;
   for (int i = 0; i < 3; i++) { float fi = float(i); q += 0.55 * vec2(sin(q.y * 1.31 + t * 0.55 + fi * 1.7), cos(q.x * 1.17 - t * 0.47 + fi * 2.3)); c += abs(sin(q.x) + sin(q.y)); }
   c /= 3.0; return pow(max(0.0, 1.0 - 0.62 * c), 3.0) * 2.4; }`;
@@ -120,8 +122,11 @@ function initThree() {
   const ctl = new THREE.OrbitControls(cam, cv); ctl.target.set(0, 0.0, 0); ctl.enableDamping = true; ctl.dampingFactor = 0.08; ctl.maxPolarAngle = Math.PI * 0.49; ctl.minDistance = 1.2; ctl.maxDistance = 26;
   Object.assign(R3, { r, sc, cam, ctl });
   // lights: nine small fixed spots straight down, a weak hemisphere for the room
-  R3.spots = LAMPS.map((L) => { const sp = new THREE.SpotLight(0xfff4e6, 2.6, 0, SPOT_A * 1.05, 0.55, 0); sp.position.copy(L); sp.target.position.set(L.x, 0, L.z);
-    sp.castShadow = true; sp.shadow.mapSize.set(512, 512); sp.shadow.camera.near = 1.5; sp.shadow.camera.far = 7; sp.shadow.bias = -0.0006; sc.add(sp); sc.add(sp.target); return sp; });
+  R3.spots = LAMPS.map((L) => { const sp = new THREE.SpotLight(0xfff4e6, 1.55, 0, SPOT_A * 1.05, 0.85, 0); sp.position.copy(L); sp.target.position.set(L.x, 0, L.z);
+    sc.add(sp); sc.add(sp.target); return sp; });
+  // sixteen shadow maps would be too many; one soft light from straight above casts the shadows for all of them
+  const sh = new THREE.DirectionalLight(0xfff4e6, 0.35); sh.position.set(0.3, 6, 0.4); sh.castShadow = true; sh.shadow.mapSize.set(2048, 2048);
+  Object.assign(sh.shadow.camera, { left: -TX - 0.3, right: TX + 0.3, top: TZ + 0.3, bottom: -TZ - 0.3, near: 1, far: 9 }); sh.shadow.bias = -0.0005; sh.shadow.radius = 3; sc.add(sh); sc.add(sh.target);
   R3.hemi = new THREE.HemisphereLight(0xc8d2da, 0x0a0a0a, 0.3); sc.add(R3.hemi);
   R3.fill = new THREE.DirectionalLight(0xdfe6ee, 0.2); R3.fill.position.set(-3, 6, 4); sc.add(R3.fill);
   buildRoom(); buildWater(); buildBeam(); buildRelLines();
@@ -219,7 +224,7 @@ function buildWater() {
       void main() { vec2 g = grad(vW.xz, uTime); vec3 n = normalize(vec3(-g.x, 1.0, -g.y));
         vec3 V = normalize(cameraPosition - vW); float fr = 0.02 + 0.98 * pow(1.0 - max(dot(n, V), 0.0), 5.0);
         float s = spotK(vW), sp = 0.0;
-        for (int i = 0; i < 9; i++) { vec3 L = normalize(uLamps[i] - vW); vec3 H = normalize(L + V); float k = smoothstep(uCos.x, uCos.y, -normalize(vW - uLamps[i]).y); sp += pow(max(dot(n, H), 0.0), 600.0) * k * 9.0 + pow(max(dot(n, H), 0.0), 60.0) * k * 0.25; }
+        for (int i = 0; i < ${NL}; i++) { vec3 L = normalize(uLamps[i] - vW); vec3 H = normalize(L + V); float k = smoothstep(uCos.x, uCos.y, -normalize(vW - uLamps[i]).y); sp += pow(max(dot(n, H), 0.0), 600.0) * k * 9.0 + pow(max(dot(n, H), 0.0), 60.0) * k * 0.25; }
         float ring = 0.0; for (int i = 0; i < 10; i++) { vec4 r = uRip[i]; float age = uTime - r.z; if (age < 0.0 || age > 6.0) continue;
           float x = length(vW.xz - r.xy) - 0.35 * age; ring += r.w * exp(-x * x * 900.0) * exp(-age * 0.6); }
         vec3 c = vec3(0.40, 0.47, 0.52) * (0.03 + 0.22 * s) + vec3(0.80, 0.86, 0.90) * fr * (0.12 + 0.35 * s) + vec3(1.0) * sp + vec3(0.7, 0.8, 0.86) * ring * (0.25 + s);
@@ -232,7 +237,7 @@ function buildWater() {
 }
 function buildBeam() {
   const geo = new THREE.ConeGeometry(1, 1, 64, 1, true); geo.translate(0, -0.5, 0);      // apex at the origin, opening downward
-  const m = new THREE.ShaderMaterial({ uniforms: { uI: { value: 0.09 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+  const m = new THREE.ShaderMaterial({ uniforms: { uI: { value: 0.06 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
     vertexShader: `varying float vH; varying vec3 vN; varying vec3 vV; void main() { vH = -position.y; vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position, 1.0); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }`,
     fragmentShader: `uniform float uI; varying float vH; varying vec3 vN; varying vec3 vV;
       void main() { float rim = pow(abs(dot(normalize(vN), normalize(vV))), 2.2); float a = uI * rim * (1.0 - 0.75 * vH) * smoothstep(0.0, 0.06, vH) * smoothstep(1.0, 0.92, vH);
