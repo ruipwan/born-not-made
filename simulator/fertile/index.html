@@ -890,7 +890,7 @@ function applyFert(S) {
   const PX = J.fertile, sp = PX.sh_pose;
   FX.sh.visible = !!S.sh;
   if (S.sh) { FX.sh.matrix.copy(PARm).multiply(Tm(sp.T)).multiply(M4().makeRotationZ(sp.yaw)).multiply(M4().makeRotationY(-sp.th)); FX.sh.matrixWorldNeedsUpdate = true;
-    const s = clamp(S.roof, 0.3, 1), zf = -sp.T[2], uc = J.body.L_full / 2; FX.shIn.matrix.copy(Tm([uc, 0, zf])).multiply(M4().makeScale(s, s, s * S.rz)).multiply(Tm([-uc, 0, -zf])); FX.shIn.matrixWorldNeedsUpdate = true;
+    const s = clamp(S.roof, 0.3, 1), zf = -sp.T[2], uc = J.body.L_full;          // the head shrinks toward its clamped rim, on the floor FX.shIn.matrix.copy(Tm([uc, 0, zf])).multiply(M4().makeScale(s, s, s * S.rz)).multiply(Tm([-uc, 0, -zf])); FX.shIn.matrixWorldNeedsUpdate = true;
     FX.gelPlane.constant = S.sgel; FX.gel.visible = S.sgel > 0.004; FX.slit.visible = !S.mem; }
   FX.n1.visible = !!S.n1;
   if (S.n1) { const th = PX.th_trim, c = Math.cos(S.n1yaw), s = Math.sin(S.n1yaw), d = PX.ug * Math.cos(th); FX.n1.matrix.copy(Tm([S.n1x - d * c, S.n1y - d * s, PX.h_ax])).multiply(M4().makeRotationZ(S.n1yaw)).multiply(M4().makeRotationY(-th)); FX.n1.matrixWorldNeedsUpdate = true; }
@@ -942,9 +942,9 @@ const CAMS = {
   plancam: () => ({ p: [0.0, -0.03, 1.75], t: [0.0, 0, 0.1] }),
   mouthcam: () => ({ p: [0.8, -0.55, 0.33], t: [0.27, 0, 0.16] }),
   fullcam: () => { const b = nbPos(); return { p: [b.x * 0.5 + 0.3, -2.2, 0.75], t: [b.x * 0.5 + 0.15, 0, 0.12] }; },
-  top: () => { const T = J.tank; return { p: [(T.x0 + T.x1) / 2, (T.y0 + T.y1) / 2 - 0.04, 3.0], t: [(T.x0 + T.x1) / 2, (T.y0 + T.y1) / 2, 0] }; },
+  top: () => { const T = J.tank; return { p: [(T.x0 + T.x1) / 2, (T.y0 + T.y1) / 2 - 0.9, 2.3], t: [(T.x0 + T.x1) / 2, (T.y0 + T.y1) / 2 - 0.05, 0] }; },
   relaycam: () => { const T = J.tank, cx = (T.x0 + T.x1) / 2 - 0.2, cy = (T.y0 + T.y1) / 2; return { p: [cx - 0.3, cy - 2.2, 1.7], t: [cx, cy, 0.05] }; },
-  peelcam: () => ({ p: [-0.12, -0.7, 0.34], t: [0.0, 0, 0.1] }),
+  peelcam: () => ({ p: [-0.15, -1.05, 0.5], t: [0.06, 0, 0.12] }),
   softcam: () => ({ p: [0.95, -0.95, 0.5], t: [0.3, 0, 0.14] }),
   kit: () => { const b = new THREE.Vector3().setFromMatrixPosition(BB.kitG.matrix); return { p: [b.x - 0.05, b.y - 0.34, b.z + 0.12], t: [b.x, b.y, b.z] }; },
 };
@@ -990,7 +990,7 @@ function renderReadouts(S) {
   h += `<div class="rg"><h4>Arm, fixed base</h4>${rr("Base, J1, J2", `${f1(S.q0 * D)}, ${f1(S.q1 * D)}, ${f1(S.q2 * D)}`, "deg")}${rr("Tool tip x, y, z", `${mm(ARM.tip[0])}, ${mm(ARM.tip[1])}, ${mm(ARM.tip[2])}`, "mm")}${rr("Tool", TOOLN[S.tool])}`;
   if (S.vac) h += rr("Magnet lifts", f2(R.suction_N), "N", true) + rr("Kit weight, margin", `${f2(R.kit_N)} N, ${f1(R.suction_N / R.kit_N)} x`) ;
   if (["drain", "push", "fill"].includes(S.k)) h += rr("Force on the valve", f2(S.F), "N", true) + bar(S.F / R.payload_N, S.F > R.payload_N) + rr("Limit (payload 500 g)", f2(R.payload_N), "N");
-  h += `</div><div class="rg"><h4>Gel chamber</h4>${rr("Gel level", mm(S.gel), "mm")}${rr("Gel volume", f2(R.gel_L * gelFrac(S.gel)), "L of " + f2(R.gel_L))}${rr("Lip above the gel, the water", `${mm(R.lip_z - S.gel)}, ${mm(R.lip_z - R.wlz)}`, "mm")}${rr("Kit", KITN[S.nv > 0.5 && S.k !== "print" ? 3 : S.kit])}</div>`;
+  h += `</div>`; if (S.hg) h += `<div class="rg"><h4>Gel chamber</h4>${rr("Gel level", mm(S.gel), "mm")}${rr("Gel volume", f2(R.gel_L * gelFrac(S.gel)), "L of " + f2(R.gel_L))}${rr("Lip above the gel, the water", `${mm(R.lip_z - S.gel)}, ${mm(R.lip_z - R.wlz)}`, "mm")}${rr("Kit", KITN[S.nv > 0.5 && S.k !== "print" ? 3 : S.kit])}</div>`; h += "";
   if (S.k === "print") h += `<div class="rg"><h4>Print</h4>${rr("Progress", f0(S.pr * 100), "%", true)}${bar(S.pr)}${rr("Layer height z", f1(S.pz * 1000), "mm")}${rr("Bead, silicone", `${f0(R.bead_m)} m, ${f2(R.sil_L)} L`)}</div>`;
   if (S.nv > 0.5 && S.k !== "print") { const full = S.fill > 0, p = S.k === "drain" ? 450 : full ? lerp(R.p_unfold, R.p_full, S.fill) : (S.air ? R.p_unfold : 0);
     h += `<div class="rg"><h4>Newborn</h4>${rr("Length, diameter", `${mm(BB.L)}, ${mm(2 * BB.rmax)}`, "mm", true)}${rr("Of the gel chamber (length, width)", `${f0(BB.L / R.ch_L * 100)} %, ${f0(2 * BB.rmax / R.ch_W * 100)} %`)}${rr("Pressure", f0(p), "Pa")}${rr("Pitch, droop", `${f1(S.th * D)}, ${f1(S.bend * D)}`, "deg")}`;
