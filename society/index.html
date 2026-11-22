@@ -228,21 +228,21 @@ function buildRelLines() {
 const glowTex = (() => { const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d"), gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, "rgba(255,255,255,0.9)"); gr.addColorStop(0.25, "rgba(255,255,255,0.35)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
 function glow(color, size) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0 })); s.scale.setScalar(size); s.renderOrder = 15; return s; }
 
-/* ---------- bodies: the simplified design, a pointed tail and a bare gel chamber with a snout ---------- */
+/* ---------- bodies: the simplified design, round 7: a blunt rounded tail holding the arm, and a clear head that narrows in a curve to a small slanted nose ---------- */
 // genome g[0..8] in 0..1. Every printed form differs a little; all are about the same size.
 function shapeOf(g) {
-  const A = 0.13 + 0.035 * g[1], B = 0.145 + 0.03 * g[2];
-  return { Lc: 0.22 + 0.06 * g[0], A, B, n: 2.4 + 2.2 * g[3], Ls: 0.06 + 0.05 * g[4], As: Math.min(A - 0.035, 0.068 + 0.028 * g[5]), Bs: Math.min(B - 0.05, 0.062 + 0.024 * g[5]), zs: 0.012 + 0.03 * g[8],
-    Lt: 0.27 + 0.13 * g[6], tp: 1.6 + 1.0 * g[7], drop: -(0.02 + 0.035 * g[2]), R: 0.07 + 0.03 * g[6] };
+  const A = 0.135 + 0.03 * g[1], B = 0.15 + 0.025 * g[2];
+  return { Lh: 0.25 + 0.06 * g[0], A, B, n: 2.6 + 2.0 * g[3], As: 0.072 + 0.03 * g[5], q: 1.6 + 1.4 * g[4], Ln: 0.04 + 0.035 * g[8],
+    Lt: 0.2 + 0.09 * g[6], tp: 2.2 + 2.0 * g[7], drop: -(0.01 + 0.025 * g[2]), R: 0.05 + 0.03 * g[6] };
 }
 function bodyGeometry(s, tail) {
   const M = 36, st = [];
-  const x0 = -s.Lc / 2, r = 0.045, x1 = s.Lc / 2 - r;
-  if (tail) { const NT = 18; for (let i = 0; i <= NT; i++) { const t = i / NT, f = 1 - Math.pow(1 - t, s.tp); st.push({ x: x0 - s.Lt * (1 - t), a: s.A * Math.pow(f, 0.8), b: s.B * Math.pow(f, 0.85), zc: s.drop * Math.pow(1 - t, 1.4), tail: 1 }); } }
+  const x0 = -s.Lh / 2;
+  if (tail) { const NT = 18; for (let i = 0; i <= NT; i++) { const t = i / NT, f = Math.pow(1 - Math.pow(1 - t, s.tp), 1 / s.tp); st.push({ x: x0 - s.Lt * (1 - t), a: s.A * f, b: s.B * Math.pow(f, 0.95), zc: s.drop * (1 - t) * (1 - t), tail: 1 }); } }
   else { const NR = 10; for (let i = 0; i <= NR; i++) { const t = i / NR, ph = t * Math.PI / 2; st.push({ x: x0 - s.R * Math.cos(ph), a: s.A * Math.sin(ph), b: s.B * Math.sin(ph), zc: 0, tail: 0 }); } }
-  for (let i = 1; i <= 4; i++) st.push({ x: lerp(x0, x1, i / 4), a: s.A, b: s.B, zc: 0 });
-  for (let i = 1; i <= 9; i++) { const ph = i / 9 * Math.PI / 2; st.push({ x: x1 + r * Math.sin(ph), a: s.As + (s.A - s.As) * Math.cos(ph), b: s.Bs + (s.B - s.Bs) * Math.cos(ph), zc: s.zs * (1 - Math.cos(ph)) }); }
-  for (let i = 1; i <= 3; i++) st.push({ x: s.Lc / 2 + s.Ls * i / 3, a: s.As * (1 + 0.04 * (i === 3)), b: s.Bs * (1 + 0.04 * (i === 3)), zc: s.zs });
+  const NH = 14; for (let i = 1; i <= NH; i++) { const u = i / NH; st.push({ x: x0 + s.Lh * u, a: s.As + (s.A - s.As) * (1 - Math.pow(u, s.q)), b: s.B * (1 - 0.12 * Math.pow(u, 4)), zc: 0.01 * u }); }
+  const E = st[st.length - 1];
+  for (let i = 1; i <= 4; i++) { const v = i / 4; st.push({ x: E.x + s.Ln * v, a: E.a * (1 - 0.1 * v), b: E.b * (1 - 0.45 * v), zc: E.zc - E.b * 0.45 * v }); }
   const e = 2 / s.n, pos = [], wr = [], ang = [];
   const ring = (k) => { const S = st[k]; for (let j = 0; j < M; j++) { const th = j / M * Math.PI * 2, c = Math.cos(th), sn = Math.sin(th);
     const y = S.zc + S.b * Math.sign(sn) * Math.pow(Math.abs(sn), e), z = S.a * Math.sign(c) * Math.pow(Math.abs(c), e); pos.push(S.x, y, z); ang.push(th, k); } };
