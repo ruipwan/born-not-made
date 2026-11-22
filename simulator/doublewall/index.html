@@ -202,7 +202,7 @@ html.bnm-embed .bottom .area, html.bnm-embed .info { overflow: visible; }
     <section class="area" aria-label="Panels">
       <div class="tabs" role="tablist">
         <button role="tab" aria-selected="true" data-tab="checks">Checks</button>
-        <button role="tab" aria-selected="false" data-tab="birth">Tubes</button>
+        <button role="tab" aria-selected="false" data-tab="birth">Quilt</button>
         <button role="tab" aria-selected="false" data-tab="masses">Masses</button>
         <button role="tab" aria-selected="false" data-tab="kit">Kit</button>
       </div>
@@ -235,8 +235,8 @@ html.bnm-embed .bottom .area, html.bnm-embed .info { overflow: visible; }
 
 <section class="doc" id="how">
   <h2>Double wall: the newborn is a soft copy of the head</h2>
-  <p>The newborn is printed as a soft copy of the head that bore it: the same inner face, a rear opening that meets the tail's docking face, a mouth open to the floor, and an interlayer of inflated tubes between two skins (a rear rim, two ribs, a mouth ring, a crest longeron and two gunwales, on one circuit). The interior stays open to the water. Docked to the tail, the newborn works as the hard head works, so the next birth runs the same way and the soft head stands up through it.</p>
-  <p><b>What it took.</b> Three outer changes, each forced by a calculation: the head is shorter (its mouth 245 mm from the docking plane, because the arm pushes an open, unpressurized body no further than 284 mm); the gel stands at the water level with the mouth open to the floor (so the folded body is pushed out without being lifted, and the soft head's walls carry no gel pressure); and the newborn is printed in Dragon Skin 30 (a soft copy of the hard head's full section needs 6.8 kPa in its ribs, which Dragon Skin 10 NV tubes cannot hold with the safety margins). The newborn also carries 1.24 kg of steel plates so that it floats at the height of the tail's face. Failed checks stay on the page.</p>
+  <p>The newborn is printed as a soft copy of the head that bore it: the same inner face, a rear opening that meets the tail's docking face, a mouth open to the floor, and a quilted double wall of nine soft hoop cells running round the body, laid as a few serpentine loops on one circuit. The interior stays open to the water. Docked to the tail, the newborn works as the hard head works, so the next birth runs the same way and the soft head stands up through it.</p>
+  <p><b>What it took.</b> Three outer changes, each forced by a calculation: the head is shorter (its mouth 245 mm from the docking plane, because the arm pushes an open, unpressurized body no further than 284 mm); the gel stands at the water level with the mouth open to the floor (so the folded body is pushed out without being lifted, and the soft walls carry no gel pressure); and the newborn is printed in Dragon Skin 30 (an even quilt of the hard head's full section cannot be held at one safe pressure in Dragon Skin 10 NV at any cell size). The wall is a quilt of nine hoop cells, like a down jacket; the creases of the fold lie on its seams. Gel left in the lowest cells is the only ballast. Failed checks stay on the page.</p>
   <h4>Gate by gate</h4>
   <table id="verdict"></table>
   <h4>How each dimension is set</h4>
@@ -714,9 +714,9 @@ function poseArm(q, tool, S, now) {
   }
 }
 /* ---------------------------------------------------------------- the newborn: a soft copy of the head with its inflated interlayer; three states (folded, laid flat, printed shape) */
-function nbPositions(f) {
-  const N = J.nb, out = new Float32Array(N.fin.length), a = f < 0.5 ? N.fold : N.flat, b = f < 0.5 ? N.flat : N.fin, t = f < 0.5 ? mj(f / 0.5) : mj((f - 0.5) / 0.5);
-  for (let i = 0; i < out.length; i++) out[i] = a[i] + (b[i] - a[i]) * t; return out;
+function nbPositions(f, p = 0) {
+  const N = J.nb, out = new Float32Array(N.fin.length), a = f < 0.5 ? N.fold : N.flat, b = f < 0.5 ? N.flat : N.fin, t = f < 0.5 ? mj(f / 0.5) : mj((f - 0.5) / 0.5), sw = f < 0.5 ? 0 : t * p;
+  for (let i = 0; i < out.length; i++) out[i] = a[i] + (b[i] - a[i]) * t + N.off[i] * sw; return out;          // the quilt swells with the pressure
 }
 // mj (minimum jerk) comes from the shared helpers
 function tubePts(T, f) { const a = f < 0.5 ? T.fold : T.flat, b = f < 0.5 ? T.flat : T.fin, t = f < 0.5 ? mj(f / 0.5) : mj((f - 0.5) / 0.5); return a.map((p, i) => new THREE.Vector3(p[0] + (b[i][0] - p[0]) * t, p[1] + (b[i][1] - p[1]) * t, p[2] + (b[i][2] - p[2]) * t)); }
@@ -773,23 +773,22 @@ function makeNB(k) {
   o.tubeMat = clayMat(0xf6f1ea, { opacity: 0.86, depthWrite: true, sub: 0.6, sss: 0.7, sssi: 0.7, clip, rough: 0.32 });
   o.tubeMatHot = clayMat(0xf0e2cf, { opacity: 0.9, depthWrite: true, sub: 0.6, sss: 0.8, sssi: 0.8, clip, rough: 0.3 });
   o.tgrp = new THREE.Group(); o.grp.add(o.tgrp);
-  o.plates = []; const pm = clayMat(0x8f959c, { rough: 0.35, clip }), S0 = N.stack, P = N.plates;
-  for (let i = 0; i < P.n; i++) { const m = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.042, P.t), pm); m.renderOrder = 8; o.grp.add(m); o.plates.push(m); }
+  // the soft body: a milky translucent layer under the clear skin, so the quilt reads as a body; seams as fine lines
+  o.body = new THREE.Mesh(g, clayMat(0xf2eee6, { opacity: 0.3, side: THREE.DoubleSide, depthWrite: false, sub: 0.7, sss: 0.9, sssi: 0.9, clip, rough: 0.5 })); o.body.renderOrder = 9.45; o.grp.add(o.body);
+  o.seamMat = new THREE.LineBasicMaterial({ color: 0xb8bfc6, transparent: true, opacity: 0.55, depthWrite: false, clippingPlanes: clip }); o.seams = [];
+  for (const sm of N.seams) { const lg = new THREE.BufferGeometry(); lg.setAttribute("position", new THREE.BufferAttribute(new Float32Array(sm.fin.length * 3), 3)); const l = new THREE.Line(lg, o.seamMat); l.renderOrder = 9.7; l.frustumCulled = false; o.grp.add(l); o.seams.push(l); }
   o.kit = makeKit(); o.jet = jetPlume(0.0045, 0.2); o.grp.add(o.jet);
   o.gelClip = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0); o.gel = new THREE.Mesh(g, clayMat(0xd5e3ec, { opacity: 0.3, side: THREE.DoubleSide, sub: 0.2, rough: 0.25, clip: [o.gelClip, SECT] })); o.gel.renderOrder = 9.2; o.gel.visible = false; o.grp.add(o.gel);
   setNB(o, 0, 0); return o;
 }
 function setNB(o, f, a) {
   const key = f.toFixed(3) + "|" + a.toFixed(2); if (key === o.key) return; o.key = key;
-  if (Math.abs(f - o.f) > 1e-4) { o.geo.attributes.position.array.set(nbPositions(f)); o.geo.attributes.position.needsUpdate = true; o.geo.computeVertexNormals(); o.geo.computeBoundingSphere(); o.f = f; }
+  o.geo.attributes.position.array.set(nbPositions(f, a)); o.geo.attributes.position.needsUpdate = true; o.geo.computeVertexNormals(); o.geo.computeBoundingSphere(); o.f = f;
+  J.nb.seams.forEach((sm, i) => { const pts = tubePts(sm, f), arr = o.seams[i].geometry.attributes.position; pts.forEach((p, k) => arr.setXYZ(k, p.x, p.y, p.z)); arr.needsUpdate = true; o.seams[i].visible = f > 0.5; });
   for (const m of o.tubes) { o.tgrp.remove(m); m.geometry.dispose(); } o.tubes = [];
   for (const T of J.nb.tubes) { const pts = tubePts(T, f), r = T.r * (0.16 + 0.84 * a), fl = 1 - a;
     const m = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, T.closed, "catmullrom", 0.2), Math.max(24, pts.length), Math.max(0.0012, r), 10, T.closed), /longeron|gunwale/.test(T.name) ? o.tubeMatHot : o.tubeMat);
     if (fl > 0.02) m.scale.set(1, 1, 1); m.renderOrder = 9.5; o.tgrp.add(m); o.tubes.push(m); }
-  // steel plates: under the folded body, then on the floor of the printed shape
-  const S0 = J.nb.stack, P = J.nb.plates, xs = [], n = P.n;
-  for (let i = 0; i < n; i++) { const cx = S0.x0 + 0.045 + (i % 2) * (S0.L - 0.09), cy = -S0.W / 2 + 0.04 + Math.floor(i / 2) * ((S0.W - 0.08) / Math.max(1, Math.ceil(n / 2) - 1)), fx = J.read.dock_x + 0.06 + 0.035 * i, fy = (i % 2 ? 1 : -1) * 0.05;
-    const t = f < 0.5 ? 0 : mj((f - 0.5) / 0.5); o.plates[i].position.set(lerp(cx, fx, t), lerp(cy, fy, t), lerp(S0.zp + P.t / 2, 0.0015 + P.t / 2, t)); }
   o.a = a;
 }
 function nbValve(o, f) { const N = J.nb, t = clamp((f - 0.5) / 0.5, 0, 1); const v = f <= 0.5 ? N.valve_fold : N.valve.map((x, i) => lerp(N.valve_fold[i], x, t)); return new THREE.Vector3(...v).applyMatrix4(o.grp.matrix); }
@@ -834,8 +833,6 @@ function applyState(S, now) {
     o1.grp.matrixWorldNeedsUpdate = true; o1.gel.visible = S.n1mode === 2 && S.gelS > 0.003; o1.gelClip.constant = S.gelS; }
   o2.grp.visible = !!S.n2v;
   if (S.n2v) { setNB(o2, S.n2f, S.n2a); o2.clipPlane.constant = S.n2clip < 0.999 ? R.stack_z0 + S.n2clip * J.nb.stack.H + 0.0008 : 100; o2.grp.matrix.copy(PARm).multiply(Tm([S.n2x, 0, 0])); o2.grp.matrixWorldNeedsUpdate = true; o2.gel.visible = false; }
-  // plates: shown under the print from the moment they are laid
-  for (const [o, gen] of [[o1, 1], [o2, 2]]) { const on = (S.gen === gen && S.plates > 0) || (gen === 1 && S.gen === 2); o.plates.forEach((p) => { p.visible = on && o.grp.visible; }); }
   // kits: the kit of the generation being made follows the holder or lies on the seat; afterwards it rides in its newborn
   for (const [o, gen] of [[o1, 1], [o2, 2]]) { const K = o.kit, mine = S.gen === gen, seat = [0.207, 0, 0.025], fin = [J.nb.x_kit, 0.0, 0.026];
     if (mine && S.kit !== 2) { K.visible = !(S.kit === 0 && gen === 2 && false); K.matrix.copy(PARm).multiply(Tm([S.kx, S.ky, S.kz + 0.003])).multiply(M4().makeRotationZ(S.kyaw)); if (S.kit === 0 && gen === 2 && S.gen === 1) K.visible = false; }
@@ -860,11 +857,10 @@ function buildLabels() {
   const inS = (...ks) => ks.includes(STATE.k), tp = (v) => new THREE.Vector3(...v).applyMatrix4(PARm).toArray(), R = () => J.read;
   mk("Tail", "", () => tp([-0.12, 0, 0.36])); mk("Hard head, 245 mm, open to the floor", "", () => [0.15, 0, 0.36]);
   mk("Gel at the water level: the open mouth holds it", "w", () => inS("gel", "kit", "print", "push") && STATE.gen === 1 ? [R().x_lip - 0.01, -0.09, R().gel_z + 0.012] : null);
-  mk("Steel plates on the floor of the bowl", "k", () => inS("kit") ? tp([0.15, -0.06, 0.03]) : null);
-  mk("Folded newborn: laid flat, Z folded 3 x 2, 12 layers", "", () => inS("print", "cure") ? tp([J.nb.stack.x0 + 0.06, 0, R().stack_z0 + J.nb.stack.H + 0.03]) : null);
+  mk("Folded newborn: the quilt laid flat, Z folded on its seams", "", () => inS("print", "cure") ? tp([J.nb.stack.x0 + 0.06, 0, R().stack_z0 + J.nb.stack.H + 0.03]) : null);
   mk("Holder in the valve: pushes along the floor, nothing lifted", "", () => inS("push") ? tp([ARM.tip[0], ARM.tip[1], ARM.tip[2] + 0.09]) : null);
-  mk("Interlayer: rim, two ribs, mouth ring, crest, gunwales", "", () => inS("inflate", "release") ? (STATE.gen === 1 ? [J.read.dock_x + J.read.dxf + 0.12, 0, 0.36] : tp([J.read.dock_x + J.read.dxf + 0.12, 0, 0.36])) : null);
-  mk("Soft head: interior open, %s kPa in the interlayer".replace("%s", (J.read.p_op / 1000).toFixed(1)), "", () => STATE.n1mode === 2 ? tp([0.15, 0, 0.38]) : null);
+  mk("Quilted wall: nine soft hoop cells, one circuit", "", () => inS("inflate", "release") ? (STATE.gen === 1 ? [J.read.dock_x + J.read.dxf + 0.12, 0, 0.36] : tp([J.read.dock_x + J.read.dxf + 0.12, 0, 0.36])) : null);
+  mk("Soft head: interior open, %s kPa in the quilt".replace("%s", (J.read.p_op / 1000).toFixed(1)), "", () => STATE.n1mode === 2 ? tp([0.15, 0, 0.38]) : null);
   mk("Free lane", "w", () => inS("swim", "tailmove") ? [0.7, J.read.y_lane, 0.08] : null);
   mk("Waterline", "w", () => [0.95, -0.17, J.read.wl]);
 }
@@ -937,7 +933,7 @@ function renderReadouts(S) {
   const pr = S.gen === 1 ? S.n1clip : S.n2clip;
   if (S.k === "print") h += `<div class="rg"><h4>Print</h4>${rr("Progress", f0(pr * 100), "%", true)}${bar(pr)}${rr("Folded body", `${mm(J.nb.stack.L)} x ${mm(J.nb.stack.W)} x ${mm(J.nb.stack.H)}`, "mm")}${rr("Silicone, " + R.material, f0(R.sil_mL), "mL")}</div>`;
   const fa = S.gen === 1 ? [S.n1f, S.n1a] : [S.n2f, S.n2a];
-  if ((S.gen === 1 ? S.n1v : S.n2v) && S.k !== "print") h += `<div class="rg"><h4>Newborn, generation ${S.gen}</h4>${rr("Unfolded", f0(fa[0] * 100), "%", true)}${bar(fa[0])}${rr("Interlayer pressure", f1(fa[1] * R.p_op / 1000), "kPa")}${rr("Interlayer air", f2(fa[1] * R.air_L), "L")}${rr("Steel plates", f2(R.ballast), "kg")}${rr("Floats with its floor", "4 mm over the tank floor")}</div>`;
+  if ((S.gen === 1 ? S.n1v : S.n2v) && S.k !== "print") h += `<div class="rg"><h4>Newborn, generation ${S.gen}</h4>${rr("Unfolded", f0(fa[0] * 100), "%", true)}${bar(fa[0])}${rr("Quilt pressure", f1(fa[1] * R.p_op / 1000), "kPa")}${rr("Air in the quilt", f2(fa[1] * R.air_L), "L")}${rr("Gel ballast in the lowest cells", f0(fa[1] > 0.99 ? R.ballast : 0), "mL")}${rr("Floats with its floor", "4 mm over the tank floor")}</div>`;
   if (["swim", "undock", "tailmove", "dock"].includes(S.k)) h += `<div class="rg"><h4>Relay</h4>${rr("Pump", S.jet > 0.5 ? "on" : "off")}${rr("Speed (estimate)", "61", "mm/s")}${rr("Tail at the wheels", f1(R.wheel), "N")}${rr("Seam release, per magnet", f1(R.f_tilt), "N")}</div>`;
   h += `<div class="rg"><h4>Penetration test, this frame</h4>${rr("Deepest overlap of any pair", f2(S.pen * 1000), "mm", S.pen > 0.001)}${rr("Worst over the whole timeline", f2(R.pen_max * 1000), "mm")}</div>`;
   $("#ro").innerHTML = h; $("#tlClock").textContent = hms(S.clock) + " of " + hms(TL.realTotal);
@@ -949,7 +945,7 @@ function renderProps() {
   if (TAB === "checks") { const groups = [...new Set(J.checks.map((c) => c.group))];
     el.innerHTML = groups.map((g) => `<div class="pnl"><h3>${esc(g)}</h3>${J.checks.filter((c) => c.group === g).map((c) => `<div class="chk ${c.ok ? "" : "no"}"><i>${c.ok ? "ok" : "no"}</i><span>${esc(c.name)}</span></div>`).join("")}</div>`).join("") +
       `<div class="pnl"><h3>Penetration, every pair, every frame</h3><dl class="kv">${J.pairs.map((p) => `<dt>${esc(p.name)}</dt><dd>${f2(p.mm)} mm</dd>`).join("")}</dl><p>${J.fr.pen.length} frames tested. Limit 1 mm. The soft head's inner face is lowered by the skin sag and 10 mm of crown drop for the arm test.</p></div>`; }
-  else if (TAB === "birth") { el.innerHTML = `<div class="pnl"><h3>Tubes of the interlayer, one circuit at ${f1(J.read.p_op / 1000)} kPa (${esc(J.read.material)})</h3><dl class="kv">${J.nb.tubes.map((t) => `<dt>${esc(t.name)}</dt><dd>r ${f0(t.r * 1000)} mm</dd>`).join("")}</dl><p>Each hoop is a two hinged frame along the head's section, floor corner to floor corner; loads x 2; pressure at most the ballooning limit point / 1.5. See the Checks tab for every try, failed ones included.</p></div>`; }
+  else if (TAB === "birth") { const C = J.nb.cells; el.innerHTML = `<div class="pnl"><h3>The quilt, one circuit at ${f1(J.read.p_op / 1000)} kPa (${esc(J.read.material)})</h3><dl class="kv"><dt>Hoop cells</dt><dd>${C.n}</dd><dt>Cell radius, depth</dt><dd>${f1(C.r * 1000)} mm, ${f0(2 * C.r * 1000)} mm</dd><dt>Seam pitch</dt><dd>${f1(C.pitch * 1000)} mm</dd><dt>Gel ballast</dt><dd>${f0(J.read.ballast)} mL</dd></dl><p>Each strip of quilt is taken as a two hinged frame along the head's section, floor corner to floor corner; loads x 2; pressure at most the ballooning limit point / 1.5. The Checks tab lists every try, failed ones included.</p></div>`; }
   else if (TAB === "masses") { el.innerHTML = J.masses.map((g) => `<div class="pnl"><h3>${esc(g.name)}</h3><dl class="kv">${g.rows.map((r) => `<dt>${esc(r[0])}</dt><dd>${esc(r[1])}</dd>`).join("")}</dl>${g.note ? `<p>${esc(g.note)}</p>` : ""}</div>`).join(""); }
   else { const K = J.kit; el.innerHTML = `<div class="pnl"><h3>${esc(K.name)}, ${f0(K.mass * 1000)} g</h3><dl class="kv">${K.parts.map((p) => `<dt>${p.url ? `<a href="${esc(p.url)}" style="color:inherit">${esc(p.name)}</a>` : esc(p.name)}</dt><dd>${f1(p.mass * 1000)} g</dd>`).join("")}</dl><p>Seated on the floor of the bowl by the holder before the print, as in the fertile build, then printed around.</p></div>`; }
 }
