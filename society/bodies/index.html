@@ -877,7 +877,7 @@ function step(dt) {
   for (const b of bodies) for (const k in b.glow) { const g = b.glow[k]; g.flash = Math.max(0, g.flash - dt * 0.7); const docked = !!b.docks[k]; const on = docked ? g.level : 0; g.s.material.opacity = clamp(on * (0.6 + 0.4 * Math.sin(simT * 2 + b.ph)) + g.flash, 0, 1); g.s.scale.setScalar(0.09 + 0.18 * g.flash); }
   // backing off after an undock
   for (const b of bodies) if (b.backoff && !b.parent) { const d = 0.05 * dt; b.x += b.backoff.nx * d; b.y += b.backoff.ny * d; b.backoff.d += d; if (b.backoff.d > b.backoff.max) b.backoff = null; }
-  collide(); collide(); if (speed >= 64) collide();   // extra passes settle stacked contacts at large substeps
+  for (let k = 0; k < 10; k++) if (collide() < 0.001) break;   // repeat until no pair overlaps by more than 1 mm (at most 10 passes)
   // grown babies leave the pond
   bodies = bodies.filter((b) => { if (b.gone) { scene.remove(b.obj); if (FOLLOW === b) unfollow(); return false; } return true; });
   manage(dt);
@@ -976,9 +976,10 @@ function circlesTouch(a, b, m) { for (const p of worldCircles(a)) for (const q o
 function collide() {
   const list = bodies.filter((b) => !b.gone);
   const W = list.map((b) => ({ b, r: rootOf(b), c: worldCircles(b) }));
+  let worst = 0;
   for (let i = 0; i < W.length; i++) for (let j = i + 1; j < W.length; j++) {
     const A = W[i], B = W[j]; if (A.r === B.r) continue;
-    if (Math.abs(A.b.x - B.b.x) > 2 || Math.abs(A.b.y - B.b.y) > 2) continue;
+    if (!A.c.length || !B.c.length || Math.abs(A.c[0][0] - B.c[0][0]) > 2 || Math.abs(A.c[0][1] - B.c[0][1]) > 2) continue;   // world positions: a docked part's own x, y are not world coordinates
     const ta = A.r.task, tb = B.r.task;
     if (ta && ta.type === "dock" && rootOf(ta.B) === B.r && ta.phase !== "go") continue;
     if (tb && tb.type === "dock" && rootOf(tb.B) === A.r && tb.phase !== "go") continue;
@@ -989,10 +990,12 @@ function collide() {
       touch(A.r, B.r); touch(B.r, A.r);   // a bump counts as a touch, once per pair in 15 s
       const nx = dx / d, ny = dy / d, wa = fa && fb ? 0.5 : fa ? 0 : fb ? 1 : 0.5;
       if (fa && fb && (A.r.kind === "charger" || A.r.cluster) && (B.r.kind === "charger" || B.r.cluster)) continue;
+      if (o > worst) worst = o;
       A.r.x -= nx * o * wa; A.r.y -= ny * o * wa; B.r.x += nx * o * (1 - wa); B.r.y += ny * o * (1 - wa);
     }
   }
   for (const b of list) if (!b.parent && b.kind !== "charger" && !(b.task && b.task.type === "leave")) { b.x = clamp(b.x, POND.x0 + 0.4, POND.x1 - 0.4); b.y = clamp(b.y, POND.y0 + 0.4, POND.y1 - 0.4); }
+  return worst;
 }
 const GROW = [];   // babies that left the pond, growing into mothers
 const MOTHER_CAP = 13, CLUSTER_CAP = 14, SPENT_LIFE = [90, 150];
