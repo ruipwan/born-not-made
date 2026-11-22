@@ -643,14 +643,18 @@ function buildBody() {
   // rack forks and kit store: printed with the tail; kit seat bumps: printed with the gel chamber
   for (const b of J.boxes) { const m = boxMesh(b, white, b.grp === "seat" ? R3.chamber : R3.tail); edgeLines(m, 30, 0.3, 0xdfe3ea, clip); }
   // the two pockets: swellings of the side walls of the tail, with the parts of the tail inside
-  const podM = clayMat(0xeef0ee, { opacity: 0.5, side: THREE.DoubleSide, sub: 0.4, clip, rough: 0.35 });
-  for (const p of J.pods) { const m = meshOf(p.v, p.t, podM); m.renderOrder = 6; R3.tail.add(m); }
-  const pm = { cyl: clayMat(0xcfd3d9, { sub: 0.4, clip }), box: clayMat(0x2f6b52, { sub: 0.4, clip }), ell: clayMat(0xdfeaf0, { opacity: 0.6, sub: 0.3, clip }) };
-  for (const e of J.equip) { let g;
-    if (e.kind === "box") g = new THREE.BoxGeometry(e.size[0], e.size[1], e.size[2]);
-    else if (e.kind === "ell") g = new THREE.SphereGeometry(1, 20, 14).scale(e.size[0], e.size[1], e.size[2]);
-    else { g = new THREE.CylinderGeometry(e.size[0], e.size[0], e.size[1], 20); if (e.axis === "x") g.rotateZ(Math.PI / 2); else g.rotateX(Math.PI / 2); }
-    const m = new THREE.Mesh(g, /Battery/.test(e.name) ? clayMat(0x7fb7a4, { sub: 0.4, clip }) : /inflator/.test(e.name) ? clayMat(0x2a2b2e, { sub: 0.4, clip, rough: 0.5 }) : /valve/.test(e.name) ? clayMat(0xe6f0f4, { opacity: 0.7, sub: 0.3, clip }) : /Silicone/.test(e.name) ? clayMat(0xf1f1ec, { opacity: 0.75, sub: 0.3, clip }) : pm[e.kind]); m.position.set(...e.c); R3.tail.add(m); edgeLines(m, 30, 0.35, 0x8d9097, clip); }
+  // drawn like the shell: clear printed wall that swells inward; the parts inside are light, a little translucent, at real size
+  for (const p of J.pods) { const m = meshOf(p.v, p.t, shellMat(0.16, 0.75, clip)); m.renderOrder = 6.5; R3.tail.add(m); const mi = meshOf(p.v, p.t, clayMat(0xf2f3f0, { opacity: 0.1, side: THREE.DoubleSide, sub: 0.3, clip, rough: 0.4 })); mi.renderOrder = 6.2; R3.tail.add(mi); }
+  const softM = (hex, op = 0.78) => clayMat(hex, { opacity: op, depthWrite: true, sub: 0.3, sss: 0.4, clip, rough: 0.45 });
+  const rbox = (sx, sy, sz, r) => { const sh = new THREE.Shape(), w = sx / 2 - r, h = sz / 2 - r; sh.absarc(w, h, r, 0, Math.PI / 2); sh.absarc(-w, h, r, Math.PI / 2, Math.PI); sh.absarc(-w, -h, r, Math.PI, 1.5 * Math.PI); sh.absarc(w, -h, r, 1.5 * Math.PI, 2 * Math.PI);
+    return new THREE.ExtrudeGeometry(sh, { depth: sy - 2 * r * 0.5, bevelEnabled: true, bevelThickness: r * 0.5, bevelSize: r * 0.5, bevelSegments: 3, curveSegments: 8 }).translate(0, 0, -(sy - r) / 2).rotateX(Math.PI / 2); };
+  for (const e of J.equip) { let g, mat = softM(0xe9ebe8);
+    if (/inflator/.test(e.name)) { g = rbox(e.size[0], e.size[1], e.size[2], 0.008); mat = softM(0xc9ccd0, 0.8); }
+    else if (/Raspberry/.test(e.name)) { g = new THREE.BoxGeometry(e.size[0], 0.0016, e.size[2]); mat = softM(0x9fc7b4, 0.85); }
+    else if (e.kind === "box") g = rbox(e.size[0], e.size[1], e.size[2], 0.003);
+    else { g = new THREE.CylinderGeometry(e.size[0], e.size[0], e.size[1], 24); if (e.axis === "x") g.rotateZ(Math.PI / 2); else g.rotateX(Math.PI / 2); if (/Battery/.test(e.name)) mat = softM(0xbfdcd2, 0.8); else if (/Silicone/.test(e.name)) mat = softM(0xf4f4f0, 0.55); }
+    const m = new THREE.Mesh(g, mat); m.position.set(...e.c); m.renderOrder = 6.3; R3.tail.add(m); edgeLines(m, 40, 0.25, 0xaab0b8, clip);
+    if (/Raspberry/.test(e.name)) for (const [dx, dz, w, h] of [[-0.02, 0.008, 0.016, 0.016], [0.012, -0.006, 0.012, 0.012], [0.034, 0.012, 0.014, 0.02]]) { const c = new THREE.Mesh(new THREE.BoxGeometry(w, 0.004, h), softM(0xd9dadd, 0.9)); c.position.set(e.c[0] + dx, e.c[1] - Math.sign(e.c[1]) * 0.003, e.c[2] + dz); R3.tail.add(c); } }
   // parked modules at the two forks, in the tail
   PARTS.parkP = moduleGroup("cup"); PARTS.parkN = moduleGroup("needle");
   for (const [g, s] of [[PARTS.parkP, J.slots.P], [PARTS.parkN, J.slots.N]]) { g.position.set(...s.o); g.rotation.z = s.yaw; R3.tail.add(g); }
@@ -893,6 +897,8 @@ const CAMS = {
   birthcam: () => ({ p: [0.72, -1.15, 0.36], t: [0.4, 0, 0.14] }),
   swimcam: () => { const b = nbPos(); return { p: [0.45 + 0.55 * b.x, -1.9, 0.62], t: [0.25 + 0.55 * b.x, 0.02, 0.1] }; },
   newborn: () => { const b = nbPos(), d = 0.42 + 2.2 * (BB.rmax || 0.05); return { p: [b.x - 0.2 * d, b.y - d, b.z + 0.35 * d], t: [b.x, b.y, b.z] }; },
+  tailcam: () => ({ p: [-0.62 + STATE.dock, -0.62, 0.42], t: [-0.1 + STATE.dock, 0, 0.16] }),
+  fullcam: () => { const b = nbPos(); return { p: [b.x * 0.5 + 0.3, -2.2, 0.75], t: [b.x * 0.5 + 0.15, 0, 0.12] }; },
   kit: () => { const b = new THREE.Vector3().setFromMatrixPosition(BB.kitG.matrix); return { p: [b.x - 0.05, b.y - 0.34, b.z + 0.12], t: [b.x, b.y, b.z] }; },
 };
 function setCam(name, snap = false) { CAM = name; camGoal = CAMS[name](); SECT.constant = name === "section" ? 0 : 100; document.querySelectorAll("[data-cam]").forEach((b) => b.classList.toggle("on", b.dataset.cam === name)); if (snap) CAMSNAP = true; }
