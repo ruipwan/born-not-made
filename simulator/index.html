@@ -347,7 +347,7 @@ function resize() {
 
 /* ================================================================ the egg from the v2 meshes */
 const PARTS = {};
-const HIDE = new Set(["W_B0_Skin", "W_T1_TailShell", "W_B0_MotherRearWall", "W_B0_MotherFrontPlate", "W_V2_BellyPleats", "W_V2_TrayWall", "W_V2_Chute", "W_V2_Gel", "W_B0_SkinInner", "W_B0_RingA", "W_V2_BoreRing", "W_V2_Collar", "W_V2_LipSeal", "W_V2_Thrusters"]);   // removed by the simplification of 20 November, or redrawn here
+const HIDE = new Set(["W_V2_EPM", "W_V2_Pads", "W_B0_Skin", "W_T1_TailShell", "W_B0_MotherRearWall", "W_B0_MotherFrontPlate", "W_V2_BellyPleats", "W_V2_TrayWall", "W_V2_Chute", "W_V2_Gel", "W_B0_SkinInner", "W_B0_RingA", "W_V2_BoreRing", "W_V2_Collar", "W_V2_LipSeal", "W_V2_Thrusters"]);   // removed by the simplification of 20 November, or redrawn here
 async function loadEgg(b64) {
   const bin = Uint8Array.from(atob(b64.trim()), (c) => c.charCodeAt(0));
   const gltf = await new Promise((res, rej) => new THREE.GLTFLoader().parse(bin.buffer, "", res, rej));
@@ -381,7 +381,10 @@ async function loadEgg(b64) {
   hullMesh("W_T1_TailShell", shellMat(0.08, 0.62, clip), R3.tail, 7, false);
   hullMesh("W_B0_MotherFrontPlate", clayMat(0xe9e7e1, { opacity: 0.32, side: THREE.DoubleSide, clip, sub: 0.5 }), R3.womb, 5, true);
   hullMesh("W_B0_MotherRearWall", clayMat(0xe9e7e1, { opacity: 0.32, side: THREE.DoubleSide, clip, sub: 0.5 }), R3.womb, 5, true);
-  hullMesh("W_V3_Channel", clayMat(0xc9cbce, { opacity: 0.6, clip, sub: 0.6 }), R3.womb, 5, true);
+  hullMesh("W_V3_Collar", clayMat(0xdedcd5, { opacity: 0.55, side: THREE.DoubleSide, clip, sub: 0.5 }), R3.tail, 5, true);
+  hullMesh("W_V3_Rack", clayMat(0xcfd3d9, { sub: 0.5, clip }), R3.tail, 5, true);
+  hullMesh("W_V2_EPM", clayMat(0x8d9097, { sub: 0.6 }), R3.tail, 5, true);
+  hullMesh("W_V2_Pads", clayMat(0xb8bbc0, { sub: 0.6 }), R3.womb, 5, true);
   // second telescopic boom stage: a plate that slides out of the first and carries the arm base
   PARTS.boom2 = new THREE.Mesh(new THREE.BoxGeometry(1, 0.096, 0.007), clayMat(0xcfd1d4, { sub: 0.4 })); PARTS.boom2.position.z = J.layout.root_z - 0.0045; R3.tail.add(PARTS.boom2); edgeLines(PARTS.boom2, 30, 0.3);
 }
@@ -454,15 +457,15 @@ function buildWombParts() {
   // thin rims: 3 mm lip at the birth opening (no magnets), 4 mm lips on both faces of the docking bore, bosses behind the three steel pads
   const rimM = clayMat(0xdedcd5, { sub: 0.5 }), L = J.layout, n = L.open_n;
   torusAt([L.open_c[0] + 0.003 * n[0], 0, L.open_c[2] + 0.003 * n[2]], n, L.open_R + J.rims.open_t / 2, J.rims.open_t / 2, rimM, R3.womb);
-  torusAt([-0.381, 0, 0], [1, 0, 0], L.bore_R + J.rims.bore_t / 2, J.rims.bore_t / 2, rimM, R3.womb);
-  torusAt([-0.389, 0, 0], [1, 0, 0], L.bore_R + J.rims.bore_t / 2, J.rims.bore_t / 2, rimM, R3.tail);
+  torusAt([-0.381, 0, L.bore_z || 0], [1, 0, 0], L.bore_R + J.rims.bore_t / 2, J.rims.bore_t / 2, rimM, R3.womb);
+  torusAt([-0.389, 0, L.bore_z || 0], [1, 0, 0], L.bore_R + J.rims.bore_t / 2, J.rims.bore_t / 2, rimM, R3.tail);
   // gel trough: a box around the folded print, floor flat, open at the top, with the bottom channel from the docking face
   const T = J.gel.trough, tm = clayMat(0xe9e7e1, { opacity: 0.42, side: THREE.DoubleSide, clip: [SECT], sub: 0.5 }), H = J.layout.gel_z - T.floor + 0.004;
   const wall = (w, d, h, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, d, h).translate(x, y, z), tm); m.renderOrder = 4; R3.womb.add(m); edgeLines(m, 30, 0.3, 0xdfe3ea, [SECT]); };
   const xm = (T.x0 + T.x1) / 2, lx = T.x1 - T.x0;
-  wall(lx + 0.006, 2 * T.y + 0.006, 0.003, xm, 0, T.floor - 0.0015);
-  wall(lx + 0.006, 0.003, H, xm, T.y + 0.0015, T.floor + H / 2); wall(lx + 0.006, 0.003, H, xm, -T.y - 0.0015, T.floor + H / 2);
-  wall(0.003, 2 * T.y, H, T.x0 - 0.0015, 0, T.floor + H / 2); wall(0.003, 2 * T.y, H, T.x1 + 0.0015, 0, T.floor + H / 2);
+  // (drawn from the hull data)
+  // (drawn from the hull data)
+  // (drawn from the hull data)
   // kit seat: a post from the floor with three cups
   const kc = J.kit.centre, R = Math.max(...J.body.params.Ro), top = J.layout.z_axis - R - 0.002, bot = J.gel.trough.floor, m = clayMat(0xe2e0da, { sub: 0.4, clip: [SECT] });
   R3.womb.add(new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.012, top - bot, 16).rotateX(Math.PI / 2).translate(kc[0], 0, (top + bot) / 2), m));
@@ -470,8 +473,8 @@ function buildWombParts() {
   for (const [fx, fy] of [[-0.018, 0.012], [-0.018, -0.012], [0.018, 0]]) R3.womb.add(new THREE.Mesh(new THREE.CylinderGeometry(0.0035, 0.003, 0.003, 12).rotateX(Math.PI / 2).translate(kc[0] + fx, fy, top + 0.0015), m));
   // kit cradle on the port wall, above the gel
   const c = J.layout.cradle, cm = clayMat(0xe2e0da, { opacity: 0.6, side: THREE.DoubleSide, sub: 0.4 });
-  const box = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.074, 0.03, 1, 1, 1).translate(c[0], c[1], c[2] + 0.009), cm); R3.womb.add(box); edgeLines(box, 30, 0.35);
-  const arm = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.06, 0.006).translate(c[0], c[1] + 0.065, c[2] + 0.02), clayMat(0xe2e0da, { sub: 0.4 })); R3.womb.add(arm);
+  // (drawn from the hull data)
+  // (drawn from the hull data)
 }
 
 /* ================================================================ water: surface with waves, masked inside the two waterplanes */
@@ -531,10 +534,41 @@ function buildSoft(d) {
   SOFT.mean = b64f32(d.mean); SOFT.coef = b64f32(d.coef); SOFT.K = K; SOFT.n3 = n3; SOFT.times = d.times; SOFT.meas = d.measured; SOFT.kit = d.kit;
   SOFT.basis = new Float32Array(K * n3); for (let k = 0; k < K; k++) { const f = bs[k] / 32767; for (let i = 0; i < n3; i++) SOFT.basis[k * n3 + i] = bq[k * n3 + i] * f; }
   const g = new THREE.BufferGeometry(); SOFT.pos = new Float32Array(n3); g.setAttribute("position", new THREE.BufferAttribute(SOFT.pos, 3)); g.setIndex(new THREE.BufferAttribute(b64u32(d.tri), 1));
-  const mat = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(0xf2eee6).convertSRGBToLinear(), roughness: 0.5, metalness: 0, transmission: 0.3, thickness: 0.004, ior: 1.41, sheen: 0.5, sheenRoughness: 0.6, sheenColor: new THREE.Color(0xffffff), clearcoat: 0.2, clearcoatRoughness: 0.5, side: THREE.DoubleSide, transparent: true, opacity: 0.94 });
+  // milky clear platinum silicone: light passes and scatters, so the kit, the flex PCB, the jet tubes and the valve read through the skin
+  const mat = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(0xf4f6f5).convertSRGBToLinear(), roughness: 0.32, metalness: 0, transmission: 0.72, thickness: 0.003, ior: 1.41, attenuationColor: new THREE.Color(0xe8eeec), attenuationDistance: 0.02, sheen: 0.35, sheenRoughness: 0.5, sheenColor: new THREE.Color(0xffffff), clearcoat: 0.35, clearcoatRoughness: 0.35, side: THREE.DoubleSide, transparent: true, opacity: 0.8, depthWrite: false });
   mat.onBeforeCompile = (sh) => addWater(sh, { line: 1.0, sub: 0.85 }); mat.customProgramCacheKey = () => "softbody";
   SOFT.mesh = new THREE.Mesh(g, mat); SOFT.mesh.renderOrder = 6; SOFT.mesh.frustumCulled = false; SOFT.mesh.visible = false; R3.baby.add(SOFT.mesh);
-  SOFT.ok = true; SOFT.last = -1;
+  SOFT.ok = true; SOFT.last = -1; softInternals(d);
+}
+// inside the skin, on real routes over the baked vertices: the needle valve on the tail end, a flex PCB from the kit along the belly line to the pressure
+// sensor at the valve, and a silicone jet tube from each kit pump to an outlet in the skin aft of the kit
+function softInternals(d) {
+  if (!d.rings) return; const RC = d.rings[1], m = SOFT.mean, K = J.kit; let rk = 1e9;
+  for (const v of SOFT.kit) rk = Math.min(rk, Math.floor(v / RC));
+  let cb = 0, zb = 1e9; for (let c = 0; c < RC; c++) { const z = m[3 * (rk * RC + c) + 2]; if (z < zb) { zb = z; cb = c; } }
+  const g = new THREE.Group(); SOFT.mesh.add(g); SOFT.inner = g; SOFT.io = { RC, rk, cb, tail: d.tail_vertex };
+  const pcbN = rk + 2, pg = new THREE.BufferGeometry(); SOFT.pcbPos = new Float32Array(pcbN * 2 * 3); pg.setAttribute("position", new THREE.BufferAttribute(SOFT.pcbPos, 3));
+  const idx = []; for (let j = 0; j < pcbN - 1; j++) { const a = 2 * j; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } pg.setIndex(idx);
+  SOFT.pcb = new THREE.Mesh(pg, clayMat(0xc9933f, { sub: 0.4, side: THREE.DoubleSide })); SOFT.pcb.frustumCulled = false; g.add(SOFT.pcb);
+  SOFT.pumps = K.parts.filter((p) => p.size && p.rel && /pump/i.test(p.id + p.name)).slice(0, 2);
+  SOFT.tubeMat = clayMat(0x9fc3d0, { sub: 0.4 }); SOFT.tubes = SOFT.pumps.map(() => { const t = new THREE.Mesh(new THREE.BufferGeometry(), SOFT.tubeMat); t.frustumCulled = false; g.add(t); return t; });
+  const vg = new THREE.Group(), body = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.016, 20).rotateZ(Math.PI / 2), clayMat(0xb8bcc0, { sub: 0.4, shine: 30 }));
+  const sept = new THREE.Mesh(new THREE.CylinderGeometry(0.0045, 0.0045, 0.003, 16).rotateZ(Math.PI / 2), clayMat(0x8a4a3a, { sub: 0.4 })); sept.position.x = -0.0085; vg.add(body, sept);
+  SOFT.valve = vg; g.add(vg);
+}
+function softV(i, inset) { const p = SOFT.pos, x = p[3 * i], y = p[3 * i + 1], z = p[3 * i + 2], r = Math.hypot(y, z) || 1, k = Math.max(0, r - inset) / r; return [x, y * k, z * k]; }
+function softInternalsUpdate() {
+  if (!SOFT.io) return; const { RC, rk, cb, tail } = SOFT.io, K = J.kit, P = SOFT.pcbPos, w = 0.005; let n = 0, last = [0, 0, -1];
+  const pts = []; for (let r = rk; r >= 0; r--) pts.push(softV(r * RC + cb, 0.004)); const tv = softV(tail, 0); pts.push([tv[0] + 0.012, tv[1], tv[2]]);
+  for (const q of pts) { const r = Math.hypot(q[1], q[2]); const c = r > 0.006 ? [0, -q[2] / r, q[1] / r] : last; last = c;
+    P.set([q[0], q[1] + c[1] * w, q[2] + c[2] * w, q[0], q[1] - c[1] * w, q[2] - c[2] * w], 6 * n++); }
+  SOFT.pcb.geometry.attributes.position.needsUpdate = true; SOFT.pcb.geometry.computeVertexNormals();
+  SOFT.valve.position.set(tv[0] + 0.009, tv[1], tv[2]);
+  const k = SOFT.kitC, rr = Math.hypot(k[1], k[2]) || 1, d = K.size[2] / 2 + 0.004, kp = [k[0], k[1] - k[1] / rr * d, k[2] - k[2] / rr * d];
+  SOFT.pumps.forEach((pm, i) => { const a = new THREE.Vector3(kp[0] - pm.rel[0] - pm.size[0] / 2, kp[1] - pm.rel[1], kp[2] + pm.rel[2] - K.z), side = Math.sign(-pm.rel[1]) || (i ? -1 : 1);
+    const ro = Math.max(0, rk - 5), co = (cb + side * 3 + RC) % RC, mid = softV(Math.max(0, rk - 2) * RC + co, 0.009), out = softV(ro * RC + co, 0.001);
+    const curve = new THREE.CatmullRomCurve3([a, new THREE.Vector3(a.x - 0.015, a.y, a.z), new THREE.Vector3(...mid), new THREE.Vector3(...out)]);
+    SOFT.tubes[i].geometry.dispose(); SOFT.tubes[i].geometry = new THREE.TubeGeometry(curve, 24, 0.0028, 8, false); });
 }
 function softFrame(tt) {
   const T = SOFT.times; let lo = 0, hi = T.length - 1;
@@ -546,6 +580,7 @@ function softFrame(tt) {
   const g = SOFT.mesh.geometry; g.attributes.position.needsUpdate = true; g.computeVertexNormals();
   const m = SOFT.meas, i = Math.min(m.length - 1, lo), j = Math.min(m.length - 1, hi); SOFT.V = lerp(m[i][1], m[j][1], f); SOFT.L = lerp(m[i][2], m[j][2], f); SOFT.D = lerp(m[i][3], m[j][3], f);
   let cx = 0, cy = 0, cz = 0; for (const v of SOFT.kit) { cx += p[3 * v]; cy += p[3 * v + 1]; cz += p[3 * v + 2]; } const nk = SOFT.kit.length; SOFT.kitC = [cx / nk, cy / nk, cz / nk];
+  softInternalsUpdate();
 }
 function babyMeshUpdate(lam) {
   const key = lam.map((l) => l.toFixed(3)).join(","); if (key === BB.key) return; BB.key = key;
@@ -556,7 +591,7 @@ function babyMeshUpdate(lam) {
 }
 function buildBaby() {
   const clip = [PRINTCLIP];
-  const mat = new THREE.MeshPhongMaterial({ color: new THREE.Color(0xf3f1ec).convertSRGBToLinear(), shininess: 14, specular: 0x222222, flatShading: false, side: THREE.DoubleSide, transparent: true, opacity: 0.88, depthWrite: true, clippingPlanes: clip });
+  const mat = new THREE.MeshPhongMaterial({ color: new THREE.Color(0xf3f1ec).convertSRGBToLinear(), shininess: 22, specular: 0x333333, flatShading: false, side: THREE.DoubleSide, transparent: true, opacity: 0.62, depthWrite: false, clippingPlanes: clip });   // milky clear silicone, the kit shows through
   mat.onBeforeCompile = (sh) => addWater(sh, { line: 1.0, sub: 0.85 }); mat.customProgramCacheKey = () => "baby";
   BB.mesh = new THREE.Mesh(new THREE.BufferGeometry(), mat); BB.mesh.renderOrder = 6; R3.baby.add(BB.mesh);
   BB.edges = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0x8c949c, transparent: true, opacity: 0.32, clippingPlanes: clip })); BB.edges.renderOrder = 7; BB.mesh.add(BB.edges);
@@ -638,15 +673,15 @@ function buildTool() {      // the module on the arm: the needle module or the s
   const needle = moduleGroup("needle"), cup = moduleGroup("cup"); piv.add(needle); piv.add(cup);
   return { g, piv, needle, cup };
 }
-function buildRack() {      // two forks on posts from the womb floor, on the docking wall side; slot A holds the suction module, slot B the needle module
+function buildRack() {      // the two modules parked in the forks on the tail collar (the forks and brackets are drawn from the hull data); slot A suction module, slot B needle module
   const T = J.tools, L = J.layout.stem, m = clayMat(0xcfd3d9, { sub: 0.5, clip: [SECT] }); R3.rack = {};
   for (const [key, sl, fz] of [["A", T.rack_a, T.floor_a], ["B", T.rack_b, T.floor_b]]) {
     const sg = Math.sign(sl[1]), zf = sl[2] + L;
     const sh = new THREE.Shape(); sh.moveTo(-0.025, -0.025); sh.lineTo(0.025, -0.025); sh.lineTo(0.025, -0.006); sh.lineTo(-0.004, -0.006); sh.absarc(-0.004, 0, 0.006, -Math.PI / 2, Math.PI / 2, true); sh.lineTo(0.025, 0.006); sh.lineTo(0.025, 0.025); sh.lineTo(-0.025, 0.025); sh.lineTo(-0.025, -0.025);
-    const fork = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: 0.004, bevelEnabled: false }).translate(sl[0], sl[1], zf - 0.004), m); R3.womb.add(fork); edgeLines(fork, 30, 0.3, 0xdfe3ea, [SECT]);
-    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.006, zf - fz, 12).rotateX(Math.PI / 2).translate(sl[0], sl[1] + sg * 0.03, (zf + fz) / 2), m); R3.womb.add(post);
-    R3.womb.add(new THREE.Mesh(new THREE.BoxGeometry(0.004, 0.004, 0.012).translate(sl[0] - 0.012, sl[1], zf + 0.05), clayMat(0x8d9097, { sub: 0.5, clip: [SECT] })));   // the pin that presses the release button
-    const pm = moduleGroup(key === "A" ? "cup" : "needle"); pm.position.set(sl[0], sl[1], sl[2]); R3.womb.add(pm); R3.rack[key] = pm;
+  // (drawn from the hull data)
+  // (drawn from the hull data)
+    R3.tail.add(new THREE.Mesh(new THREE.BoxGeometry(0.004, 0.004, 0.012).translate(sl[0] - 0.012, sl[1], zf + 0.05), clayMat(0x8d9097, { sub: 0.5, clip: [SECT] })));   // the pin that presses the release button
+    const pm = moduleGroup(key === "A" ? "cup" : "needle"); pm.position.set(sl[0], sl[1], sl[2]); R3.tail.add(pm); R3.rack[key] = pm;
   }
 }
 function poseArm() {
@@ -900,7 +935,7 @@ function applyState(S, now) {
   // kit
   const K = J.kit, kc = K.centre, c = J.layout.cradle;
   BB.kitG.matrixAutoUpdate = false;
-  if (S.kit === "cradle") BB.kitG.matrix.copy(R3.womb.matrixWorld).multiply(Tm([c[0], c[1], c[2] + K.size[2] / 2]));
+  if (S.kit === "cradle") BB.kitG.matrix.copy(R3.tail.matrixWorld).multiply(Tm([c[0], c[1], c[2] + K.size[2] / 2]));
   else if (S.kit === "carried") { R3.arm.updateMatrixWorld(true); const p = new THREE.Vector3(...ARM.tip).applyMatrix4(R3.tail.matrixWorld); BB.kitG.matrix.makeTranslation(p.x, p.y, p.z - K.size[2] / 2 - 0.002); }
   else if (S.kit === "placed") BB.kitG.matrix.copy(R3.womb.matrixWorld).multiply(Tm(kc));
   else if (S.soft && SOFT.kitC) { const k = SOFT.kitC, r = Math.hypot(k[1], k[2]) || 1, d = K.size[2] / 2 + 0.004; BB.kitG.matrix.copy(R3.baby.matrix).multiply(Tm([k[0], k[1] - k[1] / r * d, k[2] - k[2] / r * d])); }
