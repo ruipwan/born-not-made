@@ -1,14 +1,36 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Inheritance · Born, Not Made</title>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0c0c0c"><title>Memory inheritance · Born, Not Made</title>
 <style>
-*{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:#0c0c0c;color:#eee;font:15px/1.5 Inter,Arial,sans-serif}main{max-width:1400px;margin:auto;padding:18px clamp(12px,3vw,44px)}header,footer{display:flex;align-items:center;gap:20px}header{justify-content:space-between;padding:0 0 14px}a,button{color:inherit;font:inherit}a{text-underline-offset:4px}header a{text-decoration:none}header span,time{font-size:13px;color:#aaa}canvas{width:100%;display:block;aspect-ratio:16/9;background:#090909}footer{padding:13px 0;gap:14px}button{background:transparent;border:0;padding:5px 0;cursor:pointer}input{accent-color:#ddd;min-width:32px;flex:1}time{font-variant-numeric:tabular-nums;white-space:nowrap}.mobile{display:none}footer a{font-size:13px}@media(max-width:600px){main{padding:12px}.mobile{display:block;min-height:3.2em;margin:12px 0 0;font:19px Georgia,serif}footer{gap:9px;font-size:13px}time{display:none}}@media(min-width:601px){main{padding-bottom:0}}
-.mobile-repertoire{display:none}details{color:#bdbdb7;font-size:14px;max-width:75ch;margin:14px 0 0}summary{cursor:pointer}details p{margin:8px 0}@media(max-width:600px){.mobile-repertoire{display:block;white-space:pre-line;line-height:1.8;font-size:13px;color:#c5c5c1}}.mobile-tech{display:none}.chapters{display:flex;flex-wrap:wrap;gap:18px;font-size:13px;color:#b7b7b4}.chapters button:hover{text-decoration:underline}@media(max-width:600px){.mobile-tech{display:block;font-size:13px;color:#bcbcb7}.chapters{gap:10px}} </style></head><body><main><header><a href="../#inheritance" target="_top">Born, Not Made</a><span>Inheritance</span></header><canvas width="1600" height="900" aria-label="Three egg-shaped robots inherit memory through model distillation"></canvas><p class="mobile"></p><p class="mobile-tech"></p><div class="mobile-repertoire"></div><footer><button id="play">Pause</button><input id="seek" type="range" min="0" max="68" step=".05" value="0" aria-label="Film position"><time></time><button id="again">Replay</button><a href="inheritance.mp4?v=lifetimes-1" download>MP4</a></footer><nav class="chapters" aria-label="Film chapters"><button data-time="0">Encounters</button><button data-time="9">Selection</button><button data-time="20">A life of its own</button><button data-time="45">Partial inheritance</button><button data-time="56">The next life</button></nav>
-<details><summary>Inside the learning simulation</summary>
-<p>Each generation has its own seven-cue, seven-action softmax policy. The film uses fictional conversations, peer messages and water conditions. Each encounter specifies a cue and an observed response. A short context window biases an immediate reply. A separate episode record can be replayed later to update the model’s own weights. Model revisions mark training batches.</p>
-<p>Here, memory compression means summarizing repeated encounters through learned response distributions and passing on a limited repertoire. All three policies have the same parameter count. The two-cue selection budget preserves one inherited pattern when possible and fills available places with frequently observed local patterns. On each selected cue, the previous model produces probabilities over all seven actions. The successor updates its own weights to match those probabilities.</p>
-<p>A response is counted when its probability from weights alone reaches 60% on its cue. Counts track the origin of distinct cue–response patterns. The simulated probabilities, time-compressed life stages and encounter counts describe this example. The proposed onboard computer is a Raspberry Pi 5.</p>
-<a href="https://arxiv.org/abs/1503.02531">Distilling the Knowledge in a Neural Network</a></details></main>
-<script>
+*{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:#0c0c0c;color:#eee;font:15px/1.55 Inter,Arial,sans-serif}
+main{max-width:1600px;margin:auto;padding:15px clamp(12px,2.2vw,36px) 24px}
+header,footer,nav{display:flex;gap:18px;align-items:center}header{justify-content:space-between;padding-bottom:12px}
+header a{text-decoration:none}header span,time,footer a,nav,summary{font-size:14px}header span,time,nav,details{color:#bcbcbc}
+a,button{color:inherit;font:inherit}a{text-underline-offset:.22em}button{background:none;border:0;padding:6px 0;cursor:pointer}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid white;outline-offset:3px}
+canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#0b0b0b}footer{padding:8px 0;gap:15px}
+input{min-width:20px;flex:1;accent-color:#ddd}time{font-variant-numeric:tabular-nums;white-space:nowrap}
+nav{flex-wrap:wrap;gap:6px 21px}nav button:hover,summary:hover{color:white;text-decoration:underline}
+details{max-width:74ch;margin-top:10px}summary{cursor:pointer;width:fit-content}details p{margin:.55em 0}details strong{color:#e6e6e6}
+main:fullscreen{max-width:none;width:100%;height:100%;padding:0;background:#080808;display:grid;place-items:center}main:fullscreen canvas{max-height:100vh;object-fit:contain}main:fullscreen>:not(canvas){display:none}
+@media(max-width:760px){main{padding:10px 12px 20px}canvas{aspect-ratio:720/840}header{padding-bottom:8px}footer{gap:10px}nav{gap:0 14px}body{font-size:14px}time,footer a,nav,summary{font-size:13px}}
+@media(max-width:365px){time{display:none}}
+</style></head><body><main>
+<header><a href="../#inheritance" target="_top">Born, Not Made</a><span>Inheritance</span></header>
+<canvas width="1600" height="900" role="img" aria-label="Three generations of robots learn from encounters."></canvas>
+<noscript><p><a href="inheritance.mp4?v=sparse-2">Watch the film (MP4)</a></p></noscript>
+<footer aria-label="Playback"><button type="button" id="play">Play</button><input id="seek" type="range" min="0" max="68" step=".05" value="0" aria-label="Film position"><time></time><button type="button" id="again">Replay</button><button type="button" id="present">Fullscreen</button><a href="inheritance.mp4?v=sparse-2" download>MP4</a></footer>
+<nav class="chapters" aria-label="Film chapters"><button data-time="0">First encounter</button><button data-time="9">I → II</button><button data-time="20">The returning visitor</button><button data-time="45">II → III</button><button data-time="56">Still water</button></nav>
+<details><summary>How does one robot teach the next?</summary>
+<p>The film follows one encounter at a time. Its simulation replays a longer history of visitor, peer and water cues to train each robot’s own model. Each of the three models has the same 19 cues and seven possible actions. A cue and the action learned for it count as one pattern once the model predicts that action with at least 60% probability.</p>
+<p><strong>Which encounters become lessons?</strong> In this artwork, the teacher chooses from ten learned patterns and gives priority to the cues it encountered most often. The first robot selects two patterns (20%). The second selects one (10%). These percentages set the teaching budget for this story. Each teacher keeps its own weights and experience.</p>
+<p><strong>What does the student learn?</strong> For each selected cue, the teacher predicts a probability for each of the seven actions. The student updates its own weights to match the teacher’s softened distribution (temperature 2). After teaching, it can respond independently and train on its own encounters.</p>
+<p id="probability-example"></p>
+<p>The model runs in this page. The Raspberry Pi 5 8GB drawn inside each shell is the proposed onboard computer. The film compresses time. Training on the physical robots has yet to be tested.</p>
+<p><a href="https://arxiv.org/abs/1503.02531" target="_blank" rel="noreferrer">Hinton, Vinyals and Dean, <i>Distilling the Knowledge in a Neural Network</i></a></p>
+</details></main><script>
+
 const cv=document.querySelector('canvas'), g=cv.getContext('2d');
 const tau=Math.PI*2, duration=68;
 const clamp=x=>Math.min(1,Math.max(0,x));
@@ -67,7 +89,7 @@ function water(t){
 // Board width in drawing units is 103; the chamber silhouette spans about 374.
 // The tail assembly is outside this schematic. Depth changes screen size, not the ratio.
 /*
- * A seven-cue, seven-action softmax policy. Each generation has an independent
+ * A nineteen-cue, seven-action softmax policy. Each generation has an independent
  * weight matrix. A cue activates one row. Local training targets come from the
  * scripted observed encounters. Inheritance fits soft targets on selected cues.
  * World cues, outcomes, retention threshold, and time compression are authored.
@@ -76,16 +98,32 @@ function water(t){
  * selected cues, action distributions, and the active stage for the film.
  */
 const growthState = (() => {
-  const patterns = [
-    {id:'company', cue:'Someone asks for company', action:'Stay close'},
-    {id:'pause', cue:'A peer asks for a pause', action:'Wait'},
-    {id:'wake', cue:'A crossing wake arrives', action:'Yield'},
-    {id:'return', cue:'A visitor returns', action:'Approach'},
-    {id:'call', cue:'Another robot calls', action:'Answer'},
-    {id:'current', cue:'A steady current forms', action:'Follow'},
-    {id:'still', cue:'The water settles', action:'Drift'}
-  ];
-  const n = patterns.length;
+  const actions=['Stay close','Wait','Yield','Approach','Answer','Follow','Drift'];
+  // Each item identifies one observable cue-response pair; several cues can
+  // elicit the same action. A retained pair contributes one unit to coverage.
+  const patterns=[
+    ['company','Someone asks for company','Stay close','Stay close'],
+    ['pause','A peer asks for a pause','Wait','Wait'],
+    ['wake','A crossing wake arrives','Yield','Yield to a wake'],
+    ['invitation','A visitor invites contact','Approach','Accept an invitation'],
+    ['hello','A visitor says hello','Answer','Answer a greeting'],
+    ['guide','A peer offers to lead','Follow','Follow a guide'],
+    ['eddy','A gentle eddy forms','Drift','Drift in an eddy'],
+    ['crossing','Two peers cross paths','Yield','Give way at a crossing'],
+    ['edge','Water reaches a boundary','Wait','Pause at the edge'],
+    ['beside','A peer travels alongside','Stay close','Keep a peer company'],
+    ['return','A visitor returns','Approach','Approach'],
+    ['call','Another robot calls','Answer','Answer a peer'],
+    ['current','A steady current forms','Follow','Follow a current'],
+    ['quiet','A visitor requests quiet','Wait','Share a quiet moment'],
+    ['distance','A peer requests space','Yield','Make room'],
+    ['rain','Rain stipples the surface','Drift','Drift in rain'],
+    ['near','A visitor stays nearby','Stay close','Linger nearby'],
+    ['turn','A peer changes direction','Follow','Follow a turn'],
+    ['still','The water settles','Drift','Drift']
+  ].map(([id,cue,action,name])=>({id,cue,action,name,actionIndex:actions.indexOf(action)}));
+  const selectionBudgets=[.20,.10];
+  const temperature=2;
   const stages = [
     [0,5,0,'encounter','Encounters become memories','Context + episode buffer'],
     [5,9,0,'update','Experience becomes a tendency','Local weight update'],
@@ -102,67 +140,78 @@ const growthState = (() => {
     [63,64,2,'hold','Inheritance continues','Independent local models']
   ].map(([start,end,gen,phase,title,tech])=>({start,end,gen,phase,title,tech}));
   const inputs = [
-    [0.15,0,'human','“Stay a moment.”','company'],
-    [0.82,0,'machine','“Wait for me.”','pause'],
-    [1.51,0,'water','A wake crosses from the left.','wake'],
-    [2.13,0,'human','“Will you stay here?”','company'],
-    [2.84,0,'machine','“Hold here with me.”','pause'],
-    [3.54,0,'water','A second wake crosses.','wake'],
-    [4.27,0,'human','“A little longer.”','company'],
-    [20.4,1,'human','“I came back.”','return'],
-    [21.8,1,'machine','“Can you hear me?”','call'],
-    [23.1,1,'water','A current carries past.','current'],
-    [24.6,1,'human','“Here I am again.”','return'],
-    [26.0,1,'machine','“Are you there?”','call'],
-    [27.4,1,'water','The current gathers again.','current'],
-    [29.3,1,'human','“Do you remember me?”','return'],
-    [37.35,1,'human','“It’s me again.”','return'],
-    [38.6,1,'machine','“I’m still here.”','call'],
-    [39.85,1,'human','“I found you.”','return'],
+    [.15,0,'human','"Stay a moment."','company'],
+    [.48,0,'machine','"Wait for me."','pause'],
+    [.80,0,'water','A wake crosses from the left.','wake'],
+    [1.10,0,'human','"Come closer."','invitation'],
+    [1.40,0,'human','"Hello there."','hello'],
+    [1.70,0,'machine','"Follow me."','guide'],
+    [2.00,0,'water','Water circles behind a stone.','eddy'],
+    [2.30,0,'machine','"Crossing your path."','crossing'],
+    [2.60,0,'human','"Will you stay here?"','company'],
+    [2.90,0,'water','The current reaches an edge.','edge'],
+    [3.22,0,'machine','"Hold here with me."','pause'],
+    [3.68,0,'machine','"I am beside you."','beside'],
+    [4.39,0,'human','"A little longer."','company'],
+    [20.40,1,'human','"I came back."','return'],
+    [21.30,1,'machine','"Can you hear me?"','call'],
+    [22.20,1,'water','A current carries past.','current'],
+    [23.15,1,'human','"Let us be quiet."','quiet'],
+    [24.05,1,'machine','"A little more space?"','distance'],
+    [24.90,1,'water','Rain breaks the surface.','rain'],
+    [25.80,1,'human','"Here I am again."','return'],
+    [26.65,1,'machine','"Are you there?"','call'],
+    [27.60,1,'water','The current gathers again.','current'],
+    [29.20,1,'human','"Do you remember me?"','return'],
+    [37.30,1,'human','"It is me again."','return'],
+    [38.15,1,'human','"I will be right here."','near'],
+    [38.98,1,'machine','"Turning this way."','turn'],
+    [39.90,1,'human','"I found you."','return'],
     [56.25,2,'water','The surface falls still.','still'],
-    [57.3,2,'water','Ripples settle nearby.','still'],
-    [58.7,2,'water','Still water surrounds it.','still']
+    [57.30,2,'water','Ripples settle nearby.','still'],
+    [58.70,2,'water','Still water surrounds it.','still']
   ].map(([at,gen,kind,label,pattern])=>{
     const key=patterns.findIndex(p=>p.id===pattern);
     return {at,gen,kind,label,pattern,key,action:patterns[key].action};
   });
 
-  const epochs=24, keepThreshold=.60;
-  const freshMatrix=()=>Array.from({length:n},()=>Array(n).fill(0));
+  const epochs=36, keepThreshold=.60;
+  const freshMatrix=()=>patterns.map(()=>actions.map(()=>0));
   const copyMatrix=m=>m.map(row=>row.slice());
-  function distribution(logits){
+  function distribution(logits,temp=1){
     const max=Math.max(...logits);
-    const exps=logits.map(v=>Math.exp(v-max));
+    const exps=logits.map(v=>Math.exp((v-max)/temp));
     const sum=exps.reduce((a,b)=>a+b,0);
     return exps.map(v=>v/sum);
   }
-  const neutral=Array(n).fill(1/n);
+  const neutral=actions.map(()=>1/actions.length);
   function countEpisodes(gen,cutoff){
-    const counts=Array(n).fill(0);
+    const counts=patterns.map(()=>0);
     for(const e of inputs)if(e.gen===gen && e.at<=cutoff)counts[e.key]++;
     return counts;
   }
-  function selection(gen,weights,cutoff,inheritedKeys){
+  function selection(gen,weights,cutoff){
     const counts=countEpisodes(gen,cutoff);
-    const available=patterns.map((_,i)=>i).filter(i=>distribution(weights[i])[i]>=keepThreshold);
-    const local=available.filter(i=>counts[i]>0 && !inheritedKeys.includes(i));
-    const rank=(a,b)=>counts[b]-counts[a] || a-b;
-    local.sort(rank);
-    // A two-cue budget. Keep one inherited anchor where available, then
-    // fill the remaining slots with recurrent local cues (index breaks ties).
-    const anchor=available.find(i=>inheritedKeys.includes(i));
-    const selected=(anchor===undefined?local:[anchor,...local]).slice(0,2);
-    return {selected,available,episodeCount:counts.reduce((a,b)=>a+b,0)};
+    const available=patterns.map((_,i)=>i).filter(i=>{
+      const p=distribution(weights[i]);
+      return p[patterns[i].actionIndex]>=keepThreshold;
+    });
+    // The artwork sets a budget over learned cue-response pairs. Pick the
+    // cues seen most often in this generation's own encounters; ties follow
+    // the stable cue order. An inherited cue may be eligible for selection.
+    const ranked=available.slice().sort((a,b)=>counts[b]-counts[a] || a-b);
+    const budget=selectionBudgets[gen];
+    const selected=ranked.slice(0,Math.floor(available.length*budget));
+    return {selected,available,budget,episodeCount:counts.reduce((a,b)=>a+b,0)};
   }
   const batches=[];
   const finalWeights=[freshMatrix(),freshMatrix(),freshMatrix()];
-  const inheritedKeys=[[],[],[]];
   const selections=new Map();
-  const provenance=Array.from({length:3},()=>Array(n).fill(null));
+  const provenance=Array.from({length:3},()=>patterns.map(()=>null));
 
   for(const s of stages){
     if(s.phase==='select'){
-      selections.set(s.gen,selection(s.gen,finalWeights[s.gen],s.start,inheritedKeys[s.gen]));
+      selections.set(s.gen,selection(s.gen,finalWeights[s.gen],s.start));
       continue;
     }
     if(s.phase!=='update' && s.phase!=='distill')continue;
@@ -171,9 +220,9 @@ const growthState = (() => {
     const localEpisodes=inputs.filter(e=>e.gen===gen && e.at<s.start);
     // Each local phase replays that individual's accumulated episodes.
     const samples=distilling?selections.get(s.gen).selected.map(key=>({
-      key,target:distribution(finalWeights[s.gen][key])
+      key,target:distribution(finalWeights[s.gen][key],temperature)
     })):localEpisodes.map(e=>({
-      key:e.key,target:patterns.map((_,j)=>j===e.key ? .86 : .14/(n-1))
+      key:e.key,target:actions.map((_,j)=>j===patterns[e.key].actionIndex ? .86 : .14/(actions.length-1))
     }));
     const weights=copyMatrix(finalWeights[gen]);
     const history=[copyMatrix(weights)];
@@ -184,12 +233,14 @@ const growthState = (() => {
     // gradient. distillation never writes to the source model.
     for(let epoch=0;epoch<epochs;epoch++){
       for(const {key,target} of samples){
-        const pred=distribution(weights[key]);
-        for(let j=0;j<n;j++)weights[key][j]+=.55*(target[j]-pred[j]);
+        // For T² KL(p_source,T || p_successor,T), the gradient with
+        // respect to successor logits is T*(p_successor,T - p_source,T).
+        const temp=distilling?temperature:1;
+        const pred=distribution(weights[key],temp);
+        for(let j=0;j<actions.length;j++)weights[key][j]+=.55*temp*(target[j]-pred[j]);
       }
       history.push(copyMatrix(weights));
     }
-    if(distilling)inheritedKeys[gen]=samples.map(e=>e.key);
     finalWeights[gen]=weights;
     batches.push({gen,start:s.start,end:s.end,distilling,history,sampleCount:samples.length,
       trainedEpisodes:distilling?0:localEpisodes.length});
@@ -211,8 +262,8 @@ const growthState = (() => {
     const models=matrix.map((m,i)=>{
       const acquiredNames=[],inheritedNames=[];
       m.forEach((row,k)=>{
-        if(distribution(row)[k]<keepThreshold)return;
-        (provenance[i][k]==='inherited'?inheritedNames:acquiredNames).push(patterns[k].action);
+        if(distribution(row)[patterns[k].actionIndex]<keepThreshold)return;
+        (provenance[i][k]==='inherited'?inheritedNames:acquiredNames).push(patterns[k].name);
       });
       const episodes=inputs.filter(e=>e.gen===i&&e.at<=t).length;
       return {inherited:inheritedNames.length,acquired:acquiredNames.length,
@@ -224,22 +275,26 @@ const growthState = (() => {
       const src=stage.gen,dst=src+1,s=selections.get(src);
       const idx=Math.min(s.selected.length-1,Math.floor(progress*s.selected.length)),key=s.selected[idx];
       const sourceDist=distribution(matrix[src][key]),targetDist=distribution(matrix[dst][key]);
-      transfer={src,dst,selected:s.selected.map(k=>patterns[k].action),available:s.available.map(k=>patterns[k].action),
-        omitted:s.available.filter(k=>!s.selected.includes(k)).map(k=>patterns[k].action),
+      const sourceSoftDist=distribution(matrix[src][key],temperature),targetSoftDist=distribution(matrix[dst][key],temperature);
+      const actionIndex=patterns[key].actionIndex;
+      transfer={src,dst,selected:s.selected.map(k=>patterns[k].name),available:s.available.map(k=>patterns[k].name),
+        omitted:s.available.filter(k=>!s.selected.includes(k)).map(k=>patterns[k].name),
         episodeCount:s.episodeCount,selectedCount:s.selected.length,availableCount:s.available.length,
-        cue:patterns[key].cue,action:patterns[key].action,sourceProb:sourceDist[key],targetProb:targetDist[key],
+        omittedCount:s.available.length-s.selected.length,coverage:s.selected.length/s.available.length,
+        budget:s.budget,temperature,sourceSoftDist,targetSoftDist,
+        cue:patterns[key].cue,action:patterns[key].action,sourceProb:sourceDist[actionIndex],targetProb:targetDist[actionIndex],
         sourceDist,targetDist,progress};
     }
     const seen=inputs.filter(e=>e.at<=t);
     const latest=seen.filter(e=>e.gen===stage.gen).at(-1);
     const key=latest?.key??0;
-    const localDist=distribution(matrix[stage.gen][key]),localProb=localDist[key];
+    const localDist=distribution(matrix[stage.gen][key]),actionIndex=patterns[key].actionIndex,localProb=localDist[actionIndex];
     // A transient demonstration in a short context can bias the immediate reply.
     // This readout never modifies logits or contributes to the retention count.
     const context=seen.filter(e=>e.gen===stage.gen && t-e.at<2.5).slice(-2);
     const contextMatch=context.some(e=>e.key===key);
-    const contextDist=contextMatch?localDist.map((p,j)=>.55*p+.45*Number(j===key)):localDist.slice();
-    const contextProb=contextDist[key];
+    const contextDist=contextMatch?localDist.map((p,j)=>.55*p+.45*Number(j===actionIndex)):localDist.slice();
+    const contextProb=contextDist[actionIndex];
     return {t,stage,generation:stage.gen,phase:stage.phase,models,inputs:seen,transfer,
       latest:latest||null,pattern:latest?.action||null,localProb,localDist,contextProb,contextDist,context,progress};
   }
@@ -248,208 +303,320 @@ const growthState = (() => {
   stateAt.patterns=patterns;
   stateAt.retentionThreshold=keepThreshold;
   stateAt.neutral=neutral;
+  stateAt.actions=actions;
+  stateAt.temperature=temperature;
+  stateAt.selectionBudgets=selectionBudgets;
   return stateAt;
 })();
 if(typeof module!=='undefined'&&module.exports)module.exports=growthState;
 
-function pointOnArc(start,end,u,lift){
- const x=lerp(start[0],end[0],u),y=lerp(start[1],end[1],u)-4*lift*u*(1-u);
- return [x,y];
-}
-function direction(x,y,angle,alpha,size){
- g.save();g.translate(x,y);g.rotate(angle);
- path('M-'+size+' '+(-size*.42)+' L0 0 L-'+size+' '+size*.42,null,ink(alpha),2.2);
- g.restore();
-}
-function arc(start,end,extent,lift,opacity){
- if(extent<.002)return;
- g.beginPath();g.moveTo(...start);
- for(let i=1;i<=64;i++)g.lineTo(...pointOnArc(start,end,extent*i/64,lift));
- g.lineWidth=1.8;g.strokeStyle=ink(opacity);g.stroke();
- const tip=pointOnArc(start,end,extent,lift),near=pointOnArc(start,end,extent-.012,lift);
- direction(...tip,Math.atan2(tip[1]-near[1],tip[0]-near[0]),opacity,12);
-}
-// Small packets encode a qualitative response profile. Only the selected link is active.
-function packet(start,end,u,lift,weights){
- if(u<=0||u>=1)return;
- const fade=Math.sin(Math.PI*u)**.45;
- weights.forEach((v,i)=>{
-   const f=clamp(u-.010*i),[x,y]=pointOnArc(start,end,f,lift);
-   const h=(i-2)*2.8*Math.sin(Math.PI*f);
-   ellipse(x,y+h,1.5+v*2.3,1.5+v*2.3,ink(fade*(.46+.50*v)));
- });
-}
-function profile(x,y,values,amount){
- if(amount<.001)return;
- g.save();g.translate(x,y);
- values.forEach((v,i)=>{const h=v*23*amount;rect(i*7,-h,4,h,ink(.80))});
- g.restore();
-}
-const spans=[
- [0,5,'A life begins in company.','Incoming context · human voices, peer messages and water conditions'],
- [5,9,'Some encounters leave a habit behind.','Local learning · replay recorded encounters and update model I’s weights'],
- [9,13,'Seven encounters are compressed into two inheritable responses.','Memory selection · condense repeated encounters into selected response patterns'],
- [13,20,'II inherits how to stay close and how to wait.','Knowledge distillation · fit II’s weights to I’s response probabilities on selected cues'],
- [20,25,'Now II has a life of its own. People come back.','Fresh context · new conversations enter II’s own encounter record'],
- [25,31,'Other robots call. The current pulls at its body.','Experience collection · keep a local record across separate encounters'],
- [31,37,'Even after a voice falls silent, II can answer differently.','Local training · the interaction ends; the updated weights persist'],
- [37,41,'Another return. Another exchange. Time to grow.','New context · later encounters join the same lifetime record'],
- [41,45,'What II has lived changes what it can pass on.','Continual learning · a second local update revises II’s own parameters'],
- [45,49,'Memory is selected again. Only part of II’s life travels on.','Partial inheritance · select one inherited response and one acquired by II'],
- [49,56,'III carries a way of greeting someone it has never met.','Soft-target distillation · II’s selected outputs shape III’s independent model'],
- [56,60,'The water around III grows quiet.','New environmental input · III begins its own experience record'],
- [60,63,'Drifting is something III learns for itself.','Local training · III updates its response to still water'],
- [63,68,'An encounter belongs to one life. A way of responding can travel.','Memory inheritance · selected responses persist across generations']
-];
+// Each shot lingers on one witnessed encounter. The policy replays a longer history.
+const sparseShots = [
+  [0,  'encounter', 'Visitor', '“Stay a moment.”', 'Stay close', 'Its hull slows. The first robot holds its place beside the visitor.'],
+  [5,  'update', '', '', 'Stay close', 'After the visitor leaves, the robot learns from the encounter.'],
+  [9,  'select', '', '', '', 'Two familiar responses are chosen for the next life.'],
+  [13, 'distill', '', '', '', 'The second robot learns how to stay close and when to wait.'],
+  [20, 'encounter', 'Returning visitor', '“I came back.”', 'Approach', 'The second robot turns toward the familiar voice.'],
+  [31, 'update', '', '', 'Approach', 'With each return, approaching becomes more likely.'],
+  [37, 'encounter', 'Another robot', '“Turning this way.”', 'Follow', 'It turns with the other robot and follows for a moment.'],
+  [41, 'update', '', '', 'Follow', 'Those encounters change how the second robot responds.'],
+  [45, 'select', '', '', '', 'Of all its encounters, the visitor’s return recurred most often.'],
+  [49, 'distill', '', '', '', 'The third robot learns to approach a returning visitor.'],
+  [56, 'encounter', 'Water', 'The surface falls still.', 'Drift', 'In quiet water, the third robot begins to drift.'],
+  [60, 'update', '', '', 'Drift', 'It learns to drift from its own encounters with still water.'],
+  [63, 'hold', '', '', '', 'Each robot keeps learning in its own stretch of water.']
+].map(([at,type,who,voice,action,caption])=>({at,type,who,voice,action,caption}));
 const numerals=['I','II','III'];
-const envColumns=[
- {kind:'human',title:'Human conversations',x:275},
- {kind:'machine',title:'Machine conversations',x:805},
- {kind:'water',title:'Water conditions',x:1330}
-];
+const phaseName={encounter:'Encounter',update:'Local learning',select:'Memory selection',distill:'Model distillation',hold:'Inheritance'};
 function centered(text,x,y,size,color,face='Arial'){
- g.save();g.textAlign='center';label(text,x,y,size,color,face);g.restore();
+  g.save();g.textAlign='center';label(text,x,y,size,color,face);g.restore();
 }
-function curve(p0,p1,p2,p3,u){
- const v=1-u;
- return [0,1].map(i=>v*v*v*p0[i]+3*v*v*u*p1[i]+3*v*u*u*p2[i]+u*u*u*p3[i]);
+function ledger(model){
+  return model.inherited+' inherited   ·   '+model.acquired+' learned here';
 }
-function arrowAt(point,amount,alpha,width=1.5,head=10){
- if(amount<=0||alpha<.01)return;
- g.beginPath();g.moveTo(...point(0));
- for(let i=1;i<=46;i++)g.lineTo(...point(amount*i/46));
- g.lineWidth=width;g.strokeStyle=ink(alpha);g.stroke();
- const tip=point(amount),prev=point(Math.max(0,amount-.015));
- direction(tip[0],tip[1],Math.atan2(tip[1]-prev[1],tip[0]-prev[0]),alpha,head);
-}
-function inputField(t,state,anchor){
- const gen=state.generation;
- const local=state.inputs.filter(e=>e.gen===gen&&e.at<=t);
- const use=state.phase==='encounter'?1:.62;
- for(const f of envColumns){
-  const matching=local.filter(e=>e.kind===f.kind);
-  const latest=matching.at(-1);
-  const ids=matching.length;
-  const speaker=latest&&f.kind==='human'?['Visitor A','Visitor B','Visitor A','Visitor C','Visitor B'][(ids-1)%5]:latest&&f.kind==='machine'?['Peer 01','Peer 02','Peer 01'][(ids-1)%3]:'';
-  centered(speaker?f.title+'  /  '+speaker:f.title,f.x,110,17,ink(latest && latest.at >= t-4 ? .88 : .46));
-  if(latest){
-   let words=latest.label;
-   if(f.kind!=='water'&&!words.includes('“')&&!words.includes('"'))words='“'+words+'”';
-   centered(words,f.x,143,22,ink(.90*use),'Georgia');
+function drawSignal(start,end,u,alpha,packets=false,lift=72){
+  if(u<=0||alpha<=0)return;
+  const [ax,ay]=start,[bx,by]=end;
+  const pos=k=>[lerp(ax,bx,k),lerp(ay,by,k)-4*lift*k*(1-k)];
+  const tangent=k=>Math.atan2(by-ay-4*lift*(1-2*k),bx-ax);
+  g.save();g.strokeStyle=ink(alpha*.77);g.lineWidth=1.55;
+  g.beginPath();g.moveTo(ax,ay);
+  const control=[(ax+bx)/2,(ay+by)/2-2*lift],head=pos(u);
+  g.quadraticCurveTo(lerp(ax,control[0],u),lerp(ay,control[1],u),...head);g.stroke();
+  const angle=tangent(u),tip=packets?10:7;
+  g.beginPath();
+  for(const sign of [-1,1]){
+    g.moveTo(...head);g.lineTo(head[0]-tip*Math.cos(angle+sign*.4),head[1]-tip*Math.sin(angle+sign*.4));
   }
-  // Each visible strand starts at a separately recorded input of the same modality.
-  for(const [j,e] of matching.slice(-4).entries()){
-   const start=[f.x+(j-1)*11,159],end=[anchor[0]+(j-1)*5,anchor[1]-27];
-   const point=u=>curve(start,[start[0],start[1]+40+j*8],[lerp(start[0],end[0],.79),end[1]-110-j*9],end,u);
-   const age=t-e.at,alpha=(.16+.62*(1-ease(age,.8,3.6)))*use;
-   arrowAt(point,ease(age,0,.72),alpha,1.15,7);
+  g.stroke();
+  if(packets){
+    const elapsed=packets.elapsed;
+    // Two glints share one trajectory and move only while the receiver is updating.
+    for(let i=0;i<2;i++){
+      const k=(elapsed*.25+i*.09)%1;
+      if(k>u)continue;
+      const [x,y]=pos(k);
+      const fade=Math.sin(k*Math.PI);
+      ellipse(x,y,2.1-i*.55,2.1-i*.55,ink(fade*alpha*(1-i*.3)));
+    }
   }
- }
+  g.restore();
 }
-function recordSelection(t,state){
- const f=state.transfer;if(!f)return;
- const leftBehind=f.available.filter(n=>!f.selected.includes(n));
- const begin=state.stage.start,end=state.stage.end,u=ease(t,begin+.25,Math.min(end,begin+2.8));
- const n=f.episodeCount,mid=774;
- label('LOCAL EPISODES',133,106,15,'#aaa');label(n+' encounters',132,143,26,'#e0dfdd','Georgia');
- label('SELECTED PATTERNS',mid-100,106,15,'#aaa');label(f.selected.join('  ·  '),mid-100,143,25,'#e8e7e5','Georgia');
- label('REMAIN WITH '+numerals[f.src],1120,106,15,'#aaa');label(leftBehind.join('  ·  '),1120,143,23,'#c8c8c5','Georgia');
- const start=326,stop=633;
- // Many encounter marks converge on a narrower set of outputs, while the record stays at source.
- for(let i=0;i<n;i++){
-  const y=161+i*4,sy=163+(i%Math.max(1,f.selectedCount))*13;
-  const point=p=>curve([start,y],[start+95,y],[stop-70,sy],[stop,sy],p);
-  rect(start-12,y-1,6,1.4,ink(.53));
-  arrowAt(point,u,.24,1,0);
- }
- for(let j=0;j<f.selectedCount;j++)rect(stop+4,161+j*13,13,3,ink(.85*u));
+function transferStat(f){
+  return f.selectedCount+' of '+f.availableCount+' learned patterns   ·   '+Math.round(100*f.coverage)+'% selected';
 }
-function probabilities(t,f){
- if(!f)return;
- const prob=p=>Math.round(p*100)+'%';
- label('SAME CUE',105,107,15,'#aaa');label(f.cue,105,142,24,'#e4e4e0','Georgia');
- label('RESPONSE',572,107,15,'#aaa');label(f.action,572,142,24,'#eee','Georgia');
- label('PROBABILITY IN EACH MODEL',875,107,15,'#aaa');
- for(const [n,p] of [[f.src,f.sourceProb],[f.dst,f.targetProb]]){
-  const x=875+(n===f.dst?255:0);
-  label(numerals[n],x,141,20,'#dededb','Georgia');
-  rect(x+38,131,104,4,'#373737');rect(x+38,131,p*104,4,'#d7d7d3');
-  label(prob(p),x+158,139,17,'#d8d8d4');
- }
+function castForShot(s,shot){
+  if(shot.type==='hold')return [0,1,2];
+  if(shot.type==='distill')return [s.transfer.src,s.transfer.dst];
+  return [s.generation];
 }
-function totals(m){
- return m.inherited+' inherited  /  '+m.acquired+' from encounters';
-}
-function lifeRecord(i,m,x,active){
- const c=active?'#e5e5e1':'#adada9';
- centered(numerals[i],x,529,24,c,'Georgia');
- centered(totals(m),x,570,21,c);
- centered(m.episodes+' encounters   /   model v'+m.version,x,600,16,active?'#c5c5c0':'#91918e');
- const known=[...m.inheritedNames,...m.acquiredNames];
- centered(known.length?known.join(' · '):'—',x,631,15,active?'#c2c2bd':'#888885');
-}
-function generationLink(t,i,start,end,begin,finish,inFlight){
- const point=u=>pointOnArc(start,end,u,i?89:97);
- arrowAt(point,ease(t,begin,begin+1),inFlight ? .91 : .34,1.7,12);
- if(t<=begin)return;
- const p=point(.49);centered('Model distillation',p[0],p[1]-17,17,ink(ease(t,begin,begin+1)*(inFlight ? .93 : .56)));
- if(inFlight){
-  for(const offset of [0,.42,.84]){
-   const u=(t-begin-offset) / 2.55;
-   if(u>=0)packet(start,end,u%1,i?89:97,inFlight.sourceDist);
+function robotPose(t,s,shot,i,cx,cy,scale,mobile){
+  let x=cx+19*scale, y=cy+Math.sin(t*.45+i)*2.5, angle=-.065;
+  let opacity=1, fold=null;
+  const motion=mobile?.50:1, dt=t-shot.at;
+  if(shot.type==='encounter' || shot.type==='update'){
+    // Position follows the stimulus. Each local update begins where its encounter ended.
+    if(shot.action==='Stay close'){
+      const stop=1-ease(t,0,2.4);
+      x-=85*motion*stop; y+=12*motion*stop; angle-=.08*stop;
+    }else if(shot.action==='Approach'){
+      const near=ease(t,20.9,26.8);
+      x+=(near-.51)*173*motion; y-=near*42*motion;
+      angle-=.19*(ease(t,20.8,22.9)-ease(t,25,29));
+    }else if(shot.action==='Follow'){
+      const turn=ease(t,37.4,39.1), glide=ease(t,38.0,40.8);
+      x+=(glide-.48)*142*motion; y-=(glide-.5)*28*motion;
+      angle+=.12*(1-turn)-.23*turn;
+    }else if(shot.action==='Drift'){
+      const drift=ease(t,56.45,62.6);
+      x+=(drift-.5)*177*motion; y+=(drift-.5)*44*motion;
+      angle+=drift*.17;
+    }
+  }else if(shot.type==='distill' && i===s.transfer.dst){
+    // The receiver takes shape here; its rigid board stays at the same physical scale.
+    const release=ease(dt,3.7,6.9);
+    x-=(1-release)*75*motion; y+=(1-release)*21*motion;
+    angle+=.07*(1-release);
+    opacity=.16+.84*ease(dt,.15,5.0);
+    fold={unfold:ease(dt,1.4,6.1), alpha:.2+.70*ease(dt,0,1.5)-.78*ease(dt,5.6,7)};
+  }else if(shot.type==='hold'){
+    x+=(i-1)*7*motion*ease(dt,0,4); y+=i*2*ease(dt,0,4);
   }
- }
+  return {x,y,angle,scale,opacity,fold};
 }
-function frame(t){
- const s=growthState(Math.min(t,64)),f=s.transfer;
- const shot=spans.findLast(e=>t>=e[0])||spans[0];
- water(t);
- const x=[302,820,1324],y=[367,354,334].map((v,i)=>v+2.2*Math.sin(t*.36+i)),sc=[1,1.025,.88],rt=[-.095,-.08,-.065];
- const anchors=x.map((v,i)=>[v-60*sc[i]*Math.cos(rt[i]),y[i]-60*sc[i]*Math.sin(rt[i])]);
- for(let i=0;i<3;i++){
-  const visible=i===0?1:i===1?(.45+.55*ease(t,9,20)):(.38+.62*ease(t,45,56));
-  body(t,x[i],y[i],sc[i],rt[i],0,0,0,visible);
- }
- for(let i=0;i<2;i++)generationLink(t,i,[anchors[i][0]+23,anchors[i][1]-7],[anchors[i+1][0]-22,anchors[i+1][1]-7],i?49:13,i?56:20,s.phase==='distill'&&f?.src===i?f:null);
- if(s.phase==='encounter'||s.phase==='update'){
-  inputField(t,s,anchors[s.generation]);
- }else if(s.phase==='select')recordSelection(t,s);
- else if(s.phase==='distill'){
-  probabilities(t,f);
-  if(f){for(const [gen,dist] of [[f.src,f.sourceDist],[f.dst,f.targetDist]])profile(anchors[gen][0]+24,anchors[gen][1]-21,dist,1)}
- }else{
-  centered('Partial inheritance',790,137,27,'#d8d8d4','Georgia');
- }
- for(let i=0;i<3;i++)lifeRecord(i,s.models[i],x[i],s.phase==='hold'||i===s.generation);
- const p=anchors[0];path('M'+p[0]+' '+(p[1]+15)+' l-63 66 h-62',null,ink(.39),1);label('Pi 5 · 85 × 56 mm',p[0]-154,p[1]+103,15,'#bbb');
- if(s.phase==='encounter'&&s.context.length&&s.latest){
-  const chance=v=>Math.round(v*100)+'%';
-  centered('P('+s.pattern.toLowerCase()+')    with current context  '+chance(s.contextProb)+'     /     from weights alone  '+chance(s.localProb),800,680,17,'#c8c8c4');
- }
- if(s.phase==='update'&&s.latest){
-  const m=s.models[s.generation],prob=Math.round(s.localProb*100);
-  centered('Local replay   ·   '+m.trainedEpisodes+' encounters   /   P('+s.pattern.toLowerCase()+')  '+prob+'%',800,680,17,'#dededb');
- }
- label('BORN, NOT MADE',72,52,15,'#aaa');g.save();g.textAlign='right';label('Memory inheritance',1528,52,20,'#ccc','Georgia');g.restore();
- g.save();g.font='40px Georgia';const w=g.measureText(shot[2]).width;g.restore();
- label(shot[2],70,774,Math.min(40,40*1450/w),'#ecece8','Georgia');
- label(shot[3],72,824,20,'#bdbdb8');
- document.querySelector('.mobile').textContent=shot[2];
- document.querySelector('.mobile-tech').textContent=shot[3];
- document.querySelector('.mobile-repertoire').textContent=numerals.map((v,i)=>v+'   '+totals(s.models[i])).join('\n');
+// Project the near half of an eight-bay folded sleeve in the recipient's front chamber.
+function chamberPleats(u,alpha){
+  if(alpha<=0)return;
+  const left=52-37*u, right=78+48*u, mid=(left+right)/2, r=18+9*u;
+  const point=(j,k)=>{
+    const x=lerp(left,right,j/8);
+    const phi=-Math.PI/2+(k+(j%2)*.42)*Math.PI/8;
+    const radius=r*(1-.21*((x-mid)/((right-left)/2))**2);
+    return [x+4*Math.cos(phi),5+radius*Math.sin(phi)];
+  };
+  g.save();g.globalAlpha*=alpha;
+  for(let j=0;j<8;j++){
+    for(let k=0;k<8;k++){
+      const a=point(j,k),b=point(j+1,k),c=point(j,k+1),d=point(j+1,k+1);
+      for(const [tri,light] of [[[a,b,c],.18+.26*(1-k/8)],[[c,b,d],.08+.14*(1-k/8)]]){
+        g.beginPath();g.moveTo(...tri[0]);g.lineTo(...tri[1]);g.lineTo(...tri[2]);g.closePath();
+        g.fillStyle=ink(light);g.fill();
+        g.strokeStyle=ink(.32);g.lineWidth=.55;g.stroke();
+      }
+    }
+  }
+  g.restore();
 }
-let t=0,run=false,last=0,id=0;
-const play=document.getElementById('play'),seek=document.getElementById('seek'),clock=document.querySelector('time');
-function show(){frame(t);seek.value=t;clock.textContent=Math.floor(t/60)+':'+String(Math.floor(t)%60).padStart(2,'0')+' / 1:08';play.textContent=run?'Pause':t>=duration?'Replay':'Play'}
-function tick(now){if(!run)return;t=Math.min(duration,t+(now-last)/1000);last=now;if(t>=duration)run=false;show();if(run)id=requestAnimationFrame(tick)}
+function drawIndividual(t,p){
+  body(t,p.x,p.y,p.scale,p.angle,0,0,0,p.opacity);
+  if(p.fold){
+    g.save();g.translate(p.x,p.y);g.rotate(p.angle);g.scale(p.scale,p.scale);
+    chamberPleats(p.fold.unfold,p.fold.alpha);g.restore();
+  }
+  return [p.x-60*p.scale*Math.cos(p.angle),p.y-60*p.scale*Math.sin(p.angle)];
+}
+function desktopFrame(t,s,shot){
+  water(t);
+  const f=s.transfer, cast=castForShot(s,shot), count=cast.length;
+  const centers=count===3?[305,800,1295]:count===2?[492,1123]:[800];
+  const scale=count===3?1.04:count===2?1.19:1.48;
+  const anchors=[];
+  for(const [index,gen] of cast.entries()){
+    const cy=count===2?407-13*index:392;
+    const pose=robotPose(t,s,shot,gen,centers[index],cy,scale,false);
+    anchors.push(drawIndividual(t,pose));
+    centered(numerals[gen],centers[index],601,32,ink(.88),'Georgia');
+    centered(ledger(s.models[gen]),centers[index],635,20,ink(.78));
+  }
+  const [bx,by]=anchors[0],tx=shot.action==='Approach'||shot.action==='Follow'?981:800;
+  if(shot.type==='encounter'){
+    centered(shot.who,tx,122,19,ink(.72));
+    centered(shot.voice,tx,168,37,ink(.98),'Georgia');
+    drawSignal([tx,191],[bx+4,by-21],ease(t,shot.at+.16,shot.at+1.5),.68,false,0);
+  }else if(f){
+    centered(f.selected.join('   /   '),800,153,38,ink(.97),'Georgia');
+    centered(transferStat(f),800,194,21,ink(.82));
+    if(shot.type==='distill'){
+      const [destX,destY]=anchors[1];
+      drawSignal([bx+20,by-7],[destX-20,destY-7],ease(t,shot.at,shot.at+1.45),
+        .92*(1-ease(t,shot.at+5.45,shot.at+6.65)),{elapsed:t-shot.at},113);
+    }
+  }else if(shot.type==='update'){
+    centered('Local weight update',800,126,20,ink(.70));
+    centered(shot.action,800,173,38,ink(.98),'Georgia');
+    const u=ease(t,shot.at,Math.min(s.stage.end,shot.at+2.5));
+    rect(768,196,64,1,ink(.2));rect(768,196,64*u,1.5,ink(.68));
+  }
+  if(t<5){
+    const a=1-ease(t,3.6,5);
+    path('M'+bx+' '+(by+17)+' l-72 80 h-88',null,ink(.46*a),1);
+    label('Pi 5   85 x 56 mm',bx-163,by+125,17,ink(.77*a));
+  }
+  label('BORN, NOT MADE',64,56,17,ink(.73));
+  g.save();g.textAlign='right';label('Memory inheritance',1536,56,24,ink(.87),'Georgia');g.restore();
+  label(phaseName[shot.type],66,750,19,ink(.68));
+  g.font='39px Georgia';
+  const width=g.measureText(shot.caption).width;
+  label(shot.caption,64,814,Math.min(39,39*1465/width),ink(.99),'Georgia');
+}
+const portraitMedia=matchMedia('(max-width: 760px)');
+function frame(t,pixelRatio=1){
+  const s=growthState(Math.min(64,t));
+  const shot=sparseShots.findLast(shot=>shot.at<=t)||sparseShots[0];
+  const portrait=portraitMedia.matches;
+  const width=portrait?720:1600,height=portrait?840:900;
+  const rw=Math.round(width*pixelRatio),rh=Math.round(height*pixelRatio);
+  if(cv.width!==rw||cv.height!==rh){cv.width=rw;cv.height=rh;}
+  g.setTransform(pixelRatio,0,0,pixelRatio,0,0);
+  if(portrait)drawPortrait(t,s,shot);else desktopFrame(t,s,shot);
+  const phase=phaseName[shot.type];
+  const info=s.transfer?transferStat(s.transfer):shot.voice;
+  const desc=[phase,info,shot.caption,...castForShot(s,shot).map(i=>'Generation '+numerals[i]+', '+ledger(s.models[i]))].filter(Boolean).join('. ');
+  if(cv.getAttribute('aria-label')!==desc)cv.setAttribute('aria-label',desc);
+}
+
+function drawPortrait(t, s, shot) {
+  // Keep the plot and the caption in separate bands at narrow viewport widths.
+  g.save();
+  g.scale(720 / 1600, 618 / 692);
+  water(t);
+  g.restore();
+  rect(0, 618, 720, 222, '#0b0b0b');
+
+  label('BORN, NOT MADE', 37, 52, 21, ink(.72));
+  g.save();
+  g.textAlign = 'right';
+  label('Memory inheritance', 683, 52, 27, ink(.90), 'Georgia');
+  g.restore();
+
+  const f = s.transfer;
+  const hold = shot.type === 'hold';
+  const generations = castForShot(s, shot);
+  const paired = generations.length === 2;
+  const centers = hold ? [120, 360, 600] : paired ? [174, 543] : [360];
+  const scale = hold ? .56 : paired ? .81 : 1.27;
+  const board = [];
+  const signalX = shot.action === 'Approach' || shot.action === 'Follow' ? 432 : 360;
+  if (shot.type === 'encounter') {
+    centered(shot.who, signalX, 127, 23, ink(.68));
+    centered(shot.voice, signalX, 177, 41, ink(.98), 'Georgia');
+  } else if (shot.type === 'update') {
+    centered('Local weight update', 360, 127, 23, ink(.68));
+    centered(shot.action, 360, 177, 41, ink(.98), 'Georgia');
+    const elapsed = ease(t, shot.at, Math.min(s.stage.end, shot.at + 2.5));
+    rect(327, 203, 66, 1.5, ink(.19));
+    rect(327, 203, 66 * elapsed, 1.5, ink(.70));
+  } else if (f) {
+    centered(f.selected.join('   /   '), 360, 164, 39, ink(.98), 'Georgia');
+    centered(transferStat(f), 360, 209, 23, ink(.78));
+  }
+
+  const arrival = ease(t, shot.at, shot.at + 1.6);
+  for (const [index, gen] of generations.entries()) {
+    const cx = centers[index];
+    const y = (hold ? 345 : 373) - (paired ? 12 * index : 0);
+    board[index] = drawIndividual(t, robotPose(t, s, shot, gen, cx, y, scale, true));
+    const model = s.models[gen];
+    const textY = hold ? 454 : paired ? 505 : 544;
+    centered(numerals[gen], cx, textY, 32, ink(.9), 'Georgia');
+    if (generations.length === 1) {
+      centered(ledger(model), cx, textY + 38, 24, ink(.83));
+    } else {
+      centered(model.inherited + ' inherited', cx, textY + 34, 22, ink(.83));
+      centered(model.acquired + ' learned here', cx, textY + 63, 22, ink(.83));
+    }
+  }
+  if (shot.type === 'encounter') {
+    drawSignal([signalX, 202], [board[0][0] + 3, board[0][1] - 22], arrival, .64, false, 0);
+    if (t < 5) {
+      const alpha = 1 - ease(t, 3.8, 5), [bx, by] = board[0];
+      g.save();
+      g.strokeStyle = ink(.46 * alpha);
+      g.lineWidth = 1;
+      g.beginPath(); g.moveTo(bx - 7, by + 13); g.lineTo(190, 452); g.lineTo(92, 452); g.stroke();
+      label('Pi 5   85 × 56 mm', 78, 482, 19, ink(.78 * alpha));
+      g.restore();
+    }
+  } else if (shot.type === 'distill') {
+    drawSignal([board[0][0] + 15, board[0][1] - 8],
+      [board[1][0] - 15, board[1][1] - 8], arrival, .90 * (1 - ease(t, shot.at + 5.45, shot.at + 6.65)), {elapsed: t - shot.at}, 93);
+  }
+
+  label(phaseName[shot.type], 38, 672, 23, ink(.68));
+  g.save();
+  g.font = '38px Georgia';
+  let line = '', y = 726;
+  for (const word of shot.caption.split(/\s+/)) {
+    const next = line ? line + ' ' + word : word;
+    if (line && g.measureText(next).width > 644) {
+      label(line, 36, y, 38, ink(.98), 'Georgia');
+      y += 44;
+      line = word;
+    } else {
+      line = next;
+    }
+  }
+  if (line) label(line, 36, y, 38, ink(.98), 'Georgia');
+  g.restore();
+}
+
+
+const play=document.getElementById('play'), seek=document.getElementById('seek'), clock=document.querySelector('time');
+const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
+let t=0, run=false, last=0, id=0;
+function timeLabel(seconds){return Math.floor(seconds/60)+':'+String(Math.floor(seconds)%60).padStart(2,'0')}
+function show(){
+  frame(t); seek.value=t; seek.setAttribute('aria-valuetext',timeLabel(t)+' of '+timeLabel(duration));
+  clock.textContent=timeLabel(t)+' / '+timeLabel(duration); play.textContent=run?'Pause':t>=duration?'Replay':'Play';
+}
+function tick(now){
+  if(!run)return;
+  t=Math.min(duration,t+(now-last)/1000); last=now;
+  if(t>=duration)run=false;
+  show(); if(run)id=requestAnimationFrame(tick);
+}
 function start(){cancelAnimationFrame(id);run=true;last=performance.now();show();id=requestAnimationFrame(tick)}
 function pause(){run=false;cancelAnimationFrame(id);show()}
-play.onclick=()=>{if(run)pause();else{if(t>=duration)t=0;start()}};document.getElementById('again').onclick=()=>{t=0;start()};
-document.querySelectorAll('.chapters button').forEach(button=>button.onclick=()=>{t=Number(button.dataset.time);start()});
+play.onclick=()=>{if(run){pause();return}if(t>=duration)t=0;start()};
+document.getElementById('again').onclick=()=>{t=0;start()};
+document.querySelectorAll('.chapters button').forEach(button=>button.onclick=()=>{t=Number(button.dataset.time);if(reducedMotion.matches)pause();else start()});
 seek.oninput=()=>{t=Number(seek.value);pause()};
+const main=document.querySelector('main'), present=document.getElementById('present');
+present.hidden=!document.fullscreenEnabled;
+present.onclick=()=>main.requestFullscreen().catch(()=>{present.hidden=true});
+document.addEventListener('keydown',event=>{
+  if(event.code==='Space' && ['BODY','MAIN','CANVAS'].includes(document.activeElement.tagName)){
+    event.preventDefault();play.click();
+  }
+});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&run)pause()});
+portraitMedia.addEventListener('change',show);
+const shotStart=growthState(49).transfer;
+const shotEnd=growthState(55.99).transfer;
+const percent=p=>Math.round(p*100)+'%';
+document.getElementById('probability-example').textContent='For example, Robot II selects one of its ten patterns for teaching. When a visitor returns, Robot II assigns a probability of '+percent(shotStart.sourceProb)+' to “Approach”. During the final teaching shot, Robot III’s own chance of approaching rises from '+percent(shotStart.targetProb)+' to '+percent(shotEnd.targetProb)+'. These are response probabilities for the same cue, measured at the normal inference temperature.';
 const requestedTime=new URLSearchParams(location.search).get('t');
-if(requestedTime!==null&&requestedTime.trim()!==''&&Number.isFinite(Number(requestedTime))){
- t=Math.max(0,Math.min(duration,Number(requestedTime)));show();
-}else if(matchMedia('(prefers-reduced-motion: reduce)').matches){t=66;show()}else start();
+if(requestedTime!==null && requestedTime.trim()!=='' && Number.isFinite(Number(requestedTime))){
+  t=Math.max(0,Math.min(duration,Number(requestedTime)));show();
+}else if(reducedMotion.matches){show()}else start();
 </script></body></html>
