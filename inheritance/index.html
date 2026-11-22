@@ -2,10 +2,14 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Inheritance · Born, Not Made</title>
 <style>
 *{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:#0c0c0c;color:#eee;font:15px/1.5 Inter,Arial,sans-serif}main{max-width:1400px;margin:auto;padding:18px clamp(12px,3vw,44px)}header,footer{display:flex;align-items:center;gap:20px}header{justify-content:space-between;padding:0 0 14px}a,button{color:inherit;font:inherit}a{text-underline-offset:4px}header a{text-decoration:none}header span,time{font-size:13px;color:#aaa}canvas{width:100%;display:block;aspect-ratio:16/9;background:#090909}footer{padding:13px 0;gap:14px}button{background:transparent;border:0;padding:5px 0;cursor:pointer}input{accent-color:#ddd;min-width:32px;flex:1}time{font-variant-numeric:tabular-nums;white-space:nowrap}.mobile{display:none}footer a{font-size:13px}@media(max-width:600px){main{padding:12px}.mobile{display:block;min-height:3.2em;margin:12px 0 0;font:19px Georgia,serif}footer{gap:9px;font-size:13px}time{display:none}}@media(min-width:601px){main{padding-bottom:0}}
-</style></head><body><main><header><a href="../#inheritance" target="_top">Born, Not Made</a><span>Inheritance</span></header><canvas width="1600" height="900" aria-label="Three egg-shaped robots inherit memory through model distillation"></canvas><p class="mobile"></p><footer><button id="play">Pause</button><input id="seek" type="range" min="0" max="20" step=".05" value="0" aria-label="Film position"><time></time><button id="again">Replay</button><a href="inheritance.mp4?v=outputs-3" download>MP4</a></footer></main>
+.mobile-repertoire{display:none}details{color:#bdbdb7;font-size:14px;max-width:75ch;margin:14px 0 0}summary{cursor:pointer}details p{margin:8px 0}@media(max-width:600px){.mobile-repertoire{display:block;white-space:pre-line;line-height:1.8;font-size:13px;color:#c5c5c1}}</style></head><body><main><header><a href="../#inheritance" target="_top">Born, Not Made</a><span>Inheritance</span></header><canvas width="1600" height="900" aria-label="Three egg-shaped robots inherit memory through model distillation"></canvas><p class="mobile"></p><div class="mobile-repertoire"></div><footer><button id="play">Pause</button><input id="seek" type="range" min="0" max="32" step=".05" value="0" aria-label="Film position"><time></time><button id="again">Replay</button><a href="inheritance.mp4?v=repertoire-1" download>MP4</a></footer><details><summary>How the patterns are counted</summary>
+<p>Each model has five possible actions for each cue. Encounters in this study specify a preferred action. During distillation, the next model sees selected cues and fits its own action probabilities to the previous model’s outputs. The source keeps its responses. The particles visualize those output probabilities.</p>
+<p>Each count is one distinct cue–response pair. In this simulation a pair enters the count when its action reaches 60% probability on that cue. Its origin records how that generation acquired it. For example, “visitor lingers → stay beside” originates in I and appears as inherited in II and III. “Visitor returns → approach” originates in II and appears as inherited in III.</p>
+<p>The encounters, cue selection, and threshold are design choices. The displayed values come from this small simulation. The Raspberry Pi is the proposed onboard computer.</p>
+<a href="https://arxiv.org/abs/1503.02531">Distilling the Knowledge in a Neural Network</a></details></main>
 <script>
 const cv=document.querySelector('canvas'), g=cv.getContext('2d');
-const tau=Math.PI*2, duration=20;
+const tau=Math.PI*2, duration=32;
 const clamp=x=>Math.min(1,Math.max(0,x));
 function ease(t,a,b){let x=clamp((t-a)/(b-a));return x*x*(3-2*x)}
 function lerp(a,b,u){return a+(b-a)*u}
@@ -61,12 +65,51 @@ function water(t){
 // Board-to-shell ratio: 85 mm PCB / 723.3 mm main chamber.
 // Board width in drawing units is 103; the chamber silhouette spans about 374.
 // The tail assembly is outside this schematic. Depth changes screen size, not the ratio.
+const actions=['Stay beside','Wait','Turn','Approach','Drift'];
+const cues=['A visitor lingers','A visitor leaves','A wake crosses','A visitor returns','The water settles'];
+const generations=['I','II','III'];
+// Each row is an independent categorical policy for one cue, with five possible actions.
+// For a local encounter the target is a stipulated outcome; for inheritance it is the
+// prior model's full probability vector. Gradient descent fits softmax cross-entropy.
+const events=[
+ {gen:0,cue:0,begin:.1,end:2.4}, {gen:0,cue:1,begin:1.2,end:3.4}, {gen:0,cue:2,begin:2.5,end:4.7},
+ {gen:1,cue:0,from:0,begin:7,end:10.5}, {gen:1,cue:1,from:0,begin:10.4,end:13.4},
+ {gen:1,cue:3,begin:14.5,end:18.5},
+ {gen:2,cue:0,from:1,begin:20.6,end:23.4}, {gen:2,cue:3,from:1,begin:23.5,end:27},
+ {gen:2,cue:4,begin:28,end:30.5}
+];
+function softmax(logits){
+ const z=Math.max(...logits), exp=logits.map(v=>Math.exp(v-z)),sum=exp.reduce((a,b)=>a+b,0);
+ return exp.map(v=>v/sum);
+}
+const uniform=actions.map(()=>1/actions.length);
+for(const e of events){
+ const parent=e.from===undefined?null:events.find(v=>v.gen===e.from&&v.cue===e.cue);
+ const target=parent?parent.steps.at(-1):actions.map((_,i)=>i === e.cue ? .86 : .035);
+ const logits=actions.map(()=>0);e.steps=[uniform];
+ for(let n=0;n<36;n++){
+  const predicted=e.steps.at(-1);
+  logits.forEach((_,k)=>logits[k]+=.38*(target[k]-predicted[k]));
+  e.steps.push(softmax(logits));
+ }
+}
+function response(e,t){
+ const step=36*ease(t,e.begin,e.end),lo=Math.floor(step),hi=Math.min(36,lo+1);
+ return e.steps[lo].map((v,i)=>lerp(v,e.steps[hi][i],step-lo));
+}
+function repertoire(gen,t){
+ return events.filter(e=>e.gen===gen&&response(e,t)[e.cue]>=.60);
+}
 const shots=[
- [0,'Experience','Encounters shape the first model’s responses.'],
- [3,'Distillation','The next model inherits a pattern of responses.'],
- [8,'Experience','New encounters change the second model’s responses.'],
- [11.5,'Distillation','That changed pattern passes to the third generation.'],
- [17,'Inheritance','Three independent models, each with its own memory.']
+ [0,'Encounter','A visitor stays a little longer. So does the first robot.'],
+ [4.8,'Selection','Staying and waiting carry forward. Turning with a wake stays with I.'],
+ [7,'Distillation','On the same cue, II comes to favor staying close.'],
+ [10.5,'Distillation','II also inherits the tendency to wait when someone leaves.'],
+ [13.6,'New encounter','A visitor returns. This time, II moves closer.'],
+ [19,'Selection','II passes on staying close and approaching a returning visitor.'],
+ [23.5,'Distillation','III inherits a response to a return it has never witnessed.'],
+ [27.4,'New encounter','The water settles around III. It learns to drift.'],
+ [30.6,'Inheritance','The encounter belongs to one life. A response can outlive it.']
 ];
 function pointOnArc(start,end,u,lift){
  const x=lerp(start[0],end[0],u),y=lerp(start[1],end[1],u)-4*lift*u*(1-u);
@@ -95,11 +138,6 @@ function packet(start,end,u,lift,weights){
    ellipse(x,y+h,1.5+v*2.3,1.5+v*2.3,ink(fade*(.46+.50*v)));
  });
 }
-function link(t,start,end,begin,finish,lift,weights){
- const extent=ease(t,begin,begin+1.2);
- arc(start,end,extent,lift,.28+.61*(1-ease(t,finish,finish+1)));
- for(const shift of [0,.92,1.84])packet(start,end,(t-begin-.65-shift)/(finish-begin-2.3),lift,weights);
-}
 function profile(x,y,values,amount){
  if(amount<.001)return;
  g.save();g.translate(x,y);
@@ -113,43 +151,82 @@ function encounter(t,x,y,start){
  label('Encounters',x+30,y-63,17,ink(.8*f*v));
  arc(a,b,u,5,.7*f*v);
 }
+function ledger(gen,t,center){
+ const kept=repertoire(gen,t),x=center-178;
+ const inherited=kept.filter(e=>e.from!==undefined),local=kept.filter(e=>e.from===undefined);
+ for(const [i,group] of [inherited,local].entries()){
+  const y=605+i*36;
+  g.save();
+  if(i===0){g.fillStyle='#d5d5d1';g.fillRect(x,y-11,8,8)}
+  else{g.strokeStyle='#c8c8c4';g.lineWidth=1.2;g.strokeRect(x+.5,y-10.5,7,7)}
+  label(String(group.length),x+16,y-1,20,'#eee');
+  label(i?'From encounters':'Inherited',x+40,y-1,16,'#c0c0bd');
+  label(group.length?group.map(e=>actions[e.cue]).join(' · '):'—',x+40,y+15,14,'#b1b1ad');
+  g.restore();
+ }
+}
+function matchReadout(t,e){
+ if(!e||e.from===undefined)return;
+ const src=events.find(v=>v.gen===e.from&&v.cue===e.cue);
+ const a=response(src,t),b=response(e,t);
+ const x=530,y=113;
+ label('SAME CUE',x,y,14,'#a7a7a3');
+ label(cues[e.cue],x,y+29,24,'#e2e2df','Georgia');
+ const caption='Probability of '+actions[e.cue].toLowerCase();
+ label(caption,x+278,y,16,'#c2c2bd');
+ for(const [i,probs] of [a,b].entries()){
+  const xx=x+278+i*141,p=probs[e.cue];
+  label(generations[i?e.gen:e.from],xx,y+29,18,'#e2e2df','Georgia');
+  rect(xx+27,y+19,58,3,'#464646');rect(xx+27,y+19,58*p,3,'#e3e3e0');
+  label(Math.round(100*p)+'%',xx+92,y+26,15,'#d4d4d0');
+ }
+}
 function frame(t){
- const shot=shots[Math.max(0,shots.findLastIndex(s=>t>=s[0]))];
- water(t);
- // A single held shot, composed like the annotated final frame.
- const x=[312,840,1344],y=[453,375,352].map((p,i)=>p+2*Math.sin(t*.43+i)),scale=[1.05,1.08,.85],tilt=[-.105,-.095,-.065];
+ const shot=shots.findLast(s=>t>=s[0])||shots[0];water(t);
+ const x=[312,840,1344],y=[381,332,320].map((p,i)=>p+2*Math.sin(t*.43+i)),scale=[1.05,1.08,.85],tilt=[-.105,-.095,-.065];
  const anchors=x.map((v,i)=>[v-60*scale[i]*Math.cos(tilt[i]),y[i]-60*scale[i]*Math.sin(tilt[i])]);
  for(let i=0;i<3;i++)body(t,x[i],y[i],scale[i],tilt[i],0,0,0);
- const a=[.51,.91,.32,.63,.23],b=[.51,.77,.40,.62,.27],changed=[.32,.65,.88,.52,.36],c=[.35,.65,.80,.55,.35];
- const learnt=ease(t,8.8,11.2),blend=b.map((w,i)=>lerp(w,changed[i],learnt));
- const weights=[a,blend,c],reveals=[ease(t,.6,2.7),ease(t,4.7,7.8),ease(t,13.8,16.8)];
- anchors.forEach(([px,py],i)=>profile(px+25,py-22,weights[i],reveals[i]));
  const start=i=>[anchors[i][0]+23*scale[i],anchors[i][1]-5];
  const end=i=>[anchors[i][0]-25*scale[i],anchors[i][1]-4];
- link(t,start(0),end(1),3,8,107,a);
- link(t,start(1),end(2),11.5,17,103,changed);
- for(const [i,begin,lift] of [[0,3,107],[1,11.5,103]]){
-   const pos=pointOnArc(start(i),end(i+1),.53,lift);g.save();g.textAlign='center';
-   label('Model distillation',pos[0],pos[1]-18,18,ink(.86*ease(t,begin+.35,begin+1.3)));g.restore();
+ const pending=events.find(e=>e.from!==undefined&&t>=e.begin-.1&&t<e.end+.35);
+ const showCue=pending?.cue??(t<13.6?0:t<27.4?3:t<30.6?4:0);
+ anchors.forEach(([px,py],i)=>{
+  const own=events.find(e=>e.gen===i&&e.cue===showCue);
+  if(own&&t>=own.begin-.3)profile(px+25,py-22,response(own,t),1);
+ });
+ for(const [i,begin,lift] of [[0,5,92],[1,19,90]]){
+  arc(start(i),end(i+1),ease(t,begin,begin+1.1),lift,pending?.from === i ? .91 : .42);
+  const pos=pointOnArc(start(i),end(i+1),.48,lift);g.save();g.textAlign='center';
+  label('Model distillation',pos[0],pos[1]-17,18,ink(.9*ease(t,begin,begin+1)));g.restore();
  }
- encounter(t,x[0]-45,y[0]-108,0);encounter(t,x[1]-38,y[1]-110,8);encounter(t,x[2]-30,y[2]-86,17);
+ for(const e of events.filter(e=>e.from!==undefined)){
+  const source=events.find(v=>v.gen===e.from&&v.cue===e.cue);
+  const span=(e.end-e.begin)*.66;
+  for(const lag of [0,.28,.55])packet(start(e.from),end(e.gen),(t-e.begin-lag)/span,e.from?90:92,source.steps.at(-1));
+ }
+ for(const [gen,begin] of [[0,0],[1,13.7],[2,27.4]])encounter(t,x[gen]-40,y[gen]-scale[gen]*104,begin);
  for(let i=0;i<3;i++){
-   g.save();g.textAlign='center';label(['I','II','III'][i],x[i]-12,y[i]+117*scale[i]+25,26,'#e2e2df','Georgia');g.restore();
+  g.save();g.textAlign='center';label(['I','II','III'][i],x[i]-12,y[i]+117*scale[i]+22,26,'#dededb','Georgia');g.restore();
+  ledger(i,t,x[i]);
  }
- const px=anchors[0][0],py=anchors[0][1];path('M'+px+' '+(py+20)+' l-39 102 h-82',null,ink(.43),1);
- label('Raspberry Pi 5',px-152,py+145,18,'#cececc');label('85 × 56 mm PCB',px-152,py+167,15,'#aaa');
- label('BORN, NOT MADE',75,64,16,'#acacaa');g.save();g.textAlign='right';label('Inheritance',1526,64,21,'#ccc','Georgia');g.restore();
- label(shot[1].toUpperCase(),77,744,17,'#aaa');label(shot[2],74,808,40,'#e8e8e5','Georgia');
+ const px=anchors[0][0],py=anchors[0][1];path('M'+px+' '+(py+17)+' l-50 89 h-83',null,ink(.45),1);
+ label('Pi 5 · 85 × 56 mm',px-159,py+126,16,'#cfcfca');
+ label('BORN, NOT MADE',75,62,16,'#acacaa');g.save();g.textAlign='right';label('Inheritance',1526,62,21,'#ccc','Georgia');g.restore();
+ matchReadout(t,pending);
+ label('RESPONSE PATTERNS  /  SIMULATED',75,565,14,'#aaa');
+ label(shot[1].toUpperCase(),76,739,17,'#aaa');label(shot[2],74,802,36,'#e8e8e5','Georgia');
  document.querySelector('.mobile').textContent=shot[2];
+ const live=document.querySelector('.mobile-repertoire');
+ live.textContent=generations.map((name,i)=>{const r=repertoire(i,t);return name+'   '+r.filter(e=>e.from!==undefined).length+' inherited  ·  '+r.filter(e=>e.from===undefined).length+' from encounters'}).join('\n');
 }
 let t=0,run=false,last=0,id=0;
 const play=document.getElementById('play'),seek=document.getElementById('seek'),clock=document.querySelector('time');
-function show(){frame(t);seek.value=t;clock.textContent='0:'+String(Math.floor(t)).padStart(2,'0')+' / 0:20';play.textContent=run?'Pause':t>=duration?'Replay':'Play'}
+function show(){frame(t);seek.value=t;clock.textContent='0:'+String(Math.floor(t)).padStart(2,'0')+' / 0:32';play.textContent=run?'Pause':t>=duration?'Replay':'Play'}
 function tick(now){if(!run)return;t=Math.min(duration,t+(now-last)/1000);last=now;if(t>=duration)run=false;show();if(run)id=requestAnimationFrame(tick)}
 function start(){cancelAnimationFrame(id);run=true;last=performance.now();show();id=requestAnimationFrame(tick)}
 function pause(){run=false;cancelAnimationFrame(id);show()}
 play.onclick=()=>{if(run)pause();else{if(t>=duration)t=0;start()}};document.getElementById('again').onclick=()=>{t=0;start()};
 seek.oninput=()=>{t=Number(seek.value);pause()};
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&run)pause()});
-if(matchMedia('(prefers-reduced-motion: reduce)').matches){t=19.5;show()}else start();
+if(matchMedia('(prefers-reduced-motion: reduce)').matches){t=31.5;show()}else start();
 </script></body></html>
