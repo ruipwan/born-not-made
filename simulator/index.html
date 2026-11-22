@@ -446,8 +446,16 @@ async function loadEgg(b64) {
   const hullMesh = (k, mat, parent, ro, ed) => { if (!J.hull[k]) return; const o = new THREE.Mesh(HM(k), mat); o.renderOrder = ro; parent.add(o); PARTS[k] = o; if (ed) edgeLines(o, 30, 0.25, 0xdfe3ea, clip); };
   hullMesh("W_B0_Skin", shellMat(0.07, 0.6, clip), R3.womb, 7, false);
   hullMesh("W_T1_TailShell", shellMat(0.08, 0.62, clip), R3.tail, 7, false);
-  hullMesh("W_B0_MotherFrontPlate", clayMat(0xe9e7e1, { opacity: 0.32, side: THREE.DoubleSide, clip, sub: 0.5 }), R3.womb, 5, true);
-  hullMesh("W_B0_MotherRearWall", clayMat(0xe9e7e1, { opacity: 0.32, side: THREE.DoubleSide, clip, sub: 0.5 }), R3.womb, 5, true);
+  // the stern plate and the docking wall are the same clear shell as the hull, so the birth opening reads as a plain rimmed hole and nothing reads as a panel standing open
+  hullMesh("W_B0_MotherFrontPlate", shellMat(0.07, 0.6, clip), R3.womb, 7, false);
+  hullMesh("W_B0_MotherRearWall", shellMat(0.08, 0.6, clip), R3.womb, 7, false);
+  // the docking face of the tail: a clear wall across the open end of the tail shell, with the bore for the arm; without the wall the tail alone was an open cup
+  { const tv = J.hull.W_T1_TailShell.v, xs = []; for (let i = 0; i < tv.length; i += 3) xs.push(tv[i]); const xf = Math.max(...xs), ring = [];
+    for (let i = 0; i < tv.length; i += 3) if (xf - tv[i] < 0.002) ring.push([tv[i + 1], tv[i + 2]]);
+    const zc = ring.reduce((a, q) => a + q[1], 0) / ring.length; ring.sort((a, b) => Math.atan2(a[1] - zc, a[0]) - Math.atan2(b[1] - zc, b[0]));
+    const sh = new THREE.Shape(ring.map((q) => new THREE.Vector2(q[0], q[1]))); const hole = new THREE.Path(); hole.absarc(0, J.layout.bore_z || 0, J.layout.bore_R, 0, 2 * Math.PI, true); sh.holes.push(hole);
+    const fg = new THREE.ShapeGeometry(sh, 48), fp = fg.attributes.position; for (let i = 0; i < fp.count; i++) fp.setXYZ(i, xf - 0.003, fp.getX(i), fp.getY(i)); fg.computeVertexNormals();
+    const fm = new THREE.Mesh(fg, shellMat(0.08, 0.6, clip)); fm.renderOrder = 7; R3.tail.add(fm); PARTS.tailFace = fm; }
   hullMesh("W_V3_Channel", clayMat(0xc9cbce, { opacity: 0.6, clip, sub: 0.6 }), R3.womb, 5, true);
   // second telescopic boom stage: a plate that slides out of the first and carries the arm base
   PARTS.boom2 = new THREE.Mesh(new THREE.BoxGeometry(1, 0.096, 0.007), clayMat(0xcfd1d4, { sub: 0.4 })); PARTS.boom2.position.z = J.layout.root_z - 0.0045; R3.tail.add(PARTS.boom2); edgeLines(PARTS.boom2, 30, 0.3);
@@ -1253,7 +1261,7 @@ const CAMS = {
   mswim: () => { const f = STATE.k === "mswim" ? mj(STATE.st.f) : 0; return { p: [lerp(-0.3, 1.6, f), lerp(-3.4, -7.6, f), lerp(1.0, 2.0, f)], t: [lerp(-0.3, -0.35, f), lerp(0, 0.4, f), lerp(-0.05, -0.7, f)] }; },   // cranes back out to the room
 };
 let camGoal = null;
-function setCam(name, snap = false) { CAM = name; const c = CAMS[name](); camGoal = c; SECT.constant = ["section", "print", "kitcam", "push", "birthcam"].includes(name) ? 0 : 100; document.querySelectorAll("[data-cam]").forEach((b) => b.classList.toggle("on", b.dataset.cam === name)); if (snap) CAMSNAP = true; }
+function setCam(name, snap = false) { CAM = name; const c = CAMS[name](); camGoal = c; SECT.constant = name === "section" ? 0 : 100;      /* the hull is a closed clear shell in every view; only the Section view cuts the near half away */ document.querySelectorAll("[data-cam]").forEach((b) => b.classList.toggle("on", b.dataset.cam === name)); if (snap) CAMSNAP = true; }
 function setAuto(v) { AUTO = v; $("#autoCam").classList.toggle("on", v); $("#autoCam").setAttribute("aria-pressed", String(v)); }
 function autoCam(S) {
   const want = { approach: "wide", dock: "overview", gel: "kitcam", out: "section", tool1: "rackcam", kit: "kitcam", tool2: "rackcam", drain: "push", print: "print", cure: "section", push: "push", birth: "birthcam", float: "birthcam", swim: "swim", mswim: "mswim" }[S.k];
