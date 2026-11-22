@@ -1,68 +1,166 @@
 {
- "tail": {
-  "file": "bnm_simple_tail.stl",
+ "tail_front": {
+  "file": "bnm_simple_tail_front.stl",
   "watertight": true,
   "winding": true,
   "bodies": 1,
-  "volume_cm3": 856.2,
-  "mass_kg": 1.09,
-  "hours": 24.8,
+  "volume_cm3": 802.6,
+  "mass_kg": 1.02,
+  "hours": 23.2,
   "box": [
    336.0,
    314.0,
-   305.4
+   251.0
   ],
   "margin": [
    4.0,
    6.0,
-   34.6
+   89.0
   ],
-  "faces": 82034,
+  "faces": 53612,
   "orientations": {
    "on the docking face": {
     "box": [
      336.0,
      314.0,
-     305.4
+     251.0
     ],
     "fits": true,
     "margin": [
      4.0,
      6.0,
-     34.6
+     89.0
     ],
-    "overhang_cm2": 1147.0,
+    "overhang_cm2": 661.0,
     "bed_cm2": 0.0
    },
    "on the floor": {
     "box": [
-     305.4,
+     251.0,
      314.0,
      336.0
     ],
     "fits": true,
     "margin": [
-     34.6,
+     89.0,
      6.0,
      4.0
     ],
-    "overhang_cm2": 664.0,
-    "bed_cm2": 431.0
+    "overhang_cm2": 753.0,
+    "bed_cm2": 427.0
    },
    "on the side": {
     "box": [
-     305.4,
+     251.0,
      336.0,
      314.0
     ],
     "fits": true,
     "margin": [
      4.0,
-     14.6,
+     69.0,
      26.0
     ],
-    "overhang_cm2": 1482.0,
-    "bed_cm2": 18.0
+    "overhang_cm2": 1434.0,
+    "bed_cm2": 24.0
+   },
+   "on the tip": {
+    "box": [
+     336.0,
+     314.0,
+     251.0
+    ],
+    "fits": true,
+    "margin": [
+     4.0,
+     6.0,
+     89.0
+    ],
+    "overhang_cm2": 632.0,
+    "bed_cm2": 25.0
+   }
+  },
+  "choice": "on the docking face"
+ },
+ "tail_rear": {
+  "file": "bnm_simple_tail_rear.stl",
+  "watertight": true,
+  "winding": true,
+  "bodies": 1,
+  "volume_cm3": 375.2,
+  "mass_kg": 0.48,
+  "hours": 10.9,
+  "box": [
+   318.1,
+   222.3,
+   226.4
+  ],
+  "margin": [
+   21.9,
+   97.7,
+   113.6
+  ],
+  "faces": 42494,
+  "orientations": {
+   "on the docking face": {
+    "box": [
+     318.1,
+     222.3,
+     226.4
+    ],
+    "fits": true,
+    "margin": [
+     21.9,
+     97.7,
+     113.6
+    ],
+    "overhang_cm2": 66.0,
+    "bed_cm2": 21.0
+   },
+   "on the floor": {
+    "box": [
+     226.4,
+     222.3,
+     318.1
+    ],
+    "fits": true,
+    "margin": [
+     113.6,
+     97.7,
+     21.9
+    ],
+    "overhang_cm2": 253.0,
+    "bed_cm2": 128.0
+   },
+   "on the side": {
+    "box": [
+     226.4,
+     318.1,
+     222.3
+    ],
+    "fits": true,
+    "margin": [
+     113.6,
+     1.9,
+     117.7
+    ],
+    "overhang_cm2": 988.0,
+    "bed_cm2": 0.0
+   },
+   "on the tip": {
+    "box": [
+     318.1,
+     222.3,
+     226.4
+    ],
+    "fits": true,
+    "margin": [
+     21.9,
+     97.7,
+     113.6
+    ],
+    "overhang_cm2": 73.0,
+    "bed_cm2": 1.0
    }
   },
   "choice": "on the docking face"
@@ -85,7 +183,7 @@
    6.0,
    4.9
   ],
-  "faces": 34844,
+  "faces": 34672,
   "orientations": {
    "on the docking face": {
     "box": [
@@ -131,6 +229,21 @@
     ],
     "overhang_cm2": 1520.0,
     "bed_cm2": 33.0
+   },
+   "on the tip": {
+    "box": [
+     336.0,
+     314.0,
+     335.1
+    ],
+    "fits": true,
+    "margin": [
+     4.0,
+     6.0,
+     4.9
+    ],
+    "overhang_cm2": 266.0,
+    "bed_cm2": 0.0
    }
   },
   "choice": "on the docking face"
