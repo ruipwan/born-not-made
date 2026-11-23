@@ -250,8 +250,9 @@ st.px = 0.0
 st.red = np.array([OFF, 0.0, 0.0])          # pose of the parent's tail frame: world = (x, y) + R(yaw) (lx, ly)
 st.item = np.array([0.0, 0.0, 0.0]); st.itemv = 0
 st.q = REST.copy(); st.tool = 1; st.crank = 0.0; st.rot = 0.0
-st.N = dict(x=0.0, y=0.0, yaw=0.0, k=0.0, vis=0, pack=0.0, jet=0.0)
-st.F = dict(x=0.0, y=0.0, yaw=0.0, k=0.0, vis=0, pack=0.0)
+st.N = dict(x=0.0, y=0.0, yaw=0.0, k=0.0, vis=0, pack=0.0, jet=0.0, bm=0, ba=0.0, bx=0.0)
+st.F = dict(x=0.0, y=0.0, yaw=0.0, k=0.0, vis=0, pack=0.0, jet=0.0, bm=0, ba=0.0, bx=0.0)
+st.hd = 0.0                 # the head's offset in x from its place (it moves only when the parent backs off at a birth)
 st.pods = 0          # 0 in the parent's store, 1 on the bowl floor, 2 in N
 st.root = R_BOWL.copy(); st.cq = lie_q.copy()
 st.mods = {k: dict(G=np.eye(4), att=0, vis=1, collar=1) for k in MOD_ORDER}
@@ -277,8 +278,8 @@ def quat(R):
 
 def emit():
     fr = dict(red=[R2(x) for x in st.red], item=[R2(x) for x in st.item] + [st.itemv], px=R2(st.px), q=[R2(x) for x in st.q], tool=st.tool, crank=R2(st.crank), rot=R2(st.rot),
-              N=[R2(st.N['x']), R2(st.N['y']), R2(st.N['yaw']), R2(st.N['k']), st.N['vis'], R2(st.N['pack']), R2(st.N['jet'])],
-              F=[R2(st.F['x']), R2(st.F['y']), R2(st.F['yaw']), R2(st.F['k']), st.F['vis'], R2(st.F['pack'])],
+              N=[R2(st.N['x']), R2(st.N['y']), R2(st.N['yaw']), R2(st.N['k']), st.N['vis'], R2(st.N['pack']), R2(st.N['jet']), st.N['bm'], R2(st.N['ba']), R2(st.N['bx'])],
+              F=[R2(st.F['x']), R2(st.F['y']), R2(st.F['yaw']), R2(st.F['k']), st.F['vis'], R2(st.F['pack']), R2(st.F['jet']), st.F['bm'], R2(st.F['ba']), R2(st.F['bx'])], hd=R2(st.hd),
               pods=st.pods, root=mat7(st.root), cq=[R2(x) for x in st.cq], cv=st.childvis,
               m=[mat7(st.mods[k]['G']) + [st.mods[k]['att'], st.mods[k]['vis'], st.mods[k]['collar']] for k in MOD_ORDER],
               lip=R2(st.lip), gel=R2(st.gel))
@@ -430,16 +431,56 @@ def f_kit(u, s0):
         if u > 0.9: st.pods = 1
 stage('kitN', 'Pods on the floor', 6, 75, 'The holder lays N\'s two sealed pods on the floor of the bowl, the way it lays a kit: a battery and a Raspberry Pi in one, the pump in the other.', f_kit)
 
+# ---- the birth path, in the head's frame (x toward the mouth, z up): the folded body lies on the bowl floor, goes up the
+# inner floor of the head (its chin) to the lower lip, and outside comes down to the tank floor. The same path is used by the page.
+_px = np.array(J['hull']['prof']['x']); _pzb = np.array(J['hull']['prof']['zb'])
+LIPL = np.array(J['mouth']['lip'])                      # lip in the head frame
+PTS = []
+for x in np.arange(0.035, LIPL[0] + 1e-9, 0.005):
+    PTS.append((x, float(np.interp(x, _px, _pzb)) + 0.002))
+PTS[-1] = (LIPL[0], LIPL[1] + 0.002)
+for t in np.linspace(0, 1, 30)[1:]:                     # outside: the strip drapes from the lip down to the tank floor over 160 mm
+    x = LIPL[0] + 0.16 * t; z = (LIPL[1] + 0.002) * (1 - (3 * t * t - 2 * t * t * t))
+    PTS.append((x, max(0.002, z)))
+for x in np.arange(LIPL[0] + 0.17, LIPL[0] + 3.0, 0.05):
+    PTS.append((x, 0.002))
+PTS = np.array(PTS); _d = np.r_[0, np.cumsum(np.hypot(np.diff(PTS[:, 0]), np.diff(PTS[:, 1])))]
+P_LIP = float(np.interp(LIPL[0], PTS[:, 0], _d))
+P_FLAT = float(_d[np.searchsorted(PTS[:, 0], LIPL[0] + 0.165)])
+X_FLAT = float(PTS[np.searchsorted(PTS[:, 0], LIPL[0] + 0.165), 0])
+def path_at(p):
+    x = np.interp(p, _d, PTS[:, 0]); z = np.interp(p, _d, PTS[:, 1]); return x, z
+OPEN = P_FLAT - P_LIP + 0.01                             # a section fills once it lies on the tank floor: the inflation front sits just past the fold of the drape
+def seg_len(which):
+    sec = SECN if which == 'N' else SECF; return sec[-1][0] - sec[0][0]
+def a_pack(which):
+    """advance at which the folded pack sits centred on the print seat: the middle of the body stays still while folded"""
+    pc = float(np.interp(PRINT_C[0] - OFF, PTS[:, 0], _d))
+    return pc + seg_len(which) / 2
+def trail_world(which, a):
+    """the rim at the trailing end (where the holder pushes and the needle feeds air), in the world"""
+    x, z = path_at(a - seg_len(which)); return np.array([x + OFF + st.hd, 0.0, z + 0.03])
+def tip_ok(tip):
+    return ik_pose(np.array(tip), CUP, st.red) is not None
+def a_limits(which):
+    L = seg_len(which); amax_h = amax_c = None
+    for a in np.arange(P_LIP, P_LIP + L + 0.5, 0.002):
+        t = trail_world(which, a)
+        if amax_h is None and not tip_ok(t + [-0.012, 0, 0]): amax_h = a - 0.002
+        if not tip_ok(t + [-CRANK, 0, 0.0]): amax_c = a - 0.002; break
+    return amax_h, max(amax_c, amax_h)
+BIRTH = {}
+
 def printer(key, name, which, real, text):
     def f(u, s0):
         st.tool = 2
         seg_ = st.N if which == 'N' else st.F
         P = packN if which == 'N' else packF
-        seg_['pack'] = u; seg_['vis'] = 0
+        seg_['pack'] = u; seg_['vis'] = 0; seg_['bm'] = 1; seg_['ba'] = a_pack(which); seg_['bx'] = 0.0
         h = P[2] / 1000 * u + 0.004
         lanes = 9; v = (u * lanes * 6) % 1; lane = int(u * lanes * 6) % lanes
         y = (-P[1] / 2000 + 0.01) + (P[1] / 1000 - 0.02) * (v if lane % 2 == 0 else 1 - v)
-        x = PRINT_X[0] + 0.008 + (P[0] / 1000 - 0.016) * lane / (lanes - 1)
+        x = PRINT_C[0] - P[0] / 2000 + 0.008 + (P[0] / 1000 - 0.016) * lane / (lanes - 1)
         q = ikc(np.array([x, y, h]), NEEDLE)
         if q is not None: st.q = q if u > 0.04 else s0['q'] + (q - s0['q']) * mj(u / 0.04)
     stage(key, name, 10, real, text, f)
@@ -447,27 +488,36 @@ def printer(key, name, which, real, text):
 printer('printN', 'Print N', 'N', tN, f'The needle prints the nose segment folded flat over the pods: {layN} layers, {packN[2]:.0f} mm tall, double wall with the quilt between.')
 stage('cureN', 'Cure', 3, 57600, 'Dragon Skin 30 cures in the gel for 16 hours.', lambda u, s0: setattr(st, 'tool', 1))
 
-def birth(which, park):
-    def f(u, s0):
-        seg_ = st.N if which == 'N' else st.F
-        P = packN if which == 'N' else packF
-        q0 = s0['q']
-        rear = PRINT_X[0] - 0.004
-        if u < 0.15:
-            st.q = arm_to(q0, [rear, 0, 0.05], 1, u, 0, 0.15)
-        elif u < 0.55:
-            w = seg(u, 0.15, 0.55)
-            seg_['pack'] = 1 + w                         # 1..2: the pack slides out (JS reads 1+w as the push)
-            tipx = rear + min(0.20, (LIP[0] + 0.01 - PRINT_X[0]) * w)
-            st.q = arm_to(st.q, [tipx, 0, 0.05 + 0.06 * w], 1, 1)
-            if which == 'N': st.pods = 2
-        else:
-            w = seg(u, 0.55, 1.0)
-            seg_['pack'] = 3; seg_['vis'] = 1; seg_['k'] = w
-            seg_['x'] = LIP[0] + 0.06 - (SECN if which == 'N' else SECF)[0][0]; seg_['y'] = 0; seg_['yaw'] = 0.0
-            st.q = arm_to(st.q, HOME, 1, u, 0.6, 0.9)
-    return f
-stage('birthN', 'Birth of N', 8, 300, 'The holder lifts the folded nose out of the gel and pushes it over the lip. Outside, air goes into the quilt and the segment opens to its printed shape.', birth('N', N_PARK))
+def births(which, label):
+    L = seg_len(which); a0 = a_pack(which); a1 = P_LIP + 0.03
+    ah, ac = a_limits(which); a_end = L + P_FLAT + OPEN * 0 + 0.10; back = max(0.0, a_end - ac)
+    BIRTH[which] = dict(a0=a0, a1=a1, ah=ah, ac=ac, a_end=a_end, back=back)
+    seg_ = lambda: st.N if which == 'N' else st.F
+    def fa(u, s0):          # a: the ball needle in the valve at the rim; the lengthwise folds open, the leading end goes up the chin and over the lip
+        s_ = seg_(); s_['bm'] = 1; s_['pack'] = 1.0; st.tool = 1
+        s_['bx'] = seg(u, 0.15, 0.7); s_['ba'] = a0 + (a1 - a0) * seg(u, 0.3, 1.0)
+        st.q = arm_to(s0['q'], trail_world(which, s_['ba']) + [-0.012, 0, 0], 1, u, 0.0, 0.25) if u < 0.25 else ikc(trail_world(which, s_['ba']) + [-0.012, 0, 0], CUP)
+        if which == 'N': st.pods = 2
+    def fb(u, s0):          # b: the holder pushes the rim at 2 mm/s, air fed with the advance so each section opens only outside the lip; at the end of its reach the folding crank takes over
+        s_ = seg_(); s_['ba'] = a1 + (ac - a1) * seg(u, 0.0, 1.0)
+        fh = (ah - a1) / max(1e-6, ac - a1); st.crank = seg(u, fh, min(1, fh + 0.12))
+        st.q = ikc(trail_world(which, s_['ba']) + [-CRANK * st.crank - 0.012 * (1 - st.crank), 0, 0], CUP)
+    def fd(u, s0):          # d: the needle leaves; the parent backs away on its wheels and the body slides over the lip onto the floor
+        s_ = seg_(); w = seg(u, 0.1, 0.9); st.crank = 1 - seg(u, 0.0, 0.2)
+        st.hd = -back * w; st.red = np.array([OFF - back * w, 0.0, 0.0])
+        s_['ba'] = ac + back * w
+        st.q = arm_to(s0['q'], tip_of(REST, 1, [OFF, 0, 0]), 1, u, 0.0, 0.3)
+        if u > 0.999:          # hand over to the pose: the same shape, now a body on the floor
+            s_['bm'] = 0; s_['vis'] = 1; s_['k'] = 1.0
+            s_['x'] = OFF + st.hd + X_FLAT - P_FLAT + a_end + (SECN if which == 'N' else SECF)[0][0]; s_['y'] = 0.0; s_['yaw'] = math.pi
+    def fe(u, s0):          # the parent drives back to its place
+        w = seg(u, 0.1, 0.9); st.hd = -back * (1 - w); st.red = np.array([OFF + st.hd, 0.0, 0.0])
+    stage('birth' + which + 'a', f'Birth of {which}: the folds open', 7, 90, f'The ball needle sits in the valve at the rim. The lengthwise folds open first and the leading end ({label}) goes up the chin of the head and over the lower lip, cupped.', fa)
+    stage('birth' + which + 'b', f'Birth of {which}: push while inflating', 14, (ac - a1) / 0.002, f'The holder pushes the rim at 2 mm/s; air is fed in steps matched to the advance, so each section opens only outside: the flat strip drapes over the lip to the tank floor and fills there, across first, then the quilt; inside, the body stays a flat strip. After {(ah-a1)*1000:.0f} mm the folding crank takes the rim on, {(ac-ah)*1000:.0f} mm more, as far as the arm reaches.', fb)
+    stage('birth' + which + 'd', f'Birth of {which}: the parent backs away', 7, 60, f'The needle leaves the valve. The parent backs {back*1000:.0f} mm on its wheels, the head with it, and the rest of the body slides over the lip and settles on the tank floor.', fd)
+    BIRTH[which]['fe'] = fe
+
+births('N', 'the nose')
 
 def f_wakeN(u, s0):
     w = seg(u, 0.15, 1.0)
@@ -476,10 +526,11 @@ def f_wakeN(u, s0):
     st.N['y'] = s0['N']['y'] + (N_PARK[1] - s0['N']['y']) * w
     st.N['yaw'] = s0['N']['yaw'] + (N_PARK[2] - s0['N']['yaw']) * w
 stage('wakeN', 'N wakes', 5, 120, 'The Pi in the pod boots on its own battery. N has the pump, so the first part of the child is the part that moves: it swims clear of the mouth.', f_wakeN)
+stage('birthNe', 'Back in place', 3, 60, 'With the newborn clear of the mouth, the parent drives back to its place.', BIRTH['N'].pop('fe'))
 
 printer('printF', 'Print F', 'F', tF, f'The needle prints the face segment: a quilted ring with the arm\'s seat plate printed into its floor, {layF} layers, {packF[2]:.0f} mm tall.')
 stage('cureF', 'Cure', 3, 57600, 'Sixteen hours in the gel.', lambda u, s0: setattr(st, 'tool', 1))
-stage('birthF', 'Birth of F', 8, 300, 'F is born the same way. It has no pump: it opens in front of the mouth and waits.', birth('F', F_PARK))
+births('F', 'its rear rim')
 
 def f_moveF(u, s0):
     w = seg(u, 0.1, 1.0)
@@ -495,6 +546,7 @@ def f_moveF(u, s0):
     if u > 0.85:
         b = seg(u, 0.85, 1.0); st.N['x'] = nx + (N_PARK[0] - nx) * b; st.N['y'] = ny + (N_PARK[1] - ny) * b; st.N['yaw'] = -math.pi / 2 + (N_PARK[2] + math.pi / 2) * b
 stage('parkF', 'N moves F aside', 6, 240, 'N pushes F against the port glass and parks itself against the starboard glass: the middle of the tank is clear.', f_moveF)
+stage('birthFe', 'Back in place', 3, 60, 'The parent drives back to its place.', BIRTH['F'].pop('fe'))
 
 def lerp3(a, b, w): return np.array(a) + (np.array(b) - np.array(a)) * w
 def yaw_lerp(a, b, w): d = (b - a + math.pi) % (2 * math.pi) - math.pi; return a + d * w
@@ -640,7 +692,7 @@ out = dict(
     off=OFF, water=WATER, gel=GEL, lip=[float(x) for x in LIP], mouth_top=[float(x) for x in MOUTH_TOP], base=[float(x) for x in BASE], tank=TANK,
     seg=dict(na=NA, nv=NV, secN=SECN, secF=SECF, perN=PER_N, perF=PER_F, joint=JOINT, pitch=J['q']['q4']['pitch_mm'], packN=packN, packF=packF,
              areaN=AN, areaF=AF, layN=layN, layF=layF),
-    print_x=[float(x) for x in PRINT_X], rbowl=[R2(x) for x in R_BOWL.T.reshape(-1)], lie_q=[float(x) for x in lie_q], croot=[R2(x) for x in CROOT.T.reshape(-1)], qj={k: [float(x) for x in QJ[k]] for k in MOD_ORDER}, tray=dict(x0=float(TRAY_X[0]), x1=float(TRAY_X[1]), y=TRAY_Y, top=TRAY_TOP), rb=RB, out=[float(x) for x in OUT], dock=[float(x) for x in DOCK], mods=MODS, mod_order=MOD_ORDER, floats=floats, fold=[float(x) for x in FOLD], rest=[float(x) for x in REST], delta=float(DELTA),
+    print_x=[float(x) for x in PRINT_X], rbowl=[R2(x) for x in R_BOWL.T.reshape(-1)], lie_q=[float(x) for x in lie_q], croot=[R2(x) for x in CROOT.T.reshape(-1)], path=dict(x=[R2(x) for x in PTS[:, 0]], z=[R2(x) for x in PTS[:, 1]], d=[R2(x) for x in _d], lip=P_LIP, open=OPEN), birth=BIRTH, qj={k: [float(x) for x in QJ[k]] for k in MOD_ORDER}, tray=dict(x0=float(TRAY_X[0]), x1=float(TRAY_X[1]), y=TRAY_Y, top=TRAY_TOP), rb=RB, out=[float(x) for x in OUT], dock=[float(x) for x in DOCK], mods=MODS, mod_order=MOD_ORDER, floats=floats, fold=[float(x) for x in FOLD], rest=[float(x) for x in REST], delta=float(DELTA),
     stages=stages, fps=FPS, fr=frames, checks=checks, notes=notes,
     sources=dict(dex=J['sources']['dex'], ds30=J['sources']['ds30'], mag=J['sources']['mag']),
 )

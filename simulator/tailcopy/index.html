@@ -61,7 +61,7 @@ body { font:12.5px/1.45 var(--sans); -webkit-font-smoothing:antialiased; }
       <div class="ov"><div class="stg" id="ovStage">Loading</div><div class="txt" id="ovText"></div><div class="clk" id="ovClk"></div></div>
       <div class="cams" id="cams">
         <button class="btn on" id="auto">Auto camera</button>
-        <button class="btn" data-cam="wide">Wide</button><button class="btn" data-cam="bowl">Bowl</button><button class="btn" data-cam="front">Front</button><button class="btn" data-cam="side">Side</button><button class="btn" data-cam="tray">Tray</button><button class="btn" data-cam="top">Top</button>
+        <button class="btn" data-cam="wide">Wide</button><button class="btn" data-cam="bowl">Bowl</button><button class="btn" data-cam="front">Front</button><button class="btn" data-cam="side">Side</button><button class="btn" data-cam="birth">Birth</button><button class="btn" data-cam="tray">Tray</button><button class="btn" data-cam="top">Top</button>
       </div>
     </div>
   </section>
@@ -233,6 +233,57 @@ function shapeSeg(S, kf, ki) {
   for (let j = 0; j < nv; j += 8) for (let i = 0; i < na - 1; i++) { const a = (i * n1 + j) * 3, b = ((i + 1) * n1 + j) * 3; L2.push(pos[a], pos[a + 1], pos[a + 2], pos[b], pos[b + 1], pos[b + 2]); }
   S.lines.geometry.setAttribute("position", new THREE.Float32BufferAttribute(L2, 3));
 }
+/* ---------------------------------------------------------------- birth along the path (the method of the quilted head simulator):
+   the body lies folded on the bowl floor; the lengthwise folds open (bx), the body moves along the path by its advance (ba);
+   a section opens across and inflates only once it is OPEN past the lip; inside it stays a flat strip, cupped where it rides over the lip */
+function pathAt(p) {
+  const X = D.path.x, Z = D.path.z, Dd = D.path.d, n = Dd.length;
+  if (p <= Dd[0]) { const t = [X[1] - X[0], Z[1] - Z[0]], l = Math.hypot(...t); return [X[0] + (p - Dd[0]) * t[0] / l, Z[0] + (p - Dd[0]) * t[1] / l, t[0] / l, t[1] / l]; }
+  if (p >= Dd[n - 1]) return [X[n - 1] + (p - Dd[n - 1]), Z[n - 1], 1, 0];
+  let lo = 0, hi = n - 1; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (Dd[m] <= p) lo = m; else hi = m; }
+  const f = (p - Dd[lo]) / (Dd[hi] - Dd[lo] || 1), tx = X[hi] - X[lo], tz = Z[hi] - Z[lo], l = Math.hypot(tx, tz) || 1;
+  return [lerp(X[lo], X[hi], f), lerp(Z[lo], Z[hi], f), tx / l, tz / l];
+}
+function stationP(Sg, xl) { const x0 = Sg.secs[0][0], L = Sg.secs[Sg.secs.length - 1][0] - x0, [dd, rx] = acc(xl - x0, L, 3, Sg.bx, 6 * D.seg.pitch / 1000); return [Sg.ba - dd, rx]; }
+function stationOpen(Sg, xl) { const [p] = stationP(Sg, xl); return clamp((p - D.path.lip - D.path.open) / 0.07, 0, 1); }
+function stationM(Sg, xl, hd, dz) {      // the frame of a station on the path, in the world: x along the travel, the body's local x pointing back
+  const [p, rx] = stationP(Sg, xl), [x, z, tx, tz] = pathAt(p);
+  const m = new THREE.Matrix4().makeBasis(new THREE.Vector3(-tx, 0, -tz), new THREE.Vector3(0, -1, 0), new THREE.Vector3(-tz, 0, tx));
+  m.setPosition(D.off + hd + x - tz * (rx + dz), 0, z + tx * (rx + dz)); return m;
+}
+function shapeBirth(Sg, ba, bx, hd) {
+  const key = "b" + ba.toFixed(4) + "/" + bx.toFixed(3) + "/" + hd.toFixed(4); if (Sg.key === key) return; Sg.key = key; Sg.ba = ba; Sg.bx = bx;
+  const secs = Sg.secs, na = secs.length, nv = D.seg.nv, n1 = nv + 1, p3 = 3.2, pos = Sg.mesh.geometry.attributes.position.array, pitch = D.seg.pitch / 1000, x0 = secs[0][0], L = secs[na - 1][0] - x0, R = 0.09;
+  for (let i = 0; i < na; i++) {
+    const [xl, w, zb, zt] = secs[i], h = (zt - zb) / 2, per = 2 * (2 * w + 2 * h) * 0.93, w0 = per / 4;
+    const [dd, rx] = acc(xl - x0, L, 3, bx, 6 * pitch), p = ba - dd, [px_, pz, tx0, tz0] = pathAt(p);
+    const f = clamp((p - D.path.lip - D.path.open) / 0.08, 0, 1), ky = clamp(2 * f, 0, 1), ki = clamp(2 * f - 1, 0, 1), e = ki * ki * (3 - 2 * ki);
+    // an opened section stands up in the water: its up turns from the path's normal to the vertical as it fills
+    const up = ky * ky * (3 - 2 * ky); let nx = lerp(-tz0, 0, up), nz = lerp(tx0, 1, up); const nl = Math.hypot(nx, nz); nx /= nl; nz /= nl;
+    const cup = Math.max(0, 1 - Math.abs(p - D.path.lip) / 0.09) * (1 - ky);          // the strip curls into a trough where it rides over the lip
+    const Hk = lerp(0.0025, h, e), Wk = lerp(w0, w, Math.pow(e, 0.6)), zc = lerp(0.003, zb + h, e);
+    for (let j = 0; j <= nv; j++) {
+      const t = 2 * Math.PI * (j % nv) / nv, c = Math.cos(t), s = Math.sin(t);
+      let y, v;
+      if (ki <= 0) {          // folded strip, opening across: the three panels slide apart and lie flat (no panel stands up)
+        const arc = (t < Math.PI ? t : 2 * Math.PI - t) / Math.PI, layer = s >= 0 ? 1 : 0;
+        const [ya, ry] = acc(arc * 2 * w0, 2 * w0, 3, 0, 2 * pitch);
+        const yf = ya - w0, vf = 0.002 + layer * pitch + ry, yo = arc * 2 * w0 - w0, vo = 0.002 + layer * pitch;
+        y = lerp(yf, yo, up); v = lerp(vf, vo, up) + rx;
+        if (cup > 0) { const yy = clamp(y, -Math.PI * R / 2, Math.PI * R / 2), cy = R * Math.sin(yy / R), cv = R * (1 - Math.cos(yy / R)); y = lerp(y, cy, cup); v += cv * cup; }
+      } else {
+        y = Wk * Math.sign(c) * Math.pow(Math.abs(c), 2 / p3); v = Math.max(0, zc + Hk * Math.sign(s) * Math.pow(Math.abs(s), 2 / p3)) + rx * (1 - e);
+      }
+      const d = (i * n1 + j) * 3;
+      pos[d] = D.off + hd + px_ + nx * v; pos[d + 1] = -y; pos[d + 2] = Math.max(0, pz + nz * v);
+    }
+  }
+  if (secs === D.seg.secN) { const c = [0, 0, 0]; for (let j = 0; j < nv; j++) for (let k = 0; k < 3; k++) c[k] += pos[j * 3 + k] / nv; for (let j = 0; j <= nv; j++) for (let k = 0; k < 3; k++) pos[j * 3 + k] = c[k] + (pos[j * 3 + k] - c[k]) * 0.15; }
+  Sg.mesh.geometry.attributes.position.needsUpdate = true; Sg.mesh.geometry.computeVertexNormals(); Sg.mesh.geometry.computeBoundingSphere();
+  const L2 = []; for (let i = 0; i < na; i += 3) for (let j = 0; j < nv; j++) { const a = (i * n1 + j) * 3, b = (i * n1 + j + 1) * 3; L2.push(pos[a], pos[a + 1], pos[a + 2], pos[b], pos[b + 1], pos[b + 2]); }
+  for (let j = 0; j < nv; j += 8) for (let i = 0; i < na - 1; i++) { const a = (i * n1 + j) * 3, b = ((i + 1) * n1 + j) * 3; L2.push(pos[a], pos[a + 1], pos[a + 2], pos[b], pos[b + 1], pos[b + 2]); }
+  Sg.lines.geometry.setAttribute("position", new THREE.Float32BufferAttribute(L2, 3));
+}
 function buildChild() {
   P.N = segment(D.seg.secN, D.seg.perN, 0xf2f4f2); P.F = segment(D.seg.secF, D.seg.perF, 0xf4f2ee);
   P.packClip = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0.1);
@@ -262,7 +313,7 @@ function buildChild() {
 function frameAt(T) {
   const F = D.fr, f = clamp(T * D.fps, 0, F.length - 1), i = Math.floor(f), u = f - i, a = F[i], b = F[Math.min(i + 1, F.length - 1)];
   const L = (x, y) => (Array.isArray(x) ? x.map((v, k) => lerp(v, y[k], u)) : lerp(x, y, u));
-  return { i, a, red: L(a.red, b.red), item: L(a.item, b.item), px: L(a.px, b.px), lip: L(a.lip, b.lip), q: L(a.q, b.q), crank: L(a.crank, b.crank), N: L(a.N, b.N), F: L(a.F, b.F), root: L(a.root, b.root), cq: L(a.cq, b.cq), m: a.m.map((x, k) => L(x, b.m[k])), pods: a.pods, tool: a.tool, cv: a.cv };
+  return { i, a, hd: L(a.hd, b.hd), red: L(a.red, b.red), item: L(a.item, b.item), px: L(a.px, b.px), lip: L(a.lip, b.lip), q: L(a.q, b.q), crank: L(a.crank, b.crank), N: L(a.N, b.N), F: L(a.F, b.F), root: L(a.root, b.root), cq: L(a.cq, b.cq), m: a.m.map((x, k) => L(x, b.m[k])), pods: a.pods, tool: a.tool, cv: a.cv };
 }
 const m7 = (r) => new THREE.Matrix4().compose(new THREE.Vector3(r[0], r[1], r[2]), new THREE.Quaternion(r[3], r[4], r[5], r[6]).normalize(), new THREE.Vector3(1, 1, 1));
 const segPose = (x, y, yaw) => Tm([x, y, 0]).multiply(M4().makeRotationZ(yaw));
@@ -274,38 +325,30 @@ function apply(S, now) {
   const th = toolHead(proot, S.q); P.tool.position.copy(th); P.tool.rotation.z = S.q[0] + S.red[2];
   P.item.visible = S.a.item[3] > 0; P.item.position.set(S.item[0], S.item[1], S.item[2] + 0.006);
   P.tool.userData.cup.visible = S.tool === 1; P.tool.userData.nee.visible = S.tool === 2; P.tool.userData.crank.rotation.y = -Math.PI / 2 * (1 - S.crank);
-  // segments: pack (in the bowl, printing), sliding out, unfolding, inflating
-  const px = D.print_x, lipx = D.lip[0];
+  // segments: printed folded on the bowl floor, born along the path (each section opens only outside the lip), then a body with a pose
+  P.head.position.x = D.off + S.hd;
+  const cx = (D.print_x[0] + D.print_x[1]) / 2;
   for (const [key, Sg, v] of [["N", P.N, S.N], ["F", P.F, S.F]]) {
-    const pk = v[5], vis = v[4], k = v[3]; let M;
-    const sec = Sg.secs, x0 = sec[0][0];
-    if (pk <= 0 && !vis) { Sg.mesh.visible = Sg.lines.visible = false; continue; }
+    const pk = v[5], vis = v[4], bm = v[7] > 0.5; let M;
+    if (!bm && !vis) { Sg.mesh.visible = Sg.lines.visible = false; Sg.bm = false; Sg.vis = false; continue; }
     Sg.mesh.visible = Sg.lines.visible = true;
-    if (!vis) {     // folded: print position in the bowl, then out over the lip
-      shapeSeg(Sg, 0, 0); const L = sec[sec.length - 1][0] - x0;
-      const cx = (px[0] + px[1]) / 2, base = Tm([cx - (x0 + L / 2), 0, 0]);
-      let out = M4();
-      if (pk > 1) { const w = clamp(pk - 1, 0, 1), lift = Math.max(0, Math.sin(Math.PI * w)) * 0.115; out = Tm([(D.lip[0] + 0.06 + L / 2 - cx) * w, 0, lift]); }
-      M = out.multiply(base);
+    if (bm) {
+      shapeBirth(Sg, v[8], v[9], S.hd); M = M4();
       Sg.mat.clippingPlanes = pk < 1 ? [P.packClip] : []; Sg.lines.material.clippingPlanes = Sg.mat.clippingPlanes;
       if (pk < 1) P.packClip.constant = 0.004 + 0.0792 * pk;
     } else {
       Sg.mat.clippingPlanes = []; Sg.lines.material.clippingPlanes = [];
-      shapeSeg(Sg, clamp(k / 0.5, 0, 1), clamp((k - 0.5) / 0.5, 0, 1));
-      M = segPose(v[0], v[1], v[2]);
-      if (k < 1) { const sec2 = sec, L = sec2[sec2.length - 1][0] - x0; M = segPose(v[0], v[1], v[2]).multiply(Tm([0, 0, 0])); }
+      shapeSeg(Sg, 1, 1); M = segPose(v[0], v[1], v[2]);
     }
-    Sg.mesh.matrix.copy(M); Sg.lines.matrix.copy(M); Sg.mesh.matrixWorldNeedsUpdate = Sg.lines.matrixWorldNeedsUpdate = true; Sg.M = M; Sg.vis = vis; Sg.k = k;
+    Sg.mesh.matrix.copy(M); Sg.lines.matrix.copy(M); Sg.mesh.matrixWorldNeedsUpdate = Sg.lines.matrixWorldNeedsUpdate = true; Sg.M = M; Sg.vis = vis; Sg.bm = bm; Sg.ba = v[8]; Sg.bx = v[9];
   }
-  // pods: in the parent's store, on the bowl floor, carried in N's fold, in N's floor
-  const cx = (px[0] + px[1]) / 2;
+  // rigid things inside a segment follow their station: pods in N's floor, the seat plate in F's floor
+  const inSeg = (Sg, xl, dz) => Sg.bm ? stationM(Sg, xl, S.hd, dz) : Sg.M.clone().multiply(Tm([xl, 0, dz]));
+  P.pods.matrixAutoUpdate = false;
   if (S.pods === 0) P.pods.visible = false;
-  else { P.pods.visible = true;
-    if (S.pods === 1 || (S.pods === 2 && !P.N.vis)) { const pk = S.N[5]; let m = Tm([cx, 0, 0]); if (S.pods === 2 && pk > 1 && P.N.M) m = P.N.M.clone().multiply(Tm([-0.33, 0, 0])); P.pods.matrixAutoUpdate = false; P.pods.matrix.copy(S.pods === 2 && P.N.M ? P.N.M.clone().multiply(Tm([-0.27, 0, 0])) : m); }
-    else { P.pods.matrixAutoUpdate = false; P.pods.matrix.copy(P.N.M.clone().multiply(Tm([-0.27, 0, 0.004]))); }
-    P.pods.matrixWorldNeedsUpdate = true; }
-  // seat plate in F's floor
-  P.seat.visible = P.F.vis && P.F.k > 0.6; if (P.seat.visible) { P.seat.matrix.copy(P.F.M.clone().multiply(Tm([-0.115, 0, 0]))); P.seat.matrixWorldNeedsUpdate = true; }
+  else { P.pods.visible = true; P.pods.matrix.copy(S.pods === 1 ? Tm([cx, 0, 0]) : inSeg(P.N, -0.27, 0.004)); P.pods.matrixWorldNeedsUpdate = true; }
+  P.seat.visible = (P.F.vis || P.F.bm) && (P.F.bm ? stationOpen(P.F, -0.115) > 0.9 : true);
+  if (P.seat.visible) { P.seat.matrix.copy(inSeg(P.F, -0.115, 0)); P.seat.matrixWorldNeedsUpdate = true; }
   // jet
   P.jet.visible = S.N[6] > 0.5 && P.N.vis; if (P.jet.visible) { P.jet.matrix.copy(P.N.M.clone().multiply(Tm([-0.40, 0, 0.07]))); P.jet.material.opacity = 0.12 + 0.06 * Math.sin(now * 20); P.jet.matrixWorldNeedsUpdate = true; }
   // the child arm: attached modules follow the folded arm, loose ones float or ride the holder
@@ -332,11 +375,12 @@ const CAMS = {
   front: () => [[0.95, -0.85, 0.55], [0.35, 0.0, 0.1]],
   side: () => [[0.42, -1.05, 0.22], [0.38, 0, 0.12]],
   top: () => [[-0.1, -0.4, 3.3], [-0.1, 0, 0]],
+  birth: () => [[D.off + 0.62, -0.95, 0.36], [D.off + 0.45, 0.0, 0.12]],
   tray: () => [[-0.75, -0.95, 0.55], [-1.15, 0.0, 0.08]],
 };
 function setCam(n) { CAM = n; camGoal = CAMS[n](); document.querySelectorAll("[data-cam]").forEach((b) => b.classList.toggle("on", b.dataset.cam === n)); }
 function setAuto(v) { AUTO = v; $("#auto").classList.toggle("on", v); }
-function autoCam(k) { const want = { intro: "wide", kitN: "bowl", printN: "bowl", cureN: "bowl", birthN: "side", wakeN: "front", printF: "bowl", cureF: "bowl", birthF: "side", parkF: "front", undock: "wide", turnRed: "top", toTray: "tray", blueWait: "top", modM1: "tray", modM2: "tray", modM3: "tray", modM4: "tray", wake: "tray", part: "top", selfPick: "tray", home: "wide", joinNF: "front", dockMouth: "front", birthArm: "side", pull: "side", stand: "side", turn: "front", unfold: "front", free: "wide" }[k] || "wide"; if (want !== CAM) setCam(want); }
+function autoCam(k) { const want = { intro: "wide", kitN: "bowl", printN: "bowl", cureN: "bowl", birthNa: "birth", birthNb: "birth", birthNd: "birth", birthNe: "front", wakeN: "front", printF: "bowl", cureF: "bowl", birthFa: "birth", birthFb: "birth", birthFd: "birth", birthFe: "front", parkF: "front", undock: "wide", turnRed: "top", toTray: "tray", blueWait: "top", modM1: "tray", modM2: "tray", modM3: "tray", modM4: "tray", wake: "tray", part: "top", selfPick: "tray", home: "wide", joinNF: "front", dockMouth: "front", birthArm: "side", pull: "side", stand: "side", turn: "front", unfold: "front", free: "wide" }[k] || "wide"; if (want !== CAM) setCam(want); }
 function stepCam(dt) { if (!camGoal) return; const c = R3.camera.position, t = R3.controls.target, k = 1 - Math.exp(-dt * 1.6); c.lerp(new THREE.Vector3(...camGoal[0]), k); t.lerp(new THREE.Vector3(...camGoal[1]), k); if (c.distanceTo(new THREE.Vector3(...camGoal[0])) < 0.003) camGoal = null; }
 
 /* ---------------------------------------------------------------- timeline, panels */
