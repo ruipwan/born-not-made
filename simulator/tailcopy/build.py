@@ -696,6 +696,23 @@ out = dict(
     stages=stages, fps=FPS, fr=frames, checks=checks, notes=notes,
     sources=dict(dex=J['sources']['dex'], ds30=J['sources']['ds30'], mag=J['sources']['mag']),
 )
+out['mass'] = MASS; out['trims'] = TRIMS; out['rsk'] = {k: [float(x) for x in v] for k, v in RSK.items()}; out['tank_size'] = [TANK['L'], TANK['W']]
+# schematic G-code for the two prints, as the quilted head simulator shows its own: every layer of the folded stack, lanes across the footprint
+G = ['; Born, Not Made, tail copy variant: the two halves of the next tail, printed folded flat in the gel of the head',
+     '; SCHEMATIC: lanes across the footprint of each layer of the 3 x 3 Z fold, not the toolpath of the quilt',
+     '; frame: X toward the mouth, Y port, Z up, mm, origin on the docking plane of the head', 'G21', 'G90', 'M82']
+GL = {}
+for which, P in (('N', packN), ('F', packF)):
+    GL[which] = len(G); G.append(f'; ---- {which}: {P[0]:.0f} x {P[1]:.0f} x {P[2]:.1f} mm, 18 layers')
+    x0 = (PRINT_C[0] - OFF) * 1000 - P[0] / 2; y0 = -P[1] / 2
+    for L in range(18):
+        z = 4.4 * (L + 0.5) + 0.5; G.append(f'; layer z {z:.2f}')
+        for k in range(10):
+            y = y0 + 4 + (P[1] - 8) * k / 9; xa, xb = (x0 + 3, x0 + P[0] - 3) if k % 2 == 0 else (x0 + P[0] - 3, x0 + 3)
+            G.append(f'G0 X{xa:.2f} Y{y:.2f} Z{z:.2f} F1800'); G.append(f'G1 X{xb:.2f} Y{y:.2f} Z{z:.2f} E{abs(xb-xa)*0.0186:.2f} F1200')
+    GL[which + '_end'] = len(G) - 1
+open('tailcopy_print.gcode', 'w').write('\n'.join(G) + '\n')
+out['gcode_lines'] = GL
 json.dump(out, open('tailcopy.json', 'w'), separators=(',', ':'))
 print(len(frames), 'frames,', sum(s['disp'] for s in stages), 's')
 for c in checks: print(('PASS ' if c['ok'] else 'FAIL ') + c['group'] + ': ' + c['name'] + ('  [' + c['value'] + ']' if c['value'] else ''))
