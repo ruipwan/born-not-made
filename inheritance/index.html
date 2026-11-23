@@ -38,9 +38,9 @@ const NUM=['I','II','III','IV'];
 const TILES=[null,['Sense','a microphone'],['Link','a radio link'],['Display','a small light']];
 const robots=[
  {l:1,   h:1,   crown:0,     pitch:.012, kit:['Core','Power','Drive']},
- {l:1.06,h:.93, crown:.014,  pitch:.009, kit:['Core','Power','Drive','Sense']},
- {l:.95, h:1.05,crown:-.012, pitch:.016, kit:['Core','Power','Sense','Link']},
- {l:1.02,h:.97, crown:.02,   pitch:.011, kit:['Core','Power','Sense','Link','Display']}
+ {l:1.1, h:.9,  crown:.026,  pitch:.009, kit:['Core','Power','Drive','Sense']},
+ {l:.9,  h:1.08,crown:-.02,  pitch:.016, kit:['Core','Power','Sense','Link']},
+ {l:1.05,h:.95, crown:.032,  pitch:.011, kit:['Core','Power','Sense','Link','Display']}
 ];
 /* Memory. Every moment a body lives through is one point of light inside the body.
    Inheritance is compression: neighboring moments are pressed into one denser point, about six into one,
@@ -71,10 +71,11 @@ const count=(r,t)=>{let a=0,b=0;for(const q of r.pts)if(q.t0<=t)q.inh?a++:b++;re
 
 /* Poses. A head pose: X0 = screen x of the back face, Yb = screen y of the body floor, sc = depth scale, mx/mz = fold. */
 const SC=.6, FG_W=470, FG_YB=FG_W+FLOAT*S*SC, BG_W=215, BSC=.3, BG_YB=BG_W+FLOAT*S*BSC;
-const slotX=k=>250+k*375;
+const slotX=k=>215+k*370;
 const slot=k=>({X0:slotX(k),Yb:FG_YB,sc:SC,mx:1,mz:1,a:1});
 const mix=(p,q,u)=>({X0:lerp(p.X0,q.X0,u),Yb:lerp(p.Yb,q.Yb,u),sc:lerp(p.sc,q.sc,u),mx:lerp(p.mx,q.mx,u),mz:lerp(p.mz,q.mz,u),a:lerp(p.a,q.a,u)});
-function hx(r,p,x){return p.X0+(x-DOCK)*r.l*S*p.sc*p.mx}
+const HK=1.3, TK=.62; // head longer, tail shorter than the simulator body
+function hx(r,p,x){return p.X0+(x-DOCK)*HK*r.l*S*p.sc*p.mx}
 function hz(r,p,x,z){const c=r.crown*Math.sin(Math.PI*clamp((x-DOCK)/.3))*(z>.2?1:0);return p.Yb-(z*r.h+c)*S*p.sc*p.mz}
 
 function headPath(r,p){
@@ -122,7 +123,7 @@ function drawHead(r,p,t,opts={}){
   g.restore();
 }
 function drawTail(Xd,Yb,sc,a,docked){
-  const P=new Path2D(),tx=x=>Xd+(x-DOCK)*S*sc,tz=z=>Yb-z*S*sc;
+  const P=new Path2D(),tx=x=>Xd+(x-DOCK)*TK*S*sc,tz=z=>Yb-z*S*sc;
   // a rounded tail, lower than the head, the back end one soft curve
   P.moveTo(tx(DOCK),tz(.33));P.lineTo(tx(-.12),tz(.33));
   P.bezierCurveTo(tx(-.27),tz(.33),tx(-.42),tz(.25),tx(-.44),tz(.14));
@@ -132,7 +133,7 @@ function drawTail(Xd,Yb,sc,a,docked){
   return {base:[tx(-.115),tz(.2)],floor:[tx(-.115),tz(.005)],roof:tz(.3),front:tx(DOCK),docked,sc,a};
 }
 function drawArm(tail,tip){
-  const [bx,by]=tail.base,L=.26*S*tail.sc;
+  const [bx,by]=tail.base,L=.33*S*tail.sc;
   tip=tip||[bx+.1*S*tail.sc,by+.08*S*tail.sc];
   let dx=tip[0]-bx,dy=tip[1]-by,d=Math.hypot(dx,dy);
   if(d>2*L-1){tip=[bx+dx/d*(2*L-1),by+dy/d*(2*L-1)];dx=tip[0]-bx;dy=tip[1]-by;d=2*L-1}
@@ -245,7 +246,7 @@ function frame(t){
   // the arms: one per body
   let tip=null, tile=null;
   if(!done){
-    const rest=[home.X0-.147*k+.1*k,home.Yb-.2*k+.08*k];
+    const rest=[home.X0-.091*k+.06*k,home.Yb-.2*k+.08*k];
     const seat=[hx(par,home,.2),FG_YB-.04*k], wx=hx(par,home,.43)+3*Math.sin(t);
     let tp=[lerp(wx+160,wx,ease(u,0,2.4)),FG_W-4+1.5*Math.sin(t*1.3)];
     if(u>=2&&u<3.1)tip=[lerp(rest[0],tp[0],ease(u,2,3.1)),lerp(rest[1],tp[1],ease(u,2,3.1))];
@@ -311,13 +312,13 @@ function frame(t){
 
   // the parent speaks
   const V=VOICE[cyc], who=NUM[cyc]+' to '+NUM[ci]; let phase, caption;
-  if(done){phase='Lineage';caption='Less of the first in each one. More of its own.'}
-  else if(u<2){phase=NUM[cyc];caption=V.dock}
+  if(done){phase='Lineage';caption='Not copies. Each one inherits, learns, and gives “birth” in turn.'}
+  else if(u<2){phase=cyc?NUM[cyc]+' · It grows up, and gives “birth” too':NUM[cyc];caption=V.dock}
   else if(u<4.5){phase=who+' · A new part';caption='I take '+TILES[ci][1]+' from the water. I never had one. '+V.gift}
-  else if(u<10.5){phase=who+' · Print and distill';caption=V.press}
-  else if(u<13){phase=who+' · Birth';caption='I push. You fill with air and leave at my size.'}
-  else if(u<15){phase=who+' · A different body';caption='You are not a copy of me. The shape, the layers and the parts are yours.'}
-  else{phase=who+' · The next arm';caption='Most of you is still empty. That part is yours. So is the next arm. Mine stays with me.'}
+  else if(u<10.5){phase=who+' · It inherits';caption=V.press}
+  else if(u<13){phase=who+' · “Birth”';caption='I push. You fill with air and leave at my size.'}
+  else if(u<15){phase=who+' · Each one is unique';caption='You are not a copy of me, or of anyone. The shape, the layers and the parts are yours.'}
+  else{phase=who+' · Then it learns';caption='Most of you is still empty. That part is yours. I stay, and keep learning too.'}
   text(phase.toUpperCase(),64,808,12,.55,mono,'left',1.6);
   g.save();g.font='36px Georgia';const w=g.measureText(caption).width;g.restore();
   text(caption,64,854,Math.min(36,36*1470/w),.97,'Georgia');
