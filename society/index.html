@@ -919,7 +919,9 @@ let mods = [], segs = [], mid = 1, tailsMade = 0, itemsMade = 0;
 const _V = new THREE.Vector3(), _QA = new THREE.Quaternion(), _QB = new THREE.Quaternion(), _MA = new THREE.Matrix4(), _MB = new THREE.Matrix4();
 const basis = (X, Y, Z) => new THREE.Matrix4().makeBasis(new THREE.Vector3(...X), new THREE.Vector3(...Y), new THREE.Vector3(...Z));
 // the folded arm lies on its side so every joint axis (the arm's y) is vertical; on a free tail its base points forward, out of the open face
-const LIE_F = basis([0, 0, 1], [0, 1, 0], [-1, 0, 0]), LIE_S = basis([0, 0, -1], [0, 1, 0], [1, 0, 0]), STAND = ROOTR.clone();
+// the arm is assembled lying on its side across the front of the free tail's face (its top toward port), so the growing arm stays outside the tail and within reach;
+// then it floats forward, turns to lie lengthwise with its top toward the free tail, and the new tail's face draws it in base first
+const LIE_F = basis([1, 0, 0], [0, 1, 0], [0, 0, 1]), LIE_OUT = basis([0, 0, 1], [0, 1, 0], [-1, 0, 0]), LIE_S = basis([0, 0, -1], [0, 1, 0], [1, 0, 0]), STAND = ROOTR.clone(), ASM_OUT = 0.42;
 function modGeos() { const mats = dexMats(DREST);
   DEX.mod = MODS.map((M) => { const P = [], I = []; let off = 0;
     for (const n of M.parts) { const g = DEX.geo[n], pa = g.attributes.position.array, ia = g.index.array, mm = mats[n]; for (let i = 0; i < pa.length; i += 3) { _V.set(pa[i], pa[i + 1], pa[i + 2]).applyMatrix4(mm); P.push(_V.x, _V.y, _V.z); } for (let i = 0; i < ia.length; i++) I.push(ia[i] + off); off += pa.length / 3; }
@@ -952,10 +954,10 @@ function tailArm(T) { const s = T.s, bx = -s.Lh / 2 - DEX.BACK; T.B0 = [bx, base
 // the free tail sets its work where its own arm reaches it: the module is drawn in to the face, and the arm is assembled lying on the water, at distances
 // from the face found on the arm's inverse kinematics (the farthest that work), so the holder takes, snaps and pushes the real module, not a point short of it
 // a waiting module is drawn in by the face's pump flow fast enough to be under the magnet before the holder comes down
-const pushPt = (T) => { const b = asmBase(T), c = DEX.mod[0].c; return [b[0] - c[2], waterY(T.s) + 0.03, 0]; };
+const pushPt = (T) => { const b = asmBase(T), c = DEX.mod[0].c; return [b[0] + c[2], waterY(T.s) + 0.03, 0]; };
 function tailReach(T) { const ok = (p) => ikArm(T, p, "mag").err < 1e-6, wy = waterY(T.s), f = faceX(T);
   T.pullD = 0.2; for (let d = 0.2; d > 0.08; d -= 0.005) if (ok([f + d, wy + 0.04, 0]) && ok([f + d, safeY(T), 0])) { T.pullD = d; break; }
-  T.asmD = 0.26; for (let d = 0.34; d > 0.15; d -= 0.005) { T.asmD = d; if ([0, 1, 2, 3].every((m) => { const p = asmPt(T, m); return ok([p[0], p[1] + 0.04, p[2]]) && ok([p[0], Math.max(safeY(T), p[1] + 0.04), p[2]]); }) && ok(pushPt(T))) return; }
+  T.asmD = 0.26; for (let d = 0.2; d > -0.02; d -= 0.005) { T.asmD = d; if (DEX.mod.some((M) => d + M.c[0] - M.e[0] / 2 < 0.006)) break; if ([0, 1, 2, 3].every((m) => { const p = asmPt(T, m); return ok([p[0], p[1] + 0.04, p[2]]) && ok([p[0], Math.max(safeY(T), p[1] + 0.04), p[2]]); })) return; }
   T.asmD = 0.26; DEX.reachMiss = (DEX.reachMiss || 0) + 1; }
 const faceX = (T) => -T.s.Lh / 2;
 
@@ -1084,7 +1086,7 @@ function steer(T, gx, gz, gh, dt, vmax = 0.09) { const dx = gx - T.x, dz = gz - 
   else { const k = Math.min(1, dt * 1.2); T.vx = lerp(T.vx, dx * 0.6, k); T.vz = lerp(T.vz, dz * 0.6, k); if (gh !== undefined) T.h = angLerp(T.h, gh, Math.min(1, dt * 1.5)); }
   const v = Math.hypot(T.vx, T.vz); if (v > vmax) { T.vx *= vmax / v; T.vz *= vmax / v; } T.x = clamp(T.x + T.vx * dt, -TX + 0.3, TX - 0.3); T.z = clamp(T.z + T.vz * dt, -TZ + 0.3, TZ - 0.3); return d; }
 const asmBase = (T) => [faceX(T) + (T.asmD ?? 0.26), waterY(T.s) - 0.02, 0];
-const asmPt = (T, m) => { const c = DEX.mod[m].c, b = asmBase(T); return [b[0] - c[2], b[1] + c[1], b[2] + c[0]]; };      // LIE_F applied to the module centre
+const asmPt = (T, m) => { const c = DEX.mod[m].c, b = asmBase(T); return [b[0] + c[0], b[1] + c[1], b[2] + c[2]]; };      // LIE_F applied to the module centre
 function jobStep(T, dt) { const J = T.job; J.t += dt; armStep(T, dt); const busy = T.arm.cur || T.arm.seg.length;
   if (J.st === "mod") { if (!DEX.mod) return;
     if (!J.tgt) { let best = null, bd = 1e9; for (const M of mods) { if (M.m !== J.m || M.claim || (M.st !== "float" && M.st !== "row")) continue; const d = Math.hypot(M.x - T.x, M.z - T.z); if (d < bd) { bd = d; best = M; } }
@@ -1101,24 +1103,33 @@ function jobStep(T, dt) { const J = T.job; J.t += dt; armStep(T, dt); const busy
     if ((J.tt = (J.tt || 0) + dt) > 60 && J.tgt && J.st === "mod") { J.tgt.claim = null; J.tgt = null; J.tt = 0; } }
   else if (J.st === "pull") { T.vx *= 1 - dt * 2; T.vz *= 1 - dt * 2; }
   else if (J.st === "toShell") { const S = J.shell; if (!S) { T.vx *= 1 - dt; T.vz *= 1 - dt; return; } S.hold = T;
-    const c = Math.cos(S.h), s = Math.sin(S.h), fx = S.x + c * S.s.Lt / 2, fz = S.z + s * S.s.Lt / 2, gap = 0.35, k = gap + T.s.Lt / 2, gh = S.h + Math.PI;
-    const e = steer(T, fx + c * k, fz + s * k, gh, dt); if (e < 0.03 && !busy) { J.st = "push"; J.u = 0; J.p0 = tL(S, tW(T, asmBase(T))); hop(T, pushPt(T), "mag", 1.2); armRest(T, 1.0); } }
+    const c = Math.cos(S.h), s = Math.sin(S.h), fx = S.x + c * S.s.Lt / 2, fz = S.z + s * S.s.Lt / 2, gap = 0.58, k = gap + T.s.Lt / 2, gh = S.h + Math.PI; J.ts = Math.min(1, (J.ts || 0) + dt / 6);
+    const e = steer(T, fx + c * k, fz + s * k, gh, dt); if (e < 0.03 && !busy && J.ts >= 1) { J.st = "push"; J.u = 0; const b = asmBase(T); J.p0 = tL(S, tW(T, [b[0] + ASM_OUT, b[1], b[2]])); } }
   else if (J.st === "push" || J.st === "stand" || J.st === "unfold") { T.vx = T.vz = 0; const S = J.shell; S.vx = S.vz = 0; J.u = Math.min(1, J.u + dt / (J.st === "push" ? 3 : J.st === "stand" ? 2.5 : 3));
     if (J.u >= 1) { if (J.st === "push") { J.st = "stand"; J.u = 0; dtag(() => tW(S, S.B0), "SEAT HINGE · ARM 2.4 KG (ROTRICS), BASE 1.4 KG, ESTIMATE"); flash(tW(S, S.B0), 0.8, 0.1, 3); log(`the base hooks the seat hinge; the arm stands up in the new tail`); }
       else if (J.st === "stand") { J.st = "unfold"; J.u = 0; S.arm = newArm(); S.armed = true; if (J.asm) { R3.sc.remove(J.asm); J.asm = null; } }
       else { S.arm.q = DREST.slice(); S.hold = null; T.job = null; S.made = true; tailsMade++; ripple(S.x, S.z, 0.8); log(`a new tail is whole: the arm unfolds and folds again; the new tail waits for a head`); } }
     if (J.st === "unfold" && S.arm) { const w = Math.sin(J.u * Math.PI); S.arm.q = [0, 0.7 * w, 85 * D2R * (1 - w) + 0.5 * w]; } } }
 // the half assembled arm, drawn with the module meshes where the modules sit in the folded pose
+// how far the assembled modules pass into the free tail through its open face, or, while pushed in and standing up, through the new tail's walls (kept in DEX.gap.asm, m)
+function asmPen(T) { const J = T.job, S = J.shell, inS = J.st === "push" || J.st === "stand"; let w = 0;
+  J.asm.mods.forEach((mm, i) => { if (!mm.visible) return; const p = DEX.mod[i].geo.attributes.position.array; _MB.copy(J.asm.matrix).multiply(_l.makeTranslation(mm.position.x, mm.position.y, mm.position.z));
+    for (let k = 0; k < p.length; k += 3 * 25) { _V.set(p[k], p[k + 1], p[k + 2]).applyMatrix4(_MB); const wv = [_V.x, _V.y, _V.z];
+      if (inS) { const q = tL(S, wv), f = q[0]; if (f < faceX(S) - 0.002) w = Math.max(w, penAt(S.s, true, f, q[1], q[2], 0)); }
+      else { const q = tL(T, wv), f = q[0]; if (f < faceX(T) && shellF(T.s, true, f, q[1], q[2]) < 1) w = Math.max(w, faceX(T) - f); } } });
+  const k = "asm " + J.st; DEX.gap[k] = Math.max(DEX.gap[k] || 0, w); }
 function asmDraw(T) { const J = T.job; if (!J || !DEX.mod || J.st === "unfold") return;
   if (!J.asm) { J.asm = new THREE.Group(); J.asm.matrixAutoUpdate = false; J.asm.mods = DEX.mod.map((d) => { const m = new THREE.Mesh(d.geo, DEX.mat); m.position.set(...d.c); m.renderOrder = 5; J.asm.add(m); return m; }); R3.sc.add(J.asm); }
   J.asm.mods.forEach((m, i) => { m.visible = i < J.have; const c = DEX.mod[i].c, t = simT - (J.snapT || -9); let d = 0;
     if (i === J.have - 1 && t < 0.9) d = t < 0.25 ? 0.002 * (1 - t / 0.25) : -0.0006 * Math.sin((t - 0.25) * 22) * Math.exp(-(t - 0.25) * 6);      // magnets close the last 2 mm, the latch clicks, a small spring back
     m.position.set(c[0], c[1] + d, c[2]); });
-  if (J.st === "push" || J.st === "stand") { const S = J.shell, u = sstep(0, 1, J.u), p = J.st === "push" ? lerp3(J.p0, S.B0.concat(0), u) : [S.B0[0], S.B0[1], 0];
+  if (J.st === "push" || J.st === "stand") { const S = J.shell, u = sstep(0, 1, J.u), lift = DEX.mod.reduce((m, M) => Math.max(m, M.c[1] + M.e[1] / 2), 0) + 0.006, p = J.st === "push" ? lerp3(J.p0, [S.B0[0], S.B0[1] + lift, 0], u) : [S.B0[0], S.B0[1] + lift * (1 - sstep(0.55, 1, J.u)), 0];      // lying on its side it is as tall as the base is wide: it slides in that high above the plate, and comes down onto the hinge as it stands up
     _QA.setFromRotationMatrix(LIE_S); _QB.setFromRotationMatrix(STAND); if (J.st === "stand") _QA.slerp(_QB, u); _MA.makeRotationFromQuaternion(_QA);
     J.asm.matrix.copy(frameW(S)).multiply(Tm(p)).multiply(_MA); }
+  else if (J.st === "toShell") { const t = J.ts || 0, b = asmBase(T); _QA.setFromRotationMatrix(LIE_F); _QB.setFromRotationMatrix(LIE_OUT); _QA.slerp(_QB, sstep(0.5, 1, t)); _MA.makeRotationFromQuaternion(_QA);
+    J.asm.matrix.copy(frameW(T)).multiply(Tm([b[0] + ASM_OUT * sstep(0, 0.5, t), b[1], b[2]])).multiply(_MA); }      // it floats forward, then turns lengthwise
   else J.asm.matrix.copy(frameW(T)).multiply(Tm(asmBase(T))).multiply(LIE_F);
-  J.asm.matrixWorldNeedsUpdate = true;
+  J.asm.matrixWorldNeedsUpdate = true; asmPen(T);
   if (J.st !== "stand") for (let i = 0; i < J.have; i++) collar(_MB.copy(J.asm.matrix).multiply(Tm(DEX.mod[i].c)), i); }
 // a foam collar: a pale ring at the waterline round a module lying on its side (the module's y is vertical)
 function collar(Mb, m) { const im = DEX.collars[m]; if (im.count < 160) im.setMatrixAt(im.count++, Mb); }
