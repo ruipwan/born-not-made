@@ -12,8 +12,6 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); 
 .view { position: relative; overflow: hidden; background: #000; }
 #c { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
 #c:active { cursor: grabbing; }
-.grain { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: overlay; opacity: .1; background-size: 160px 160px; }
-.vig { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 46%, rgb(0 0 0 / 0) 52%, rgb(0 0 0 / .62) 100%); }
 .cap { position: absolute; left: 16px; top: 12px; pointer-events: none; max-width: min(620px, calc(100% - 32px)); text-shadow: 0 0 6px #000; }
 .cap h1 { margin: 0; font: 400 26px/1.1 var(--serif); letter-spacing: -.01em; }
 .cap p { margin: 6px 0 0; color: #b9b8b2; font-size: 12px; }
@@ -51,11 +49,11 @@ html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
 <div class="app">
   <div class="view">
     <canvas id="c" aria-label="Many robots in one tank under small spot lights"></canvas>
-    <div class="grain" id="grain"></div><div class="vig"></div>
+    <canvas id="diag" style="position:absolute;inset:0;pointer-events:none"></canvas>
     <div id="labs"></div>
     <div class="cap"><h1>Society</h1><p>Small electronic parts float on the water, each at its true size in a thin collar. They are all there will ever be. Two robots that relate touch mouth to mouth. The one holding a tail carries. It plans what the next one should be able to do, swims to the parts it wants, and its arm lifts them in through the mouth. It prints the newborn head and sets the parts into its wall while printing, then pushes it out full size. The parts decide what each body can do.</p>
       <div class="hud" id="hud"></div></div>
-    <div class="views" id="views"><button data-cam="tank" class="on">Whole tank</button><button data-cam="follow">Follow</button><button data-cam="above">Above</button></div>
+    <div class="views" id="views"><button data-cam="film" class="on">Film</button><button data-cam="tank">Whole tank</button><button data-cam="follow">Follow</button><button data-cam="above">Above</button></div>
     <div class="ev" id="ev"></div>
   </div>
   <aside>
@@ -81,7 +79,7 @@ html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
       <h3>Function diversity, distinct kits</h3><canvas class="spark" id="sp3"></canvas>
       <h3>Mean tiles per body</h3><canvas class="spark" id="sp4"></canvas></div>
     <div><h3>Selected</h3><div id="insp" class="note">Click a robot in the tank.</div></div>
-    <div><h3>Rules</h3><p class="note">The parts are real small electronic parts at their true size. Core, Store and most Link and Sense parts are Bergsonne style tiles: sealed, on one pad layout and one I2C/I3C bus, T44 is 4 x 4 mm and T48 is 4 x 8 mm, 1 to 2 mm tall. Sense also has camera modules and MEMS microphones, Drive has coin and pager motors, Link has chip antennas, Power has LiPo pouch cells and coin cells, Display has single LEDs. Every part differs a little in size. Each floats in a thin pale collar 3 mm wider than the part on each side, just enough to keep it at the surface, and carries a small steel disc for the electromagnet. A part set into a wall pocket sits flush with the outer skin in a small clear printed window, drawn with a thin pale rim. Parts smaller than 8 mm are drawn at 8 mm so they can be seen; all others are drawn at true size, so from the whole tank they are nearly invisible. A fixed set is scattered on the water at the start and nothing arrives later; parts shed in swaps go back onto the water.</p>
+    <div><h3>Rules</h3><p class="note">The parts are real small electronic parts at their true size. Core, Store and most Link and Sense parts are Bergsonne style tiles: sealed, on one pad layout and one I2C/I3C bus, T44 is 4 x 4 mm and T48 is 4 x 8 mm, 1 to 2 mm tall. Sense also has camera modules and MEMS microphones, Drive has coin and pager motors, Link has chip antennas, Power has LiPo pouch cells and coin cells, Display has single LEDs. Every part differs a little in size. Each floats in a thin pale collar 3 mm wider than the part on each side, just enough to keep it at the surface, and carries a small steel disc for the electromagnet. A part set into a wall pocket sits flush with the outer skin in a small clear printed window, drawn with a thin pale rim. Parts smaller than 12 mm are drawn at 12 mm across so they can be seen; all others are drawn at true size, so from the whole tank they are nearly invisible. A fixed set is scattered on the water at the start and nothing arrives later; parts shed in swaps go back onto the water. Thin lines and small type mark the part a robot is going for, and soft lights mark eating, touching and placing; they are drawn for the viewer and are not in the tank. The Film camera cuts between the whole tank and what is happening at that moment.</p>
       <p class="note">The idea follows von Neumann's kinematic machine, which picks its parts from a lake of parts, and the digital materials of MIT's Center for Bits and Atoms, robots assembled from a small set of parts that join and come apart. It also follows Robot Metabolism, machines that grow by taking in parts from around them, and Print &amp; Place, where parts are set into a print while it is being made.</p>
       <p class="note">The arm has its base in the tail: a yaw joint turns its working plane toward the target, then two links and a short tool. At rest it lies folded on the floor of the head. A robot swims until the part is at its mouth, which sits at the waterline, and stops. The arm reaches out through the mouth, sets the magnet on the part, lifts it just clear of the water, draws it straight back along the body through the opening, and lays it on a rack on the floor of the head. Every mouth is at least wide enough for the largest part; where a genome's mouth would be smaller, the nose drops less and the snout widens. The arm plans each move so that it and what it holds stay inside the shell. Only a robot holding a tail can pick.</p>
       <p class="note">What the parts do. Core is needed to be alive, so no newborn is born without one. Power is needed too; a bigger cell holds more energy, and each extra Power lowers the idle drain. Sense sets how far it notices parts: 1 m with none, 0.6 m more for each. Drive sets swim speed. Link is a radio: robots with Link that relate share what they see and count each other from farther away. Store sets how many memory traces a body holds and passes on. Display is a small light, so others notice it a little more. Bodies charge in the pools of light.</p>
@@ -121,14 +119,14 @@ float causK(vec2 p, float t) { vec2 q = p * 2.6; float c = 0.0;
 
 function initThree() {
   const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true, powerPreference: "high-performance" });
-  r.setPixelRatio(Math.min(2, devicePixelRatio || 1)); r.outputEncoding = THREE.sRGBEncoding; r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.05;
-  r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFShadowMap; r.localClippingEnabled = true;
+  r.setPixelRatio(Math.min(2, devicePixelRatio || 1)); r.outputEncoding = THREE.LinearEncoding; r.toneMapping = THREE.NoToneMapping;      // ACES, bloom and the lens are applied in the last pass
+  r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.localClippingEnabled = true;
   const sc = new THREE.Scene(); sc.background = new THREE.Color(0x000000); sc.fog = new THREE.FogExp2(0x000000, 0.035);
   const cam = new THREE.PerspectiveCamera(30, 1, 0.05, 120); cam.position.set(0.9, 5.4, 13.8);
   const ctl = new THREE.OrbitControls(cam, cv); ctl.target.set(0, 0.0, 0); ctl.enableDamping = true; ctl.dampingFactor = 0.08; ctl.maxPolarAngle = Math.PI * 0.49; ctl.minDistance = 1.2; ctl.maxDistance = 26;
   Object.assign(R3, { r, sc, cam, ctl });
   // lights: nine small fixed spots straight down, a weak hemisphere for the room
-  R3.spots = LAMPS.map((L) => { const sp = new THREE.SpotLight(0xfff4e6, 1.55, 0, SPOT_A * 1.05, 0.85, 0); sp.position.copy(L); sp.target.position.set(L.x, 0, L.z);
+  R3.spots = LAMPS.map((L) => { const sp = new THREE.SpotLight(0xfff4e6, 1.05, 0, SPOT_A * 1.05, 0.85, 0); sp.position.copy(L); sp.target.position.set(L.x, 0, L.z);
     sc.add(sp); sc.add(sp.target); return sp; });
   // sixteen shadow maps would be too many; one soft light from straight above casts the shadows for all of them
   const sh = new THREE.DirectionalLight(0xfff4e6, 0.35); sh.position.set(0.3, 6, 0.4); sh.castShadow = true; sh.shadow.mapSize.set(2048, 2048);
@@ -136,9 +134,10 @@ function initThree() {
   R3.hemi = new THREE.HemisphereLight(0xc8d2da, 0x0a0a0a, 0.3); sc.add(R3.hemi);
   R3.fill = new THREE.DirectionalLight(0xdfe6ee, 0.2); R3.fill.position.set(-3, 6, 4); sc.add(R3.fill);
   buildRoom(); buildWater(); buildBeam(); buildRelLines(); buildParts(); R3.lampT = new THREE.Vector3();
+  cineInit(); buildLights(); buildDiagram();
   addEventListener("resize", resize); new ResizeObserver(resize).observe(cv.parentElement); resize();
 }
-function resize() { const b = cv.parentElement.getBoundingClientRect(); R3.r.setSize(b.width, b.height, false); cv.style.width = b.width + "px"; cv.style.height = b.height + "px"; R3.cam.aspect = b.width / Math.max(1, b.height); R3.cam.updateProjectionMatrix(); if (typeof camMode !== "undefined" && camMode === "tank" && !R3.moved) tankCam(); }
+function resize() { const b = cv.parentElement.getBoundingClientRect(); R3.r.setSize(b.width, b.height, false); const pr = R3.r.getPixelRatio(); cineTargets(Math.round(b.width * pr), Math.round(b.height * pr)); diagSize(b.width, b.height); cv.style.width = b.width + "px"; cv.style.height = b.height + "px"; R3.cam.aspect = b.width / Math.max(1, b.height); R3.cam.updateProjectionMatrix(); if (typeof camMode !== "undefined" && camMode === "tank" && !R3.moved) tankCam(); }
 function tankCam() { const k = Math.max(1, 1.2 / R3.cam.aspect); R3.cam.position.set(0.7 * k, 7.6 * k, 12.4 * k); R3.ctl.target.set(0, -0.4, 0); }
 
 /* a standard material that knows the waterline: darker and cooler below, a thin bright line at the surface */
@@ -165,11 +164,11 @@ vec3 bumpN(vec3 sp, vec3 n, vec2 dH, float fd) { vec3 sx = dFdx(sp), sy = dFdy(s
       fs = fs.replace("#include <color_fragment>", "#include <color_fragment>\n" + (opt.sil ? "diffuseColor.a = vSil.x;\n" : ""));
       fs = fs.replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\n" + (opt.sil ? "roughnessFactor = vSil.y;\n" : ""));
       fs = fs.replace("#include <normal_fragment_maps>", `#include <normal_fragment_maps>
-  float pH = printH(vObj, vTex); float fade = 1.0 - smoothstep(0.2, 0.55, fwidth(vObj.y / vTex.y) + fwidth(vObj.x / vTex.y));
+  float pH = printH(vObj, vTex); float fade = 1.0 - smoothstep(0.06, 0.22, fwidth(vObj.y / vTex.y) + fwidth(vObj.x / vTex.y));
   float hh = pH * vTex.z * fade; normal = bumpN(-vViewPosition, normal, vec2(dFdx(hh), dFdy(hh)), faceDirection);
-  diffuseColor.rgb *= 1.0 - 0.16 * (1.0 - pH) * fade * step(0.001, vTex.z);`);
+  diffuseColor.rgb *= 1.0 - 0.1 * (1.0 - pH) * fade * step(0.001, vTex.z);`);
     }
-    if (opt.caus) fs = fs.replace("#include <lights_fragment_end>", "#include <lights_fragment_end>\n reflectedLight.directDiffuse *= 0.45 + 1.25 * causK(vWP.xz, uTime) * step(vWP.y, uWL);");
+    if (opt.caus) fs = fs.replace("#include <lights_fragment_end>", "#include <lights_fragment_end>\n reflectedLight.directDiffuse *= 0.7 + 0.45 * causK(vWP.xz, uTime) * step(vWP.y, uWL);");
     let tail = `{ float dW = vWP.y - uWL; float fw = max(fwidth(dW), 1e-4);
       float und = smoothstep(0.002, -0.02, dW);
       gl_FragColor.rgb *= mix(vec3(1.0), vec3(0.50, 0.57, 0.62), und * (0.55 + 0.45 * smoothstep(0.0, 0.35, -dW)));
@@ -193,7 +192,7 @@ function buildRoom() {
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), std(0x2c2c2e, 0.9)); floor.rotation.x = -Math.PI / 2; floor.position.y = -PLINTH - GL; floor.receiveShadow = true; sc.add(floor);
   const pl = new THREE.Mesh(new THREE.BoxGeometry(2 * TX - 0.1, PLINTH - GL, 2 * TZ - 0.1), std(0x141416, 0.7)); pl.position.y = -GL - (PLINTH - GL) / 2; pl.castShadow = true; pl.receiveShadow = true; sc.add(pl);
   const base = new THREE.Mesh(new THREE.BoxGeometry(2 * TX + 2 * GL, GL, 2 * TZ + 2 * GL), std(0x121214, 0.8)); base.position.y = -GL / 2; sc.add(base);
-  const tf = new THREE.Mesh(new THREE.PlaneGeometry(2 * TX, 2 * TZ), waterAware(new THREE.MeshStandardMaterial({ color: 0x77777a, roughness: 0.92 }), { caus: true, line: "0.0" }));
+  const tf = new THREE.Mesh(new THREE.PlaneGeometry(2 * TX, 2 * TZ), waterAware(new THREE.MeshStandardMaterial({ color: 0x5c5c5f, roughness: 0.92 }), { caus: true, line: "0.0" }));
   tf.rotation.x = -Math.PI / 2; tf.position.y = 0.001; tf.receiveShadow = true; sc.add(tf);
   // glass: faint walls and bright edges
   const glass = new THREE.ShaderMaterial({ uniforms: Object.assign({}, U), transparent: true, depthWrite: false, side: THREE.DoubleSide,
@@ -233,13 +232,13 @@ function buildWater() {
         for (int i = 0; i < ${NL}; i++) { vec3 L = normalize(uLamps[i] - vW); vec3 H = normalize(L + V); float k = smoothstep(uCos.x, uCos.y, -normalize(vW - uLamps[i]).y); sp += pow(max(dot(n, H), 0.0), 600.0) * k * 9.0 + pow(max(dot(n, H), 0.0), 60.0) * k * 0.25; }
         float ring = 0.0; for (int i = 0; i < 10; i++) { vec4 r = uRip[i]; float age = uTime - r.z; if (age < 0.0 || age > 6.0) continue;
           float x = length(vW.xz - r.xy) - 0.35 * age; ring += r.w * exp(-x * x * 900.0) * exp(-age * 0.6); }
-        vec3 c = vec3(0.40, 0.47, 0.52) * (0.03 + 0.22 * s) + vec3(0.80, 0.86, 0.90) * fr * (0.12 + 0.35 * s) + vec3(1.0) * sp + vec3(0.7, 0.8, 0.86) * ring * (0.25 + s);
+        vec3 c = vec3(0.40, 0.47, 0.52) * (0.02 + 0.13 * s) + vec3(0.80, 0.86, 0.90) * fr * (0.07 + 0.24 * s) + vec3(1.0) * sp + vec3(0.7, 0.8, 0.86) * ring * (0.25 + s);
         gl_FragColor = vec4(c, clamp(0.10 + 0.42 * fr + 0.06 * s + sp + ring * 0.4, 0.0, 1.0));
         #include <tonemapping_fragment>
         #include <encodings_fragment>
       }` });
   const g = new THREE.PlaneGeometry(2 * TX, 2 * TZ, 1, 1); g.rotateX(-Math.PI / 2);
-  const w = new THREE.Mesh(g, m); w.position.y = WL; w.renderOrder = 10; R3.sc.add(w); R3.water = w;
+  const w = new THREE.Mesh(g, m); w.position.y = WL; w.renderOrder = 10; w.layers.enable(1); R3.sc.add(w); R3.water = w;
 }
 function buildBeam() {
   const geo = new THREE.ConeGeometry(1, 1, 64, 1, true); geo.translate(0, -0.5, 0);      // apex at the origin, opening downward
@@ -269,6 +268,70 @@ function buildRelLines() {
 const glowTex = (() => { const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d"), gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, "rgba(255,255,255,0.9)"); gr.addColorStop(0.25, "rgba(255,255,255,0.35)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
 function glow(color, size) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0 })); s.scale.setScalar(size); s.renderOrder = 15; return s; }
 
+/* ---------- the picture: as in the printing simulator, the scene is drawn in linear light into a multisampled target, then bloom, a gentle depth of field on close shots, ACES, a soft vignette and a trace of fine grain ---------- */
+const CINE = { rt: null, w: 0, h: 0, focus: 8, ap: 0 };
+const FSV = "varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }";
+function fsMat(fs, uniforms, extra = {}) { return new THREE.ShaderMaterial(Object.assign({ vertexShader: FSV, fragmentShader: fs, uniforms, depthTest: false, depthWrite: false }, extra)); }
+function cineInit() {
+  const C = CINE, r = R3.r; C.half = r.capabilities.isWebGL2 || r.extensions.has("OES_texture_half_float") ? THREE.HalfFloatType : THREE.UnsignedByteType;
+  C.fs = { scene: new THREE.Scene(), cam: new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1), mesh: new THREE.Mesh(new THREE.PlaneGeometry(2, 2)) }; C.fs.mesh.frustumCulled = false; C.fs.scene.add(C.fs.mesh);
+  C.depthMat = new THREE.MeshBasicMaterial({ colorWrite: false, side: THREE.DoubleSide });
+  C.dof = fsMat(`uniform sampler2D tColor; uniform sampler2D tDepth; uniform vec2 uPx; uniform float uFocus; uniform float uAp; uniform float uMaxR; uniform float uNear; uniform float uFar; varying vec2 vUv;
+float dist(vec2 uv) { float d = texture2D(tDepth, uv).x; return (uNear * uFar) / (uFar - d * (uFar - uNear)); }
+float coc(float z) { return clamp(uAp * abs(z - uFocus) / (z * uFocus), 0.0, 1.0) * uMaxR; }
+void main() { float zc = dist(vUv), cc = coc(zc); vec3 acc = texture2D(tColor, vUv).rgb; float tot = 1.0;
+  float a0 = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715)))) * 6.2831;
+  for (int i = 1; i <= 32; i++) { float fi = float(i); float r = sqrt(fi / 32.0) * uMaxR; float an = fi * 2.39996 + a0; vec2 uv = vUv + vec2(cos(an), sin(an)) * r * uPx;
+    float zs = dist(uv); float cs = coc(zs); if (zs > zc) cs = min(cs, cc * 2.0);
+    float m = smoothstep(r - 0.5, r + 0.5, cs); acc += mix(acc / tot, texture2D(tColor, uv).rgb, m); tot += 1.0; }
+  gl_FragColor = vec4(acc / tot, 1.0); }`, { tColor: { value: null }, tDepth: { value: null }, uPx: { value: new THREE.Vector2() }, uFocus: { value: 2 }, uAp: { value: 0.2 }, uMaxR: { value: 4 }, uNear: { value: 0.05 }, uFar: { value: 120 } });
+  C.pre = fsMat("uniform sampler2D tColor; uniform float uExp; varying vec2 vUv; void main() { vec3 c = min(texture2D(tColor, vUv).rgb * uExp, vec3(24.0)); float br = max(c.r, max(c.g, c.b)); float w = clamp(br - 0.85, 0.0, 0.7); w = w * w / 1.4; gl_FragColor = vec4(c * max(w, br - 1.2) / max(br, 1e-4), 1.0); }", { tColor: { value: null }, uExp: { value: 1 } });
+  C.down = fsMat("uniform sampler2D t; uniform vec2 hp; varying vec2 vUv; void main() { vec3 s = texture2D(t, vUv).rgb * 4.0 + texture2D(t, vUv - hp).rgb + texture2D(t, vUv + hp).rgb + texture2D(t, vUv + vec2(hp.x, -hp.y)).rgb + texture2D(t, vUv - vec2(hp.x, -hp.y)).rgb; gl_FragColor = vec4(s / 8.0, 1.0); }", { t: { value: null }, hp: { value: new THREE.Vector2() } });
+  C.up = fsMat("uniform sampler2D t; uniform vec2 hp; varying vec2 vUv; void main() { vec3 s = texture2D(t, vUv + vec2(-hp.x * 2.0, 0.0)).rgb + texture2D(t, vUv + vec2(-hp.x, hp.y)).rgb * 2.0 + texture2D(t, vUv + vec2(0.0, hp.y * 2.0)).rgb + texture2D(t, vUv + hp).rgb * 2.0 + texture2D(t, vUv + vec2(hp.x * 2.0, 0.0)).rgb + texture2D(t, vUv + vec2(hp.x, -hp.y)).rgb * 2.0 + texture2D(t, vUv + vec2(0.0, -hp.y * 2.0)).rgb + texture2D(t, vUv - hp).rgb * 2.0; gl_FragColor = vec4(s / 12.0, 1.0); }", { t: { value: null }, hp: { value: new THREE.Vector2() } }, { blending: THREE.AdditiveBlending, transparent: true });
+  C.fin = fsMat(`uniform sampler2D tColor; uniform sampler2D tBloom; uniform float uExp; uniform float uBloom; uniform float uVig; uniform float uGrainK; uniform float uT; uniform vec2 uRes; varying vec2 vUv;
+vec3 fit(vec3 v) { vec3 a = v * (v + 0.0245786) - 0.000090537; vec3 b = v * (0.983729 * v + 0.4329510) + 0.238081; return a / b; }
+vec3 aces(vec3 c) { c *= 1.0 / 0.6; c = mat3(0.59719, 0.07600, 0.02840, 0.35458, 0.90834, 0.13383, 0.04823, 0.01566, 0.83777) * c; c = fit(c); c = mat3(1.60475, -0.10208, -0.00327, -0.53108, 1.10813, -0.07276, -0.07367, -0.00605, 1.07602) * c; return clamp(c, 0.0, 1.0); }
+float h21(vec2 p) { vec3 q = fract(vec3(p.xyx) * 0.1031); q += dot(q, q.yzx + 33.33); return fract((q.x + q.y) * q.z); }
+void main() { vec2 cu = vUv - 0.5; float r2 = dot(cu * vec2(1.0, uRes.y / uRes.x * 1.25), cu * vec2(1.0, uRes.y / uRes.x * 1.25));
+  vec2 ca = cu * r2 * 0.003;
+  vec3 c = vec3(texture2D(tColor, vUv - ca).r, texture2D(tColor, vUv).g, texture2D(tColor, vUv + ca).b);
+  c = c * uExp + texture2D(tBloom, vUv).rgb * uBloom;
+  c *= 1.0 - uVig * smoothstep(0.08, 0.62, r2);
+  c = aces(c);
+  c = mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, c));
+  float g = (h21(gl_FragCoord.xy + floor(uT * 24.0) * 37.0) + h21(gl_FragCoord.xy * 0.5 + floor(uT * 24.0) * 11.0) - 1.0);
+  c += g * uGrainK * (0.35 + 0.65 * (1.0 - dot(c, vec3(0.33))));
+  gl_FragColor = vec4(c, 1.0); }`, { tColor: { value: null }, tBloom: { value: null }, uExp: { value: 0.72 }, uBloom: { value: 0.16 }, uVig: { value: 0.6 }, uGrainK: { value: 0.012 }, uT: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) } });
+}
+function cineTargets(w, h) {
+  const C = CINE, mk = (ww, hh, o = {}) => new THREE.WebGLRenderTarget(Math.max(2, Math.round(ww)), Math.max(2, Math.round(hh)), Object.assign({ type: C.half, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false }, o));
+  if (C.w === w && C.h === h) return;
+  if (C.rt) for (const t of [C.rt.scene, C.rt.dof, ...C.rt.bloom]) if (t) { if (t.depthTexture) t.depthTexture.dispose(); t.dispose(); }
+  const dt = new THREE.DepthTexture(w, h); dt.type = THREE.UnsignedIntType; dt.minFilter = dt.magFilter = THREE.NearestFilter;
+  const rt = { scene: mk(w, h, { depthBuffer: true, depthTexture: dt, samples: R3.r.capabilities.isWebGL2 && !C.low ? 4 : 0 }), dof: mk(w, h), bloom: [] };
+  for (let i = 0, bw = w / 2, bh = h / 2; i < 6 && bw > 8 && bh > 8; i++, bw /= 2, bh /= 2) rt.bloom.push(mk(bw, bh));
+  C.rt = rt; C.w = w; C.h = h;
+}
+function cinePass(mat, target) { const C = CINE; C.fs.mesh.material = mat; R3.r.setRenderTarget(target); R3.r.render(C.fs.scene, C.fs.cam); }
+function cineRender(now, dt) {
+  const C = CINE, r = R3.r, cam = R3.cam, sc = R3.sc, rt = C.rt; if (!rt) return;
+  r.setRenderTarget(rt.scene); r.render(sc, cam);
+  // the clear heads and the water write depth after the picture is drawn, so the depth of field takes them as surfaces
+  let src = rt.scene;
+  if (C.ap > 0.002 && !C.noDof) {
+    r.autoClear = false; cam.layers.set(1); sc.overrideMaterial = C.depthMat; const bg = sc.background; sc.background = null; r.render(sc, cam); sc.background = bg; sc.overrideMaterial = null; cam.layers.set(0); r.autoClear = true;
+    const u = C.dof.uniforms; u.tColor.value = rt.scene.texture; u.tDepth.value = rt.scene.depthTexture; u.uPx.value.set(1 / C.w, 1 / C.h); u.uFocus.value = C.focus; u.uAp.value = C.ap; u.uMaxR.value = 0.009 * C.h; u.uNear.value = cam.near; u.uFar.value = cam.far; cinePass(C.dof, rt.dof); src = rt.dof; }
+  const B = rt.bloom, exp = C.fin.uniforms.uExp.value;
+  C.pre.uniforms.tColor.value = src.texture; C.pre.uniforms.uExp.value = exp; cinePass(C.pre, B[0]);
+  for (let i = 1; i < B.length; i++) { C.down.uniforms.t.value = B[i - 1].texture; C.down.uniforms.hp.value.set(0.5 / B[i - 1].width, 0.5 / B[i - 1].height); cinePass(C.down, B[i]); }
+  r.autoClear = false; for (let i = B.length - 2; i >= 0; i--) { C.up.uniforms.t.value = B[i + 1].texture; C.up.uniforms.hp.value.set(0.5 / B[i + 1].width, 0.5 / B[i + 1].height); cinePass(C.up, B[i]); } r.autoClear = true;
+  const f = C.fin.uniforms; f.tColor.value = src.texture; f.tBloom.value = B[0].texture; f.uT.value = now; f.uRes.value.set(C.w, C.h);
+  cinePass(C.fin, null);
+  // if frames come slowly, first drop the depth of field, then render at a lower pixel ratio without multisampling
+  C.n = (C.n || 0) + 1; C.acc = (C.acc || 0) + dt; if (C.n >= 40) { const ft = C.acc / C.n; C.n = 0; C.acc = 0;
+    if (ft > 0.045 && !C.noDof) C.noDof = true; else if (ft > 0.06 && !C.low) { C.low = true; R3.r.setPixelRatio(1); C.w = 0; resize(); } }
+}
+
 /* ---------- bodies: the simplified design, round 7: a blunt rounded tail holding the arm, and a clear head that narrows in a curve to a small slanted nose ---------- */
 // genome g[0..8] in 0..1. Every printed form differs a little; all are about the same size.
 const GENES = 19;
@@ -279,11 +342,12 @@ function shapeOf0(g) {
   const k = 0.6 / (Lh + Lt + Ln);
   return { Lh: Lh * k, A: A * k, B: B * k, n: 1.9 + 3.6 * g[3], As: (0.35 + 0.45 * g[5]) * A * k, q: 1.1 + 2.6 * g[4], Ln: Ln * k, Lt: Lt * k, tp: 1.5 + 3.5 * g[7], drop: -(0.03 * g[2] - 0.01) * k, R: (0.04 + 0.05 * g[6]) * k,
     // printed features: rings around the body, a crest along the back, a lobed section, clay tone
-    ribN: 2 + Math.floor(g[9] * 6), ribD: g[9] > 0.35 ? 0.03 + 0.06 * (g[9] - 0.35) / 0.65 : 0,
-    crest: g[10] > 0.5 ? (0.02 + 0.1 * (g[10] - 0.5) * 2) * k : 0, fin: g[11] > 0.45 ? 0.25 + 1.1 * (g[11] - 0.45) / 0.55 : 0,
-    lobeN: 3 + Math.floor(g[12] * 4), lobeD: g[12] > 0.4 ? 0.03 + 0.06 * (g[12] - 0.4) / 0.6 : 0, tone: 0.72 + 0.28 * g[13],
+    // relief is kept to a whisper: the bodies are two smooth rounded segments, as in the newest simulators
+    ribN: 2 + Math.floor(g[9] * 6), ribD: g[9] > 0.35 ? 0.004 + 0.006 * (g[9] - 0.35) / 0.65 : 0,
+    crest: 0, fin: 0,
+    lobeN: 3 + Math.floor(g[12] * 4), lobeD: g[12] > 0.4 ? 0.003 + 0.005 * (g[12] - 0.4) / 0.6 : 0, tone: 0.72 + 0.28 * g[13],
     // print texture: pattern (layers, spiral, crosshatch, waves, dimples, smooth), pitch, ridge depth, angle; silicone opacity and frost
-    tex: [Math.min(5, Math.floor(g[14] * 6)), 0.006 + 0.014 * g[15], g[16] < 0.15 ? 0 : 0.0008 + 0.0025 * g[16], 0.3 + 0.9 * g[17]], sil: [0.32 + 0.4 * g[18], 0.25 + 0.6 * (1 - g[18]) * 0.9 + 0.1 * g[16], 0, 0], nb: 0.45, nd: 0.45 };
+    tex: [Math.min(5, Math.floor(g[14] * 6)), 0.006 + 0.014 * g[15], g[16] < 0.15 ? 0 : 0.00012 + 0.00035 * g[16], 0.3 + 0.9 * g[17]], sil: [0.32 + 0.4 * g[18], 0.25 + 0.6 * (1 - g[18]) * 0.9 + 0.1 * g[16], 0, 0], nb: 0.45, nd: 0.45 };
 }
 // a minimum mouth: the opening must pass the largest part in its collar, held just clear of the water, with the arm's tool above it.
 // If a genome's mouth is too small, the nose drops less and then the snout widens, until it fits.
@@ -324,7 +388,7 @@ function bodyGeometry(s, tail) {
   const xmin = st[0].x, xmax = S.x;
   for (let i = 0; i < pos.length / 3; i++) { const x = pos[i * 3], y = pos[i * 3 + 1], z = pos[i * 3 + 2], th = ang[i * 2], k = ang[i * 2 + 1];
     const zc = k >= 0 ? st[k].zc : S.zc, ry = y - zc, rl = Math.hypot(ry, z) || 1, env = sstep(xmin, xmin + 0.08, x) * (k >= 0 ? 1 : 0);
-    const w = (0.07 * Math.sin(th * 5 + x * 22) + 0.045 * Math.sin(x * 38 - th * 3) + 0.03 * Math.sin(th * 11 + x * 9)) * env;
+    const w = (0.022 * Math.sin(th * 5 + x * 22) + 0.014 * Math.sin(x * 38 - th * 3) + 0.01 * Math.sin(th * 11 + x * 9)) * env;      // thin fine folds that vanish as it fills
     wr.push(x * 0.4, (zc + ry * (1 + w)) * 0.44, z * (1 + w) * 0.44); }
   const tmp = new THREE.BufferGeometry(); tmp.setAttribute("position", new THREE.Float32BufferAttribute(wr, 3)); tmp.setIndex(all); tmp.computeVertexNormals();
   g.morphAttributes.position = [tmp.getAttribute("position")]; g.morphAttributes.normal = [tmp.getAttribute("normal")];
@@ -333,7 +397,7 @@ function bodyGeometry(s, tail) {
 }
 function bodyMesh(r) {
   const geo = bodyGeometry(r.s, r.tail), m = new THREE.Mesh(geo, [MAT.clay, MAT.shell, MAT.mouth]);
-  m.castShadow = true; m.receiveShadow = false; m.updateMorphTargets(); m.userData.robot = r; m.renderOrder = 5; return m;
+  m.castShadow = true; m.receiveShadow = false; m.updateMorphTargets(); m.userData.robot = r; m.renderOrder = 5; m.layers.enable(1); return m;
 }
 
 /* ---------- parts: real electronic parts at their true size, each in a thin floating collar ---------- */
@@ -342,7 +406,7 @@ function bodyMesh(r) {
 const FAM = ["Core", "Sense", "Drive", "Link", "Power", "Store", "Display"], FC = 0, FS = 1, FD = 2, FL = 3, FP = 4, FT = 5, FY = 6;
 const SUBS = ["motion", "pressure", "light", "touch", "environment"];
 const START_W = [0, 0.2, 0.17, 0.14, 0.27, 0.1, 0.12];          // the mix of families at the start, after the Core parts
-const KIT = 6, MAXF = 700, NLAY = 80, COLLAR = 0.003, VMIN = 0.008, WALL = 0.004;     // collar: 3 mm each side; parts under 8 mm are drawn at 8 mm; the printed wall is 4 mm
+const KIT = 6, MAXF = 700, NLAY = 80, COLLAR = 0.003, VMIN = 0.012, WALL = 0.004;     // collar: 3 mm each side; parts under 12 mm are drawn at 12 mm; the printed wall is 4 mm
 const SUB_T = 10, GO_T = 16, GIVEUP_T = 200;                 // foraging: substitutes after 10 s, go with Core and Power after 16 s, give up after 200 s without them
 const REST = [-0.06, Math.PI - 0.12, 0, 0];                  // the arm at rest: folded flat along the floor of the head, base in the tail
 const COL = { tile: 0x151516, chip: 0x1d1d1e, lipo: 0xb4b4b6, coin: 0x8c8c8e, motor: 0x9a9a9c, led: 0xf2f1ec, lens: 0x050505, collar: 0xe4e2dc };
@@ -392,7 +456,7 @@ function buildParts() {
 /* ---------- the society ---------- */
 const SEED = ["slow tide", "three pulses", "an open ring", "light above", "the low pump"];
 const LEX = ["salt", "current", "fold", "glass", "echo", "shadow", "warmth", "valve", "pressure", "silt", "hum", "drift"];
-let loose = [], robots = [], floats = [], nextId = 1, fid = 1, simT = 0, speed = 1, running = true, broadcast = null, selected = null, events = [], births = 0, picks = 0, swaps = 0, ripI = 0, camMode = "tank", showRel = true, armWorst = 0;
+let loose = [], robots = [], floats = [], nextId = 1, fid = 1, simT = 0, speed = 1, running = true, broadcast = null, selected = null, events = [], births = 0, picks = 0, swaps = 0, ripI = 0, camMode = "film", showRel = true, armWorst = 0;
 const hist = { pop: [], parts: [], div: [], tiles: [] };
 const pickable = [];
 const kitN = (kit) => { const n = [0, 0, 0, 0, 0, 0, 0]; for (const t of kit) n[t.f]++; return n; };
@@ -565,11 +629,11 @@ function pocketTip(q, p) { const k = 0.002 + p.h / 2 + (p.col ? 0.002 : 0); retu
 const pocketIn = (q) => q.ledge ? [q.x, q.y + 0.03, q.z] : [q.x - q.n[0] * 0.035, q.y - q.n[1] * 0.035, q.z - q.n[2] * 0.035];
 // a pick: reach out through the mouth, magnet down onto the part, lift it just clear of the water, draw it straight back along the body through the mouth, then onto the rack (or into the skin, in a swap)
 function startPick(r, F) {
-  const own = !r.forage, pp = F.p; F.st = "wait"; F.claim = r; r.pick = { F, own, slot: own ? r.selfSlot : r.nk.length }; if (r.forage) r.forage.tgt = null; r.self = null; r.vx = r.vz = 0;
+  const own = !r.forage, pp = F.p; F.st = "wait"; F.claim = r; r.pickT0 = simT; r.pick = { F, own, slot: own ? r.selfSlot : r.nk.length }; if (r.forage) r.forage.tgt = null; r.self = null; r.vx = r.vz = 0;
   const s = r.s, fr = reach(r), w = waterY(s), L = Math.max(pp.l, VMIN), xo = fr + 0.006 + L / 2 + COLLAR, yC = w + 0.0015 + pp.h + 0.002, yL = w + 0.008 + pp.h, xi = s.Lh / 2 - 0.03 - L / 2;
   seg(r, { p: [fr - 0.04, yL, 0], rng: H_RNG, dur: 0.6, tool: "mag" });
   seg(r, { p: [xo, yL, 0], rng: H_RNG, dur: 0.35 });
-  seg(r, { p: [xo, yC, 0], rng: H_RNG, dur: 0.2, hold: F, fn: () => { F.st = "held"; ripple(F.x, F.z, 0.12); } });
+  seg(r, { p: [xo, yC, 0], rng: H_RNG, dur: 0.2, hold: F, fn: () => { F.st = "held"; r.pickHoldT = simT; ripple(F.x, F.z, 0.5); flash([F.x, WL + 0.01, F.z], 0.5, 0.09, 3.5); } });      // magnet on: a small bright pulse, and a ring in the water where the part was
   seg(r, { p: [xo, yL, 0], rng: H_RNG, dur: 0.2 });
   seg(r, { p: [xi, yL, 0], rng: H_RNG, dur: 0.4 });
   if (own) { const q = r.pk[r.pick.slot], rg = pocketRng(r, q);
@@ -582,7 +646,7 @@ function startPick(r, F) {
     seg(r, { p: [fr - 0.04, yL, 0], rng: H_RNG, dur: 0.4 });
   } else { const rp = rackPos(r, r.nk.length, pp), top = rp[1] + 0.0015 + 0.002 + pp.h + 0.002;
     seg(r, { p: [rp[0], top + 0.015, rp[2]], rng: H_RNG, dur: 0.35 });
-    seg(r, { p: [rp[0], top, rp[2]], rng: H_RNG, dur: 0.25, hold: null, fn: () => { const t = Object.assign({}, pp, { col: true }); r.nk.push(t); r.nkn = kitN(r.nk); const fi = floats.indexOf(F); if (fi >= 0) floats.splice(fi, 1); picks++; r.pick = null;
+    seg(r, { p: [rp[0], top, rp[2]], rng: H_RNG, dur: 0.25, hold: null, fn: () => { const t = Object.assign({}, pp, { col: true }); r.nk.push(t); { const ii = r.nk.length - 1; flash(() => { const q = rackPos(r, ii); return worldOf(r, [q[0], q[1] + 0.01, q[2]]); }, 1.8, 0.06, 1.5); } r.nkn = kitN(r.nk); const fi = floats.indexOf(F); if (fi >= 0) floats.splice(fi, 1); picks++; r.pick = null;
       log(`#${r.id} eats ${FAM[t.f]}, ${t.name} ${partDims(t)}, for the next one, ${r.nk.length} of ${r.plan.length}`); } });
   }
   armRest(r, 0.6);
@@ -591,7 +655,7 @@ const armRest = (r, dur, fn) => r.arm.q.push({ rest: true, dur, fn });
 // self improvement is a swap: a body has one pocket per part built into it, so it cuts one out and sets the new one in its place; the shed part leaves through the mouth on the same collar
 function swapIn(r, F) { const i = r.pick.slot, old = r.kit[i], t = Object.assign({}, F.p, { col: false }), kit = r.kit.slice(); kit[i] = t; setKit(r, kit); r.need[t.f] = 0;
   F.p = Object.assign({}, old, { col: false }); F.f = old.f; F.rad = Math.hypot(Math.max(old.l, VMIN), Math.max(old.w, VMIN)) / 2 + COLLAR; F.shedBy = r.id; F.shedT = simT + 90; swaps++; picks++;
-  r.swapT = simT; r.swapTxt = `${FAM[old.f]} for ${FAM[t.f]}`; log(`#${r.id} swaps: cuts ${FAM[old.f]} (${old.name}) out of its body and sets ${FAM[t.f]} (${t.name}) in its place`); }
+  r.swapT = simT; r.swapTxt = `${FAM[old.f]} for ${FAM[t.f]}`; F.glowT = simT; { const q = r.pk[i]; flash(() => worldOf(r, [q.x, q.y, q.z]), 1.5, 0.06, 1.8); } log(`#${r.id} swaps: cuts ${FAM[old.f]} (${old.name}) out of its body and sets ${FAM[t.f]} (${t.name}) in its place`); }
 // the part a body can shed for family f: never Core, never its only Power, the one it needs least
 function swapSlot(r, f) { let best = -1, bv = 1e9; r.kit.forEach((t, i) => { if (t.f === f || t.f === FC || (t.f === FP && r.kn[FP] < 2)) return; const v = r.need[t.f] + (r.kn[t.f] === 1 ? 0.25 : 0); if (v < bv) { bv = v; best = i; } }); return [best, bv]; }
 // print and place: the head is printed bottom up; at the layer of each pocket the print pauses, the arm takes the part from the rack and sets it into the wall, or onto the inner ledge
@@ -603,7 +667,7 @@ function pauseAndPlace(r, i) {
   seg(r, { p: [rp[0], top, rp[2]], rng: DOWN, dur: 0.15, hold: t });
   seg(r, { p: [rp[0], top + 0.015, rp[2]], rng: DOWN, dur: 0.15 });
   seg(r, { p: [bp[0], bp[1] + 0.015 + t.h, bp[2]], rng: DOWN, dur: 0.4 });
-  seg(r, { p: [bp[0], bp[1] + 0.004 + t.h / 2, bp[2]], rng: DOWN, dur: 0.2, hold: null, fn: () => { t.inBaby = true; r.paused = false; sp.next++; log(`#${r.id} pauses the print at layer ${L} of ${NLAY} and sets ${FAM[t.f]}, ${t.name}, ${q.ledge ? "on the inner ledge" : "into the wall"}`); } });
+  seg(r, { p: [bp[0], bp[1] + 0.004 + t.h / 2, bp[2]], rng: DOWN, dur: 0.2, hold: null, fn: () => { t.inBaby = true; r.paused = false; sp.next++; flash(() => worldOf(r, babyPt(r, q)), 1.4, 0.07, 2.2); log(`#${r.id} pauses the print at layer ${L} of ${NLAY} and sets ${FAM[t.f]}, ${t.name}, ${q.ledge ? "on the inner ledge" : "into the wall"}`); } });
 }
 
 function conceive(bearer, other) {
@@ -891,7 +955,7 @@ function updateScene(dtReal) {
       if (hd && hd.st === "held") { heldCenter(A.a, tip, Object.assign({ col: true }, hd.p), HC2); _p.set(HC2[0], HC2[1], HC2[2]).applyMatrix4(M); hd.x = _p.x; hd.z = _p.z; hd.y = _p.y; hd.h = -r.h; }
       else if (hd) { heldCenter(A.a, tip, hd, HC2); drawPart(frameAt(M, HC2[0], HC2[1], HC2[2], 0), hd, hd.col); }
     }
-    const gI = r.carry ? (0.35 + 0.25 * Math.sin(t * 3 + r.id)) * Math.min(1, r.carry * 6) * (r.birthT ? 1.6 : 1) : touching ? 0.25 + 0.2 * Math.sin(t * 6) : 0;
+    const gI = r.carry ? (0.25 + 0.15 * Math.sin(t * 3 + r.id)) * Math.min(1, r.carry * 6) * (r.birthT ? 2 : 1) : 0;
     r.glow.material.opacity = lerp(r.glow.material.opacity, gI, Math.min(1, dtReal * 4)); r.glow.visible = r.glow.material.opacity > 0.01;
     r.glow.position.set(touching ? reach(r) : 0, -0.02, 0); r.glow.scale.setScalar(touching ? 0.35 : 0.55);
   }
@@ -913,10 +977,10 @@ function updateScene(dtReal) {
   const f = focus; tgtV.set(0, 0, 0);
   if (f) { tgtV.set(f.x, 0, f.z); if (f.phase === "touch" && f.pair) tgtV.set((f.x + f.pair.x) / 2, 0, (f.z + f.pair.z) / 2); }
   R3.lampT.lerp(tgtV, Math.min(1, dtReal * 0.9));
-  R3.hemi.intensity = 0.04 + 0.5 * P.room; R3.fill.intensity = 0.3 * P.room;
+  R3.hemi.intensity = 0.02 + 0.32 * P.room; R3.fill.intensity = 0.2 * P.room;
   // relations, drawn at the waterline
   const pa = R3.rel.geometry.attributes.position.array, ca = R3.rel.geometry.attributes.color.array; let n = 0; const cap = pa.length / 6;
-  if (showRel && camMode !== "follow") for (const r of robots) { let o = null, v = 0.5; for (const [q, w2] of r.relTo) { if (w2 > v && Math.hypot(q.x - r.x, q.z - r.z) < 1.5) { o = q; v = w2; } }      // each robot to the one it relates to most
+  if (showRel && camMode !== "follow" && camMode !== "film") for (const r of robots) { let o = null, v = 0.5; for (const [q, w2] of r.relTo) { if (w2 > v && Math.hypot(q.x - r.x, q.z - r.z) < 1.5) { o = q; v = w2; } }      // each robot to the one it relates to most
     if (!o || n >= cap) continue; const d = Math.hypot(o.x - r.x, o.z - r.z), a = (0.25 + (v - 0.5) * 1.2) * (1 - d / 1.5);
     pa.set([r.x, WL + 0.004, r.z, o.x, WL + 0.004, o.z], n * 6); ca.set([a, a, a, a, a, a], n * 6); n++; }
   R3.rel.geometry.setDrawRange(0, n * 2); R3.rel.geometry.attributes.position.needsUpdate = true; R3.rel.geometry.attributes.color.needsUpdate = true;
@@ -933,7 +997,6 @@ function labels() {
     if (r.phase === "touch" && r.pair && r.id < r.pair.id) put((r.x + r.pair.x) / 2, WL + 0.42, (r.z + r.pair.z) / 2, `touch · #${r.id} #${r.pair.id}`);
     else if (r.birthT) put(r.x, WL + 0.45, r.z, `birth · #${r.id}`);
     else if (r.swapT && simT - r.swapT < 5) put(r.x, WL + (fol ? 0.24 : 0.42), r.z, `swap · ${r.swapTxt}`);
-    else if (near && r.pick) put(r.x, WL + 0.24, r.z, `pick · ${FAM[r.pick.F.f >= 0 ? r.pick.F.f : r.nk.length ? r.nk[r.nk.length - 1].f : FC]}`);
     else if (near && r.carry) put(r.x, WL + 0.26, r.z, r.paused ? `pause · set ${FAM[r.arm.hold ? r.arm.hold.f : r.nk[r.babySpec.order[r.babySpec.next]]?.f ?? 0]}` : r.carry < 0.75 ? `printing ${Math.round(r.carry / 0.75 * 100)}%` : "air in");
     else if (near && r === focus && r.forage) put(r.x, WL + 0.24, r.z, r.forage.tgt ? `foraging · ${r.nk.length} of ${r.plan.length}` : "searching");
     else if (fol && !r.adult && r.age < 6) put(r.x, WL + 0.35, r.z, `newborn · #${r.id}`);
@@ -973,22 +1036,115 @@ function inspect() {
     <dt>body</dt><dd>${mm(r.len)} × ${mm(2 * r.s.A)} × ${mm(2 * r.s.B)} mm</dd><dt>relations</dt><dd>${r.rel}</dd><dt>energy</dt><dd>${r.energy.toFixed(2)}</dd>
     <dt>memory</dt><dd>${r.memory.map((m) => esc(m.t) + " (" + m.w.toFixed(2) + ")").join(", ") || "none"}</dd></dl>`;
 }
-// grain, as in the printing simulator
-const grainTiles = Array.from({ length: 4 }, () => { const c = document.createElement("canvas"); c.width = c.height = 160; const g = c.getContext("2d"), im = g.createImageData(160, 160); for (let i = 0; i < im.data.length; i += 4) { const v = 128 + (rnd() - 0.5) * 255; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; } g.putImageData(im, 0, 0); return `url(${c.toDataURL()})`; });
+
+/* ---------- light cues: small soft lights drawn in linear light, so the bloom of the last pass carries them ---------- */
+const LT = { list: [], N: 600 };
+function buildLights() {
+  const g = new THREE.BufferGeometry(), N = LT.N; g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(N * 3), 3)); g.setAttribute("aSize", new THREE.BufferAttribute(new Float32Array(N), 1)); g.setAttribute("aK", new THREE.BufferAttribute(new Float32Array(N), 1));
+  const m = new THREE.ShaderMaterial({ uniforms: { uScale: { value: 500 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    vertexShader: "attribute float aSize; attribute float aK; uniform float uScale; varying float vK; void main() { vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mv; gl_PointSize = max(1.0, aSize * uScale / -mv.z); vK = aK; }",
+    fragmentShader: "varying float vK; void main() { vec2 c = gl_PointCoord - 0.5; float d = length(c) * 2.0; if (d > 1.0) discard; float a = exp(-d * d * 6.0) * (1.0 - d) + 0.6 * exp(-d * d * 60.0); gl_FragColor = vec4(vec3(1.0, 0.97, 0.92) * vK * a, 1.0); }" });
+  LT.pts = new THREE.Points(g, m); LT.pts.frustumCulled = false; LT.pts.renderOrder = 40; R3.sc.add(LT.pts);
+}
+const worldOf = (r, p) => { _p.set(p[0], p[1], p[2]).applyMatrix4(r.grp.matrix); return [_p.x, _p.y, _p.z]; };
+// a brief light at a place, or following a thing: at(t) gives the world position
+function flash(at, dur, size, k) { LT.list.push({ at, t0: simT, dur, size, k }); }      // in simulation time, so the cues keep pace at 3x and 8x
+function updateLights() {
+  const t = simT, a = LT.pts.geometry.attributes, P = a.position.array, S = a.aSize.array, K = a.aK.array; let n = 0;
+  const put = (x, y, z, sz, k) => { if (n >= LT.N || k < 0.01) return; P[n * 3] = x; P[n * 3 + 1] = y; P[n * 3 + 2] = z; S[n] = sz; K[n] = k; n++; };
+  LT.list = LT.list.filter((L) => t - L.t0 < L.dur);
+  for (const L of LT.list) { const u = (t - L.t0) / L.dur, p = typeof L.at === "function" ? L.at() : L.at; if (p) put(p[0], p[1], p[2], L.size, L.k * Math.sin(Math.PI * Math.min(1, u * 4)) * (1 - u) * 1.6); }
+  // a part glows softly while a robot swims to it, and its light travels with it while the arm holds it
+  for (const r of robots) { const T = r.pick && r.pick.F.st === "wait" ? r.pick.F : r.forage ? r.forage.tgt : r.self; if (T && T.claim === r) put(T.x, WL + 0.006, T.z, 0.06, 0.9 + 0.35 * Math.sin(t * 2.2 + T.id));
+    const hd = r.tail && r.arm.hold; if (hd && hd.st === "held") put(hd.x, hd.y, hd.z, 0.07, 1.6); else if (hd) { const q = r.arm, P2 = armPts(r, q.a, PT2); const w = worldOf(r, [P2[9], P2[10], P2[11]]); put(w[0], w[1], w[2], 0.06, 1.4); }
+    // two that touch flash together, a few slow blinks in both heads, readable from the wide shot
+    if (r.phase === "touch" && r.pair && r.id < r.pair.id) { const b = Math.pow(Math.max(0, Math.sin(r.phaseT * Math.PI * 1.4)), 3) * 2.6 + 0.25;
+      for (const q of [r, r.pair]) { const w = worldOf(q, [0, 0.02, 0]); put(w[0], w[1], w[2], 0.42, b); } } }
+  for (const F of floats) if (F.glowT && simT - F.glowT < 5) put(F.x, F.st === "held" ? F.y : WL + 0.006, F.z, 0.07, 1.4 * (1 - (simT - F.glowT) / 5));       // a shed part glows as it leaves
+  a.position.needsUpdate = a.aSize.needsUpdate = a.aK.needsUpdate = true; LT.pts.geometry.setDrawRange(0, n);
+  LT.pts.material.uniforms.uScale.value = CINE.h / (2 * Math.tan(R3.cam.fov * Math.PI / 360));
+}
+
+/* ---------- the diagram: thin lines and small type over the picture, like an architectural drawing, for parts being eaten ---------- */
+const DG = {};
+function buildDiagram() { DG.cv = $("#diag"); DG.g = DG.cv.getContext("2d"); }
+function diagSize(w, h) { const D = Math.min(2, devicePixelRatio || 1); DG.cv.width = w * D; DG.cv.height = h * D; DG.cv.style.width = w + "px"; DG.cv.style.height = h + "px"; DG.D = D; DG.w = w; DG.h = h; }
+const scr = (x, y, z) => { tmpV.set(x, y, z).project(R3.cam); return tmpV.z < 1 ? [(tmpV.x + 1) / 2 * DG.w, (1 - tmpV.y) / 2 * DG.h] : null; };
+const shortDims = (p) => p.sh === "disc" ? `${MM(p.l)} mm across` : `${MM(p.l)} × ${MM(p.w)} mm`;
+function drawDiagram() {
+  const g = DG.g; g.setTransform(DG.D, 0, 0, DG.D, 0, 0); g.clearRect(0, 0, DG.w, DG.h); if (camMode === "above") return;
+  g.font = '500 10px "JetBrains Mono", monospace'; g.textBaseline = "middle";
+  const cp = R3.cam.position;
+  for (const r of robots) { const F = r.pick ? r.pick.F : r.forage ? r.forage.tgt : r.self; if (!F || F.claim !== r && !r.pick) continue;
+    const dc = Math.hypot(F.x - cp.x, WL - cp.y, F.z - cp.z); if (dc > 5.5) continue;
+    let pp = 0; if (r.pick && r.pickHoldT > r.pickT0) pp = clamp((simT - r.pickHoldT) / 1.2, 0, 1);      // the ring closes into the mouth once the magnet holds the part if (pp >= 1) continue;
+    const fr = reach(r), m = worldOf(r, [fr, waterY(r.s) + 0.01, 0]), ms = scr(m[0], m[1], m[2]), ps0 = scr(F.x, F.st === "held" ? F.y : WL + 0.004, F.z); if (!ms || !ps0) continue;
+    const ps = [lerp(ps0[0], ms[0], sstep(0, 1, pp)), lerp(ps0[1], ms[1], sstep(0, 1, pp))], al = (1 - 0.6 * Math.max(0, dc - 3.5) / 2) * (1 - pp);
+    const size = Math.max(F.p.l, VMIN) / dc * DG.h * 0.95, R = Math.max(7, size) * (1 - 0.85 * pp) + 1;
+    g.strokeStyle = `rgba(236,235,230,${0.75 * al})`; g.fillStyle = `rgba(236,235,230,${0.9 * al})`; g.lineWidth = 0.75;
+    // a dotted arc from the mouth to the part
+    const dx = ps[0] - ms[0], dy = ps[1] - ms[1], L = Math.hypot(dx, dy); if (L > R + 4) { const cx = (ms[0] + ps[0]) / 2 - dy * 0.18, cy = (ms[1] + ps[1]) / 2 + dx * 0.18 - L * 0.12, k = R / L;
+      g.setLineDash([1.5, 3]); g.beginPath(); g.moveTo(ms[0], ms[1]); g.quadraticCurveTo(cx, cy, lerp(ps[0], cx, k), lerp(ps[1], cy, k)); g.stroke(); g.setLineDash([]); }
+    // a ring and four ticks round the part
+    g.beginPath(); g.arc(ps[0], ps[1], R, 0, Math.PI * 2); g.stroke();
+    for (let i = 0; i < 4; i++) { const an = i * Math.PI / 2 + Math.PI / 4; g.beginPath(); g.moveTo(ps[0] + Math.cos(an) * (R + 2), ps[1] + Math.sin(an) * (R + 2)); g.lineTo(ps[0] + Math.cos(an) * (R + 6), ps[1] + Math.sin(an) * (R + 6)); g.stroke(); }
+    g.beginPath(); g.arc(ms[0], ms[1], 1.6, 0, Math.PI * 2); g.fill();
+    // the tag: family and true size, on a short leader
+    if (al > 0.05) { const tx = ps[0] + R + 14, ty = ps[1] - R - 12; g.beginPath(); g.moveTo(ps[0] + (R + 2) * 0.72, ps[1] - (R + 2) * 0.72); g.lineTo(tx - 4, ty); g.lineTo(tx + 2, ty); g.stroke();
+      g.fillText(`${FAM[F.p.f]} · ${F.p.kind === "tile" ? "tile" : F.p.name} ${shortDims(F.p)}`.toUpperCase(), tx + 5, ty); } }
+}
+
+/* ---------- the director: the Film camera cuts between a slow wide shot of the tank and closer shots of what is happening now ---------- */
+const DIR = { shot: null, t: 0, lastWide: -99, last: null, az: 0.4 };
+function eventShots() { const c = [];
+  for (const r of robots) {
+    if (r.birthT > 0 && r.birthT < 0.5) c.push({ r, kind: "birth", p: 5, d: 1.7, dur: 7 });
+    else if (r.pick && simT - (r.pickT0 || 0) < 1.2) c.push({ r, kind: r.pick.own ? "swap" : "pick", p: r.pick.own ? 5 : 4, d: 0.95, dur: 6 });
+    else if (r.phase === "touch" && r.pair && r.id < r.pair.id && r.phaseT < 2) c.push({ r, kind: "touch", p: 4, d: 2.1, dur: 6 });
+    else if (r.paused && r.carry > 0.05) c.push({ r, kind: "place", p: 3, d: 1.1, dur: 5 });
+    else if (r.carry > 0 && r.carry < 0.7) c.push({ r, kind: "print", p: 1, d: 1.3, dur: 5 }); }
+  return c; }
+function shotTarget(S) { const r = S.r; if (S.kind === "wide") return [0, -0.2, 0];
+  if (S.kind === "touch" && r.pair) return [(r.x + r.pair.x) / 2, WL + 0.03, (r.z + r.pair.z) / 2];
+  const fr = reach(r), k = S.kind === "pick" || S.kind === "swap" ? 0.75 : S.kind === "birth" ? 1.1 : 0.1; return [r.x + Math.cos(r.h) * fr * k, WL + 0.03, r.z + Math.sin(r.h) * fr * k]; }
+function director(dt) {
+  const C = CINE; if (camMode !== "film") { C.ap = camMode === "follow" ? 0.06 : 0; return; }
+  const D = DIR; D.t += dt; const S = D.shot;
+  const lost = S && S.r && (!robots.includes(S.r) || (S.kind === "touch" && !S.r.pair));
+  if (!S || D.t > S.dur || lost) {
+    const ev = eventShots().filter((e) => !D.last || e.r !== D.last.r || e.kind !== D.last.kind).sort((a, b) => b.p - a.p);
+    if ((!ev.length || (S && S.kind !== "wide" && U.uTime.value - D.lastWide > 24)) && (!S || S.kind !== "wide" || !ev.length)) { D.shot = { kind: "wide", dur: 10, az: D.az }; D.lastWide = U.uTime.value; D.az += 0.9; }
+    else if (ev.length) { const e = ev[0]; e.side = rnd() < 0.5 ? 1 : -1; e.tgt = shotTarget(e); D.shot = e; D.last = e; }
+    else D.shot = { kind: "wide", dur: 6, az: D.az };
+    D.t = 0; D.cut = true; }
+  const s = D.shot, u = clamp(D.t / s.dur, 0, 1);
+  let pos, tgt;
+  if (s.kind === "wide") { const az = s.az + 0.035 * D.t, R = 13 - 0.7 * u; tgt = [0, -0.25, 0]; pos = [Math.sin(az) * R, 5.2 - 0.4 * u, Math.cos(az) * R]; C.ap = 0; }
+  else { const nt = shotTarget(s); s.tgt = D.cut ? nt : lerp3(s.tgt, nt, Math.min(1, dt * 1.5)); tgt = s.tgt;
+    // three quarters from the side, slow dolly in and a slight orbit; high enough to see into the clear head, never below the water
+    const r = s.r, az = r.h + s.side * (Math.PI / 2 - 0.55) + s.side * 0.16 * u, d = s.d * (1 - 0.1 * u);
+    pos = [tgt[0] + Math.cos(az) * d, tgt[1] + d * 0.62, tgt[2] + Math.sin(az) * d];
+    C.ap = s.d < 1.5 ? 0.14 : 0.08; }
+  // never inside a body
+  for (const r of robots) { const dx = pos[0] - r.x, dz = pos[2] - r.z, dd = Math.hypot(dx, dz), m = r.len * 0.65; if (dd < m && pos[1] < WL + r.s.B * 1.5) pos[1] = WL + r.s.B * 1.5; }
+  pos[1] = Math.max(pos[1], WL + 0.12);
+  if (D.cut) { R3.cam.position.set(...pos); R3.ctl.target.set(...tgt); D.cut = false; }
+  else { const k = Math.min(1, dt * 2.5); R3.cam.position.lerp(_d.set(...pos), k); R3.ctl.target.lerp(_d.set(...tgt), k); }
+  C.focus = R3.cam.position.distanceTo(R3.ctl.target);
+}
 
 let last = performance.now(), acc = 0, gi = 0, gacc = 0;
 function loop(now) {
   const dtR = Math.min(0.05, (now - last) / 1000); last = now;
   if (running) for (let i = 0; i < speed; i++) step(dtR);
   U.uTime.value += dtR;
-  updateScene(dtR); R3.ctl.update(); R3.r.shadowMap.needsUpdate = true; R3.r.render(R3.sc, R3.cam); labels();
-  gacc += dtR; if (gacc > 0.083) { gacc = 0; $("#grain").style.backgroundImage = grainTiles[gi++ % 4]; }
+  updateScene(dtR); director(dtR); R3.ctl.update(); updateLights(dtR); R3.r.shadowMap.needsUpdate = true; cineRender(now / 1000, dtR); drawDiagram(dtR); labels();
   acc += dtR; if (acc > 0.5) { acc = 0; spark("#sp1", hist.pop); spark("#sp2", hist.parts); spark("#sp3", hist.div); spark("#sp4", hist.tiles, 6); inspect(); hud(); }
   requestAnimationFrame(loop);
 }
 const CAMS = { tank: [[0.9, 5.4, 13.8], [0, 0.0, 0]], above: [[0, 15.5, 0.01], [0, 0, 0]] };
 document.querySelectorAll("[data-cam]").forEach((b) => (b.onclick = () => { camMode = b.dataset.cam; document.querySelectorAll("[data-cam]").forEach((x) => x.classList.toggle("on", x === b));
-  R3.moved = false; if (camMode === "tank") tankCam(); else if (CAMS[camMode]) { R3.cam.position.set(...CAMS[camMode][0]); R3.ctl.target.set(...CAMS[camMode][1]); } else { R3.cam.position.set(R3.lampT.x + 1.1, 1.5, R3.lampT.z + 2.4); R3.ctl.target.set(R3.lampT.x, 0.25, R3.lampT.z); } }));
+  R3.moved = false; DIR.shot = null; if (camMode === "tank") tankCam(); else if (CAMS[camMode]) { R3.cam.position.set(...CAMS[camMode][0]); R3.ctl.target.set(...CAMS[camMode][1]); } else { R3.cam.position.set(R3.lampT.x + 1.1, 1.5, R3.lampT.z + 2.4); R3.ctl.target.set(R3.lampT.x, 0.25, R3.lampT.z); } }));
 $("#relBtn").onclick = () => { showRel = !showRel; $("#relBtn").classList.toggle("on", showRel); $("#relBtn").textContent = showRel ? "Relations shown" : "Relations hidden"; };
 $("#run").onclick = () => { running = !running; $("#run").textContent = running ? "Pause" : "Run"; $("#run").classList.toggle("on", running); };
 $("#reset").onclick = reset;
@@ -997,7 +1153,7 @@ $("#send").onclick = () => { const t = $("#sig").value.trim().toLowerCase().slic
 $("#sig").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#send").click(); });
 let downAt = null; cv.addEventListener("pointerdown", (e) => (downAt = [e.clientX, e.clientY]));
 cv.addEventListener("pointerup", (e) => { if (!downAt || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 5) return; const b = cv.getBoundingClientRect(); const rc = new THREE.Raycaster(); rc.setFromCamera({ x: (e.clientX - b.left) / b.width * 2 - 1, y: -(e.clientY - b.top) / b.height * 2 + 1 }, R3.cam); const hit = rc.intersectObjects(pickable, false)[0]; selected = hit ? hit.object.userData.robot : null; inspect(); });
-initThree(); tankCam(); R3.ctl.addEventListener("start", () => (R3.moved = true));
+initThree(); tankCam(); R3.ctl.addEventListener("start", () => { R3.moved = true; if (camMode === "film") { camMode = "free"; document.querySelectorAll("[data-cam]").forEach((x) => x.classList.remove("on")); } });
 const embedSync = () => { const e = document.documentElement.classList.contains("bnm-embed"); R3.ctl.enableZoom = !e; }; embedSync(); new MutationObserver(embedSync).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] }); reset(); requestAnimationFrame(loop);
 // a check that the arm and what it holds stay inside the shell: random genomes, every kind of part, every move
 function armTest(n = 12) { const out = { worst: 0, where: "", n: 0, by: {}, over2: 0, over5: 0 }; const save = armWorst, saveLog = events.slice();
@@ -1018,6 +1174,6 @@ window.__society = { get robots() { return robots; }, get floats() { return floa
     fam: Object.fromEntries(FAM.map((x, i) => [x, famTotals()[i]])), kits: new Set(robots.map((r) => r.kn.join(""))).size, meanTiles: +(robots.reduce((a, r) => a + r.kit.length, 0) / Math.max(1, robots.length)).toFixed(2), coreAfloat: coreAfloat(), armWorstMM: +(armWorst * 1000).toFixed(1), armWorstAt, forageT: robots.filter((r) => r.forage).map((r) => Math.round(r.forage.t)).join(" "), ready: robots.filter(ready).length }),
   forceSwap: (r, f) => { const [i] = swapSlot(r, f); if (i < 0) return false; const fr = reach(r), F = addFloat(makePart(f), r.x + Math.cos(r.h) * (fr + 0.02), r.z + Math.sin(r.h) * (fr + 0.02)); r.selfSlot = i; r.forage = null; startPick(r, F); return true; },
   forcePick: (r, f, kind) => { let p = makePart(f); for (let k = 0; k < 200 && kind && p.kind !== kind; k++) p = makePart(f); const fr = reach(r), L = Math.max(p.l, VMIN), F = addFloat(p, r.x + Math.cos(r.h) * (fr + 0.006 + L / 2 + COLLAR), r.z + Math.sin(r.h) * (fr + 0.006 + L / 2 + COLLAR)); F.h = -r.h; if (!r.forage) { r.plan = [FC, FP, f]; r.forage = { t: 0 }; } startPick(r, F); return p.name; },
-  armTest, setEl: (e) => (FORCE_EL = e), dbg: { rackPos, pocketRng, pocketTip, pocketIn, babyPt, armDims, setKit, shapeOf, newArm, armPen, ikP, shellF, penAt, bestPose, pocketOf, armPts, REST, makePart, H_RNG, DOWN }, clear: () => { robots.forEach(disposeRobot); robots = []; [...loose].forEach(disposeLoose); loose = []; floats = []; pickable.length = 0; } };
+  DIR, CINE, armTest, setEl: (e) => (FORCE_EL = e), dbg: { rackPos, pocketRng, pocketTip, pocketIn, babyPt, armDims, setKit, shapeOf, newArm, armPen, ikP, shellF, penAt, bestPose, pocketOf, armPts, REST, makePart, H_RNG, DOWN }, clear: () => { robots.forEach(disposeRobot); robots = []; [...loose].forEach(disposeLoose); loose = []; floats = []; pickable.length = 0; } };
 </script>
 </body></html>
