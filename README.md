@@ -11,7 +11,7 @@ Live site: https://ruipwan.github.io/born-not-made/
 | Branches | `index.html#branches` | Side readings: matrix, cyberfeminism, artificial womb, labour |
 | Build | `build/` | Parametric teardown: every part, spec, tolerance and source |
 | Simulator | `simulator/` | Stage 3 console: dock under water, place the kit, print from G-code, push and inflate, swim. Data: `stage3.json`, `stage3_print.gcode` (from `bnm_design/stage3/physics.py`). Stage 2 kept in `simulator/old_/stage2/` |
-| Society (Simulator) | `society/` | Population in 3D, simplified bodies in one tank close to square under a dense grid of small fixed spot lights: pairs touch at the opening, a body with a tail prints the newborn; only the silicone head is born, the tails are a fixed number, never born, and pass from head to head after each birth. Earlier 2D model kept in `society/old_/` |
+| Society (Simulator) | `society/` | Population in 3D, simplified bodies in one tank under a dense grid of small spot lights. Robots eat parts: Bergsonne style tiles (Core, Sense, Drive, Link, Power, Store, Display) on small floats, picked through the mouth by the arm in the tail and set into the newborn's wall during the print; the tiles decide what each body can do, and a finite stock of Core tiles limits the population. Earlier touch and birth version kept in `society/touch_/`, earlier 2D model in `society/old_/` |
 | Academia Research | [`index.html#academia`](https://ruipwan.github.io/born-not-made/#academia) / [`academia/`](https://ruipwan.github.io/born-not-made/academia/) | Image-led reference atlas: universities, labs, artistic works, research keywords, project relevance, and PhD pathways |
 
 Everything is static HTML and JavaScript (three.js r147 from jsDelivr). No build step.
