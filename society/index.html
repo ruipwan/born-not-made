@@ -426,8 +426,10 @@ const waterY = (s) => -0.1 * s.B;                               // the waterline
 function armDims(r) { const s = r.s, fr = s.Lh / 2 + s.Ln, bx = -s.Lh / 2, by = -0.6 * s.B, L3 = 0.045 + 0.5 * s.Ln, yl = waterY(s) + 0.016;
   const need = Math.hypot(fr + 0.02 - L3 - bx, yl - by); r.armL = [0.56 * need + 0.01, 0.56 * need + 0.01, L3]; r.armB = [bx, by]; if (r.arm && !r.arm.cur) { r.arm.a = REST.slice(); r.arm.p = restTip(r); r.arm.th = 0; r.arm.el = -1; } if (r.kit) r.pk = r.kit.map((p, i) => pocketOf(s, p, i, 1.0)); }
 // the rack: parts eaten and not yet built in lie in a row on the floor of the head, to one side, each in its own slot
-function rackPos(r, i, p = r.nk[i]) { let x = -0.03 * r.s.Lh / 0.25; for (let k = 0; k < i; k++) x += (r.nk[k] ? Math.max(r.nk[k].l, VMIN) : 0.008) + 2 * COLLAR + 0.004;
-  return [x + (p ? Math.max(p.l, VMIN) / 2 + COLLAR : 0.006), -0.55 * r.s.B, -0.26 * r.s.A]; }
+function rackPos(r, i, p = r.nk[i]) { const x0 = -r.s.Lh / 2 + 0.05, xm = r.s.Lh / 2 - 0.05; let x = x0, side = -1;
+  const step = (q) => (q ? Math.max(q.l, VMIN) : 0.008) + 2 * COLLAR + 0.004;
+  for (let k = 0; k <= i; k++) { const q = k === i ? p : r.nk[k], w = step(q); if (x + w > xm && side < 0) { side = 1; x = x0; } if (k === i) return [x + w / 2, -0.55 * r.s.B, side * 0.26 * r.s.A]; x += w; }      // a second row on the other side when the first is full
+}
 
 function newRobot(o) {
   const r = Object.assign({ id: nextId++, x: 0, z: 0, vx: 0, vz: 0, h: rnd() * 6.283, age: 30, energy: 1, inflate: 1, adult: true, carry: 0, birthT: 0, pair: null, phase: "", phaseT: 0, cool: 0, near: new Map(), relTo: new Map(), links: [], rel: 0, gen: 0, parents: null, bob: rnd() * 6.283,
@@ -542,7 +544,7 @@ function startSeg(r, c) { const A = r.arm; A.cur = c; A.t = 0; A.on = true; if (
       const l2 = planLeg(r, { a: l1.a1.slice(0, 4), p: V, th: l1.a1[2], el: vv.st ? 0 : l1.el }, c.p, c.rng, A.hold, c.el1), pen = Math.max(l1.pen, l2.pen);
       if (!bv || pen < bv.pen) bv = { V, pen, rng: vv.rng, st: vv.st }; }
     if (bv && bv.pen < best.pen - 0.001) { const v = { p: bv.V, rng: bv.rng, dur: c.dur * 0.55, via: true, st: bv.st }; c.dur *= 0.6; c.via = true; A.q.unshift(c); startSeg(r, v); return; } }
-  c.el = best.el; c.a1 = best.a1; c.lin = best.lin; c.p0 = A.p ? A.p.slice() : null; c.th0 = A.th; c.pen = best.pen; armWorst = Math.max(armWorst, best.pen);
+  c.el = best.el; c.a1 = best.a1; c.lin = best.lin; c.p0 = A.p ? A.p.slice() : null; c.th0 = A.th; c.pen = best.pen; if (best.pen > armWorst) { armWorst = best.pen; armWorstAt = `${c.rest ? "rest" : c.via ? "via" : r.paused ? "place" : r.pick ? (r.pick.own ? "swap" : "pick") : "needle"} holding ${A.hold ? (A.hold.p || A.hold).name : "nothing"}`; }
 }
 function armStep(r, dt) { const A = r.arm;
   if (!A.cur && A.q.length) startSeg(r, A.q.shift());
@@ -555,7 +557,7 @@ function armStep(r, dt) { const A = r.arm;
   if (r.needle) { if (!A.needleOn) { A.q.push({ p: r.needle.slice(), rng: DOWN, dur: 0.6, tool: "needle", fn: () => (A.needleOn = true) }); return; }
     const a = ikP(r, r.needle, -Math.PI / 2, A.el || 1); for (let k = 0; k < 4; k++) A.a[k] = a[k]; A.p = r.needle.slice(); A.th = -Math.PI / 2; A.on = true; A.tool = "needle"; }
 }
-let FORCE_EL = 0, tailsHeld = 0;
+let FORCE_EL = 0, tailsHeld = 0, armWorstAt = "";
 const seg = (r, o) => { o.dur *= 0.8; r.arm.q.push(o); };      // moves a little brisker than written
 // the range of tool angles for a pocket: from inside, pointing out along the wall's normal; onto a ledge, from above
 function pocketRng(r, q) { if (q.ledge) return DOWN; const psi = Math.atan2(q.z, Math.max(1e-4, q.x - r.armB[0])), dh = q.n[0] * Math.cos(psi) + q.n[2] * Math.sin(psi), t = Math.atan2(q.n[1], dh); return [t - 0.9, t + 0.9]; }
@@ -1013,7 +1015,7 @@ function armTest(n = 12) { const out = { worst: 0, where: "", n: 0, by: {}, over
 window.__society = { get robots() { return robots; }, get floats() { return floats; }, get simT() { return simT; }, get births() { return births; }, R3, P, setSpeed: (s) => (speed = s), step, newRobot, conceive, startPick, disposeRobot, reset,
   select: (r) => { selected = r; inspect(); }, focus: (r) => { focus = r; focusUntil = simT + 30; }, setCam: (m) => document.querySelector(`[data-cam="${m}"]`).click(),
   stats: () => ({ t: Math.round(simT), pop: robots.length, tails: robots.filter((r) => r.tail).length, afloat: partsAfloat(), births, picks, swaps, foraging: robots.filter((r) => r.forage).length, printing: robots.filter((r) => r.carry).length,
-    fam: Object.fromEntries(FAM.map((x, i) => [x, famTotals()[i]])), kits: new Set(robots.map((r) => r.kn.join(""))).size, meanTiles: +(robots.reduce((a, r) => a + r.kit.length, 0) / Math.max(1, robots.length)).toFixed(2), coreAfloat: coreAfloat(), armWorstMM: +(armWorst * 1000).toFixed(1), forageT: robots.filter((r) => r.forage).map((r) => Math.round(r.forage.t)).join(" "), ready: robots.filter(ready).length }),
+    fam: Object.fromEntries(FAM.map((x, i) => [x, famTotals()[i]])), kits: new Set(robots.map((r) => r.kn.join(""))).size, meanTiles: +(robots.reduce((a, r) => a + r.kit.length, 0) / Math.max(1, robots.length)).toFixed(2), coreAfloat: coreAfloat(), armWorstMM: +(armWorst * 1000).toFixed(1), armWorstAt, forageT: robots.filter((r) => r.forage).map((r) => Math.round(r.forage.t)).join(" "), ready: robots.filter(ready).length }),
   forceSwap: (r, f) => { const [i] = swapSlot(r, f); if (i < 0) return false; const fr = reach(r), F = addFloat(makePart(f), r.x + Math.cos(r.h) * (fr + 0.02), r.z + Math.sin(r.h) * (fr + 0.02)); r.selfSlot = i; r.forage = null; startPick(r, F); return true; },
   forcePick: (r, f, kind) => { let p = makePart(f); for (let k = 0; k < 200 && kind && p.kind !== kind; k++) p = makePart(f); const fr = reach(r), L = Math.max(p.l, VMIN), F = addFloat(p, r.x + Math.cos(r.h) * (fr + 0.006 + L / 2 + COLLAR), r.z + Math.sin(r.h) * (fr + 0.006 + L / 2 + COLLAR)); F.h = -r.h; if (!r.forage) { r.plan = [FC, FP, f]; r.forage = { t: 0 }; } startPick(r, F); return p.name; },
   armTest, setEl: (e) => (FORCE_EL = e), dbg: { rackPos, pocketRng, pocketTip, pocketIn, babyPt, armDims, setKit, shapeOf, newArm, armPen, ikP, shellF, penAt, bestPose, pocketOf, armPts, REST, makePart, H_RNG, DOWN }, clear: () => { robots.forEach(disposeRobot); robots = []; [...loose].forEach(disposeLoose); loose = []; floats = []; pickable.length = 0; } };
