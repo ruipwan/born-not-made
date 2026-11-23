@@ -293,7 +293,7 @@ function log(msg, cls = "") {
 
 const UW = { uTime: { value: 0 }, uWL: { value: -0.13 } };
 /* the gallery: one square glass tank on a dark plinth, one spotlight straight above. CU holds what every shader needs to know about the light, the tank and the inner lights. */
-const TANK = { x0: -0.508, x1: 0.962, y0: -0.285, y1: 0.285, zf: -0.003, zt: 0.582, th: 0.015, zr: -0.95, lamp: [0.32, 0, 2.6] };   /* UNS 150U, inner size */
+const TANK = { x0: -1.128, x1: 0.982, y0: -0.285, y1: 0.285, zf: -0.003, zt: 0.582, th: 0.015, zr: -0.95, lamp: [0.32, 0, 2.6] };   /* UNS 150U, inner size */
 const LAMP_ANG = 0.56;
 /* the tank as drawn is made to order: no stock aquarium found is wide enough. Clear acrylic 1190 kg/m3; the volume is the water up to the waterline, the weight is that water plus the four walls. */
 const TANKF = () => { const T = TANK, W = T.x1 - T.x0, D = T.y1 - T.y0, dep = J.WL - T.zf, V = W * D * dep, walls = (2 * (W + 2 * T.th) + 2 * D) * T.th * (T.zt - T.zf) * 1190; return { W, D, dep, L: V * 1000, kg: V * 1000 + walls }; };
@@ -867,7 +867,7 @@ function updateTrack(st) {
 function scrubTo(clientX) {
   const segs = $("#track").querySelectorAll(".seg"); for (let i = 0; i < segs.length; i++) { const r = segs[i].getBoundingClientRect(); if (clientX <= r.right || i === segs.length - 1) { const f = clamp((clientX - r.left) / r.width, 0, 0.999); TL.T = TL.stages[i].d0 + f * TL.stages[i].disp; break; } }
 }
-const NUM = ["mdy", "q0", "q1", "q2", "kx", "ky", "kz", "kyaw", "gel", "dock", "pr", "pz", "tx", "ty", "tz", "th", "bend", "ub", "yaw", "roll", "drain", "fill", "jets", "ballast", "v", "F", "Fz", "pen", "crank", "pbar", "front", "rimx", "Fn", "nbi", "dip"], DIS2 = ["kset"], DIS = ["tool", "pP", "pN", "kit", "vac", "air", "nv", "note"];
+const NUM = ["mdy", "q0", "q1", "q2", "kx", "ky", "kz", "kyaw", "gel", "dock", "pr", "pz", "tx", "ty", "tz", "th", "bend", "ub", "yaw", "roll", "drain", "fill", "jets", "ballast", "v", "F", "Fz", "pen", "crank", "pbar", "front", "rimx", "Fn", "nbi", "dip", "tdx", "tdy", "hdx", "hdy"], DIS2 = ["kset"], DIS = ["tool", "pP", "pN", "kit", "vac", "air", "nv", "note"];
 function evalState(T) {
   const st = stageAt(T), s = st.s, F = J.fr, x = s.i0 + st.f * (s.i1 - 1 - s.i0), i = Math.min(s.i1 - 1, Math.floor(x)), j = Math.min(s.i1 - 1, i + 1), f = x - i, S = { st, k: s.key, i };
   for (const n of NUM) S[n] = lerp(F[n][i], F[n][j], f); for (const n of DIS) S[n] = F[n][i]; for (const n of DIS2) S[n] = F[n] ? F[n][i] : 1;
@@ -877,7 +877,7 @@ function evalState(T) {
 }
 const kitM = M4();
 function applyState(S, now) {
-  CLOCK = S.clock; R3.tail.position.x = S.dock; const wl = J.read.wl[S.i]; UW.uWL.value = wl; J.WL = Math.max(wl, 0.002); WATER.surf.visible = wl > 0.003;
+  CLOCK = S.clock; R3.tail.position.x = S.dock + (S.tdx || 0); R3.tail.position.y = S.tdy || 0; R3.chamber.position.set(S.hdx || 0, S.hdy || 0, 0); const wl = J.read.wl[S.i]; UW.uWL.value = wl; J.WL = Math.max(wl, 0.002); WATER.surf.visible = wl > 0.003;
   poseArm([S.q0, S.q1, S.q2], S.tool, S, now);
   PARTS.parkP.visible = !!S.pP; PARTS.parkN.visible = !!S.pN; setGel(S.gel, S.dock);
   setNewborn(S.nbi); applyDip(S.dip || 0); const nb = S.nv > 0.5; R3.baby.visible = nb;
@@ -943,6 +943,7 @@ const CAMS = {
   sidecam: () => ({ p: [-0.03, -1.55, 0.17], t: [-0.03, 0, 0.16] }),
   dockcam: () => ({ p: [-0.03, -1.4, 0.28], t: [-0.03, 0, 0.15] }),
   plancam: () => ({ p: [-0.03, -0.03, 2.0], t: [-0.03, 0, 0.1] }),
+  lanecam: () => ({ p: [-0.15, -0.9, 2.3], t: [-0.15, 0, 0.05] }),
   lipcam: () => ({ p: [0.82, -0.52, 0.33], t: [0.28, 0.0, 0.075] }),
   mouthcam: () => ({ p: [0.98, -0.2, 0.3], t: [0.32, 0, 0.15] }),
   fullcam: () => { const b = nbPos(); return { p: [b.x * 0.5 + 0.3, -2.2, 0.75], t: [b.x * 0.5 + 0.15, 0, 0.12] }; },
@@ -955,7 +956,7 @@ const CAMS = {
 };
 function setCam(name, snap = false) { CAM = name; camGoal = CAMS[name](); SECT.constant = name === "section" ? 0 : 100; document.querySelectorAll("[data-cam]").forEach((b) => b.classList.toggle("on", b.dataset.cam === name)); if (snap) CAMSNAP = true; }
 function setAuto(v) { AUTO = v; $("#autoCam").classList.toggle("on", v); $("#autoCam").setAttribute("aria-pressed", String(v)); }
-function autoCam(S) { const want = { dock: S.st.f < 0.45 ? "wide" : "overview", gel: "overview", kit: "rack", change: "rack", print: "print", cure: "rack", drain: "push", push: "push", fill: "birthcam", float: "birthcam", swim: "swimcam", birth_a: "push", birth_b: "push", birth_c: "push", birth_d: "birthcam", free: "freecam" }[S.k] || "overview"; if (want !== CAM) setCam(want); }
+function autoCam(S) { const want = { dock: S.st.f < 0.45 ? "wide" : "overview", gel: "overview", kit: "rack", change: "rack", print: "print", cure: "rack", drain: "push", push: "push", fill: "birthcam", float: "birthcam", swim: "swimcam", birth_a: "push", birth_b: "push", birth_c: "push", birth_d: "birthcam", free: "freecam", relay_back: "lanecam", relay_release: "lanecam", relay_lane: "lanecam", relay_dock: "lanecam", relay_gel: "lanecam", next: "lanecam" }[S.k] || "overview"; if (want !== CAM) setCam(want); }
 const CAMV = { p: new THREE.Vector3(), t: new THREE.Vector3(), gp: new THREE.Vector3(), gt: new THREE.Vector3(), d: new THREE.Vector3() };
 function damp(cur, goal, vel, tau, dt) {      // critically damped: the camera eases off and arrives without a stop
   for (const a of ["x", "y", "z"]) { const om = 2 / (a === "z" ? tau * 1.35 : tau), x = om * dt, ex = 1 / (1 + x + 0.48 * x * x + 0.235 * x * x * x), ch = cur[a] - goal[a], tmp = (vel[a] + om * ch) * dt; vel[a] = (vel[a] - om * tmp) * ex; cur[a] = goal[a] + (ch + tmp) * ex; }
