@@ -431,7 +431,7 @@ function rackPos(r, i, p = r.nk[i]) { let x = -0.03 * r.s.Lh / 0.25; for (let k 
 
 function newRobot(o) {
   const r = Object.assign({ id: nextId++, x: 0, z: 0, vx: 0, vz: 0, h: rnd() * 6.283, age: 30, energy: 1, inflate: 1, adult: true, carry: 0, birthT: 0, pair: null, phase: "", phaseT: 0, cool: 0, near: new Map(), relTo: new Map(), links: [], rel: 0, gen: 0, parents: null, bob: rnd() * 6.283,
-    kit: [], nk: [], nkn: [0, 0, 0, 0, 0, 0, 0], need: [0, 0, 0, 0, 0, 0, 0], plan: null, forage: null, pick: null, self: null, selfT: 50 + 60 * rnd(), paused: false, needle: null, arm: newArm() }, o);
+    kit: [], nk: [], nkn: [0, 0, 0, 0, 0, 0, 0], need: [0, 0, 0, 0, 0, 0, 0], plan: null, forage: null, pick: null, self: null, selfT: 30 + 40 * rnd(), paused: false, needle: null, arm: newArm() }, o);
   r.s = shapeOf(r.g); r.mesh = bodyMesh(r); r.len = r.mesh.geometry.userData.len; armDims(r); setKit(r, r.kit); r.grp = new THREE.Group(); r.grp.add(r.mesh); r.grp.matrixAutoUpdate = false;
   r.glow = glow(0xffc890, 0.5); r.glow.position.set(0, 0, 0); r.grp.add(r.glow);
   R3.sc.add(r.grp); pickable.push(r.mesh); robots.push(r); return r;
@@ -462,6 +462,7 @@ function addFloat(p, x, z) { if (floats.length >= MAXF) return null;
   const F = { id: fid++, p, f: p.f, x, z, vx: 0, vz: 0, h: rnd() * 6.283, bob: rnd() * 6.283, y: WL, st: "float", claim: null, t: 0, shedBy: 0, shedT: 0, rad: Math.hypot(Math.max(p.l, VMIN), Math.max(p.w, VMIN)) / 2 + COLLAR };
   floats.push(F); return F; }
 const partsAfloat = () => { let n = 0; for (const F of floats) if (F.st !== "held") n++; return n; };
+const famAfloat = (f) => { let n = 0; for (const F of floats) if (F.f === f && F.st === "float") n++; return n; };
 const coreAfloat = () => { let n = 0; for (const F of floats) if (F.f === FC && F.st !== "held") n++; return n; };
 
 function reset() {
@@ -680,10 +681,11 @@ function look(r) {
     if (!F_.tgt) { const F = findFloat(r, wantMask(r)); if (F) { F.claim = r; F_.tgt = F; F_.tt = 0; } else { r.need[FS] += 0.5 / 30; if (!r.ab.link) r.need[FL] += 0.5 / 60; } }
     return; }
   if (!r.self && r.tail && r.adult && !r.carry && !r.babySpec && !r.pair && !r.dock && simT > r.selfT) {
-    r.selfT = simT + 6; let bf = -1, bv = 0.4, bs = -1;
-    for (let f = 1; f < 7; f++) { const v = r.need[f] + (r.kn[f] ? 0 : 0.25); if (v <= bv) continue; const [i, sv] = swapSlot(r, f); if (i >= 0 && sv < v - 0.2) { bf = f; bv = v; bs = i; } }
+    r.selfT = simT + 6; let bf = -1, bv = 0.25, bs = -1;
+    // a swap never takes Power, and not a family that is getting scarce on the water, so newborns are not starved of parts
+    for (let f = 1; f < 7; f++) { if (f === FP || famAfloat(f) < 6) continue; const v = r.need[f] + (r.kn[f] ? 0 : 0.3); if (v <= bv) continue; const [i, sv] = swapSlot(r, f); if (i >= 0 && sv < v - 0.1) { bf = f; bv = v; bs = i; } }
     if (bf < 0) return; const mask = [0, 0, 0, 0, 0, 0, 0]; mask[bf] = 1; const F = findFloat(r, mask);
-    if (F) { F.claim = r; r.self = F; r.selfSlot = bs; r.selfT0 = simT; r.selfT = simT + 90 + 90 * rnd(); log(`#${r.id} swims to a ${FAM[bf]} part for itself`); }
+    if (F) { F.claim = r; r.self = F; r.selfSlot = bs; r.selfT0 = simT; r.selfT = simT + 45 + 45 * rnd(); log(`#${r.id} swims to a ${FAM[bf]} part for itself`); }
   }
 }
 
@@ -922,6 +924,7 @@ function labels() {
     const near = fol && Math.hypot(r.x - tg.x, r.z - tg.z) < 2;
     if (r.phase === "touch" && r.pair && r.id < r.pair.id) put((r.x + r.pair.x) / 2, WL + 0.42, (r.z + r.pair.z) / 2, `touch · #${r.id} #${r.pair.id}`);
     else if (r.birthT) put(r.x, WL + 0.45, r.z, `birth · #${r.id}`);
+    else if (r.swapT && simT - r.swapT < 5) put(r.x, WL + (fol ? 0.24 : 0.42), r.z, `swap · ${r.swapTxt}`);
     else if (near && r.pick) put(r.x, WL + 0.24, r.z, `pick · ${FAM[r.pick.F.f >= 0 ? r.pick.F.f : r.nk.length ? r.nk[r.nk.length - 1].f : FC]}`);
     else if (near && r.carry) put(r.x, WL + 0.26, r.z, r.paused ? `pause · set ${FAM[r.arm.hold ? r.arm.hold.f : r.nk[r.babySpec.order[r.babySpec.next]]?.f ?? 0]}` : r.carry < 0.75 ? `printing ${Math.round(r.carry / 0.75 * 100)}%` : "air in");
     else if (near && r === focus && r.forage) put(r.x, WL + 0.24, r.z, r.forage.tgt ? `foraging · ${r.nk.length} of ${r.plan.length}` : "searching");
