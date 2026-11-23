@@ -775,6 +775,19 @@ function rackPos(r, i, p = r.nk[i]) { const x0 = r.B0[0] + 0.215, xm = r.B0[0] +
   const step = (q) => (q ? Math.max(q.l, VMIN) : 0.008) + 2 * COLLAR + 0.004;
   for (let k = 0; k <= i; k++) { const q = k === i ? p : r.nk[k], w = step(q); if (x + w > xm) { side = -side; x = x0; } if (k === i) { const xx = x + w / 2, z = side * SHELF.z; return [xx, shelfY(r, xx, z), side * 0.097, -side * Math.PI / 4]; } x += w; } }
 const shelfY = (r, x, z) => Math.min(Math.max(floorY(r.s, true, x, z), floorY(r.s, true, x, z + Math.sign(z) * SHELF.w * 0.4)) + SHELF.h, waterY(r.s) - 0.015);
+/* where eaten parts wait: two kit magazines on the head floor, built like the quilted head study's (two rails 5 x 2 mm on posts 4 x 4 mm, end stops
+   5 x 3 x 8 mm, from quilt.json), and the study's two tool saddles beside the arm base (holder and needle), placed from the base as there.
+   Far from the camera a magazine is one plain box, and the saddles are left out */
+// the saddle boxes are the study's half sizes, doubled when drawn
+const RACKC = 0xd4d2cc, SADDLE = [[0.127, 0.107, 0.108, 0.004, 0.02, 0.0015], [0.105, 0.109, 0.108, 0.011, 0.004, 0.0015], [0.133, 0.111, 0.111, 0.0025, 0.01, 0.003], [0.107, 0.119, 0.111, 0.01, 0.002, 0.003], [0.105, 0.129, 0.108, 0.005, 0.0229, 0.0015]];
+function drawRack(r, M) { const far = farFrom(r.x, WL, r.z) && !(DIR.shot && DIR.shot.r === r);
+  for (const sd of [-1, 1]) { const x0 = r.B0[0] + 0.215, xm = r.B0[0] + 0.315, xc = (x0 + xm) / 2, zc = sd * SHELF.z, yt = shelfY(r, xc, zc);
+    if (far) { emitBox(M, xc, yt - SHELF.h / 2, zc, xm - x0, SHELF.h, SHELF.w, RACKC); continue; }
+    for (const dz of [-0.014, 0.014]) { const z = zc + dz; emitBox(M, xc, yt - 0.001, z, xm - x0, 0.002, 0.005, RACKC);      // a rail
+      for (const x of [x0 + 0.006, xc, xm - 0.006]) { const yf = floorY(r.s, true, x, z), h = Math.max(0.002, yt - 0.002 - yf); emitBox(M, x, yf + h / 2, z, 0.004, h, 0.004, RACKC); }      // its posts, down to the floor
+      for (const x of [x0 + 0.0015, xm - 0.0015]) emitBox(M, x, yt + 0.004, z, 0.003, 0.008, 0.005, RACKC); } }      // end stops
+  if (far) return;
+  for (const sd of [-1, 1]) for (const [dx, dz, y, a, b, c] of SADDLE) { const x = r.B0[0] + dx, z = sd * Math.min(dz, 0.85 * r.s.A), yb = floorY(r.s, true, x, 0) + y; if (yb > waterY(r.s) + 0.08) continue; _q.setFromAxisAngle(AY, b > 0.02 ? 0 : -sd * 0.7); _l.compose(_p.set(x, yb, z), _q, _s.set(2 * a, 2 * c, 2 * b)); _m.multiplyMatrices(M, _l); R3.pbox.setMatrixAt(nB, _m); R3.pbox.setColorAt(nB++, _c.setHex(RACKC)); } }      // the holder and needle saddles, at the study's height above the floor
 const inward = (z) => z > 0 ? -Math.PI / 4 : Math.PI / 4;      // the holder's stem points forward and in, toward the open middle of the head
 
 const newArm = () => ({ psi: 0, q: DREST.slice(), seg: [], cur: null, on: false, hold: null, tool: "mag", pp: null, ppRest: true, needleOn: false });
@@ -1458,7 +1471,7 @@ function updateScene(dtReal) {
         if (d < 1.2 && !q.ledge) { const off = 0.006 * (1 - sstep(0, 0.55, d)) - 0.0005 * Math.sin((d - 0.55) * 18) * Math.exp(-(d - 0.55) * 5) * (d > 0.55 ? 1 : 0); Mb.multiply(_l.makeTranslation(0, -off, 0)); drawPocket(_b2.copy(Mb).multiply(_l.makeTranslation(0, off, 0)), k, sstep(0.6, 1.2, d)); }      // lowered in from inside, it settles flush with a small spring back, then the rim closes over it
         drawEmbedded(Mb, k, q.ledge); }
       else { const rp = rackPos(r, i); drawPart(frameAt(M, rp[0], rp[1] + 0.003 + k.h / 2, rp[2], 0), k, true); } }
-    if (r.B0) for (const sd of [-1, 1]) { const x0 = r.B0[0] + 0.215, xm = r.B0[0] + 0.315, xc = (x0 + xm) / 2, yt = shelfY(r, xc, sd * SHELF.z); emitBox(M, xc, yt - SHELF.h / 2, sd * SHELF.z, xm - x0, SHELF.h, SHELF.w, 0xd4d2cc); }      // the two shelves of the rack, printed with the head
+    if (r.B0) drawRack(r, M);
     // the arm: the DexArm, drawn whenever the robot holds a tail; folded, it stands in the tail behind the head joint
     if (r.tail && DEX.data) { dexPose(r); const A = r.arm, hd = A.hold, tp = dexFK(r, A.q, A.tool, A.psi);
       if (hd && hd.st === "held") { _p.set(tp[0], tp[1] - 0.002 - hd.p.h / 2 - 0.002, tp[2]).applyMatrix4(M); hd.x = _p.x; hd.z = _p.z; hd.y = _p.y; hd.h = -r.h; }
