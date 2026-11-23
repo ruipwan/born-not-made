@@ -114,8 +114,8 @@ function loop(canvas,W,H,dur,draw){
     // double wall: a band inside the outline; gel fills the space it encloses
     const B=.035*S, C=m(.2,.17);
     c.save();c.clip(P);
-    c.fillStyle='rgba(156,200,236,.07)';c.fillRect(0,m(0,.24)[1],W,H);
-    c.strokeStyle='rgba(156,200,236,.25)';c.beginPath();c.moveTo(0,m(0,.24)[1]);c.lineTo(W,m(0,.24)[1]);c.stroke();
+    c.fillStyle='rgba(156,200,236,.07)';c.fillRect(0,m(0,.1)[1],W,H);
+    c.strokeStyle='rgba(156,200,236,.25)';c.beginPath();c.moveTo(0,m(0,.1)[1]);c.lineTo(W,m(0,.1)[1]);c.stroke();
     c.lineWidth=2*B+1.6;c.strokeStyle=ink(.35);c.stroke(P);c.lineWidth=2*B;c.strokeStyle='#161616';c.stroke(P);
     c.restore();c.strokeStyle=ink(.8);c.lineWidth=1.4;c.stroke(P);mouth(c,m,1);
     // everything but the arm sits in the wall
@@ -137,14 +137,14 @@ function loop(canvas,W,H,dur,draw){
       c.fillStyle=ink(.9);c.beginPath();c.arc(anchor[0],anchor[1],2.5,0,7);c.fill();
       text(c,head,x,y,15,.95,'Arial',align);if(align==='right')text(c,body,x,y+19,13,.55,'Arial',align);else wrap(c,body,x,y+19,260,13,.55,17);c.restore()};
     L(0,[bx,by-6],1310,250,'Brain','A microcontroller with a small local model, in the wall.');
-    L(1,m(.2,.18),1310,340,'Gel','Fills most of the inside. The next body is printed here.');
+    L(1,m(.2,.06),1310,340,'Gel','A shallow layer on the floor of the head. The next body is printed in it.');
     L(2,PP[0],1310,430,'Double wall','Battery, pump, motor and sensors, sealed between two skins.');
     L(3,m(.345,.22),1310,520,'Mouth','The newborn leaves here, inflating on the way.');
     L(4,tm(-.17,.22),470,300,'Arm','The only part not in the wall. Prints in the gel, picks up parts.','right');
     L(5,[kx+12,ky+15],470,410,'Tools','Syringe, holder, the gel line.','right');
     L(6,tm(DOCK,.16),470,520,'Docks from behind','Not part of the head. It moves on.','right');
     text(c,'Head',m(.2,.36)[0],m(.2,.36)[1]-50,28,ease(t,2,2.6),'Georgia','center');
-    text(c,'thinks, senses, carries the gel',m(.2,.36)[0],m(.2,.36)[1]-28,12,.55*ease(t,2,2.6),mono,'center',1);
+    text(c,'thinks, senses, holds the gel',m(.2,.36)[0],m(.2,.36)[1]-28,12,.55*ease(t,2,2.6),mono,'center',1);
     text(c,'Tail',tm(-.2,.33)[0],tm(-.2,.33)[1]-50,28,ease(t,2,2.6),'Georgia','center');
     text(c,'reproduces',tm(-.2,.33)[0],tm(-.2,.33)[1]-28,12,.55*ease(t,2,2.6),mono,'center',1);
     c.globalAlpha=1;
