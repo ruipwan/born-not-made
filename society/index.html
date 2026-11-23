@@ -1139,7 +1139,7 @@ function clipMat(m, plane) { const c = m.clone(); c.clippingPlanes = [plane]; c.
 /* the birth, after the quilted head study: keel first, mouth end first. The keel (two tubes along the floor centreline of the newborn) fills first
    and straightens the lengthwise folds; the newborn slides up to the lip and out, mouth end first, and each section opens across only once it is
    past the lip, so the folded part never has to pass the mouth open; the rim, at the back, opens last */
-const _bo = [0, 0, 0];
+const _bo = [0, 0, 0], BIRTHS = { n: 0, f: 0 };
 function birthMap(b, out, x, y, z, fx, fy, fz, o) { const U = b.userData, ka = sstep(0, 0.22, out), lx = lerp(fx, x, ka), X = U.bx + lx;
   const keel = sstep(-0.55 * U.B, -0.85 * U.B, y) * (1 - sstep(0.12 * U.A, 0.3 * U.A, Math.abs(z))), past = sstep(U.lip + 0.005, U.lip + 0.08, X), kc = Math.max(past, 0.45 * keel * ka);
   const yo = U.fy * (1 - 0.75 * sstep(U.lip - 0.22, U.lip, X));      // the folded part rides up the floor toward the lip
@@ -1428,7 +1428,7 @@ function updateScene(dtReal) {
     for (const r of robots) { const gu = r.mesh.geometry.userData, cx = (gu.front + gu.back) / 2, c = Math.cos(r.h), s = Math.sin(r.h); put(r.x + c * cx, r.z + s * cx, r.h, gu.len / 2 * r.inflate, r.s.A * r.inflate + 0.002); }
     for (const T of loose) put(T.x, T.z, T.h, T.s.Lt / 2, T.s.A * 0.85); U.uNB.value = n; }
   const t = U.uTime.value;
-  let nl = 0, nj = 0, nm = 0, nd = 0; nB = 0; nC = 0; instBegin(); const led = R3.leds.geometry.attributes.position.array;
+  let nl = 0, nj = 0, nm = 0, nd = 0; nB = 0; nC = 0; instBegin(); BIRTHS.n = 0; BIRTHS.f++; const led = R3.leds.geometry.attributes.position.array;
   for (const r of robots) {
     const touching = r.phase === "touch";
     r.grp.position.set(r.x, WL - waterY(r.s) + Math.sin(t * 0.8 + r.bob) * 0.007, r.z);
@@ -1447,7 +1447,8 @@ function updateScene(dtReal) {
     if (r.inflate > 0.97) { r.mesh.updateMatrix(); _MB.multiplyMatrices(M, r.mesh.matrix); for (const D of r.mesh.userData.rims[0].userData.discs) instPut(DISCGEO, STEELMAT, _m.multiplyMatrices(_MB, D), { ro: 5.5 }); }
     if (r.baby) {
       const b = r.baby, pr = clamp(r.carry / 0.75, 0, 1), out = r.birthT;      // no air goes in before the birth: the pack stays folded inside the parent, as in the study
-      if (out > 0) { birthPose(r, b, out); bx = b.userData.bx; by = 0; w = 0; b.visible = true; }
+      // at most four full births a frame (0.76 ms each, measured); the rest every third frame
+      if (out > 0) { if (BIRTHS.n++ < 4 || b.userData.bx === undefined || (BIRTHS.f + r.id) % 3 === 0) birthPose(r, b, out); bx = b.userData.bx; by = 0; w = 0; b.visible = true; }
       else {
       const e1 = sstep(0, 0.3, out), u = sstep(0.2, 1, out); w = lerp(1, 0, u); const sx = 1 - 0.6 * w;
       b.morphTargetInfluences[0] = w;
@@ -1806,7 +1807,7 @@ window.__society = { get robots() { return robots; }, get floats() { return floa
     fam: Object.fromEntries(FAM.map((x, i) => [x, famTotals()[i]])), kits: new Set(robots.map((r) => r.kn.join(""))).size, meanTiles: +(robots.reduce((a, r) => a + r.kit.length, 0) / Math.max(1, robots.length)).toFixed(2), coreAfloat: coreAfloat(), armWorstMM: +(armWorst * 1000).toFixed(1), armWorstAt, forageT: robots.filter((r) => r.forage).map((r) => Math.round(r.forage.t)).join(" "), ready: robots.filter(ready).length }),
   forceSwap: (r, f) => { const [i] = swapSlot(r, f); if (i < 0) return false; const F = addFloat(makePart(f), r.x + Math.cos(r.h) * r.pickX, r.z + Math.sin(r.h) * r.pickX); r.selfSlot = i; r.forage = null; startPick(r, F); return true; },
   forcePick: (r, f, kind) => { let p = makePart(f); for (let k = 0; k < 200 && kind && p.kind !== kind; k++) p = makePart(f); const F = addFloat(p, r.x + Math.cos(r.h) * r.pickX, r.z + Math.sin(r.h) * r.pickX); F.h = -r.h; if (!r.forage) { r.plan = [FC, FP, f]; r.forage = { t: 0 }; } startPick(r, F); return p.name; },
-  DIR, CINE, director, armTest, dbg: { DEX, ikArm, dexFK, dexPen, rackPos, babyPt, armDims, setKit, shapeOf, newArm, pocketOf, makePart, floorY, tW, faceX, V3: THREE.Vector3, segSecs, quiltSeg, qShape, babyPen, birthTest, prof: (n = 30, dt = 1 / 60) => { const gl = R3.r.getContext(), px = new Uint8Array(4), T = { step: 0, scene: 0, dir: 0, render: 0, diag: 0 }, now = () => performance.now();
+  DIR, CINE, director, armTest, dbg: { DEX, ikArm, dexFK, dexPen, rackPos, babyPt, armDims, setKit, shapeOf, newArm, pocketOf, makePart, floorY, tW, faceX, V3: THREE.Vector3, segSecs, quiltSeg, qShape, babyPen, birthTest, birthPose, prof: (n = 30, dt = 1 / 60) => { const gl = R3.r.getContext(), px = new Uint8Array(4), T = { step: 0, scene: 0, dir: 0, render: 0, diag: 0 }, now = () => performance.now();
     for (let i = 0; i < n; i++) { let t = now(); step(dt); T.step += now() - t; t = now(); U.uTime.value += dt; updateScene(dt); T.scene += now() - t; t = now(); director(dt); R3.ctl.update(); updateLights(dt); T.dir += now() - t;
       t = now(); R3.r.info.autoReset = false; R3.r.info.reset(); R3.r.shadowMap.needsUpdate = true; cineRender(performance.now() / 1000, dt); R3.r.info.autoReset = true; gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); T.render += now() - t; t = now(); drawDiagram(dt); labels(); T.diag += now() - t; }
     for (const k in T) T[k] = +(T[k] / n).toFixed(2); T.calls = R3.r.info.render.calls; T.tris = R3.r.info.render.triangles; return T; } }, clear: () => { robots.forEach(disposeRobot); robots = []; [...loose].forEach(disposeLoose); loose = []; floats = []; pickable.length = 0; } };
