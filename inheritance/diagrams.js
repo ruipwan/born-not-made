@@ -111,7 +111,7 @@ function loop(canvas,W,H,dur,draw){
 (function(){
   const cv=document.getElementById('d-body');if(!cv)return;
   const W=1600,H=900,DUR=16,IX=262,IY=205,IS=1080/1908;
-  const img=new Image();img.src='body-section.jpg?v=5';
+  const img=new Image();img.src='body-section.jpg?v=6';
   const P=(x,y)=>[IX+x*IS,IY+y*IS], IW=1908*IS, IH=838*IS;
   // [anchor in the image, side, label x or y, title, line]
   const LB=[
