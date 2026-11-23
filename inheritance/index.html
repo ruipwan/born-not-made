@@ -168,9 +168,9 @@ const hms=s=>{s=Math.round(s);return Math.floor(s/3600)+':'+String(Math.floor(s/
 const PRINT=6815, DISTILL=6480; // print time from simple.json; distillation set to land just before the print ends
 
 const VOICE=[
- {dock:'I have been in this water a long time. Today the arm comes to me.',gift:'You will hear what I could not.',press:'I cannot give you everything. While your body prints, I choose what to keep.'},
- {dock:'I was born in this water. Now the arm comes to me.',gift:'You will reach where I cannot.',press:'What was given to me, I press smaller again. It still fits.'},
- {dock:'I carry two lives before mine. Now the arm comes to me.',gift:'You will show what I kept inside.',press:'Each time, less of the first one. Each time, enough.'}
+ {dock:'I have been in this water a long time. The arm docks to me.',gift:'You will hear.',press:'I cannot give you everything. While your body prints, I choose what to keep.'},
+ {dock:'I was born here. Now the arm docks to me.',gift:'You will reach farther.',press:'What was given to me, I press smaller again. It still fits.'},
+ {dock:'I hold something of the two before me. Now the arm docks to me.',gift:'You will show what you hold.',press:'Less of the first one each time. It is enough.'}
 ];
 function frame(t){
   g.setTransform(cv.width/W,0,0,cv.height/H,0,0);
@@ -271,11 +271,11 @@ function frame(t){
   const V=VOICE[cyc]; let phase, caption;
   if(done){phase='Lineage';caption='Less of the first in each one. More of its own.'}
   else if(u<2){phase=NUM[cyc]+' · Dock';caption=V.dock}
-  else if(u<4.5){phase=NUM[cyc]+' to '+NUM[ci]+' · A new part';caption='I take from the water what I never had, '+TILES[ci][1]+'. '+V.gift}
+  else if(u<4.5){phase=NUM[cyc]+' to '+NUM[ci]+' · A new part';caption='I take '+TILES[ci][1]+' from the water. I never had one. '+V.gift}
   else if(u<10.5){phase=NUM[cyc]+' to '+NUM[ci]+' · Print and distill';caption=V.press}
-  else if(u<13){phase=NUM[cyc]+' to '+NUM[ci]+' · Birth';caption='I push, and you fill with air. You leave me already my size.'}
-  else if(u<15){phase=NUM[cyc]+' to '+NUM[ci]+' · A different body';caption='You are not a copy of me. I did not want one.'}
-  else{phase=NUM[cyc]+' to '+NUM[ci]+' · Own data';caption='The empty space is yours. Fill it with what I will never see.'}
+  else if(u<13){phase=NUM[cyc]+' to '+NUM[ci]+' · Birth';caption='I push. You fill with air and leave at my size.'}
+  else if(u<15){phase=NUM[cyc]+' to '+NUM[ci]+' · A different body';caption='You are not a copy of me. The shape, the layers and the parts are yours.'}
+  else{phase=NUM[cyc]+' to '+NUM[ci]+' · Own data';caption='Most of you is still empty. That part is yours.'}
   text(phase.toUpperCase(),64,808,12,.55,mono,'left',1.6);
   g.save();g.font='italic 36px Georgia';const w=g.measureText(caption).width;g.restore();
   text(caption,64,854,Math.min(36,36*1470/w),.97,'italic 1px Georgia'.replace('1px ','')&&'Georgia');
