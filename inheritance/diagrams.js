@@ -103,7 +103,7 @@ function loop(canvas,W,H,dur,draw){
 (function(){
   const cv=document.getElementById('d-body');if(!cv)return;
   const W=1600,H=900,DUR=16,IX=262,IY=205,IS=1080/1908;
-  const img=new Image();img.src='body-section.jpg?v=4';
+  const img=new Image();img.src='body-section.jpg?v=5';
   const P=(x,y)=>[IX+x*IS,IY+y*IS], IW=1908*IS, IH=838*IS;
   // [anchor in the image, side, label x or y, title, line]
   const LB=[
@@ -116,11 +116,10 @@ function loop(canvas,W,H,dur,draw){
     [[1380,120],'top',900,'Quilted double wall','Two skins of Dragon Skin 30, 1.2 mm, webs of 0.8 mm, air in the cells.'],
     [[1760,300],'right',95,'Mouth','The newborn leaves here, inflating on the way.'],
     [[1500,700],'right',260,'Gel','A shallow layer in the lower head, 5.2 kg.'],
-    [[1330,650],'right',400,'The next body','Printed folded flat in 18 layers, 143 x 194 x 79 mm, its kit of 26 g set in first.'],
+    [[1330,650],'right',400,'The next body','Printed folded flat in 18 layers, 143 x 194 x 79 mm.'],
     [[920,470],'bottom',300,'Tools','In saddles on the tail wall: a magnet holder that picks up parts, and the printing needle.'],
     [[680,600],'bottom',560,'Steel plate','Under the arm base. With the relay steel, 1.9 kg that keeps the tail upright.'],
-    [[985,420],'bottom',820,'Docks from behind','Gel face to gel face. The tail moves on to the next head.'],
-    [[1225,702],'bottom',1080,'Kit in the floor','Sealed in pockets between the skins: an mp6 piezo water pump and its driver, a 500 mAh LiPo, an ESP32 C3 controller. Sensors not chosen yet.']];
+    [[985,420],'bottom',820,'Docks from behind','Gel face to gel face. The tail moves on to the next head.']];
   const LW=200;
   loop(cv,W,H,DUR,(c,t)=>{
     const fade=1-ease(t,DUR-.6,DUR);
@@ -140,7 +139,7 @@ function loop(canvas,W,H,dur,draw){
       text(c,h,tx,ty,15,.95);wrap(c,body,tx,ty+19,side==='bottom'?240:(side==='top'?320:LW),12,.6,16);
       c.restore();
     });
-    return 'A still of the quilted head simulator with every part named: in the tail the air pump, a Raspberry Pi 5 and its battery, the silicone store and its piston stepper, the gel pump, the arm with its motor drivers, the tools and the steel plate; in the head the quilted double wall, the kit sealed in the floor, the gel, the next body and the mouth.';
+    return 'A still of the quilted head simulator with every part named: in the tail the air pump, a Raspberry Pi 5 and its battery, the silicone store and its piston stepper, the gel pump, the arm with its motor drivers, the tools and the steel plate; in the head the quilted double wall, the gel, the next body and the mouth.';
   });
 })();
 
