@@ -126,7 +126,7 @@ function initThree() {
   const ctl = new THREE.OrbitControls(cam, cv); ctl.target.set(0, 0.0, 0); ctl.enableDamping = true; ctl.dampingFactor = 0.08; ctl.maxPolarAngle = Math.PI * 0.49; ctl.minDistance = 1.2; ctl.maxDistance = 26;
   Object.assign(R3, { r, sc, cam, ctl });
   // lights: nine small fixed spots straight down, a weak hemisphere for the room
-  R3.spots = LAMPS.map((L) => { const sp = new THREE.SpotLight(0xfff4e6, 0.85, 0, SPOT_A * 1.02, 0.7, 0); sp.position.copy(L); sp.target.position.set(L.x, 0, L.z);
+  R3.spots = LAMPS.map((L) => { const sp = new THREE.SpotLight(0xfff4e6, 0.55, 0, SPOT_A * 1.02, 0.7, 0); sp.position.copy(L); sp.target.position.set(L.x, 0, L.z);
     sc.add(sp); sc.add(sp.target); return sp; });
   // sixteen shadow maps would be too many; one soft light from straight above casts the shadows for all of them
   const sh = new THREE.DirectionalLight(0xfff4e6, 0.35); sh.position.set(0.3, 6, 0.4); sh.castShadow = true; sh.shadow.mapSize.set(2048, 2048);
@@ -252,7 +252,7 @@ function buildWater() {
 }
 function buildBeam() {
   const geo = new THREE.ConeGeometry(1, 1, 64, 1, true); geo.translate(0, -0.5, 0);      // apex at the origin, opening downward
-  const m = new THREE.ShaderMaterial({ uniforms: { uI: { value: 0.035 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+  const m = new THREE.ShaderMaterial({ uniforms: { uI: { value: 0.022 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
     vertexShader: `varying float vH; varying vec3 vN; varying vec3 vV; void main() { vH = -position.y; vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position, 1.0); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }`,
     fragmentShader: `uniform float uI; varying float vH; varying vec3 vN; varying vec3 vV;
       void main() { float rim = pow(abs(dot(normalize(vN), normalize(vV))), 2.2); float a = uI * rim * (1.0 - 0.75 * vH) * smoothstep(0.0, 0.06, vH) * smoothstep(1.0, 0.92, vH);
@@ -312,7 +312,7 @@ void main() {
   vec2 ta = boxT(uCam, rd, vec3(-4.4, ${WL.toFixed(2)}, -4.0), vec3(4.4, ${(LH - 0.15).toFixed(2)}, 4.0)); ta.x = max(ta.x, 0.0); ta.y = min(ta.y, tS);
   if (ta.y > ta.x) { float dt = (ta.y - ta.x) / 16.0;
     for (int i = 0; i < 16; i++) { vec3 p = uCam + rd * (ta.x + (float(i) + j) * dt); float dn = 0.7 + 0.6 * vn(p.xz * 1.7 + vec2(p.y * 1.3 - uTime * 0.03, uTime * 0.02)); acc += vec3(1.0, 0.96, 0.9) * lampK(p) * dn * dt * uAir * (0.25 + 0.75 * smoothstep(0.3, 3.0, p.y)); } }
-  gl_FragColor = vec4(acc, 1.0); }`, { tDepth: { value: null }, uPI: { value: new THREE.Matrix4() }, uCW: { value: new THREE.Matrix4() }, uCam: { value: new THREE.Vector3() }, uAir: { value: 0.02 }, uWat: { value: 0.022 }, uTime: U.uTime, uCos: U.uCos });
+  gl_FragColor = vec4(acc, 1.0); }`, { tDepth: { value: null }, uPI: { value: new THREE.Matrix4() }, uCW: { value: new THREE.Matrix4() }, uCam: { value: new THREE.Vector3() }, uAir: { value: 0.013 }, uWat: { value: 0.015 }, uTime: U.uTime, uCos: U.uCos });
   C.pre = fsMat("uniform sampler2D tColor; uniform sampler2D tHaze; uniform float uExp; varying vec2 vUv; void main() { vec3 c = min((texture2D(tColor, vUv).rgb + texture2D(tHaze, vUv).rgb) * uExp, vec3(24.0)); float br = max(c.r, max(c.g, c.b)); float w = clamp(br - 0.85, 0.0, 0.7); w = w * w / 1.4; gl_FragColor = vec4(c * max(w, br - 1.2) / max(br, 1e-4), 1.0); }", { tColor: { value: null }, tHaze: { value: null }, uExp: { value: 1 } });
   C.down = fsMat("uniform sampler2D t; uniform vec2 hp; varying vec2 vUv; void main() { vec3 s = texture2D(t, vUv).rgb * 4.0 + texture2D(t, vUv - hp).rgb + texture2D(t, vUv + hp).rgb + texture2D(t, vUv + vec2(hp.x, -hp.y)).rgb + texture2D(t, vUv - vec2(hp.x, -hp.y)).rgb; gl_FragColor = vec4(s / 8.0, 1.0); }", { t: { value: null }, hp: { value: new THREE.Vector2() } });
   C.up = fsMat("uniform sampler2D t; uniform vec2 hp; varying vec2 vUv; void main() { vec3 s = texture2D(t, vUv + vec2(-hp.x * 2.0, 0.0)).rgb + texture2D(t, vUv + vec2(-hp.x, hp.y)).rgb * 2.0 + texture2D(t, vUv + vec2(0.0, hp.y * 2.0)).rgb + texture2D(t, vUv + hp).rgb * 2.0 + texture2D(t, vUv + vec2(hp.x * 2.0, 0.0)).rgb + texture2D(t, vUv + vec2(hp.x, -hp.y)).rgb * 2.0 + texture2D(t, vUv + vec2(0.0, -hp.y * 2.0)).rgb + texture2D(t, vUv - hp).rgb * 2.0; gl_FragColor = vec4(s / 12.0, 1.0); }", { t: { value: null }, hp: { value: new THREE.Vector2() } }, { blending: THREE.AdditiveBlending, transparent: true });
