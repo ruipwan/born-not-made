@@ -833,7 +833,7 @@ function pauseAndPlace(r, i) {
   const sp = r.babySpec, t = r.nk[i], q = sp.pocket[i], bp = babyPt(r, q), L = Math.max(1, Math.round(sp.pf[i] * NLAY)), rp = rackPos(r, i), at = [rp[0], rp[1] + 0.003 + t.h + 0.003, rp[2]];
   r.needle = null; r.paused = true; r.arm.needleOn = false;
   hop(r, at, "mag", 1.0, { hold: t, psiEnd: rp[3] });
-  hop(r, [bp[0], bp[1] + t.h / 2 + 0.004, bp[2]], "mag", 1.0, { psiEnd: q.ledge ? 0 : inward(bp[2]), hold: null, fn: () => { t.inBaby = true; t.setT = simT; r.paused = false; sp.next++; if (!q.ledge) dtag(() => worldOf(r, babyPt(r, q)), `POCKET ${(t.h * 1000).toFixed(1)} MM DEEP, THE PART'S OWN HEIGHT · SET FLUSH IN THE WALL`, 4); flash(() => worldOf(r, babyPt(r, q)), 1.4, 0.07, 2.2); log(`#${r.id} pauses the print at layer ${L} of ${NLAY} and sets ${FAM[t.f]}, ${t.name}, ${q.ledge ? "on the inner ledge" : "into the wall"}`); } });
+  hop(r, [bp[0], bp[1] + t.h / 2 + 0.004, bp[2]], "mag", 1.0, { psiEnd: q.ledge ? 0 : inward(bp[2]), hold: null, fn: () => { t.inBaby = true; t.setT = simT; r.paused = false; sp.next++; if (!q.ledge) dtag(() => worldOf(r, babyPt(r, q)), `POCKET ${(t.h * 1000).toFixed(1)} MM DEEP · ${t.name.toUpperCase()}, SET FLUSH`, 4); flash(() => worldOf(r, babyPt(r, q)), 1.4, 0.07, 2.2); log(`#${r.id} pauses the print at layer ${L} of ${NLAY} and sets ${FAM[t.f]}, ${t.name}, ${q.ledge ? "on the inner ledge" : "into the wall"}`); } });
 }
 // the arm drawn: the link meshes of the printing simulator, and its tool modules, for each robot that holds a tail
 const TOOLG = {};      // the tool meshes, made once and shared by every arm
@@ -1416,7 +1416,7 @@ function updateScene(dtReal) {
       b.visible = r.carry > 0.002; }
     }
     if (r.tjob && r.tjob.mesh && r.tjob.mesh.parent) { const J = r.tjob, m = J.mesh, b = J.st.startsWith("birth") ? sstep(0, 1, J.b) : 0, f = lerp(0.6, 0.85, b);      // a tail segment printed folded flat, then born through the mouth
-      const Q = m.userData.Q, y0 = -0.6 * r.s.B; m.position.set(lerp(BABYX, reach(r) + 0.25, b), lerp(y0 - Q.yb, 0, b), 0); qShape(Q, clamp(J.b * 2 - 0.6, 0, 1) * (b > 0 ? 1 : 0), 0); m.updateMatrixWorld(true);
+      const Q = m.userData.Q, y0 = -0.6 * r.s.B; m.position.set(lerp(BABYX, reach(r) + 0.25, b), lerp(y0 - Q.yb, 0, b), 0); qShape(Q, b > 0 ? clamp(J.b * 2 - 0.6, 0, 1) : 0, 0); m.updateMatrixWorld(true);
       if (Q.pods) Q.pods.visible = !!J.pods; m.userData.plane.constant = b > 0 ? 10 : r.grp.position.y + y0 + J.p * Q.packH * 1.02 + 0.001; }      // layer by layer: the clip rises with the print
     // the stock: parts eaten and not yet built in, each on its slot of the rack on the floor of the head
     for (let i = 0; i < r.nk.length; i++) { const k = r.nk[i]; if (k.inSeg) continue;
@@ -1470,7 +1470,7 @@ function updateScene(dtReal) {
 }
 function labels() {
   const out = [], W = cv.clientWidth, H = cv.clientHeight;
-  const put = (x, y, z, text) => { tmpV.set(x, y, z).project(R3.cam); if (tmpV.z > 1 || Math.abs(tmpV.x) > 1.05 || Math.abs(tmpV.y) > 1.05) return; out.push(`<div class="tg" style="left:${((tmpV.x + 1) / 2 * W).toFixed(1)}px;top:${((1 - tmpV.y) / 2 * H).toFixed(1)}px">${esc(text)}</div>`); };
+  const put = (x, y, z, text) => { if (camMode === "above" && PLANV.k) { const q = planP(x, z); out.push(`<div class="tg" style="left:${q[0].toFixed(1)}px;top:${(q[1] - 12).toFixed(1)}px">${esc(text)}</div>`); return; } tmpV.set(x, y, z).project(R3.cam); if (tmpV.z > 1 || Math.abs(tmpV.x) > 1.05 || Math.abs(tmpV.y) > 1.05) return; out.push(`<div class="tg" style="left:${((tmpV.x + 1) / 2 * W).toFixed(1)}px;top:${((1 - tmpV.y) / 2 * H).toFixed(1)}px">${esc(text)}</div>`); };
   // labels sit just above the head they belong to; in a Film close shot they would cover the subject, so they stay out of it
   if (camMode === "film" && DIR.shot && DIR.shot.kind !== "wide") { $("#labs").innerHTML = ""; return; }
   const fol = camMode === "follow", tg = R3.ctl.target, top = (r) => WL - waterY(r.s) + r.s.B + 0.04;
@@ -1567,7 +1567,11 @@ function planBin(geo, nb = 40) { if (geo.userData.planB) return geo.userData.pla
   const out = []; for (let k = 0; k <= nb; k++) if (a[k] >= 0) out.push([x0 + (x1 - x0) * k / nb, a[k]]); return (geo.userData.planB = out); }
 function planRings(geo) { const U = geo.userData; if (U.planR) return U.planR; const P = U.ringPos, M = U.M, out = [];
   for (let k = 0; k <= U.mouthK; k++) { let a = 0; for (let j = 0; j < M; j++) a = Math.max(a, Math.abs(P[(k * M + j) * 3 + 2])); out.push([P[k * M * 3], a]); } return (U.planR = out); }
-function drawPlan(g) { const W = (x, z) => scr(x, WL, z); g.fillStyle = "#0b0b0c"; g.fillRect(0, 0, DG.w, DG.h);
+// the plan is drawn to scale in its own frame: the whole tank fitted into the free area between the caption block and the log, with margins
+const PLANV = { k: 0, cx: 0, cy: 0 }, planP = (x, z) => [PLANV.cx + x * PLANV.k, PLANV.cy + z * PLANV.k];
+function planFit() { const cb = cv.getBoundingClientRect(), top = $(".cap").getBoundingClientRect().bottom - cb.top + 40, bot = $("#ev").getBoundingClientRect().top - cb.top - 18, left = 24, right = DG.w - 24;
+  const hx = TX + 0.3, hz = TZ + 0.3, k = Math.max(5, Math.min((right - left) / (2 * hx), (bot - top) / (2 * hz))); PLANV.k = k; PLANV.cx = (left + right) / 2; PLANV.cy = Math.max(top + hz * k, (top + bot) / 2); }
+function drawPlan(g) { planFit(); const W = planP; g.fillStyle = "#0b0b0c"; g.fillRect(0, 0, DG.w, DG.h);
   const poly = (pts, close = true) => { let first = true; g.beginPath(); for (const q of pts) { if (!q) { first = true; continue; } if (first) { g.moveTo(q[0], q[1]); first = false; } else g.lineTo(q[0], q[1]); } if (close) g.closePath(); g.stroke(); };
   const ln = (a, b) => { if (a && b) { g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke(); } };
   const outline = (st, f) => poly(st.map(([x, a]) => f(x, a)).concat(st.slice().reverse().map(([x, a]) => f(x, -a))));
@@ -1586,9 +1590,9 @@ function drawPlan(g) { const W = (x, z) => scr(x, WL, z); g.fillStyle = "#0b0b0c
     poly([f(-l, -w), f(l, -w), f(l, w), f(-l, w)]); }
   if (pipe) { const o = W(pipe.x, pipe.z), e = W(pipe.x + 0.035, pipe.z); if (o && e) { const R = Math.hypot(e[0] - o[0], e[1] - o[1]); g.lineWidth = 0.9; g.beginPath(); g.arc(o[0], o[1], R, 0, 7); g.stroke(); g.beginPath(); g.arc(o[0], o[1], R * 0.75, 0, 7); g.stroke(); g.setLineDash([4, 3]); ln(o, W(pipe.x - 0.6, pipe.z - 0.4)); g.setLineDash([]); } }      // the pipe's mouth, its bend above dashed
   // a scale bar and the title of the drawing
-  const a = W(TX - 1, -TZ - 0.3), b = W(TX, -TZ - 0.3); if (a && b) { g.strokeStyle = "rgba(232,231,226,0.9)"; g.lineWidth = 0.8; ln(a, b); ln([a[0], a[1] - 4], [a[0], a[1] + 4]); ln([b[0], b[1] - 4], [b[0], b[1] + 4]);
+  const a = W(TX - 1, -TZ - 0.12), b = W(TX, -TZ - 0.12); if (a && b) { g.strokeStyle = "rgba(232,231,226,0.9)"; g.lineWidth = 0.8; ln(a, b); ln([a[0], a[1] - 4], [a[0], a[1] + 4]); ln([b[0], b[1] - 4], [b[0], b[1] + 4]);
     g.font = '500 10px "JetBrains Mono", monospace'; g.textBaseline = "middle"; g.fillStyle = "rgba(232,231,226,0.85)"; g.textAlign = "right"; g.fillText("1 M", a[0] - 8, a[1]);
-    g.fillText(`PLAN AT THE WATERLINE · SCENE ${SCENE} · ${robots.length} HEADS, ${tailsAll()} TAILS, ${mods.length} MODULES, ${partsAfloat()} PARTS AFLOAT`, b[0], a[1] - 16); g.textAlign = "left"; } }
+    g.fillText(`PLAN AT THE WATERLINE · SCENE ${SCENE} · ${robots.length} HEADS, ${tailsAll()} TAILS, ${mods.length} MODULES, ${partsAfloat()} PARTS AFLOAT`, b[0], a[1] - 14); g.textAlign = "left"; } }
 function drawDiagram() {
   const g = DG.g; g.setTransform(DG.D, 0, 0, DG.D, 0, 0); g.clearRect(0, 0, DG.w, DG.h); if (camMode === "above") return drawPlan(g);
   g.font = '500 10px "JetBrains Mono", monospace'; g.textBaseline = "middle";
