@@ -120,8 +120,8 @@ html.embed .ov .stepl { font-size: clamp(11px, 1.3vw, 13px); }
 
 <section class="doc" id="how">
   <h2>One part, into the wall</h2>
-  <p>No electronic part sits in the gel or on the gel floor. Every part except the arm ends up sealed between the two skins of the double wall. This page follows one pod, a pump pod, from the dry magazine in the tail into one patch of the wall, at full scale. The wall is cut open through the middle of the pod, so the inside is visible. The view is a time lapse; the clock shows process time.</p>
-  <p>Carbopol is a solid below its yield stress, so an empty cup in the print stays full of gel. The bed of fresh silicone pushes the gel out first. The pocket is filled solid; it is not an air cell. Fresh silicone may not bond to the cured capsule, so it locks through the holes in the flange. The tapered rim centers the pod after the tool change. A pump pod needs capped tubes for its ports.</p>
+  <p>No electronic part sits in the gel or on the gel floor. Every part except the arm ends up sealed between the two skins of the double wall. This page follows the one pod of the newborn from the dry magazine in the tail into one patch of the wall, at full scale. The pod is the whole kit on one aluminum plate: a Raspberry Pi 5, its sensors, a motor driver, two water pumps, a cell and a regulator, all wired on the plate and cast in silicone. No wire runs in the print. Only water crosses the skin, through four capped tubes. The wall is cut open through the middle of the pod, so the inside is visible. The view is a time lapse; the clock shows process time.</p>
+  <p>Carbopol is a solid below its yield stress, so an empty cup in the print stays full of gel. The bed of fresh silicone pushes the gel out first. The pocket is filled solid; it is not an air cell. Fresh silicone may not bond to the cured capsule, so it locks through the holes in the flange. The tapered rim centers the pod after the tool change. Each pump needs a capped tube for its inlet and one for its outlet.</p>
   <h4>Numbers</h4>
   <ul id="nums"></ul>
   <h4>Assumptions</h4>
@@ -130,9 +130,11 @@ html.embed .ov .stepl { font-size: clamp(11px, 1.3vw, 13px); }
   <ul id="openq"></ul>
   <h4>Sources</h4>
   <ul>
-    <li><a href="../../simulator/doublewall/quilt.json">simulator/doublewall/quilt.json</a>: skins 1.2 mm, webs 0.8 mm, channels 18 mm, quilt at most 14.8 mm thick, flat pack layers of 4.4 mm with 1 mm gel gaps, 763 m of bead and 1.42 L in 43,887 s of print, kit parts, electromagnet, tool lengths, the quick release head, one tool change of 60 s, a kit placement of 75 s.</li>
+    <li><a href="../../simulator/doublewall/quilt.json">simulator/doublewall/quilt.json</a>: skins 1.2 mm, webs 0.8 mm, channels 18 mm, quilt at most 14.8 mm thick, flat pack layers of 4.4 mm with 1 mm gel gaps, 763 m of bead and 1.42 L in 43,887 s of print, electromagnet, tool lengths, the quick release head, one tool change of 60 s, a kit placement of 75 s.</li>
     <li><a href="https://www.smooth-on.com/tb/files/DRAGON_SKIN_SERIES_TB.pdf">Smooth-On, Dragon Skin series technical bulletin</a>: Dragon Skin 30, pot life 45 min, cure 16 h, specific gravity 1.08; tin, sulfur and latex stop the cure.</li>
-    <li><a href="https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/5561/mp6%20micropumps.pdf">Bartels mp6 micropump datasheet</a>: 30 x 15 x 3.8 mm, 2 g. <a href="https://bartels-mikrotechnik.de/wp-content/uploads/2025/03/datasheet-electronic-driver.pdf">Bartels mp-Lowdriver datasheet</a>: 25.6 x 10.3 x 5.0 mm.</li>
+    <li><a href="https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-mechanical-drawing.pdf">Raspberry Pi 5 mechanical drawing</a>: 85 x 56 mm. <a href="https://www.raspberrypi.com/documentation/computers/raspberry-pi.html">Raspberry Pi documentation</a>: 3 A at 5 V to boot, typical bare board draw 800 mA, I2C on GPIO 2 and 3, PCM (I2S) on GPIO 18 to 21, PWM0 and PWM1 on GPIO 12 and 13, 5 V in on pins 2 and 4, all GPIO together 50 mA, throttling from 80 °C.</li>
+    <li><a href="https://www.ti.com/lit/ds/symlink/drv8833.pdf">TI DRV8833 datasheet</a>: two H bridges, 2.7 to 10.8 V, 1.5 A RMS a bridge, logic high from 2 V. <a href="https://www.pololu.com/product/4082">Pololu S13V30F5</a>: 2.8 to 22 V in, 5 V, 3 A, 22.9 x 22.9 x 9.7 mm. <a href="https://learn.adafruit.com/introducing-adafruit-stemma-qt/what-is-stemma-qt">Adafruit STEMMA QT</a>: 4 pin JST SH, 1.0 mm, Qwiic compatible.</li>
+    <li>The two pumps: the AITIAO 3 to 4.5 V micro submersible pump the artist owns, 0.18 A, about 100 L/h, 42.6 x 23.9 x 22.7 mm, about 30 g, as recorded in <a href="../../build/data/components.json">build/data/components.json</a> from a <a href="https://core-electronics.com.au/mute-sounds-mini-submersible-pump-dc-3v-5v.html">reseller page</a>; no maker sheet exists.</li>
     <li><a href="https://www.adafruit.com/products/3872">Adafruit 3872 electromagnet</a>: 20 mm across, 15 mm tall, 2.5 kg holding force.</li>
     <li><a href="https://doi.org/10.1002/adma.201703817">Valentine et al., Hybrid 3D printing of soft electronics, Adv. Mater. 2017</a>; <a href="https://doi.org/10.1126/sciadv.1500655">Bhattacharjee et al., Writing in the granular gel medium, Sci. Adv. 2015</a>; <a href="https://www.doi.org/10.1038/NATURE19100">Wehner et al., Nature 2016</a>. The 2D diagram on the <a href="../#d-wall">Inheritance page</a> lists them in full.</li>
   </ul>
@@ -172,35 +174,44 @@ const D = {
   head: [30, 40, 52], // QJ arm.HEAD: the quick release block, f 30, w 40, h 52 mm
   magnet: [20, 15],   // QJ sources magnet: Adafruit 3872, 20 mm across, 15 mm tall
   disk: [20, 1, 2.47],// QJ kit parts: steel disk 20 x 1 mm, 2.47 g
-  mp6: [30, 15, 3.8, 2],      // QJ kit parts: Bartels mp6, 30 x 15 x 3.8 mm, 2 g
-  drv: [25.6, 10.3, 5.0, 2],  // QJ kit parts: Bartels mp-Lowdriver, 25.6 x 10.3 x 5.0 mm, 2 g
-  cap: [36, 30, 8],   // assume: the cured capsule around the two parts, walls about 1 mm and more
-  flange: [43, 37, 1],// assume: flange 3.5 mm wide all round, 1 mm thick
-  hole: 1.6,          // assume: flange holes 1.6 mm, every 4 mm
+  pi: [85, 56, 1.6, 46],      // Raspberry Pi 5 mechanical drawing: 85 x 56 mm; jacks about 16 mm (scaled, not dimensioned); 46 g assume
+  pump: [42.6, 23.9, 22.7, 30, 0.18], // AITIAO 3 to 4.5 V micro submersible pump the artist owns, as in build/data/components.json (reseller data, no maker sheet)
+  cell: [65.25, 18.75, 50],   // 18650 cell, QJ sources cell (Samsung INR18650-35E: 3500 mAh, 3.6 V, about 50 g)
+  reg: [22.9, 22.9, 9.7],     // Pololu S13V30F5 product page: 5 V, 3 A, 22.9 x 22.9 x 9.7 mm
+  drv8833: [14, 12, 3],       // TI DRV8833 (HTSSOP 5.0 x 4.4 mm) on a carrier 14 x 12 mm (carrier size assumed)
+  plate: [152, 84, 1.5],      // assume: aluminum carrier, every part on it
+  cap: [156, 88, 26.2],       // the pod: plate plus 2 mm of silicone each side; 1.5 mm plate + 22.7 mm pump + 2 mm
+  flange: [164, 96, 1],       // assume: flange 4 mm wide all round, 1 mm thick
+  hole: 2,            // assume: flange holes 2 mm, every 6 mm
   rimH: 2.4,          // assume: rim of two beads, 2.4 mm tall, the upper bead 0.55 mm further out (the taper)
-  gelTop: 30,         // assume: gel surface 30 mm over the lower skin of this patch
+  gelTop: 50,         // assume: gel surface 50 mm over the lower skin of this patch
   bulge: 5.5,         // from QJ quiltMax: (14.8 - 3.4) / 2 for each skin at the crown of a channel
   airTime: 60,        // assume: the cells of this patch fill in a minute at "birth"
 };
 const BR = D.bead / 2, SZ = D.skin / D.bead;
 const ZS1 = D.skin, ZW = D.skin + D.gap, ZS2 = ZW + D.skin; // 1.2, 2.2, 3.4
-const PX = 45, PY = 22;                                    // patch half size
-const WEBX = [26, 44];                                     // webs at +-26 and +-44: channels of 18 mm
+const PX = 125, PY = 70;                                   // patch half size
+const WEBX = [88, 106, 124];                               // webs every 18 mm outside the rim: channels of 18 mm
 const SEAT = 1.8;                                          // flange bottom: 0.6 mm into the 1.2 mm bed
 const FH = [D.flange[0] / 2, D.flange[1] / 2], CH = [D.cap[0] / 2, D.cap[1] / 2];
 const RIM1 = [FH[0] + 0.8 + BR, FH[1] + 0.8 + BR], RIM2 = [RIM1[0] + 0.55, RIM1[1] + 0.55];
-const PORTS = [[12, -4], [12, -9]];
-const MAG = { x: -138, y: 0, z: [0, 19, 38], top: 56 };    // assume: the dry magazine, 3 pods on shelves
-const DOCKX = -92, SAD = { needle: V(-100, -72, 12), holder: V(-100, -46, 12) };
+/* the plate, top view, in plate mm (x 0..152, y 0..84) as in the 2D diagram; in the pod: x - 76, 42 - y */
+const PLT = { pumpA: [0, 3, 42.6, 23.9], pumpB: [0, 30, 42.6, 23.9], drv: [47, 4, 14, 12], pi: [64, 0, 85, 56], cell: [0, 62, 65.25, 18.75], reg: [69, 60, 22.9, 22.9], imu: [96, 60, 20, 18], mic: [119, 60, 14, 14], amp: [136, 60, 14, 14] };
+const PC = (x, y) => [x - 76, 42 - y];
+const PORTS = [[-72, PC(0, 14.95)[1]], [-48, PC(0, 14.95)[1]], [-72, PC(0, 41.95)[1]], [-48, PC(0, 41.95)[1]]]; // out and in of each pump
+const MAG = { x: -260, y: 0, z: [0, 42], top: 84 };        // assume: the dry magazine, 2 pods on shelves
+const DOCKX = -150, SAD = { needle: V(-160, -130, 12), holder: V(-160, -100, 12) };
 const ASSUME = [
   ["Travel speed of the tool in the gel", "30 mm/s"],
-  ["Pod capsule (cured Dragon Skin 30 around mp6 and driver)", "36 x 30 x 8 mm"],
-  ["Flange", "3.5 mm wide, 1 mm thick, holes 1.6 mm every 4 mm"],
+  ["Pod", "plate 152 x 84 mm plus 2 mm of silicone a side: 156 x 88 x 26.2 mm"],
+  ["Flange", "4 mm wide, 1 mm thick, holes 2 mm every 6 mm"],
+  ["Pi 5 mass and jack height", "46 g, jacks about 16 mm tall"],
+  ["Sensor boards", "IMU 20 x 18 mm, microphone and amplifier 14 x 14 mm"],
   ["Rim", "two beads, 2.4 mm tall, upper bead 0.55 mm out"],
   ["Bed", "one layer, 1.2 mm; the flange sinks 0.6 mm into it"],
   ["Pod placed in", "75 s, as the kit stage of the doublewall build"],
-  ["Gel over this patch", "30 mm"],
-  ["Tail drawn close", "docking plane 47 mm from the patch edge; farther in the build"],
+  ["Gel over this patch", "50 mm"],
+  ["Tail drawn close", "docking plane 25 mm from the patch edge; farther in the build"],
   ["Bulge of a cell", "5.5 mm a skin, from the 14.8 mm quilt"],
   ["Cells fill", "in about 1 minute"],
 ];
@@ -211,11 +222,15 @@ const OPENQ = [
   "Tin or sulfur in the potting would stop the platinum cure around the pod.",
   "The holder may lift the pod when the magnet lets go.",
   "Water may reach the electronics through the silicone over months.",
-  "The capped ports of a pump pod are untested.",
+  "The four capped tubes of the pumps are untested.",
+  "Heat: the Pi 5 turns about 4 W into heat inside silicone. Raspberry Pi rates the board 0 to 70 °C and throttles from 80 °C. The aluminum face to the water is the only way out.",
+  "Size: 156 x 88 x 27 mm fits the folded print in plan (143 x 194 mm) but adds about 23 mm to its 79 mm stack, more than the 17 mm of gel over it.",
+  "Weight: about 0.5 kg in air, at the 500 g limit of the DexArm. Lifting the pod from a dry magazine may be out of reach.",
+  "Radio through silicone and water reaches only a short way. Charging, by coil or contacts, is open.",
 ];
 
 /* ============================================================ toolpaths */
-function rrect(hx, hy, z, r = 3, step = 1) { // rounded rectangle loop, closed
+function rrect(hx, hy, z, r = 4, step = 3) { // rounded rectangle loop, closed
   const p = [], seg = (a, b) => { const n = Math.max(1, Math.ceil(a.distanceTo(b) / step)); for (let i = 0; i < n; i++) p.push(a.clone().lerp(b, i / n)); };
   const arc = (cx, cy, a0) => { for (let i = 0; i < 6; i++) { const a = a0 + (i / 6) * Math.PI / 2; p.push(V(cx + r * Math.cos(a), cy + r * Math.sin(a), z)); } };
   seg(V(-hx + r, -hy, z), V(hx - r, -hy, z)); arc(hx - r, -hy + r, -Math.PI / 2);
@@ -225,20 +240,20 @@ function rrect(hx, hy, z, r = 3, step = 1) { // rounded rectangle loop, closed
   p.push(p[0].clone()); return p;
 }
 function linesY(xs, y0, y1, z, skip) { // zigzag lines along y, one bead each; skip(x,y) breaks a line
-  const out = []; xs.forEach((x, i) => { const a = i % 2 ? y1 : y0, b = i % 2 ? y0 : y1, n = Math.ceil(Math.abs(b - a)); let cur = [];
+  const out = []; xs.forEach((x, i) => { const a = i % 2 ? y1 : y0, b = i % 2 ? y0 : y1, n = Math.ceil(Math.abs(b - a) / 4); let cur = [];
     for (let k = 0; k <= n; k++) { const y = lerp(a, b, k / n); if (skip && skip(x, y)) { if (cur.length > 1) out.push(cur); cur = []; } else cur.push(V(x, y, z)); }
     if (cur.length > 1) out.push(cur); }); return out;
 }
 const range = (a, b, s) => { const o = []; for (let x = a; x <= b + 1e-6; x += s) o.push(+x.toFixed(3)); return o; };
 const L = {}; // layers: name -> {paths, r, sz}
 L.skin = { paths: linesY(range(-PX + BR, PX - BR, D.bead), -PY, PY, ZS1 / 2), r: BR, sz: SZ, name: "lower skin" };
-L.webs = { paths: [-WEBX[1], -WEBX[0], WEBX[0], WEBX[1]].map((x, i) => i % 2 ? [V(x, PY, ZS1 + .5), V(x, -PY, ZS1 + .5)] : [V(x, -PY, ZS1 + .5), V(x, PY, ZS1 + .5)]), r: D.web / 2, sz: 1.25, name: "webs" };
+L.webs = { paths: [...WEBX.map((x) => -x), ...WEBX].map((x, i) => i % 2 ? [V(x, PY, ZS1 + .5), V(x, -PY, ZS1 + .5)] : [V(x, -PY, ZS1 + .5), V(x, PY, ZS1 + .5)]), r: D.web / 2, sz: 1.25, name: "webs" };
 L.rim = { paths: [rrect(RIM1[0], RIM1[1], ZS1 + .6), rrect(RIM2[0], RIM2[1], ZS1 + 1.8)], r: BR, sz: SZ, name: "rim" };
 L.bed = { paths: (() => { const o = []; range(-RIM1[1] + 1.4, RIM1[1] - 1.4, 1.5).forEach((y, i) => { const xa = RIM1[0] - 1.3; o.push(i % 2 ? [V(xa, y, ZS1 + .6), V(-xa, y, ZS1 + .6)] : [V(-xa, y, ZS1 + .6), V(xa, y, ZS1 + .6)]); }); return o; })(), r: BR, sz: SZ, name: "bed" };
 L.cover = { paths: [
     rrect(CH[0] + 1.5, CH[1] + 1.5, SEAT + 1.6), rrect(CH[0] + 3.0, CH[1] + 3.0, SEAT + 1.6),
-    ...[2.8, 4.0, 5.2, 6.4, 7.6, 8.8].map((h) => rrect(CH[0] + BR, CH[1] + BR, SEAT + h)),
-    ...linesY(range(-CH[0] + 1, CH[0] - 1, D.bead), -CH[1] + .5, CH[1] - .5, SEAT + 10.6, (x, y) => PORTS.some(([px, py]) => Math.hypot(x - px, y - py) < 2.1)),
+    ...Array.from({ length: 21 }, (_, i) => rrect(CH[0] + BR, CH[1] + BR, SEAT + 2.8 + i * 1.2)),
+    ...linesY(range(-CH[0] + 1, CH[0] - 1, D.bead), -CH[1] + .5, CH[1] - .5, SEAT + 1 + D.cap[2] + 1.6, (x, y) => PORTS.some(([px, py]) => Math.hypot(x - px, y - py) < 2.6)),
   ], r: BR, sz: SZ, name: "cover" };
 L.upper = { paths: linesY([...range(-PX + BR, -RIM2[0] - BR - .2, D.bead), ...range(RIM2[0] + BR + .2, PX - BR, D.bead)], -PY, PY, ZW + D.skin / 2), r: BR, sz: SZ, name: "upper skin" };
 const ORDER = ["skin", "webs", "rim", "bed", "cover", "upper"];
@@ -246,7 +261,7 @@ for (const k of ORDER) { let len = 0; L[k].paths.forEach((p) => { for (let i = 1
 const AREA = Math.PI * BR * BR * SZ; // mm2 of a bead (flattened to the layer height)
 
 /* ============================================================ moves and stages */
-const POD_TOP = 10; // disk top over the flange bottom
+const POD_TOP = D.flange[2] + D.cap[2] + D.disk[1]; // disk top over the flange bottom
 const STAGES = [];
 function stage(k, name, cap, disp) { const s = { k, name, cap, disp, moves: [], real: 0 }; STAGES.push(s); return s; }
 let CUR = { tool: "needle", p: V(-PX, -PY, 14) };
@@ -264,24 +279,24 @@ const tipZ = (z) => V(0, 0, z);
   printLayer(s3, "bed"); mv(s3, V(CUR.p.x, CUR.p.y, 8));
   const s4 = stage("change", "Tool change", "The arm leaves the needle in its saddle on the tail wall and takes the magnet holder.", 8);
   const n0 = SAD.needle, h0 = SAD.holder;
-  mv(s4, V(n0.x + 40, n0.y, 14)); mv(s4, V(n0.x, n0.y, n0.z)); wait(s4, 8, { ev: "needle off" });
+  mv(s4, V(n0.x + 40, n0.y, 34)); mv(s4, V(n0.x, n0.y, n0.z)); wait(s4, 8, { ev: "needle off" });
   CUR.tool = null; CUR.p = V(n0.x, n0.y, n0.z + D.needleLen);
   mv(s4, V(n0.x, n0.y, n0.z + D.needleLen + 6), { tool: null, wrist: true }); mv(s4, V(h0.x, h0.y, h0.z + D.holderLen + 6), { tool: null, wrist: true }); mv(s4, V(h0.x, h0.y, h0.z + D.holderLen), { tool: null, wrist: true, dur: 2 });
   wait(s4, Math.max(4, D.toolChange - s4.real), { tool: null, wrist: true, ev: "holder on" });
   CUR.tool = "holder"; CUR.p = h0.clone();
   const s5 = stage("pod", "Pod", "The holder carries a sealed pod from the dry magazine, through the gel, and presses the pod into the wet bed.", 16);
-  const topPod = V(MAG.x, MAG.y, MAG.z[2] + POD_TOP);
-  mv(s5, V(h0.x, h0.y, 64)); mv(s5, V(MAG.x, MAG.y, 64)); mv(s5, topPod); wait(s5, 3, { mag: true, ev: "magnet on" });
-  mv(s5, V(MAG.x, MAG.y, 64), { carry: true, mag: true }); mv(s5, V(0, 0, 64), { carry: true, mag: true }); mv(s5, V(0, 0, SEAT + POD_TOP + 4), { carry: true, mag: true });
+  const topPod = V(MAG.x, MAG.y, MAG.z[MAG.z.length - 1] + POD_TOP);
+  mv(s5, V(h0.x, h0.y, 128)); mv(s5, V(MAG.x, MAG.y, 128)); mv(s5, topPod); wait(s5, 3, { mag: true, ev: "magnet on" });
+  mv(s5, V(MAG.x, MAG.y, 128), { carry: true, mag: true }); mv(s5, V(-150, 0, 128), { carry: true, mag: true }); mv(s5, V(-130, 0, 74), { carry: true, mag: true }); mv(s5, V(0, 0, 74), { carry: true, mag: true }); mv(s5, V(0, 0, SEAT + POD_TOP + 4), { carry: true, mag: true });
   mv(s5, V(0, 0, SEAT + POD_TOP), { carry: true, mag: true, dur: 6, ev: "press" }); wait(s5, 3, { carry: true, mag: true }); wait(s5, 2, { mag: false, ev: "magnet off" });
-  mv(s5, V(0, 0, SEAT + POD_TOP + 1.5), { dur: 2 }); mv(s5, V(0, 0, 40));
+  mv(s5, V(0, 0, SEAT + POD_TOP + 1.5), { dur: 2 }); mv(s5, V(0, 0, 70));
   const s6 = stage("cover", "Cover", "Back to the needle. Beads go round the pod and over the flange, then the upper skin closes over the pod and the webs, wet on wet.", 18);
-  mv(s6, V(h0.x, h0.y, 40)); mv(s6, h0); wait(s6, 6, { ev: "holder off" }); CUR.tool = null; CUR.p = V(h0.x, h0.y, h0.z + D.holderLen);
+  mv(s6, V(h0.x, h0.y, 70)); mv(s6, h0); wait(s6, 6, { ev: "holder off" }); CUR.tool = null; CUR.p = V(h0.x, h0.y, h0.z + D.holderLen);
   mv(s6, V(h0.x, h0.y, h0.z + D.holderLen + 50), { tool: null, wrist: true }); mv(s6, V(n0.x, n0.y, n0.z + D.needleLen + 6), { tool: null, wrist: true }); mv(s6, V(n0.x, n0.y, n0.z + D.needleLen), { tool: null, wrist: true, dur: 2 }); wait(s6, 6, { tool: null, wrist: true, ev: "needle on" });
-  CUR.tool = "needle"; CUR.p = n0.clone(); mv(s6, V(n0.x + 40, n0.y, 14)); mv(s6, V(-10, 0, 16));
+  CUR.tool = "needle"; CUR.p = n0.clone(); mv(s6, V(n0.x + 40, n0.y, 40)); mv(s6, V(-90, 0, 40));
   printLayer(s6, "cover"); printLayer(s6, "upper"); mv(s6, V(CUR.p.x, CUR.p.y, 14));
   const s7 = stage("cure", "Cure", "Time passes. The fresh silicone turns from glossy to matte. Bed, flange holes and cover cure as one.", 7);
-  mv(s7, V(n0.x + 40, n0.y, 14)); mv(s7, n0); wait(s7, D.cure - s7.real, { ev: "cure" });
+  mv(s7, V(CUR.p.x, CUR.p.y, 40)); mv(s7, V(n0.x + 40, n0.y, 40)); mv(s7, n0); wait(s7, D.cure - s7.real, { ev: "cure" });
   const s8 = stage("air", "Air", "After “birth” air fills the cells around the pod. The skins bulge between the webs like a quilt. The pod stays a solid island.", 8);
   wait(s8, D.airTime);
 }
@@ -367,50 +382,62 @@ function roundBox(w, d, h, r) { const s = new THREE.Shape(), x = w / 2 - r, y = 
   return new THREE.ExtrudeGeometry(s, { depth: h, bevelEnabled: true, bevelThickness: .8, bevelSize: .8, bevelSegments: 2, curveSegments: 4 }); }
 function box(w, d, h, mat, x = 0, y = 0, z = 0) { const m = new THREE.Mesh(new THREE.BoxGeometry(w, d, h), mat); m.position.set(x, y, z + h / 2); return m; }
 function cyl(r, h, mat, seg = 20) { const g = new THREE.CylinderGeometry(r, r, h, seg); g.rotateX(Math.PI / 2); g.translate(0, 0, h / 2); return new THREE.Mesh(g, mat); }
+function partMat(o) { // solid parts: back faces of a cut part are painted flat, so the cut reads as solid
+  const m = new THREE.MeshStandardMaterial(Object.assign({ side: THREE.DoubleSide }, o));
+  m.onBeforeCompile = (sh) => { sh.fragmentShader = sh.fragmentShader.replace("#include <dithering_fragment>", "#include <dithering_fragment>\n if (!gl_FrontFacing) gl_FragColor.rgb = diffuseColor.rgb * 0.55;"); };
+  return m;
+}
 function makePod(clip) {
   const G = new THREE.Group(), cp = clip ? CUT : [];
   const capM = new THREE.MeshStandardMaterial({ color: 0xeef6f8, roughness: .15, transparent: true, opacity: .2, emissive: 0x1a2022, depthWrite: false, side: THREE.DoubleSide, clippingPlanes: cp });
   const flM = new THREE.MeshStandardMaterial({ color: 0xe6eef0, roughness: .3, transparent: true, opacity: .55, side: THREE.DoubleSide, clippingPlanes: cp });
   // flange with holes all round
   const s = new THREE.Shape(); s.moveTo(-FH[0], -FH[1]); s.lineTo(FH[0], -FH[1]); s.lineTo(FH[0], FH[1]); s.lineTo(-FH[0], FH[1]); s.lineTo(-FH[0], -FH[1]);
-  const holes = []; const ring = (hx, hy) => { const per = 4 * (hx + hy), n = Math.floor(per / 4); for (let i = 0; i < n; i++) { let d = (i + .5) * per / n, x, y; if (d < 2 * hx) { x = -hx + d; y = -hy; } else if ((d -= 2 * hx) < 2 * hy) { x = hx; y = -hy + d; } else if ((d -= 2 * hy) < 2 * hx) { x = hx - d; y = hy; } else { d -= 2 * hx; x = -hx; y = hy - d; } holes.push([x, y]); } };
-  ring(FH[0] - 1.6, FH[1] - 1.6);
+  const holes = []; const ring = (hx, hy) => { const per = 4 * (hx + hy), n = Math.floor(per / 6); for (let i = 0; i < n; i++) { let d = (i + .5) * per / n, x, y; if (d < 2 * hx) { x = -hx + d; y = -hy; } else if ((d -= 2 * hx) < 2 * hy) { x = hx; y = -hy + d; } else if ((d -= 2 * hy) < 2 * hx) { x = hx - d; y = hy; } else { d -= 2 * hx; x = -hx; y = hy - d; } holes.push([x, y]); } };
+  ring(FH[0] - 2, FH[1] - 2);
   holes.forEach(([x, y]) => { const h = new THREE.Path(); h.absarc(x, y, D.hole / 2, 0, Math.PI * 2, true); s.holes.push(h); });
   const fl = new THREE.Mesh(new THREE.ExtrudeGeometry(s, { depth: D.flange[2], bevelEnabled: false, curveSegments: 6 }), flM); G.add(fl);
-  const cap = new THREE.Mesh(roundBox(D.cap[0] - 1.6, D.cap[1] - 1.6, D.cap[2] - 1.6, 3), capM); cap.position.z = D.flange[2] + .8; cap.renderOrder = 2; G.add(cap);
-  const board = new THREE.MeshStandardMaterial({ color: 0x2e5a3a, roughness: .7, clippingPlanes: cp }), chip = new THREE.MeshStandardMaterial({ color: 0x1b1b1d, roughness: .5, clippingPlanes: cp }), pump = new THREE.MeshStandardMaterial({ color: 0x9aa3a8, roughness: .35, metalness: .5, clippingPlanes: cp });
-  G.add(box(32, 26, .8, board, 0, 0, 2.2));
-  G.add(box(D.mp6[0], D.mp6[1], D.mp6[2], pump, -1, -7, 3.0));
-  G.add(box(D.drv[0], D.drv[1], D.drv[2] * .7, chip, -1, 6.6, 3.0));
-  G.add(box(4, 4, 1, chip, 12, 6.6, 3.0 + D.drv[2] * .7));
-  const steel = new THREE.MeshStandardMaterial({ color: 0x8d9298, roughness: .35, metalness: .85, clippingPlanes: cp });
-  const disk = cyl(D.disk[0] / 2, D.disk[1], steel, 28); disk.position.z = POD_TOP - D.disk[1]; G.add(disk);
-  const tube = new THREE.MeshStandardMaterial({ color: 0xd8d6cf, roughness: .5, clippingPlanes: cp }), capc = new THREE.MeshStandardMaterial({ color: 0x3a3a3c, roughness: .6, clippingPlanes: cp });
-  PORTS.forEach(([x, y]) => { const t = cyl(1, 7, tube, 12); t.position.set(x, y, D.flange[2] + D.cap[2]); G.add(t); const c = cyl(1.5, 1.6, capc, 12); c.position.set(x, y, D.flange[2] + D.cap[2] + 7); G.add(c); });
+  const cap = new THREE.Mesh(roundBox(D.cap[0] - 1.6, D.cap[1] - 1.6, D.cap[2] - 1.6, 6), capM); cap.position.z = D.flange[2] + .8; cap.renderOrder = 2; G.add(cap);
+  // the kit hangs under the aluminum plate, which is the top face of the pod (toward the outer skin)
+  const board = partMat({ color: 0x2e5a3a, roughness: .7, clippingPlanes: cp  }), chip = partMat({ color: 0x1b1b1d, roughness: .5, clippingPlanes: cp  }), pump = partMat({ color: 0x9aa3a8, roughness: .35, metalness: .5, clippingPlanes: cp  });
+  const alu = partMat({ color: 0xb8bcc0, roughness: .3, metalness: .8, clippingPlanes: cp  }), cellM = partMat({ color: 0x3f5f8a, roughness: .45, clippingPlanes: cp  }), jack = partMat({ color: 0x8e9398, roughness: .4, metalness: .6, clippingPlanes: cp  });
+  const zP = D.flange[2] + D.cap[2] - 2 - D.plate[2];                 // plate underside
+  G.add(box(D.plate[0], D.plate[1], D.plate[2], alu, 0, 0, zP));
+  const under = (k, h, mat, inset = 0) => { const [x, y, w, d] = PLT[k], [cx, cy] = PC(x + w / 2, y + d / 2); const m = box(w - inset, d - inset, h, mat, cx, cy, zP - h); G.add(m); return m; };
+  under("pumpA", D.pump[2], pump); under("pumpB", D.pump[2], pump);
+  { const [x, y, w, d] = PLT.cell, [cx, cy] = PC(x + w / 2, y + d / 2); const g = new THREE.CylinderGeometry(d / 2, d / 2, w, 20); g.rotateZ(Math.PI / 2); const m = new THREE.Mesh(g, cellM); m.position.set(cx, cy, zP - d / 2); G.add(m); }
+  under("reg", D.reg[2], chip); under("drv", D.drv8833[2], chip); under("imu", 3, board); under("mic", 3, board); under("amp", 3, board);
+  { const [x, y, w, d] = PLT.pi, [cx, cy] = PC(x + w / 2, y + d / 2); G.add(box(w, d, D.pi[2], board, cx, cy, zP - 3 - D.pi[2]));   // Pi 5 board on 3 mm standoffs
+    const jz = zP - 3 - D.pi[2]; [[70.5, 2, 17.5, 14, 15], [70.5, 20, 17.5, 14, 15], [67, 37, 21, 16, 13.5]].forEach(([jx, jy, jw, jd, jh]) => { const [qx, qy] = PC(x + jx + jw / 2, y + jy + jd / 2); G.add(box(jw, jd, jh, jack, qx, qy, jz - jh)); });
+    const [hx, hy] = PC(x + 32.5, y + 3.5); G.add(box(50.8, 5, 8.5, chip, hx, hy, jz - 8.5)); const [sx, sy] = PC(x + 31, y + 21); G.add(box(14, 14, 1.4, chip, sx, sy, jz - 1.4)); }
+  const steel = partMat({ color: 0x8d9298, roughness: .35, metalness: .85, clippingPlanes: cp  });
+  const disk = cyl(D.disk[0] / 2, D.disk[1], steel, 28); disk.position.set(10, 0, POD_TOP - D.disk[1]); G.add(disk);
+  const tube = partMat({ color: 0xd8d6cf, roughness: .5, clippingPlanes: cp  }), capc = partMat({ color: 0x3a3a3c, roughness: .6, clippingPlanes: cp  });
+  PORTS.forEach(([x, y]) => { const t = cyl(2.5, 10, tube, 14); t.position.set(x, y, D.flange[2] + D.cap[2]); G.add(t); const c = cyl(3.2, 2.5, capc, 14); c.position.set(x, y, D.flange[2] + D.cap[2] + 10); G.add(c); });
   G.userData.holes = holes;
   return G;
 }
 function build() {
   // grid floor 10 mm, under the gel
-  const grid = new THREE.GridHelper(300, 30, 0x2a2a2c, 0x161618); grid.rotation.x = Math.PI / 2; grid.position.set(-50, 0, -10); SCN.add(grid);
+  const grid = new THREE.GridHelper(600, 60, 0x2a2a2c, 0x161618); grid.rotation.x = Math.PI / 2; grid.position.set(-80, 0, -10); SCN.add(grid);
   // gel: a faint clipped volume with a visible surface
   const gelM = new THREE.MeshStandardMaterial({ color: 0x9cc8ec, transparent: true, opacity: .07, depthWrite: false, side: THREE.DoubleSide, clippingPlanes: CUT, roughness: .1 });
-  OBJ.gel = new THREE.Mesh(new THREE.BoxGeometry(170, 170, D.gelTop + 10), gelM); OBJ.gel.position.set(-25, 0, (D.gelTop - 10) / 2); OBJ.gel.renderOrder = 5; SCN.add(OBJ.gel);
-  const sg = new THREE.PlaneGeometry(170, 85, 48, 20); sg.translate(-25, -42.5, D.gelTop);
+  OBJ.gel = new THREE.Mesh(new THREE.BoxGeometry(320, 300, D.gelTop + 10), gelM); OBJ.gel.position.set(-25, 0, (D.gelTop - 10) / 2); OBJ.gel.renderOrder = 5; SCN.add(OBJ.gel);
+  const sg = new THREE.PlaneGeometry(320, 150, 48, 20); sg.translate(-25, -75, D.gelTop);
   OBJ.surfM = new THREE.MeshStandardMaterial({ color: 0xb6d8f4, transparent: true, opacity: .2, depthWrite: false, side: THREE.DoubleSide, roughness: .05, metalness: .1 });
   OBJ.surf = new THREE.Mesh(sg, OBJ.surfM); OBJ.surf.renderOrder = 6; OBJ.surf.userData.z0 = Float32Array.from(sg.attributes.position.array); SCN.add(OBJ.surf);
-  const edge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(170, 85, D.gelTop + 10)), new THREE.LineBasicMaterial({ color: 0x4d6c86, transparent: true, opacity: .5 }));
-  edge.position.set(-25, -42.5, (D.gelTop - 10) / 2); OBJ.gelEdge = edge; SCN.add(edge);
+  const edge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(320, 150, D.gelTop + 10)), new THREE.LineBasicMaterial({ color: 0x4d6c86, transparent: true, opacity: .5 }));
+  edge.position.set(-25, -75, (D.gelTop - 10) / 2); OBJ.gelEdge = edge; SCN.add(edge);
   // tail side: docking plane, a plain plate, the two saddles, the dry magazine
   const petg = new THREE.MeshStandardMaterial({ color: 0x8b8f93, roughness: .6, transparent: true, opacity: .22, side: THREE.DoubleSide, depthWrite: false });
-  const plane = new THREE.Mesh(new THREE.PlaneGeometry(190, 80), petg); plane.rotation.y = Math.PI / 2; plane.position.set(DOCKX - 1, -25, 30); SCN.add(plane);
-  const pl = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(190, 80)), new THREE.LineBasicMaterial({ color: 0x77797c })); pl.rotation.y = Math.PI / 2; pl.position.copy(plane.position); SCN.add(pl);
+  const plane = new THREE.Mesh(new THREE.PlaneGeometry(320, 140), petg); plane.rotation.y = Math.PI / 2; plane.position.set(DOCKX - 1, -40, 55); SCN.add(plane);
+  const pl = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(320, 140)), new THREE.LineBasicMaterial({ color: 0x77797c })); pl.rotation.y = Math.PI / 2; pl.position.copy(plane.position); SCN.add(pl);
   const solid = new THREE.MeshStandardMaterial({ color: 0x5f6266, roughness: .7 });
   [SAD.needle, SAD.holder].forEach((s, i) => { const z = s.z + (i ? D.holderLen : D.needleLen) - 6; const f = box(16, 16, 3, solid, s.x - 2, s.y, z); SCN.add(f); const arm = box(10, 6, 3, solid, DOCKX - 4, s.y, z); SCN.add(arm); });
   const magM = new THREE.MeshStandardMaterial({ color: 0x9aa0a4, roughness: .5, transparent: true, opacity: .16, side: THREE.DoubleSide, depthWrite: false });
-  const mg = new THREE.BoxGeometry(50, 44, MAG.top + 8); OBJ.mag = new THREE.Mesh(mg, magM); OBJ.mag.position.set(MAG.x, MAG.y, (MAG.top - 8) / 2); SCN.add(OBJ.mag);
+  const mg = new THREE.BoxGeometry(D.flange[0] + 12, D.flange[1] + 12, MAG.top + 8); OBJ.mag = new THREE.Mesh(mg, magM); OBJ.mag.position.set(MAG.x, MAG.y, (MAG.top - 8) / 2); SCN.add(OBJ.mag);
   const ml = new THREE.LineSegments(new THREE.EdgesGeometry(mg), new THREE.LineBasicMaterial({ color: 0x8a8e92 })); ml.position.copy(OBJ.mag.position); SCN.add(ml);
-  MAG.z.forEach((z) => SCN.add(box(46, 40, 1, solid, MAG.x, MAG.y, z - 1)));
+  MAG.z.forEach((z) => SCN.add(box(D.flange[0] + 8, D.flange[1] + 8, 1, solid, MAG.x, MAG.y, z - 1)));
   OBJ.magPods = MAG.z.map((z) => { const p = makePod(false); p.position.set(MAG.x, MAG.y, z); SCN.add(p); return p; });
   // the layers
   OBJ.lay = {};
@@ -420,11 +447,11 @@ function build() {
   // fresh silicone through the flange holes, and the squeeze out at the rim
   const hm = silMat(); const hg = new THREE.CylinderGeometry(D.hole / 2, D.hole / 2 * 1.5, 1, 8); hg.rotateX(Math.PI / 2); hg.translate(0, 0, .5);
   OBJ.holes = new THREE.InstancedMesh(hg, hm, OBJ.pod.userData.holes.length); OBJ.holeMat = hm; SCN.add(OBJ.holes);
-  const sq = beadGeo([rrect(RIM2[0] + .2, RIM2[1] + .2, ZS1 + 2.6)], .9, .7); OBJ.squeeze = new THREE.Mesh(sq.g, silMat()); SCN.add(OBJ.squeeze);
+  const sq = beadGeo([rrect(RIM2[0] + .2, RIM2[1] + .2, ZS1 + 2.6)], 1.2, .7); OBJ.squeeze = new THREE.Mesh(sq.g, silMat()); SCN.add(OBJ.squeeze);
   // gel pushed out of the rim by the bed: particles
-  const N = 260, gp = new Float32Array(N * 3), seeds = []; for (let i = 0; i < N; i++) { const x = (Math.random() * 2 - 1) * (RIM1[0] - 2), y = -Math.random() * (RIM1[1] - 2), z = ZS1 + .3 + Math.random() * 2.5; seeds.push([x, y, z, Math.random()]); }
+  const N = 420, gp = new Float32Array(N * 3), seeds = []; for (let i = 0; i < N; i++) { const x = (Math.random() * 2 - 1) * (RIM1[0] - 2), y = -Math.random() * (RIM1[1] - 2), z = ZS1 + .3 + Math.random() * 2.5; seeds.push([x, y, z, Math.random()]); }
   const pg = new THREE.BufferGeometry(); pg.setAttribute("position", new THREE.BufferAttribute(gp, 3));
-  OBJ.gelP = new THREE.Points(pg, new THREE.PointsMaterial({ color: 0x9cc8ec, size: .9, sizeAttenuation: true, transparent: true, opacity: .9, depthWrite: false })); OBJ.gelP.userData.seeds = seeds; SCN.add(OBJ.gelP);
+  OBJ.gelP = new THREE.Points(pg, new THREE.PointsMaterial({ color: 0x9cc8ec, size: 1.8, sizeAttenuation: true, transparent: true, opacity: .9, depthWrite: false })); OBJ.gelP.userData.seeds = seeds; SCN.add(OBJ.gelP);
   // tools: needle with its static mixer, holder with its electromagnet, the quick release head and a line for the arm
   const steel = new THREE.MeshStandardMaterial({ color: 0xc9cdd1, roughness: .25, metalness: .9 }), body = new THREE.MeshStandardMaterial({ color: 0x3c3f43, roughness: .55 }), clear = new THREE.MeshStandardMaterial({ color: 0xd7e3e6, roughness: .2, transparent: true, opacity: .5 });
   const nd = new THREE.Group(); const nt = cyl(.9, 26, steel, 12); nd.add(nt); const cone = new THREE.Mesh(new THREE.CylinderGeometry(4, 1.2, 6, 16).rotateX(Math.PI / 2).translate(0, 0, 29), clear); nd.add(cone);
@@ -439,7 +466,7 @@ function build() {
   OBJ.wallM = silMat({ color: CURED.getHex(), roughness: .9 }); OBJ.airM = new THREE.MeshStandardMaterial({ color: 0x9cc8ec, transparent: true, opacity: .14, depthWrite: false, side: THREE.DoubleSide, clippingPlanes: CUT });
   OBJ.wall = new THREE.Group(); SCN.add(OBJ.wall);
 }
-function bump(x, a) { const ax = Math.abs(x); return ax > WEBX[0] && ax < WEBX[1] ? a * Math.sin(Math.PI * (ax - WEBX[0]) / D.channel) : 0; }
+function bump(x, a) { const ax = Math.abs(x); for (let i = 0; i < WEBX.length - 1; i++) if (ax > WEBX[i] && ax < WEBX[i + 1]) return a * Math.sin(Math.PI * (ax - WEBX[i]) / D.channel); return 0; }
 function profileGeo(lo, hi, x0, x1) { const s = new THREE.Shape(), n = Math.max(2, Math.ceil((x1 - x0) / 1)); for (let i = 0; i <= n; i++) { const x = lerp(x0, x1, i / n); i ? s.lineTo(x, lo(x)) : s.moveTo(x, lo(x)); } for (let i = n; i >= 0; i--) { const x = lerp(x0, x1, i / n); s.lineTo(x, hi(x)); }
   const g = new THREE.ExtrudeGeometry(s, { depth: 2 * PY, bevelEnabled: false }); g.rotateX(Math.PI / 2); g.translate(0, PY, 0); return g; }
 let WALL_A = -1;
@@ -449,8 +476,8 @@ function buildWall(a) {
   const add = (g, m) => OBJ.wall.add(new THREE.Mesh(g, m));
   add(profileGeo((x) => -bump(x, a), (x) => ZS1 - bump(x, a), -PX, PX), OBJ.wallM);
   [[-PX, -RIM2[0] - BR], [RIM2[0] + BR, PX]].forEach(([x0, x1]) => add(profileGeo((x) => ZW + bump(x, a), (x) => ZS2 + bump(x, a), x0, x1), OBJ.wallM));
-  [-WEBX[1], -WEBX[0], WEBX[0], WEBX[1]].forEach((x) => add(profileGeo(() => ZS1, () => ZW, x - D.web / 2, x + D.web / 2), OBJ.wallM));
-  [[-WEBX[1] + .4, -WEBX[0] - .4], [WEBX[0] + .4, WEBX[1] - .4]].forEach(([x0, x1]) => add(profileGeo((x) => ZS1 - bump(x, a), (x) => ZW + bump(x, a), x0, x1), OBJ.airM));
+  [...WEBX.map((x) => -x), ...WEBX].forEach((x) => add(profileGeo(() => ZS1, () => ZW, x - D.web / 2, x + D.web / 2), OBJ.wallM));
+  WEBX.slice(1).flatMap((x, i) => [[-x + .4, -WEBX[i] - .4], [WEBX[i] + .4, x - .4]]).forEach(([x0, x1]) => add(profileGeo((x) => ZS1 - bump(x, a), (x) => ZW + bump(x, a), x0, x1), OBJ.airM));
 }
 
 /* ============================================================ apply a state */
@@ -464,7 +491,7 @@ function applyState(st) {
   // pod
   const pod = OBJ.pod; pod.visible = st.placed || (st.carry && st.podAt.z < SEAT + 6); OBJ.podC.visible = st.carry && !pod.visible;
   if (st.carry) { pod.position.copy(st.podAt); OBJ.podC.position.copy(st.podAt); } else if (st.placed) pod.position.set(0, 0, SEAT);
-  OBJ.magPods[2].visible = !st.taken;
+  OBJ.magPods[OBJ.magPods.length - 1].visible = !st.taken;
   // holes and squeeze out
   const H = pod.userData.holes, pr = st.press; OBJ.holes.visible = pr > 0;
   H.forEach(([x, y], i) => { _m.makeScale(1, 1, Math.max(.01, 1.6 * pr)); _m.setPosition(x, y, SEAT - .3); OBJ.holes.setMatrixAt(i, _m); }); OBJ.holes.instanceMatrix.needsUpdate = true;
@@ -493,10 +520,10 @@ function waveSurface(t) { const p = OBJ.surf.geometry.attributes.position, z0 = 
 
 /* ============================================================ cameras */
 const CAMS = {
-  section: () => ({ p: V(0, 100, 28), t: V(0, 0, 6) }),
-  close: () => ({ p: V(46, 58, 44), t: V(0, -4, 5) }),
-  top: () => ({ p: V(0, -40, 190), t: V(0, -8, 0) }),
-  magazine: () => ({ p: V(-30, 175, 90), t: V(-85, 0, 28) }),
+  section: () => ({ p: V(0, 300, 70), t: V(-20, 0, 18) }),
+  close: () => ({ p: V(150, 170, 130), t: V(-10, -10, 12) }),
+  top: () => ({ p: V(0, -90, 460), t: V(-20, -30, 0) }),
+  magazine: () => ({ p: V(-110, 430, 230), t: V(-170, 0, 50) }),
 };
 let CAMNAME = "section", CAMGOAL = null, AUTO = true, SNAP = false;
 function setCam(name, snap = false) { if (!CAMS[name]) return; CAMNAME = name; CAMGOAL = CAMS[name](); if (snap) SNAP = true; document.querySelectorAll("[data-cam]").forEach((b) => b.classList.toggle("on", b.dataset.cam === name)); }
@@ -507,24 +534,28 @@ function autoCam(st) { const k = st.s.k, f = st.f; let w = "section";
 function camStep(dt) { if (!CAMGOAL) return; const k = SNAP ? 1 : 1 - Math.exp(-dt * 2.4); CAM.position.lerp(CAMGOAL.p, k); CTRL.target.lerp(CAMGOAL.t, k); SNAP = false; if (CAM.position.distanceTo(CAMGOAL.p) < .05 && CTRL.target.distanceTo(CAMGOAL.t) < .05) CAMGOAL = null; }
 
 /* ============================================================ labels */
+const PT = (k, dz) => { const [x, y, w, d] = PLT[k]; const [cx, cy] = PC(x + w / 2, y + d / 2); return V(cx, Math.min(cy, -1), dz); };
 const LABS = [
-  ["Lower skin, 1.2 mm", (s) => s.printed.skin > 30 && s.si < 5 ? V(-34, 0, 0) : null],
-  ["Web, 0.8 mm", (s) => s.printed.webs > 40 && s.si < 7 ? V(-26, 0, ZW) : null],
-  ["Rim, tapered", (s) => s.printed.rim > 60 && s.si < 5 ? V(-RIM2[0], 0, ZS1 + 2.4) : null],
-  ["Fresh bed", (s) => s.printed.bed > 40 && s.si < 4 ? V(8, 0, ZS1 + 1.2) : null],
-  ["Gel pushed out", (s) => s.si === 2 && s.f > .2 ? V(RIM2[0] + 4, 0, ZS1 + 5) : null],
-  ["Gel, Carbopol", (s) => s.si < 7 ? V(32, 0, D.gelTop) : null],
-  ["Needle", (s) => s.tool === "needle" && s.tip ? V(s.tip.x, s.tip.y, s.tip.z + 34) : null],
-  ["Magnet holder", (s) => s.tool === "holder" && s.tip ? V(s.tip.x, s.tip.y, s.tip.z + 30) : null],
-  ["Magazine, dry", (s) => s.si >= 3 && s.si <= 5 ? V(MAG.x, MAG.y, MAG.top + 6) : null],
-  ["Docking plane", (s) => s.si >= 3 && s.si <= 5 ? V(DOCKX, 0, 70) : null],
-  ["Pod", (s) => (s.carry || s.placed) && s.si < 7 ? (s.carry ? s.podAt.clone().add(V(-14, 0, 9)) : V(-14, 0, SEAT + 9)) : null],
-  ["Flange holes", (s) => s.si === 4 && s.placed ? V(-FH[0] + 1.6, 0, SEAT + 1) : null],
-  ["Capped ports", (s) => (s.carry || s.placed) && s.si < 7 ? (s.carry ? s.podAt.clone().add(V(PORTS[0][0], PORTS[1][1], 17.5)) : V(PORTS[0][0], PORTS[1][1], SEAT + 17.5)) : null],
-  ["Cover", (s) => s.printed.cover > 200 && s.si >= 5 ? V(-CH[0] - 2, 0, SEAT + 6) : null],
-  ["Upper skin", (s) => s.printed.upper > 100 ? V(-38, 0, ZS2 + bump(-38, s.air * D.bulge)) : null],
-  ["Air", (s) => s.si === 7 && s.air > .3 ? V(35, 0, ZW + 1) : null],
-  ["Solid island", (s) => s.si === 7 && s.air > .3 ? V(0, 0, SEAT + 12) : null],
+  ["Lower skin, 1.2 mm", (s) => s.printed.skin > 80 && s.si < 5 ? V(-110, 0, 0) : null],
+  ["Web, 0.8 mm", (s) => s.printed.webs > 100 && s.si < 7 ? V(-106, 0, ZW) : null],
+  ["Rim, tapered", (s) => s.printed.rim > 200 && s.si < 5 ? V(-RIM2[0], 0, ZS1 + 2.4) : null],
+  ["Fresh bed", (s) => s.printed.bed > 100 && s.si < 4 ? V(30, 0, ZS1 + 1.2) : null],
+  ["Gel pushed out", (s) => s.si === 2 && s.f > .2 ? V(RIM2[0] + 6, 0, ZS1 + 6) : null],
+  ["Gel, Carbopol", (s) => s.si < 7 ? V(100, 0, D.gelTop) : null],
+  ["Needle", (s) => s.tool === "needle" && s.tip ? V(s.tip.x, s.tip.y, s.tip.z + 60) : null],
+  ["Magnet holder", (s) => s.tool === "holder" && s.tip ? V(s.tip.x, s.tip.y, s.tip.z + 45) : null],
+  ["Magazine, dry", (s) => s.si >= 3 && s.si <= 5 ? V(MAG.x, MAG.y, MAG.top + 8) : null],
+  ["Docking plane", (s) => s.si >= 3 && s.si <= 5 ? V(DOCKX, 0, 120) : null],
+  ["Raspberry Pi 5", (s) => s.placed && s.si < 6 ? V(30, 0, SEAT + 14) : null],
+  ["Water pump", (s) => s.placed && s.si < 6 ? V(-55, 0, SEAT + 6) : null],
+  ["Aluminum face", (s) => s.placed && s.si === 4 ? V(40, 0, SEAT + D.cap[2] - 1) : null],
+  ["Flange holes", (s) => s.si === 4 && s.placed ? V(FH[0] - 2, 0, SEAT + 1) : null],
+  ["Capped tubes", (s) => (s.carry || s.placed) && s.si < 7 ? (s.carry ? s.podAt.clone().add(V(PORTS[2][0], -1, D.cap[2] + 13)) : V(PORTS[2][0], -1, SEAT + D.cap[2] + 13)) : null],
+  ["Pod", (s) => s.carry && s.si < 7 ? s.podAt.clone().add(V(40, 0, D.cap[2])) : null],
+  ["Cover", (s) => s.printed.cover > 800 && s.si >= 5 ? V(CH[0] + 2, 0, SEAT + 16) : null],
+  ["Upper skin", (s) => s.printed.upper > 300 ? V(-115, 0, ZS2 + bump(-115, s.air * D.bulge)) : null],
+  ["Air", (s) => s.si === 7 && s.air > .3 ? V(97, 0, ZW + 1) : null],
+  ["Solid island", (s) => s.si === 7 && s.air > .3 ? V(0, 0, SEAT + D.cap[2] + 4) : null],
 ];
 const LABEL_EL = [];
 function initLabels() { const box = $("#labs"); LABS.forEach(([t]) => { const d = document.createElement("div"); d.className = "lab"; d.textContent = t; d.style.display = "none"; box.appendChild(d); LABEL_EL.push(d); }); }
@@ -540,8 +571,11 @@ function placeLabels(st) { const vp = $("#vp"), w = vp.clientWidth, h = vp.clien
 /* ============================================================ readouts, timeline */
 const TL = { T: 0, playing: true, speed: 1 };
 const fmtT = (s) => s < 3600 ? Math.floor(s / 60) + " min " + String(Math.floor(s % 60)).padStart(2, "0") + " s" : (s / 3600).toFixed(1) + " h";
-const POD = (() => { const vCap = D.cap[0] * D.cap[1] * D.cap[2], vFl = (D.flange[0] * D.flange[1] - D.cap[0] * D.cap[1]) * D.flange[2], vParts = D.mp6[0] * D.mp6[1] * D.mp6[2] + D.drv[0] * D.drv[1] * D.drv[2];
-  const sil = (vCap + vFl - vParts) / 1000 * D.sg; return { g: sil + D.mp6[3] + D.drv[3] + D.disk[2], sil }; })();
+const POD = (() => { // mass: silicone around the parts, the aluminum plate, the parts (Pi 5 mass and small boards assumed)
+  const vPod = D.cap[0] * D.cap[1] * D.cap[2] + (D.flange[0] * D.flange[1] - D.cap[0] * D.cap[1]) * D.flange[2];
+  const vParts = 2 * D.pump[0] * D.pump[1] * D.pump[2] + Math.PI * (D.cell[1] / 2) ** 2 * D.cell[0] + D.plate[0] * D.plate[1] * D.plate[2] + 21000 + D.reg[0] * D.reg[1] * D.reg[2] + 3000;
+  const sil = (vPod - vParts) / 1000 * D.sg, plate = D.plate[0] * D.plate[1] * D.plate[2] / 1000 * 2.7;
+  return { g: sil + plate + 2 * D.pump[3] + D.cell[2] + D.pi[3] + 17 + D.disk[2], sil, plate }; })();
 function renderRO(st) {
   const s = st.s, rr = (a, b, hot) => `<div class="rr${hot ? " hot" : ""}"><span>${esc(a)}</span><span>${b}</span></div>`;
   const comp = s.real / s.disp;
@@ -554,7 +588,7 @@ function renderRO(st) {
     ${rr("Cure, 16 h", st.si < 6 ? "not yet" : st.si === 6 ? f0(st.f * 100) + " %" : "cured")}</div>
     <div class="rg"><h4>Print</h4>${rr("Layer", esc(lay))}${rr("Silicone laid", f2(st.vol) + " mL")}${rr("Bead", D.bead + " mm, " + D.speed + " mm/s")}
     ${ORDER.map((k) => rr(L[k].name, f0(st.printed[k]) + " of " + f0(L[k].len) + " mm")).join("")}</div>
-    <div class="rg"><h4>Pod</h4>${rr("Kind", "pump pod: mp6 and driver")}${rr("Capsule", D.cap.join(" x ") + " mm")}${rr("Flange", D.flange[0] + " x " + D.flange[1] + " mm")}${rr("Mass", f1(POD.g) + " g")}${rr("Holes", OBJ.pod.userData.holes.length + " of " + D.hole + " mm")}${rr("Pressed in", f0(st.press * 100) + " %")}</div>
+    <div class="rg"><h4>Pod</h4>${rr("Kit", "Pi 5, sensors, driver, 2 pumps, cell")}${rr("Pod", D.cap.join(" x ") + " mm")}${rr("Power", "5.8 W, about 2.2 h")}${rr("Flange", D.flange[0] + " x " + D.flange[1] + " mm")}${rr("Mass", f1(POD.g) + " g")}${rr("Holes", OBJ.pod.userData.holes.length + " of " + D.hole + " mm")}${rr("Tubes", "4, capped")}${rr("Pressed in", f0(st.press * 100) + " %")}</div>
     <div class="rg"><h4>Assumptions</h4>${ASSUME.map(([a, b]) => `<div class="rr st"><span>${esc(a)}</span><span>${esc(b)}</span></div>`).join("")}</div>
     <div class="rg"><h4>Open questions</h4>${OPENQ.map((q) => `<div class="rr"><span style="white-space:normal">${esc(q)}</span><span></span></div>`).join("")}</div>`;
 }
@@ -583,7 +617,8 @@ function renderDoc() {
     `Bead ${D.bead} mm at ${D.speed} mm/s, both from 763 m of bead and 1.42 L laid in 43,887 s.`,
     `This patch: ${PX * 2} x ${PY * 2} mm. Lower skin ${L.skin.beads} beads, ${f0(L.skin.len)} mm; rim ${f0(L.rim.len)} mm; bed ${f0(L.bed.len)} mm; cover ${f0(L.cover.len)} mm; upper skin ${f0(L.upper.len)} mm.`,
     `From the first bead of the bed to the last bead of the cover: ${fmtT(COVER_T1 - BED_T0)} of the 45 min pot life.`,
-    `Pod: ${D.cap.join(" x ")} mm capsule on a ${D.flange[0]} x ${D.flange[1]} mm flange, ${f1(POD.g)} g (silicone ${f1(POD.sil)} g, mp6 2 g, driver 2 g, steel disk ${D.disk[2]} g). The electromagnet holds 2.5 kg.`,
+    `Pod: one aluminum plate (152 x 84 mm) with a Raspberry Pi 5 (85 x 56 mm), an IMU on I2C, an I2S microphone and amplifier, a DRV8833 driver, two AITIAO pumps (42.6 x 23.9 x 22.7 mm, 0.18 A), one 18650 cell and a 5 V, 3 A regulator, cast into ${D.cap.join(" x ")} mm on a ${D.flange[0]} x ${D.flange[1]} mm flange: about ${f0(POD.g)} g (silicone ${f0(POD.sil)} g, plate ${f0(POD.plate)} g).`,
+    `Power: Pi 4.0 W / 0.9 + pumps 2 x 0.18 A x 3.7 V = 1.3 W, so 5.8 W; one cell, 3.5 Ah x 3.6 V = 12.6 Wh: about 2.2 h with both pumps on.`,
   ].map((x) => `<li>${esc(x)}</li>`).join("");
 }
 
