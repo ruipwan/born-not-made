@@ -52,7 +52,7 @@ function loop(canvas,W,H,dur,draw){
   new IntersectionObserver(e=>{vis=e[0].isIntersecting;last=performance.now()}).observe(canvas);
   function size(){const r=Math.min(2,devicePixelRatio||1),w=Math.round(canvas.clientWidth*r);if(w&&canvas.width!==w){canvas.width=w;canvas.height=Math.round(w*H/W)}}
   function tick(now){if(vis||t===0||fix!==null){size();if(fix===null){if(!reduce&&vis)t=Math.max(0,t+(now-last)/1000)%dur;if(reduce)t=dur*.92}last=now;
-    c.setTransform(canvas.width/W,0,0,canvas.height/H,0,0);c.fillStyle='#0c0c0c';c.fillRect(0,0,W,H);const d=draw(c,t);if(d&&canvas.getAttribute('aria-label')!==d)canvas.setAttribute('aria-label',d)}
+    c.setTransform(canvas.width/W,0,0,canvas.height/H,0,0);c.fillStyle='#000';c.fillRect(0,0,W,H);const d=draw(c,t);if(d&&canvas.getAttribute('aria-label')!==d)canvas.setAttribute('aria-label',d)}
     else last=now;requestAnimationFrame(tick)}
   requestAnimationFrame(tick);
 }
@@ -102,7 +102,7 @@ function loop(canvas,W,H,dur,draw){
 (function(){
   const cv=document.getElementById('d-body');if(!cv)return;
   const W=1600,H=900,DUR=14,IX=150,IY=175,IS=1300/1908;
-  const img=new Image();img.src='body-section.jpg?v=1';
+  const img=new Image();img.src='body-section.jpg?v=2';
   const P=(x,y)=>[IX+x*IS,IY+y*IS];
   const LB=[ // anchor in the image, label x, top or bottom, title, line
     [[860,230],330,'top','Arm','The only part not in the wall. It prints, and picks up parts.'],
@@ -118,13 +118,13 @@ function loop(canvas,W,H,dur,draw){
     if(img.complete&&img.naturalWidth){c.drawImage(img,IX,IY,iw,ih);
       // soften the frame so the still sits in the page
       const E=70,edges=[[IX,0,IX+E,0,IX,IY,E,ih],[IX+iw,0,IX+iw-E,0,IX+iw-E,IY,E,ih],[0,IY,0,IY+E,IX,IY,iw,E],[0,IY+ih,0,IY+ih-E,IX,IY+ih-E,iw,E]];
-      for(const [x0,y0,x1,y1,rx,ry,rw,rh] of edges){const gr=c.createLinearGradient(x0,y0,x1,y1);gr.addColorStop(0,'#0c0c0c');gr.addColorStop(1,'rgba(12,12,12,0)');c.fillStyle=gr;c.fillRect(rx,ry,rw,rh)}}
+      for(const [x0,y0,x1,y1,rx,ry,rw,rh] of edges){const gr=c.createLinearGradient(x0,y0,x1,y1);gr.addColorStop(0,'#000');gr.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=gr;c.fillRect(rx,ry,rw,rh)}}
     LB.forEach(([an,x,side,h,body],i)=>{
       const a=ease(t,.6+i*.9,1.2+i*.9)*fade;if(a<=0)return;
       const [ax,ay]=P(...an), y=side==='top'?70:IY+838*IS+45;
       c.save();c.globalAlpha=a;
       c.strokeStyle=ink(.45);c.lineWidth=1;c.beginPath();c.moveTo(ax,ay);c.lineTo(ax,side==='top'?y+48:y-22);c.lineTo(x,side==='top'?y+48:y-22);c.stroke();
-      c.fillStyle=ink(.95);c.beginPath();c.arc(ax,ay,3.5,0,7);c.fill();c.strokeStyle='#0c0c0c';c.lineWidth=1.5;c.stroke();
+      c.fillStyle=ink(.95);c.beginPath();c.arc(ax,ay,3.5,0,7);c.fill();c.strokeStyle='#000';c.lineWidth=1.5;c.stroke();
       text(c,h,x,y,16,.95);wrap(c,body,x,y+20,300,13,.6,17);
       c.restore();
     });

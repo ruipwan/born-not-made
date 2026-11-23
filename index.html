@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 /* Born, Not Made: project site. Paper white like the white clay model; gel blue as the only colour. */
-:root { --bg: #0c0c0d; --paper: #141415; --ink: #ecebe6; --muted: #9b9a94; --line: #2a2a2c; --gel: #9cc8ec; --gel-soft: #15283a; --serif: "Cormorant Garamond", Georgia, serif; --sans: "Inter", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace; color-scheme: dark; }
+:root { --bg: #000; --paper: #141415; --ink: #ecebe6; --muted: #9b9a94; --line: #2a2a2c; --gel: #9cc8ec; --gel-soft: #15283a; --serif: "Cormorant Garamond", Georgia, serif; --sans: "Inter", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace; color-scheme: dark; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.62 var(--sans); -webkit-font-smoothing: antialiased; }
@@ -102,7 +102,7 @@ h3 { font: 600 15px/1.35 var(--sans); margin: 0 0 6px; }
 .refs li { margin: 0 0 6px; }
 .venues li { margin: 0 0 8px; }
 .note { font-size: 14px; color: var(--muted); }
-.fullframe { margin: 24px 0 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #0b0e12; height: min(82vh, 860px); }
+.fullframe { margin: 24px 0 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #000; height: min(82vh, 860px); }
 .fullframe iframe { width: 100%; height: 100%; border: 0; }
 .tabhead { padding: 44px 0 8px; display: flex; justify-content: space-between; align-items: end; gap: 20px; flex-wrap: wrap; }
 .tabhead p { margin: 0; max-width: 70ch; color: var(--muted); }
@@ -1456,13 +1456,13 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 <!-- ============================== BUILD ============================== -->
 <section class="tab" id="build">
   <div class="tabhead"><div><p class="kicker">Build</p><h2>Every part, taken apart</h2><p>A parametric white model of the body, tail, arm and newborn. Explode it, pick a part, read its spec, its tolerance and its source. Change the folds and run the birth.</p></div><a class="btn" href="build/" target="_blank" rel="noopener">Open full screen</a></div>
-  <div class="fullframe" style="background:#0c0c0d"><iframe data-src="build/" title="Build: parametric teardown"></iframe></div>
+  <div class="fullframe" style="background:#000"><iframe data-src="build/" title="Build: parametric teardown"></iframe></div>
 </section>
 
 <!-- ============================== SIMULATOR ============================== -->
 <section class="tab" id="inheritance">
-  <div class="tabhead"><h2>Inheritance</h2><a class="btn" href="inheritance/?v=sim2">Open diagram</a></div>
-  <div class="fullframe" style="height:min(88vh,1080px);background:#101010"><iframe data-src="inheritance/?v=sim2" title="Inheritance: print and distillation across generations"></iframe></div>
+  <div class="tabhead"><h2>Inheritance</h2><a class="btn" href="inheritance/?v=black">Open diagram</a></div>
+  <div class="fullframe" style="height:min(88vh,1080px);background:#000"><iframe data-src="inheritance/?v=black" title="Inheritance: print and distillation across generations"></iframe></div>
 </section>
 <section class="tab" id="simulator">
   <div class="tabhead"><div><p class="kicker">Simulator</p><h2>The printing process</h2><p>Stage 3, a console modeled on Blender. The robot is one egg: the tail docks to the gel chamber by magnets, gel goes in, and the DexArm comes out of the tail, places the electronics kit and prints the folded Kresling newborn around the kit from real G-code. The arm then pushes and inflates the newborn out of the stern opening. The newborn floats and swims away on two jets. Every number comes from a physics script.</p></div><a class="btn" href="simulator/" target="_blank" rel="noopener">Open full screen</a></div>
@@ -1478,7 +1478,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 <!-- ============================== LOG ============================== -->
 <section class="tab" id="process">
   <div class="tabhead"><div><p class="kicker">Process</p><h2>How the work got here</h2><p>Discussions, options, decisions and reversals, tests, renders and shows, oldest first. Follow one idea through its changes.</p></div><a class="btn" href="log/" target="_blank" rel="noopener">Open full screen</a></div>
-  <div class="fullframe" style="background:#0c0c0d"><iframe data-src="log/" title="Making log"></iframe></div>
+  <div class="fullframe" style="background:#000"><iframe data-src="log/" title="Making log"></iframe></div>
 </section>
 
 <!-- ============================== VOICES ============================== -->
@@ -1499,7 +1499,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 
 <section class="tab" id="voices">
   <div class="tabhead"><div><p class="kicker">Talk</p><h2>Voices: an open experiment</h2><p>This is an ongoing social experiment about a new kind of artificial species. The work has a trunk, the argument, but it is an open question, so the site grows branches, keeps a log, and invites you in. The discussion is the work. Anyone can leave words or a drawing about birth, kinship between robots, a design idea, a worry or a question. Every voice stays public, with a link to where it came from.</p></div><a class="btn" href="voices/" target="_blank" rel="noopener">Open full screen</a></div>
-  <div class="fullframe" style="background:#0c0c0d;height:min(88vh,960px)"><iframe data-src="voices/" title="Voices: an open discussion"></iframe></div>
+  <div class="fullframe" style="background:#000;height:min(88vh,960px)"><iframe data-src="voices/" title="Voices: an open discussion"></iframe></div>
 </section>
 
 <!-- ============================== PHYSICS ============================== -->

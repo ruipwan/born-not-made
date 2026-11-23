@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0c0c0c"><title>Inheritance · Born, Not Made</title>
+<meta name="theme-color" content="#000"><title>Inheritance · Born, Not Made</title>
 <meta name="description" content="One continuous shot of a lineage. The tail with the arm docks into a head, takes a new part from the water, prints the newborn in gel while the parent's local model is distilled into the newborn's, then pushes the newborn out, inflating. Each newborn keeps part of the parent's model, gathers its own data, and differs in shape, print and parts.">
 <style>
-*{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:#0c0c0c;color:#eee;font:14px/1.5 Inter,Arial,sans-serif}
+*{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:#000;color:#eee;font:14px/1.5 Inter,Arial,sans-serif}
 main{max-width:1600px;margin:auto;padding:0 0 6px}
-canvas{display:block;width:100%;height:auto;background:#0c0c0c}
+canvas{display:block;width:100%;height:auto;background:#000}
 section{padding:28px 0 10px}section+section{border-top:1px solid #1c1c1c}
 .hd{padding:0 clamp(12px,2.2vw,36px) 8px}.hd p{margin:0;color:#8d8c86;font:11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase}.hd h2{margin:4px 0 0;font:400 clamp(22px,2.6vw,34px)/1.2 Georgia,serif}
 footer{display:flex;gap:16px;align-items:center;padding:8px clamp(12px,2.2vw,36px)}
@@ -24,7 +24,7 @@ button:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:3
 
 <section><div class="hd"><p>3 · The tail</p><h2>The tail copies itself</h2></div>
 <canvas id="d-tail" width="1600" height="700" style="aspect-ratio:1600/700" role="img" aria-label="A tail prints the next tail and hands over the arm."></canvas></section>
-</main><script src="diagrams.js?v=sim2"></script><script>
+</main><script src="diagrams.js?v=black"></script><script>
 /* One shot, one frame. Side view of the simplified bodies (profiles from simulator/simple/simple.json, meters).
    Time is compressed: one print, about two hours, plays in six seconds; the distillation runs in the same window. */
 const cv=document.getElementById('d-lineage'), g=cv.getContext('2d');
@@ -227,7 +227,7 @@ const VOICE=[
    The spare arms wait on the far water line and come forward one at a time. */
 function frame(t){
   g.setTransform(cv.width/W,0,0,cv.height/H,0,0);
-  g.fillStyle='#0c0c0c';g.fillRect(0,0,W,H);
+  g.fillStyle='#000';g.fillRect(0,0,W,H);
   g.strokeStyle=ink(.08);g.lineWidth=1;g.beginPath();g.moveTo(0,BG_W);g.lineTo(W,BG_W);g.stroke();
   g.strokeStyle=ink(.22);g.beginPath();for(let x=0;x<=W;x+=10){const y=FG_W+1.4*Math.sin(x*.012+t*.8);x?g.lineTo(x,y):g.moveTo(x,y)}g.stroke();
   g.fillStyle='rgba(255,255,255,.018)';g.fillRect(0,FG_W,W,H-FG_W);
