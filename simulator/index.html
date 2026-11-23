@@ -151,7 +151,9 @@ button:focus-visible, input:focus-visible, a:focus-visible, .track:focus-visible
   .top .file { font-size: 15px; }
   .top .logo { display: none; }
   .top { padding: 0 8px; }
-  .top { gap: 8px; }
+  .top { gap: 8px; overflow-x: auto; scrollbar-width: none; }
+  .top::-webkit-scrollbar { display: none; }
+  .top .sp { flex: 0 0 0; }
   .seg { padding: 3px 2px; font-size: 9px; }
   .ahead { padding: 0 6px; gap: 5px; }
   .cams .btn { padding: 3px 7px; font-size: 11px; }
