@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tail Copy Simulator</title>
+<meta name="description" content="Born, Not Made, tail copy variant: the parent prints the two quilted segments of a new tail and puts a new arm together from four floating modules, then gives birth to the arm into its own body.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root { --bg:#000; --region:#000; --header:#000; --panel:#0b0b0c; --line:#2a2a2c; --ink:#ecebe6; --muted:#9b9a94; --dim:#67665f; --ok:#cfe8c9; --bad:#e9b3a6;
+  --serif:"Cormorant Garamond",Georgia,serif; --sans:"Inter",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace; color-scheme:dark; }
+* { box-sizing:border-box; }
+html,body { background:var(--bg); color:var(--ink); margin:0; }
+body { font:12.5px/1.45 var(--sans); -webkit-font-smoothing:antialiased; }
+.app { display:grid; gap:2px; padding:2px; grid-template-columns:minmax(0,1fr) 380px; grid-template-rows:40px minmax(440px,calc(100vh - 128px)) 82px; grid-template-areas:"top top" "view side" "time time"; }
+.area { background:var(--region); border:1px solid var(--line); overflow:hidden; display:flex; flex-direction:column; min-width:0; min-height:0; }
+.top { grid-area:top; flex-direction:row; align-items:center; gap:14px; padding:0 12px; }
+.top .file { font:500 20px/1 var(--serif); white-space:nowrap; }
+.top .sub { color:var(--muted); font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sp { flex:1; }
+.home { font:500 12px var(--sans); color:var(--ink); border:1px solid var(--line); padding:4px 11px; border-radius:999px; text-decoration:none; white-space:nowrap; }
+.home:hover { background:#1a1a1c; }
+.view { grid-area:view; position:relative; }
+#vp { position:relative; flex:1; min-height:0; background:#050506; }
+#vp canvas { display:block; width:100%; height:100%; touch-action:none; }
+.ov { position:absolute; left:12px; top:10px; pointer-events:none; max-width:min(640px,calc(100% - 24px)); background:linear-gradient(90deg,#000a,#0006 70%,#0000); padding:8px 12px 9px; }
+.ov .stg { font:500 26px/1.1 var(--serif); }
+.ov .txt { color:#c9c8c2; font-size:12.5px; margin-top:4px; }
+.ov .clk { font:500 12px var(--mono); color:#dfe7ee; margin-top:6px; }
+.ov .clk span { color:var(--muted); font-weight:400; }
+.cams { position:absolute; right:10px; top:10px; display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end; }
+.btn { font:500 11.5px var(--sans); color:var(--ink); background:#0b0b0ccc; border:1px solid var(--line); border-radius:999px; padding:3px 10px; cursor:pointer; white-space:nowrap; }
+.btn:hover { background:#222; } .btn.on { background:var(--ink); color:#111; border-color:var(--ink); }
+.lab { position:absolute; left:0; top:0; pointer-events:none; font:500 9.5px/1 var(--mono); letter-spacing:.09em; text-transform:uppercase; color:#fffb; text-shadow:0 0 5px #000; white-space:nowrap; transform:translate(-50%,-140%); }
+.side { grid-area:side; padding:10px 12px; overflow:auto; }
+.side h3 { font:500 18px/1.1 var(--serif); margin:6px 0 6px; }
+.side p { color:#c9c8c2; margin:0 0 8px; }
+.ck { display:grid; grid-template-columns:14px 1fr; gap:6px; padding:4px 0; border-bottom:1px solid #161618; font-size:11.5px; color:#d6d5cf; }
+.ck i { font-style:normal; font:500 11px var(--mono); }
+.ck.ok i { color:var(--ok); } .ck.no i { color:var(--bad); }
+.ck small { display:block; color:var(--muted); font-size:10.5px; }
+.ck .g { color:var(--dim); font:500 9.5px var(--mono); letter-spacing:.06em; text-transform:uppercase; margin-right:4px; }
+.time { grid-area:time; padding:8px 12px; gap:6px; }
+.trow { display:flex; align-items:center; gap:8px; }
+.track { position:relative; flex:1; height:26px; border:1px solid var(--line); cursor:pointer; display:flex; }
+.track div { height:100%; border-right:1px solid #1b1b1d; overflow:hidden; font:500 9px var(--mono); color:var(--dim); padding:2px 3px; white-space:nowrap; }
+.track div.on { background:#1a1a1c; color:var(--ink); }
+.head { position:absolute; top:-2px; bottom:-2px; width:2px; background:#fff; pointer-events:none; }
+@media (max-width:900px) { .app { grid-template-columns:1fr; grid-template-rows:40px 62vh 82px auto; grid-template-areas:"top" "view" "time" "side"; } .top .sub { display:none; } }
+</style>
+</head><body>
+<div class="app">
+  <header class="area top">
+    <span class="file">Tail copy simulator</span>
+    <span class="sub">Born, Not Made · the parent prints a new tail in two quilted halves and puts a new arm together from floating modules</span>
+    <span class="sp"></span>
+    <a class="home" href="../doublewall/">Quilted version</a>
+    <a class="home" href="../simple/">Simple version</a>
+    <a class="home" href="../../">Home</a>
+  </header>
+  <section class="area view" aria-label="3D viewport">
+    <div id="vp">
+      <div class="ov"><div class="stg" id="ovStage">Loading</div><div class="txt" id="ovText"></div><div class="clk" id="ovClk"></div></div>
+      <div class="cams" id="cams">
+        <button class="btn on" id="auto">Auto camera</button>
+        <button class="btn" data-cam="wide">Wide</button><button class="btn" data-cam="bowl">Bowl</button><button class="btn" data-cam="front">Front</button><button class="btn" data-cam="side">Side</button><button class="btn" data-cam="top">Top</button>
+      </div>
+    </div>
+  </section>
+  <aside class="area side" id="side"></aside>
+  <section class="area time">
+    <div class="trow"><button class="btn" id="play">Pause</button><button class="btn" data-speed="0.5">0.5x</button><button class="btn on" data-speed="1">1x</button><button class="btn" data-speed="2">2x</button><div class="track" id="track"><span class="head" id="head"></span></div></div>
+  </section>
+</div>
+<script src="../../assets/vendor/three-r147/three.min.js"></script>
+<script src="../../assets/vendor/three-r147/OrbitControls.js"></script>
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x)), lerp = (a, b, t) => a + (b - a) * t;
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const hms = (s) => { s = Math.max(0, s); const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60), x = Math.floor(s % 60); return (d ? d + " d " : "") + h + ":" + String(m).padStart(2, "0") + ":" + String(x).padStart(2, "0"); };
+const M4 = () => new THREE.Matrix4(), Tm = (v) => M4().makeTranslation(v[0], v[1], v[2]);
+const about = (p, a) => Tm(p).multiply(M4().makeRotationX(a)).multiply(Tm([-p[0], -p[1], -p[2]]));
+const rxv = (v, t) => { const c = Math.cos(t), s = Math.sin(t); return [v[0], c * v[1] - s * v[2], s * v[1] + c * v[2]]; };
+function b64(s, T) { const b = atob(s), a = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) a[i] = b.charCodeAt(i); return new T(a.buffer); }
+async function gunzipB64(s) { const b = atob(s), u8 = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u8[i] = b.charCodeAt(i); return await new Response(new Blob([u8]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer(); }
+async function getJSON(u) { const r = await fetch(u, { cache: "no-cache" }); if (!r.ok) throw new Error(u); return r.json(); }
+
+let Q, AD, D, R3, TL = { T: 0, total: 0, playing: true, speed: 1, st: [] }, CAM = "wide", AUTO = true, camGoal = null;
+const P = {};
+
+function clay(hex, o = {}) { return new THREE.MeshStandardMaterial(Object.assign({ color: new THREE.Color(hex).convertSRGBToLinear(), roughness: 0.62, metalness: 0 }, o)); }
+function glass(hex, op) { return new THREE.MeshStandardMaterial({ color: new THREE.Color(hex).convertSRGBToLinear(), roughness: 0.3, transparent: true, opacity: op, depthWrite: false, side: THREE.DoubleSide }); }
+function meshOf(v, t, mat) { const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(v, 3)); g.setIndex(Array.from(t)); g.computeVertexNormals(); return new THREE.Mesh(g, mat); }
+
+function init() {
+  const host = $("#vp");
+  const renderer = new THREE.WebGLRenderer({ antialias: true }); renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1)); renderer.localClippingEnabled = true;
+  renderer.outputEncoding = THREE.sRGBEncoding; renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  host.prepend(renderer.domElement);
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(0x050506);
+  const camera = new THREE.PerspectiveCamera(32, 1, 0.01, 40); camera.up.set(0, 0, 1);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping = true; controls.dampingFactor = 0.1;
+  controls.addEventListener("start", () => setAuto(false));
+  const spot = new THREE.SpotLight(0xfff4e6, 2.6, 0, 0.75, 0.7, 1.4); spot.position.set(0.05, 0.1, 2.6); spot.target.position.set(0.05, 0, 0); scene.add(spot, spot.target);
+  spot.castShadow = true; spot.shadow.mapSize.set(2048, 2048); spot.shadow.bias = -0.0004;
+  scene.add(new THREE.HemisphereLight(0x9fb0c0, 0x202024, 0.55));
+  const fill = new THREE.DirectionalLight(0xbcd0ff, 0.35); fill.position.set(2, -2, 1); scene.add(fill);
+  R3 = { renderer, scene, camera, controls, host };
+  new ResizeObserver(resize).observe(host); resize();
+}
+function resize() { const { renderer, camera, host } = R3; const w = host.clientWidth, h = host.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+
+/* ---------------------------------------------------------------- tank, water, the parent */
+function buildTank() {
+  const t = D.tank, s = R3.scene;
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(t.L, t.W), clay(0x1b1c1f, { roughness: 0.9 })); floor.position.set((t.x0 + t.x1) / 2, 0, -0.0005); floor.receiveShadow = true; s.add(floor);
+  const box = new THREE.BoxGeometry(t.L, t.W, t.H); box.translate((t.x0 + t.x1) / 2, 0, t.H / 2);
+  s.add(new THREE.LineSegments(new THREE.EdgesGeometry(box), new THREE.LineBasicMaterial({ color: 0x4a4f56, transparent: true, opacity: 0.6 })));
+  const wat = new THREE.Mesh(new THREE.PlaneGeometry(t.L - 0.03, t.W - 0.03), new THREE.MeshStandardMaterial({ color: new THREE.Color(0x6f8fa8), roughness: 0.15, metalness: 0.1, transparent: true, opacity: 0.06, depthWrite: false, side: THREE.DoubleSide }));
+  wat.position.set((t.x0 + t.x1) / 2, 0, D.water); wat.renderOrder = 20; s.add(wat); P.water = wat;
+  const vol = new THREE.Mesh(new THREE.BoxGeometry(t.L - 0.03, t.W - 0.03, D.water), new THREE.MeshBasicMaterial({ color: 0x2c4a63, transparent: true, opacity: 0.05, depthWrite: false })); vol.position.set((t.x0 + t.x1) / 2, 0, D.water / 2); s.add(vol);
+}
+function quiltGeo(Pf, na, nv) {
+  const n1 = nv + 1, pos = new Float32Array(na * n1 * 3), uv = new Float32Array(na * n1 * 2), idx = [];
+  for (let i = 0; i < na; i++) for (let j = 0; j <= nv; j++) { const s = (i * nv + (j % nv)) * 3, d = i * n1 + j; pos[3 * d] = Pf[s]; pos[3 * d + 1] = Pf[s + 1]; pos[3 * d + 2] = Pf[s + 2]; uv[2 * d] = i / (na - 1); uv[2 * d + 1] = 1 - j / nv; }
+  for (let i = 0; i < na - 1; i++) for (let j = 0; j < nv; j++) { const a = i * n1 + j, b = a + 1, c = a + n1, e = c + 1; idx.push(a, c, b, b, c, e); }
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.BufferAttribute(uv, 2)); g.setIndex(idx); g.computeVertexNormals(); return g;
+}
+async function buildParent() {
+  const g = new THREE.Group(); g.position.x = D.off; R3.scene.add(g); P.parent = g;
+  const H = Q.hull.tail, tail = meshOf(H.v, H.t, new THREE.MeshPhysicalMaterial({ color: 0xe9ecee, roughness: 0.25, transmission: 0, transparent: true, opacity: 0.16, depthWrite: false, side: THREE.DoubleSide }));
+  tail.renderOrder = 6; g.add(tail);
+  g.add(new THREE.LineSegments(new THREE.EdgesGeometry(tail.geometry, 40), new THREE.LineBasicMaterial({ color: 0xb8c0c8, transparent: true, opacity: 0.28 })));
+  for (const b of Q.boxes) { const m = new THREE.Mesh(new THREE.BoxGeometry(2 * b.h[0], 2 * b.h[1], 2 * b.h[2]), clay(0xbfc3c8)); m.position.set(...b.c); m.rotation.z = b.yaw; g.add(m); }
+  // the quilted head
+  const qu = Q.quilt; const dec = async (k) => { const a = new Int16Array(await gunzipB64(qu[k])), f = new Float32Array(a.length); for (let i = 0; i < a.length; i++) f[i] = a[i] * qu.scale; return f; };
+  const O = await dec("outer"), I = await dec("inner");
+  const om = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.6, transparent: true, opacity: 0.42, depthWrite: false, side: THREE.FrontSide, emissive: new THREE.Color(0x15181b) });
+  const im = new THREE.MeshStandardMaterial({ color: 0xdfe6ea, roughness: 0.5, transparent: true, opacity: 0.2, depthWrite: false, side: THREE.DoubleSide });
+  const o = new THREE.Mesh(quiltGeo(O, qu.na, qu.nv), om); o.renderOrder = 7.2; g.add(o); const ii = new THREE.Mesh(quiltGeo(I, qu.na, qu.nv), im); ii.renderOrder = 7; g.add(ii);
+  P.quiltMat = [om];
+  // gel in the bowl
+  const gel = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.27, D.gel), new THREE.MeshStandardMaterial({ color: 0x9cc8ec, transparent: true, opacity: 0.16, roughness: 0.2, depthWrite: false })); gel.position.set(0.032 + 0.155, 0, D.gel / 2); gel.renderOrder = 5; g.add(gel); P.gel = gel;
+  // the parent arm
+  const am = clay(0xecebe6); P.parentParts = {};
+  for (const n in AD.parts) { const p = AD.parts[n]; const m = meshOf(b64(p.p, Float32Array), b64(p.i, Uint32Array), am); m.matrixAutoUpdate = false; m.castShadow = true; R3.scene.add(m); P.parentParts[n] = m; }
+  P.tool = toolGroup(); R3.scene.add(P.tool);
+}
+function toolGroup() {
+  const A = Q.arm, g = new THREE.Group(), m = clay(0xdfe4ea), dark = clay(0x8d9097);
+  g.add(new THREE.Mesh(new THREE.BoxGeometry(A.HEAD.f, A.HEAD.w, A.HEAD.h).translate(0, 0, A.HEAD.h / 2), m));
+  const cup = new THREE.Group(), nee = new THREE.Group(); g.add(cup, nee); g.userData = { cup, nee };
+  const Lc = A.tools.cup, M = A.MAG;
+  cup.add(new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, Lc - 0.03, 12).rotateX(Math.PI / 2).translate(0, 0, -(Lc - 0.03) / 2), m));
+  cup.add(new THREE.Mesh(new THREE.CylinderGeometry(M.r, M.r, M.h, 24).rotateX(Math.PI / 2).translate(-M.off, 0, -Lc + M.P + M.h / 2), clay(0xb9bcc2, { roughness: 0.3 })));
+  cup.add(new THREE.Mesh(new THREE.BoxGeometry(0.003, 0.008, Lc - M.P - M.h).translate(-M.off, 0, -(Lc - M.P - M.h) / 2), m));
+  const C = Q.r2.crank, cr = new THREE.Group(); cr.position.set(0.004, 0, -C.H); cup.add(cr); g.userData.crank = cr;
+  cr.add(new THREE.Mesh(new THREE.CylinderGeometry(0.0028, 0.0028, C.L, 10).rotateZ(Math.PI / 2).translate(C.L / 2, 0, 0), m));
+  cr.add(new THREE.Mesh(new THREE.TorusGeometry(0.008, 0.0015, 6, 16, Math.PI * 1.3).rotateX(Math.PI / 2).translate(C.L + 0.006, 0, 0), dark));
+  const Ln = A.tools.needle;
+  nee.add(new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, Ln - 0.025, 12).rotateX(Math.PI / 2).translate(0, 0, -(Ln - 0.025) / 2), m));
+  nee.add(new THREE.Mesh(new THREE.CylinderGeometry(0.0014, 0.0009, 0.025, 8).rotateX(Math.PI / 2).translate(0, 0, -Ln + 0.0125), dark));
+  // the gel line to the needle: a short pale hose on the head, the sign that it prints
+  nee.add(new THREE.Mesh(new THREE.TorusGeometry(0.02, 0.0025, 6, 20, Math.PI).rotateX(Math.PI / 2).translate(-0.02, 0, 0.05), clay(0xe8e2c8, { transparent: true, opacity: 0.9 })));
+  g.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+  return g;
+}
+/* DexArm forward kinematics, as in the quilted head simulator: part matrices for a base frame (x forward, z up) */
+function armMats(root, q) {
+  const A = Q.arm, a = q[1] - A.A_REST, b = q[2] - A.B_REST, S = A.S, E = A.E, W = A.W;
+  const e2 = rxv([E[0] - S[0], E[1] - S[1], E[2] - S[2]], a), E2 = [S[0] + e2[0], S[1] + e2[1], S[2] + e2[2]];
+  const w2 = rxv([W[0] - E[0], W[1] - E[1], W[2] - E[2]], b), W2 = [E2[0] + w2[0], E2[1] + w2[1], E2[2] + w2[2]];
+  const Lp = [0, 1, 2].map((i) => A.O1[i] - (E[i] - S[i])), dE = [E2[0] - E[0], E2[1] - E[1], E2[2] - E[2]];
+  const m = { B_Fix: M4(), B_Rot: M4(), In_1: about(S, a), Join: Tm(dE), In_2: Tm(dE).multiply(about(E, b)), EE: Tm([W2[0] - W[0], W2[1] - W[1], W2[2] - W[2]]), Out_1: about(Lp, a), Out_2: Tm(dE).multiply(about(A.O2, b)) };
+  const base = root.clone().multiply(M4().makeRotationZ(Math.PI / 2)), yb = base.clone().multiply(M4().makeRotationZ(q[0])), out = {};
+  for (const n in m) out[n] = n === "B_Fix" ? base : yb.clone().multiply(m[n]);
+  return out;
+}
+function toolHead(root, q) {
+  const A = Q.arm, rw = A.SF + A.L1 * Math.sin(q[1]) + A.L2 * Math.cos(q[2]), zw = A.SZ + A.L1 * Math.cos(q[1]) - A.L2 * Math.sin(q[2]), r = rw + A.STEM_F;
+  return new THREE.Vector3(r * Math.cos(q[0]), r * Math.sin(q[0]), zw + A.HEAD_BOT).applyMatrix4(root);
+}
+
+/* ---------------------------------------------------------------- the child: two quilted segments that print folded, unfold and inflate */
+function segment(secs, per, tint) {
+  const na = secs.length, nv = D.seg.nv, n1 = nv + 1, pos = new Float32Array(na * n1 * 3), uv = new Float32Array(na * n1 * 2), idx = [];
+  for (let i = 0; i < na; i++) for (let j = 0; j <= nv; j++) { const d = i * n1 + j; uv[2 * d] = i / (na - 1) * 1.6; uv[2 * d + 1] = j / nv * 3; }
+  for (let i = 0; i < na - 1; i++) for (let j = 0; j < nv; j++) { const a = i * n1 + j, b = a + 1, c = a + n1, e = c + 1; idx.push(a, c, b, b, c, e); }
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.BufferAttribute(uv, 2)); g.setIndex(idx);
+  const mat = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(tint), roughness: 0.5, clearcoat: 0.15, transparent: true, opacity: 0.55, depthWrite: false, side: THREE.DoubleSide, emissive: new THREE.Color(0x111416), clippingPlanes: [] });
+  const mesh = new THREE.Mesh(g, mat); mesh.renderOrder = 9; mesh.frustumCulled = false; mesh.matrixAutoUpdate = false;
+  const lines = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0xdfe7ee, transparent: true, opacity: 0.25, clippingPlanes: [] })); lines.matrixAutoUpdate = false; lines.frustumCulled = false;
+  R3.scene.add(mesh, lines);
+  return { secs, per, mesh, lines, mat, key: "" };
+}
+/* accordion: a coordinate a in [0, L] folded in n panels; k = 0 folded, 1 flat. returns [along, rise], the middle point kept still */
+function acc(a, L, n, k, gap) {
+  const W = L / n, dl = Math.asin(clamp(gap / W, 0, 0.9)), g = (i) => (i === 0 ? 0 : i % 2 ? (Math.PI - dl) * (1 - k) : dl * (1 - k));
+  const pt = (x) => { const i = Math.min(n - 1, Math.floor(x / W)); let u = 0, v = 0; for (let m = 0; m < i; m++) { u += W * Math.cos(g(m)); v += W * Math.sin(g(m)); } const t = x - i * W; return [u + t * Math.cos(g(i)), v + t * Math.sin(g(i))]; };
+  const p = pt(a), c = pt(L / 2), sag = 1 - 0.7 * Math.sin(Math.PI * k);      // a soft sheet in water: the panels slide open low instead of standing up
+  return [p[0] - c[0] + L / 2, (p[1] - Math.min(0, pt(0)[1], pt(L)[1])) * sag];
+}
+/* shape of a segment: kf 0..1 unfolds the Z folds, ki 0..1 opens the lay flat tube by air in the quilt */
+function shapeSeg(S, kf, ki) {
+  const key = kf.toFixed(3) + "/" + ki.toFixed(3); if (S.key === key) return; S.key = key;
+  const secs = S.secs, na = secs.length, nv = D.seg.nv, n1 = nv + 1, p = 3.2, pos = S.mesh.geometry.attributes.position.array;
+  const x0 = secs[0][0], L = secs[na - 1][0] - x0, pitch = D.seg.pitch / 1000;
+  const e = ki * ki * (3 - 2 * ki);
+  for (let i = 0; i < na; i++) {
+    const [x, w, zb, zt] = secs[i], h = (zt - zb) / 2, per = 2 * (2 * w + 2 * h) * 0.93, w0 = per / 4;
+    const Hk = lerp(0.0025, h, e), Wk = lerp(w0, w, Math.pow(e, 0.6)), zc = lerp(0.003, zb + h, e);
+    for (let j = 0; j <= nv; j++) {
+      const t = 2 * Math.PI * (j % nv) / nv, c = Math.cos(t), s = Math.sin(t);
+      let y = Wk * Math.sign(c) * Math.pow(Math.abs(c), 2 / p), z = Math.max(0, zc + Hk * Math.sign(s) * Math.pow(Math.abs(s), 2 / p)), xx = x;
+      if (ki < 0.001) {     // lay flat strip folded in 3 x 3: the arc length round the section is the strip's width
+        const arc = (t < Math.PI ? t : 2 * Math.PI - t) / Math.PI;          // 0 at one crease, 1 at the other
+        const layer = s >= 0 ? 1 : 0, a = arc * 2 * w0;
+        const kx = clamp(kf * 2, 0, 1), ky = clamp(kf * 2 - 1, 0, 1);      // along first, then across
+        const [ya, ry] = acc(a, 2 * w0, 3, ky, 2 * pitch), [xa, rx] = acc(xx - x0, L, 3, kx, 6 * pitch);
+        y = ya - w0; xx = x0 + xa; z = 0.002 + layer * pitch + ry + rx;
+      }
+      const d = (i * n1 + j) * 3; pos[d] = xx; pos[d + 1] = y; pos[d + 2] = z;
+    }
+  }
+  if (secs === D.seg.secN) { const c = [0, 0, 0]; for (let j = 0; j < nv; j++) for (let k = 0; k < 3; k++) c[k] += pos[j * 3 + k] / nv; for (let j = 0; j <= nv; j++) for (let k = 0; k < 3; k++) pos[j * 3 + k] = c[k] + (pos[j * 3 + k] - c[k]) * 0.15; }
+  S.mesh.geometry.attributes.position.needsUpdate = true; S.mesh.geometry.computeVertexNormals();
+  // the quilt seams, drawn as rings and lines along: every third station, every eighth meridian
+  const L2 = []; for (let i = 0; i < na; i += 3) for (let j = 0; j < nv; j++) { const a = (i * n1 + j) * 3, b = (i * n1 + j + 1) * 3; L2.push(pos[a], pos[a + 1], pos[a + 2], pos[b], pos[b + 1], pos[b + 2]); }
+  for (let j = 0; j < nv; j += 8) for (let i = 0; i < na - 1; i++) { const a = (i * n1 + j) * 3, b = ((i + 1) * n1 + j) * 3; L2.push(pos[a], pos[a + 1], pos[a + 2], pos[b], pos[b + 1], pos[b + 2]); }
+  S.lines.geometry.setAttribute("position", new THREE.Float32BufferAttribute(L2, 3));
+}
+function buildChild() {
+  P.N = segment(D.seg.secN, D.seg.perN, 0xf2f4f2); P.F = segment(D.seg.secF, D.seg.perF, 0xf4f2ee);
+  P.packClip = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0.1);
+  // pods (battery and Pi, pump) and the seat plate with its hinge bar
+  const pm = clay(0x2b2d31, { roughness: 0.4 }); P.pods = new THREE.Group();
+  const p1 = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.045, 0.026), pm); p1.position.set(0, 0.035, 0.013); const p2 = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.03, 0.022), clay(0x3a4048)); p2.position.set(0, -0.035, 0.011);
+  P.pods.add(p1, p2); P.pods.traverse((o) => { if (o.isMesh) o.castShadow = true; }); R3.scene.add(P.pods);
+  P.seat = new THREE.Group(); const sp = new THREE.Mesh(new THREE.CylinderGeometry(0.095, 0.095, 0.006, 40).rotateX(Math.PI / 2).translate(0, 0, 0.003), clay(0x6c7076, { roughness: 0.35 }));
+  const hb = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.12, 10).translate(0, 0, 0).rotateX(0).translate(D.rb, 0, 0.008), clay(0x9aa0a6, { roughness: 0.3 }));
+  hb.rotation.set(0, 0, 0); P.seat.add(sp); const hbg = new THREE.Group(); hbg.add(new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.12, 10), clay(0x9aa0a6))); hbg.position.set(D.rb, 0, 0.008); P.seat.add(hbg);
+  P.seat.matrixAutoUpdate = false; R3.scene.add(P.seat);
+  // the child arm
+  const cm = clay(0xf1e6d6); P.childParts = {};
+  for (const n in AD.parts) { const p = AD.parts[n]; const m = meshOf(b64(p.p, Float32Array), b64(p.i, Uint32Array), cm); m.matrixAutoUpdate = false; m.castShadow = true; R3.scene.add(m); P.childParts[n] = m; }
+  // collars: foam rings sized from the float volumes, one per module
+  P.collars = {}; P.modOf = {}; P.rbowl = new THREE.Matrix4().fromArray(D.rbowl);
+  for (const k of D.mod_order) { for (const n of D.mods[k]) P.modOf[n] = k;
+    const V = D.floats[k].float_L / 1000, R = k === "M1" ? 0.075 : 0.05, r = Math.sqrt(V / (2 * Math.PI * Math.PI * R));
+    const c = new THREE.Mesh(new THREE.TorusGeometry(R, r, 10, 36), clay(0xe2a24e, { roughness: 0.8 })); c.castShadow = true; R3.scene.add(c); P.collars[k] = { mesh: c, R, r }; }
+  // module centres in the folded arm as assembled in the bowl
+  const W = armMats(P.rbowl, D.lie_q); P.modC = {};
+  for (const k of D.mod_order) { const bb = new THREE.Box3(); for (const n of D.mods[k]) { const g = P.childParts[n].geometry; g.computeBoundingBox(); bb.union(g.boundingBox.clone().applyMatrix4(W[n])); } P.modC[k] = bb.getCenter(new THREE.Vector3()); P.modH = P.modH || {}; P.modH[k] = bb.getSize(new THREE.Vector3()); }
+  // N's jet
+  P.jet = new THREE.Mesh(new THREE.ConeGeometry(0.012, 0.07, 16, 1, true).rotateZ(-Math.PI / 2).translate(-0.035, 0, 0), new THREE.MeshBasicMaterial({ color: 0x9cc8ec, transparent: true, opacity: 0.25, depthWrite: false })); P.jet.matrixAutoUpdate = false; R3.scene.add(P.jet);
+  for (const n of ["N", "F", "arm", "mouth"]) { const d = document.createElement("div"); d.className = "lab"; $("#vp").appendChild(d); P["lab" + n] = d; }
+}
+
+/* ---------------------------------------------------------------- one frame of state */
+function frameAt(T) {
+  const F = D.fr, f = clamp(T * D.fps, 0, F.length - 1), i = Math.floor(f), u = f - i, a = F[i], b = F[Math.min(i + 1, F.length - 1)];
+  const L = (x, y) => (Array.isArray(x) ? x.map((v, k) => lerp(v, y[k], u)) : lerp(x, y, u));
+  return { i, a, q: L(a.q, b.q), crank: L(a.crank, b.crank), N: L(a.N, b.N), F: L(a.F, b.F), root: L(a.root, b.root), cq: L(a.cq, b.cq), m: a.m.map((x, k) => L(x, b.m[k])), pods: a.pods, tool: a.tool, cv: a.cv };
+}
+const m7 = (r) => new THREE.Matrix4().compose(new THREE.Vector3(r[0], r[1], r[2]), new THREE.Quaternion(r[3], r[4], r[5], r[6]).normalize(), new THREE.Vector3(1, 1, 1));
+const segPose = (x, y, yaw) => Tm([x, y, 0]).multiply(M4().makeRotationZ(yaw));
+function apply(S, now) {
+  // parent arm and tool
+  const proot = Tm(D.base), W = armMats(proot, S.q);
+  for (const n in W) P.parentParts[n].matrix.copy(W[n]);
+  const th = toolHead(proot, S.q); P.tool.position.copy(th); P.tool.rotation.z = S.q[0];
+  P.tool.userData.cup.visible = S.tool === 1; P.tool.userData.nee.visible = S.tool === 2; P.tool.userData.crank.rotation.y = -Math.PI / 2 * (1 - S.crank);
+  // segments: pack (in the bowl, printing), sliding out, unfolding, inflating
+  const px = D.print_x, lipx = D.lip[0];
+  for (const [key, Sg, v] of [["N", P.N, S.N], ["F", P.F, S.F]]) {
+    const pk = v[5], vis = v[4], k = v[3]; let M;
+    const sec = Sg.secs, x0 = sec[0][0];
+    if (pk <= 0 && !vis) { Sg.mesh.visible = Sg.lines.visible = false; continue; }
+    Sg.mesh.visible = Sg.lines.visible = true;
+    if (!vis) {     // folded: print position in the bowl, then out over the lip
+      shapeSeg(Sg, 0, 0); const L = sec[sec.length - 1][0] - x0;
+      const cx = (px[0] + px[1]) / 2, base = Tm([cx - (x0 + L / 2), 0, 0]);
+      let out = M4();
+      if (pk > 1) { const w = clamp(pk - 1, 0, 1), lift = Math.max(0, Math.sin(Math.PI * w)) * 0.115; out = Tm([(D.lip[0] + 0.06 + L / 2 - cx) * w, 0, lift]); }
+      M = out.multiply(base);
+      Sg.mat.clippingPlanes = pk < 1 ? [P.packClip] : []; Sg.lines.material.clippingPlanes = Sg.mat.clippingPlanes;
+      if (pk < 1) P.packClip.constant = 0.004 + 0.0792 * pk;
+    } else {
+      Sg.mat.clippingPlanes = []; Sg.lines.material.clippingPlanes = [];
+      shapeSeg(Sg, clamp(k / 0.5, 0, 1), clamp((k - 0.5) / 0.5, 0, 1));
+      M = segPose(v[0], v[1], v[2]);
+      if (k < 1) { const sec2 = sec, L = sec2[sec2.length - 1][0] - x0; M = segPose(v[0], v[1], v[2]).multiply(Tm([0, 0, 0])); }
+    }
+    Sg.mesh.matrix.copy(M); Sg.lines.matrix.copy(M); Sg.mesh.matrixWorldNeedsUpdate = Sg.lines.matrixWorldNeedsUpdate = true; Sg.M = M; Sg.vis = vis; Sg.k = k;
+  }
+  // pods: in the parent's store, on the bowl floor, carried in N's fold, in N's floor
+  const cx = (px[0] + px[1]) / 2;
+  if (S.pods === 0) P.pods.visible = false;
+  else { P.pods.visible = true;
+    if (S.pods === 1 || (S.pods === 2 && !P.N.vis)) { const pk = S.N[5]; let m = Tm([cx, 0, 0]); if (S.pods === 2 && pk > 1 && P.N.M) m = P.N.M.clone().multiply(Tm([-0.33, 0, 0])); P.pods.matrixAutoUpdate = false; P.pods.matrix.copy(S.pods === 2 && P.N.M ? P.N.M.clone().multiply(Tm([-0.27, 0, 0])) : m); }
+    else { P.pods.matrixAutoUpdate = false; P.pods.matrix.copy(P.N.M.clone().multiply(Tm([-0.27, 0, 0.004]))); }
+    P.pods.matrixWorldNeedsUpdate = true; }
+  // seat plate in F's floor
+  P.seat.visible = P.F.vis && P.F.k > 0.6; if (P.seat.visible) { P.seat.matrix.copy(P.F.M.clone().multiply(Tm([-0.115, 0, 0]))); P.seat.matrixWorldNeedsUpdate = true; }
+  // jet
+  P.jet.visible = S.N[6] > 0.5 && P.N.vis; if (P.jet.visible) { P.jet.matrix.copy(P.N.M.clone().multiply(Tm([-0.40, 0, 0.07]))); P.jet.material.opacity = 0.12 + 0.06 * Math.sin(now * 20); P.jet.matrixWorldNeedsUpdate = true; }
+  // the child arm: attached modules follow the folded arm, loose ones float or ride the holder
+  const root = m7(S.root), Wc = armMats(root, S.cq), Wb = armMats(P.rbowl, D.lie_q);
+  const G = {}; S.m.forEach((r, k) => { G[D.mod_order[k]] = { M: m7(r), att: r[7] > 0.5, vis: r[8] > 0.5, col: r[9] > 0.5 }; });
+  for (const n in P.childParts) { const k = P.modOf[n], g = G[k], o = P.childParts[n];
+    o.matrix.copy(g.att ? Wc[n] : g.M.clone().multiply(Wb[n])); o.matrixWorldNeedsUpdate = true; o.visible = g.vis; }
+  for (const k of D.mod_order) { const g = G[k], c = P.collars[k], ctr = P.modC[k].clone();
+    if (g.att) { // the collar rides the module where it now is in the arm
+      const n0 = D.mods[k][0]; const rel = Wb[n0].clone().invert(); ctr.applyMatrix4(rel).applyMatrix4(Wc[n0]); } else ctr.applyMatrix4(g.M);
+    if (g.col) { c.mesh.visible = true; c.mesh.position.copy(ctr); c.shed = null; }
+    else { if (!c.shed) c.shed = { p: ctr.clone(), t: now }; const u = clamp((now - c.shed.t) / 3, 0, 1); c.mesh.position.set(c.shed.p.x + 0.12 * u, c.shed.p.y - 0.18 * u * (1 + D.mod_order.indexOf(k) * 0.4), lerp(c.shed.p.z, D.water - c.r * 0.4, 1 - (1 - u) * (1 - u))); }
+  }
+  P.labN.textContent = "N"; P.labF.textContent = "F"; P.labarm.textContent = "new arm"; P.labmouth.textContent = "mouth";
+}
+function placeLabel(el, v, on = true) { if (!on) { el.style.display = "none"; return; } const p = v.clone().project(R3.camera); if (p.z > 1) { el.style.display = "none"; return; } el.style.display = ""; el.style.left = ((p.x + 1) / 2 * R3.host.clientWidth) + "px"; el.style.top = ((1 - p.y) / 2 * R3.host.clientHeight) + "px"; }
+
+/* ---------------------------------------------------------------- cameras */
+const CAMS = {
+  wide: () => [[0.25, -2.1, 1.35], [0.15, 0.0, 0.02]],
+  bowl: () => [[D.off + 0.33, -0.55, 0.55], [D.off + 0.2, 0.0, 0.07]],
+  front: () => [[0.95, -0.85, 0.55], [0.35, 0.0, 0.1]],
+  side: () => [[0.42, -1.05, 0.22], [0.38, 0, 0.12]],
+  top: () => [[0.25, -0.05, 2.0], [0.25, 0, 0]],
+};
+function setCam(n) { CAM = n; camGoal = CAMS[n](); document.querySelectorAll("[data-cam]").forEach((b) => b.classList.toggle("on", b.dataset.cam === n)); }
+function setAuto(v) { AUTO = v; $("#auto").classList.toggle("on", v); }
+function autoCam(k) { const want = { intro: "wide", kitN: "bowl", printN: "bowl", cureN: "bowl", birthN: "side", wakeN: "front", printF: "bowl", cureF: "bowl", birthF: "side", parkF: "front", getM1: "bowl", getM2: "bowl", getM3: "bowl", getM4: "bowl", folded: "bowl", joinNF: "front", dockMouth: "front", birthArm: "side", pull: "side", stand: "side", turn: "front", unfold: "front", free: "wide" }[k] || "wide"; if (want !== CAM) setCam(want); }
+function stepCam(dt) { if (!camGoal) return; const c = R3.camera.position, t = R3.controls.target, k = 1 - Math.exp(-dt * 1.6); c.lerp(new THREE.Vector3(...camGoal[0]), k); t.lerp(new THREE.Vector3(...camGoal[1]), k); if (c.distanceTo(new THREE.Vector3(...camGoal[0])) < 0.003) camGoal = null; }
+
+/* ---------------------------------------------------------------- timeline, panels */
+function buildTimeline() {
+  let a = 0, r = 0; TL.st = D.stages.map((s) => { const o = Object.assign({ d0: a, r0: r }, s); a += s.disp; r += s.real; return o; }); TL.total = a;
+  const tr = $("#track"); for (const s of TL.st) { const d = document.createElement("div"); d.style.flex = s.disp; d.textContent = s.name; d.title = s.name; tr.appendChild(d); s.el = d; }
+  const scrub = (e) => { const r2 = tr.getBoundingClientRect(); TL.T = clamp((e.clientX - r2.left) / r2.width, 0, 0.9999) * TL.total; };
+  let drag = false; tr.addEventListener("pointerdown", (e) => { drag = true; tr.setPointerCapture(e.pointerId); scrub(e); }); tr.addEventListener("pointermove", (e) => drag && scrub(e)); tr.addEventListener("pointerup", () => (drag = false));
+}
+function stageAt(T) { let s = TL.st.find((x) => T < x.d0 + x.disp) || TL.st[TL.st.length - 1]; const f = clamp((T - s.d0) / s.disp, 0, 1); return { s, f, real: s.r0 + f * s.real }; }
+function renderSide() {
+  const g = D.seg, fl = D.floats;
+  let h = `<h3>What happens</h3><p>The tail's end effector has two tools. With the gel line on the needle it prints. With the holder (a magnet and a folding crank) it picks things up: pods, floating arm modules, a whole folded arm, and puts them where they belong, here inside the new tail.</p>`;
+  h += `<p>The new tail is printed in two quilted halves, split where the hard tail is already split for the H2S: the nose N (${(g.areaN).toFixed(3)} m2 of skin, with the battery, the Pi and the pump printed in) and the face F (${g.areaF.toFixed(3)} m2, with the arm's seat plate printed into its floor). Each is laid flat and Z folded 3 by 3 into 18 layers, like a head. The arm comes as four modules that float in foam collars, trimmed so each floats the way it is joined.</p>`;
+  h += `<h3>Checks</h3>` + D.checks.map((c) => `<div class="ck ${c.ok ? "ok" : "no"}"><i>${c.ok ? "✓" : "✗"}</i><div><span class="g">${esc(c.group)}</span>${esc(c.name)}${c.value ? `<small>${esc(c.value)}</small>` : ""}</div></div>`).join("");
+  h += `<h3>Notes</h3>` + D.notes.map((n) => `<p>${esc(n)}</p>`).join("");
+  h += `<h3>Not solved here</h3><p>The water stands at ${(D.water * 1000).toFixed(0)} mm so the parent can steer its own base module (1.4 kg) under water; the quilted head and the hard tail then need ballast. The snaps, the trim of the collars and the hinge of the seat are estimates for bench tests. Data: <a href="tailcopy.json" style="color:#dfe7ee">tailcopy.json</a>, script <a href="build.py" style="color:#dfe7ee">build.py</a>.</p>`;
+  $("#side").innerHTML = h;
+}
+
+let last = 0;
+function frame(nowMs) {
+  requestAnimationFrame(frame);
+  const now = nowMs / 1000, dt = Math.min(0.1, now - (last || now)); last = now;
+  if (TL.playing) { TL.T += dt * TL.speed; if (TL.T >= TL.total) TL.T = 0; }
+  const S = frameAt(TL.T), sa = stageAt(TL.T);
+  apply(S, now);
+  if (AUTO) autoCam(sa.s.key); stepCam(dt); R3.controls.update();
+  $("#ovStage").textContent = sa.s.name; $("#ovText").textContent = sa.s.text; $("#ovClk").innerHTML = `${hms(sa.real)} <span>machine time · stage ${TL.st.indexOf(sa.s) + 1} of ${TL.st.length}</span>`;
+  for (const s of TL.st) s.el.classList.toggle("on", s === sa.s);
+  $("#head").style.left = (TL.T / TL.total * 100) + "%";
+  if (P.N.mesh.visible && P.N.M) placeLabel(P.labN, new THREE.Vector3(-0.3, 0, 0.3).applyMatrix4(P.N.M), P.N.vis); else placeLabel(P.labN, null, false);
+  if (P.F.mesh.visible && P.F.M) placeLabel(P.labF, new THREE.Vector3(-0.09, 0, 0.36).applyMatrix4(P.F.M), P.F.vis); else placeLabel(P.labF, null, false);
+  placeLabel(P.labarm, new THREE.Vector3(0, 0, 0.12).applyMatrix4(m7(S.root)), S.cv > 0);
+  placeLabel(P.labmouth, new THREE.Vector3(D.lip[0], 0, 0.30), CAM !== "top");
+  R3.renderer.render(R3.scene, R3.camera);
+}
+(async function main() {
+  try {
+    init();
+    [Q, AD, D] = await Promise.all([getJSON("../doublewall/quilt.json"), getJSON("../doublewall/arm.json"), getJSON("tailcopy.json")]);
+    buildTank(); await buildParent(); buildChild(); buildTimeline(); renderSide(); setCam("wide");
+    R3.camera.position.set(...CAMS.wide()[0]); R3.controls.target.set(...CAMS.wide()[1]);
+    $("#auto").addEventListener("click", () => setAuto(!AUTO));
+    document.querySelectorAll("[data-cam]").forEach((b) => b.addEventListener("click", () => { setAuto(false); setCam(b.dataset.cam); }));
+    $("#play").addEventListener("click", () => { TL.playing = !TL.playing; $("#play").textContent = TL.playing ? "Pause" : "Play"; });
+    document.querySelectorAll("[data-speed]").forEach((b) => b.addEventListener("click", () => { TL.speed = +b.dataset.speed; document.querySelectorAll("[data-speed]").forEach((x) => x.classList.toggle("on", x === b)); }));
+    window.BNM = { go(k, f = 0.5) { const s = TL.st.find((x) => x.key === k); if (s) { TL.T = s.d0 + s.disp * f; TL.playing = false; } }, cam: (n) => { setAuto(false); setCam(n); R3.camera.position.set(...CAMS[n]()[0]); R3.controls.target.set(...CAMS[n]()[1]); camGoal = null; }, stages: () => TL.st.map((s) => s.key) };
+    requestAnimationFrame(frame);
+  } catch (e) { console.error(e); $("#ovStage").textContent = "The simulator did not start"; $("#ovText").textContent = String(e.message || e); }
+})();
+</script>
+</body></html>
