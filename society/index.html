@@ -894,7 +894,7 @@ function collarGeo(g, yw, H) { const p = g.attributes.position.array, pts = []; 
     let nx = e1[1] / l1 + e2[1] / l2, nz = -e1[0] / l1 - e2[0] / l2; const nl = Math.hypot(nx, nz) || 1; nx /= nl; nz /= nl; const k = Math.min(2.5, 1 / Math.max(0.4, (e1[1] * nx - e1[0] * nz) / l1)); return new THREE.Vector2(q[0] + nx * d * k, -(q[1] + nz * d * k)); });
   const sh = new THREE.Shape(off(0.03)); sh.holes.push(new THREE.Path(off(0.004).reverse()));
   const cg = new THREE.ExtrudeGeometry(sh, { depth: 0.022, bevelEnabled: true, bevelThickness: 0.004, bevelSize: 0.004, bevelSegments: 2, curveSegments: 4 });
-  cg.rotateX(-Math.PI / 2); cg.translate(0, yw - 0.011, 0); cg.computeVertexNormals(); return cg; }
+  cg.rotateX(-Math.PI / 2); cg.translate(0, yw - 0.011, 0); cg.computeVertexNormals(); cg.userData.plan = [hull, off(0.03).map((v) => [v.x, -v.y])]; return cg; }
 const modName = (m) => `ARM · ${MODS[m].name.toUpperCase()} ${MODS[m].kg.toFixed(2)} KG`;
 function addMod(m, x, z) { const M = { id: mid++, m, x, z, h: rnd() * 6.283, vx: 0, vz: 0, st: "float", claim: null, mesh: null, t: 0 }; mods.push(M); return M; }
 function dropMod(M) { if (M.mesh) R3.sc.remove(M.mesh); mods = mods.filter((x) => x !== M); }
@@ -1559,8 +1559,38 @@ const shortDims = (p) => p.sh === "disc" ? `${MM(p.l)} mm across` : `${MM(p.l)} 
 // tags stay inside the frame: a tag that would leave it is drawn on the other side of its leader's end
 function tagText(g, t, x, y) { const w = g.measureText(t).width; if (x + w > DG.w - 8) x = Math.max(8, x - w - 40); g.fillText(t, clamp(x, 8, DG.w - w - 8), clamp(y, 14, DG.h - 12)); }
 function tagTextR(g, t, x, y) { const w = g.measureText(t).width; g.fillText(t, clamp(x, w + 8, DG.w - 8), clamp(y, 14, DG.h - 12)); }
+/* the Above view as a plan drawing at the waterline: thin outlines of the tank, every body (head and tail, the mouth and the docking line),
+   loose tails and new segments, every arm module in its collar, the parts at their true size, and the pipe in Scene 2 */
+function planBin(geo, nb = 40) { if (geo.userData.planB) return geo.userData.planB; const p = geo.attributes.position.array; let x0 = 1e9, x1 = -1e9;
+  for (let i = 0; i < p.length; i += 3) { x0 = Math.min(x0, p[i]); x1 = Math.max(x1, p[i]); }
+  const a = new Float32Array(nb + 1).fill(-1); for (let i = 0; i < p.length; i += 3) { const k = Math.round((p[i] - x0) / (x1 - x0 || 1) * nb); a[k] = Math.max(a[k], Math.abs(p[i + 2])); }
+  const out = []; for (let k = 0; k <= nb; k++) if (a[k] >= 0) out.push([x0 + (x1 - x0) * k / nb, a[k]]); return (geo.userData.planB = out); }
+function planRings(geo) { const U = geo.userData; if (U.planR) return U.planR; const P = U.ringPos, M = U.M, out = [];
+  for (let k = 0; k <= U.mouthK; k++) { let a = 0; for (let j = 0; j < M; j++) a = Math.max(a, Math.abs(P[(k * M + j) * 3 + 2])); out.push([P[k * M * 3], a]); } return (U.planR = out); }
+function drawPlan(g) { const W = (x, z) => scr(x, WL, z); g.fillStyle = "#0b0b0c"; g.fillRect(0, 0, DG.w, DG.h);
+  const poly = (pts, close = true) => { let first = true; g.beginPath(); for (const q of pts) { if (!q) { first = true; continue; } if (first) { g.moveTo(q[0], q[1]); first = false; } else g.lineTo(q[0], q[1]); } if (close) g.closePath(); g.stroke(); };
+  const ln = (a, b) => { if (a && b) { g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke(); } };
+  const outline = (st, f) => poly(st.map(([x, a]) => f(x, a)).concat(st.slice().reverse().map(([x, a]) => f(x, -a))));
+  g.lineJoin = "round"; g.strokeStyle = "rgba(232,231,226,0.9)"; g.lineWidth = 1.1;
+  poly([W(-TX, -TZ), W(TX, -TZ), W(TX, TZ), W(-TX, TZ)]); g.lineWidth = 0.5; g.strokeStyle = "rgba(232,231,226,0.4)"; poly([W(-TX - GL, -TZ - GL), W(TX + GL, -TZ - GL), W(TX + GL, TZ + GL), W(-TX - GL, TZ + GL)]);      // the inner face of the glass and its 15 mm thickness
+  g.strokeStyle = "rgba(232,231,226,0.85)"; g.lineWidth = 0.8;
+  for (const r of robots) { const c = Math.cos(r.h), s = Math.sin(r.h), f = (x, z) => W(r.x + x * c - z * s, r.z + x * s + z * c), st = planRings(r.mesh.geometry);
+    outline(st, f); const m = st[st.length - 1]; ln(f(m[0], -m[1]), f(m[0], m[1]));      // the mouth
+    if (r.tail) { const x = -r.s.Lh / 2, k = st.reduce((b, q) => Math.abs(q[0] - x) < Math.abs(b[0] - x) ? q : b, st[0]); g.setLineDash([3, 3]); ln(f(x, -k[1]), f(x, k[1])); g.setLineDash([]); } }      // the docking line
+  for (const T of loose) { const c = Math.cos(T.h), s = Math.sin(T.h), ox = T.mesh.position.x, f = (x, z) => W(T.x + (x + ox) * c - z * s, T.z + (x + ox) * s + z * c); outline(planBin(T.mesh.geometry), f); }
+  for (const S of segs) { const c = Math.cos(S.h), s = Math.sin(S.h); let geo = null; S.mesh.traverse((o) => { if (!geo && o.isMesh) geo = o.geometry; }); if (!geo) continue; outline(planBin(geo), (x, z) => W(S.x + x * c - z * s, S.z + x * s + z * c)); }
+  if (DEX.mod) for (const M of mods) { if (M.st === "held") continue; const Wm = modW(M), pl = DEX.mod[M.m].cg.userData.plan, f = (q) => { _V.set(q[0], 0, q[1]).applyMatrix4(Wm); return W(_V.x, _V.z); };
+    g.lineWidth = 0.7; poly(pl[0].map(f)); g.lineWidth = 0.5; poly(pl[1].map(f)); }      // the module at its waterline and the outer edge of its foam collar
+  g.lineWidth = 0.5; g.strokeStyle = "rgba(232,231,226,0.7)";
+  for (const F of floats) { if (F.st === "held") continue; const c = Math.cos(F.h), s = Math.sin(F.h), l = Math.max(F.p.l, VMIN) / 2, w = (F.p.sh === "disc" || F.p.sh === "cylv" ? Math.max(F.p.l, VMIN) : Math.max(F.p.w, VMIN)) / 2, f = (x, z) => W(F.x + x * c + z * s, F.z - x * s + z * c);
+    poly([f(-l, -w), f(l, -w), f(l, w), f(-l, w)]); }
+  if (pipe) { const o = W(pipe.x, pipe.z), e = W(pipe.x + 0.035, pipe.z); if (o && e) { const R = Math.hypot(e[0] - o[0], e[1] - o[1]); g.lineWidth = 0.9; g.beginPath(); g.arc(o[0], o[1], R, 0, 7); g.stroke(); g.beginPath(); g.arc(o[0], o[1], R * 0.75, 0, 7); g.stroke(); g.setLineDash([4, 3]); ln(o, W(pipe.x - 0.6, pipe.z - 0.4)); g.setLineDash([]); } }      // the pipe's mouth, its bend above dashed
+  // a scale bar and the title of the drawing
+  const a = W(TX - 1, -TZ - 0.3), b = W(TX, -TZ - 0.3); if (a && b) { g.strokeStyle = "rgba(232,231,226,0.9)"; g.lineWidth = 0.8; ln(a, b); ln([a[0], a[1] - 4], [a[0], a[1] + 4]); ln([b[0], b[1] - 4], [b[0], b[1] + 4]);
+    g.font = '500 10px "JetBrains Mono", monospace'; g.textBaseline = "middle"; g.fillStyle = "rgba(232,231,226,0.85)"; g.textAlign = "right"; g.fillText("1 M", a[0] - 8, a[1]);
+    g.fillText(`PLAN AT THE WATERLINE · SCENE ${SCENE} · ${robots.length} HEADS, ${tailsAll()} TAILS, ${mods.length} MODULES, ${partsAfloat()} PARTS AFLOAT`, b[0], a[1] - 16); g.textAlign = "left"; } }
 function drawDiagram() {
-  const g = DG.g; g.setTransform(DG.D, 0, 0, DG.D, 0, 0); g.clearRect(0, 0, DG.w, DG.h); if (camMode === "above") return;
+  const g = DG.g; g.setTransform(DG.D, 0, 0, DG.D, 0, 0); g.clearRect(0, 0, DG.w, DG.h); if (camMode === "above") return drawPlan(g);
   g.font = '500 10px "JetBrains Mono", monospace'; g.textBaseline = "middle";
   const cp = R3.cam.position;
   for (const r of robots) { const F = r.pick ? r.pick.F : r.forage ? r.forage.tgt : r.self; if (!F || F.claim !== r && !r.pick) continue;
@@ -1680,11 +1710,11 @@ function loop(now) {
   const dtR = Math.min(0.05, (now - last) / 1000); last = now;
   if (running) for (let i = 0; i < speed; i++) step(dtR);
   U.uTime.value += dtR;
-  updateScene(dtR); director(dtR); R3.ctl.update(); updateLights(dtR); R3.r.shadowMap.needsUpdate = true; cineRender(now / 1000, dtR); drawDiagram(dtR); labels();
+  updateScene(dtR); director(dtR); R3.ctl.update(); updateLights(dtR); R3.r.shadowMap.needsUpdate = true; if (camMode !== "above") cineRender(now / 1000, dtR); drawDiagram(dtR); labels();
   acc += dtR; if (acc > 0.5 || hist.pop.length !== histN) { acc = 0; histN = hist.pop.length; spark("#sp1", hist.pop); spark("#sp2", hist.parts); spark("#sp3", hist.div); spark("#sp4", hist.tiles, 6); inspect(); hud(); }
   requestAnimationFrame(loop);
 }
-const CAMS = { tank: [[0.9, 5.4, 13.8], [0, 0.0, 0]], above: [[0, 15.5, 0.01], [0, 0, 0]] };
+const CAMS = { tank: [[0.9, 5.4, 13.8], [0, 0.0, 0]], above: [[-1.3, 15.5, -0.85], [-1.3, 0, -0.86]] };      // the plan sits right and low, clear of the caption
 // two scenes: Scene 1 has only what is in the pool; in Scene 2 a pipe brings more in slowly. Switching starts the run again.
 const SCENE_TEXT = {
   1: { cap: null, rule: "Scene 1. Bodies are born, and tails are made too. The parts and arm modules on the water are all there will ever be: they are picked, built in and passed on, and nothing comes in from outside." },
