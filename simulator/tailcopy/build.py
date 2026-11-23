@@ -442,13 +442,13 @@ def _clear_of_head(red):
     P = tb.to_world(_PAR_O, red); H = tb.to_world(_HEAD_O, HEAD_PARK)
     from scipy.spatial import cKDTree as _K
     return float(_K(H).query(P)[0].min()) > 0.003
-def best_stand(k, q, site, others):
+def best_stand(k, q, site, others, ys_pref=(0.0, 0.05, 0.1)):
     """where the parent stands to set module k (or the pack) in pose q: the pad in reach from above, its arm clear of its own wall,
     everything of the new arm in front of its face"""
     pad, _ = pad_world(k, q, ROOT_ASM, site) if k in MODS else (site, None)
     NA = np.vstack([module_pts(o, q, ROOT_ASM, step=11) for o in (others or ['M1'])])
     MP = module_pts(k, q, ROOT_ASM, step=11) if k in MODS else None
-    for D, ys in [(D_, y_) for y_ in (0.0, 0.05, 0.1) for D_ in np.arange(0.24, 0.43, 0.01)]:
+    for D, ys in [(D_, y_) for y_ in ys_pref for D_ in np.arange(0.24, 0.43, 0.01)]:
         red = stand(D, ys)
         if not _clear_of_head(red): continue
         if not _clear_of_parent(NA if MP is None else np.r_[NA, MP], red): continue
@@ -575,7 +575,7 @@ def plan_part(pid):
     # at the seat
     padW = (SEAT[pid] @ np.r_[pad_l, 1])[:3]
     if pid not in RP:
-        qq_ = QJ['M1']; bs = best_stand(pid, qq_ if pid in ('M1', 'P') else QJ[pid], padW if pid == 'P' else BOSS_AT.get(pid, BOSS_AT['M1']), [] if pid in ('M1', 'P') else [o for o in ('M1', 'M2', 'M3') if o < pid])
+        qq_ = QJ['M1']; bs = best_stand(pid, qq_ if pid in ('M1', 'P') else QJ[pid], padW if pid == 'P' else BOSS_AT.get(pid, BOSS_AT['M1']), [] if pid in ('M1', 'P') else [o for o in ('M1', 'M2', 'M3') if o < pid], ys_pref=(0.1, 0.05, 0.0) if pid == 'M1' else (0.0, 0.05, 0.1))
         RP[pid] = bs[1] if bs else stand(0.30, 0.1)
     tip, q, h = solve_contact(padW, RP[pid])
     if tip is None: print('no place contact', pid); tip, q, h = contact_tip(padW, 0.0), REST, 0.0
@@ -697,8 +697,34 @@ def set_part(pid, G, s=0):
     st.parts[pid] = dict(G=G.copy(), st=s)
 for pid in ('M1', 'P', 'M2', 'M3', 'M4'): set_part(pid, TRAY_G[pid])
 
+
+# ---- drives made of straight runs and turns on the spot (the wheels of a tail)
+def prims_time(P):
+    L = [abs(p[3] - p[2]) * 0.15 if p[0] == 'r' else max(1e-4, float(np.linalg.norm(p[2] - p[1]))) for p in P]
+    return np.cumsum([0] + L) / sum(L)
+def drive_along(P, w):
+    C = prims_time(P); k = min(len(P) - 1, int(np.searchsorted(C, w, side='right') - 1)); t = mj((w - C[k]) / max(1e-9, C[k + 1] - C[k])); p = P[k]
+    return turn_about(p[1], p[2] + (p[3] - p[2]) * t) if p[0] == 'r' else turn_about(p[1] + (p[2] - p[1]) * t, p[3])
+Y_CROSS = None           # where the parent crosses to the tray side: by default the line of its pick place (no drive toward the tray afterwards)
+X_BACK = 0.09            # where the parent turns on the spot between the assembly plate and the old head (face corner sweeps 217 mm round, rear corner 350 mm)
+def pick_route(a, ax, yc=None):
+    """from a stand by the assembly plate (or the end of the lane): back along x, turn to the tray, cross to the tray side,
+    turn along x, drive to the pick place, turn to the tray and drive in"""
+    A = axis_of(a); P = []; yc = min(ax[1] + 0.10, 0.03) if yc is None else yc       # 100 mm back from the pick place (so the part leaves the tray straight), never so far that the face corner reaches the base
+    if abs(a[2]) < 1e-3 and abs(A[1] - yc) > 0.02:
+        xb = X_BACK
+        if xb < A[0] - 1e-4: P.append(('s', A.copy(), np.array([xb, A[1]]), 0.0))
+        B = np.array([xb, A[1]]); P.append(('r', B, 0.0, -math.pi / 2)); Cc = np.array([xb, yc]); P.append(('s', B, Cc, -math.pi / 2))
+        P.append(('r', Cc, -math.pi / 2, 0.0)); D_ = np.array([ax[0], yc])
+        if abs(ax[0] - xb) > 1e-4: P.append(('s', Cc, D_, 0.0))
+        A = D_
+    else:
+        D_ = np.array([ax[0], A[1]]); P.append(('s', A.copy(), D_, 0.0)); A = D_
+    P.append(('r', A, 0.0, -math.pi / 2)); P.append(('s', A, np.array(ax[:2]), -math.pi / 2))
+    return P
+
 CUR = dict(pose=None)
-CARRY_YT = {'M1': 0.10, 'M3': 0.0}                 # the base is carried low: it turns where it sweeps clear of the plinth
+Y_CROSS_OF = {'M1': 0.10}                 # the base is carried low: it turns where it sweeps clear of the plinth
 def trip(pid, first=False):
     label = MOD_NAME[pid]; xp = PICK_X[pid]; pk = pick_pose(xp, pid); ax = axis_of(pk)
     tipT, qT = PICK_TIP[pid]; tipP, qP = PLACE_TIP[pid]
@@ -707,10 +733,7 @@ def trip(pid, first=False):
     def f_pick(u, s0):
         a = s0['red']
         # drive: straight back (or on) along x to the turning point, turn to face the tray, drive in
-        A = np.array([ax[0], axis_of(a)[1] if abs(a[2]) < 1e-3 else 0.0]); p_turn0 = turn_about(A, 0.0); p_turn1 = turn_about(A, -math.pi / 2)
-        if u < 0.2: st.red = lerp(a, p_turn0, seg(u, 0.0, 0.2)); st.red[2] = 0.0
-        elif u < 0.36: st.red = turn_about(A, -math.pi / 2 * seg(u, 0.2, 0.36))
-        elif u < 0.5: st.red = lerp(p_turn1, pk, seg(u, 0.36, 0.5))
+        if u < 0.5: st.red = drive_along(pick_route(np.array(a), ax, Y_CROSS_OF.get(pid, Y_CROSS)), seg(u, 0.0, 0.5))
         else: st.red = pk.copy()
         # arm: home while driving, then over the pad, down to contact, magnet on, lift, back to the carry pose
         above = tipT + [0, 0, up]
@@ -726,21 +749,12 @@ def trip(pid, first=False):
             t_l = tipT + [0, 0, lift]
             st.q = arm_to(lerp(tipT, t_l, seg(u, 0.7, 0.85)), CUP, pk, 'lift ' + pid)
     def f_carry(u, s0):
-        # back out along y to the turning point, turn to face +x, drive along x to the stand (and, if the turn had to be made
-        # elsewhere, a turn, a short drive across and a turn back): every segment checked by the penetration test
-        yt = CARRY_YT.get(pid, RP[pid][1]); A = np.array([ax[0], yt]); p_back = turn_about(A, -math.pi / 2)
-        S = axis_of(RP[pid]); B = np.array([S[0], yt])
-        if u < 0.2: st.red = lerp(s0['red'], p_back, seg(u, 0.0, 0.2)); st.q = s0['q'].copy(); return
-        st.q = lerp(s0['q'], CARRY[pid][1], seg(u, 0.2, 0.32)) if u < 0.32 else CARRY[pid][1].copy()
-        if u < 0.32: st.red = p_back.copy()
-        elif u < 0.48: st.red = turn_about(A, -math.pi / 2 * (1 - seg(u, 0.32, 0.48)))
-        elif abs(S[1] - yt) < 1e-6 or u < 0.72:
-            w = seg(u, 0.48, 1.0 if abs(S[1] - yt) < 1e-6 else 0.72); st.red = turn_about(A + (B - A) * w, 0.0)
-        else:
-            h = math.copysign(math.pi / 2, S[1] - yt)
-            if u < 0.8: st.red = turn_about(B, h * seg(u, 0.72, 0.8))
-            elif u < 0.9: st.red = turn_about(B + (S - B) * seg(u, 0.8, 0.9), h)
-            else: st.red = turn_about(S, h * (1 - seg(u, 0.9, 1.0)))
+        # the pick route run backwards: back out from the tray, cross, along x, turn, to the stand by the assembly plate
+        P = pick_route(RP[pid], ax, Y_CROSS_OF.get(pid, Y_CROSS)); R_ = [(p[0], p[2], p[1], p[3]) if p[0] == 's' else (p[0], p[1], p[3], p[2]) for p in reversed(P)]
+        if u < 0.12: st.red = drive_along(R_[:1], seg(u, 0.0, 0.12)); st.q = s0['q'].copy(); return
+        st.q = lerp(s0['q'], CARRY[pid][1], seg(u, 0.12, 0.24)) if u < 0.24 else CARRY[pid][1].copy()
+        if st.new['on'] and pid in ('M2', 'M3', 'M4'): st.new['cq'] = lerp(s0['new']['cq'], QJ[pid], seg(u, 0.24, 0.45))      # the new arm holds out its joint while the parent is still at the tray side
+        st.red = drive_along(R_[:1], 1.0) if u < 0.24 else drive_along(R_[1:], seg(u, 0.24, 1.0))
     def f_place(u, s0):
         RDp = RP[pid]; st.red = RDp.copy(); above = tipP + [0, 0, up]
         cq = CARRY[pid][1]; qa = arm_to(above, CUP, RDp, 'place above ' + pid)
@@ -756,8 +770,8 @@ def trip(pid, first=False):
             if pid == 'M1': st.new['on'] = 0
         if u >= 0.62: st.q = arm_to(lerp(tipP, above, seg(u, 0.62, 0.75)), CUP, RDp, 'release ' + pid) if u < 0.75 else lerp(arm_to(above, CUP, RDp, 'release ' + pid), HOME_Q, seg(u, 0.75, 1.0))
         # the new arm holds the next join pose once it is powered
-        # the new arm, once powered, waits folded up while the parent drives; it holds out the joint only when the parent stands by
-        if st.new['on'] and pid in ('M2', 'M3', 'M4'): st.new['cq'] = lerp(s0['new']['cq'], QJ[pid], seg(u, 0.0, 0.18)) if u < 0.62 else lerp(QJ[pid], WAIT_Q, seg(u, 0.8, 1.0))
+        # the new arm, once powered, waits folded up between trips; it holds out the joint while the parent comes with the next module
+        if st.new['on'] and pid in ('M2', 'M3', 'M4'): st.new['cq'] = QJ[pid].copy() if u < 0.62 else lerp(QJ[pid], WAIT_Q, seg(u, 0.8, 1.0))
         elif st.new['on'] and pid == 'P': st.new['cq'] = lerp(s0['new']['cq'], WAIT_Q, seg(u, 0.8, 1.0))
     stage('pick' + pid, f'{label.capitalize()}: from the tray', 9, 300,
           PICK_TEXT[pid], f_pick, short=f'{label.capitalize()}: pick')
@@ -785,7 +799,7 @@ def up_for(pid):
     return 0.008
 UP = {p: up_for(p) for p in ('M1', 'P', 'M2', 'M3', 'M4')}
 print('approach heights', UP)
-WAIT_Q = np.array([0.0, 0.0, math.radians(85)])          # the new arm waits folded up (as it folds to drive), out of the parent's way
+WAIT_Q = np.array([math.radians(-80), 0.0, math.radians(85)])          # the new arm waits folded up and turned to the port glass, out of the parent's way
 CARRY = {}
 for pid in ('M1', 'P', 'M2', 'M3', 'M4'):
     tipT, qT = PICK_TIP[pid]
@@ -933,17 +947,17 @@ def f_selfT(u, s0):
     if u >= 0.24 and st.parts['TS']['st'] == 0:
         st.parts['TS']['st'] = 1; st.new['mag'] = 1; NHELD['Hoff'] = np.linalg.inv(ntool_frame(TS_Q, pose, CUP)) @ st.parts['TS']['G']
     if 0.24 <= u < 0.64:
-        via = np.array(pose_M(pose) @ np.r_[0.125, 0.05, 0.12, 1])[:3]
         if u < 0.3: st.new['cq'] = nik(lerp(TS_TIP, above, seg(u, 0.24, 0.3)), CUP, pose, 'new lift tile')
-        elif u < 0.4: st.new['cq'] = lerp(nik(above, CUP, pose, 'new lift tile'), nik(via, CUP, pose, 'new via'), seg(u, 0.3, 0.4))
-        elif u < 0.5: st.new['cq'] = lerp(nik(via, CUP, pose, 'new via'), nik(DROP_TIP + [0, 0, 0.008], CUP, pose, 'new above lip'), seg(u, 0.4, 0.5))
+        elif u < 0.5: st.new['cq'] = lerp(nik(above, CUP, pose, 'new lift tile'), nik(DROP_TIP + [0, 0, 0.008], CUP, pose, 'new above lip'), seg(u, 0.3, 0.5))     # joint space: close to its axis the arm reaches only a thin band
         elif u < 0.56: st.new['cq'] = nik(lerp(DROP_TIP + [0, 0, 0.008], DROP_TIP, seg(u, 0.5, 0.56)), CUP, pose, 'new down lip')
         else: st.new['cq'] = nik(lerp(DROP_TIP, SLIDE_TIP, seg(u, 0.56, 0.64)), CUP, pose, 'new slide in')
     if 0.64 <= u and st.parts['TS']['st'] == 1:
         if u > 0.66: st.new['mag'] = 0; st.parts['TS']['st'] = 4; st.parts['TS']['loc'] = np.linalg.inv(pose_M(new_pose())) @ st.parts['TS']['G']
     if u >= 0.66:
-        if u < 0.76: st.new['cq'] = nik(lerp(SLIDE_TIP, SLIDE_TIP + [0, 0, 0.012], seg(u, 0.66, 0.76)), CUP, pose, 'new up')
-        else: st.new['cq'] = lerp(nik(SLIDE_TIP + [0, 0, 0.012], CUP, pose, 'new up'), REST, seg(u, 0.76, 1.0))
+        if u < 0.72: st.new['cq'] = nik(lerp(SLIDE_TIP, SLIDE_TIP + [0, 0, 0.008], seg(u, 0.66, 0.72)), CUP, pose, 'new up')
+        elif u < 0.8: st.new['cq'] = nik(lerp(SLIDE_TIP + [0, 0, 0.008], DROP_TIP + [0, 0, 0.008], seg(u, 0.72, 0.8)), CUP, pose, 'new back out')     # the needle runs back out along the slot
+        elif u < 0.9: st.new['cq'] = lerp(nik(DROP_TIP + [0, 0, 0.008], CUP, pose, 'new back out'), nik(above, CUP, pose, 'new lift tile'), seg(u, 0.8, 0.9))
+        else: st.new['cq'] = lerp(nik(above, CUP, pose, 'new lift tile'), REST, seg(u, 0.9, 1.0))
 stage('selfT', 'It puts a tile set into its own wall', 12, 240, f'Magnet on the steel disk of the tile set, the ball needle into the well of its cradle. The arm draws the tile into its own body over the pack and lays it on the lower skin of the pocket on the port flank, then slides it {(R_IN - R_LIP)*1000:.0f} mm in under the two lips of the pocket, the needle running in the slot of the lower skin. Magnet off; the magnet lifts out between the lips. A Core tile, two Sense tiles (motion, pressure), a Power tile and an mp6 pump, on one cast tile (after bergsonne.io/tiles and the quilted head kit).', f_selfT, short='Tile set')
 def f_end(u, s0):
     a = np.array(s0['F']['pose']); b = a + [0, 0.12, 0]          # straight back along its own axis, heading kept
