@@ -21,7 +21,7 @@ const cv=document.querySelector('canvas'), g=cv.getContext('2d');
 const W=1600,H=900,S=700,FLOAT=.14,DOCK=.032;
 const TOP=[[-0.43,0.125],[-0.413,0.147],[-0.397,0.167],[-0.38,0.185],[-0.363,0.202],[-0.347,0.218],[-0.33,0.233],[-0.313,0.248],[-0.297,0.261],[-0.28,0.273],[-0.264,0.284],[-0.247,0.294],[-0.23,0.303],[-0.213,0.311],[-0.197,0.318],[-0.18,0.323],[-0.164,0.326],[-0.147,0.329],[-0.13,0.33],[-0.03,0.33],[0.036,0.33],[0.07,0.33],[0.086,0.329],[0.103,0.328],[0.119,0.327],[0.136,0.325],[0.153,0.323],[0.17,0.321],[0.186,0.318],[0.203,0.314],[0.22,0.31],[0.236,0.305],[0.253,0.299],[0.269,0.292],[0.286,0.284],[0.304,0.274]];
 const BOT=[[-0.43,0.125],[-0.413,0.083],[-0.397,0.053],[-0.38,0.03],[-0.363,0.014],[-0.347,0.003],[-0.33,0],[0.243,0],[0.249,0.04],[0.253,0.055],[0.256,0.065],[0.263,0.081],[0.269,0.091],[0.276,0.098],[0.283,0.102],[0.296,0.104],[0.366,0.104]];
-const LIP=[0.372,0.15], MTOP=[0.315,0.29];
+const LIP=[0.36,0.15], MTOP=[0.295,0.325];
 const topAt=x=>{for(let i=1;i<TOP.length;i++)if(TOP[i][0]>=x){const [a,b]=TOP[i-1],[c,d]=TOP[i];return b+(d-b)*(x-a)/(c-a)}return TOP.at(-1)[1]};
 const headTop=TOP.filter(p=>p[0]>=DOCK), headBot=BOT.filter(p=>p[0]>=DOCK);headTop.unshift([DOCK,topAt(DOCK)]);headBot.unshift([DOCK,0]);
 const tailTop=TOP.filter(p=>p[0]<=DOCK).concat([[DOCK,.33]]), tailBot=BOT.filter(p=>p[0]<=DOCK).concat([[DOCK,0]]);
@@ -78,15 +78,14 @@ function hz(r,p,x,z){const c=r.crown*Math.sin(Math.PI*clamp((x-DOCK)/.3))*(z>.2?
 
 function headPath(r,p){
   const P=new Path2D();
-  // one smooth outline: rounded back corners, a crown above the tail, the mouth, a soft S from the lip down to the floor
+  // after the sketch: a soft dome that leans forward, a tilted oval mouth, one long curve from the floor up into the lip
   const m=(x,z)=>[hx(r,p,x),hz(r,p,x,z)];
-  P.moveTo(...m(DOCK,.05));P.lineTo(...m(DOCK,.29));
-  P.quadraticCurveTo(...m(DOCK,.355),...m(.085,.358));
-  P.bezierCurveTo(...m(.19,.362),...m(.27,.335),...m(MTOP[0],MTOP[1]));
-  P.lineTo(...m(LIP[0],LIP[1]));
-  P.bezierCurveTo(...m(.34,.15),...m(.305,.142),...m(.29,.11));
-  P.bezierCurveTo(...m(.27,.045),...m(.245,0),...m(.19,0));
-  P.lineTo(...m(.085,0));P.quadraticCurveTo(...m(DOCK,0),...m(DOCK,.05));
+  P.moveTo(...m(DOCK,.06));P.lineTo(...m(DOCK,.29));
+  P.bezierCurveTo(...m(DOCK,.345),...m(.06,.36),...m(.12,.36));
+  P.bezierCurveTo(...m(.19,.36),...m(.25,.345),...m(MTOP[0],MTOP[1]));
+  P.bezierCurveTo(...m(.335,.30),...m(.37,.22),...m(LIP[0],LIP[1]));
+  P.bezierCurveTo(...m(.345,.075),...m(.27,0),...m(.16,0));
+  P.lineTo(...m(.09,0));P.bezierCurveTo(...m(.05,0),...m(DOCK,.015),...m(DOCK,.06));
   P.closePath();return P;
 }
 function drawHead(r,p,t,opts={}){
@@ -113,17 +112,19 @@ function drawHead(r,p,t,opts={}){
   });
   g.restore();
   g.strokeStyle=ink(.78);g.lineWidth=1.5*Math.max(.6,p.sc);g.stroke(P);
-  // the mouth, an opening
-  g.strokeStyle='#0c0c0c';g.lineWidth=2.4*Math.max(.6,p.sc);g.beginPath();
-  g.moveTo(lerp(hx(r,p,MTOP[0]),hx(r,p,LIP[0]),.12),lerp(hz(r,p,MTOP[0],MTOP[1]),hz(r,p,LIP[0],LIP[1]),.12));
-  g.lineTo(lerp(hx(r,p,MTOP[0]),hx(r,p,LIP[0]),.88),lerp(hz(r,p,MTOP[0],MTOP[1]),hz(r,p,LIP[0],LIP[1]),.88));g.stroke();
+  // the mouth, a tilted oval opening
+  { const [ax,ay]=[hx(r,p,MTOP[0]),hz(r,p,MTOP[0],MTOP[1])],[bx,by]=[hx(r,p,LIP[0]),hz(r,p,LIP[0],LIP[1])];
+    const cx=(ax+bx)/2-3*p.sc,cy=(ay+by)/2,L=Math.hypot(bx-ax,by-ay)/2;
+    g.strokeStyle=ink(.6);g.lineWidth=1.1*Math.max(.6,p.sc);g.beginPath();g.ellipse(cx,cy,L*.98,.03*S*p.sc,Math.atan2(by-ay,bx-ax),0,7);g.stroke(); }
   g.restore();
 }
 function drawTail(Xd,Yb,sc,a,docked){
   const P=new Path2D(),tx=x=>Xd+(x-DOCK)*S*sc,tz=z=>Yb-z*S*sc;
-  tailTop.forEach(([x,z],i)=>i?P.lineTo(tx(x),tz(z)):P.moveTo(tx(x),tz(z)));
-  for(let i=tailBot.length-1;i>=0;i--)P.lineTo(tx(tailBot[i][0]),tz(tailBot[i][1]));
-  P.closePath();
+  // a rounded tail, lower than the head, the back end one soft curve
+  P.moveTo(tx(DOCK),tz(.33));P.lineTo(tx(-.12),tz(.33));
+  P.bezierCurveTo(tx(-.27),tz(.33),tx(-.42),tz(.25),tx(-.44),tz(.14));
+  P.bezierCurveTo(tx(-.455),tz(.05),tx(-.40),tz(0),tx(-.32),tz(0));
+  P.lineTo(tx(DOCK),tz(0));P.closePath();
   g.save();g.globalAlpha*=a;g.fillStyle=ink(.035);g.fill(P);g.strokeStyle=ink(.55);g.lineWidth=1.2;g.stroke(P);g.restore();
   return {base:[tx(-.115),tz(.2)],floor:[tx(-.115),tz(.005)],roof:tz(.3),front:tx(DOCK),docked,sc,a};
 }
