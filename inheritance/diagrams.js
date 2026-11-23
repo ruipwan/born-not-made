@@ -46,15 +46,23 @@ function arm(c,t,s,tip,a,segs){
 // points inside a head, in head coordinates
 function spots(seed,n){const R=rng(seed),o=[];for(let i=0;i<n;i++){const x=.06+R()*.24,lo=x<.19?.03:.03+.15*Math.pow((x-.19)/.11,1.3),hi=.32-.06*Math.pow((x-.05)/.25,2);o.push([x,lo+R()*(hi-lo)])}return o}
 
+/* Each canvas plays on its own. Earlier this froze on one still frame when the system asked for reduced motion
+   (macOS "Reduce motion"), which made the diagrams look like pictures. Now every canvas always plays, and has
+   the same speed for everyone. Time advances only while the canvas is on screen; if no IntersectionObserver report ever
+   arrives (some nested frames), it plays anyway. Returns a small control: play(), pause(), seek(t), playing, t. */
 function loop(canvas,W,H,dur,draw){
-  const c=canvas.getContext('2d');let t=0,last=performance.now(),vis=false;
-  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches, fix=new URLSearchParams(location.search).get('dt');if(fix!==null)t=+fix;
-  new IntersectionObserver(e=>{vis=e[0].isIntersecting;last=performance.now()}).observe(canvas);
+  const c=canvas.getContext('2d');let t=0,last=performance.now(),vis=true,run=true;
+  const rate=1, fix=new URLSearchParams(location.search).get('dt');if(fix!==null){t=+fix;run=false}
+  if('IntersectionObserver' in window)new IntersectionObserver(e=>{vis=e[e.length-1].isIntersecting;last=performance.now()}).observe(canvas);
   function size(){const r=Math.min(2,devicePixelRatio||1),w=Math.round(canvas.clientWidth*r);if(w&&canvas.width!==w){canvas.width=w;canvas.height=Math.round(w*H/W)}}
-  function tick(now){if(vis||t===0||fix!==null){size();if(fix===null){if(!reduce&&vis)t=Math.max(0,t+(now-last)/1000)%dur;if(reduce)t=dur*.92}last=now;
-    c.setTransform(canvas.width/W,0,0,canvas.height/H,0,0);c.fillStyle='#000';c.fillRect(0,0,W,H);const d=draw(c,t);if(d&&canvas.getAttribute('aria-label')!==d)canvas.setAttribute('aria-label',d)}
-    else last=now;requestAnimationFrame(tick)}
-  requestAnimationFrame(tick);
+  const api={get t(){return t},get playing(){return run},dur,onframe:null,
+    play(){run=true;last=performance.now()},pause(){run=false},seek(v){t=Math.min(dur-1e-3,Math.max(0,+v||0))}};
+  function tick(now){size();
+    if(vis&&run&&!document.hidden){t=(t+Math.min(.1,Math.max(0,(now-last)/1000))*rate)%dur}
+    last=now;
+    if(vis){c.setTransform(canvas.width/W,0,0,canvas.height/H,0,0);c.fillStyle='#000';c.fillRect(0,0,W,H);const d=draw(c,t);if(d&&canvas.getAttribute('aria-label')!==d)canvas.setAttribute('aria-label',d);if(api.onframe)api.onframe(t)}
+    requestAnimationFrame(tick)}
+  requestAnimationFrame(tick);return api;
 }
 
 /* 1 · Copy, update, "birth" */
@@ -181,7 +189,7 @@ function loop(canvas,W,H,dur,draw){
     [17.5,19.5,'Tool change','Tool change: the holder off, the needle back on.',''],
     [19.5,26,'4 · The cover','Wet on wet, the needle prints around the pod, over the pod, then the upper skin.','All within the 45 minutes of pot life of Dragon Skin 30, so bed, flange holes and cover cure as one.'],
     [26,DUR,'5 · Cured, then “birth”','After the cure the pod is a solid island between the two skins. Air fills the cells around it.','16 hours of cure. No wire crosses the skin: Bluetooth from the controller, charging by a coil through the skin. A pump pod adds two capped ports.']];
-  loop(cv,W,H,DUR,(c,t)=>{
+  const ctl=loop(cv,W,H,DUR,(c,t)=>{
     const fade=1-ease(t,DUR-.6,DUR);c.globalAlpha=fade;
     // gel, tail and dock
     c.fillStyle='rgba(255,255,255,.025)';c.fillRect(X0-40,GS,W-X0+40,LB+40-GS);
@@ -198,10 +206,18 @@ function loop(canvas,W,H,dur,draw){
     const sk=ease(t,.3,3.2), wb=ease(t,3.2,4.4), rim=ease(t,4.2,5.5), bed=ease(t,5.8,8.2);
     const inflate=ease(t,27,30), cell=lerp(8,64,inflate);
     c.fillStyle=ink(.16);c.strokeStyle=ink(.8);c.lineWidth=1;
-    const xs=lerp(X0,X1,sk);if(sk>0){c.fillRect(X0,LT,xs-X0,LB-LT);c.strokeRect(X0,LT,xs-X0,LB-LT)}
-    WEBS.forEach((x,i)=>{const a=ease(t,3.2+i*.15,3.5+i*.15);if(a<=0)return;c.globalAlpha=fade*a;c.fillRect(x-3,LT-cell,6,cell);c.strokeRect(x-3,LT-cell,6,cell);c.globalAlpha=fade});
+    // fresh silicone is glossy and brighter; it turns matte in the cure
+    const wet=1-ease(t,26,27.6), FR=a=>'rgba(250,246,226,'+a+')';
+    // lower skin as beads in section, laid one by one behind the needle tip
+    const xs=lerp(X0,X1,sk);if(sk>0){for(let x=X0+5;x<=xs;x+=10){const nw=clamp(1-(xs-x)/160);c.fillStyle=nw>0&&wet>0?FR(.18+.5*nw*wet):ink(.16+.1*wet);c.beginPath();c.arc(x,LB-5,5.4,0,7);c.fill()}
+      c.strokeStyle=ink(.8);c.strokeRect(X0,LT,xs-X0,LB-LT)}
+    WEBS.forEach((x,i)=>{const a=ease(t,3.2+i*.15,3.5+i*.15);if(a<=0)return;const h=Math.max(cell*a,2);c.fillStyle=a<1?FR(.6):ink(.16+.1*wet);c.fillRect(x-3,LT-h,6,h);c.strokeStyle=ink(.8);c.strokeRect(x-3,LT-h,6,h)});
     if(rim>0){c.globalAlpha=fade*rim;[-1,1].forEach(s=>{c.beginPath();c.moveTo(PX+s*136,LT);c.lineTo(PX+s*146,LT-32);c.lineTo(PX+s*154,LT-32);c.lineTo(PX+s*144,LT);c.closePath();c.fill();c.stroke()});c.globalAlpha=fade}
-    if(bed>0){const top=LT-16*bed;c.fillStyle=ink(.3);c.fillRect(PX-136,top,272,LT-top)}
+    if(bed>0){const rows=bed*3;for(let r=0;r<Math.ceil(rows);r++){const f=Math.min(1,rows-r),y=LT-3-r*5.3,xe=r%2?PX+132-264*f:PX-132+264*f;
+        for(let x=PX-131;x<=PX+131;x+=8){if(r%2?x<xe:x>xe)continue;c.fillStyle=FR(t<19.5?.32+.25*(r===Math.ceil(rows)-1&&bed<1):.18+.2*wet);c.beginPath();c.arc(x,y,4,0,7);c.fill()}}
+      // the gel in the rim is pushed out over the edge
+      const g=Math.sin(Math.PI*clamp((t-5.8)/2.6));if(g>0){c.strokeStyle=ink(.55*g);c.lineWidth=1.2;[-1,1].forEach(s2=>{const x=PX+s2*120,y=LT-30;c.beginPath();c.moveTo(x,y+14);c.quadraticCurveTo(x+s2*20,y-14-10*g,x+s2*48,y-6);c.stroke();c.beginPath();c.moveTo(x+s2*48,y-6);c.lineTo(x+s2*40,y-12);c.moveTo(x+s2*48,y-6);c.lineTo(x+s2*38,y-2);c.stroke()});
+        text(c,'GEL PUSHED OUT',PX,LT-70,11,.6*g,mono,'center',1.2)}}
     // squeeze out at the rim when the pod goes in
     const sq=ease(t,14.4,15.6);
     if(sq>0&&t<19.5+3){[-1,1].forEach(s=>{c.fillStyle=ink(.3);c.beginPath();c.ellipse(PX+s*150,LT-34,7*sq,5*sq,0,0,7);c.fill()})}
@@ -233,8 +249,9 @@ function loop(canvas,W,H,dur,draw){
     const cov=ease(t,19.5,23.5), us=ease(t,23.5,25.8);
     if(cov>0){const top=lerp(LT,PT-16,cov);c.save();c.beginPath();c.rect(0,top,W,H);c.clip();
       const P=new Path2D();P.moveTo(PX-170,LT);P.lineTo(PX-170,PT+4);P.quadraticCurveTo(PX-170,PT-16,PX-140,PT-16);P.lineTo(PX+140,PT-16);P.quadraticCurveTo(PX+170,PT-16,PX+170,PT+4);P.lineTo(PX+170,LT);P.closePath();
-      c.fillStyle='rgba(236,235,230,.13)';c.fill(P);c.strokeStyle=ink(.8);c.lineWidth=1;c.stroke(P);c.restore();pod(c,PX,PB,.25*cov,true)}
-    if(us>0){c.fillStyle=ink(.16);c.strokeStyle=ink(.8);c.lineWidth=1;
+      c.fillStyle=wet>0?FR(.1+.14*wet):ink(.13);c.fill(P);c.save();c.clip(P);c.strokeStyle=ink(.22);c.lineWidth=1;for(let y=LT-5;y>PT-20;y-=5.3){c.beginPath();c.moveTo(PX-172,y);c.lineTo(PX+172,y);c.stroke()}c.restore();
+      c.strokeStyle=ink(.8);c.lineWidth=1;c.stroke(P);c.restore();pod(c,PX,PB,.25*cov,true)}
+    if(us>0){c.fillStyle=wet>0?FR(.16+.3*wet):ink(.16);c.strokeStyle=ink(.8);c.lineWidth=1;
       const xl=lerp(PX-170,WEBS[0],us),xr=lerp(PX+170,WEBS[WEBS.length-1],us),yb=LT-cell;
       // upper skin: flat while printed, cells bulge when inflated
       const seg=(xa,xb)=>{const P=new Path2D();const pts=[xa,...WEBS.filter(x=>x>xa&&x<xb),xb];P.moveTo(xa,yb);
@@ -245,7 +262,7 @@ function loop(canvas,W,H,dur,draw){
     if(inflate>0){tag(c,'CELL, AIR',1010+320,LT-cell-70,1315,LT-cell/2,inflate);
       const r=ease(t,29.5,31);if(r>0)for(let k=0;k<3;k++){c.strokeStyle=ink(.5*r*(1-((t*0.8+k/3)%1)));c.lineWidth=1;c.beginPath();c.arc(PX-40,PT-16,30+((t*0.8+k/3)%1)*70,-Math.PI*.85,-Math.PI*.15);c.stroke()}}
     // the tool
-    if(tool==='needle')needle(c,tx,ty,1);else if(tool==='holder')holder(c,tx,ty,1,on);
+    if(tool==='needle'){needle(c,tx,ty,1);const pr=(t<5.5)||(t>5.8&&t<8.3)||(t>19.5&&t<25.8);if(pr){c.fillStyle=FR(.95);c.beginPath();c.arc(tx,ty,3.4,0,7);c.fill();c.strokeStyle=FR(.35);c.lineWidth=1;c.beginPath();c.arc(tx,ty,8+3*Math.sin(t*12),0,7);c.stroke()}}else if(tool==='holder')holder(c,tx,ty,1,on);
     // tags
     tag(c,'LOWER SKIN, 1.2 MM',W-30,LB+30,X1-60,LB-5,sk,'right');
     tag(c,'WEB',WEBS[5]-60,LB+30,WEBS[5],LT-4,wb*(1-inflate),'right');
@@ -265,6 +282,11 @@ function loop(canvas,W,H,dur,draw){
     if(S[4])text(c,S[4],64,H-36,14,.6);
     c.globalAlpha=1;return S[2]+'. '+S[3]+' '+S[4];
   });
+  // play, pause and scrub under the canvas
+  const pb=document.getElementById('wplay'),sk=document.getElementById('wseek'),tm=document.getElementById('wtime');
+  if(pb&&sk){const lab=s=>Math.floor(s/60)+':'+String(Math.floor(s)%60).padStart(2,'0');sk.max=DUR;
+    ctl.onframe=t=>{sk.value=t;if(tm)tm.textContent=lab(t)+' / '+lab(DUR);const p=ctl.playing?'Pause':'Play';if(pb.textContent!==p)pb.textContent=p};
+    pb.onclick=()=>ctl.playing?ctl.pause():ctl.play();sk.oninput=()=>{ctl.pause();ctl.seek(sk.value)}}
 })();
 
 /* 4 · The tail copies itself */
