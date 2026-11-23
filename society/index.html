@@ -833,7 +833,7 @@ function pauseAndPlace(r, i) {
   const sp = r.babySpec, t = r.nk[i], q = sp.pocket[i], bp = babyPt(r, q), L = Math.max(1, Math.round(sp.pf[i] * NLAY)), rp = rackPos(r, i), at = [rp[0], rp[1] + 0.003 + t.h + 0.003, rp[2]];
   r.needle = null; r.paused = true; r.arm.needleOn = false;
   hop(r, at, "mag", 1.0, { hold: t, psiEnd: rp[3] });
-  hop(r, [bp[0], bp[1] + t.h / 2 + 0.004, bp[2]], "mag", 1.0, { psiEnd: q.ledge ? 0 : inward(bp[2]), hold: null, fn: () => { t.inBaby = true; r.paused = false; sp.next++; flash(() => worldOf(r, babyPt(r, q)), 1.4, 0.07, 2.2); log(`#${r.id} pauses the print at layer ${L} of ${NLAY} and sets ${FAM[t.f]}, ${t.name}, ${q.ledge ? "on the inner ledge" : "into the wall"}`); } });
+  hop(r, [bp[0], bp[1] + t.h / 2 + 0.004, bp[2]], "mag", 1.0, { psiEnd: q.ledge ? 0 : inward(bp[2]), hold: null, fn: () => { t.inBaby = true; t.setT = simT; r.paused = false; sp.next++; if (!q.ledge) dtag(() => worldOf(r, babyPt(r, q)), `POCKET ${(t.h * 1000).toFixed(1)} MM DEEP, THE PART'S OWN HEIGHT · SET FLUSH IN THE WALL`, 4); flash(() => worldOf(r, babyPt(r, q)), 1.4, 0.07, 2.2); log(`#${r.id} pauses the print at layer ${L} of ${NLAY} and sets ${FAM[t.f]}, ${t.name}, ${q.ledge ? "on the inner ledge" : "into the wall"}`); } });
 }
 // the arm drawn: the link meshes of the printing simulator, and its tool modules, for each robot that holds a tail
 const TOOLG = {};      // the tool meshes, made once and shared by every arm
@@ -1359,6 +1359,11 @@ function drawPart(Mb, p, col) { const l = Math.max(p.l, VMIN), w = Math.max(p.w,
   if (p.deco) for (const [t, x, y, z, a, b, c, col] of p.deco) { const k = Math.max(1, VMIN / Math.max(p.l, p.w)); if (t === "box") emitBox(Mb, x * k, y, z * k, a * k, b, c * k, col); else if (t === "cyl") emitCyl(Mb, x * k, y, z * k, a * k, b, false, col); else emitCyl(Mb, x * k, y, z * k, b * k, a, true, col); } }
 // a part built into a body: in a wall pocket it sits flush with the outer surface in a small clear printed window, drawn as a thin pale rim, so it reads on every head, clear or frosted
 function drawEmbedded(Mb, p, ledge) { if (!ledge) emitBox(Mb, 0, -p.h / 2 + 0.0002, 0, Math.max(p.l, VMIN) + 0.004, 0.0006, Math.max(p.w, VMIN) + 0.004, 0xf6f5f0); drawPart(Mb, p, false); }
+// an open pocket in the newborn's wall, in the frame of the part (y along the wall normal): four thin walls as high as the part and a dark floor of gel; k fades it shut
+const _b2 = new THREE.Matrix4();
+function drawPocket(Mb, p, k = 0) { if (k >= 1) return; const L = Math.max(p.l, VMIN) + 0.0016, W = Math.max(p.w, VMIN) + 0.0016, h = Math.max(p.h, 0.001) * (1 - k), t = 0.0012, y = -p.h / 2 + h / 2, c = 0xdedcd6;
+  emitBox(Mb, 0, -p.h / 2 - 0.0003, 0, L, 0.0005, W, 0x2b2c2e);
+  emitBox(Mb, (L + t) / 2, y, 0, t, h, W + 2 * t, c); emitBox(Mb, -(L + t) / 2, y, 0, t, h, W + 2 * t, c); emitBox(Mb, 0, y, (W + t) / 2, L, h, t, c); emitBox(Mb, 0, y, -(W + t) / 2, L, h, t, c); }
 const frameAt = (M, x, y, z, rx) => { _q.setFromAxisAngle(AX, rx); _l.compose(_p.set(x, y, z), _q, _s.set(1, 1, 1)); return _b.multiplyMatrices(M, _l); };
 function updateScene(dtReal) {
   { let n = 0; const put = (x, z, h, a, b) => { if (n >= 64) return; U.uBodA.value[n].set(x, z, Math.cos(h), Math.sin(h)); U.uBodB.value[n].set(a, b); n++; };
@@ -1397,8 +1402,14 @@ function updateScene(dtReal) {
       const Q = m.userData.Q, y0 = -0.6 * r.s.B; m.position.set(lerp(BABYX, reach(r) + 0.25, b), lerp(y0 - Q.yb, 0, b), 0); qShape(Q, clamp(J.b * 2 - 0.6, 0, 1) * (b > 0 ? 1 : 0), 0); m.updateMatrixWorld(true);
       if (Q.pods) Q.pods.visible = !!J.pods; m.userData.plane.constant = b > 0 ? 10 : r.grp.position.y + y0 + J.p * Q.packH * 1.02 + 0.001; }      // layer by layer: the clip rises with the print
     // the stock: parts eaten and not yet built in, each on its slot of the rack on the floor of the head
-    for (let i = 0; i < r.nk.length; i++) { const k = r.nk[i]; if (k === r.arm.hold || k.inSeg) continue;
-      if (k.inBaby && r.babySpec && r.babySpec.pocket) { const q = r.babySpec.pocket[i], sx = 1 - 0.6 * w, sy = 1 - 0.56 * w; drawEmbedded(frameAt(M, bx + q.x * sx, by + q.y * sy, q.z * sy, q.rx), k, q.ledge); }
+    for (let i = 0; i < r.nk.length; i++) { const k = r.nk[i]; if (k.inSeg) continue;
+      const sp = r.babySpec, q = sp && sp.pocket && r.baby ? sp.pocket[i] : null, sx = 1 - 0.6 * w, sy = 1 - 0.56 * w;
+      // the pocket is left open in the wall from the layer where it starts until the part is set in: a rim as high as the part, the gel dark at its floor
+      if (q && !q.ledge && !k.inBaby && !r.birthT && r.carry / 0.75 >= sp.pf[i] - 0.03) drawPocket(frameAt(M, bx + q.x * sx, by + q.y * sy, q.z * sy, q.rx), k);
+      if (k === r.arm.hold) continue;
+      if (k.inBaby && q) { const Mb = frameAt(M, bx + q.x * sx, by + q.y * sy, q.z * sy, q.rx), d = simT - (k.setT ?? -9);
+        if (d < 1.2 && !q.ledge) { const off = 0.006 * (1 - sstep(0, 0.55, d)) - 0.0005 * Math.sin((d - 0.55) * 18) * Math.exp(-(d - 0.55) * 5) * (d > 0.55 ? 1 : 0); Mb.multiply(_l.makeTranslation(0, -off, 0)); drawPocket(_b2.copy(Mb).multiply(_l.makeTranslation(0, off, 0)), k, sstep(0.6, 1.2, d)); }      // lowered in from inside, it settles flush with a small spring back, then the rim closes over it
+        drawEmbedded(Mb, k, q.ledge); }
       else { const rp = rackPos(r, i); drawPart(frameAt(M, rp[0], rp[1] + 0.003 + k.h / 2, rp[2], 0), k, true); } }
     if (r.B0) for (const sd of [-1, 1]) { const x0 = r.B0[0] + 0.215, xm = r.B0[0] + 0.315, xc = (x0 + xm) / 2, yt = shelfY(r, xc, sd * SHELF.z); emitBox(M, xc, yt - SHELF.h / 2, sd * SHELF.z, xm - x0, SHELF.h, SHELF.w, 0xd4d2cc); }      // the two shelves of the rack, printed with the head
     // the arm: the DexArm, drawn whenever the robot holds a tail; folded, it stands in the tail behind the head joint
@@ -1578,7 +1589,7 @@ function eventShots() { const c = [];
     else if (r.pick && simT - (r.pickT0 || 0) < 2.5) c.push({ r, kind: r.pick.own ? "swap" : "pick", p: r.pick.own ? 4 : 5, d: 0.95, dur: r.pick.own ? 7 : 6 });
     else if (!r.pick && (r.forage ? r.forage.tgt : r.self)) { const T = r.forage ? r.forage.tgt : r.self, fr = reach(r); if (Math.hypot(T.x - r.x - Math.cos(r.h) * fr, T.z - r.z - Math.sin(r.h) * fr) < 0.6) c.push({ r, kind: r.self ? "swap" : "pick", p: r.self ? 4 : 5, d: 1.0, dur: 8 }); }      // the approach, then the pick
     else if (r.phase === "touch" && r.pair && r.id < r.pair.id && r.phaseT < 2) c.push({ r, kind: "touch", p: 4, d: 2.1, dur: 5 });
-    else if (r.paused && r.carry > 0.05) c.push({ r, kind: "place", p: 3, d: 1.1, dur: 4.5 });
+    else if (r.paused && r.carry > 0.02) c.push({ r, kind: "place", p: 3, d: 0.38, dur: 6 });      // close on the pocket: open, the part lowered in, settling flush
     else if (r.carry > 0 && r.carry < 0.7) c.push({ r, kind: "print", p: 1, d: 1.3, dur: 4.5 });
     else if (r.tjob && r.tjob.st.startsWith("birth")) c.push({ r, kind: "segbirth", p: 5, d: 1.7, dur: 6 });
     else if (r.tjob && r.tjob.st.startsWith("print")) c.push({ r, kind: "tailprint", p: 3, d: 1.2, dur: 5 }); }
@@ -1601,6 +1612,7 @@ function shotTarget(S) { const r = S.r; if (S.kind === "wide") return [0, -0.2, 
     if (J.st === "toShell" && J.shell) { const Sh = J.shell; S.d = 1.4; return [(r.x + Sh.x) / 2, WL + 0.05, (r.z + Sh.z) / 2]; }
     if (J.shell) { const Sh = J.shell, w = tW(Sh, [Sh.B0[0] + 0.1, 0, 0]); S.d = 1.25; return [w[0], WL + 0.1, w[2]]; }
     const w = tW(r, [faceX(r) + 0.2, 0, 0]); S.d = 1.0; return [w[0], WL + 0.05, w[2]]; }
+  if (S.kind === "place" && r.babySpec && r.babySpec.pocket && r.baby) { if (S.i === undefined) S.i = r.babySpec.order[r.babySpec.next] ?? 0; const q = r.babySpec.pocket[S.i]; if (q) return worldOf(r, babyPt(r, q)); }
   if (S.kind === "pipe") return [r.x + Math.cos(r.h) * 0.12, WL + 0.04, r.z + Math.sin(r.h) * 0.12];
   if (S.kind === "modpull") { const w = tW(r, [faceX(r) + 0.15, 0, 0]); return [w[0], WL + 0.03, w[2]]; }
   if (S.kind === "standup") { const w = tW(r, [r.B0[0] + 0.1, 0, 0]); return [w[0], WL + 0.1, w[2]]; }
@@ -1636,7 +1648,7 @@ function director(dt) {
         for (const o of [...robots, ...loose]) { if (o === s.r || (s.r.job && o === s.r.job.shell)) continue; const ax = p0[0] - tgt[0], az_ = p0[1] - tgt[2], L2 = ax * ax + az_ * az_, t = clamp(((o.x - tgt[0]) * ax + (o.z - tgt[2]) * az_) / L2, 0, 1), dx = tgt[0] + ax * t - o.x, dz = tgt[2] + az_ * t - o.z; if (Math.hypot(dx, dz) < 0.4) n++; } return n; };
       if (occ(-s.side) < occ(s.side)) s.side = -s.side; }
     const r = s.r, az = s.kind === "pipe" ? r.h + s.side * (0.5 + 0.1 * u) : r.h + s.side * (Math.PI / 2 - 0.55) + s.side * 0.16 * u, d = s.d * (1 - 0.1 * u);      // at the pipe the camera stands in the pool, looking back at the mouth
-    pos = [tgt[0] + Math.cos(az) * d, tgt[1] + d * 0.62, tgt[2] + Math.sin(az) * d];
+    const azp = r.h + s.side * 0.45; pos = s.kind === "place" ? [tgt[0] + Math.cos(azp) * d * 0.6, tgt[1] + d * 0.8, tgt[2] + Math.sin(azp) * d * 0.6] : [tgt[0] + Math.cos(az) * d, tgt[1] + d * 0.62, tgt[2] + Math.sin(az) * d];      // the pocket: from the mouth side and above, through the clear roof, the arm behind it
     C.ap = s.d < 1.5 ? 0.14 : 0.08; }
   // never inside a body
   for (const r of robots) { const dx = pos[0] - r.x, dz = pos[2] - r.z, dd = Math.hypot(dx, dz), m = r.len * 0.65; if (dd < m && pos[1] < WL - waterY(r.s) + r.s.B + 0.1) pos[1] = WL - waterY(r.s) + r.s.B + 0.1; }
