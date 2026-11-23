@@ -100,7 +100,7 @@ function setup(host) {
     "aria-label": "Map of the site. One line: a robot gives birth to another. Branches: " + BRANCHES.map((b) => b.label).join(", ") + "." }, host);
   const nav = document.createElement("nav"); nav.className = "bnm-sr"; nav.setAttribute("aria-label", "Tabs of the site");
   const ul = document.createElement("ul");
-  for (const [href, text] of [["#work", "The Work"], ...BRANCHES.map((b) => ["#" + b.tab, b.label])]) {
+  for (const [href, text] of [["#work", "The Prototype"], ...BRANCHES.map((b) => ["#" + b.tab, b.label])]) {
     const li = document.createElement("li"), a = document.createElement("a"); a.href = href; a.textContent = text; li.appendChild(a); ul.appendChild(li);
   }
   nav.appendChild(ul); host.appendChild(nav);

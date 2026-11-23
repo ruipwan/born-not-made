@@ -527,7 +527,7 @@
   "stage": "design",
   "title": "Print and assemble in one cycle",
   "text": "Ten steps: the tail comes in, docks by magnets, the gel goes in, magnets are set in the gel, the arm prints the baby, blows and pushes, the birth, full size, a new tail, and the baby becomes a mother.",
-  "decision": "Printing and placing happen in one cycle (shown on The Work).",
+  "decision": "Printing and placing happen in one cycle (shown on The Prototype).",
   "media": [
    "media/1105_print_assemble_cycle.jpg"
   ],
@@ -733,7 +733,7 @@
   "date": "2026-11-17",
   "stage": "render",
   "title": "Relation animation",
-  "text": "A first relation animation with babies of different forms and colors (the finished version is on The Work). A second version follows on 18 Nov.",
+  "text": "A first relation animation with babies of different forms and colors (the finished version is on The Prototype). A second version follows on 18 Nov.",
   "media": [
    "media/1117_relation.jpg"
   ],
@@ -768,7 +768,7 @@
   "date": "2026-11-18",
   "stage": "design",
   "title": "Fold belly",
-  "text": "The upper skin became printed silicone origami that swells while the womb is closed and full of gel. How it works is on The Work, parts and numbers in Build.",
+  "text": "The upper skin became printed silicone origami that swells while the womb is closed and full of gel. How it works is on The Prototype, parts and numbers in Build.",
   "decision": "The gel stays inside after birth.",
   "media": [
    "media/1118_fold_belly.jpg"
