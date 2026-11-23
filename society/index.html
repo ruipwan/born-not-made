@@ -1543,13 +1543,23 @@ function eventShots() { const c = [];
     else if (r.tjob && r.tjob.st.startsWith("print")) c.push({ r, kind: "tailprint", p: 3, d: 1.2, dur: 5 }); }
   // the new tail: a module drawn in, a module snapped on, the arm standing up in the new tail
   for (const T of loose) { const J = T.job; if (!J) continue;
+    // the whole assembly as one close sequence: module approach, snap, push into the new tail's face, standing up; it follows the free tail through its stages
+    if (J.st === "mod" && J.have === 0 && J.tgt) c.push({ r: T, kind: "asm", p: 5.2, d: 1.0, dur: 75 });
     if (J.st === "pull" || (J.st === "mod" && J.tgt && Math.hypot(J.tgt.x - T.x, J.tgt.z - T.z) < T.ox + 0.9)) c.push({ r: T, kind: "modpull", p: 5, d: 1.1, dur: 8 });
     else if (J.shell && (J.st === "push" || J.st === "stand" || J.st === "unfold")) c.push({ r: J.shell, kind: "standup", p: 5, d: 1.5, dur: 9, away: T }); }
   // scene 2: one shot holds on the pipe's mouth as a part comes out
   if (pipe && simT - pipe.lastT < 1.2) c.push({ r: pipe, kind: "pipe", p: 4.5, d: 1.0, dur: 7 });
   return c; }
 const alive = (o) => robots.includes(o) || loose.includes(o) || (o && o === pipe);
+const asmLost = (S) => S.kind === "asm" && !S.r.job && S.t2 === undefined;
 function shotTarget(S) { const r = S.r; if (S.kind === "wide") return [0, -0.2, 0];
+  if (S.kind === "asm") { const J = r.job;
+    if (!J) { S.t2 = S.t2 ?? DIR.t; const w = tW(r, [faceX(r) + 0.4, 0, 0]); S.d = 1.3; return [w[0], WL + 0.08, w[2]]; }      // the new tail whole: hold a moment longer
+    if ((J.st === "mod" || J.st === "pull") && J.tgt) { const f = tW(r, [faceX(r) + 0.1, 0, 0]); S.d = 0.95; return [(f[0] + J.tgt.x) / 2, WL + 0.04, (f[2] + J.tgt.z) / 2]; }
+    if (J.st === "mod" || J.st === "pull") { const w = tW(r, [faceX(r) + 0.2, 0, 0]); S.d = 0.8; return [w[0], WL + 0.05, w[2]]; }      // the snap, close
+    if (J.st === "toShell" && J.shell) { const Sh = J.shell; S.d = 1.4; return [(r.x + Sh.x) / 2, WL + 0.05, (r.z + Sh.z) / 2]; }
+    if (J.shell) { const Sh = J.shell, w = tW(Sh, [Sh.B0[0] + 0.1, 0, 0]); S.d = 1.25; return [w[0], WL + 0.1, w[2]]; }
+    const w = tW(r, [faceX(r) + 0.2, 0, 0]); S.d = 1.0; return [w[0], WL + 0.05, w[2]]; }
   if (S.kind === "pipe") return [r.x + Math.cos(r.h) * 0.12, WL + 0.04, r.z + Math.sin(r.h) * 0.12];
   if (S.kind === "modpull") { const w = tW(r, [faceX(r) + 0.15, 0, 0]); return [w[0], WL + 0.03, w[2]]; }
   if (S.kind === "standup") { const w = tW(r, [r.B0[0] + 0.1, 0, 0]); return [w[0], WL + 0.1, w[2]]; }
@@ -1559,7 +1569,7 @@ function director(dt) {
   const C = CINE; if (camMode !== "film") { C.ap = camMode === "follow" ? 0.06 : 0; return; }
   const D = DIR; D.t += dt; D.clock += dt; const S = D.shot;
   // a shot is never shorter than 4 s: if its event ends early, the camera holds on the place a little longer
-  const lost = S && S.r && D.t >= 4 && (!alive(S.r) || (S.kind === "touch" && !S.r.pair));
+  const lost = S && S.r && D.t >= 4 && (!alive(S.r) || (S.kind === "touch" && !S.r.pair) || (S.kind === "asm" && S.t2 !== undefined && D.t - S.t2 > 5));
   // a wide shot gives way, after 4 s, to a pick, a touch, a swap or a birth
   const cutIn = S && S.kind === "wide" && D.t >= 4 && (D.k = (D.k || 0) + 1) % 5 === 0 && eventShots().some((e) => e.p >= 4 && (!D.last || e.r !== D.last.r));
   if (!S || D.t > S.dur || lost || cutIn) {
@@ -1579,6 +1589,11 @@ function director(dt) {
   if (s.kind === "wide") { const az = s.az + 0.035 * D.t, R = 13 - 0.7 * u; tgt = [0, -0.25, 0]; pos = [Math.sin(az) * R, 5.2 - 0.4 * u, Math.cos(az) * R]; C.ap = 0; }
   else { const nt = shotTarget(s); s.tgt = D.cut ? nt : lerp3(s.tgt, nt, Math.min(1, dt * 1.5)); tgt = s.tgt;
     // three quarters from the side, slow dolly in and a slight orbit; high enough to see into the clear head, never below the water
+    // close shots that follow a sequence keep a clear line of sight: every 2 s the camera may move to the other side if fewer bodies stand between
+    if ((s.kind === "asm" || s.kind === "standup") && D.t - (s.sideT ?? -9) > 2) { s.sideT = D.t;
+      const occ = (sd) => { const az0 = s.r.h + sd * (Math.PI / 2 - 0.55), p0 = [tgt[0] + Math.cos(az0) * s.d, tgt[2] + Math.sin(az0) * s.d]; let n = 0;
+        for (const o of [...robots, ...loose]) { if (o === s.r || (s.r.job && o === s.r.job.shell)) continue; const ax = p0[0] - tgt[0], az_ = p0[1] - tgt[2], L2 = ax * ax + az_ * az_, t = clamp(((o.x - tgt[0]) * ax + (o.z - tgt[2]) * az_) / L2, 0, 1), dx = tgt[0] + ax * t - o.x, dz = tgt[2] + az_ * t - o.z; if (Math.hypot(dx, dz) < 0.4) n++; } return n; };
+      if (occ(-s.side) < occ(s.side)) s.side = -s.side; }
     const r = s.r, az = s.kind === "pipe" ? r.h + s.side * (0.5 + 0.1 * u) : r.h + s.side * (Math.PI / 2 - 0.55) + s.side * 0.16 * u, d = s.d * (1 - 0.1 * u);      // at the pipe the camera stands in the pool, looking back at the mouth
     pos = [tgt[0] + Math.cos(az) * d, tgt[1] + d * 0.62, tgt[2] + Math.sin(az) * d];
     C.ap = s.d < 1.5 ? 0.14 : 0.08; }
