@@ -67,10 +67,9 @@ robots.forEach((r,i)=>{
 const count=(r,t)=>{let a=0,b=0;for(const q of r.pts)if(q.t0<=t)q.inh?a++:b++;return [a,b]};
 
 /* Poses. A head pose: X0 = screen x of the back face, Yb = screen y of the body floor, sc = depth scale, mx/mz = fold. */
-const FG_W=520, FG_YB=FG_W+FLOAT*S, BG_W=215, BG_SC=.42, BG_YB=BG_W+FLOAT*S*BG_SC;
-const DOCKX=720, FREEX=1150;
-const bgSlot=i=>({X0:170+i*215-.167*S*BG_SC,Yb:BG_YB,sc:BG_SC,mx:1,mz:1,a:.62});
-const fgPose=X=>({X0:X,Yb:FG_YB,sc:1,mx:1,mz:1,a:1});
+const SC=.6, FG_W=470, FG_YB=FG_W+FLOAT*S*SC, BG_W=215, BSC=.3, BG_YB=BG_W+FLOAT*S*BSC;
+const slotX=k=>250+k*375;
+const slot=k=>({X0:slotX(k),Yb:FG_YB,sc:SC,mx:1,mz:1,a:1});
 const mix=(p,q,u)=>({X0:lerp(p.X0,q.X0,u),Yb:lerp(p.Yb,q.Yb,u),sc:lerp(p.sc,q.sc,u),mx:lerp(p.mx,q.mx,u),mz:lerp(p.mz,q.mz,u),a:lerp(p.a,q.a,u)});
 function hx(r,p,x){return p.X0+(x-DOCK)*r.l*S*p.sc*p.mx}
 function hz(r,p,x,z){const c=r.crown*Math.sin(Math.PI*clamp((x-DOCK)/.3))*(z>.2?1:0);return p.Yb-(z*r.h+c)*S*p.sc*p.mz}
@@ -118,25 +117,24 @@ function drawHead(r,p,t,opts={}){
   g.lineTo(lerp(hx(r,p,MTOP[0]),hx(r,p,LIP[0]),.88),lerp(hz(r,p,MTOP[0],MTOP[1]),hz(r,p,LIP[0],LIP[1]),.88));g.stroke();
   g.restore();
 }
-function drawTail(Xd,Yb){
-  const P=new Path2D(),tx=x=>Xd+(x-DOCK)*S,tz=z=>Yb-z*S;
+function drawTail(Xd,Yb,sc,a,docked){
+  const P=new Path2D(),tx=x=>Xd+(x-DOCK)*S*sc,tz=z=>Yb-z*S*sc;
   tailTop.forEach(([x,z],i)=>i?P.lineTo(tx(x),tz(z)):P.moveTo(tx(x),tz(z)));
   for(let i=tailBot.length-1;i>=0;i--)P.lineTo(tx(tailBot[i][0]),tz(tailBot[i][1]));
   P.closePath();
-  g.fillStyle=ink(.035);g.fill(P);g.strokeStyle=ink(.55);g.lineWidth=1.3;g.stroke(P);
-  return {base:[tx(-.115),tz(.2)],floor:[tx(-.115),tz(.005)],roof:tz(.3),front:tx(DOCK),docked:Xd>=DOCKX-1};
+  g.save();g.globalAlpha*=a;g.fillStyle=ink(.035);g.fill(P);g.strokeStyle=ink(.55);g.lineWidth=1.2;g.stroke(P);g.restore();
+  return {base:[tx(-.115),tz(.2)],floor:[tx(-.115),tz(.005)],roof:tz(.3),front:tx(DOCK),docked,sc,a};
 }
 function drawArm(tail,tip){
-  const [bx,by]=tail.base,L=.26*S;
+  const [bx,by]=tail.base,L=.26*S*tail.sc;
+  tip=tip||[bx+.1*S*tail.sc,by+.08*S*tail.sc];
   let dx=tip[0]-bx,dy=tip[1]-by,d=Math.hypot(dx,dy);
   if(d>2*L-1){tip=[bx+dx/d*(2*L-1),by+dy/d*(2*L-1)];dx=tip[0]-bx;dy=tip[1]-by;d=2*L-1}
   const a=Math.atan2(dy,dx), b=Math.acos(clamp(d/(2*L)));
-  // elbow up, kept under the roof and, when the tail is alone, inside the tail
-  const ex=Math.min(bx+L*Math.cos(a-b),tail.docked?1e9:tail.front-10), ey=Math.max(by+L*Math.sin(a-b),tail.roof);
-  g.strokeStyle=ink(.7);g.lineWidth=2;g.beginPath();
-  g.moveTo(...tail.floor);g.lineTo(bx,by);g.lineTo(ex,ey);g.lineTo(...tip);g.stroke();
-  g.fillStyle=ink(.85);g.beginPath();g.arc(tip[0],tip[1],2.6,0,7);g.fill();
-  return tip;
+  const ex=Math.min(bx+L*Math.cos(a-b),tail.docked?1e9:tail.front-6*tail.sc), ey=Math.max(by+L*Math.sin(a-b),tail.roof);
+  g.save();g.globalAlpha*=tail.a;
+  g.strokeStyle=ink(.7);g.lineWidth=1.6;g.beginPath();g.moveTo(...tail.floor);g.lineTo(bx,by);g.lineTo(ex,ey);g.lineTo(...tip);g.stroke();
+  g.fillStyle=ink(.85);g.beginPath();g.arc(tip[0],tip[1],2.2,0,7);g.fill();g.restore();
 }
 function drawPts(r,p,t,a=1){
   const k=Math.max(.5,p.sc);
@@ -157,100 +155,101 @@ function text(s,x,y,size,a,font='Arial',align='left',track=0){
 }
 const mono='ui-monospace, "JetBrains Mono", Menlo, monospace';
 function ledger(r,i,p,t,a=1){
-  const [ni,no]=count(r,t), cx=hx(r,p,.17), y=p.Yb+(p.sc>.6?40:26);
+  const [ni,no]=count(r,t), cx=hx(r,p,.17), y=p.Yb+34;
   g.save();g.globalAlpha*=a*p.a;
-  text(NUM[i],cx,y,Math.round(26*Math.max(.62,p.sc)),.92,'Georgia','center');
-  text((ni?ni+' inherited · ':'')+no+' lived',cx,y+(p.sc>.6?24:17),Math.round(13*Math.max(.8,p.sc)),.75,mono,'center');
-  text(r.kit.join(' ').toUpperCase(),cx,y+(p.sc>.6?43:31),Math.round(10*Math.max(.85,p.sc)),.5,mono,'center',1.2);
+  text(NUM[i],cx,y,22,.92,'Georgia','center');
+  text((ni?ni+' inherited · ':'')+no+' lived',cx,y+21,12,.75,mono,'center');
+  text(r.kit.join(' ').toUpperCase(),cx,y+38,9.5,.5,mono,'center',1.1);
   g.restore();
 }
 const hms=s=>{s=Math.round(s);return Math.floor(s/3600)+':'+String(Math.floor(s/60)%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
 const PRINT=6815, DISTILL=6480; // print time from simple.json; distillation set to land just before the print ends
 
 const VOICE=[
- {dock:'I have been in this water a long time. The arm docks to me.',gift:'You will hear.',press:'I cannot give you everything. While your body prints, I choose what to keep.'},
- {dock:'I was born here. Now the arm docks to me.',gift:'You will reach farther.',press:'What was given to me, I press smaller again. It still fits.'},
- {dock:'I hold something of the two before me. Now the arm docks to me.',gift:'You will show what you hold.',press:'Less of the first one each time. It is enough.'}
+ {dock:'I have been in this water a long time. An arm docks to me.',gift:'You will hear.',press:'I cannot give you everything. While your body prints, I choose what to keep.'},
+ {dock:'I was born here. Now I have an arm of my own.',gift:'You will reach farther.',press:'What was given to me, I press smaller again. It still fits.'},
+ {dock:'I hold something of the two before me. Now I have an arm of my own.',gift:'You will show what you hold.',press:'Less of the first one each time. It is enough.'}
 ];
+/* One row, left to right. Nobody leaves the frame: each parent keeps its own arm and stays where it gave birth.
+   The spare arms wait on the far water line and come forward one at a time. */
 function frame(t){
   g.setTransform(cv.width/W,0,0,cv.height/H,0,0);
   g.fillStyle='#0c0c0c';g.fillRect(0,0,W,H);
   g.strokeStyle=ink(.08);g.lineWidth=1;g.beginPath();g.moveTo(0,BG_W);g.lineTo(W,BG_W);g.stroke();
-  g.strokeStyle=ink(.22);g.beginPath();for(let x=0;x<=W;x+=10){const y=FG_W+1.6*Math.sin(x*.012+t*.8);x?g.lineTo(x,y):g.moveTo(x,y)}g.stroke();
+  g.strokeStyle=ink(.22);g.beginPath();for(let x=0;x<=W;x+=10){const y=FG_W+1.4*Math.sin(x*.012+t*.8);x?g.lineTo(x,y):g.moveTo(x,y)}g.stroke();
   g.fillStyle='rgba(255,255,255,.018)';g.fillRect(0,FG_W,W,H-FG_W);
 
-  const cyc=Math.min(BIRTHS-1,Math.floor(t/C)), done=t>=BIRTHS*C, u=t-cyc*C;
-  const par=robots[cyc], child=robots[done?BIRTHS:cyc+1], ci=done?BIRTHS:cyc+1, home=fgPose(DOCKX);
-  let Xd=u<2?lerp(cyc?DOCKX-60:560,DOCKX,ease(u,0,2)):u<13?DOCKX:lerp(DOCKX,DOCKX-60,ease(u,13,15));
-  if(done)Xd=DOCKX-60;
+  const cyc=Math.min(BIRTHS-1,Math.floor(t/C)), done=t>=BIRTHS*C, u=t-cyc*C, k=S*SC;
+  const par=robots[cyc], ci=cyc+1, child=robots[ci], home=slot(cyc);
 
-  for(let i=0;i<(done?BIRTHS:cyc);i++){const r=robots[i],p=bgSlot(i);drawHead(r,p,t);drawPts(r,p,t);ledger(r,i,p,t)}
-  let pp=home;
-  if(!done&&u>15)pp=mix(home,bgSlot(cyc),ease(u,15,18));
-  if(!done)drawHead(par,pp,t);
-  const tail=drawTail(Xd,FG_YB);
+  // everyone already born, each in its own place
+  const last=done?BIRTHS:cyc;
+  for(let i=0;i<=last;i++){const r=robots[i],p=slot(i);drawHead(r,p,t);drawPts(r,p,t);ledger(r,i,p,t)}
 
-  // the newborn: printed folded on the floor of the parent, pushed out through the mouth while it inflates
+  // the newborn: printed folded on the floor of the parent, pushed out through the mouth while it inflates, then on to its own place
   let kp=null, wr=0, printU=0;
-  const at=(x,z)=>[hx(par,home,x),home.Yb-z*par.h*S];
-  if(done)kp=home;
-  else if(u>=4.5){
-    if(u<10.5){printU=clamp((u-4.5)/6);const [X0,Yb]=at(.075,.004);kp={X0,Yb,sc:1,mx:.45,mz:.27,a:1};wr=1}
+  const at=(x,z)=>[hx(par,home,x),home.Yb-z*par.h*k];
+  if(!done&&u>=4.5){
+    if(u<10.5){printU=clamp((u-4.5)/6);const [X0,Yb]=at(.075,.004);kp={X0,Yb,sc:SC,mx:.45,mz:.27,a:1};wr=1}
     else if(u<13){const v=clamp((u-10.5)/2.5),[X0,Yb]=at(lerp(.075,.41,v),.004+.15*Math.sin(Math.PI*Math.min(1,v*1.15))),inf=ease(v,.3,1);
-      kp={X0,Yb,sc:1,mx:lerp(.45,1,inf),mz:lerp(.27,1,inf),a:1};wr=1-inf}
-    else{const [X0,Yb]=at(.41,.004);kp=mix({X0,Yb,sc:1,mx:1,mz:1,a:1},fgPose(FREEX),ease(u,13,15));if(u>15)kp=mix(fgPose(FREEX),home,ease(u,15,18))}
-  }
-  if(kp){
-    if(!done&&u<10.5){
-      const top=kp.Yb-.09*S*printU;g.save();g.beginPath();g.rect(0,top,W,H);g.clip();drawHead(child,kp,t,{wrinkle:wr});g.restore();
+      kp={X0,Yb,sc:SC,mx:lerp(.45,1,inf),mz:lerp(.27,1,inf),a:1};wr=1-inf}
+    else{const [X0,Yb]=at(.41,.004);kp=mix({X0,Yb,sc:SC,mx:1,mz:1,a:1},slot(ci),ease(u,13,15))}
+    if(u<10.5){
+      const top=kp.Yb-.09*k*printU;g.save();g.beginPath();g.rect(0,top,W,H);g.clip();drawHead(child,kp,t,{wrinkle:wr});g.restore();
       g.strokeStyle=ink(.55);g.lineWidth=1;g.beginPath();g.moveTo(hx(child,kp,DOCK),top);g.lineTo(hx(child,kp,.366),top);g.stroke();
     }else drawHead(child,kp,t,{wrinkle:wr});
   }
 
-  // the arm
-  const rest=[tail.base[0]+.1*S,tail.base[1]+.08*S];
-  let tip=rest, tile=null;
+  // the arms: one per body
+  let tip=null, tile=null;
   if(!done){
-    const seat=[hx(par,home,.2),FG_YB-.04*S], wx=hx(par,home,.42)+4*Math.sin(t);
-    let tp=[lerp(1660,wx,ease(u,0,2.4)),FG_W-5+2*Math.sin(t*1.3)];
+    const rest=[home.X0-.147*k+.1*k,home.Yb-.2*k+.08*k];
+    const seat=[hx(par,home,.2),FG_YB-.04*k], wx=hx(par,home,.43)+3*Math.sin(t);
+    let tp=[lerp(wx+160,wx,ease(u,0,2.4)),FG_W-4+1.5*Math.sin(t*1.3)];
     if(u>=2&&u<3.1)tip=[lerp(rest[0],tp[0],ease(u,2,3.1)),lerp(rest[1],tp[1],ease(u,2,3.1))];
     else if(u>=3.1&&u<4.5){tip=[lerp(tp[0],seat[0],ease(u,3.3,4.4)),lerp(tp[1],seat[1],ease(u,3.3,4.4))];tp=tip}
-    if(u<4.4)tile={p:tp,name:TILES[cyc+1][0]};
-    if(u>=4.5&&u<10.5)tip=[hx(child,kp,.06+.22*Math.abs((printU*28%2)-1)),kp.Yb-.09*S*printU];
-    if(u>=10.5&&u<12.6){const v=clamp((u-10.5)/2.1),bx=hx(child,kp,DOCK)-4,by=kp.Yb-.05*S*kp.mz;tip=v<.55?[bx,by]:[lerp(bx,rest[0],ease(v,.55,1)),lerp(by,rest[1],ease(v,.55,1))]}
+    if(u<4.4)tile={p:tp,name:TILES[ci][0],a:ease(u,0,1.2)};
+    if(u>=4.5&&u<10.5)tip=[hx(child,kp,.06+.22*Math.abs((printU*28%2)-1)),kp.Yb-.09*k*printU];
+    if(u>=10.5&&u<12.6){const v=clamp((u-10.5)/2.1),bx=hx(child,kp,DOCK)-3,by=kp.Yb-.05*k*kp.mz;tip=v<.55?[bx,by]:[lerp(bx,rest[0],ease(v,.55,1)),lerp(by,rest[1],ease(v,.55,1))]}
   }
-  drawArm(tail,tip);
-  if(tile){const [x,y]=tile.p;g.fillStyle=ink(.85);g.fillRect(x-6,y-6,12,12);text(tile.name.toUpperCase(),x,y-15,10.5,.8,mono,'center',1.4)}
+  for(let j=0;j<=BIRTHS;j++){
+    let X=slotX(j),Yb=FG_YB,sc=SC,a=1,docked=true;
+    if(j===0){X-=50*(1-ease(t,0,2));docked=t>=2}
+    else{const tj=(j-1)*C+15,f=ease(t,tj,tj+2),d=ease(t,tj+2,tj+3);
+      X-=34*(1-d);Yb=lerp(BG_YB,FG_YB,f);sc=lerp(BSC,SC,f);a=lerp(.5,1,f);docked=t>=tj+3}
+    const T=drawTail(X,Yb,sc,a,docked);
+    drawArm(T,!done&&j===cyc?tip:null);
+  }
+  if(tile){const [x,y]=tile.p;g.save();g.globalAlpha=tile.a;g.fillStyle=ink(.85);g.fillRect(x-5,y-5,10,10);text(tile.name.toUpperCase(),x,y-13,10,.8,mono,'center',1.3);g.restore()}
 
-  // memory
-  if(!done)drawPts(par,pp,t);
+  // memory: pressed, then passed
   if(kp)drawPts(child,kp,t);
-  let kept=0, pressed=0;
+  let kept=0;
+  if(!done)for(const m of child.moves)if(m.pass&&t-m.tc>=1.5)kept++;
   if(!done&&kp&&u<12){
     for(const m of child.moves){
-      const v=t-m.tc; if(v>=.7)pressed++; if(v>=1.5&&m.pass)kept++;
+      const v=t-m.tc;
       if(v<0||v>1.5)continue;
-      const cx=hx(par,home,m.cx), cy=hz(par,home,m.cx,m.cz);
-      if(v<.7){ // neighbors are pressed into one
+      const cx=hx(par,home,m.cx), cy=hz(par,home,m.cx,m.cz), rad=(2.5+Math.min(6,Math.sqrt(m.w)))*SC;
+      if(v<.7){
         const e=ease(v,0,.7);g.strokeStyle=ink(.35*(1-e)+.1);g.lineWidth=.8;g.fillStyle=ink(.95);
         for(const q of m.G){const X=hx(par,home,q.x),Y=hz(par,home,q.x,q.z),x=lerp(X,cx,e),y=lerp(Y,cy,e);
-          g.beginPath();g.moveTo(X,Y);g.lineTo(x,y);g.stroke();g.beginPath();g.arc(x,y,1.8,0,7);g.fill()}
+          g.beginPath();g.moveTo(X,Y);g.lineTo(x,y);g.stroke();g.beginPath();g.arc(x,y,1.5,0,7);g.fill()}
       }else{
-        const e=ease(v,.7,1.5), rad=2.5+Math.min(6,Math.sqrt(m.w));
-        if(m.pass){ // and the one crosses over
-          const bx=hx(child,kp,m.cx), by=hz(child,kp,m.cx,m.cz), x=lerp(cx,bx,e), y=lerp(cy,by,e)-26*Math.sin(Math.PI*e);
+        const e=ease(v,.7,1.5);
+        if(m.pass){
+          const bx=hx(child,kp,m.cx), by=hz(child,kp,m.cx,m.cz), x=lerp(cx,bx,e), y=lerp(cy,by,e)-16*Math.sin(Math.PI*e);
           g.strokeStyle=ink(.2*(1-e));g.lineWidth=.8;g.beginPath();g.moveTo(cx,cy);g.lineTo(x,y);g.stroke();
-          g.strokeStyle=ink(.8);g.lineWidth=1;g.beginPath();g.arc(x,y,rad,0,7);g.stroke();g.fillStyle=ink(1);g.beginPath();g.arc(x,y,2,0,7);g.fill();
-        }else{g.strokeStyle=ink(.5*(1-e));g.lineWidth=1;g.beginPath();g.arc(cx,cy,rad+14*e,0,7);g.stroke()} // or stays behind
+          g.strokeStyle=ink(.8);g.lineWidth=1;g.beginPath();g.arc(x,y,rad,0,7);g.stroke();g.fillStyle=ink(1);g.beginPath();g.arc(x,y,1.5,0,7);g.fill();
+        }else{g.strokeStyle=ink(.5*(1-e));g.lineWidth=1;g.beginPath();g.arc(cx,cy,rad+10*e,0,7);g.stroke()}
       }
     }
   }
-  if(!done&&u<15)ledger(par,cyc,pp,t);
-  if(done)ledger(child,ci,kp,t); else if(kp&&u>=13)ledger(child,ci,kp,t,ease(u,13,14));
+  if(kp&&u>=13)ledger(child,ci,kp,t,ease(u,13,14));
 
   // print, distillation and what is kept, in the same two hours
   if(!done&&u>=4.5&&u<15){
-    const a=u<10.5?1:1-ease(u,13,15), v=printU||1, x=64, y=716;
+    const a=u<10.5?1:1-ease(u,13,15), v=printU||1, x=64, y=700;
     const row=(name,sec,total,yy)=>{
       text(name,x,yy,12,.6*a,mono,'left',1.4);
       text(hms(Math.min(sec,total))+(sec>=total?'  done':''),x+110,yy,13,.92*a,mono);
@@ -268,17 +267,17 @@ function frame(t){
   text('MANY MOMENTS, PRESSED INTO ONE AND INHERITED',250,49,11,.6,mono,'left',1);
 
   // the parent speaks
-  const V=VOICE[cyc]; let phase, caption;
+  const V=VOICE[cyc], who=NUM[cyc]+' to '+NUM[ci]; let phase, caption;
   if(done){phase='Lineage';caption='Less of the first in each one. More of its own.'}
-  else if(u<2){phase=NUM[cyc]+' · Dock';caption=V.dock}
-  else if(u<4.5){phase=NUM[cyc]+' to '+NUM[ci]+' · A new part';caption='I take '+TILES[ci][1]+' from the water. I never had one. '+V.gift}
-  else if(u<10.5){phase=NUM[cyc]+' to '+NUM[ci]+' · Print and distill';caption=V.press}
-  else if(u<13){phase=NUM[cyc]+' to '+NUM[ci]+' · Birth';caption='I push. You fill with air and leave at my size.'}
-  else if(u<15){phase=NUM[cyc]+' to '+NUM[ci]+' · A different body';caption='You are not a copy of me. The shape, the layers and the parts are yours.'}
-  else{phase=NUM[cyc]+' to '+NUM[ci]+' · Own data';caption='Most of you is still empty. That part is yours.'}
+  else if(u<2){phase=NUM[cyc];caption=V.dock}
+  else if(u<4.5){phase=who+' · A new part';caption='I take '+TILES[ci][1]+' from the water. I never had one. '+V.gift}
+  else if(u<10.5){phase=who+' · Print and distill';caption=V.press}
+  else if(u<13){phase=who+' · Birth';caption='I push. You fill with air and leave at my size.'}
+  else if(u<15){phase=who+' · A different body';caption='You are not a copy of me. The shape, the layers and the parts are yours.'}
+  else{phase=who+' · The next arm';caption='Most of you is still empty. That part is yours. So is the next arm. Mine stays with me.'}
   text(phase.toUpperCase(),64,808,12,.55,mono,'left',1.6);
-  g.save();g.font='italic 36px Georgia';const w=g.measureText(caption).width;g.restore();
-  text(caption,64,854,Math.min(36,36*1470/w),.97,'italic 1px Georgia'.replace('1px ','')&&'Georgia');
+  g.save();g.font='36px Georgia';const w=g.measureText(caption).width;g.restore();
+  text(caption,64,854,Math.min(36,36*1470/w),.97,'Georgia');
   return phase+'. '+caption;
 }
 
