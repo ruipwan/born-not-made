@@ -79,10 +79,10 @@ html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
       <h3>Function diversity, distinct kits</h3><canvas class="spark" id="sp3"></canvas>
       <h3>Mean tiles per body</h3><canvas class="spark" id="sp4"></canvas></div>
     <div><h3>Selected</h3><div id="insp" class="note">Click a robot in the tank.</div></div>
-    <div><h3>Rules</h3><p class="note">The parts are real small electronic parts at their true size. Core, Store and most Link and Sense parts are Bergsonne style tiles: sealed, on one pad layout and one I2C/I3C bus, T44 is 4 x 4 mm and T48 is 4 x 8 mm, 1 to 2 mm tall. Sense also has camera modules and MEMS microphones, Drive has coin and pager motors, Link has chip antennas, Power has LiPo pouch cells and coin cells, Display has single LEDs. Every part differs a little in size. Each floats in a thin pale collar 3 mm wider than the part on each side, just enough to keep it at the surface, and carries a small steel disc for the electromagnet. A part set into a wall pocket sits flush with the outer skin in a small clear printed window, drawn with a thin pale rim. Parts smaller than 12 mm are drawn at 12 mm across so they can be seen; all others are drawn at true size, so from the whole tank they are nearly invisible. A fixed set is scattered on the water at the start and nothing arrives later; parts shed in swaps go back onto the water. Thin lines and small type mark the part a robot is going for, and soft lights mark eating, touching and placing; they are drawn for the viewer and are not in the tank. The Film camera cuts between the whole tank and what is happening at that moment.</p>
+    <div><h3>Rules</h3><p class="note">The parts are real small electronic parts at their true size. Core, Store and most Link and Sense parts are Bergsonne style tiles: sealed, on one pad layout and one I2C/I3C bus, T44 is 4 x 4 mm and T48 is 4 x 8 mm, 1 to 2 mm tall. Sense also has camera modules, MEMS microphones, time of flight distance sensors, temperature and humidity sensors and hall sensors; Drive has coin and pager motors, N20 gear motors with a propeller and micro submersible water pumps; Link has chip antennas, NFC antenna coils and Bluetooth modules; Power has LiPo pouch cells, coin cells and small solar cells; Store has microSD cards; Display has single LEDs, 5 mm LEDs with legs, LED strip segments and small OLED screens. Every part differs a little in size. Each floats in a thin pale collar 3 mm wider than the part on each side, just enough to keep it at the surface, and carries a small steel disc for the electromagnet. A part set into a wall pocket sits flush with the outer skin in a small clear printed window, drawn with a thin pale rim. Parts smaller than 12 mm are drawn at 12 mm across so they can be seen; all others are drawn at true size, so from the whole tank they are nearly invisible. A fixed set is scattered on the water at the start and nothing arrives later; parts shed in swaps go back onto the water. Thin lines and small type mark the part a robot is going for, and soft lights mark eating, touching and placing; they are drawn for the viewer and are not in the tank. The Film camera cuts between the whole tank and what is happening at that moment.</p>
       <p class="note">The idea follows von Neumann's kinematic machine, which picks its parts from a lake of parts, and the digital materials of MIT's Center for Bits and Atoms, robots assembled from a small set of parts that join and come apart. It also follows Robot Metabolism, machines that grow by taking in parts from around them, and Print &amp; Place, where parts are set into a print while it is being made.</p>
       <p class="note">The arm is the Rotrics DexArm of the printing simulator, at true size, with its link meshes, its kinematics and the official joint ranges (base ±110, J1 0 to 110, J2 0 to 85 degrees): the base turns, two 150 mm links swing, a parallel linkage keeps the end effector level, and the end effector turns the tool about its stem (taken here as ±90 degrees). It stands on a fixed base in the tail, 147 mm behind the head joint, and folds there when idle. The bodies are sized after the real design so the arm fits: about 0.8 m long and 0.36 to 0.4 m tall, and they float high, with about 90 mm of water inside, as the real design stands. The arm cannot reach out of the mouth, so a robot swims over a part until the part floats in through the mouth onto the water inside the head, where the arm reaches it. Its tool hangs straight down: the magnet holder of the printing simulator for parts (its inflation needle left off), and the print needle for printing; tools are changed at the folded pose. Eaten parts lie on two raised shelves beside the newborn's place. Every mouth is at least wide enough for the largest part; where a genome's mouth would be smaller, the nose drops less and the snout widens. Only a robot holding a tail can pick.</p>
-      <p class="note">What the parts do. Core is needed to be alive, so no newborn is born without one. Power is needed too; a bigger cell holds more energy, and each extra Power lowers the idle drain. Sense sets how far it notices parts: 1 m with none, 0.6 m more for each. Drive sets swim speed. Link is a radio: robots with Link that relate share what they see and count each other from farther away. Store sets how many memory traces a body holds and passes on. Display is a small light, so others notice it a little more. Bodies charge in the pools of light.</p>
+      <p class="note">What the parts do. Core is needed to be alive, so no newborn is born without one. Power is needed too; a bigger cell holds more energy, each extra Power lowers the idle drain, and a solar cell charges the body faster under the lamps. Sense sets how far it notices parts: 1 m with none, and each sensor adds 0.4 to 0.9 m, a distance sensor or a camera most. Drive sets swim speed: a motor adds a little, a pump most, by jet. Link is a radio: robots with Link that relate share what they see and count each other as far as the weaker radio reaches, 2 m for a coil, 5 to 6 m for a radio or Bluetooth module. Store sets how many memory traces a body holds and passes on, a microSD card most. Display is light: the more and larger the lights, the farther others notice the body. Bodies charge in the pools of light.</p>
       <p class="note">Two that relate touch mouth to mouth and exchange memory and form. The one with a tail carries; when both hold a tail, both carry, each with its own arm and chamber. A carrier plans the newborn's kit on purpose: Core and Power, then a mix of both parents' kits, then one wish for what it ran short of. If it kept searching, Sense; if it swam far, Drive; if it ran low, Power; if it could not hold its memories, Store; and so on, with drift. It forages for those families, knowing only the parts it can sense or hear of by Link. After a while it takes substitutes, and later it goes with what it has, as long as Core and Power are there. Then it prints the newborn head bottom up. At the layer of each pocket the print pauses, the arm takes the part from the rack and sets it in, and the next layers seal it. The printed wall is 4 mm thick, so parts up to 3 mm thick go into pockets in the lower wall, set from above while the print is open there; thicker ones, LiPo cells, motors, cameras, sit on an inner ledge low in the head. The head is pushed out through the mouth while filling with air, so it leaves full size. Only heads are born. The tails are a fixed number; after a birth the tail lets go and another head docks it from behind.</p>
       <p class="note">A body has one place for each part built into it. A robot with a tail may change its own hardware: when it has felt a lack, it eats a part of that family, cuts out the part it needs least and sets the new one in its place, and the shed part goes back out through the mouth on the same collar, for someone else. Every body needs one Core, so when the Core parts on the water are used up the population stops growing. A carrier that finds none left stops planning newborns, and tells those it touches; after that the robots only touch and swap. Nobody dies. Every printed body also differs in form: proportions, rings, crest, lobes, clay tone, print texture and how clear the silicone is are inherited and drift.</p></div>
     <p class="links"><a href="bodies/">Bodies</a>: the same society with the earlier v2 bodies. <a href="old_/">Earlier 2D version</a>. <a href="../simulator/simple/">Printing simulator, simplified</a>. <a href="touch_/">Earlier version: touch and birth</a>. <a href="../">Home</a></p>
@@ -384,7 +384,7 @@ function shapeOf0(g) {
 // a minimum mouth: the opening must pass the largest part in its collar, held just clear of the water, with the arm's tool above it.
 // If a genome's mouth is too small, the nose drops less and then the snout widens, until it fits.
 function mouthFit(s) { const w = -s.B + 0.09, ok = () => { const Eb = 0.88 * s.B, yc = 0.01 - Eb * s.nd, hb = Eb * (1 - s.nb), ha = 0.9 * s.As * (1 - 0.5 * s.lobeD);
-    for (const y of [w - 0.002, w + 0.028]) if (Math.pow(0.02 / ha, s.n) + Math.pow(Math.abs(y - yc) / hb, s.n) > 1) return false; return true; };
+    for (const y of [w - 0.002, w + 0.03]) if (Math.pow(0.03 / ha, s.n) + Math.pow(Math.abs(y - yc) / hb, s.n) > 1) return false; return true; };
   for (let i = 0; i < 60 && !ok(); i++) { if (s.nd > 0.2) s.nd -= 0.025; else s.As = Math.min(s.A, s.As * 1.04); } return s; }
 function printAttrs(g, s, n) { const a = new Float32Array(n * 4), b = new Float32Array(n * 4); for (let i = 0; i < n; i++) { a.set(s.tex, i * 4); b.set(s.sil, i * 4); } g.setAttribute("aTex", new THREE.BufferAttribute(a, 4)); g.setAttribute("aSil", new THREE.BufferAttribute(b, 4)); }
 function bodyGeometry(s, tail) {
@@ -437,35 +437,53 @@ function bodyMesh(r) {
 // the other parts are real small parts: camera module, MEMS microphone, coin and pager motors, chip antenna, LiPo pouch and coin cells, single LEDs.
 const FAM = ["Core", "Sense", "Drive", "Link", "Power", "Store", "Display"], FC = 0, FS = 1, FD = 2, FL = 3, FP = 4, FT = 5, FY = 6;
 const SUBS = ["motion", "pressure", "light", "touch", "environment"];
-const START_W = [0, 0.2, 0.17, 0.14, 0.27, 0.1, 0.12];          // the mix of families at the start, after the Core parts
+const START_W = [0, 0.18, 0.18, 0.15, 0.19, 0.12, 0.18];          // the mix of families at the start, after the Core parts: no family dominates
 const KIT = 6, MAXF = 700, NLAY = 80, COLLAR = 0.003, VMIN = 0.012, WALL = 0.004;     // collar: 3 mm each side; parts under 12 mm are drawn at 12 mm; the printed wall is 4 mm
 const SUB_T = 10, GO_T = 16, GIVEUP_T = 200;                 // foraging: substitutes after 10 s, go with Core and Power after 16 s, give up after 200 s without them
-const COL = { tile: 0x151516, chip: 0x1d1d1e, lipo: 0xb4b4b6, coin: 0x8c8c8e, motor: 0x9a9a9c, led: 0xf2f1ec, lens: 0x050505, collar: 0xe4e2dc };
+const COL = { board: 0x2a2b2d, dark: 0x0c0c0d, tile: 0x151516, chip: 0x1d1d1e, lipo: 0xb4b4b6, coin: 0x8c8c8e, motor: 0x9a9a9c, led: 0xf2f1ec, lens: 0x050505, collar: 0xe4e2dc };
 const RND = (a, b) => a + (b - a) * rnd(), MM = (v) => Math.round(v * 1000);
 // one part: its family, kind, shape (box, disc, or a cylinder lying along x) and true size in metres: l along x, w along z, h up
 function makePart(f) {
   const tile = (n) => { const big = rnd() < 0.4; return { kind: "tile", name: `${n}tile ${big ? "T48" : "T44"}`, sh: "box", l: big ? 0.008 : 0.004, w: 0.004, h: RND(0.001, 0.002), c: COL.tile }; };
+  const pick = (opts) => { let u = rnd() * opts.reduce((a, o) => a + o[0], 0); for (const o of opts) { u -= o[0]; if (u <= 0) return o[1](); } return opts[0][1](); };
   let p, sub = "";
+  // each part says what it adds: sense range (m), speed (m/s), link range (m), display weight, memory traces, solar charge
   if (f === FC) p = tile("");
-  else if (f === FS) { sub = SUBS[Math.floor(rnd() * SUBS.length)]; const u = rnd();
-    if (u < 0.15) { sub = "light"; p = { kind: "camera", name: "camera module", sh: "box", l: 0.008, w: 0.008, h: 0.005, c: COL.chip, lens: 0.0035 }; }
-    else if (u < 0.3) { sub = "pressure"; p = { kind: "mic", name: "MEMS microphone", sh: "box", l: 0.004, w: 0.003, h: 0.001, c: COL.chip }; }
-    else { p = tile(""); p.l = RND(0.004, 0.008); p.name = "tile"; } }
-  else if (f === FD) { const u = rnd();
-    if (u < 0.35) p = tile("driver ");
-    else if (u < 0.68) { const d = RND(0.008, 0.012); p = { kind: "coin motor", name: "coin vibration motor", sh: "disc", l: d, w: d, h: 0.003, c: COL.motor }; }
-    else { const d = RND(0.004, 0.007); p = { kind: "pager motor", name: "pager motor", sh: "cyl", l: RND(0.008, 0.012), w: d, h: d, c: COL.motor }; } }
-  else if (f === FL) { if (rnd() < 0.6) p = tile("radio "); else p = { kind: "antenna", name: "chip antenna", sh: "box", l: RND(0.008, 0.01), w: RND(0.0025, 0.0032), h: 0.001, c: COL.chip }; }
-  else if (f === FP) { if (rnd() < 0.6) { const w = RND(0.012, 0.02); p = { kind: "lipo", name: "LiPo cell", sh: "box", l: RND(Math.max(0.02, w + 0.004), 0.03), w, h: RND(0.003, 0.005), c: COL.lipo }; }
-    else { const d = RND(0.012, 0.02); p = { kind: "coin cell", name: "coin cell", sh: "disc", l: d, w: d, h: RND(0.0016, 0.0032), c: COL.coin }; } }
-  else if (f === FT) p = Object.assign(tile("memory "), { l: 0.004 });
-  else { if (rnd() < 0.6) { const a = RND(0.002, 0.003); p = { kind: "led", name: "LED", sh: "box", l: a, w: a, h: 0.0014, c: COL.led }; } else p = tile("LED driver "); }
+  else if (f === FS) p = pick([
+    [2, () => { sub = SUBS[Math.floor(rnd() * SUBS.length)]; const t = tile(""); t.l = RND(0.004, 0.008); t.name = "tile"; t.sense = 0.5; return t; }],
+    [1.2, () => { sub = "light"; return { kind: "camera", name: "camera module", sh: "box", l: 0.008, w: 0.008, h: 0.005, c: COL.chip, deco: [["cyl", 0, 0.0033, 0, 0.0035, 0.0016, 0.0035, COL.lens]], sense: 0.8 }; }],
+    [1, () => { sub = "sound"; return { kind: "mic", name: "MEMS microphone", sh: "box", l: 0.004, w: 0.003, h: 0.001, c: COL.chip, sense: 0.6 }; }],
+    [1.2, () => { sub = "distance"; return { kind: "tof", name: "time of flight sensor on its board", sh: "box", l: RND(0.01, 0.012), w: RND(0.008, 0.01), h: 0.0016, c: COL.board, deco: [["box", 0, 0.0016, 0, 0.0044, 0.0018, 0.0024, COL.chip]], sense: 0.9 }; }],
+    [1, () => { sub = "temperature and humidity"; return { kind: "sht", name: "temperature and humidity sensor", sh: "box", l: 0.003, w: 0.003, h: 0.0011, c: COL.chip, sense: 0.4 }; }],
+    [1, () => { sub = "magnetic field"; return { kind: "hall", name: "hall sensor", sh: "box", l: 0.003, w: 0.0014, h: 0.0011, c: COL.chip, sense: 0.4 }; }]]);
+  else if (f === FD) p = pick([
+    [1, () => Object.assign(tile("driver "), { speed: 0.03 })],
+    [1, () => { const d = RND(0.008, 0.012); return { kind: "coin motor", name: "coin vibration motor", sh: "disc", l: d, w: d, h: 0.003, c: COL.motor, speed: 0.035 }; }],
+    [1, () => { const d = RND(0.004, 0.007); return { kind: "pager motor", name: "pager motor", sh: "cyl", l: RND(0.008, 0.012), w: d, h: d, c: COL.motor, speed: 0.04 }; }],
+    [1.3, () => ({ kind: "gear motor", name: "N20 gear motor with a propeller", sh: "box", l: 0.026, w: 0.012, h: 0.01, c: COL.motor, deco: [["cylx", 0.016, 0, 0, 0.006, 0.0016, 0.0016, COL.coin], ["cylx", 0.0195, 0, 0, 0.0012, 0.009, 0.009, COL.lipo]], speed: 0.055 })],
+    [1.5, () => { const d = RND(0.02, 0.024), l = RND(0.025, 0.03); return { kind: "pump", name: "micro submersible water pump", sh: "cyl", l, w: d, h: d, c: COL.lipo, deco: [["cylx", -l / 2 - 0.002, 0, 0, 0.004, 0.006, 0.006, COL.coin], ["cyl", l / 2 - 0.006, d / 2 + 0.003, 0, 0.004, 0.006, 0.004, COL.coin]], speed: 0.075 }; }]]);      // water out of the spout: jet propulsion
+  else if (f === FL) p = pick([
+    [1, () => Object.assign(tile("radio "), { linkR: 5 })],
+    [1, () => ({ kind: "antenna", name: "chip antenna", sh: "box", l: RND(0.008, 0.01), w: RND(0.0025, 0.0032), h: 0.001, c: COL.chip, linkR: 5 })],
+    [1.2, () => { const d = RND(0.015, 0.02); return { kind: "coil", name: "NFC antenna coil", sh: "disc", l: d, w: d, h: 0.0006, c: COL.coin, deco: [["cyl", 0, 0.0004, 0, d * 0.7, 0.0004, d * 0.7, COL.dark]], linkR: 2 }; }],
+    [1.2, () => ({ kind: "bt", name: "Bluetooth module", sh: "box", l: 0.015, w: 0.012, h: 0.0024, c: COL.board, deco: [["box", -0.0015, 0.0018, 0, 0.009, 0.0012, 0.01, COL.coin]], linkR: 6 })]]);
+  else if (f === FP) p = pick([
+    [1.5, () => { const w = RND(0.012, 0.02); return { kind: "lipo", name: "LiPo cell", sh: "box", l: RND(Math.max(0.02, w + 0.004), 0.03), w, h: RND(0.003, 0.005), c: COL.lipo }; }],
+    [1, () => { const d = RND(0.012, 0.02); return { kind: "coin cell", name: "coin cell", sh: "disc", l: d, w: d, h: RND(0.0016, 0.0032), c: COL.coin }; }],
+    [1, () => ({ kind: "solar", name: "solar cell", sh: "box", l: RND(0.018, 0.022), w: RND(0.018, 0.022), h: 0.0012, c: COL.dark, deco: [["box", 0, 0.0007, 0, 0.0004, 0.0002, 0.016, COL.coin]], solar: 1 })]]);
+  else if (f === FT) p = pick([[1.2, () => Object.assign(tile("memory "), { l: 0.004, mem: 2 })], [1, () => ({ kind: "microsd", name: "microSD card", sh: "box", l: 0.015, w: 0.011, h: 0.001, c: COL.chip, mem: 3 })]]);
+  else p = pick([
+    [1, () => { const a = RND(0.002, 0.003); return { kind: "led", name: "LED", sh: "box", l: a, w: a, h: 0.0014, c: COL.led, disp: 1 }; }],
+    [1, () => ({ kind: "led5", name: "5 mm LED with legs", sh: "cylv", l: 0.0058, w: 0.0058, h: 0.0086, c: COL.led, deco: [["box", 0.0012, -0.007, 0, 0.0005, 0.006, 0.0005, COL.coin], ["box", -0.0012, -0.007, 0, 0.0005, 0.006, 0.0005, COL.coin]], disp: 1.5 })],
+    [1, () => ({ kind: "strip", name: "LED strip segment", sh: "box", l: 0.03, w: 0.008, h: 0.0016, c: COL.board, deco: [["box", -0.01, 0.0012, 0, 0.005, 0.0012, 0.005, COL.led], ["box", 0, 0.0012, 0, 0.005, 0.0012, 0.005, COL.led], ["box", 0.01, 0.0012, 0, 0.005, 0.0012, 0.005, COL.led]], disp: 2 })],
+    [1, () => ({ kind: "oled", name: "OLED screen", sh: "box", l: 0.012, w: 0.012, h: 0.0015, c: COL.board, deco: [["box", 0, 0.0009, 0, 0.01, 0.0004, 0.008, COL.lens]], disp: 2 })],
+    [0.8, () => Object.assign(tile("LED driver "), { disp: 1 })]]);
   p.f = f; p.sub = sub; p.name = p.name.trim(); return p;
 }
-const partDims = (p) => p.sh === "box" ? `${MM(p.l)} × ${MM(p.w)} × ${(p.h * 1000).toFixed(1).replace(/\.0$/, "")} mm` : p.sh === "disc" ? `${MM(p.l)} mm across, ${(p.h * 1000).toFixed(1).replace(/\.0$/, "")} mm thick` : `${MM(p.w)} × ${MM(p.l)} mm`;
+const partDims = (p) => p.sh === "cylv" ? `${(p.l * 1000).toFixed(1)} mm across, ${(p.h * 1000).toFixed(1)} mm tall` : p.sh === "box" ? `${MM(p.l)} × ${MM(p.w)} × ${(p.h * 1000).toFixed(1).replace(/\.0$/, "")} mm` : p.sh === "disc" ? `${MM(p.l)} mm across, ${(p.h * 1000).toFixed(1).replace(/\.0$/, "")} mm thick` : `${MM(p.w)} × ${MM(p.l)} mm`;
 const partText = (p) => `${FAM[p.f]}${p.sub ? " (" + p.sub + ")" : ""}, ${p.name} ${partDims(p)}`;
 // a part thicker than the printed wall cannot sit in a wall pocket; it sits on an inner ledge of the head instead
-const thick = (p) => p.h > WALL - 0.001;
+const thick = (p) => p.h > WALL - 0.001 || Math.max(p.l, p.w) > 0.016;      // and so does a part wider than 16 mm (a pump, a solar cell, a Bluetooth board, an LED strip)
 
 function buildParts() {
   const mat = (r, m = 0) => waterAware(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: r, metalness: m }));
@@ -490,7 +508,9 @@ const kitText = (kit) => kit.map((t) => FAM[t.f]).join(", ");
 // what the kit lets a body do; every number here acts in the simulation. A bigger cell holds more energy.
 const cellCap = (p) => p.kind === "lipo" ? 0.3 + 0.5 * (p.l * p.w * p.h) / (0.03 * 0.02 * 0.005) : 0.3 + 0.15 * p.l / 0.02;
 function abilities(r) { const n = r.kn; let cap = 0.7; for (const p of r.kit) if (p.f === FP) cap += cellCap(p);
-  return { sense: 1.0 + 0.6 * n[FS], speed: 0.11 + 0.05 * r.g[4] + 0.045 * n[FD], ecap: Math.max(1, cap), drain: 0.016 / (1 + 0.4 * Math.max(0, n[FP] - 1)), mem: 4 + 2 * n[FT], link: n[FL] > 0, disp: n[FY] }; }
+  let sense = 1.0, speed = 0.11 + 0.05 * r.g[4], mem = 4, linkR = 0, disp = 0, solar = 0;
+  for (const p of r.kit) { sense += p.sense || 0; speed += p.speed || 0; mem += p.mem || 0; linkR = Math.max(linkR, p.linkR || 0); disp += p.disp || 0; solar += p.solar || 0; if (p.solar) cap += 0.1; }
+  return { sense, speed, ecap: Math.max(1, cap), drain: 0.016 / (1 + 0.4 * Math.max(0, n[FP] - 1)), mem, link: linkR > 0, linkR, disp, solar }; }
 function setKit(r, kit) { r.kit = kit; r.kn = kitN(kit); r.ab = abilities(r); r.pk = kit.map((p, i) => pocketOf(r.s, p, i, 1.0)); if (r.memory && r.memory.length > r.ab.mem) { r.need[FT] += 0.3 * (r.memory.length - r.ab.mem); r.memory = r.memory.slice(0, r.ab.mem); } }
 // where part i of a kit sits: thin parts in a wall pocket, in a loose band around the head just under the skin; thick parts on an inner ledge low in the head
 function pocketOf(s, p, i, k) {
@@ -570,7 +590,7 @@ function ripple(x, z, amp) { U.uRip.value[ripI++ % 10].set(x, z, U.uTime.value, 
 function overlap(a, b) { const ma = a.mm || new Map(a.map((x) => [x.t, x.w])), mb = b.mm || new Map(b.map((x) => [x.t, x.w])); let n = 0, d = 0; for (const k of new Set([...ma.keys(), ...mb.keys()])) { const x = ma.get(k) || 0, y = mb.get(k) || 0; n += Math.min(x, y); d += Math.max(x, y); } return d ? n / d : 0; }
 function like(a, b) { let s = 0; for (let i = 0; i < a.length; i++) s += (a[i] - b[i]) ** 2; return 1 - Math.sqrt(s / a.length); }
 // a Display light makes a body noticed a little more
-function relation(a, b) { a.memory.mm = a.memory.mm || new Map(a.memory.map((x) => [x.t, x.w])); b.memory.mm = b.memory.mm || new Map(b.memory.map((x) => [x.t, x.w])); return 0.5 * overlap(a.memory, b.memory) + 0.3 * like(a.g, b.g) + 0.2 * Math.min(1, (a.near.get(b.id) || 0) / 10) + (a.tail !== b.tail ? 0.03 : 0) + 0.04 * Math.min(2, b.ab.disp); }
+function relation(a, b) { a.memory.mm = a.memory.mm || new Map(a.memory.map((x) => [x.t, x.w])); b.memory.mm = b.memory.mm || new Map(b.memory.map((x) => [x.t, x.w])); return 0.5 * overlap(a.memory, b.memory) + 0.3 * like(a.g, b.g) + 0.2 * Math.min(1, (a.near.get(b.id) || 0) / 10) + (a.tail !== b.tail ? 0.03 : 0) + 0.03 * Math.min(3, b.ab.disp); }
 const reach = (r) => r.s.Lh / 2 + r.s.Ln;     // center to the mouth, along the body
 const ready = (r) => r.adult && !r.carry && !r.babySpec && !r.pair && !r.dock && !r.forage && !r.pick && !r.self && r.cool <= 0 && r.energy > 0.8;
 
@@ -828,7 +848,8 @@ function step(dt) {
   simT += dt; let carrying = 0; for (const r of robots) if (r.babySpec) carrying++;
   const tick = Math.floor(simT * 2) !== Math.floor((simT - dt) * 2);
   // relations; robots with Link that relate count each other from farther away
-  if (tick) { for (const r of robots) { r.relTo.clear(); r.links.length = 0; let rc = 0; for (const o of robots) { if (o === r) continue; const both = r.ab.link && o.ab.link, d = Math.hypot(o.x - r.x, o.z - r.z); if (d > (both ? 5 : 3)) continue; const v = relation(r, o); r.relTo.set(o, v); if (v > 0.42) { rc++; if (both) r.links.push(o); } } r.rel = rc; }
+  // relations: a radio pair counts each other as far as the weaker radio reaches; a light is noticed from farther
+  if (tick) { for (const r of robots) { r.relTo.clear(); r.links.length = 0; let rc = 0; for (const o of robots) { if (o === r) continue; const both = r.ab.link && o.ab.link, d = Math.hypot(o.x - r.x, o.z - r.z); if (d > Math.max(both ? Math.min(r.ab.linkR, o.ab.linkR) : 0, 3 + 0.5 * Math.min(3, o.ab.disp))) continue; const v = relation(r, o); r.relTo.set(o, v); if (v > 0.42) { rc++; if (both) r.links.push(o); } } r.rel = rc; }
     tailsHeld = 0; for (const r of robots) if (r.tail) tailsHeld++;
     for (const r of robots) look(r); }
   for (const r of robots) {
@@ -848,7 +869,7 @@ function step(dt) {
       if (d < minD) { const k = (minD - d) / minD; ax -= dx / d * 2.4 * k; az -= dz / d * 2.4 * k; if (d < minD * 0.6) { r.x -= dx / d * (minD * 0.6 - d) * 0.5; r.z -= dz / d * (minD * 0.6 - d) * 0.5; } }
       else if (!r.pair && !T0 && d < 1.6) { const v = r.relTo.get(o) || 0; if (v > 0.42) { const k = 0.006 * v * (d - minD - 0.25); ax += dx / d * k; az += dz / d * k; } }
     }
-    let e = dt * (0.006 - r.ab.drain - (r.carry ? 0.006 : 0)); for (const L of LAMPS) if (Math.hypot(L.x - r.x, L.z - r.z) < POOL) { e += dt * 0.034; break; }      // bodies charge in the pools of light
+    let e = dt * (0.006 - r.ab.drain - (r.carry ? 0.006 : 0)); for (const L of LAMPS) if (Math.hypot(L.x - r.x, L.z - r.z) < POOL) { e += dt * (0.034 + 0.012 * r.ab.solar); break; }      // bodies charge in the pools of light
     if (r.energy < 0.5) r.need[FP] += dt / 40;
     // picking: the robot holds still while the arm works
     if (r.pick) { r.vx = r.vz = 0; r.energy = clamp(r.energy + e, -1, r.ab.ecap); continue; }
@@ -981,9 +1002,9 @@ function emitBox(Mb, x, y, z, sx, sy, sz, col) { _l.compose(_p.set(x, y, z), _qI
 function emitCyl(Mb, x, y, z, d, len, lying, col) { _l.compose(_p.set(x, y, z), lying ? _qL : _qI, _s.set(d, len, d)); _m.multiplyMatrices(Mb, _l); R3.pcyl.setMatrixAt(nC, _m); R3.pcyl.setColorAt(nC++, _c.setHex(col)); }
 // a part centred on the origin of frame Mb, lying flat with its length along x; with its collar when it floats or waits on the rack
 function drawPart(Mb, p, col) { const l = Math.max(p.l, VMIN), w = Math.max(p.w, VMIN), h = p.h;
-  if (col) { if (p.sh === "disc") emitCyl(Mb, 0, -h / 2 - 0.001, 0, l + 2 * COLLAR, 0.002, false, COL.collar); else emitBox(Mb, 0, -h / 2 - 0.001, 0, l + 2 * COLLAR, 0.002, w + 2 * COLLAR, COL.collar); }
-  if (p.sh === "box") emitBox(Mb, 0, 0, 0, l, h, w, p.c); else if (p.sh === "disc") emitCyl(Mb, 0, 0, 0, l, h, false, p.c); else emitCyl(Mb, 0, 0, 0, w, l, true, p.c);
-  if (p.lens) emitCyl(Mb, 0, h / 2 + 0.0008, 0, p.lens, 0.0016, false, COL.lens); }
+  if (col) { if (p.sh === "disc" || p.sh === "cylv") emitCyl(Mb, 0, -h / 2 - 0.001, 0, l + 2 * COLLAR, 0.002, false, COL.collar); else emitBox(Mb, 0, -h / 2 - 0.001, 0, l + 2 * COLLAR, 0.002, w + 2 * COLLAR, COL.collar); }
+  if (p.sh === "box") emitBox(Mb, 0, 0, 0, l, h, w, p.c); else if (p.sh === "disc" || p.sh === "cylv") emitCyl(Mb, 0, 0, 0, l, h, false, p.c); else emitCyl(Mb, 0, 0, 0, w, l, true, p.c);
+  if (p.deco) for (const [t, x, y, z, a, b, c, col] of p.deco) { const k = Math.max(1, VMIN / Math.max(p.l, p.w)); if (t === "box") emitBox(Mb, x * k, y, z * k, a * k, b, c * k, col); else if (t === "cyl") emitCyl(Mb, x * k, y, z * k, a * k, b, false, col); else emitCyl(Mb, x * k, y, z * k, b * k, a, true, col); } }
 // a part built into a body: in a wall pocket it sits flush with the outer surface in a small clear printed window, drawn as a thin pale rim, so it reads on every head, clear or frosted
 function drawEmbedded(Mb, p, ledge) { if (!ledge) emitBox(Mb, 0, -p.h / 2 + 0.0002, 0, Math.max(p.l, VMIN) + 0.004, 0.0006, Math.max(p.w, VMIN) + 0.004, 0xf6f5f0); drawPart(Mb, p, false); }
 const frameAt = (M, x, y, z, rx) => { _q.setFromAxisAngle(AX, rx); _l.compose(_p.set(x, y, z), _q, _s.set(1, 1, 1)); return _b.multiplyMatrices(M, _l); };
@@ -1101,7 +1122,7 @@ function inspect() {
   $("#insp").innerHTML = `<dl class="kv"><dt>robot</dt><dd>#${r.id}, generation ${r.gen}${r.parents ? ", from #" + r.parents[0] + " and #" + r.parents[1] : ", founder"}</dd>
     <dt>tail</dt><dd>${r.tail ? "yes, holds the arm, can pick and carry" : "no, cannot pick"}</dd><dt>stage</dt><dd>${stage}</dd>
     <dt>kit</dt><dd>${r.kit.map(partText).join("<br>") || "none"}</dd>
-    <dt>can</dt><dd>notices floats at ${ab.sense.toFixed(1)} m${ab.link ? ", and hears what related Link robots see" : ""}; swims ${ab.speed.toFixed(2)} m/s; holds energy ${ab.ecap.toFixed(1)}; keeps ${ab.mem} memory traces${ab.disp ? "; a light others notice" : ""}</dd>
+    <dt>can</dt><dd>notices floats at ${ab.sense.toFixed(1)} m${ab.link ? `, and hears what related Link robots see (radio ${ab.linkR} m)` : ""}; swims ${ab.speed.toFixed(2)} m/s; holds energy ${ab.ecap.toFixed(1)}; keeps ${ab.mem} memory traces${ab.disp ? `; a light others notice from ${(3 + 0.5 * Math.min(3, ab.disp)).toFixed(1)} m` : ""}${ab.solar ? "; a solar cell that charges it under the lamps" : ""}</dd>
     ${r.plan ? `<dt>next one</dt><dd>wants ${r.plan.map((f) => FAM[f]).join(", ")}; has ${r.nk.map((t) => FAM[t.f]).join(", ") || "nothing yet"}</dd>` : r.nk.length ? `<dt>stock</dt><dd>${r.nk.map(partText).join("<br>")}</dd>` : ""}
     ${lk > 0 ? `<dt>short of</dt><dd>${FAM[lk]}</dd>` : ""}
     <dt>body</dt><dd>${mm(r.len)} × ${mm(2 * r.s.A)} × ${mm(2 * r.s.B)} mm</dd><dt>relations</dt><dd>${r.rel}</dd><dt>energy</dt><dd>${r.energy.toFixed(2)}</dd>
