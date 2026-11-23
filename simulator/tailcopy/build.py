@@ -23,8 +23,8 @@ WATER = 0.27                                  # variant: water level (doublewall
 GEL = J['read']['gel_z']                      # 0.100
 LIP = np.array(J['mouth']['lip']) + [OFF, 0]  # (x, z) of the lower lip
 MOUTH_TOP = np.array([J['mouth']['top'][0] + OFF, J['mouth']['top'][2]])
-TANK = dict(L=2.438, W=0.914, H=0.406, glass=0.012, x0=-1.15, x1=1.288, y1=0.457, name='Glasscages rimless 96 x 36 x 16 in (the fertile build\'s tank)', url='https://glasscages.com/aquariums-rimless/')
-TX1 = TANK['x1'] - TANK['glass']; TY1 = TANK['y1'] - TANK['glass']
+TANK = dict(L=3.0, W=1.22, H=0.406, glass=0.012, x0=-1.6, x1=1.4, y1=0.61, name='a 3.0 x 1.22 m tank (estimate: room for two tails side by side and one to turn)', url='')
+TX1 = TANK['x1'] - TANK['glass']; TX0 = TANK['x0'] + TANK['glass']; TY1 = TANK['y1'] - TANK['glass']
 CUP, NEEDLE = AR['tools']['cup'], AR['tools']['needle']
 CRANK = J['r2']['crank']['L']
 notes, checks = [], []
@@ -122,9 +122,10 @@ for k, m in MASS.items():
 chk('Arm', 'Four modules: base (with the three steppers), upper arm, forearm, end effector with the rotary flange; 2.4 kg in all', True, 'split estimated')
 chk('Arm', f'No floats. Only the base (1.4 kg) needs help: its housing is sealed and holds air, {floats["M1"]["need_L"]:.2f} L of displacement inside a {floats["M1"]["box_L"]:.2f} L housing, trimmed to weigh 0.10 N in water', floats['M1']['need_L'] < 0.6 * floats['M1']['box_L'], 'the slim links could not hold enough air; they do not need to')
 chk('Arm', 'Wet weight of each module against the holder\'s 2.45 N magnet: ' + ', '.join(f'{k} {TRIMS[k]:.2f} N' for k in ['M1', 'M2', 'M3', 'M4']), max(TRIMS.values()) < 2.45, 'the forearm is the heaviest, 10 % under the magnet')
-notes.append('No floats. Each module has a closed, sealed housing that holds air, trimmed with a little steel so it weighs 0.04 to 0.10 N in water and sits still on the shelf. '
+notes.append('No floats. Each module has a closed, sealed housing that holds air, trimmed with a little steel so it weighs 0.10 N in water and stands still on the tray. '
              'The parent\'s arm (500 g payload, a 2.45 N magnet) could not lift its own base in air (1.4 kg), but it can carry it under water. This is why the arm is put together under water, and why the water stands at 270 mm.')
-notes.append('The modules wait on a shelf hung on the tank\'s front glass, at the height of the lower lip. The shelf slopes to its middle, so when one module is taken the next slides into place. The parent drives its whole body up to the shelf, takes the four modules in through the mouth and puts the arm together in its bowl, then drives back.')
+
+
 
 # ---------------------------------------------------------------- 3. the child arm: folded pose, seat, lying pose
 RB = 0.070                                   # base radius (B_Fix: 128 x 146 mm)
@@ -227,11 +228,13 @@ chk('Forces', f'N\'s jet ({jet*1000:.0f} mN) could not drag the hooked arm ({0.3
 chk('Forces', f'Standing up: the arm weighs {WARM:.1f} N in water, about {WARM*0.12:.2f} N m about the hinge; it pushes its forearm on the floor with joint 1', WARM * 0.12 < 1.0, 'DexArm stepper with its reduction, estimate; bench test')
 hold = 3 * 54 * 0.5
 chk('Forces', f'Seat: three magnet pairs in the seat plate hold the base ({hold:.0f} N at half pull through 1.2 mm of silicone); with the arm\'s 5 N of wet weight they carry its reactions', True, 'estimate; a steel trim plate can be added to the base once it is seated')
+DROP = ('Folded for birth', 'Standing folded', 'Assembly in the bowl', 'Birth of the arm', 'The parent backs', 'Standing up', 'The whole folded arm', "N's jet")
+checks[:] = [c for c in checks if not c['name'].startswith(DROP)]
+notes[:] = [n for n in notes if not n.startswith('In the bowl')]
 # water level consequences
 air_head = J['q']['silicone']['air_L']
 chk('Water', f'Water at {WATER*1000:.0f} mm (quilted head simulator: {J["WL"]*1000:.0f} mm): the quilted head\'s {air_head:.1f} L of cell air lifts {air_head*9.81:.0f} N against its {J["r2"]["float"]["weight_N"]:.1f} N',
     False, 'needs gel ballast in its low cells, as in round 2 (bench test 9 there)')
-chk('Water', 'Deep water for the hard tail too: it needs steel to keep its wheels on the floor', False, 'outer change, not sized here')
 chk('Births', 'N and F go over the lower lip at 104.5 mm: each folded body is lifted out of the gel and pushed out, about neutral in water', True, 'Dragon Skin 30, SG 1.08')
 
 # ---------------------------------------------------------------- 4. the timeline
@@ -244,6 +247,8 @@ class S:  # state, carried from frame to frame
     pass
 st = S()
 st.px = 0.0
+st.red = np.array([OFF, 0.0, 0.0])          # pose of the parent's tail frame: world = (x, y) + R(yaw) (lx, ly)
+st.item = np.array([0.0, 0.0, 0.0]); st.itemv = 0
 st.q = REST.copy(); st.tool = 1; st.crank = 0.0; st.rot = 0.0
 st.N = dict(x=0.0, y=0.0, yaw=0.0, k=0.0, vis=0, pack=0.0, jet=0.0)
 st.F = dict(x=0.0, y=0.0, yaw=0.0, k=0.0, vis=0, pack=0.0)
@@ -271,7 +276,7 @@ def quat(R):
     return [x, y, z, w]
 
 def emit():
-    fr = dict(px=R2(st.px), q=[R2(x) for x in st.q], tool=st.tool, crank=R2(st.crank), rot=R2(st.rot),
+    fr = dict(red=[R2(x) for x in st.red], item=[R2(x) for x in st.item] + [st.itemv], px=R2(st.px), q=[R2(x) for x in st.q], tool=st.tool, crank=R2(st.crank), rot=R2(st.rot),
               N=[R2(st.N['x']), R2(st.N['y']), R2(st.N['yaw']), R2(st.N['k']), st.N['vis'], R2(st.N['pack']), R2(st.N['jet'])],
               F=[R2(st.F['x']), R2(st.F['y']), R2(st.F['yaw']), R2(st.F['k']), st.F['vis'], R2(st.F['pack'])],
               pods=st.pods, root=mat7(st.root), cq=[R2(x) for x in st.cq], cv=st.childvis,
@@ -289,18 +294,23 @@ def arm_to(q_from, tip, tool, u, a=0.0, b=1.0):
     w = seg(u, a, b)
     return q_from + (q - q_from) * w if q is not None else q_from
 
-def BASEt():
-    return BASE + [st.px, 0, 0]
-def ikc(tip, Ls):
-    tip = np.array(tip, float); BASE_ = BASEt()
+BL = np.array(J['base'])                              # arm base in the tail frame
+def pose_M(p):
+    return T([p[0], p[1], 0]) @ Rz(p[2])
+def ik_pose(tip, Ls, pose, lim=True):
+    tl = np.linalg.inv(pose_M(pose)) @ np.r_[tip, 1]
+    return ik(tl[:3], Ls, BL, lim)
+def ikc(tip, Ls, pose=None):
+    pose = st.red if pose is None else pose
+    Minv = np.linalg.inv(pose_M(pose)); tl = (Minv @ np.r_[tip, 1])[:3]
     for k in range(60):
-        q = ik(tip, Ls, BASE_)
+        q = ik(tl, Ls, BL)
         if q is not None: return q
-        d = tip[:2] - BASE_[:2]; tip[:2] = BASE_[:2] + d * 0.985; tip[2] = tip[2] * 0.99 + 0.12 * 0.01
-    return ik(tip, Ls, BASE_, lim=False)
-
-def tip_of(q, tool):
-    p = tool_head(T(BASEt()), q); return p - [0, 0, CUP if tool == 1 else NEEDLE]
+        d = tl[:2] - BL[:2]; tl[:2] = BL[:2] + d * 0.985; tl[2] = tl[2] * 0.99 + 0.12 * 0.01
+    return ik(tl, Ls, BL, lim=False)
+def tip_of(q, tool, pose=None):
+    pose = st.red if pose is None else pose
+    p = tool_head(pose_M(pose) @ T(BL), q); return p - [0, 0, CUP if tool == 1 else NEEDLE]
 
 def stage(key, name, disp, real, text, fn):
     n = max(2, int(disp * FPS)); i0 = len(frames)
@@ -324,32 +334,91 @@ def mod_box(k):
     W, _ = world_parts(R_BOWL, lie_q)
     pts = np.vstack([(W[n] @ np.c_[PARTS[n][0][::9], np.ones(len(PARTS[n][0][::9]))].T).T[:, :3] for n in MODS[k]])
     return pts.min(0), pts.max(0)
-SHELF_TOP = LIP[1] + 0.002
-SHELF_X = (TX1 - 0.15, TX1)                      # 150 mm deep, hung on the glass
-SHELF_Y = 0.40
-SLOT0 = {'M1': 0.0, 'M2': -0.20, 'M3': 0.20, 'M4': -0.36}
-def shelf_G(k, y):
-    lo_, hi_ = mod_box(k); c = (lo_ + hi_) / 2
-    x = SHELF_X[0] + 0.01 + (hi_[0] - lo_[0]) / 2
-    return T([x - c[0], y - c[1], SHELF_TOP - lo_[2]])
+# the tray on the back glass, sloped toward its middle slot; the four modules stand on it the way they will be joined
+TRAY_TOP = 0.006
+TRAY_X = (TX0, TX0 + 0.15)
+TRAY_Y = 0.42
+FACE = 0.032
+RS = np.array([TRAY_X[1] + 0.012 + FACE, 0.0, math.pi])                 # the parent's tail, its face at the tray
+BX = -0.95                                                              # where the new tail sits for a handover
+RD = np.array([BX + 2 * FACE + 0.004, 0.0, math.pi])                    # the parent's tail, face to face with it
+BD = np.array([BX, 0.0, 0.0])
+BWAIT = np.array([BX, 0.42, 0.0])
+CROOT = pose_M(BD) @ T([-0.115, 0, 0.005])                              # the new arm's base frame in the seat
+# join poses: the new arm, powered from N as soon as its base is seated, holds its joints where the parent can reach
+def reach_c(p, tool=CUP):
+    return ik_pose(p + [0, 0, 0.04], tool, RD) is not None
+def find_pose(j, also=None):
+    for q0 in range(-110, 111, 10):
+        for q1 in range(0, 111, 5):
+            for q2 in range(0, 86, 5):
+                q = np.radians([q0, q1, q2]); W, jp = world_parts(CROOT, q); p = jp[j]
+                if p[2] < 0.04 or abs(p[1]) > 0.14 or p[2] > 0.29: continue
+                if reach_c(p) and (also is None or also(q)): return q
+    return None
+def mod_box_at(k, root, q):
+    W, _ = world_parts(root, q)
+    pts = np.vstack([(W[n] @ np.c_[PARTS[n][0][::9], np.ones(len(PARTS[n][0][::9]))].T).T[:, :3] for n in MODS[k]])
+    return pts.min(0), pts.max(0)
+def grip(k, root, q, G=None):
+    """where the holder takes a module: the top of its box, or for the forearm the top of its elbow end"""
+    Mr = root if G is None else G @ root
+    if k == 'M3':
+        _, jp = world_parts(Mr, q); return jp[1] + [0, 0, 0.03]
+    lo_, hi_ = mod_box_at(k, Mr, q); return np.array([(lo_[0] + hi_[0]) / 2, (lo_[1] + hi_[1]) / 2, hi_[2] + 0.003])
+def top_reach(k):
+    def f(q):
+        g = grip(k, CROOT, q)
+        return ik_pose(g, CUP, RD) is not None and ik_pose(g + [0, 0, 0.02], CUP, RD) is not None
+    return f
+QJ = {'M1': REST.copy()}
+QJ['M2'] = find_pose(0, top_reach('M2')); QJ['M3'] = find_pose(1, top_reach('M3')); QJ['M4'] = find_pose(2, top_reach('M4'))
+print('QJ', {k: np.degrees(v).round() if v is not None else None for k, v in QJ.items()})
+JOINP = {}
 for k in MOD_ORDER:
-    st.mods[k]['G'] = shelf_G(k, SLOT0[k])
-DXS = SHELF_X[0] - 0.012 - LIP[0]               # how far the parent drives so its lip meets the shelf
-chk('Shelf', f'The shelf hangs on the front glass, its top at the lower lip ({SHELF_TOP*1000:.0f} mm), 150 mm deep and {2*SHELF_Y*1000:.0f} mm long; the parent drives {DXS*1000:.0f} mm to meet it',
-    True, 'the shelf slopes to the middle at 20 deg, steeper than the friction of a module in water (0.3)')
-chk('Shelf', 'The modules slide over the lip into the mouth level, no lift: the crank draws each one with ' + f'{0.3*0.10:.2f} N of friction at most', 0.03 < 0.039 * 100, 'the crank is on the arm, 4.9 N')
-chk('Water', 'Driving at 270 mm of water: the hard tail is buoyant and its wheels lose grip', False, 'steel in the tail, not sized here')
-
+    _, jp = world_parts(CROOT, QJ[k]); JOINP[k] = {'M1': (CROOT @ np.r_[0, 0, 0.09, 1])[:3], 'M2': jp[0], 'M3': jp[1], 'M4': jp[2]}[k]
+def mod_box_at(k, root, q):
+    W, _ = world_parts(root, q)
+    pts = np.vstack([(W[n] @ np.c_[PARTS[n][0][::9], np.ones(len(PARTS[n][0][::9]))].T).T[:, :3] for n in MODS[k]])
+    return pts.min(0), pts.max(0)
+SLOT0 = {'M1': 0.0, 'M2': -0.20, 'M3': 0.20, 'M4': -0.34}
+def tray_G(k, y):
+    lo_, hi_ = mod_box_at(k, CROOT, QJ[k]); c = (lo_ + hi_) / 2
+    x = TRAY_X[0] + 0.012 + (hi_[0] - lo_[0]) / 2
+    return T([x - c[0], y - c[1], TRAY_TOP - lo_[2]])
+for k in MOD_ORDER:
+    st.mods[k]['G'] = tray_G(k, SLOT0[k])
+st.item = np.array([TRAY_X[0] + 0.05, 0.34, TRAY_TOP + 0.01]); st.itemv = 1
+ok_join = all(top_reach(k)(QJ[k]) for k in MOD_ORDER)
+def rs_for(k):
+    g = grip(k, CROOT, QJ[k], tray_G(k, 0.0))
+    for back in np.arange(0.0, 0.25, 0.005):
+        p = RS + [back, 0, 0]
+        if ik_pose(g, CUP, p) is not None and ik_pose(g + [0, 0, 0.03], CUP, p) is not None: return p
+    return None
+RSK = {k: rs_for(k) for k in MOD_ORDER}
+ok_tray = all(v is not None for v in RSK.values())
+RSK = {k: (v if v is not None else RS) for k, v in RSK.items()}
+_unused = all(ik_pose(((lambda b: (b[0] + b[1]) / 2)(mod_box_at(k, tray_G(k, 0.0) @ CROOT, QJ[k]))) + [0, 0, 0.06], CUP, RS) is not None for k in MOD_ORDER)
+chk('Handover', 'Face to face: the parent\'s tail and the new tail dock face to face, the nine magnets of the parent\'s face on the steel disks of F\'s cuff, as a tail docks to a head', True, 'the open faces make one chamber')
+chk('Handover', f'The new arm\'s seat is {RD[0]-FACE - (BD[0]+FACE) + 0.147 + 0.147:.3f} m from the parent\'s arm axis, inside its reach', ik_pose((CROOT @ np.r_[0, 0, 0.1, 1])[:3], CUP, RD) is not None, 'the parent\'s base sits 147 mm behind its face, the seat 147 mm behind F\'s')
+chk('Handover', 'Every joint reachable when the new arm helps: seated and powered from N, it holds its shoulder, then its elbow, then its wrist where the parent\'s holder can reach (joint 1 at '
+    + ', '.join(f'{math.degrees(QJ[k][1]):.0f}' for k in MOD_ORDER[1:]) + ' deg)', ok_join, 'upright and still, its elbow and wrist would be out of reach')
+chk('Handover', 'The parent takes each module from the middle slot of the tray on the back glass', ok_tray, 'the tray slopes to the middle: the next one slides in')
+chk('Handover', f'The new tail waits beside, {BWAIT[1]*1000:.0f} mm off the centre line, and comes in for each module', True, 'the tank is 1.22 m wide so a tail fits beside a tail')
+notes.append('Face to face. The parent\'s tail leaves its head, turns round and docks face to face with the new tail. Its arm reaches into the new tail as it reaches into a head: the new arm\'s seat is 294 mm from its axis. It brings the four modules from a tray on the back glass one at a time and builds the arm upright in the seat. From the base on, the new arm has power from N\'s battery through the cuff and helps: it holds each joint where the parent can reach it.')
 PRINT_X = (np.array([J['q']['q4']['x0_mm'], J['q']['q4']['x1_mm']]) / 1000 + OFF)
 PRINT_C = np.array([PRINT_X.mean(), 0.0])
 HOME = tip_of(REST, 1)
-N_PARK = (0.70, 0.015, math.pi / 2); F_PARK = (0.52, 0.395, math.pi / 2)    # both against the side glass, out of the parent's lane
-OUT = (LIP[0] + 0.20, 0.0)                      # where a born segment unfolds, in front of the mouth
+N_PARK = (0.70, 0.015, math.pi / 2); F_PARK = (0.52, 0.40, math.pi / 2)    # both beside the glass, out of the way
+OUT = (LIP[0] + 0.20, 0.0)
+chk('Water', 'Driving at 270 mm of water: the hard tail is buoyant and its wheels lose grip', False, 'steel in the tail, not sized here')
+notes.append('After the handover the new tail has an arm, so it can pick up the rest itself: the last thing on the tray, a tile set, it takes with its own arm.')
 
 # 0
 def f_intro(u, s0):
     st.text = ''
-stage('intro', 'The parent and the parts', 4, 60, 'The parent, a hard tail with its DexArm and a quilted head, sits at the back of the tank. Four arm modules wait on a shelf hung on the front glass: base, upper arm, forearm, end effector, each in a sealed housing.', f_intro)
+stage('intro', 'The parent and the parts', 4, 60, 'The parent, a hard tail with its DexArm and a quilted head, sits in the middle of the tank. Four arm modules stand on a tray against the back glass: base, upper arm, forearm, end effector. No floats.', f_intro)
 
 def f_kit(u, s0):
     q0 = s0['q']
@@ -427,142 +496,142 @@ def f_moveF(u, s0):
         b = seg(u, 0.85, 1.0); st.N['x'] = nx + (N_PARK[0] - nx) * b; st.N['y'] = ny + (N_PARK[1] - ny) * b; st.N['yaw'] = -math.pi / 2 + (N_PARK[2] + math.pi / 2) * b
 stage('parkF', 'N moves F aside', 6, 240, 'N pushes F against the port glass and parks itself against the starboard glass: the middle of the tank is clear.', f_moveF)
 
-# drive to the shelf, take the four modules in, put the arm together, drive back
-def f_drive(u, s0):
-    st.px = DXS * seg(u, 0.05, 0.95); st.q = arm_to(s0['q'], HOME + [0, 0, 0], 1, u, 0, 0.3) if False else s0['q']
-stage('drive', 'To the shelf', 7, 240, f'The parent drives its whole body {DXS*1000:.0f} mm, tail and head together, between the two parked halves, until its lower lip meets the shelf on the front glass.', f_drive)
+def lerp3(a, b, w): return np.array(a) + (np.array(b) - np.array(a)) * w
+def yaw_lerp(a, b, w): d = (b - a + math.pi) % (2 * math.pi) - math.pi; return a + d * w
+def set_blue(p):
+    for s_ in (st.F, st.N): s_['x'], s_['y'], s_['yaw'] = float(p[0]), float(p[1]), float(p[2])
 
-def queue_y(k, idx_taken):
-    """where module k stands on the shelf after idx_taken modules were taken: the next one slides to the middle"""
-    order = MOD_ORDER
-    i = order.index(k)
-    if i == idx_taken: return 0.0
-    return SLOT0[k]
-for idx, k in enumerate(MOD_ORDER):
-    label = {'M1': 'base', 'M2': 'upper arm', 'M3': 'forearm', 'M4': 'end effector'}[k]
-    def f_gather(u, s0, k=k, idx=idx):
-        st.mods = copy_mods(s0) if u == 0 else st.mods
-        m = st.mods[k]
-        q0 = s0['q']
-        # 1. the next module slides down the shelf to the middle slot (0 .. 0.2)
-        y0 = SLOT0[k] if idx > 0 else 0.0
-        y = y0 * (1 - seg(u, 0.0, 0.2))
-        Gs = shelf_G(k, y)
-        if u <= 0.42:
-            m['G'] = Gs
-        cs = mod_center(k, Gs)
-        st.q = arm_to(q0, [LIP[0] + DXS - 0.12, 0, 0.20], 1, u, 0.0, 0.2) if u <= 0.2 else st.q
-        # 2. the crank swings out and hooks the eye on the module (0.2 .. 0.42)
-        if 0.2 < u <= 0.42:
-            st.crank = seg(u, 0.2, 0.32)
-            q = ikc([LIP[0] + DXS - 0.10, 0, cs[2] + 0.05], CUP)
-            st.q = q
-        # 3. draws it off the shelf over the lip, then the magnet carries it to its place in the arm (0.42 .. 0.92)
-        if u > 0.42:
-            dest = mod_center(k) + [DXS, 0, 0]
-            w1 = seg(u, 0.42, 0.62); w2 = seg(u, 0.62, 0.9)
-            mid = dest + [0, 0, 0.08]
-            p1 = cs + (np.array([LIP[0] + DXS - 0.06, 0, cs[2]]) - cs) * w1
-            pos = p1 + (mid - p1) * min(1, w2 * 1.6) if w2 > 0 else p1
-            if w2 > 0.6: pos = mid + (dest - mid) * ((w2 - 0.6) / 0.4)
-            c_home = mod_center(k)
-            m['G'] = T(pos - c_home)
-            st.crank = 1 - seg(u, 0.55, 0.65)
-            q = ikc(pos + [0, 0, 0.06], CUP)
-            if q is not None: st.q = q
-            if u > 0.92:
-                m['att'] = 1; m['G'] = T([DXS, 0, 0])
-                st.childvis = 1
-        st.root = T([st.px, 0, 0]) @ R_BOWL
-    joint = {'M1': 'It goes down onto the gel floor of the bowl, the base plate toward the mouth.', 'M2': 'The upper arm goes down onto the shoulder: magnets pull the last 2 mm and a spring latch clicks.',
-             'M3': 'The forearm goes onto the elbow and clicks.', 'M4': 'The end effector clicks onto the wrist. The arm is whole, folded, lying in the gel.'}[k]
-    stage('get' + k, f'Module {idx+1}: {label}', 10, 600,
-          f'The {label} slides down the shelf to the middle. The holder\'s crank, the hook it uses at a birth, reaches 25 mm past the lip, catches the eye on the housing and draws it in over the lip. {joint}', f_gather)
-
-def f_back(u, s0):
-    st.px = DXS * (1 - seg(u, 0.05, 0.95)); st.root = T([st.px, 0, 0]) @ R_BOWL
-    for k in MOD_ORDER: st.mods[k]['G'] = T([st.px, 0, 0])
-stage('driveBack', 'Back', 7, 240, 'The parent drives back with the folded arm lying in its bowl.', f_back)
-
-def f_holdreach(u, s0):
-    st.q = arm_to(s0['q'], HOME, 1, u, 0, 0.8)
-stage('folded', 'The folded arm', 3, 30, 'Every joint is vertical while it lies like this, so every module went straight down onto the one before. Nothing was screwed.', f_holdreach)
-
-# N docks to F, the shell turns and docks its face on the mouth
-JOINT_END = lambda pose: (seg_pose(*pose) @ np.r_[JOINT, 0, 0, 1])[:3]
 def f_joinNF(u, s0):
     st.N['jet'] = 1.0 if u < 0.92 else 0.0
-    # N's joint end on F's joint end, N's nose away
-    Fp = (s0['F']['x'], s0['F']['y'], s0['F']['yaw'])
-    tgt_yaw = Fp[2]
-    # same tail frame: N's local coords are the tail's, so N docks with the same pose as F
-    w = seg(u, 0.0, 0.85)
-    a = (s0['N']['x'], s0['N']['y'], s0['N']['yaw'])
-    via = (Fp[0] - 0.12, Fp[1] + 0.32, tgt_yaw)
+    Fp = (s0['F']['x'], s0['F']['y'], s0['F']['yaw']); w = seg(u, 0.0, 0.85)
+    a = (s0['N']['x'], s0['N']['y'], s0['N']['yaw']); via = (Fp[0] - 0.32, Fp[1] - 0.05, Fp[2])
     if w < 0.6:
-        v = w / 0.6; st.N['x'] = a[0] + (via[0] - a[0]) * v; st.N['y'] = a[1] + (via[1] - a[1]) * v
-        dy = (tgt_yaw - a[2] + math.pi) % (2 * math.pi) - math.pi; st.N['yaw'] = a[2] + dy * v
+        v = w / 0.6; st.N['x'] = a[0] + (via[0] - a[0]) * v; st.N['y'] = a[1] + (via[1] - a[1]) * v; st.N['yaw'] = yaw_lerp(a[2], Fp[2], v)
     else:
-        v = (w - 0.6) / 0.4; st.N['x'] = via[0] + (Fp[0] - via[0]) * v; st.N['y'] = via[1] + (Fp[1] - via[1]) * v; st.N['yaw'] = tgt_yaw
-stage('joinNF', 'N docks to F', 8, 300, 'N backs its open end onto F\'s rear cuff: magnets in the two cuffs, the same as the docking of a tail and a head. Pogo pads in the cuff carry the battery\'s power into F. The shell is whole, still without an arm.', f_joinNF)
+        v = (w - 0.6) / 0.4; st.N['x'] = via[0] + (Fp[0] - via[0]) * v; st.N['y'] = via[1] + (Fp[1] - via[1]) * v; st.N['yaw'] = Fp[2]
+stage('joinNF', 'N docks to F', 8, 300, 'N backs its open end onto F\'s rear cuff: magnets in the two cuffs, the same as the docking of a tail and a head. Pogo pads in the cuff carry the battery\'s power into F. The new tail is whole, still without an arm.', f_joinNF)
 
-def f_dockmouth(u, s0):
-    a = (s0['F']['x'], s0['F']['y'], s0['F']['yaw'])
-    b = DOCK
-    w = seg(u, 0.0, 1.0)
-    via = (b[0] + 0.12, 0.10, b[2])
-    if w < 0.55:
-        v = w / 0.55; x = a[0] + (via[0] - a[0]) * v; y = a[1] + (via[1] - a[1]) * v
-        dy = (b[2] - a[2] + math.pi) % (2 * math.pi) - math.pi; yaw = a[2] + dy * mj(v)
-    else:
-        v = (w - 0.55) / 0.45; x = via[0] + (b[0] - via[0]) * v; y = via[1] + (b[1] - via[1]) * v; yaw = b[2]
-    for s_ in (st.F, st.N): s_['x'], s_['y'], s_['yaw'] = x, y, yaw
-    st.N['jet'] = 1.0 if u < 0.95 else 0.0
-stage('dockMouth', 'The shell docks on the mouth', 9, 300, 'The shell swims round and brings its open face against the parent\'s mouth. Nine magnet pairs in F\'s cuff meet steel disks in the quilt round the mouth.', f_dockmouth)
+def f_undock(u, s0):
+    st.red = lerp3(s0['red'], [OFF - 0.25, 0, 0], seg(u, 0.1, 0.9)); st.q = arm_to(s0['q'], HOME, 1, u, 0, 0.3)
+stage('undock', 'The parent leaves its head', 5, 120, 'The tilt release lets the nine magnets go. The parent\'s tail backs 250 mm away from its head on its wheels. The head stays where it is.', f_undock)
 
-def f_birtharm(u, s0):
-    q0 = s0['q']
-    st.lip = seg(u, 0.0, 0.2)
-    lift = 0.0
-    push = DELTA * seg(u, 0.38, 0.9)
-    st.root = T([push, 0, lift]) @ R_BOWL
-    if u < 0.12:
-        st.q = arm_to(q0, [push_from, 0, 0.06], 1, u, 0, 0.12)
-    else:
-        q = ikc(np.array([push_from + push, 0, 0.06 + lift]), CUP)
-        if q is not None: st.q = q
-    st.gel = GEL
-stage('birthArm', 'Birth of the arm', 9, 240, f'The parent vents its lower lip, which folds down flat on the floor; the gel stays, the water stands over it. The holder pushes the folded arm base first along the floor, out of the mouth into F: {DELTA*1000:.0f} mm, until the base plate hooks the hinge bar of the seat.', f_birtharm)
-
-def f_pull(u, s0):
-    w = seg(u, 0.1, 0.9)
-    st.px = -BACK * w
-    st.root = root_tilt(DOCK, math.pi / 2)
-    # the holder keeps the elbow end of the arm while it can, then lets it down
-    q = ikc([LIP[0] - 0.05, 0, 0.08 + 0.01 * math.sin(math.pi * min(1, w * 3))], CUP)
-    st.q = q if w < 0.35 else arm_to(q, HOME - [BACK, 0, 0], 1, w, 0.35, 0.8)
-    st.lip = 1 - seg(u, 0.85, 1.0)
-stage('pull', 'The parent backs away', 8, 240, f'The magnets of the face cuff let go. The arm is hooked in F, so the parent backs {BACK*1000:.0f} mm away on its wheels; the holder carries the elbow end of the arm over the flat lip and sets it on the tank floor. The lip fills again.', f_pull)
-
-def f_stand(u, s0):
-    ph = math.pi / 2 * (1 - seg(u, 0.12, 0.95))
-    st.root = root_tilt(POSE_PULL, ph); st.cq = stand_q(ph)
-stage('stand', 'The arm stands up', 7, 60, 'The seat\'s pogo pads touch the base plate: the arm has power for the first time. It presses its forearm on the floor and stands itself up about the hinge, and the seat magnets close.', f_stand)
-
+C_TURN = np.array([OFF - 0.25 - 0.2, 0.0])
 def f_turn(u, s0):
-    w = seg(u, 0.05, 0.9)
-    st.cq = np.array([math.radians(35) * math.sin(math.pi * w), STAND_Q1, FOLD[2]])
-stage('turn', 'It looks', 4, 20, 'It turns its base a little to one side and back, the first move it chooses.', f_turn)
+    yaw = math.pi * seg(u, 0.05, 0.95); R2_ = np.array([[math.cos(yaw), -math.sin(yaw)], [math.sin(yaw), math.cos(yaw)]])
+    p = C_TURN - R2_ @ np.array([-0.2, 0.0]); st.red = np.array([p[0], p[1], yaw])
+stage('turnRed', 'It turns round', 6, 120, 'It turns on the spot, its face now toward the back glass.', f_turn)
 
-def f_unfold(u, s0):
-    w = seg(u, 0.25, 1.0)
-    F2 = np.array([0, STAND_Q1, FOLD[2]]); st.cq = F2 + (REST - F2) * w
-stage('unfold', 'It unfolds', 6, 30, 'The arm unfolds to its rest pose. The new tail is whole: N, F and an arm, and the parent kept its own.', f_unfold)
+def f_toTray(u, s0):
+    st.red = lerp3(s0['red'], RS, seg(u, 0.05, 0.95))
+stage('toTray', 'To the tray', 5, 120, 'It drives to the tray on the back glass, where the four modules of the new arm stand.', f_toTray)
 
-def f_end(u, s0):
-    w = seg(u, 0.1, 1.0)
-    st.cq = REST + np.array([0.35 * math.sin(u * 6), 0.12 * math.sin(u * 4), 0.1 * math.sin(u * 5)]) * math.sin(math.pi * u)
-stage('free', 'A tail of its own', 6, 60, 'The new tail can dock to any head and print. Its two segments are quilted and soft where the parent\'s were printed hard on the H2S; its nose came out a little longer. Same principle, its own body.', f_end)
+def f_blueWait(u, s0):
+    a = np.array([s0['F']['x'], s0['F']['y'], s0['F']['yaw']]); w = seg(u, 0.0, 1.0)
+    via = np.array([a[0], BWAIT[1], 0.0])
+    if w < 0.25: p = np.array([a[0], a[1] + (BWAIT[1] - a[1]) * w / 0.25, yaw_lerp(a[2], 0.0, w / 0.25)])
+    else: p = lerp3(via, BWAIT, (w - 0.25) / 0.75)
+    set_blue(p); st.N['jet'] = 1.0 if u < 0.97 else 0.0
+stage('blueWait', 'The new tail comes round', 7, 300, 'The new tail swims down the side of the tank, past the head, and waits beside the place of the handover.', f_blueWait)
+
+for idx, k in enumerate(MOD_ORDER):
+    label = {'M1': 'base', 'M2': 'upper arm', 'M3': 'forearm', 'M4': 'end effector'}[k]
+    last = idx == len(MOD_ORDER) - 1
+    def f_mod(u, s0, k=k, idx=idx, last=last):
+        if u == 0: st.mods = copy_mods(s0)
+        m = st.mods[k]; q0 = s0['q']
+        # A. the module slides to the middle slot; the holder comes down onto it (0 .. 0.2)
+        y0 = SLOT0[k] if idx > 0 else 0.0
+        Gt = tray_G(k, y0 * (1 - seg(u, 0.0, 0.12)))
+        top = grip(k, CROOT, QJ[k], Gt)
+        if u <= 0.2:
+            st.red = lerp3(s0['red'], RSK[k], seg(u, 0.0, 0.08)); m['G'] = Gt
+            st.q = arm_to(q0, top, 1, u, 0.08, 0.2)
+        G_grab = tray_G(k, 0.0); top2 = grip(k, CROOT, QJ[k], G_grab)
+        # B. lift and carry to the place of the handover (0.2 .. 0.45)
+        if 0.2 < u <= 0.45:
+            lift = 0.03 * seg(u, 0.2, 0.26)
+            st.red = lerp3(RSK[k], RD, seg(u, 0.26, 0.45))
+            dx = st.red[0] - RSK[k][0]
+            tip = top2 + [dx, 0, lift]; q = ikc(tip, CUP)
+            st.q = q; m['G'] = T([dx, 0, lift]) @ G_grab
+        # C. the new tail comes in and docks; its arm holds the joint where the parent can reach (0.45 .. 0.6)
+        if 0.45 < u <= 0.6:
+            st.red = RD.copy()
+            set_blue(lerp3(BWAIT if idx > 0 or True else BD, BD, seg(u, 0.45, 0.58))); st.N['jet'] = 1.0 if u < 0.57 else 0.0
+            if idx > 0: st.cq = s0['cq'] + (QJ[k] - s0['cq']) * seg(u, 0.5, 0.6)
+        # D. the holder sets the module on its joint: magnets close the last 2 mm, the latch clicks (0.6 .. 0.85)
+        if u > 0.6:
+            dx = RD[0] - RSK[k][0]
+            Gc = T([dx, 0, 0.03]) @ G_grab                     # as carried
+            w = seg(u, 0.6, 0.84)
+            g_car = grip(k, CROOT, QJ[k], Gc); g_fin = grip(k, CROOT, QJ[k])
+            via = np.array([g_fin[0], g_fin[1], max(g_car[2], g_fin[2] + 0.06)])
+            pos = lerp3(g_car, via, min(1, w * 2)) if w < 0.5 else lerp3(via, g_fin, (w - 0.5) * 2)
+            if u <= 0.84: m['G'] = T(pos - g_fin)
+            st.q = ikc(pos, CUP)
+            if u > 0.84:
+                m['G'] = np.eye(4); m['att'] = 1; st.childvis = 1
+                st.root = CROOT.copy()
+        # E. the new tail moves aside, the parent drives back to the tray (0.86 .. 1)
+        if u > 0.86 and not last:
+            w = seg(u, 0.86, 1.0); set_blue(lerp3(BD, BWAIT, w)); st.red = lerp3(RD, RSK[MOD_ORDER[idx + 1]], w)
+            st.q = arm_to(st.q, tip_of(REST, 1), 1, u, 0.86, 1.0)
+    joint = {'M1': 'It sets the base in F\'s seat: three magnets and the pogo pads. The new arm has power.',
+             'M2': 'The new arm holds its shoulder up; the upper arm goes down onto it and clicks.',
+             'M3': 'The new arm leans its upper arm toward the parent; the forearm clicks onto the elbow.',
+             'M4': 'It holds its wrist where the parent can reach; the end effector clicks on. The arm is whole.'}[k]
+    real = 900
+    stage('mod' + k, f'Module {idx+1}: {label}', 13, real,
+          f'The {label} slides to the middle of the tray and the holder takes it. The parent drives back, the new tail comes in and docks face to face. {joint}', f_mod)
+    st.root = CROOT.copy()
+
+st.cq = QJ['M4'].copy()
+def f_wake(u, s0):
+    w = seg(u, 0.1, 0.9); st.cq = s0['cq'] + (REST - s0['cq']) * w
+    st.q = arm_to(s0['q'], tip_of(REST, 1, RD), 1, u, 0.0, 0.4)
+stage('wake', 'Its own arm', 5, 30, 'The new arm straightens to its rest pose, inside its own tail.', f_wake)
+
+def f_part(u, s0):
+    w = seg(u, 0.05, 0.6); st.red = lerp3(RD, RD + [0.35, 0, 0], w)
+    # the new tail turns on the spot to face the tray
+    v = seg(u, 0.5, 1.0); c = np.array([BX - 0.2, 0.0])
+    yaw = math.pi * v; R2_ = np.array([[math.cos(yaw), -math.sin(yaw)], [math.sin(yaw), math.cos(yaw)]]); p = c + R2_ @ np.array([0.2, 0.0])
+    set_blue([p[0], p[1], yaw]); st.N['jet'] = 1.0 if u > 0.5 else 0.0
+stage('part', 'Apart', 6, 120, 'The magnets let go. The parent backs off; the new tail turns round to face the tray.', f_part)
+
+SELF_POSE = np.array([TRAY_X[1] + 0.012 + FACE, 0.30, math.pi])
+def f_self(u, s0):
+    a = np.array([s0['F']['x'], s0['F']['y'], s0['F']['yaw']])
+    set_blue(lerp3(a, SELF_POSE, seg(u, 0.0, 0.35))); st.N['jet'] = 1.0 if u < 0.33 else 0.0
+    bp = np.array([st.F['x'], st.F['y'], st.F['yaw']]); croot = pose_M(bp) @ T([-0.115, 0, 0.005])
+    item = np.array([TRAY_X[0] + 0.05, 0.34, TRAY_TOP + 0.01])
+    inside = (pose_M(SELF_POSE) @ np.r_[-0.03, 0.07, 0.02, 1])[:3]
+    def cik(p):
+        tl = (np.linalg.inv(pose_M(bp)) @ np.r_[p, 1])[:3]; q = ik(tl, CUP, BL)
+        if q is None:
+            for _ in range(60):
+                d = tl[:2] - BL[:2]; tl[:2] = BL[:2] + d * 0.985; q = ik(tl, CUP, BL)
+                if q is not None: break
+        return q
+    if u > 0.35:
+        if u < 0.6: q = cik(item + [0, 0, 0.012]); w = seg(u, 0.35, 0.6); st.cq = s0['cq'] + (q - s0['cq']) * w if q is not None else st.cq; st.item = item
+        else:
+            w = seg(u, 0.6, 0.95); p = lerp3(item, inside, w) + [0, 0, 0.06 * math.sin(math.pi * w)]; q = cik(p + [0, 0, 0.012])
+            if q is not None: st.cq = q
+            st.item = p
+    st.root = croot
+stage('selfPick', 'It picks up the rest', 9, 120, 'The new tail swims to the tray. With its own arm it takes the last thing there, a tile set, and puts it inside itself. From here it can gather what it needs.', f_self)
+
+def f_home(u, s0):
+    st.cq = s0['cq'] + (REST - s0['cq']) * seg(u, 0.0, 0.4)
+    bp = np.array([st.F['x'], st.F['y'], st.F['yaw']]); st.root = pose_M(bp) @ T([-0.115, 0, 0.005])
+    # the parent turns round and goes back to its head
+    a = s0['red']; c = np.array([a[0] - math.cos(a[2]) * 0.2, a[1] - math.sin(a[2]) * 0.2])
+    w1 = seg(u, 0.0, 0.45)
+    yaw = math.pi * (1 - w1); R2_ = np.array([[math.cos(yaw), -math.sin(yaw)], [math.sin(yaw), math.cos(yaw)]]); p = c - R2_ @ np.array([-0.2, 0.0])
+    st.red = np.array([p[0], p[1], yaw])
+    if u > 0.45: st.red = lerp3(st.red, [OFF, 0, 0], seg(u, 0.45, 1.0))
+stage('home', 'Two tails', 8, 300, 'The parent turns and docks back to its head. The new tail has two quilted halves, an arm put together inside it, and a first thing it picked up itself.', f_home)
 
 # ---------------------------------------------------------------- 5. write
 out = dict(
@@ -571,7 +640,7 @@ out = dict(
     off=OFF, water=WATER, gel=GEL, lip=[float(x) for x in LIP], mouth_top=[float(x) for x in MOUTH_TOP], base=[float(x) for x in BASE], tank=TANK,
     seg=dict(na=NA, nv=NV, secN=SECN, secF=SECF, perN=PER_N, perF=PER_F, joint=JOINT, pitch=J['q']['q4']['pitch_mm'], packN=packN, packF=packF,
              areaN=AN, areaF=AF, layN=layN, layF=layF),
-    shelf=dict(x0=float(SHELF_X[0]), x1=float(SHELF_X[1]), y=SHELF_Y, top=float(SHELF_TOP)), print_x=[float(x) for x in PRINT_X], rbowl=[R2(x) for x in R_BOWL.T.reshape(-1)], lie_q=[float(x) for x in lie_q], rb=RB, out=[float(x) for x in OUT], dock=[float(x) for x in DOCK], mods=MODS, mod_order=MOD_ORDER, floats=floats, fold=[float(x) for x in FOLD], rest=[float(x) for x in REST], delta=float(DELTA),
+    print_x=[float(x) for x in PRINT_X], rbowl=[R2(x) for x in R_BOWL.T.reshape(-1)], lie_q=[float(x) for x in lie_q], croot=[R2(x) for x in CROOT.T.reshape(-1)], qj={k: [float(x) for x in QJ[k]] for k in MOD_ORDER}, tray=dict(x0=float(TRAY_X[0]), x1=float(TRAY_X[1]), y=TRAY_Y, top=TRAY_TOP), rb=RB, out=[float(x) for x in OUT], dock=[float(x) for x in DOCK], mods=MODS, mod_order=MOD_ORDER, floats=floats, fold=[float(x) for x in FOLD], rest=[float(x) for x in REST], delta=float(DELTA),
     stages=stages, fps=FPS, fr=frames, checks=checks, notes=notes,
     sources=dict(dex=J['sources']['dex'], ds30=J['sources']['ds30'], mag=J['sources']['mag']),
 )
