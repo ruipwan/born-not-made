@@ -471,7 +471,12 @@ function rimMeshes(geo) { const U = geo.userData, P = U.ringPos, M = U.M, ringPt
   for (let k = 0; k < 9; k++) { const t = (k + 0.5) / 9 * M, j = Math.floor(t), q = dp[j].clone().lerp(dp[(j + 1) % M], t - j), c = new THREE.Vector3(q.x, 0, 0), n = q.clone().sub(c).normalize(), o = q.clone().sub(n.multiplyScalar(0.012)), b = pos.length / 3;
     for (let i = 0; i < cp.length; i += 3) pos.push(cp[i] + o.x - 0.004, cp[i + 1] + o.y, cp[i + 2] + o.z); for (const i of ci) idx.push(i + b); }
   const dg = new THREE.BufferGeometry(); dg.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); dg.setIndex(idx); dg.computeVertexNormals();
-  const discs = new THREE.Mesh(dg, STEELMAT), cuff = new THREE.Mesh(band, LIPMAT); return [lip, cuff, discs]; }
+  // the lip and the cuff share one material, so one mesh (one draw call fewer per body)
+  const L = lip.geometry, merged = new THREE.BufferGeometry(), pa = [L, band].map((g) => g.attributes.position.array), na = [L, band].map((g) => g.attributes.normal.array), off = pa[0].length / 3;
+  const P2 = new Float32Array(pa[0].length + pa[1].length); P2.set(pa[0]); P2.set(pa[1], pa[0].length); const N2 = new Float32Array(P2.length); N2.set(na[0]); N2.set(na[1], na[0].length);
+  merged.setAttribute("position", new THREE.BufferAttribute(P2, 3)); merged.setAttribute("normal", new THREE.BufferAttribute(N2, 3)); merged.setIndex(Array.from(L.index.array).concat(Array.from(band.index.array, (i) => i + off)));
+  L.dispose(); band.dispose(); lip.geometry = merged;
+  const discs = new THREE.Mesh(dg, STEELMAT); return [lip, discs]; }
 function bodyMesh(r) {
   const geo = bodyGeometry(r.s, r.tail), m = new THREE.Mesh(geo, [r.qtail ? MAT.qtail : MAT.hard, MAT.shell, MAT.mouth]);
   for (const x of rimMeshes(geo)) { x.renderOrder = 5.5; m.add(x); } m.userData.rims = m.children.slice();
@@ -683,6 +688,8 @@ function dexLoad(d) {
   DEX.mat = waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xecebe6), roughness: 0.6, metalness: 0 }), { sss: "0.1", rim: "0.05" });
   DEX.toolMat = waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xdfe4ea), roughness: 0.55 }), {}); DEX.darkMat = waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0x8d9097), roughness: 0.4 }), {});
   DEX.data = d; for (const r of robots) armDims(r); modGeos();
+  // far versions of the arm parts and modules for the whole tank: the same mesh with its vertices clustered on an 8 mm grid, about a tenth of the triangles
+  DEX.geoLo = {}; for (const n in DEX.geo) DEX.geoLo[n] = clusterGeo(DEX.geo[n], 0.008); for (const m of DEX.mod) m.geoLo = clusterGeo(m.geo, 0.008);
 }
 const M4 = () => new THREE.Matrix4(), Tm = (v) => M4().makeTranslation(v[0], v[1], v[2]);
 const about = (p, a) => Tm(p).multiply(M4().makeRotationX(a)).multiply(Tm([-p[0], -p[1], -p[2]]));
@@ -823,9 +830,19 @@ function dexObj(r) { if (r.dex) return r.dex; const root = new THREE.Group(); ro
   for (const n in DEX.geo) { const m = new THREE.Mesh(DEX.geo[n], DEX.mat); m.matrixAutoUpdate = false; m.renderOrder = 5; root.add(m); parts[n] = m; }
   const tools = { mag: dexModuleGroup("mag"), needle: dexModuleGroup("needle") }; for (const k in tools) { tools[k].matrixAutoUpdate = false; root.add(tools[k]); }
   r.grp.add(root); return (r.dex = { root, parts, tools }); }
+function clusterGeo(g, cell) { const p = g.attributes.position.array, ix = g.index ? g.index.array : null, key = new Map(), sum = [], rep = new Int32Array(p.length / 3);
+  for (let i = 0; i < p.length / 3; i++) { const k = Math.floor(p[3 * i] / cell) + "," + Math.floor(p[3 * i + 1] / cell) + "," + Math.floor(p[3 * i + 2] / cell); let c = key.get(k);
+    if (c === undefined) { c = sum.length / 4; key.set(k, c); sum.push(0, 0, 0, 0); } sum[4 * c] += p[3 * i]; sum[4 * c + 1] += p[3 * i + 1]; sum[4 * c + 2] += p[3 * i + 2]; sum[4 * c + 3]++; rep[i] = c; }
+  const nc = sum.length / 4, pos = new Float32Array(nc * 3); for (let c = 0; c < nc; c++) for (let k = 0; k < 3; k++) pos[3 * c + k] = sum[4 * c + k] / sum[4 * c + 3];
+  const idx = [], seen = new Set(), n = ix ? ix.length : p.length / 3;
+  for (let t = 0; t < n; t += 3) { const a = rep[ix ? ix[t] : t], b = rep[ix ? ix[t + 1] : t + 1], c = rep[ix ? ix[t + 2] : t + 2]; if (a === b || b === c || a === c) continue; const k = [a, b, c].sort((x, y) => x - y).join(); if (seen.has(k)) continue; seen.add(k); idx.push(a, b, c); }
+  const o = new THREE.BufferGeometry(); o.setAttribute("position", new THREE.BufferAttribute(pos, 3)); o.setIndex(idx); o.computeVertexNormals(); return o; }
+// far from the camera the arm and the floating modules use the clustered meshes; near, or when the Film camera's subject, the full ones
+const LOD_D = 2.6, farFrom = (x, y, z) => R3.cam.position.distanceTo(_lodV.set(x, y, z)) > LOD_D; const _lodV = new THREE.Vector3();
 function dexDrop(r) { if (r.dex) { r.grp.remove(r.dex.root); r.dex = null; } }
 function dexPose(r) { const X = dexObj(r), q = r.arm.q, mats = dexMats(q); X.root.matrix.copy(rootOf(r)); X.root.matrixWorldNeedsUpdate = true;
-  for (const n in X.parts) { X.parts[n].matrix.copy(mats[n]); X.parts[n].matrixWorldNeedsUpdate = true; }
+  const lo = DEX.geoLo && farFrom(r.x, WL, r.z) && !(DIR.shot && (DIR.shot.r === r || (DIR.shot.r && DIR.shot.r.job && DIR.shot.r.job.shell === r)));
+  for (const n in X.parts) { X.parts[n].matrix.copy(mats[n]); X.parts[n].matrixWorldNeedsUpdate = true; X.parts[n].geometry = lo ? DEX.geoLo[n] : DEX.geo[n]; }
   const o = dexModule(q); for (const k in X.tools) { const g = X.tools[k]; g.visible = r.arm.tool === k; g.matrix.makeRotationZ(-r.arm.psi).setPosition(o[0], o[1], o[2]); g.matrixWorldNeedsUpdate = true; } }
 
 /* ---------- tails reproduce: a tail on gel prints the two segments of a new tail; a free tail assembles a DexArm from modules on the water and sets it into the new tail ---------- */
@@ -1040,7 +1057,7 @@ function modStep(dt) { for (let i = 0; i < mods.length; i++) { const M = mods[i]
   M.vx = (M.vx + ax * dt) * (1 - dt * 0.7); M.vz = (M.vz + az * dt) * (1 - dt * 0.7); const v = Math.hypot(M.vx, M.vz); if (v > 0.04) { M.vx *= 0.04 / v; M.vz *= 0.04 / v; }
   M.x = clamp(M.x + M.vx * dt, -TX + 0.15, TX - 0.15); M.z = clamp(M.z + M.vz * dt, -TZ + 0.15, TZ - 0.15); M.h += Math.sin(simT * 0.05 + M.id) * dt * 0.04; } }
 function drawTailrep() { if (DEX.collars) for (const im of DEX.collars) im.count = 0;
-  if (DEX.mod) for (const M of mods) { const mm = modMesh(M); if (M.st === "held") continue; const W = modW(M); mm.matrix.copy(W); mm.matrixWorldNeedsUpdate = true; collar(W, M.m); }
+  if (DEX.mod) for (const M of mods) { const mm = modMesh(M); mm.geometry = DEX.mod[M.m].geoLo && farFrom(M.x, WL, M.z) ? DEX.mod[M.m].geoLo : DEX.mod[M.m].geo; if (M.st === "held") continue; const W = modW(M); mm.matrix.copy(W); mm.matrixWorldNeedsUpdate = true; collar(W, M.m); }
   for (const S of segs) { S.mesh.position.set(S.x, WL - waterY(S.s), S.z); S.mesh.rotation.set(0, -S.h, 0); qShape(S.Q, 1, sstep(0, 1, S.inf)); }      // it fills with air outside: the quilt cells open
   for (const T of loose) { if (!T.arm || !DEX.data || !(T.job || T.hold || T.arm.on)) { if (T.dex) dexDrop(T); continue; }
     T.grp.updateMatrixWorld(); dexPose(T); const hd = T.arm.hold;
@@ -1657,6 +1674,9 @@ window.__society = { get robots() { return robots; }, get floats() { return floa
     fam: Object.fromEntries(FAM.map((x, i) => [x, famTotals()[i]])), kits: new Set(robots.map((r) => r.kn.join(""))).size, meanTiles: +(robots.reduce((a, r) => a + r.kit.length, 0) / Math.max(1, robots.length)).toFixed(2), coreAfloat: coreAfloat(), armWorstMM: +(armWorst * 1000).toFixed(1), armWorstAt, forageT: robots.filter((r) => r.forage).map((r) => Math.round(r.forage.t)).join(" "), ready: robots.filter(ready).length }),
   forceSwap: (r, f) => { const [i] = swapSlot(r, f); if (i < 0) return false; const F = addFloat(makePart(f), r.x + Math.cos(r.h) * r.pickX, r.z + Math.sin(r.h) * r.pickX); r.selfSlot = i; r.forage = null; startPick(r, F); return true; },
   forcePick: (r, f, kind) => { let p = makePart(f); for (let k = 0; k < 200 && kind && p.kind !== kind; k++) p = makePart(f); const F = addFloat(p, r.x + Math.cos(r.h) * r.pickX, r.z + Math.sin(r.h) * r.pickX); F.h = -r.h; if (!r.forage) { r.plan = [FC, FP, f]; r.forage = { t: 0 }; } startPick(r, F); return p.name; },
-  DIR, CINE, director, armTest, dbg: { DEX, ikArm, dexFK, dexPen, rackPos, babyPt, armDims, setKit, shapeOf, newArm, pocketOf, makePart, floorY, tW, faceX, V3: THREE.Vector3, segSecs, quiltSeg, qShape }, clear: () => { robots.forEach(disposeRobot); robots = []; [...loose].forEach(disposeLoose); loose = []; floats = []; pickable.length = 0; } };
+  DIR, CINE, director, armTest, dbg: { DEX, ikArm, dexFK, dexPen, rackPos, babyPt, armDims, setKit, shapeOf, newArm, pocketOf, makePart, floorY, tW, faceX, V3: THREE.Vector3, segSecs, quiltSeg, qShape, prof: (n = 30, dt = 1 / 60) => { const gl = R3.r.getContext(), px = new Uint8Array(4), T = { step: 0, scene: 0, dir: 0, render: 0, diag: 0 }, now = () => performance.now();
+    for (let i = 0; i < n; i++) { let t = now(); step(dt); T.step += now() - t; t = now(); U.uTime.value += dt; updateScene(dt); T.scene += now() - t; t = now(); director(dt); R3.ctl.update(); updateLights(dt); T.dir += now() - t;
+      t = now(); R3.r.info.autoReset = false; R3.r.info.reset(); R3.r.shadowMap.needsUpdate = true; cineRender(performance.now() / 1000, dt); R3.r.info.autoReset = true; gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); T.render += now() - t; t = now(); drawDiagram(dt); labels(); T.diag += now() - t; }
+    for (const k in T) T[k] = +(T[k] / n).toFixed(2); T.calls = R3.r.info.render.calls; T.tris = R3.r.info.render.triangles; return T; } }, clear: () => { robots.forEach(disposeRobot); robots = []; [...loose].forEach(disposeLoose); loose = []; floats = []; pickable.length = 0; } };
 </script>
 </body></html>
