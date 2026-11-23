@@ -42,3 +42,4 @@
 .org-doc .block:has(.ref-entry) { grid-template-columns:minmax(0,1fr); row-gap:1.25rem; }
 .org-doc .refs .ref-text { color:var(--ink); font-size:1rem; line-height:1.5; }
 .org-doc .refs .ref-credit, .org-doc .refs .ref-credit a { color:#bcb9b2; }
+.org-doc .ref-entry > .ref-text:only-child { grid-column: 1 / -1; }
