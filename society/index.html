@@ -1635,6 +1635,12 @@ function planRings(geo) { const U = geo.userData; if (U.planR) return U.planR; c
 const PLANV = { k: 0, cx: 0, cy: 0 }, planP = (x, z) => [PLANV.cx + x * PLANV.k, PLANV.cy + z * PLANV.k];
 function planFit() { const cb = cv.getBoundingClientRect(), top = $(".cap").getBoundingClientRect().bottom - cb.top + 40, bot = $("#ev").getBoundingClientRect().top - cb.top - 18, left = 24, right = DG.w - 24;
   const hx = TX + 0.3, hz = TZ + 0.3, k = Math.max(5, Math.min((right - left) / (2 * hx), (bot - top) / (2 * hz))); PLANV.k = k; PLANV.cx = (left + right) / 2; PLANV.cy = Math.max(top + hz * k, (top + bot) / 2); }
+function planArr(A, nb) { let x0 = 1e9, x1 = -1e9; for (let i = 0; i < A.length; i += 3) { x0 = Math.min(x0, A[i]); x1 = Math.max(x1, A[i]); } const a = new Float32Array(nb + 1).fill(-1);
+  for (let i = 0; i < A.length; i += 3) { const k = Math.round((A[i] - x0) / (x1 - x0 || 1) * nb); a[k] = Math.max(a[k], Math.abs(A[i + 2])); } const out = []; for (let k = 0; k <= nb; k++) if (a[k] >= 0) out.push([x0 + (x1 - x0) * k / nb, 0, a[k]]); return out; }
+// the DexArm in plan: base, shoulder, elbow, wrist and tool point as thin links, a small circle for the base
+function planArm(r, f, g) { const q = r.arm.q, A = DEX, rad = [0, A.SF, A.SF + A.L1 * Math.sin(q[1]), dexWrist(q)[0], dexWrist(q)[0] + A.STEM_F], P = rad.map((rr) => f(r.B0[0] + rr * Math.cos(q[0]), -rr * Math.sin(q[0])));
+  const tp = dexFK(r, q, r.arm.tool, r.arm.psi); P.push(f(tp[0], tp[2])); g.lineWidth = 0.6; g.beginPath(); let first = true; for (const p of P) { if (!p) continue; if (first) { g.moveTo(p[0], p[1]); first = false; } else g.lineTo(p[0], p[1]); } g.stroke();
+  const c = P[0], e = f(r.B0[0] + 0.05, 0); if (c && e) { g.beginPath(); g.arc(c[0], c[1], Math.hypot(e[0] - c[0], e[1] - c[1]), 0, 7); g.stroke(); } g.lineWidth = 0.8; }
 function drawPlan(g) { planFit(); const W = planP; g.fillStyle = "#0b0b0c"; g.fillRect(0, 0, DG.w, DG.h);
   const poly = (pts, close = true) => { let first = true; g.beginPath(); for (const q of pts) { if (!q) { first = true; continue; } if (first) { g.moveTo(q[0], q[1]); first = false; } else g.lineTo(q[0], q[1]); } if (close) g.closePath(); g.stroke(); };
   const ln = (a, b) => { if (a && b) { g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke(); } };
@@ -1644,8 +1650,12 @@ function drawPlan(g) { planFit(); const W = planP; g.fillStyle = "#0b0b0c"; g.fi
   g.strokeStyle = "rgba(232,231,226,0.85)"; g.lineWidth = 0.8;
   for (const r of robots) { const c = Math.cos(r.h), s = Math.sin(r.h), f = (x, z) => W(r.x + x * c - z * s, r.z + x * s + z * c), st = planRings(r.mesh.geometry);
     outline(st, f); const m = st[st.length - 1]; ln(f(m[0], -m[1]), f(m[0], m[1]));      // the mouth
+    if (r.baby) { const b = r.baby, U = b.userData, born = r.birthT > 0, A = born ? b.geometry.attributes.position.array : b.geometry.morphAttributes.position[0].array, ox = born ? 0 : BABYX, pts = planArr(A, 28);      // the newborn: the folded pack while it is printed, then the newborn as it opens, dashed
+      g.setLineDash([2, 2]); outline(pts.map(([x, a0, a1]) => [x + ox, a1]), f); g.setLineDash([]); }
+    if (r.tail && DEX.data) planArm(r, f, g);
     if (r.tail) { const x = -r.s.Lh / 2, k = st.reduce((b, q) => Math.abs(q[0] - x) < Math.abs(b[0] - x) ? q : b, st[0]); g.setLineDash([3, 3]); ln(f(x, -k[1]), f(x, k[1])); g.setLineDash([]); } }      // the docking line
-  for (const T of loose) { const c = Math.cos(T.h), s = Math.sin(T.h), ox = T.mesh.position.x, f = (x, z) => W(T.x + (x + ox) * c - z * s, T.z + (x + ox) * s + z * c); outline(planBin(T.mesh.geometry), f); }
+  for (const T of loose) { const c = Math.cos(T.h), s = Math.sin(T.h), ox = T.mesh.position.x, f = (x, z) => W(T.x + (x + ox) * c - z * s, T.z + (x + ox) * s + z * c); outline(planBin(T.mesh.geometry), f);
+    if (T.arm && T.B0 && DEX.data && (T.job || T.hold || T.arm.on)) { const fo = (x, z) => W(T.x + (x + (T.ox || 0)) * c - z * s, T.z + (x + (T.ox || 0)) * s + z * c); planArm(T, fo, g); } }
   for (const S of segs) { const c = Math.cos(S.h), s = Math.sin(S.h); let geo = null; S.mesh.traverse((o) => { if (!geo && o.isMesh) geo = o.geometry; }); if (!geo) continue; outline(planBin(geo), (x, z) => W(S.x + x * c - z * s, S.z + x * s + z * c)); }
   if (DEX.mod) for (const M of mods) { if (M.st === "held") continue; const Wm = modW(M), pl = DEX.mod[M.m].cg.userData.plan, f = (q) => { _V.set(q[0], 0, q[1]).applyMatrix4(Wm); return W(_V.x, _V.z); };
     g.lineWidth = 0.7; poly(pl[0].map(f)); g.lineWidth = 0.5; poly(pl[1].map(f)); }      // the module at its waterline and the outer edge of its foam collar
