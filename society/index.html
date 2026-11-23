@@ -81,7 +81,7 @@ html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
       <h3>Function diversity, distinct kits</h3><canvas class="spark" id="sp3"></canvas>
       <h3>Mean tiles per body</h3><canvas class="spark" id="sp4"></canvas></div>
     <div><h3>Selected</h3><div id="insp" class="note">Click a robot in the tank.</div></div>
-    <div><h3>Rules</h3><p class="note">The parts are real small electronic parts at their true size. Core, Store and most Link and Sense parts are Bergsonne style tiles: sealed, on one pad layout and one I2C/I3C bus, T44 is 4 x 4 mm and T48 is 4 x 8 mm, 1 to 2 mm tall. Sense also has camera modules and MEMS microphones, Drive has coin and pager motors, Link has chip antennas, Power has LiPo pouch cells and coin cells, Display has single LEDs. Every part differs a little in size. Each floats in a thin pale collar 3 mm wider than the part on each side, just enough to keep it at the surface, and carries a small steel disc for the electromagnet. Parts smaller than 8 mm are drawn at 8 mm so they can be seen; all others are drawn at true size, so from the whole tank they are nearly invisible. A fixed set is scattered on the water at the start and nothing arrives later; parts shed in swaps go back onto the water.</p>
+    <div><h3>Rules</h3><p class="note">The parts are real small electronic parts at their true size. Core, Store and most Link and Sense parts are Bergsonne style tiles: sealed, on one pad layout and one I2C/I3C bus, T44 is 4 x 4 mm and T48 is 4 x 8 mm, 1 to 2 mm tall. Sense also has camera modules and MEMS microphones, Drive has coin and pager motors, Link has chip antennas, Power has LiPo pouch cells and coin cells, Display has single LEDs. Every part differs a little in size. Each floats in a thin pale collar 3 mm wider than the part on each side, just enough to keep it at the surface, and carries a small steel disc for the electromagnet. A part set into a wall pocket sits flush with the outer skin in a small clear printed window, drawn with a thin pale rim. Parts smaller than 8 mm are drawn at 8 mm so they can be seen; all others are drawn at true size, so from the whole tank they are nearly invisible. A fixed set is scattered on the water at the start and nothing arrives later; parts shed in swaps go back onto the water.</p>
       <p class="note">The idea follows von Neumann's kinematic machine, which picks its parts from a lake of parts, and the digital materials of MIT's Center for Bits and Atoms, robots assembled from a small set of parts that join and come apart. It also follows Robot Metabolism, machines that grow by taking in parts from around them, and Print &amp; Place, where parts are set into a print while it is being made.</p>
       <p class="note">The arm has its base in the tail: a yaw joint turns its working plane toward the target, then two links and a short tool. At rest it lies folded on the floor of the head. A robot swims until the part is at its mouth, which sits at the waterline, and stops. The arm reaches out through the mouth, sets the magnet on the part, lifts it just clear of the water, draws it straight back along the body through the opening, and lays it on a rack on the floor of the head. Every mouth is at least wide enough for the largest part; where a genome's mouth would be smaller, the nose drops less and the snout widens. The arm plans each move so that it and what it holds stay inside the shell. Only a robot holding a tail can pick.</p>
       <p class="note">What the parts do. Core is needed to be alive, so no newborn is born without one. Power is needed too; a bigger cell holds more energy, and each extra Power lowers the idle drain. Sense sets how far it notices parts: 1 m with none, 0.6 m more for each. Drive sets swim speed. Link is a radio: robots with Link that relate share what they see and count each other from farther away. Store sets how many memory traces a body holds and passes on. Display is a small light, so others notice it a little more. Bodies charge in the pools of light.</p>
@@ -401,7 +401,7 @@ const kitText = (kit) => kit.map((t) => FAM[t.f]).join(", ");
 const cellCap = (p) => p.kind === "lipo" ? 0.3 + 0.5 * (p.l * p.w * p.h) / (0.03 * 0.02 * 0.005) : 0.3 + 0.15 * p.l / 0.02;
 function abilities(r) { const n = r.kn; let cap = 0.7; for (const p of r.kit) if (p.f === FP) cap += cellCap(p);
   return { sense: 1.0 + 0.6 * n[FS], speed: 0.11 + 0.05 * r.g[4] + 0.045 * n[FD], ecap: Math.max(1, cap), drain: 0.016 / (1 + 0.4 * Math.max(0, n[FP] - 1)), mem: 4 + 2 * n[FT], link: n[FL] > 0, disp: n[FY] }; }
-function setKit(r, kit) { r.kit = kit; r.kn = kitN(kit); r.ab = abilities(r); r.pk = kit.map((p, i) => pocketOf(r.s, p, i, 0.95)); if (r.memory && r.memory.length > r.ab.mem) { r.need[FT] += 0.3 * (r.memory.length - r.ab.mem); r.memory = r.memory.slice(0, r.ab.mem); } }
+function setKit(r, kit) { r.kit = kit; r.kn = kitN(kit); r.ab = abilities(r); r.pk = kit.map((p, i) => pocketOf(r.s, p, i, 1.0)); if (r.memory && r.memory.length > r.ab.mem) { r.need[FT] += 0.3 * (r.memory.length - r.ab.mem); r.memory = r.memory.slice(0, r.ab.mem); } }
 // where part i of a kit sits: thin parts in a wall pocket, in a loose band around the head just under the skin; thick parts on an inner ledge low in the head
 function pocketOf(s, p, i, k) {
   if (thick(p)) { const x = -s.Lh / 2 + s.Lh * (0.38 + 0.09 * (i % 4)), side = i % 2 ? 1 : -1, y = -0.66 * s.B;
@@ -424,7 +424,7 @@ function shellF(s, tail, x, y, z) { const x0 = -s.Lh / 2, xf = s.Lh / 2 + s.Ln; 
 const penAt = (s, tail, x, y, z, rad) => { const f = shellF(s, tail, x, y, z); return f === 0 ? 0 : Math.max(0, (f - 1) * SH.m + rad); };
 const waterY = (s) => -0.1 * s.B;                               // the waterline in the body's own frame
 function armDims(r) { const s = r.s, fr = s.Lh / 2 + s.Ln, bx = -s.Lh / 2, by = -0.6 * s.B, L3 = 0.045 + 0.5 * s.Ln, yl = waterY(s) + 0.016;
-  const need = Math.hypot(fr + 0.02 - L3 - bx, yl - by); r.armL = [0.56 * need + 0.01, 0.56 * need + 0.01, L3]; r.armB = [bx, by]; if (r.arm && !r.arm.cur) { r.arm.a = REST.slice(); r.arm.p = restTip(r); r.arm.th = 0; r.arm.el = -1; } if (r.kit) r.pk = r.kit.map((p, i) => pocketOf(s, p, i, 0.95)); }
+  const need = Math.hypot(fr + 0.02 - L3 - bx, yl - by); r.armL = [0.56 * need + 0.01, 0.56 * need + 0.01, L3]; r.armB = [bx, by]; if (r.arm && !r.arm.cur) { r.arm.a = REST.slice(); r.arm.p = restTip(r); r.arm.th = 0; r.arm.el = -1; } if (r.kit) r.pk = r.kit.map((p, i) => pocketOf(s, p, i, 1.0)); }
 // the rack: parts eaten and not yet built in lie in a row on the floor of the head, to one side, each in its own slot
 function rackPos(r, i, p = r.nk[i]) { let x = -0.03 * r.s.Lh / 0.25; for (let k = 0; k < i; k++) x += (r.nk[k] ? Math.max(r.nk[k].l, VMIN) : 0.008) + 2 * COLLAR + 0.004;
   return [x + (p ? Math.max(p.l, VMIN) / 2 + COLLAR : 0.006), -0.55 * r.s.B, -0.26 * r.s.A]; }
@@ -835,6 +835,8 @@ function drawPart(Mb, p, col) { const l = Math.max(p.l, VMIN), w = Math.max(p.w,
   if (col) { if (p.sh === "disc") emitCyl(Mb, 0, -h / 2 - 0.001, 0, l + 2 * COLLAR, 0.002, false, COL.collar); else emitBox(Mb, 0, -h / 2 - 0.001, 0, l + 2 * COLLAR, 0.002, w + 2 * COLLAR, COL.collar); }
   if (p.sh === "box") emitBox(Mb, 0, 0, 0, l, h, w, p.c); else if (p.sh === "disc") emitCyl(Mb, 0, 0, 0, l, h, false, p.c); else emitCyl(Mb, 0, 0, 0, w, l, true, p.c);
   if (p.lens) emitCyl(Mb, 0, h / 2 + 0.0008, 0, p.lens, 0.0016, false, COL.lens); }
+// a part built into a body: in a wall pocket it sits flush with the outer surface in a small clear printed window, drawn as a thin pale rim, so it reads on every head, clear or frosted
+function drawEmbedded(Mb, p, ledge) { if (!ledge) emitBox(Mb, 0, -p.h / 2 + 0.0002, 0, Math.max(p.l, VMIN) + 0.004, 0.0006, Math.max(p.w, VMIN) + 0.004, 0xf6f5f0); drawPart(Mb, p, false); }
 const frameAt = (M, x, y, z, rx) => { _q.setFromAxisAngle(AX, rx); _l.compose(_p.set(x, y, z), _q, _s.set(1, 1, 1)); return _b.multiplyMatrices(M, _l); };
 function updateScene(dtReal) {
   const t = U.uTime.value;
@@ -847,7 +849,7 @@ function updateScene(dtReal) {
     const swell = r.carry ? 1 + 0.06 * sstep(0.6, 1, r.carry) + 0.05 * Math.sin(r.birthT * Math.PI) : 1; r.mesh.scale.set(1, swell, swell);
     const M = r.grp.matrix;
     // its own kit: thin parts in wall pockets, a loose band around the head; thick parts on the inner ledge
-    for (let i = 0; i < r.kit.length; i++) { const q = r.pk[i]; drawPart(frameAt(M, q.x, q.y * swell, q.z * swell, q.rx), r.kit[i], false); }
+    for (let i = 0; i < r.kit.length; i++) { const q = r.pk[i]; drawEmbedded(frameAt(M, q.x, q.y * swell, q.z * swell, q.rx), r.kit[i], q.ledge); }
     if (r.ab.disp) { _p.set(-r.s.Lh * 0.1, r.s.B * swell * 1.02, 0).applyMatrix4(M); led.set([_p.x, _p.y, _p.z], nd * 3); nd++; }
     // the newborn inside: printed bottom up with pauses, then a little air, then pushed out through the mouth
     let w = 0, bx = 0, by = 0;
@@ -865,7 +867,7 @@ function updateScene(dtReal) {
     }
     // the stock: parts eaten and not yet built in, each on its slot of the rack on the floor of the head
     for (let i = 0; i < r.nk.length; i++) { const k = r.nk[i]; if (k === r.arm.hold) continue;
-      if (k.inBaby && r.babySpec && r.babySpec.pocket) { const q = r.babySpec.pocket[i], sx = 1 - 0.6 * w, sy = 1 - 0.56 * w; drawPart(frameAt(M, bx + q.x * sx, by + q.y * sy, q.z * sy, q.rx), k, false); }
+      if (k.inBaby && r.babySpec && r.babySpec.pocket) { const q = r.babySpec.pocket[i], sx = 1 - 0.6 * w, sy = 1 - 0.56 * w; drawEmbedded(frameAt(M, bx + q.x * sx, by + q.y * sy, q.z * sy, q.rx), k, q.ledge); }
       else { const rp = rackPos(r, i); emitBox(M, rp[0], rp[1], rp[2], Math.max(k.l, VMIN) + 2 * COLLAR + 0.004, 0.003, 0.03, 0xd4d2cc); drawPart(frameAt(M, rp[0], rp[1] + 0.0035 + k.h / 2, rp[2], 0), k, true); } }
     if (r.forage && !r.nk.length) { const rp = rackPos(r, 0, { l: 0.008 }); emitBox(M, rp[0], rp[1], rp[2], 0.016, 0.003, 0.03, 0xd4d2cc); }
     // the arm: always drawn while it works; at rest it lies folded on the floor of the head
