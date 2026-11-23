@@ -19,8 +19,8 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); 
 .hud b { color: var(--ink); font-weight: 500; }
 .ev { position: absolute; left: 16px; bottom: 12px; pointer-events: none; font: 11px/1.6 var(--mono); color: #8d8c86; text-shadow: 0 0 5px #000; }
 .ev div:last-child { color: var(--ink); }
-.tg { position: absolute; left: 0; top: 0; pointer-events: none; transform: translate(-50%, -100%); font: 500 9.5px/1 var(--mono); letter-spacing: .09em; text-transform: uppercase; color: rgb(255 255 255 / 78%); text-shadow: 0 0 5px #000, 0 0 2px #000; white-space: nowrap; padding-bottom: 12px; }
-.tg::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 1px; height: 9px; background: rgb(255 255 255 / 42%); }
+.tg { position: absolute; left: 0; top: 0; pointer-events: none; transform: translate(-50%, -100%); font: 500 8.5px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: rgb(255 255 255 / 58%); text-shadow: 0 0 4px #000; white-space: nowrap; padding-bottom: 7px; }
+.tg::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 1px; height: 5px; background: rgb(255 255 255 / 30%); }
 .views { position: absolute; right: 12px; top: 12px; display: flex; gap: 2px; }
 aside { border-left: 1px solid var(--line); background: var(--panel); overflow-y: auto; padding: 12px 12px 40px; display: flex; flex-direction: column; gap: 16px; }
 aside h3 { margin: 0 0 7px; font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
@@ -126,7 +126,7 @@ function initThree() {
   const ctl = new THREE.OrbitControls(cam, cv); ctl.target.set(0, 0.0, 0); ctl.enableDamping = true; ctl.dampingFactor = 0.08; ctl.maxPolarAngle = Math.PI * 0.49; ctl.minDistance = 1.2; ctl.maxDistance = 26;
   Object.assign(R3, { r, sc, cam, ctl });
   // lights: nine small fixed spots straight down, a weak hemisphere for the room
-  R3.spots = LAMPS.map((L) => { const sp = new THREE.SpotLight(0xfff4e6, 1.05, 0, SPOT_A * 1.05, 0.85, 0); sp.position.copy(L); sp.target.position.set(L.x, 0, L.z);
+  R3.spots = LAMPS.map((L) => { const sp = new THREE.SpotLight(0xfff4e6, 0.85, 0, SPOT_A * 1.02, 0.7, 0); sp.position.copy(L); sp.target.position.set(L.x, 0, L.z);
     sc.add(sp); sc.add(sp.target); return sp; });
   // sixteen shadow maps would be too many; one soft light from straight above casts the shadows for all of them
   const sh = new THREE.DirectionalLight(0xfff4e6, 0.35); sh.position.set(0.3, 6, 0.4); sh.castShadow = true; sh.shadow.mapSize.set(2048, 2048);
@@ -159,40 +159,50 @@ float printH(vec3 p, vec4 t) {
   if (ty < 4.5) { vec2 q = vec2(p.x + p.z * 0.7, p.y) / (k * 1.6); vec2 f = fract(q) - 0.5; return 1.0 - smoothstep(0.15, 0.42, length(f)); }   // dimples
   return 0.0;                                                                           // smooth
 }
+float vnz(vec3 p) { vec3 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); float n = dot(i, vec3(1.0, 57.0, 113.0));
+  vec4 a = fract(sin(vec4(n, n + 1.0, n + 57.0, n + 58.0)) * 43758.5453), b = fract(sin(vec4(n + 113.0, n + 114.0, n + 170.0, n + 171.0)) * 43758.5453);
+  vec4 m = mix(a, b, f.z); vec2 q = mix(m.xy, m.zw, f.y); return mix(q.x, q.y, f.x); }
+float grainF(vec3 p) { return 0.6 * vnz(p * 60.0) + 0.4 * vnz(p * 420.0); }
 vec3 bumpN(vec3 sp, vec3 n, vec2 dH, float fd) { vec3 sx = dFdx(sp), sy = dFdy(sp); vec3 r1 = cross(sy, n), r2 = cross(n, sx); float det = dot(sx, r1) * fd; vec3 g = sign(det) * (dH.x * r1 + dH.y * r2); return normalize(abs(det) * n - g); }
 ` + fs;
-      fs = fs.replace("#include <color_fragment>", "#include <color_fragment>\n" + (opt.sil ? "diffuseColor.a = vSil.x;\n" : ""));
+      fs = fs.replace("#include <color_fragment>", "#include <color_fragment>\n" + (opt.sil ? "diffuseColor.a = vSil.x;\n" : "") + `{ float gF = 1.0 - smoothstep(0.0004, 0.002, fwidth(vObj.x)); diffuseColor.rgb *= 1.0 + ${opt.grain ?? "0.05"} * (grainF(vObj) - 0.5) * 2.0 * gF; }\n`);      // a fine grain of the print, only when near
       fs = fs.replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\n" + (opt.sil ? "roughnessFactor = vSil.y;\n" : ""));
       fs = fs.replace("#include <normal_fragment_maps>", `#include <normal_fragment_maps>
   float pH = printH(vObj, vTex); float fade = 1.0 - smoothstep(0.06, 0.22, fwidth(vObj.y / vTex.y) + fwidth(vObj.x / vTex.y));
   float hh = pH * vTex.z * fade; normal = bumpN(-vViewPosition, normal, vec2(dFdx(hh), dFdy(hh)), faceDirection);
   diffuseColor.rgb *= 1.0 - 0.1 * (1.0 - pH) * fade * step(0.001, vTex.z);`);
     }
+    // light passing through: from the lamps above, the clear silicone glows on the side turned away, and the clay wraps the light a little round its form
+    if (opt.sss) fs = fs.replace("#include <lights_fragment_end>", `#include <lights_fragment_end>
+ { vec3 Lv = normalize((viewMatrix * vec4(0.0, 1.0, 0.0, 0.0)).xyz); float nl = dot(normal, Lv); float sk = spotK(vWP);
+   float back = clamp(0.45 - 0.65 * nl, 0.0, 1.0), wrap = clamp((nl + 0.5) / 1.5, 0.0, 1.0) - clamp(nl, 0.0, 1.0);
+   reflectedLight.directDiffuse += diffuseColor.rgb * sk * (${opt.sss} * back + 0.22 * wrap); }`);
     if (opt.caus) fs = fs.replace("#include <lights_fragment_end>", "#include <lights_fragment_end>\n reflectedLight.directDiffuse *= 0.7 + 0.45 * causK(vWP.xz, uTime) * step(vWP.y, uWL);");
     let tail = `{ float dW = vWP.y - uWL; float fw = max(fwidth(dW), 1e-4);
       float und = smoothstep(0.002, -0.02, dW);
       gl_FragColor.rgb *= mix(vec3(1.0), vec3(0.50, 0.57, 0.62), und * (0.55 + 0.45 * smoothstep(0.0, 0.35, -dW)));
       gl_FragColor.rgb += vec3(0.75, 0.82, 0.86) * (1.0 - smoothstep(0.6, 1.8, abs(dW) / fw)) * (0.10 + 0.5 * spotK(vWP)) * ${opt.line ?? "1.0"}; }`;
-    if (opt.fres) tail += `{ vec3 nV = normalize(normal); float fr = pow(1.0 - abs(dot(nV, normalize(vViewPosition))), 3.0); gl_FragColor.a = clamp(gl_FragColor.a + fr * ${opt.fres}, 0.0, 1.0); }`;
+    if (opt.fres) tail += `{ vec3 nV = normalize(normal); float fr = pow(1.0 - abs(dot(nV, normalize(vViewPosition))), 3.0); gl_FragColor.a = clamp(gl_FragColor.a + fr * ${opt.fres}, 0.0, 1.0); gl_FragColor.rgb += vec3(0.85, 0.9, 0.95) * fr * (0.02 + 0.12 * spotK(vWP)); }`;
+    if (opt.rim) tail += `{ float fr = pow(1.0 - abs(dot(normalize(normal), normalize(vViewPosition))), 4.0); gl_FragColor.rgb += vec3(0.8, 0.85, 0.9) * fr * ${opt.rim} * (0.05 + spotK(vWP)); }`;
     sh.fragmentShader = fs.replace("#include <output_fragment>", "#include <output_fragment>\n" + tail);
   };
   m.customProgramCacheKey = () => "wa2" + JSON.stringify(opt);
   return m;
 }
 const MAT = {
-  clay: waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xe4e2dc), roughness: 0.62, metalness: 0, vertexColors: true }), { print: true }),
+  clay: waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xe4e2dc), roughness: 0.62, metalness: 0, vertexColors: true }), { print: true, sss: "0.12", grain: "0.06", rim: "0.08" }),
   // the head is printed silicone: translucent and milky, not glass; how clear and how frosted varies by print
-  shell: waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xf1efe9), roughness: 0.45, metalness: 0, transparent: true, opacity: 0.55, depthWrite: false, vertexColors: true, side: THREE.DoubleSide }), { fres: "0.22", line: "0.7", print: true, sil: true }),
+  shell: waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xf1efe9), roughness: 0.45, metalness: 0, transparent: true, opacity: 0.55, depthWrite: false, vertexColors: true, side: THREE.DoubleSide }), { fres: "0.22", line: "0.7", print: true, sil: true, sss: "0.55", grain: "0.035" }),
   mouth: waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0x8a8a8c), roughness: 0.45, metalness: 0, side: THREE.DoubleSide })),
 };
 
 function buildRoom() {
   const sc = R3.sc;
   const std = (c, rough) => new THREE.MeshStandardMaterial({ color: c, roughness: rough, metalness: 0 });
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), std(0x2c2c2e, 0.9)); floor.rotation.x = -Math.PI / 2; floor.position.y = -PLINTH - GL; floor.receiveShadow = true; sc.add(floor);
-  const pl = new THREE.Mesh(new THREE.BoxGeometry(2 * TX - 0.1, PLINTH - GL, 2 * TZ - 0.1), std(0x141416, 0.7)); pl.position.y = -GL - (PLINTH - GL) / 2; pl.castShadow = true; pl.receiveShadow = true; sc.add(pl);
-  const base = new THREE.Mesh(new THREE.BoxGeometry(2 * TX + 2 * GL, GL, 2 * TZ + 2 * GL), std(0x121214, 0.8)); base.position.y = -GL / 2; sc.add(base);
-  const tf = new THREE.Mesh(new THREE.PlaneGeometry(2 * TX, 2 * TZ), waterAware(new THREE.MeshStandardMaterial({ color: 0x5c5c5f, roughness: 0.92 }), { caus: true, line: "0.0" }));
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), std(0x0d0d0e, 0.9)); floor.rotation.x = -Math.PI / 2; floor.position.y = -PLINTH - GL; floor.receiveShadow = true; sc.add(floor);
+  const pl = new THREE.Mesh(new THREE.BoxGeometry(2 * TX - 0.1, PLINTH - GL, 2 * TZ - 0.1), std(0x0a0a0b, 0.7)); pl.position.y = -GL - (PLINTH - GL) / 2; pl.castShadow = true; pl.receiveShadow = true; sc.add(pl);
+  const base = new THREE.Mesh(new THREE.BoxGeometry(2 * TX + 2 * GL, GL, 2 * TZ + 2 * GL), std(0x0b0b0c, 0.8)); base.position.y = -GL / 2; sc.add(base);
+  const tf = new THREE.Mesh(new THREE.PlaneGeometry(2 * TX, 2 * TZ), waterAware(new THREE.MeshStandardMaterial({ color: 0x2a2a2d, roughness: 0.92 }), { caus: true, line: "0.0" }));
   tf.rotation.x = -Math.PI / 2; tf.position.y = 0.001; tf.receiveShadow = true; sc.add(tf);
   // glass: faint walls and bright edges
   const glass = new THREE.ShaderMaterial({ uniforms: Object.assign({}, U), transparent: true, depthWrite: false, side: THREE.DoubleSide,
@@ -232,8 +242,8 @@ function buildWater() {
         for (int i = 0; i < ${NL}; i++) { vec3 L = normalize(uLamps[i] - vW); vec3 H = normalize(L + V); float k = smoothstep(uCos.x, uCos.y, -normalize(vW - uLamps[i]).y); sp += pow(max(dot(n, H), 0.0), 600.0) * k * 9.0 + pow(max(dot(n, H), 0.0), 60.0) * k * 0.25; }
         float ring = 0.0; for (int i = 0; i < 10; i++) { vec4 r = uRip[i]; float age = uTime - r.z; if (age < 0.0 || age > 6.0) continue;
           float x = length(vW.xz - r.xy) - 0.35 * age; ring += r.w * exp(-x * x * 900.0) * exp(-age * 0.6); }
-        vec3 c = vec3(0.40, 0.47, 0.52) * (0.02 + 0.13 * s) + vec3(0.80, 0.86, 0.90) * fr * (0.07 + 0.24 * s) + vec3(1.0) * sp + vec3(0.7, 0.8, 0.86) * ring * (0.25 + s);
-        gl_FragColor = vec4(c, clamp(0.10 + 0.42 * fr + 0.06 * s + sp + ring * 0.4, 0.0, 1.0));
+        vec3 c = vec3(0.40, 0.47, 0.52) * (0.004 + 0.05 * s) + vec3(0.80, 0.86, 0.90) * fr * (0.03 + 0.14 * s) + vec3(1.0) * sp + vec3(0.7, 0.8, 0.86) * ring * (0.25 + s);
+        gl_FragColor = vec4(c, clamp(0.22 + 0.42 * fr + 0.06 * s + sp + ring * 0.4, 0.0, 1.0));      // a darker, denser surface: the floor shows through less
         #include <tonemapping_fragment>
         #include <encodings_fragment>
       }` });
@@ -242,7 +252,7 @@ function buildWater() {
 }
 function buildBeam() {
   const geo = new THREE.ConeGeometry(1, 1, 64, 1, true); geo.translate(0, -0.5, 0);      // apex at the origin, opening downward
-  const m = new THREE.ShaderMaterial({ uniforms: { uI: { value: 0.06 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+  const m = new THREE.ShaderMaterial({ uniforms: { uI: { value: 0.035 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
     vertexShader: `varying float vH; varying vec3 vN; varying vec3 vV; void main() { vH = -position.y; vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position, 1.0); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }`,
     fragmentShader: `uniform float uI; varying float vH; varying vec3 vN; varying vec3 vV;
       void main() { float rim = pow(abs(dot(normalize(vN), normalize(vV))), 2.2); float a = uI * rim * (1.0 - 0.75 * vH) * smoothstep(0.0, 0.06, vH) * smoothstep(1.0, 0.92, vH);
@@ -285,30 +295,49 @@ void main() { float zc = dist(vUv), cc = coc(zc); vec3 acc = texture2D(tColor, v
     float zs = dist(uv); float cs = coc(zs); if (zs > zc) cs = min(cs, cc * 2.0);
     float m = smoothstep(r - 0.5, r + 0.5, cs); acc += mix(acc / tot, texture2D(tColor, uv).rgb, m); tot += 1.0; }
   gl_FragColor = vec4(acc / tot, 1.0); }`, { tColor: { value: null }, tDepth: { value: null }, uPx: { value: new THREE.Vector2() }, uFocus: { value: 2 }, uAp: { value: 0.2 }, uMaxR: { value: 4 }, uNear: { value: 0.05 }, uFar: { value: 120 } });
-  C.pre = fsMat("uniform sampler2D tColor; uniform float uExp; varying vec2 vUv; void main() { vec3 c = min(texture2D(tColor, vUv).rgb * uExp, vec3(24.0)); float br = max(c.r, max(c.g, c.b)); float w = clamp(br - 0.85, 0.0, 0.7); w = w * w / 1.4; gl_FragColor = vec4(c * max(w, br - 1.2) / max(br, 1e-4), 1.0); }", { tColor: { value: null }, uExp: { value: 1 } });
+  // light in the air and in the water, after the printing simulator: march each pixel's ray through the dusty air under the lamp grid and through the tank water, where slow shafts move
+  C.haze = fsMat(`uniform sampler2D tDepth; uniform mat4 uPI; uniform mat4 uCW; uniform vec3 uCam; uniform float uAir; uniform float uWat; uniform float uTime; uniform vec2 uCos; varying vec2 vUv;
+vec2 boxT(vec3 ro, vec3 rd, vec3 a, vec3 b) { vec3 t0 = (a - ro) / rd, t1 = (b - ro) / rd; vec3 mn = min(t0, t1), mx = max(t0, t1); return vec2(max(max(mn.x, mn.y), mn.z), min(min(mx.x, mx.y), mx.z)); }
+float ign(vec2 p) { return fract(52.9829189 * fract(dot(p, vec2(0.06711056, 0.00583715)))); }
+float lampK(vec3 p) { float lx = clamp(floor((p.x + 3.4) / 1.7), 0.0, 3.0) * 1.7 - 2.55, lz = clamp(floor((p.z + 3.0) / 1.5), 0.0, 3.0) * 1.5 - 2.25;
+  vec3 d = p - vec3(lx, ${LH.toFixed(2)}, lz); return smoothstep(uCos.x, uCos.y, -d.y / length(d)); }
+float shaftW(vec2 p, float t) { float a = sin(7.0 * p.x + 3.1 * p.y - 0.7 * t) + sin(-4.3 * p.x + 8.2 * p.y + 0.5 * t) + sin(11.0 * p.x - 9.0 * p.y - 0.9 * t + 1.3); return smoothstep(-1.2, 2.6, a); }
+float vn(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); vec4 h = fract(sin(vec4(dot(i, vec2(127.1, 311.7)), dot(i + vec2(1.0, 0.0), vec2(127.1, 311.7)), dot(i + vec2(0.0, 1.0), vec2(127.1, 311.7)), dot(i + vec2(1.0, 1.0), vec2(127.1, 311.7)))) * 43758.5453); return mix(mix(h.x, h.y, f.x), mix(h.z, h.w, f.x), f.y); }
+void main() {
+  float d = texture2D(tDepth, vUv).x; vec4 v = uPI * vec4(vUv * 2.0 - 1.0, d * 2.0 - 1.0, 1.0); v /= v.w; vec3 wp = (uCW * vec4(v.xyz, 1.0)).xyz; vec3 rd = wp - uCam; float tS = length(rd); rd /= tS; if (d > 0.999995) tS = 80.0;
+  rd += vec3(1e-5); float j = ign(gl_FragCoord.xy); vec3 acc = vec3(0.0);
+  vec2 tw = boxT(uCam, rd, vec3(-${TX.toFixed(2)}, 0.0, -${TZ.toFixed(2)}), vec3(${TX.toFixed(2)}, ${WL.toFixed(2)}, ${TZ.toFixed(2)})); tw.x = max(tw.x, 0.0); tw.y = min(tw.y, tS);
+  if (tw.y > tw.x) { float dt = (tw.y - tw.x) / 14.0;
+    for (int i = 0; i < 14; i++) { vec3 p = uCam + rd * (tw.x + (float(i) + j) * dt); float sh = shaftW(p.xz, uTime); acc += vec3(0.6, 0.85, 1.0) * lampK(p) * (0.25 + 1.6 * sh * sh) * exp(-(${WL.toFixed(2)} - p.y) * 1.6) * dt * uWat; } }
+  vec2 ta = boxT(uCam, rd, vec3(-4.4, ${WL.toFixed(2)}, -4.0), vec3(4.4, ${(LH - 0.15).toFixed(2)}, 4.0)); ta.x = max(ta.x, 0.0); ta.y = min(ta.y, tS);
+  if (ta.y > ta.x) { float dt = (ta.y - ta.x) / 16.0;
+    for (int i = 0; i < 16; i++) { vec3 p = uCam + rd * (ta.x + (float(i) + j) * dt); float dn = 0.7 + 0.6 * vn(p.xz * 1.7 + vec2(p.y * 1.3 - uTime * 0.03, uTime * 0.02)); acc += vec3(1.0, 0.96, 0.9) * lampK(p) * dn * dt * uAir * (0.25 + 0.75 * smoothstep(0.3, 3.0, p.y)); } }
+  gl_FragColor = vec4(acc, 1.0); }`, { tDepth: { value: null }, uPI: { value: new THREE.Matrix4() }, uCW: { value: new THREE.Matrix4() }, uCam: { value: new THREE.Vector3() }, uAir: { value: 0.02 }, uWat: { value: 0.022 }, uTime: U.uTime, uCos: U.uCos });
+  C.pre = fsMat("uniform sampler2D tColor; uniform sampler2D tHaze; uniform float uExp; varying vec2 vUv; void main() { vec3 c = min((texture2D(tColor, vUv).rgb + texture2D(tHaze, vUv).rgb) * uExp, vec3(24.0)); float br = max(c.r, max(c.g, c.b)); float w = clamp(br - 0.85, 0.0, 0.7); w = w * w / 1.4; gl_FragColor = vec4(c * max(w, br - 1.2) / max(br, 1e-4), 1.0); }", { tColor: { value: null }, tHaze: { value: null }, uExp: { value: 1 } });
   C.down = fsMat("uniform sampler2D t; uniform vec2 hp; varying vec2 vUv; void main() { vec3 s = texture2D(t, vUv).rgb * 4.0 + texture2D(t, vUv - hp).rgb + texture2D(t, vUv + hp).rgb + texture2D(t, vUv + vec2(hp.x, -hp.y)).rgb + texture2D(t, vUv - vec2(hp.x, -hp.y)).rgb; gl_FragColor = vec4(s / 8.0, 1.0); }", { t: { value: null }, hp: { value: new THREE.Vector2() } });
   C.up = fsMat("uniform sampler2D t; uniform vec2 hp; varying vec2 vUv; void main() { vec3 s = texture2D(t, vUv + vec2(-hp.x * 2.0, 0.0)).rgb + texture2D(t, vUv + vec2(-hp.x, hp.y)).rgb * 2.0 + texture2D(t, vUv + vec2(0.0, hp.y * 2.0)).rgb + texture2D(t, vUv + hp).rgb * 2.0 + texture2D(t, vUv + vec2(hp.x * 2.0, 0.0)).rgb + texture2D(t, vUv + vec2(hp.x, -hp.y)).rgb * 2.0 + texture2D(t, vUv + vec2(0.0, -hp.y * 2.0)).rgb + texture2D(t, vUv - hp).rgb * 2.0; gl_FragColor = vec4(s / 12.0, 1.0); }", { t: { value: null }, hp: { value: new THREE.Vector2() } }, { blending: THREE.AdditiveBlending, transparent: true });
-  C.fin = fsMat(`uniform sampler2D tColor; uniform sampler2D tBloom; uniform float uExp; uniform float uBloom; uniform float uVig; uniform float uGrainK; uniform float uT; uniform vec2 uRes; varying vec2 vUv;
+  C.fin = fsMat(`uniform sampler2D tColor; uniform sampler2D tHaze; uniform sampler2D tBloom; uniform float uExp; uniform float uBloom; uniform float uVig; uniform float uGrainK; uniform float uT; uniform vec2 uRes; varying vec2 vUv;
 vec3 fit(vec3 v) { vec3 a = v * (v + 0.0245786) - 0.000090537; vec3 b = v * (0.983729 * v + 0.4329510) + 0.238081; return a / b; }
 vec3 aces(vec3 c) { c *= 1.0 / 0.6; c = mat3(0.59719, 0.07600, 0.02840, 0.35458, 0.90834, 0.13383, 0.04823, 0.01566, 0.83777) * c; c = fit(c); c = mat3(1.60475, -0.10208, -0.00327, -0.53108, 1.10813, -0.07276, -0.07367, -0.00605, 1.07602) * c; return clamp(c, 0.0, 1.0); }
 float h21(vec2 p) { vec3 q = fract(vec3(p.xyx) * 0.1031); q += dot(q, q.yzx + 33.33); return fract((q.x + q.y) * q.z); }
 void main() { vec2 cu = vUv - 0.5; float r2 = dot(cu * vec2(1.0, uRes.y / uRes.x * 1.25), cu * vec2(1.0, uRes.y / uRes.x * 1.25));
   vec2 ca = cu * r2 * 0.003;
   vec3 c = vec3(texture2D(tColor, vUv - ca).r, texture2D(tColor, vUv).g, texture2D(tColor, vUv + ca).b);
-  c = c * uExp + texture2D(tBloom, vUv).rgb * uBloom;
+  vec2 ht = 1.0 / uRes; vec3 hz = (texture2D(tHaze, vUv + ht).rgb + texture2D(tHaze, vUv - ht).rgb + texture2D(tHaze, vUv + vec2(ht.x, -ht.y)).rgb + texture2D(tHaze, vUv + vec2(-ht.x, ht.y)).rgb) * 0.25;
+  c = (c + hz) * uExp + texture2D(tBloom, vUv).rgb * uBloom;
   c *= 1.0 - uVig * smoothstep(0.08, 0.62, r2);
   c = aces(c);
   c = mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, c));
   float g = (h21(gl_FragCoord.xy + floor(uT * 24.0) * 37.0) + h21(gl_FragCoord.xy * 0.5 + floor(uT * 24.0) * 11.0) - 1.0);
   c += g * uGrainK * (0.35 + 0.65 * (1.0 - dot(c, vec3(0.33))));
-  gl_FragColor = vec4(c, 1.0); }`, { tColor: { value: null }, tBloom: { value: null }, uExp: { value: 0.72 }, uBloom: { value: 0.16 }, uVig: { value: 0.6 }, uGrainK: { value: 0.012 }, uT: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) } });
+  gl_FragColor = vec4(c, 1.0); }`, { tColor: { value: null }, tHaze: { value: null }, tBloom: { value: null }, uExp: { value: 0.72 }, uBloom: { value: 0.16 }, uVig: { value: 0.6 }, uGrainK: { value: 0.012 }, uT: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) } });
 }
 function cineTargets(w, h) {
   const C = CINE, mk = (ww, hh, o = {}) => new THREE.WebGLRenderTarget(Math.max(2, Math.round(ww)), Math.max(2, Math.round(hh)), Object.assign({ type: C.half, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false }, o));
   if (C.w === w && C.h === h) return;
-  if (C.rt) for (const t of [C.rt.scene, C.rt.dof, ...C.rt.bloom]) if (t) { if (t.depthTexture) t.depthTexture.dispose(); t.dispose(); }
+  if (C.rt) for (const t of [C.rt.scene, C.rt.dof, C.rt.haze, ...C.rt.bloom]) if (t) { if (t.depthTexture) t.depthTexture.dispose(); t.dispose(); }
   const dt = new THREE.DepthTexture(w, h); dt.type = THREE.UnsignedIntType; dt.minFilter = dt.magFilter = THREE.NearestFilter;
-  const rt = { scene: mk(w, h, { depthBuffer: true, depthTexture: dt, samples: R3.r.capabilities.isWebGL2 && !C.low ? 4 : 0 }), dof: mk(w, h), bloom: [] };
+  const rt = { scene: mk(w, h, { depthBuffer: true, depthTexture: dt, samples: R3.r.capabilities.isWebGL2 && !C.low ? 4 : 0 }), dof: mk(w, h), haze: mk(w / 2, h / 2), bloom: [] };
   for (let i = 0, bw = w / 2, bh = h / 2; i < 6 && bw > 8 && bh > 8; i++, bw /= 2, bh /= 2) rt.bloom.push(mk(bw, bh));
   C.rt = rt; C.w = w; C.h = h;
 }
@@ -316,12 +345,14 @@ function cinePass(mat, target) { const C = CINE; C.fs.mesh.material = mat; R3.r.
 function cineRender(now, dt) {
   const C = CINE, r = R3.r, cam = R3.cam, sc = R3.sc, rt = C.rt; if (!rt) return;
   r.setRenderTarget(rt.scene); r.render(sc, cam);
+  const hz = C.haze.uniforms; hz.tDepth.value = rt.scene.depthTexture; hz.uPI.value.copy(cam.projectionMatrixInverse); hz.uCW.value.copy(cam.matrixWorld); hz.uCam.value.copy(cam.position); cinePass(C.haze, rt.haze);
   // the clear heads and the water write depth after the picture is drawn, so the depth of field takes them as surfaces
   let src = rt.scene;
   if (C.ap > 0.002 && !C.noDof) {
     r.autoClear = false; cam.layers.set(1); sc.overrideMaterial = C.depthMat; const bg = sc.background; sc.background = null; r.render(sc, cam); sc.background = bg; sc.overrideMaterial = null; cam.layers.set(0); r.autoClear = true;
     const u = C.dof.uniforms; u.tColor.value = rt.scene.texture; u.tDepth.value = rt.scene.depthTexture; u.uPx.value.set(1 / C.w, 1 / C.h); u.uFocus.value = C.focus; u.uAp.value = C.ap; u.uMaxR.value = 0.009 * C.h; u.uNear.value = cam.near; u.uFar.value = cam.far; cinePass(C.dof, rt.dof); src = rt.dof; }
   const B = rt.bloom, exp = C.fin.uniforms.uExp.value;
+  C.pre.uniforms.tHaze.value = rt.haze.texture; C.fin.uniforms.tHaze.value = rt.haze.texture;
   C.pre.uniforms.tColor.value = src.texture; C.pre.uniforms.uExp.value = exp; cinePass(C.pre, B[0]);
   for (let i = 1; i < B.length; i++) { C.down.uniforms.t.value = B[i - 1].texture; C.down.uniforms.hp.value.set(0.5 / B[i - 1].width, 0.5 / B[i - 1].height); cinePass(C.down, B[i]); }
   r.autoClear = false; for (let i = B.length - 2; i >= 0; i--) { C.up.uniforms.t.value = B[i + 1].texture; C.up.uniforms.hp.value.set(0.5 / B[i + 1].width, 0.5 / B[i + 1].height); cinePass(C.up, B[i]); } r.autoClear = true;
@@ -977,7 +1008,7 @@ function updateScene(dtReal) {
   const f = focus; tgtV.set(0, 0, 0);
   if (f) { tgtV.set(f.x, 0, f.z); if (f.phase === "touch" && f.pair) tgtV.set((f.x + f.pair.x) / 2, 0, (f.z + f.pair.z) / 2); }
   R3.lampT.lerp(tgtV, Math.min(1, dtReal * 0.9));
-  R3.hemi.intensity = 0.02 + 0.32 * P.room; R3.fill.intensity = 0.2 * P.room;
+  R3.hemi.intensity = 0.006 + 0.14 * P.room; R3.fill.intensity = 0.08 * P.room;
   // relations, drawn at the waterline
   const pa = R3.rel.geometry.attributes.position.array, ca = R3.rel.geometry.attributes.color.array; let n = 0; const cap = pa.length / 6;
   if (showRel && camMode !== "follow" && camMode !== "film") for (const r of robots) { let o = null, v = 0.5; for (const [q, w2] of r.relTo) { if (w2 > v && Math.hypot(q.x - r.x, q.z - r.z) < 1.5) { o = q; v = w2; } }      // each robot to the one it relates to most
@@ -991,15 +1022,17 @@ function updateScene(dtReal) {
 function labels() {
   const out = [], W = cv.clientWidth, H = cv.clientHeight;
   const put = (x, y, z, text) => { tmpV.set(x, y, z).project(R3.cam); if (tmpV.z > 1 || Math.abs(tmpV.x) > 1.05 || Math.abs(tmpV.y) > 1.05) return; out.push(`<div class="tg" style="left:${((tmpV.x + 1) / 2 * W).toFixed(1)}px;top:${((1 - tmpV.y) / 2 * H).toFixed(1)}px">${esc(text)}</div>`); };
-  const fol = camMode === "follow", tg = R3.ctl.target;
+  // labels sit just above the head they belong to; in a Film close shot they would cover the subject, so they stay out of it
+  if (camMode === "film" && DIR.shot && DIR.shot.kind !== "wide") { $("#labs").innerHTML = ""; return; }
+  const fol = camMode === "follow", tg = R3.ctl.target, top = (r) => WL + r.s.B * 1.15 + 0.03;
   for (const r of robots) {
     const near = fol && Math.hypot(r.x - tg.x, r.z - tg.z) < 2;
-    if (r.phase === "touch" && r.pair && r.id < r.pair.id) put((r.x + r.pair.x) / 2, WL + 0.42, (r.z + r.pair.z) / 2, `touch · #${r.id} #${r.pair.id}`);
-    else if (r.birthT) put(r.x, WL + 0.45, r.z, `birth · #${r.id}`);
-    else if (r.swapT && simT - r.swapT < 5) put(r.x, WL + (fol ? 0.24 : 0.42), r.z, `swap · ${r.swapTxt}`);
-    else if (near && r.carry) put(r.x, WL + 0.26, r.z, r.paused ? `pause · set ${FAM[r.arm.hold ? r.arm.hold.f : r.nk[r.babySpec.order[r.babySpec.next]]?.f ?? 0]}` : r.carry < 0.75 ? `printing ${Math.round(r.carry / 0.75 * 100)}%` : "air in");
-    else if (near && r === focus && r.forage) put(r.x, WL + 0.24, r.z, r.forage.tgt ? `foraging · ${r.nk.length} of ${r.plan.length}` : "searching");
-    else if (fol && !r.adult && r.age < 6) put(r.x, WL + 0.35, r.z, `newborn · #${r.id}`);
+    if (r.phase === "touch" && r.pair && r.id < r.pair.id) put((r.x + r.pair.x) / 2, Math.max(top(r), top(r.pair)), (r.z + r.pair.z) / 2, `touch · #${r.id} #${r.pair.id}`);
+    else if (r.birthT) put(r.x, top(r), r.z, `birth · #${r.id}`);
+    else if (r.swapT && simT - r.swapT < 5) put(r.x, top(r), r.z, `swap · ${r.swapTxt}`);
+    else if (near && r.carry) put(r.x, top(r), r.z, r.paused ? `pause · set ${FAM[r.arm.hold ? r.arm.hold.f : r.nk[r.babySpec.order[r.babySpec.next]]?.f ?? 0]}` : r.carry < 0.75 ? `printing ${Math.round(r.carry / 0.75 * 100)}%` : "air in");
+    else if (near && r === focus && r.forage) put(r.x, top(r), r.z, r.forage.tgt ? `foraging · ${r.nk.length} of ${r.plan.length}` : "searching");
+    else if (fol && !r.adult && r.age < 6) put(r.x, top(r), r.z, `newborn · #${r.id}`);
   }
   if (selected && robots.includes(selected) && !out.length) put(selected.x, WL + 0.4, selected.z, "#" + selected.id);
   else if (selected && robots.includes(selected)) put(selected.x, WL + 0.55, selected.z, "#" + selected.id);
@@ -1059,7 +1092,7 @@ function updateLights() {
     const hd = r.tail && r.arm.hold; if (hd && hd.st === "held") put(hd.x, hd.y, hd.z, 0.07, 1.6); else if (hd) { const q = r.arm, P2 = armPts(r, q.a, PT2); const w = worldOf(r, [P2[9], P2[10], P2[11]]); put(w[0], w[1], w[2], 0.06, 1.4); }
     // two that touch flash together, a few slow blinks in both heads, readable from the wide shot
     if (r.phase === "touch" && r.pair && r.id < r.pair.id) { const b = Math.pow(Math.max(0, Math.sin(r.phaseT * Math.PI * 1.4)), 3) * 2.6 + 0.25;
-      for (const q of [r, r.pair]) { const w = worldOf(q, [0, 0.02, 0]); put(w[0], w[1], w[2], 0.42, b); } } }
+      for (const q of [r, r.pair]) { const w = worldOf(q, [0, 0.02, 0]); put(w[0], w[1], w[2], 0.26, b); } } }
   for (const F of floats) if (F.glowT && simT - F.glowT < 5) put(F.x, F.st === "held" ? F.y : WL + 0.006, F.z, 0.07, 1.4 * (1 - (simT - F.glowT) / 5));       // a shed part glows as it leaves
   a.position.needsUpdate = a.aSize.needsUpdate = a.aK.needsUpdate = true; LT.pts.geometry.setDrawRange(0, n);
   LT.pts.material.uniforms.uScale.value = CINE.h / (2 * Math.tan(R3.cam.fov * Math.PI / 360));
@@ -1095,27 +1128,36 @@ function drawDiagram() {
 }
 
 /* ---------- the director: the Film camera cuts between a slow wide shot of the tank and closer shots of what is happening now ---------- */
-const DIR = { shot: null, t: 0, lastWide: -99, last: null, az: 0.4 };
+const DIR = { shot: null, t: 0, lastWide: -99, last: null, az: 0.4, clock: 0, log: [] };
+// eating is the main story: picks rank first with births; touches and swaps next; a print pause after; a print in progress last
 function eventShots() { const c = [];
   for (const r of robots) {
     if (r.birthT > 0 && r.birthT < 0.5) c.push({ r, kind: "birth", p: 5, d: 1.7, dur: 7 });
-    else if (r.pick && simT - (r.pickT0 || 0) < 1.2) c.push({ r, kind: r.pick.own ? "swap" : "pick", p: r.pick.own ? 5 : 4, d: 0.95, dur: 6 });
-    else if (r.phase === "touch" && r.pair && r.id < r.pair.id && r.phaseT < 2) c.push({ r, kind: "touch", p: 4, d: 2.1, dur: 6 });
-    else if (r.paused && r.carry > 0.05) c.push({ r, kind: "place", p: 3, d: 1.1, dur: 5 });
-    else if (r.carry > 0 && r.carry < 0.7) c.push({ r, kind: "print", p: 1, d: 1.3, dur: 5 }); }
+    else if (r.pick && simT - (r.pickT0 || 0) < 2.5) c.push({ r, kind: r.pick.own ? "swap" : "pick", p: r.pick.own ? 4 : 5, d: 0.95, dur: r.pick.own ? 7 : 6 });
+    else if (!r.pick && (r.forage ? r.forage.tgt : r.self)) { const T = r.forage ? r.forage.tgt : r.self, fr = reach(r); if (Math.hypot(T.x - r.x - Math.cos(r.h) * fr, T.z - r.z - Math.sin(r.h) * fr) < 0.6) c.push({ r, kind: r.self ? "swap" : "pick", p: r.self ? 4 : 5, d: 1.0, dur: 8 }); }      // the approach, then the pick
+    else if (r.phase === "touch" && r.pair && r.id < r.pair.id && r.phaseT < 2) c.push({ r, kind: "touch", p: 4, d: 2.1, dur: 5 });
+    else if (r.paused && r.carry > 0.05) c.push({ r, kind: "place", p: 3, d: 1.1, dur: 4.5 });
+    else if (r.carry > 0 && r.carry < 0.7) c.push({ r, kind: "print", p: 1, d: 1.3, dur: 4.5 }); }
   return c; }
 function shotTarget(S) { const r = S.r; if (S.kind === "wide") return [0, -0.2, 0];
   if (S.kind === "touch" && r.pair) return [(r.x + r.pair.x) / 2, WL + 0.03, (r.z + r.pair.z) / 2];
   const fr = reach(r), k = S.kind === "pick" || S.kind === "swap" ? 0.75 : S.kind === "birth" ? 1.1 : 0.1; return [r.x + Math.cos(r.h) * fr * k, WL + 0.03, r.z + Math.sin(r.h) * fr * k]; }
 function director(dt) {
   const C = CINE; if (camMode !== "film") { C.ap = camMode === "follow" ? 0.06 : 0; return; }
-  const D = DIR; D.t += dt; const S = D.shot;
-  const lost = S && S.r && (!robots.includes(S.r) || (S.kind === "touch" && !S.r.pair));
-  if (!S || D.t > S.dur || lost) {
-    const ev = eventShots().filter((e) => !D.last || e.r !== D.last.r || e.kind !== D.last.kind).sort((a, b) => b.p - a.p);
-    if ((!ev.length || (S && S.kind !== "wide" && U.uTime.value - D.lastWide > 24)) && (!S || S.kind !== "wide" || !ev.length)) { D.shot = { kind: "wide", dur: 10, az: D.az }; D.lastWide = U.uTime.value; D.az += 0.9; }
+  const D = DIR; D.t += dt; D.clock += dt; const S = D.shot;
+  // a shot is never shorter than 4 s: if its event ends early, the camera holds on the place a little longer
+  const lost = S && S.r && D.t >= 4 && (!robots.includes(S.r) || (S.kind === "touch" && !S.r.pair));
+  // a wide shot gives way, after 4 s, to a pick, a touch, a swap or a birth
+  const cutIn = S && S.kind === "wide" && D.t >= 4 && (D.k = (D.k || 0) + 1) % 5 === 0 && eventShots().some((e) => e.p >= 4 && (!D.last || e.r !== D.last.r));
+  if (!S || D.t > S.dur || lost || cutIn) {
+    if (S) D.log.push({ at: +(D.clock - D.t).toFixed(1), kind: S.kind, len: +D.t.toFixed(1), id: S.r ? S.r.id : 0 });
+    if (D.log.length > 400) D.log.shift();
+    const ev = eventShots().filter((e) => robots.includes(e.r) && (!D.last || e.r !== D.last.r)); for (const e of ev) if (D.last && e.kind === D.last.kind) e.p -= 1.5; ev.sort((a, b) => b.p - a.p || rnd() - 0.5);      // vary: the same kind of shot twice in a row counts less
+    const since = D.clock - D.lastWide, nextDur = ev.length ? ev[0].dur : 0;
+    // a wide shot at least every 20 s, and whenever nothing is happening close up
+    if (!S || (S.kind !== "wide" && (!ev.length || since + nextDur > 20))) { D.shot = { kind: "wide", dur: ev.length ? 7 : 9, az: D.az }; D.lastWide = D.clock; D.az += 0.9; }
     else if (ev.length) { const e = ev[0]; e.side = rnd() < 0.5 ? 1 : -1; e.tgt = shotTarget(e); D.shot = e; D.last = e; }
-    else D.shot = { kind: "wide", dur: 6, az: D.az };
+    else { D.shot = { kind: "wide", dur: 6, az: D.az }; D.lastWide = D.clock; }
     D.t = 0; D.cut = true; }
   const s = D.shot, u = clamp(D.t / s.dur, 0, 1);
   let pos, tgt;
@@ -1174,6 +1216,6 @@ window.__society = { get robots() { return robots; }, get floats() { return floa
     fam: Object.fromEntries(FAM.map((x, i) => [x, famTotals()[i]])), kits: new Set(robots.map((r) => r.kn.join(""))).size, meanTiles: +(robots.reduce((a, r) => a + r.kit.length, 0) / Math.max(1, robots.length)).toFixed(2), coreAfloat: coreAfloat(), armWorstMM: +(armWorst * 1000).toFixed(1), armWorstAt, forageT: robots.filter((r) => r.forage).map((r) => Math.round(r.forage.t)).join(" "), ready: robots.filter(ready).length }),
   forceSwap: (r, f) => { const [i] = swapSlot(r, f); if (i < 0) return false; const fr = reach(r), F = addFloat(makePart(f), r.x + Math.cos(r.h) * (fr + 0.02), r.z + Math.sin(r.h) * (fr + 0.02)); r.selfSlot = i; r.forage = null; startPick(r, F); return true; },
   forcePick: (r, f, kind) => { let p = makePart(f); for (let k = 0; k < 200 && kind && p.kind !== kind; k++) p = makePart(f); const fr = reach(r), L = Math.max(p.l, VMIN), F = addFloat(p, r.x + Math.cos(r.h) * (fr + 0.006 + L / 2 + COLLAR), r.z + Math.sin(r.h) * (fr + 0.006 + L / 2 + COLLAR)); F.h = -r.h; if (!r.forage) { r.plan = [FC, FP, f]; r.forage = { t: 0 }; } startPick(r, F); return p.name; },
-  DIR, CINE, armTest, setEl: (e) => (FORCE_EL = e), dbg: { rackPos, pocketRng, pocketTip, pocketIn, babyPt, armDims, setKit, shapeOf, newArm, armPen, ikP, shellF, penAt, bestPose, pocketOf, armPts, REST, makePart, H_RNG, DOWN }, clear: () => { robots.forEach(disposeRobot); robots = []; [...loose].forEach(disposeLoose); loose = []; floats = []; pickable.length = 0; } };
+  DIR, CINE, director, armTest, setEl: (e) => (FORCE_EL = e), dbg: { rackPos, pocketRng, pocketTip, pocketIn, babyPt, armDims, setKit, shapeOf, newArm, armPen, ikP, shellF, penAt, bestPose, pocketOf, armPts, REST, makePart, H_RNG, DOWN }, clear: () => { robots.forEach(disposeRobot); robots = []; [...loose].forEach(disposeLoose); loose = []; floats = []; pickable.length = 0; } };
 </script>
 </body></html>
