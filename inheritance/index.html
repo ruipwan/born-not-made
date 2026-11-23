@@ -54,16 +54,18 @@ robots.forEach((r,i)=>{
     const snap=robots[i-1].pts.filter(q=>q.t0<=r.distill), groups=shuffle(kd(snap,0),R);
     groups.forEach((G,j)=>{
       const w=G.reduce((a,q)=>a+q.w,0), cx=G.reduce((a,q)=>a+q.x,0)/G.length, cz=G.reduce((a,q)=>a+q.z,0)/G.length;
-      const tc=r.distill+4.4*j/groups.length, pass=R()<.68;
-      r.moves.push({G,cx,cz,tc,pass,w});
-      if(pass)r.pts.push({x:cx,z:cz,t0:tc+1.5,w,inh:true});
+      const tc=r.distill+4.4*j/groups.length, pass=R()<.68, c=[0,0,0,0];G.forEach(q=>q.c.forEach((v,o)=>c[o]+=v*q.w));const cs=c.reduce((a,b)=>a+b,0);c.forEach((v,o)=>c[o]=v/cs);const o=c.indexOf(Math.max(...c));
+      r.moves.push({G,cx,cz,tc,pass,w,o,c});
+      if(pass)r.pts.push({x:cx,z:cz,t0:tc+1.5,w,inh:true,o,c});
     });
     r.from=snap.length;
   }
   const n0=i?0:150, rate=i?9:3;
-  for(let j=0;j<n0;j++){const [x,z]=spot(R);r.pts.push({x,z,t0:-99,w:1})}
-  for(let j=0;;j++){const t0=Math.max(0,r.birth)+(j+1)/rate*(1+j/200);if(t0>END)break;const [x,z]=spot(R);r.pts.push({x,z,t0,w:1})}
+  for(let j=0;j<n0;j++){const [x,z]=spot(R);r.pts.push({x,z,t0:-99,w:1,o:i,c:[0,1,2,3].map(k=>+(k===i))})}
+  for(let j=0;;j++){const t0=Math.max(0,r.birth)+(j+1)/rate*(1+j/200);if(t0>END)break;const [x,z]=spot(R);r.pts.push({x,z,t0,w:1,o:i,c:[0,1,2,3].map(k=>+(k===i))})}
 });
+const COL=[[232,163,61],[63,193,171],[156,136,242],[239,111,134]];
+const col=(o,a)=>'rgba('+COL[o].join(',')+','+clamp(a)+')';
 const count=(r,t)=>{let a=0,b=0;for(const q of r.pts)if(q.t0<=t)q.inh?a++:b++;return [a,b]};
 
 /* Poses. A head pose: X0 = screen x of the back face, Yb = screen y of the body floor, sc = depth scale, mx/mz = fold. */
@@ -136,6 +138,8 @@ function drawArm(tail,tip){
   g.strokeStyle=ink(.7);g.lineWidth=1.6;g.beginPath();g.moveTo(...tail.floor);g.lineTo(bx,by);g.lineTo(ex,ey);g.lineTo(...tip);g.stroke();
   g.fillStyle=ink(.85);g.beginPath();g.arc(tip[0],tip[1],2.2,0,7);g.fill();g.restore();
 }
+// a ring split by where its moments came from
+function ring(X,Y,r,c,a){let s=-Math.PI/2;g.lineWidth=1.6;c.forEach((v,o)=>{if(v<.02)return;const e=s+v*2*Math.PI;g.strokeStyle=col(o,a);g.beginPath();g.arc(X,Y,r,s,e);g.stroke();s=e})}
 function drawPts(r,p,t,a=1){
   const k=Math.max(.5,p.sc);
   g.save();g.globalAlpha*=a*p.a;
@@ -143,9 +147,9 @@ function drawPts(r,p,t,a=1){
     if(q.t0>t)continue;
     const f=clamp((t-q.t0)/.6), X=hx(r,p,q.x), Y=hz(r,p,q.x,q.z);
     if(q.inh){
-      g.strokeStyle=ink(.75*f);g.lineWidth=1;g.beginPath();g.arc(X,Y,(2.5+Math.min(6,Math.sqrt(q.w)))*k,0,7);g.stroke();
-      g.fillStyle=ink(f);g.beginPath();g.arc(X,Y,2*k,0,7);g.fill();
-    }else{g.fillStyle=ink(.3+.5*f+.2*(1-f));g.beginPath();g.arc(X,Y,(1.2+1.6*(1-f))*k,0,7);g.fill()}
+      ring(X,Y,(2.5+Math.min(6,Math.sqrt(q.w)))*k,q.c,.9*f);
+      g.fillStyle=col(q.o,f);g.beginPath();g.arc(X,Y,2.2*k,0,7);g.fill();
+    }else{g.fillStyle=col(q.o,.55+.45*f);g.beginPath();g.arc(X,Y,(1.4+1.6*(1-f))*k,0,7);g.fill()}
   }
   g.restore();
 }
@@ -155,11 +159,14 @@ function text(s,x,y,size,a,font='Arial',align='left',track=0){
 }
 const mono='ui-monospace, "JetBrains Mono", Menlo, monospace';
 function ledger(r,i,p,t,a=1){
-  const [ni,no]=count(r,t), cx=hx(r,p,.17), y=p.Yb+34;
+  const n=[0,0,0,0];let tot=0;for(const q of r.pts)if(q.t0<=t){const w=q.inh?Math.min(6,q.w):1;q.c.forEach((v,o)=>n[o]+=v*w);tot+=w}
+  const cx=hx(r,p,.17), y=p.Yb+34, bw=150, bx=cx-bw/2;
   g.save();g.globalAlpha*=a*p.a;
   text(NUM[i],cx,y,22,.92,'Georgia','center');
-  text((ni?ni+' inherited · ':'')+no+' lived',cx,y+21,12,.75,mono,'center');
-  text(r.kit.join(' ').toUpperCase(),cx,y+38,9.5,.5,mono,'center',1.1);
+  let x=bx;for(let o=0;o<=i;o++){const w=tot?bw*n[o]/tot:0;g.fillStyle=col(o,.95);g.fillRect(x,y+10,Math.max(0,w-1),6);x+=w}
+  const own=tot?Math.round(100*n[i]/tot):0;
+  text(i?(100-own)+'% inherited · '+own+'% own':'100% own',cx,y+33,11.5,.75,mono,'center');
+  text(r.kit.join(' ').toUpperCase(),cx,y+49,9.5,.45,mono,'center',1.1);
   g.restore();
 }
 const hms=s=>{s=Math.round(s);return Math.floor(s/3600)+':'+String(Math.floor(s/60)%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
@@ -232,16 +239,16 @@ function frame(t){
       if(v<0||v>1.5)continue;
       const cx=hx(par,home,m.cx), cy=hz(par,home,m.cx,m.cz), rad=(2.5+Math.min(6,Math.sqrt(m.w)))*SC;
       if(v<.7){
-        const e=ease(v,0,.7);g.strokeStyle=ink(.35*(1-e)+.1);g.lineWidth=.8;g.fillStyle=ink(.95);
-        for(const q of m.G){const X=hx(par,home,q.x),Y=hz(par,home,q.x,q.z),x=lerp(X,cx,e),y=lerp(Y,cy,e);
+        const e=ease(v,0,.7);g.lineWidth=.8;
+        for(const q of m.G){g.strokeStyle=col(q.o,.35*(1-e)+.1);g.fillStyle=col(q.o,.95);const X=hx(par,home,q.x),Y=hz(par,home,q.x,q.z),x=lerp(X,cx,e),y=lerp(Y,cy,e);
           g.beginPath();g.moveTo(X,Y);g.lineTo(x,y);g.stroke();g.beginPath();g.arc(x,y,1.5,0,7);g.fill()}
       }else{
         const e=ease(v,.7,1.5);
         if(m.pass){
           const bx=hx(child,kp,m.cx), by=hz(child,kp,m.cx,m.cz), x=lerp(cx,bx,e), y=lerp(cy,by,e)-16*Math.sin(Math.PI*e);
-          g.strokeStyle=ink(.2*(1-e));g.lineWidth=.8;g.beginPath();g.moveTo(cx,cy);g.lineTo(x,y);g.stroke();
-          g.strokeStyle=ink(.8);g.lineWidth=1;g.beginPath();g.arc(x,y,rad,0,7);g.stroke();g.fillStyle=ink(1);g.beginPath();g.arc(x,y,1.5,0,7);g.fill();
-        }else{g.strokeStyle=ink(.5*(1-e));g.lineWidth=1;g.beginPath();g.arc(cx,cy,rad+10*e,0,7);g.stroke()}
+          g.strokeStyle=col(m.o,.25*(1-e));g.lineWidth=.8;g.beginPath();g.moveTo(cx,cy);g.lineTo(x,y);g.stroke();
+          ring(x,y,rad,m.c,.95);g.fillStyle=col(m.o,1);g.beginPath();g.arc(x,y,1.5,0,7);g.fill();
+        }else{g.strokeStyle=col(m.o,.5*(1-e));g.lineWidth=1;g.beginPath();g.arc(cx,cy,rad+10*e,0,7);g.stroke()}
       }
     }
   }
@@ -261,10 +268,11 @@ function frame(t){
     text(child.from+' moments held  →  '+kept+' kept',x+110,y+44,13,.92*a,mono);
   }
 
-  // legend
-  g.fillStyle=ink(.8);g.beginPath();g.arc(70,45,1.8,0,7);g.fill();text('A MOMENT LIVED',84,49,11,.6,mono,'left',1);
-  g.strokeStyle=ink(.75);g.lineWidth=1;g.beginPath();g.arc(236,45,5.5,0,7);g.stroke();g.fillStyle=ink(1);g.beginPath();g.arc(236,45,2,0,7);g.fill();
-  text('MANY MOMENTS, PRESSED INTO ONE AND INHERITED',250,49,11,.6,mono,'left',1);
+  // legend: one color per generation; a dot is a moment lived, a ring is many moments pressed into one and inherited
+  NUM.forEach((nm,o)=>{const x=64+o*74;g.fillStyle=col(o,1);g.fillRect(x,39,12,12);text(nm,x+18,50,13,.8,'Georgia')});
+  g.fillStyle=ink(.8);g.beginPath();g.arc(372,45,2,0,7);g.fill();text('A MOMENT LIVED',382,49,11,.6,mono,'left',1);
+  g.strokeStyle=ink(.75);g.lineWidth=1;g.beginPath();g.arc(518,45,5.5,0,7);g.stroke();g.fillStyle=ink(1);g.beginPath();g.arc(518,45,2,0,7);g.fill();
+  text('MANY MOMENTS PRESSED INTO ONE, INHERITED',532,49,11,.6,mono,'left',1);
 
   // the parent speaks
   const V=VOICE[cyc], who=NUM[cyc]+' to '+NUM[ci]; let phase, caption;
