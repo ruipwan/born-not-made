@@ -14,14 +14,15 @@ button{color:#bcbcbc;font:inherit;background:none;border:0;padding:4px 0;cursor:
 input{flex:1;min-width:20px;accent-color:#ddd}time{color:#9b9a94;font:12px ui-monospace,monospace;white-space:nowrap}
 button:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:3px}
 </style></head><body><main>
+<section><div class="hd"><p>Lineage</p><h2>It inherits, then learns, and gives “birth” too</h2></div>
+<canvas id="d-lineage" width="1600" height="900" style="aspect-ratio:16/9" role="img" aria-label="A lineage of robots: print, distill, birth, and learning."></canvas>
+<footer aria-label="Playback"><button type="button" id="play">Pause</button><input id="seek" type="range" min="0" max="62" step=".05" value="0" aria-label="Position"><time></time></footer></section>
 <section><div class="hd"><p>1 · Why “birth”</p><h2>Copy, update, “birth”</h2></div>
 <canvas id="d-why" width="1600" height="780" style="aspect-ratio:1600/780" role="img" aria-label="Copy, update and birth compared."></canvas></section>
 <section><div class="hd"><p>2 · The body</p><h2>Head and tail</h2></div>
 <canvas id="d-body" width="1600" height="700" style="aspect-ratio:1600/700" role="img" aria-label="The head and the tail."></canvas></section>
-<section><div class="hd"><p>3 · Lineage</p><h2>It inherits, then learns, and gives “birth” too</h2></div>
-<canvas id="d-lineage" width="1600" height="900" style="aspect-ratio:16/9" role="img" aria-label="A lineage of robots: print, distill, birth, and learning."></canvas>
-<footer aria-label="Playback"><button type="button" id="play">Pause</button><input id="seek" type="range" min="0" max="62" step=".05" value="0" aria-label="Position"><time></time></footer></section>
-<section><div class="hd"><p>4 · The tail</p><h2>The tail copies itself</h2></div>
+
+<section><div class="hd"><p>3 · The tail</p><h2>The tail copies itself</h2></div>
 <canvas id="d-tail" width="1600" height="700" style="aspect-ratio:1600/700" role="img" aria-label="A tail prints the next tail and hands over the arm."></canvas></section>
 </main><script src="diagrams.js"></script><script>
 /* One shot, one frame. Side view of the simplified bodies (profiles from simulator/simple/simple.json, meters).
