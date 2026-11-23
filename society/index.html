@@ -32,6 +32,9 @@ button:hover { color: #fff; } button.on { color: #fff; font-weight: 700; }
 .ctl output { font: 11px var(--mono); color: var(--muted); text-align: right; }
 input[type=range] { width: 100%; accent-color: #fff; }
 input[type=text] { flex: 1; min-width: 0; background: #000; color: var(--ink); border: 1px solid var(--line); padding: 5px 7px; font: 12px "Inter", sans-serif; }
+.spd { position: absolute; right: 18px; bottom: 18px; z-index: 6; display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: rgba(12,12,12,0.78); border: 1px solid rgba(255,255,255,0.18); border-radius: 6px; font: 12px/1 var(--mono); color: #ddd; letter-spacing: 0.08em; text-transform: uppercase; }
+.spd input { width: 180px; accent-color: #eee; }
+.spd b { min-width: 3.2em; text-align: right; font-weight: 600; color: #fff; }
 canvas.spark { width: 100%; height: 40px; display: block; margin-bottom: 8px; }
 .note { color: var(--muted); font-size: 12px; margin: 6px 0 0; }
 .kv { display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 2px 8px; font-size: 12px; margin: 0; }
@@ -57,6 +60,7 @@ html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
       <div class="hud" id="hud"></div></div>
     <div class="views" id="views"><button data-cam="film" class="on">Film</button><button data-cam="tank">Whole tank</button><button data-cam="follow">Follow</button><button data-cam="above">Above</button></div>
     <div class="ev" id="ev"></div>
+    <div class="spd" id="spd"><span class="spl">Speed</span><input type="range" id="spdR" min="0" max="8" step="1" value="2" aria-label="Simulation speed"><b id="spdV">1×</b></div>
   </div>
   <aside>
     <div><h3>Run</h3>
@@ -1822,7 +1826,7 @@ function director(dt) {
 let last = performance.now(), acc = 0, gi = 0, gacc = 0, histN = 0;
 function loop(now) {
   const dtR = Math.min(0.05, (now - last) / 1000); last = now;
-  if (running) for (let i = 0; i < speed; i++) step(dtR);
+  if (running) { if (speed < 1) step(dtR * speed); else for (let i = 0; i < speed; i++) step(dtR); }
   U.uTime.value += dtR;
   updateScene(dtR); director(dtR); R3.ctl.update(); updateLights(dtR); R3.r.shadowMap.needsUpdate = true; if (camMode !== "above") cineRender(now / 1000, dtR); drawDiagram(dtR); labels();
   acc += dtR; if (acc > 0.5 || hist.pop.length !== histN) { acc = 0; histN = hist.pop.length; spark("#sp1", hist.pop); spark("#sp2", hist.parts); spark("#sp3", hist.div); spark("#sp4", hist.tiles, 6); inspect(); hud(); }
@@ -1841,7 +1845,10 @@ document.querySelectorAll("[data-cam]").forEach((b) => (b.onclick = () => { camM
 $("#relBtn").onclick = () => { showRel = !showRel; $("#relBtn").classList.toggle("on", showRel); $("#relBtn").textContent = showRel ? "Relations shown" : "Relations hidden"; };
 $("#run").onclick = () => { running = !running; $("#run").textContent = running ? "Pause" : "Run"; $("#run").classList.toggle("on", running); };
 $("#reset").onclick = reset;
-document.querySelectorAll("[data-sp]").forEach((b) => (b.onclick = () => { speed = +b.dataset.sp; document.querySelectorAll("[data-sp]").forEach((x) => x.classList.toggle("on", x === b)); }));
+const SPEEDS = [0.25, 0.5, 1, 2, 3, 5, 8, 12, 16];
+const setSpd = (v) => { speed = v; $("#spdV").textContent = (v < 1 ? v : v) + "×"; $("#spdR").value = SPEEDS.indexOf(v) >= 0 ? SPEEDS.indexOf(v) : 2; document.querySelectorAll("[data-sp]").forEach((x) => x.classList.toggle("on", +x.dataset.sp === v)); };
+$("#spdR").oninput = () => setSpd(SPEEDS[+$("#spdR").value]);
+document.querySelectorAll("[data-sp]").forEach((b) => (b.onclick = () => setSpd(+b.dataset.sp)));
 $("#send").onclick = () => { const t = $("#sig").value.trim().toLowerCase().slice(0, 40); if (!t) return; broadcast = { text: t, t: simT }; $("#sig").value = ""; ripple(0, 0, 1.4); log(`signal in the water: ${t}`); };
 $("#sig").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#send").click(); });
 let downAt = null; cv.addEventListener("pointerdown", (e) => (downAt = [e.clientX, e.clientY]));
