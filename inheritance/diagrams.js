@@ -98,37 +98,49 @@ function loop(canvas,W,H,dur,draw){
   });
 })();
 
-/* 2 · Head and tail: a still from the quilted head simulator (simulator/doublewall, print stage), labels on top */
+/* 2 · Head and tail: a still from the quilted head simulator (simulator/doublewall, print stage), every part labelled.
+   Names and figures come from simulator/doublewall/quilt.json (kit, equip, masses), which keeps the first hand source of each. */
 (function(){
   const cv=document.getElementById('d-body');if(!cv)return;
-  const W=1600,H=900,DUR=14,IX=150,IY=175,IS=1300/1908;
-  const img=new Image();img.src='body-section.jpg?v=2';
-  const P=(x,y)=>[IX+x*IS,IY+y*IS];
-  const LB=[ // anchor in the image, label x, top or bottom, title, line
-    [[860,230],330,'top','Arm','The only part not in the wall. It prints, and picks up parts.'],
-    [[1380,120],760,'top','Quilted double wall','Brain, battery, pump, motor and sensors, sealed between two skins.'],
-    [[1760,300],1200,'top','Mouth','The newborn leaves here, inflating on the way.'],
-    [[380,380],150,'bottom','Tail','Reproduces. Holds the arm and its tools.'],
-    [[985,420],520,'bottom','Docks from behind','Gel face to gel face. It moves on to the next head.'],
-    [[1240,690],880,'bottom','The next body','Printed folded flat in the gel, its parts set in first.'],
-    [[1560,640],1220,'bottom','Gel','A shallow layer held by the lower part of the head.']];
+  const W=1600,H=900,DUR=16,IX=262,IY=205,IS=1080/1908;
+  const img=new Image();img.src='body-section.jpg?v=3';
+  const P=(x,y)=>[IX+x*IS,IY+y*IS], IW=1908*IS, IH=838*IS;
+  // [anchor in the image, side, label x or y, title, line]
+  const LB=[
+    [[445,262],'left',95,'Air pump','A cordless tire inflator, 75 x 60 x 32 mm. Fills the cells of the newborn at birth.'],
+    [[330,365],'left',215,'Brain and battery','Raspberry Pi 5, 85 x 56 mm. Nine 18650 cells, 10.8 V, 113 Wh.'],
+    [[175,490],'left',350,'Piston stepper','A small stepper and screw drive both pistons of the store.'],
+    [[300,470],'left',475,'Silicone store','Two printed cartridges, part A and part B, 370 mL each, mixed at the needle.'],
+    [[445,500],'left',615,'Gel pump','Peristaltic, up to 100 mL a minute, with a 90 mL gel reservoir for top ups.'],
+    [[860,230],'top',560,'Arm','Rotrics DexArm, four axes. Its mainboard holds the motor drivers for the arm and the piston stepper.'],
+    [[1380,120],'top',900,'Quilted double wall','Two skins of Dragon Skin 30, 1.2 mm, webs of 0.8 mm, air in the cells.'],
+    [[1760,300],'right',95,'Mouth','The newborn leaves here, inflating on the way.'],
+    [[1500,700],'right',260,'Gel','A shallow layer in the lower head, 5.2 kg.'],
+    [[1250,680],'right',400,'The next body','Printed folded flat in 18 layers, 143 x 194 x 79 mm, its kit of 26 g set in first.'],
+    [[920,470],'bottom',300,'Tools','In saddles on the tail wall: a magnet holder that picks up parts, and the printing needle.'],
+    [[680,600],'bottom',560,'Steel plate','Under the arm base. With the relay steel, 1.9 kg that keeps the tail upright.'],
+    [[985,420],'bottom',820,'Docks from behind','Gel face to gel face. The tail moves on to the next head.'],
+    [[1040,712],'bottom',1080,'Kit in the floor','Sealed in pockets between the skins: an mp6 piezo water pump and its driver, a 500 mAh LiPo, an ESP32 C3 controller. Sensors not chosen yet.']];
+  const LW=200;
   loop(cv,W,H,DUR,(c,t)=>{
     const fade=1-ease(t,DUR-.6,DUR);
-    const iw=1908*IS,ih=838*IS;
-    if(img.complete&&img.naturalWidth){c.drawImage(img,IX,IY,iw,ih);
-      // soften the frame so the still sits in the page
-      const E=70,edges=[[IX,0,IX+E,0,IX,IY,E,ih],[IX+iw,0,IX+iw-E,0,IX+iw-E,IY,E,ih],[0,IY,0,IY+E,IX,IY,iw,E],[0,IY+ih,0,IY+ih-E,IX,IY+ih-E,iw,E]];
+    if(img.complete&&img.naturalWidth){c.drawImage(img,IX,IY,IW,IH);
+      const E=60,edges=[[IX,0,IX+E,0,IX,IY,E,IH],[IX+IW,0,IX+IW-E,0,IX+IW-E,IY,E,IH],[0,IY,0,IY+E,IX,IY,IW,E],[0,IY+IH,0,IY+IH-E,IX,IY+IH-E,IW,E]];
       for(const [x0,y0,x1,y1,rx,ry,rw,rh] of edges){const gr=c.createLinearGradient(x0,y0,x1,y1);gr.addColorStop(0,'#000');gr.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=gr;c.fillRect(rx,ry,rw,rh)}}
-    LB.forEach(([an,x,side,h,body],i)=>{
-      const a=ease(t,.6+i*.9,1.2+i*.9)*fade;if(a<=0)return;
-      const [ax,ay]=P(...an), y=side==='top'?70:IY+838*IS+45;
+    LB.forEach(([an,side,q,h,body],i)=>{
+      const a=ease(t,.4+i*.55,.9+i*.55)*fade;if(a<=0)return;
+      const [ax,ay]=P(...an);let tx,ty,pts;
+      if(side==='left'){tx=24;ty=q;pts=[[ax,ay],[IX-14,ty+6],[tx+LW+8,ty+6]]}
+      else if(side==='right'){tx=W-24-LW;ty=q;pts=[[ax,ay],[IX+IW+14,ty+6],[tx-8,ty+6]]}
+      else if(side==='top'){tx=q;ty=40;pts=[[ax,ay],[ax,ty+66],[tx,ty+66]]}
+      else {tx=q;ty=IY+IH+42;pts=[[ax,ay],[ax,ty-20],[tx,ty-20]]}
       c.save();c.globalAlpha=a;
-      c.strokeStyle=ink(.45);c.lineWidth=1;c.beginPath();c.moveTo(ax,ay);c.lineTo(ax,side==='top'?y+48:y-22);c.lineTo(x,side==='top'?y+48:y-22);c.stroke();
-      c.fillStyle=ink(.95);c.beginPath();c.arc(ax,ay,3.5,0,7);c.fill();c.strokeStyle='#000';c.lineWidth=1.5;c.stroke();
-      text(c,h,x,y,16,.95);wrap(c,body,x,y+20,300,13,.6,17);
+      c.strokeStyle=ink(.4);c.lineWidth=1;c.beginPath();c.moveTo(...pts[0]);for(const p of pts.slice(1))c.lineTo(...p);c.stroke();
+      c.fillStyle=ink(.95);c.beginPath();c.arc(ax,ay,3.2,0,7);c.fill();c.strokeStyle='#000';c.lineWidth=1.5;c.stroke();
+      text(c,h,tx,ty,15,.95);wrap(c,body,tx,ty+19,side==='bottom'?240:(side==='top'?320:LW),12,.6,16);
       c.restore();
     });
-    return 'A still of the quilted head simulator: tail with the arm, head with the quilted double wall, gel, the next body printed in it, and the mouth.';
+    return 'A still of the quilted head simulator with every part named: in the tail the air pump, a Raspberry Pi 5 and its battery, the silicone store and its piston stepper, the gel pump, the arm with its motor drivers, the tools and the steel plate; in the head the quilted double wall, the kit sealed in the floor, the gel, the next body and the mouth.';
   });
 })();
 
