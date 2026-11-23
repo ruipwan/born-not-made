@@ -753,12 +753,15 @@ def trip(pid, first=False):
         P = pick_route(RP[pid], ax, Y_CROSS_OF.get(pid, Y_CROSS)); R_ = [(p[0], p[2], p[1], p[3]) if p[0] == 's' else (p[0], p[1], p[3], p[2]) for p in reversed(P)]
         if u < 0.12: st.red = drive_along(R_[:1], seg(u, 0.0, 0.12)); st.q = s0['q'].copy(); return
         st.q = lerp(s0['q'], CARRY[pid][1], seg(u, 0.12, 0.24)) if u < 0.24 else CARRY[pid][1].copy()
-        if st.new['on'] and pid in ('M2', 'M3', 'M4'): st.new['cq'] = lerp(s0['new']['cq'], QJ[pid], seg(u, 0.24, 0.45))      # the new arm holds out its joint while the parent is still at the tray side
+        if u >= 0.24:            # on the last straight run to the stand: the parent's arm draws the part back to the rest pose, the new arm holds out its joint
+            w = seg(u, 0.24, 1.0); c_last = prims_time(R_[1:])[-2]; f = min(1.0, max(0.0, (w - c_last) / max(1e-6, 1 - c_last)))
+            st.q = lerp(CARRY[pid][1], HOME_Q, mj(f))
+            if st.new['on'] and pid in ('M2', 'M3', 'M4'): st.new['cq'] = lerp(s0['new']['cq'], QJ[pid], mj(f))
         st.red = drive_along(R_[:1], 1.0) if u < 0.24 else drive_along(R_[1:], seg(u, 0.24, 1.0))
     def f_place(u, s0):
         RDp = RP[pid]; st.red = RDp.copy(); above = tipP + [0, 0, up]
         cq = CARRY[pid][1]; qa = arm_to(above, CUP, RDp, 'place above ' + pid)
-        if u < 0.2: st.q = lerp(cq, HOME_Q, seg(u, 0.0, 0.2))                       # to the rest pose, then over the pad (the way the stand search tested)
+        if u < 0.2: st.q = lerp(s0['q'], HOME_Q, seg(u, 0.0, 0.2))                  # (already at the rest pose) then over the pad (the way the stand search tested)
         elif u < 0.4: st.q = lerp(HOME_Q, qa, seg(u, 0.2, 0.4))
         elif u < 0.55: st.q = arm_to(lerp(above, tipP, seg(u, 0.4, 0.55)), CUP, RDp, 'place down ' + pid)
         elif u < 0.62: st.q = qP.copy(); st.mag = 0 if u > 0.6 else 1
@@ -1012,7 +1015,7 @@ def pocket_boxes(pose):
         cw = (Mp @ np.r_[c, 1])[:3]; out.append((name, cw, np.array([(r1 - r0) / 2, w / 2, t / 2]), pose[2] + PK_A))
     return out
 
-def tool_pts(q, red, tool, crank):
+def tool_pts(q, red, tool, crank, with_crank=True):
     """the holder (stem, magnet, needle, crank) or the print needle, sampled, in the world"""
     tf = tool_frame(q, red, 0.0); P = []
     if tool == 1:
@@ -1020,7 +1023,7 @@ def tool_pts(q, red, tool, crank):
         for a in np.linspace(0, 2 * math.pi, 10, endpoint=False):
             for z in (-CUP + MAG_UP, -CUP + MAG_UP + 0.015): P.append([-HOLD + 0.0095 * math.cos(a), 0.0095 * math.sin(a), z])
         cr = crank
-        for l in np.linspace(0, CRANK, 8):
+        for l in (np.linspace(0, CRANK, 8) if with_crank else []):
             th = -math.pi / 2 * (1 - cr); P.append([0.004 + l * math.cos(th), 0, -0.03 - l * math.sin(th)])
     elif tool == 2:
         for z in np.linspace(-NEEDLE + 0.03, 0.0, 8): P.append([0, 0, z])
@@ -1134,7 +1137,7 @@ for fi, fr in enumerate(frames):
         R(8, float(glass_depth(NA).max()))
         Q = NA
         if fr['ntool'] == 1:
-            Q = np.r_[Q, tool_pts(np.array(fr['cq']), newp, 1, 0.0)]
+            Q = np.r_[Q, tool_pts(np.array(fr['cq']), newp, 1, 0.0, with_crank=False)]
         d = float(W_F.depth(tb.to_local(Q, newp)).max())
         tsv = fr['parts'].get('TS')
         if tsv and tsv[4] in (1, 4):
@@ -1306,7 +1309,7 @@ ts_items = [box_item([0, 0, TILE['t'] / 2], [TILE['L'], TILE['W'], TILE['t']], 0
 for nm, sz, (dx, dy) in TILE_PARTS:
     ts_items.append(box_item([dx + (0.0 if 'mp6' in nm else 0.0), dy, TILE['t'] + sz[2] / 2], sz, 0, 'pump' if 'mp6' in nm else 'chip', edge=0))
 PDATA['TS'] = dict(kind='tiles', label='tile set', items=ts_items, mass=m_ts, load_N=LOADS['TS'], dims='46 x 32 mm cast tile: Core, two Sense, Power tiles, mp6 pump')
-PDATA['H'] = dict(kind='holder', label='holder', items=[], mass=m_H, load_N=LOADS['H'], dims='electromagnet 20 x 15 mm, ball needle, crank, as the parent\'s')
+PDATA['H'] = dict(kind='holder', label='holder', items=[], mass=m_H, load_N=LOADS['H'], dims='electromagnet 20 x 15 mm and ball needle, as the parent\'s, without the crank (the new tail gives no birth yet)')
 # the tray: plinth, cradles, base bay rails, saddle; in the world
 titems = [box_item(c, 2 * h, yaw, 'tray', ro=5) for nm, c, h, yaw in TRAYB]
 for pid, items in CRADLE.items():

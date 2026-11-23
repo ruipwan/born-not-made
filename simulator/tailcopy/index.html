@@ -954,7 +954,7 @@ function buildParts() {
   partMats();
   for (const id in D.parts) { const P = D.parts[id], grp = new THREE.Group(); grp.matrixAutoUpdate = false; R3.scene.add(grp); const o = { P, grp, links: {}, items: [] };
     if (P.links) for (const n of P.links) { const p = ARMD.parts[n], m = meshOf(b64f32(p.p), b64u32(p.i), PMAT.arm); m.matrixAutoUpdate = false; m.castShadow = true; R3.scene.add(m); o.links[n] = m; }
-    if (P.kind === "holder") { o.tool = moduleGroup("cup"); o.tool.matrixAutoUpdate = false; R3.scene.add(o.tool); }
+    if (P.kind === "holder") { o.tool = moduleGroup("cup"); if (o.tool.userData.crank) o.tool.userData.crank.visible = false; o.tool.matrixAutoUpdate = false; R3.scene.add(o.tool); }      // the new tail's holder has no crank: it gives no birth yet
     for (const it of P.items || []) { const m = itemMesh(it); m.userData.link = it.link || null; m.userData.local = m.matrix.clone(); R3.scene.add(m); o.items.push(m); }
     if (P.links) o.Wref = armMats(M4(), P.q);
     TC.parts[id] = o; }
