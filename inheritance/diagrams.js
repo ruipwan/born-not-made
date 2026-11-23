@@ -111,26 +111,23 @@ function loop(canvas,W,H,dur,draw){
     const m=headMap(XD,Yb,S,{}), tm=tailMap(Xd,Yb,S);
     // head: double wall, gel, brain, parts
     const P=drawHead(c,m,1,.03);
+    // double wall: a band inside the outline; gel fills the space it encloses
+    const B=.035*S, C=m(.2,.17);
     c.save();c.clip(P);
-    const inner=headMap(XD+.022*S,Yb-.022*S,S,{mx:.9,mz:.88});const Pi=headPath(inner);
-    c.strokeStyle=ink(.35);c.lineWidth=1;c.setLineDash([4,4]);c.stroke(Pi);c.setLineDash([]);
-    // gel fills most of the inside
-    c.save();c.clip(Pi);c.fillStyle='rgba(156,200,236,.07)';c.fillRect(0,m(0,.24)[1],W,H);
-    c.strokeStyle='rgba(156,200,236,.25)';c.beginPath();c.moveTo(0,m(0,.24)[1]);c.lineTo(W,m(0,.24)[1]);c.stroke();c.restore();
-    c.restore();
-    // brain: board and model, in the wall near the crown
-    const [bx,by]=m(.1,.3);const pulse=.5+.5*Math.sin(t*3);
-    c.fillStyle=ink(.85);c.fillRect(bx-26,by-8,52,16);c.fillStyle='#0c0c0c';c.fillRect(bx-8,by-5,16,10);
-    for(let i=0;i<6;i++){const a=t*.8+i;c.fillStyle=col(i%4,.4+.4*pulse);c.beginPath();c.arc(bx+Math.cos(a)*38,by+Math.sin(a)*14,2,0,7);c.fill()}
-    // parts sealed in the wall
-    const parts=[[.2,.03,'pump'],[.27,.04,'motor'],[.33,.24,'sensor']];
-    parts.forEach(([x,z])=>{const [px,py]=m(x,z);c.fillStyle=ink(.7);c.fillRect(px-7,py-7,14,10)});
-    // water outlet
-    {const [ox,oy]=m(.31,.02);c.strokeStyle=ink(.6);c.beginPath();c.arc(ox+6,oy,4,0,7);c.stroke()}
+    c.fillStyle='rgba(156,200,236,.07)';c.fillRect(0,m(0,.24)[1],W,H);
+    c.strokeStyle='rgba(156,200,236,.25)';c.beginPath();c.moveTo(0,m(0,.24)[1]);c.lineTo(W,m(0,.24)[1]);c.stroke();
+    c.lineWidth=2*B+1.6;c.strokeStyle=ink(.35);c.stroke(P);c.lineWidth=2*B;c.strokeStyle='#161616';c.stroke(P);
+    c.restore();c.strokeStyle=ink(.8);c.lineWidth=1.4;c.stroke(P);mouth(c,m,1);
+    // everything but the arm sits in the wall
+    const inW=(x,z)=>{const [px,py]=m(x,z),dx=C[0]-px,dy=C[1]-py,d=Math.hypot(dx,dy);return [px+dx/d*B*.5,py+dy/d*B*.5]};
+    const [bx,by]=inW(.14,.36);const pulse=.5+.5*Math.sin(t*3);
+    c.fillStyle=ink(.85);c.fillRect(bx-24,by-6,48,12);c.fillStyle='#0c0c0c';c.fillRect(bx-7,by-4,14,8);
+    for(let i=0;i<5;i++){c.fillStyle=col(i%4,.4+.5*pulse);c.beginPath();c.arc(bx-20+i*10,by-12,1.8,0,7);c.fill()}
+    const parts=[[.15,0,30,10],[.24,.012,14,10],[.06,.012,14,10],[.3,.33,10,10],[.35,.12,10,10]];
+    const PP=parts.map(([x,z,w,h])=>{const [px,py]=inW(x,z);c.fillStyle=ink(.7);c.fillRect(px-w/2,py-h/2,w,h);return [px,py]});
     // tail
     drawTail(c,tm,1);
-    const [rx,ry]=tm(-.32,.07);c.strokeStyle=ink(.6);c.strokeRect(rx,ry-22,60,22);// battery
-    const [kx,ky]=tm(-.26,.2);for(let i=0;i<3;i++){c.strokeStyle=ink(.5);c.beginPath();c.moveTo(kx+i*12,ky);c.lineTo(kx+i*12,ky+30);c.stroke()}// tool rack
+    const [kx,ky]=tm(-.3,.16);for(let i=0;i<3;i++){c.strokeStyle=ink(.5);c.beginPath();c.moveTo(kx+i*12,ky);c.lineTo(kx+i*12,ky+30);c.stroke()}// tool rack
     const pr=ease(t,2.4,3.4),ph=t*2.2;
     const tip=dock>.99?[lerp(tm(.0,.1)[0],m(.12+.08*(Math.sin(ph)+1),.06)[0],pr),lerp(tm(0,.1)[1],m(0,.06+.02*Math.sin(ph*.5))[1],pr)]:tm(-.02,.12);
     arm(c,tm,S,tip,1);
@@ -138,13 +135,13 @@ function loop(canvas,W,H,dur,draw){
     const L=(i,anchor,x,y,head,body,align)=>{const a=ease(t,2.6+i*.7,3.1+i*.7);if(a<=0)return;c.save();c.globalAlpha*=a;
       c.strokeStyle=ink(.35);c.lineWidth=1;c.beginPath();c.moveTo(...anchor);c.lineTo(align==='right'?x+8:x-8,y-5);c.stroke();
       c.fillStyle=ink(.9);c.beginPath();c.arc(anchor[0],anchor[1],2.5,0,7);c.fill();
-      text(c,head,x,y,15,.95,'Arial',align);text(c,body,x,y+19,13,.55,'Arial',align);c.restore()};
-    L(0,[bx,by-8],1310,250,'Brain','A microcontroller and a small local model.');
+      text(c,head,x,y,15,.95,'Arial',align);if(align==='right')text(c,body,x,y+19,13,.55,'Arial',align);else wrap(c,body,x,y+19,260,13,.55,17);c.restore()};
+    L(0,[bx,by-6],1310,250,'Brain','A microcontroller with a small local model, in the wall.');
     L(1,m(.2,.18),1310,340,'Gel','Fills most of the inside. The next body is printed here.');
-    L(2,m(.27,.04),1310,430,'Double wall','Pump, motor and small parts sealed inside it.');
+    L(2,PP[0],1310,430,'Double wall','Battery, pump, motor and sensors, sealed between two skins.');
     L(3,m(.345,.22),1310,520,'Mouth','The newborn leaves here, inflating on the way.');
-    L(4,tm(-.17,.22),470,300,'Arm','Prints in the gel, picks up parts.','right');
-    L(5,[rx+30,ry-11],470,410,'Battery and tools','Syringe, holder, the gel line.','right');
+    L(4,tm(-.17,.22),470,300,'Arm','The only part not in the wall. Prints in the gel, picks up parts.','right');
+    L(5,[kx+12,ky+15],470,410,'Tools','Syringe, holder, the gel line.','right');
     L(6,tm(DOCK,.16),470,520,'Docks from behind','Not part of the head. It moves on.','right');
     text(c,'Head',m(.2,.36)[0],m(.2,.36)[1]-50,28,ease(t,2,2.6),'Georgia','center');
     text(c,'thinks, senses, carries the gel',m(.2,.36)[0],m(.2,.36)[1]-28,12,.55*ease(t,2,2.6),mono,'center',1);

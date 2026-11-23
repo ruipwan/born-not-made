@@ -118,7 +118,7 @@ function drawHead(r,p,t,opts={}){
   const ks=.017*S*p.sc*Math.min(p.mx,1);
   r.kit.forEach((k,i)=>{
     if(opts.kitUpTo!==undefined&&i>=opts.kitUpTo)return;
-    const x=hx(r,p,.07)+i*(ks+3*p.sc), y=p.Yb-.25*S*p.sc*p.mz*r.h-ks/2;
+    const x=hx(r,p,.09)+i*(ks+3*p.sc), y=p.Yb-.33*S*p.sc*p.mz*r.h-ks/2; // in the wall under the crown
     const o=PART[k], isNew=o===robots.indexOf(r)&&o>0;
     g.fillStyle=col(o,.9);g.fillRect(x,y,ks,ks);
     if(isNew){g.strokeStyle=ink(.9);g.lineWidth=1;g.strokeRect(x-2.5,y-2.5,ks+5,ks+5)}
