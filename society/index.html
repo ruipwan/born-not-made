@@ -85,7 +85,7 @@ html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
       <p class="note">The idea follows von Neumann's kinematic machine, which picks its parts from a lake of parts, and the digital materials of MIT's Center for Bits and Atoms, robots assembled from a small set of parts that join and come apart. It also follows Robot Metabolism, machines that grow by taking in parts from around them, and Print &amp; Place, where parts are set into a print while it is being made.</p>
       <p class="note">The arm has its base in the tail: a yaw joint turns its working plane toward the target, then two links and a short tool. At rest it lies folded on the floor of the head. A robot swims until the part is at its mouth, which sits at the waterline, and stops. The arm reaches out through the mouth, sets the magnet on the part, lifts it just clear of the water, draws it straight back along the body through the opening, and lays it on a rack on the floor of the head. Every mouth is at least wide enough for the largest part; where a genome's mouth would be smaller, the nose drops less and the snout widens. The arm plans each move so that it and what it holds stay inside the shell. Only a robot holding a tail can pick.</p>
       <p class="note">What the parts do. Core is needed to be alive, so no newborn is born without one. Power is needed too; a bigger cell holds more energy, and each extra Power lowers the idle drain. Sense sets how far it notices parts: 1 m with none, 0.6 m more for each. Drive sets swim speed. Link is a radio: robots with Link that relate share what they see and count each other from farther away. Store sets how many memory traces a body holds and passes on. Display is a small light, so others notice it a little more. Bodies charge in the pools of light.</p>
-      <p class="note">Two that relate touch mouth to mouth and exchange memory and form. The one with a tail carries and plans the newborn's kit on purpose: Core and Power, then a mix of both parents' kits, then one wish for what it ran short of. If it kept searching, Sense; if it swam far, Drive; if it ran low, Power; if it could not hold its memories, Store; and so on, with drift. It forages for those families, knowing only the parts it can sense or hear of by Link. After a while it takes substitutes, and later it goes with what it has, as long as Core and Power are there. Then it prints the newborn head bottom up. At the layer of each pocket the print pauses, the arm takes the part from the rack and sets it in, and the next layers seal it. The printed wall is 4 mm thick, so parts up to 3 mm thick go into pockets in a band around the head; thicker ones, LiPo cells, motors, cameras, sit on an inner ledge low in the head. The head is pushed out through the mouth while filling with air, so it leaves full size. Only heads are born. The tails are a fixed number; after a birth the tail lets go and another head docks it from behind.</p>
+      <p class="note">Two that relate touch mouth to mouth and exchange memory and form. The one with a tail carries; when both hold a tail, both carry, each with its own arm and chamber. A carrier plans the newborn's kit on purpose: Core and Power, then a mix of both parents' kits, then one wish for what it ran short of. If it kept searching, Sense; if it swam far, Drive; if it ran low, Power; if it could not hold its memories, Store; and so on, with drift. It forages for those families, knowing only the parts it can sense or hear of by Link. After a while it takes substitutes, and later it goes with what it has, as long as Core and Power are there. Then it prints the newborn head bottom up. At the layer of each pocket the print pauses, the arm takes the part from the rack and sets it in, and the next layers seal it. The printed wall is 4 mm thick, so parts up to 3 mm thick go into pockets in a band around the head; thicker ones, LiPo cells, motors, cameras, sit on an inner ledge low in the head. The head is pushed out through the mouth while filling with air, so it leaves full size. Only heads are born. The tails are a fixed number; after a birth the tail lets go and another head docks it from behind.</p>
       <p class="note">A body has one place for each part built into it. A robot with a tail may change its own hardware: when it has felt a lack, it eats a part of that family, cuts out the part it needs least and sets the new one in its place, and the shed part goes back out through the mouth on the same collar, for someone else. Every body needs one Core, so when the Core parts on the water are used up the population stops growing. A carrier that finds none left stops planning newborns, and tells those it touches; after that the robots only touch and swap. Nobody dies. Every printed body also differs in form: proportions, rings, crest, lobes, clay tone, print texture and how clear the silicone is are inherited and drift.</p></div>
     <p class="links"><a href="bodies/">Bodies</a>: the same society with the earlier v2 bodies. <a href="old_/">Earlier 2D version</a>. <a href="../simulator/simple/">Printing simulator, simplified</a>. <a href="touch_/">Earlier version: touch and birth</a>. <a href="../">Home</a></p>
   </aside>
@@ -343,7 +343,7 @@ const FAM = ["Core", "Sense", "Drive", "Link", "Power", "Store", "Display"], FC 
 const SUBS = ["motion", "pressure", "light", "touch", "environment"];
 const START_W = [0, 0.2, 0.17, 0.14, 0.27, 0.1, 0.12];          // the mix of families at the start, after the Core parts
 const KIT = 6, MAXF = 700, NLAY = 80, COLLAR = 0.003, VMIN = 0.008, WALL = 0.004;     // collar: 3 mm each side; parts under 8 mm are drawn at 8 mm; the printed wall is 4 mm
-const SUB_T = 15, GO_T = 28, GIVEUP_T = 200;                 // foraging: substitutes after 15 s, go with Core and Power after 28 s, give up after 200 s without them
+const SUB_T = 10, GO_T = 16, GIVEUP_T = 200;                 // foraging: substitutes after 10 s, go with Core and Power after 16 s, give up after 200 s without them
 const REST = [-0.06, Math.PI - 0.12, 0, 0];                  // the arm at rest: folded flat along the floor of the head, base in the tail
 const COL = { tile: 0x151516, chip: 0x1d1d1e, lipo: 0xb4b4b6, coin: 0x8c8c8e, motor: 0x9a9a9c, led: 0xf2f1ec, lens: 0x050505, collar: 0xe4e2dc };
 const RND = (a, b) => a + (b - a) * rnd(), MM = (v) => Math.round(v * 1000);
@@ -471,14 +471,14 @@ function reset() {
   // it begins small: two whole robots, each with Core, Power and one or two other parts in its body, a few loose tails, and every part there will ever be, on the water
   const OTHER = [FS, FD, FL, FT, FY], seedKit = () => { const k = [makePart(FC), makePart(FP)], n = 1 + Math.floor(rnd() * 2); for (let i = 0; i < n; i++) k.push(makePart(OTHER[Math.floor(rnd() * OTHER.length)])); return k; };
   const mk = (x, z, h, cool) => { const r = newRobot({ g: Array.from({ length: GENES }, () => rnd()), tail: true, kit: seedKit(), memory: SEED.map((t) => ({ t, w: 0.6 + 0.4 * rnd() })), energy: 1, age: 40, cool }); r.x = x; r.z = z; r.h = h; return r; };
-  mk(-0.6, 0.15, 0.3, 2); mk(0.7, -0.2, Math.PI - 0.2, 4);
+  mk(-0.6, 0.15, 0.3, 0); mk(0.7, -0.2, Math.PI - 0.2, 0);      // the founders are ready at once
   for (let i = 0; i < P.loose; i++) { const L = LAMPS[(i * 4 + 1) % LAMPS.length], j = rnd() * 6.283; newLoose({ g: Array.from({ length: GENES }, () => rnd()), x: L.x + Math.cos(j) * 0.4, z: L.z + Math.sin(j) * 0.4 }); }
   const nC = Math.min(P.cores, P.parts), sw = START_W.reduce((a, b) => a + b, 0), spot = () => [(rnd() * 2 - 1) * (TX - 0.4), (rnd() * 2 - 1) * (TZ - 0.4)];
   for (let i = 0; i < nC; i++) addFloat(makePart(FC), ...spot());
   for (let i = nC; i < P.parts; i++) { let u = rnd() * sw, f = 1; for (; f < 6; f++) { u -= START_W[f]; if (u <= 0) break; } addFloat(makePart(f), ...spot()); }
   log(`two robots, ${P.loose} loose tails and ${floats.length} parts on the water, ${nC} of them Core`);
 }
-function log(t) { events.push({ t: simT, text: t }); if (events.length > 5) events.shift(); $("#ev").innerHTML = events.map((e) => `<div>${fmt(e.t)}  ${esc(e.text)}</div>`).join(""); }
+function log(t) { if (window.__logAll) window.__logAll.push(fmt(simT) + " " + t); events.push({ t: simT, text: t }); if (events.length > 5) events.shift(); $("#ev").innerHTML = events.map((e) => `<div>${fmt(e.t)}  ${esc(e.text)}</div>`).join(""); }
 const fmt = (t) => { const m = Math.floor(t / 60), s = Math.floor(t % 60); return m + ":" + String(s).padStart(2, "0"); };
 const esc = (x) => String(x).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 function ripple(x, z, amp) { U.uRip.value[ripI++ % 10].set(x, z, U.uTime.value, amp); }
@@ -555,8 +555,8 @@ function armStep(r, dt) { const A = r.arm;
   if (r.needle) { if (!A.needleOn) { A.q.push({ p: r.needle.slice(), rng: DOWN, dur: 0.6, tool: "needle", fn: () => (A.needleOn = true) }); return; }
     const a = ikP(r, r.needle, -Math.PI / 2, A.el || 1); for (let k = 0; k < 4; k++) A.a[k] = a[k]; A.p = r.needle.slice(); A.th = -Math.PI / 2; A.on = true; A.tool = "needle"; }
 }
-let FORCE_EL = 0;
-const seg = (r, o) => r.arm.q.push(o);
+let FORCE_EL = 0, tailsHeld = 0;
+const seg = (r, o) => { o.dur *= 0.8; r.arm.q.push(o); };      // moves a little brisker than written
 // the range of tool angles for a pocket: from inside, pointing out along the wall's normal; onto a ledge, from above
 function pocketRng(r, q) { if (q.ledge) return DOWN; const psi = Math.atan2(q.z, Math.max(1e-4, q.x - r.armB[0])), dh = q.n[0] * Math.cos(psi) + q.n[2] * Math.sin(psi), t = Math.atan2(q.n[1], dh); return [t - 0.9, t + 0.9]; }
 function pocketTip(q, p) { const k = 0.002 + p.h / 2 + (p.col ? 0.002 : 0); return q.ledge ? [q.x, q.y + k, q.z] : [q.x - q.n[0] * k, q.y - q.n[1] * k, q.z - q.n[2] * k]; }
@@ -650,10 +650,10 @@ function giveBirth(m) {
   const sp = m.babySpec, baby = m.baby;
   const c = Math.cos(m.h), s = Math.sin(m.h), d = reach(m) - m.baby.userData.back + 0.01;      // where the full size newborn sits as it leaves the opening
   const kit = m.nk.map((t) => Object.assign({}, t, { col: false, inBaby: false }));
-  const kid = newRobot({ g: sp.g, tail: false, kit, memory: sp.memory, gen: sp.gen, parents: sp.parents, age: 0, adult: false, inflate: 1, energy: 0.4, h: m.h, cool: 30 });
+  const kid = newRobot({ g: sp.g, tail: false, kit, memory: sp.memory, gen: sp.gen, parents: sp.parents, age: 0, adult: false, inflate: 1, energy: 0.85, h: m.h, cool: 15 });
   kid.x = m.x + c * d; kid.z = m.z + s * d; kid.vx = c * 0.2; kid.vz = s * 0.2;
   m.grp.remove(baby); baby.geometry.dispose(); baby.material.forEach((x) => x.dispose()); m.baby = null; m.babySpec = null; m.nk = []; m.nkn = kitN(m.nk); m.plan = null;
-  m.carry = 0; m.birthT = 0; m.energy -= 0.5; m.cool = 12; births++;
+  m.carry = 0; m.birthT = 0; m.energy -= 0.3; m.cool = 10; births++;
   ripple(kid.x, kid.z, 1.0); log(`#${kid.id} born from #${sp.parents[0]} and #${sp.parents[1]}, generation ${kid.gen}, with ${kitText(kit)}`);
   // the tail lets go after the birth and is passed on to another head; the one that carried stays a head for a while
   if (m.tail) {
@@ -683,7 +683,7 @@ function look(r) {
       log(`#${r.id} gives up looking for ${n[FC] ? "Power" : "a Core"} for now`); return; }
     if (!F_.tgt) { const F = findFloat(r, wantMask(r)); if (F) { F.claim = r; F_.tgt = F; F_.tt = 0; } else { r.need[FS] += 0.5 / 30; if (!r.ab.link) r.need[FL] += 0.5 / 60; } }
     return; }
-  if (!r.self && r.tail && r.adult && !r.carry && !r.babySpec && !r.pair && !r.dock && simT > r.selfT) {
+  if (!r.self && r.tail && r.adult && !r.carry && !r.babySpec && !r.pair && !r.dock && simT > r.selfT && tailsHeld >= 4) {      // swaps begin once several tails are held
     r.selfT = simT + 6; let bf = -1, bv = 0.25, bs = -1;
     // a swap never takes Power, and while newborns are still coming, not a family that is getting scarce on the water, so they are not starved of parts
     for (let f = 1; f < 7; f++) { if (f === FP || (famAfloat(f) < 6 && !coreSpent())) continue; const v = r.need[f] + (r.kn[f] ? 0 : 0.3); if (v <= bv) continue; const [i, sv] = swapSlot(r, f); if (i >= 0 && sv < v - 0.1) { bf = f; bv = v; bs = i; } }
@@ -697,10 +697,11 @@ function step(dt) {
   const tick = Math.floor(simT * 2) !== Math.floor((simT - dt) * 2);
   // relations; robots with Link that relate count each other from farther away
   if (tick) { for (const r of robots) { r.relTo.clear(); r.links.length = 0; let rc = 0; for (const o of robots) { if (o === r) continue; const both = r.ab.link && o.ab.link, d = Math.hypot(o.x - r.x, o.z - r.z); if (d > (both ? 5 : 3)) continue; const v = relation(r, o); r.relTo.set(o, v); if (v > 0.42) { rc++; if (both) r.links.push(o); } } r.rel = rc; }
+    tailsHeld = 0; for (const r of robots) if (r.tail) tailsHeld++;
     for (const r of robots) look(r); }
   for (const r of robots) {
     r.age += dt; r.cool -= dt; for (let f = 1; f < 7; f++) r.need[f] *= 1 - dt / 150;
-    if (!r.adult && r.age > 30) { r.adult = true; }
+    if (!r.adult && r.age > 20) { r.adult = true; }
     if (r.tail) armStep(r, dt);
     const rad = r.len * 0.5;
     if (!r.home || simT > r.homeT) { const L = LAMPS[Math.floor(rnd() * LAMPS.length)], j = rnd() * 6.283, d = Math.sqrt(rnd()) * 0.9; r.home = [L.x + Math.cos(j) * d, L.z + Math.sin(j) * d]; r.homeT = simT + 30 + 40 * rnd(); }      // drift from one pool of light to another
@@ -741,6 +742,7 @@ function step(dt) {
           // the one holding a tail carries; if both hold one, the one with more energy
           const bearer = r.tail && o.tail ? (r.energy >= o.energy ? r : o) : r.tail ? r : o, other = bearer === r ? o : r;
           if (bearer.noCore || other.noCore) { bearer.noCore = other.noCore = true; bearer.cool = other.cool = 30; log(`#${r.id} and #${o.id} touch; no Core is left, so no newborn`); }      // they still meet and share what they know, the end of Core included
+          else if (r.tail && o.tail) { conceive(r, o); conceive(o, r); }      // when both hold a tail, both carry: each has its own arm and its own chamber
           else { conceive(bearer, other); other.energy -= 0.15; other.cool = 15; }
           r.pair = o.pair = null; r.phase = o.phase = ""; r.vx = -Math.cos(r.h) * 0.12; r.vz = -Math.sin(r.h) * 0.12; o.vx = -Math.cos(o.h) * 0.12; o.vz = -Math.sin(o.h) * 0.12;
         }
@@ -777,7 +779,7 @@ function step(dt) {
     }
     for (const Tl of loose) { if (r.dock === Tl) continue; const dx = Tl.x - r.x, dz = Tl.z - r.z, d = Math.hypot(dx, dz) || 1e-3, minD = rad + 0.2; if (d < minD) { const k = (minD - d) / minD; ax -= dx / d * 1.6 * k; az -= dz / d * 1.6 * k; } }
     // a head without a tail looks for a loose tail and docks it from behind
-    if (!r.tail && r.adult && !r.pair && !r.carry && r.inflate >= 1) {
+    if (!r.tail && (r.adult || r.age > 8) && !r.pair && !r.carry && r.inflate >= 1) {      // a newborn may take a loose tail once it has swum clear of the one that bore it
       if (r.dock && !loose.includes(r.dock)) r.dock = null;
       if (!r.dock) { let best = null, bd = 4.5; for (const Tl of loose) { const d = Math.hypot(Tl.x - r.x, Tl.z - r.z); if (!Tl.claim && !(Tl.from === r.id && simT < Tl.notUntil) && d < bd) { best = Tl; bd = d; } } if (best) { r.dock = best; best.claim = r; r.dockT = 0; log(`#${r.id} swims to a loose tail`); } }
       if (r.dock) {
