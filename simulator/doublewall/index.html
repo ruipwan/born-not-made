@@ -636,7 +636,7 @@ function boxMesh(b, mat, parent) { const m = new THREE.Mesh(new THREE.BoxGeometr
 function quiltTextures(img) {
   const W = img.width, H = img.height, c = document.createElement("canvas"); c.width = W; c.height = H; const g = c.getContext("2d"); g.drawImage(img, 0, 0); const src = g.getImageData(0, 0, W, H).data;
   const col = g.createImageData(W, H), bump = g.createImageData(W, H);
-  for (let k = 0; k < W * H; k++) { const line = src[4 * k] / 255, puff = src[4 * k + 1] / 255; const v = 238 - 125 * line - 14 * (1 - puff);
+  for (let k = 0; k < W * H; k++) { const line = src[4 * k] / 255, puff = src[4 * k + 1] / 255; const v = 236 - 38 * line - 22 * (1 - puff) * (1 - puff);          // round 3, point E: soft ribs (the puff of the channels), the seam only a quiet line
     col.data[4 * k] = v - 4; col.data[4 * k + 1] = v; col.data[4 * k + 2] = v + 4; col.data[4 * k + 3] = 255; const b = 255 * puff; bump.data[4 * k] = bump.data[4 * k + 1] = bump.data[4 * k + 2] = b; bump.data[4 * k + 3] = 255; }
   const mk = (d) => { const cv = document.createElement("canvas"); cv.width = W; cv.height = H; cv.getContext("2d").putImageData(d, 0, 0); const t = new THREE.CanvasTexture(cv); t.anisotropy = 4; t.wrapS = THREE.RepeatWrapping; return t; };
   return { map: mk(col), bump: mk(bump) };
@@ -654,8 +654,8 @@ function quiltGeo(P, na, nv) {
   const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.BufferAttribute(uv, 2)); g.setIndex(idx); g.computeVertexNormals(); return g;
 }
 function buildQuilt() {
-  const Q = J.quilt, na = Q.na, nv = Q.nv, O = b64f32(Q.outer), I = b64f32(Q.inner), clip = [SECT];
-  const outerM = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(0xffffff), roughness: 0.55, metalness: 0, clearcoat: 0.1, clearcoatRoughness: 0.5, transparent: true, opacity: 0.5, depthWrite: false, side: THREE.FrontSide, clippingPlanes: clip, emissive: new THREE.Color(0x15181b) });
+  const Q = J.quilt, na = Q.na, nv = Q.nv, O = Q.outerF || b64f32(Q.outer), I = Q.innerF || b64f32(Q.inner), clip = [SECT];
+  const outerM = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(0xffffff), roughness: 0.62, metalness: 0, clearcoat: 0.04, clearcoatRoughness: 0.7, transparent: true, opacity: 0.5, depthWrite: false, side: THREE.FrontSide, clippingPlanes: clip, emissive: new THREE.Color(0x15181b) });
   const innerM = new THREE.MeshStandardMaterial({ color: new THREE.Color(0xdfe6ea).convertSRGBToLinear(), roughness: 0.5, transparent: true, opacity: 0.28, depthWrite: false, side: THREE.DoubleSide, clippingPlanes: clip });
   const og = quiltGeo(O, na, nv), ig = quiltGeo(I, na, nv);
   const outer = new THREE.Mesh(og, outerM); outer.renderOrder = 7.2; R3.chamber.add(outer); const inner = new THREE.Mesh(ig, innerM); inner.renderOrder = 7.0; R3.chamber.add(inner); PARTS.chamber = outer; PARTS.qInner = inner;
@@ -673,7 +673,7 @@ function buildQuilt() {
 /* ---------------------------------------------------------------- the newborn: the same quilted head, a keyframed grid from the birth model (quilt.json, nbk) */
 const NB = { mesh: null, keys: null, n: 0 };
 function buildNewborn() {
-  const K = J.nbk, na = K.na, nv = K.nv, n1 = nv + 1; const b = atob(K.data), u8 = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u8[i] = b.charCodeAt(i); NB.keys = new Int16Array(u8.buffer); NB.n = na * nv; NB.sc = K.scale;
+  const K = J.nbk, na = K.na, nv = K.nv, n1 = nv + 1; if (K.keysI) NB.keys = K.keysI; else { const b = atob(K.data), u8 = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u8[i] = b.charCodeAt(i); NB.keys = new Int16Array(u8.buffer); } NB.n = na * nv; NB.sc = K.scale;
   const pos = new Float32Array(na * n1 * 3), uv = new Float32Array(na * n1 * 2), idx = [];
   for (let i = 0; i < na; i++) for (let j = 0; j <= nv; j++) { const d = i * n1 + j; uv[2 * d] = i * K.si / (K.na_full - 1); uv[2 * d + 1] = 1 - (j * K.sj) / K.nv_full; }
   for (let i = 0; i < na - 1; i++) for (let j = 0; j < nv; j++) { const a = i * n1 + j, b2 = a + 1, c = a + n1, e = c + 1; idx.push(a, c, b2, b2, c, e); }
@@ -1055,10 +1055,15 @@ function renderDoc() {
   $("#secSvg").innerHTML = s;
 }
 /* ---------------------------------------------------------------- load, loop, UI */
+async function gunzipB64(s) { const b = atob(s), u8 = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u8[i] = b.charCodeAt(i); return await new Response(new Blob([u8]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer(); }
+async function unpack(J) {          // round 3, part C: the skins as int16 at 0.05 mm, the newborn keyframes as int16 deltas, both gzip
+  if (J.quilt.enc === "int16-gzip") for (const k of ["outer", "inner"]) { const a = new Int16Array(await gunzipB64(J.quilt[k])), f = new Float32Array(a.length); for (let i = 0; i < a.length; i++) f[i] = a[i] * J.quilt.scale; J.quilt[k + "F"] = f; }
+  if (J.nbk.enc === "delta-int16-gzip") { const d = new Int16Array(await gunzipB64(J.nbk.data)), nk = J.nbk.frames.length, m = d.length / nk, o = new Int16Array(d.length); for (let k = 0; k < nk; k++) for (let i = 0; i < m; i++) o[k * m + i] = (k ? o[(k - 1) * m + i] : 0) + d[k * m + i]; J.nbk.keysI = o; }
+}
 async function loadAll() {
   const [j, a, g] = await Promise.all([getJSON("quilt.json"), getJSON("arm.json"), fetch("quilt_print.gcode").then((r) => r.ok ? r.text() : "").catch(() => "")]);
   if (!j || !a) { $("#ovStage").textContent = "The data files did not load"; throw new Error("data"); }
-  J = j; J.read.wlz = J.WL; UW.uWL.value = J.WL; Object.assign(ARMD, a); GCL = g.split("\n").filter((l) => l.length);
+  J = j; await unpack(J); J.read.wlz = J.WL; UW.uWL.value = J.WL; Object.assign(ARMD, a); GCL = g.split("\n").filter((l) => l.length);
   buildWater(); buildBody(); buildArm(); buildBaby(); buildGallery(); setShadows(); buildLabels(); renderDoc();
   log("quilt.json: " + J.fr.q0.length + " frames, " + J.checks.length + " checks", "a"); const bad = J.checks.filter((c) => !c.ok); for (const c of bad) log("fails: " + c.name, "w");
   log("penetration test: worst pair " + f2(J.read.pen_max * 1000) + " mm over " + J.fr.pen.length + " frames", J.read.pen_max > 0.001 ? "w" : "a");
