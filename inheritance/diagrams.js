@@ -143,6 +143,130 @@ function loop(canvas,W,H,dur,draw){
   });
 })();
 
+/* 3 · How a part gets into the wall. Close up section of the wall being printed flat in the gel, 8 px to the mm.
+   Method from the sources listed under the canvas: a tapered rim, a bed of fresh silicone, the pod pressed in wet (Valentine 2017,
+   Wehner 2016), the cover printed wet on wet within the pot life of Dragon Skin 30 (Smooth-On bulletin). */
+(function(){
+  const cv=document.getElementById('d-wall');if(!cv)return;
+  const W=1600,H=800,DUR=34;
+  const X0=380,X1=1560,LB=600,LT=590,UT=572,PX=960,PH=120,PT=522,PB=578; // lower skin bottom/top, upper skin top, pod half width, pod top/bottom
+  const WEBS=[383,470,560,650,1270,1360,1450,1537], MAG={x:40,w:280,y:210,h:340}, MSP=108;
+  const GS=130; // gel surface
+  function pod(c,x,y,a,ports){ // x = center, y = bottom
+    c.save();c.globalAlpha*=a;
+    c.fillStyle='#000';c.strokeStyle=ink(.85);c.lineWidth=1.3;
+    c.beginPath();c.roundRect(x-PH,y-56,2*PH,48,8);c.fill();c.stroke();
+    // flange with holes, the lock for the fresh silicone
+    c.beginPath();c.rect(x-PH-12,y-8,2*PH+24,8);c.fill();c.stroke();
+    c.fillStyle='#000';c.strokeStyle=ink(.6);[-1,1].forEach(s=>[0,1].forEach(k=>{const hx=x+s*(PH+2-k*20)-4;c.fillRect(hx,y-7,8,6);c.strokeRect(hx,y-7,8,6)}));
+    // the parts inside, faint
+    c.strokeStyle=ink(.35);c.lineWidth=1;c.strokeRect(x-PH+16,y-46,92,28);c.strokeRect(x-PH+120,y-42,46,20);c.strokeRect(x+60,y-44,44,24);
+    if(ports){c.strokeStyle=ink(.85);c.lineWidth=1.3;[x+70,x+94].forEach(px=>{c.beginPath();c.moveTo(px-4,y-56);c.lineTo(px-4,y-104);c.moveTo(px+4,y-56);c.lineTo(px+4,y-104);c.stroke();c.fillStyle=ink(.85);c.fillRect(px-6,y-110,12,6)})}
+    c.restore();
+  }
+  function needle(c,x,y,a){c.save();c.globalAlpha*=a;c.strokeStyle=ink(.85);c.fillStyle='#000';c.lineWidth=1.3;
+    c.beginPath();c.moveTo(x-9,y-190);c.lineTo(x+9,y-190);c.lineTo(x+9,y-40);c.lineTo(x+2,y);c.lineTo(x-2,y);c.lineTo(x-9,y-40);c.closePath();c.fill();c.stroke();
+    c.strokeStyle=ink(.3);c.beginPath();c.moveTo(x,y-190);c.lineTo(x,-10);c.stroke();c.restore()}
+  function holder(c,x,y,a,on){c.save();c.globalAlpha*=a;c.strokeStyle=ink(.85);c.fillStyle='#000';c.lineWidth=1.3;
+    c.beginPath();c.rect(x-5,y-170,10,130);c.fill();c.stroke();c.beginPath();c.rect(x-40,y-40,80,40);c.fill();c.stroke();
+    if(on){c.fillStyle=ink(.85);c.fillRect(x-30,y-6,60,4)}
+    c.strokeStyle=ink(.3);c.beginPath();c.moveTo(x,y-170);c.lineTo(x,-10);c.stroke();c.restore()}
+  function tag(c,s,x,y,ax,ay,a,align){c.save();c.globalAlpha*=a;if(ax!==undefined){c.strokeStyle=ink(.35);c.lineWidth=1;c.font='11px '+mono;const tw=c.measureText(s).width+s.length*1.2,left=align==='right'?x-tw:x,ex=ax<left?left-6:ax>left+tw?left+tw+6:ax;c.beginPath();c.moveTo(ax,ay);c.lineTo(ex,ax>=left&&ax<=left+tw?y+4:y-4);c.stroke();c.fillStyle=ink(.8);c.beginPath();c.arc(ax,ay,2.2,0,7);c.fill()}
+    text(c,s,x,y,11,.6,mono,align||'left',1.2);c.restore()}
+  const STEPS=[
+    [0,5.5,'1 · Lower skin','The needle prints the lower skin, the webs and a low rim.','The rim is tapered. It will center the pod, so a small error at the tool change does no harm.'],
+    [5.5,8.5,'2 · A bed','Into the rim goes a bed of fresh silicone, so no gel stays there.','Gel left in the rim would stay as a film and stop the bond. The bed pushes the gel out first.'],
+    [8.5,10.5,'Tool change','Tool change in the tail: the needle off, the magnet holder on.',''],
+    [10.5,17.5,'3 · The pod','The holder brings a sealed pod from the dry magazine and presses the pod into the wet bed.','The pod is cast in Dragon Skin 30 beforehand, with a flange full of holes. Bed and gel squeeze out at the rim.'],
+    [17.5,19.5,'Tool change','Tool change: the holder off, the needle back on.',''],
+    [19.5,26,'4 · The cover','Wet on wet, the needle prints around the pod, over the pod, then the upper skin.','All within the 45 minutes of pot life of Dragon Skin 30, so bed, flange holes and cover cure as one.'],
+    [26,DUR,'5 · Cured, then “birth”','After the cure the pod is a solid island between the two skins. Air fills the cells around it.','16 hours of cure. No wire crosses the skin: Bluetooth from the controller, charging by a coil through the skin. A pump pod adds two capped ports.']];
+  loop(cv,W,H,DUR,(c,t)=>{
+    const fade=1-ease(t,DUR-.6,DUR);c.globalAlpha=fade;
+    // gel, tail and dock
+    c.fillStyle='rgba(255,255,255,.025)';c.fillRect(X0-40,GS,W-X0+40,LB+40-GS);
+    c.strokeStyle=ink(.25);c.lineWidth=1;c.beginPath();for(let x=X0-40;x<=W;x+=10){const y=GS+1.2*Math.sin(x*.02+t*.7);x>X0-40?c.lineTo(x,y):c.moveTo(x,y)}c.stroke();
+    c.setLineDash([4,6]);c.beginPath();c.moveTo(X0-40,GS-30);c.lineTo(X0-40,LB+40);c.stroke();c.setLineDash([]);
+    text(c,'TAIL',X0-56,GS-14,11,.5,mono,'right',1.2);text(c,'HEAD',X0-24,GS-14,11,.5,mono,'left',1.2);
+    tag(c,'GEL, CARBOPOL',W-30,GS+30,undefined,undefined,1,'right');
+    // magazine, dry, in the tail
+    c.strokeStyle=ink(.6);c.lineWidth=1.2;c.beginPath();c.moveTo(MAG.x,MAG.y);c.lineTo(MAG.x,MAG.y+MAG.h);c.lineTo(MAG.x+MAG.w,MAG.y+MAG.h);c.lineTo(MAG.x+MAG.w,MAG.y);c.stroke();
+    text(c,'MAGAZINE, DRY',MAG.x,MAG.y-62,11,.6,mono,'left',1.2);text(c,'IN THE TAIL',MAG.x,MAG.y-46,11,.6,mono,'left',1.2);
+    const taken=t>=12.2&&t<DUR-.6;
+    for(let k=0;k<(taken?2:3);k++)pod(c,MAG.x+MAG.w/2,MAG.y+MAG.h-8-k*MSP,1,true);
+    // the wall: lower skin and webs and rim
+    const sk=ease(t,.3,3.2), wb=ease(t,3.2,4.4), rim=ease(t,4.2,5.5), bed=ease(t,5.8,8.2);
+    const inflate=ease(t,27,30), cell=lerp(8,64,inflate);
+    c.fillStyle=ink(.16);c.strokeStyle=ink(.8);c.lineWidth=1;
+    const xs=lerp(X0,X1,sk);if(sk>0){c.fillRect(X0,LT,xs-X0,LB-LT);c.strokeRect(X0,LT,xs-X0,LB-LT)}
+    WEBS.forEach((x,i)=>{const a=ease(t,3.2+i*.15,3.5+i*.15);if(a<=0)return;c.globalAlpha=fade*a;c.fillRect(x-3,LT-cell,6,cell);c.strokeRect(x-3,LT-cell,6,cell);c.globalAlpha=fade});
+    if(rim>0){c.globalAlpha=fade*rim;[-1,1].forEach(s=>{c.beginPath();c.moveTo(PX+s*136,LT);c.lineTo(PX+s*146,LT-32);c.lineTo(PX+s*154,LT-32);c.lineTo(PX+s*144,LT);c.closePath();c.fill();c.stroke()});c.globalAlpha=fade}
+    if(bed>0){const top=LT-16*bed;c.fillStyle=ink(.3);c.fillRect(PX-136,top,272,LT-top)}
+    // squeeze out at the rim when the pod goes in
+    const sq=ease(t,14.4,15.6);
+    if(sq>0&&t<19.5+3){[-1,1].forEach(s=>{c.fillStyle=ink(.3);c.beginPath();c.ellipse(PX+s*150,LT-34,7*sq,5*sq,0,0,7);c.fill()})}
+    // the tool: position and kind
+    let tool='needle',tx=PX,ty=LT,on=false,carry=false;
+    const zz=(u,x0,x1,n)=>lerp(x0,x1,Math.abs((u*n%2)-1));
+    if(t<3.2){tx=lerp(X0,X1,sk);ty=LB-2}
+    else if(t<4.4){const i=Math.min(WEBS.length-1,Math.floor((t-3.2)/.15));tx=WEBS[i];ty=LT-8}
+    else if(t<5.5){tx=t<4.85?PX-150:PX+150;ty=LT-30}
+    else if(t<8.5){tx=zz(bed,PX-128,PX+128,6);ty=LT-16*bed}
+    else if(t<10.5){const u=(t-8.5)/2,away=[MAG.x+MAG.w/2,-40];tool=u<.5?'needle':'holder';const v=u<.5?ease(u,0,.5):1-ease(u,.5,1);
+      const from=u<.5?[PX,LT-16]:[MAG.x+MAG.w/2,MAG.y-60];tx=lerp(from[0],away[0],v);ty=lerp(from[1],away[1]+100,v)}
+    else if(t<17.5){tool='holder';const top=[MAG.x+MAG.w/2,MAG.y+MAG.h-8-2*MSP-56],seat=[PX,PT];
+      if(t<12){tx=top[0];ty=lerp(MAG.y-60,top[1],ease(t,10.5,11.8))}
+      else if(t<12.4){tx=top[0];ty=top[1];on=t>=12.1;carry=on}
+      else if(t<15.6){on=true;carry=true;const u=ease(t,12.4,14.2),d=ease(t,14.2,15.6);tx=lerp(top[0],seat[0],u);ty=t<14.2?lerp(top[1],PT-60,u)-80*Math.sin(Math.PI*u):lerp(PT-60,PT,d)}
+      else if(t<16.1){tx=PX;ty=PT;on=false}
+      else{tx=PX;ty=lerp(PT,PT-130,ease(t,16.1,17.4))}}
+    else if(t<19.5){const u=(t-17.5)/2;tool=u<.5?'holder':'needle';const v=u<.5?ease(u,0,.5):1-ease(u,.5,1);
+      const from=u<.5?[PX,PT-130]:[PX-170,LT-20];tx=lerp(from[0],MAG.x+MAG.w/2,v);ty=lerp(from[1],60,v)}
+    else if(t<26){const u=ease(t,19.5,23.5),w=ease(t,23.5,25.8);
+      if(t<23.5){tx=zz(u,PX-168,PX+168,10);ty=lerp(LT-20,PT-18,u)}else{tx=w<.5?lerp(PX-170,WEBS[0],w*2):lerp(PX+170,WEBS[WEBS.length-1],(w-.5)*2);ty=UT}}
+    else{tool='none'}
+    // the pod in the wall, once placed
+    const placed=t>=15.6;
+    if(placed)pod(c,PX,PB,1,true);
+    if(carry){pod(c,tx,ty+56,1,true)}
+    // the cover, printed from the bottom up, and the upper skin outward
+    const cov=ease(t,19.5,23.5), us=ease(t,23.5,25.8);
+    if(cov>0){const top=lerp(LT,PT-16,cov);c.save();c.beginPath();c.rect(0,top,W,H);c.clip();
+      const P=new Path2D();P.moveTo(PX-170,LT);P.lineTo(PX-170,PT+4);P.quadraticCurveTo(PX-170,PT-16,PX-140,PT-16);P.lineTo(PX+140,PT-16);P.quadraticCurveTo(PX+170,PT-16,PX+170,PT+4);P.lineTo(PX+170,LT);P.closePath();
+      c.fillStyle='rgba(236,235,230,.13)';c.fill(P);c.strokeStyle=ink(.8);c.lineWidth=1;c.stroke(P);c.restore();pod(c,PX,PB,.25*cov,true)}
+    if(us>0){c.fillStyle=ink(.16);c.strokeStyle=ink(.8);c.lineWidth=1;
+      const xl=lerp(PX-170,WEBS[0],us),xr=lerp(PX+170,WEBS[WEBS.length-1],us),yb=LT-cell;
+      // upper skin: flat while printed, cells bulge when inflated
+      const seg=(xa,xb)=>{const P=new Path2D();const pts=[xa,...WEBS.filter(x=>x>xa&&x<xb),xb];P.moveTo(xa,yb);
+        for(let i=1;i<pts.length;i++){const m=(pts[i-1]+pts[i])/2;P.quadraticCurveTo(m,yb-26*inflate,pts[i],yb)}
+        P.lineTo(xb,yb-10);for(let i=pts.length-1;i>0;i--){const m=(pts[i-1]+pts[i])/2;P.quadraticCurveTo(m,yb-10-26*inflate,pts[i-1],yb-10)}P.closePath();c.fill(P);c.stroke(P)};
+      seg(xl,PX-170);seg(PX+170,xr)}
+    // cells and links after "birth"
+    if(inflate>0){tag(c,'CELL, AIR',1010+320,LT-cell-70,1315,LT-cell/2,inflate);
+      const r=ease(t,29.5,31);if(r>0)for(let k=0;k<3;k++){c.strokeStyle=ink(.5*r*(1-((t*0.8+k/3)%1)));c.lineWidth=1;c.beginPath();c.arc(PX-40,PT-16,30+((t*0.8+k/3)%1)*70,-Math.PI*.85,-Math.PI*.15);c.stroke()}}
+    // the tool
+    if(tool==='needle')needle(c,tx,ty,1);else if(tool==='holder')holder(c,tx,ty,1,on);
+    // tags
+    tag(c,'LOWER SKIN, 1.2 MM',W-30,LB+30,X1-60,LB-5,sk,'right');
+    tag(c,'WEB',WEBS[5]-60,LB+30,WEBS[5],LT-4,wb*(1-inflate),'right');
+    tag(c,'RIM',PX-260,LT-70,PX-150,LT-24,rim*(1-ease(t,19.5,20.5)),'right');
+    tag(c,'FRESH BED',PX+300,LT-70,PX+100,LT-8,bed*(1-ease(t,10.5,11.5)),'left');
+    tag(c,'POD',PX+300,PT-70,PX+PH,PT+20,ease(t,15.6,16.2)*(1-ease(t,19.5,20)),'left');
+    tag(c,'FLANGE HOLES',PX+300,PT-40,PX+PH-4,PB-4,ease(t,15.8,16.4)*(1-ease(t,19.5,20)),'left');
+    tag(c,'CAPPED PORTS, PUMP POD',PX+300,PT-110,PX+94,PB-110,ease(t,16,16.6)*(1-ease(t,27,27.5)),'left');
+    tag(c,'COVER',PX-300,PT-40,PX-150,PT+20,ease(t,20,20.6)*(1-ease(t,27,27.5)),'right');
+    tag(c,'UPPER SKIN',X0+120,LT-cell-56,X0+80,LT-cell-4,us,'left');
+    if(t>=26){text(c,'16 HOURS LATER',W-30,GS+60,11,.6*ease(t,26,26.5),mono,'right',1.2)}
+    // caption
+    const S=STEPS.find(s=>t>=s[0]&&t<s[1])||STEPS[STEPS.length-1];
+    text(c,S[2].toUpperCase(),64,H-104,12,.55,mono,'left',1.6);
+    c.save();c.font='26px Georgia';const w=c.measureText(S[3]).width;c.restore();
+    text(c,S[3],64,H-68,Math.min(26,26*1470/w),.95,'Georgia');
+    if(S[4])text(c,S[4],64,H-36,14,.6);
+    c.globalAlpha=1;return S[2]+'. '+S[3]+' '+S[4];
+  });
+})();
+
 /* 4 · The tail copies itself */
 (function(){
   const cv=document.getElementById('d-tail');if(!cv)return;
