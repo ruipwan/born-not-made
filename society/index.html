@@ -508,7 +508,7 @@ function bodyMesh(r) {
 const FAM = ["Core", "Sense", "Drive", "Link", "Power", "Store", "Display"], FC = 0, FS = 1, FD = 2, FL = 3, FP = 4, FT = 5, FY = 6;
 const SUBS = ["motion", "pressure", "light", "touch", "environment"];
 const START_W = [0, 0.15, 0.16, 0.13, 0.32, 0.10, 0.14];          // the mix of families at the start, after the Core parts: Power is about a third, since every head and the pods of every new tail need one, so Power and Core run out at about the same time
-const KIT = 6, MAXF = 700, NLAY = 80, COLLAR = 0.003, VMIN = 0.012, WALL = 0.004;     // collar: 3 mm each side; parts under 12 mm are drawn at 12 mm; the printed wall is 4 mm
+const KIT = 6, MAXF = 700, NLAY = 18, COLLAR = 0.003, VMIN = 0.012, WALL = 0.004;     // the newborn is printed folded flat in 18 layers, as in the quilted head study; collar: 3 mm each side; parts under 12 mm are drawn at 12 mm; the printed wall is 4 mm
 const SUB_T = 10, GO_T = 16, GIVEUP_T = 200;                 // foraging: substitutes after 10 s, go with Core and Power after 16 s, give up after 200 s without them
 const COL = { board: 0x2a2b2d, dark: 0x0c0c0d, tile: 0x151516, chip: 0x1d1d1e, lipo: 0xb4b4b6, coin: 0x8c8c8e, motor: 0x9a9a9c, led: 0xf2f1ec, lens: 0x050505, collar: 0xe4e2dc };
 const RND = (a, b) => a + (b - a) * rnd(), MM = (v) => Math.round(v * 1000);
@@ -1140,13 +1140,15 @@ function startPrint(r) {
   const plane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0);
   const mk = (m) => clipMat(m, plane);
   mouthDark(geo); const baby = new THREE.Mesh(geo, [mk(MAT.clay), mk(MAT.clay), mk(MAT.mouth)]); baby.material[1].color.set(0xeceae4);
-  baby.updateMorphTargets(); baby.morphTargetInfluences[0] = 1; baby.renderOrder = 4; baby.userData.plane = plane; baby.userData.len = geo.userData.len; baby.userData.back = geo.userData.back; baby.userData.full = geo.attributes.position.array.slice(); baby.userData.A = s.A; baby.userData.B = s.B; baby.frustumCulled = false;
+  baby.updateMorphTargets(); baby.morphTargetInfluences[0] = 1; baby.renderOrder = 4; baby.userData.plane = plane; baby.userData.len = geo.userData.len; baby.userData.back = geo.userData.back; baby.userData.full = geo.attributes.position.array.slice();
+  { const k = (0.6 * r.s.B + 0.02) / NLAY, a = geo.attributes.aTex.array; for (let i = 0; i < a.length; i += 4) { a[i] = 0; a[i + 1] = k; a[i + 2] = 0.0006; a[i + 3] = 0; } geo.attributes.aTex.needsUpdate = true; }      // its 18 layers show as ridges on the folded newborn baby.userData.A = s.A; baby.userData.B = s.B; baby.frustumCulled = false;
   r.grp.add(baby); r.baby = baby; r.carry = 0.0001; r.paused = false;
   // one pocket per tile; the print pauses when it reaches the layer of each pocket
   sp.pocket = r.nk.map((p, i) => pocketOf(s, p, i, 1.0)); const y0 = -0.6 * r.s.B, y1 = 0.02;
   sp.pf = sp.pocket.map((q) => clamp((babyPt(r, q)[1] - y0) / (y1 - y0), 0.04, 0.96)); sp.order = sp.pf.map((_, i) => i).sort((a, b) => sp.pf[a] - sp.pf[b]); sp.next = 0;
   if (r.forage && r.forage.tgt) r.forage.tgt.claim = null; r.forage = null;
   log(`#${r.id} has ${r.nk.map((t) => FAM[t.f]).join(", ")} and prints the next one`); focusOn(r, 6);
+  dtag(() => worldOf(r, [BABYX, -r.s.B * 0.2, 0]), `NEXT HEAD PRINTED FOLDED FLAT · ${NLAY} LAYERS, AROUND ITS KIT (QUILTED HEAD STUDY)`, 5);
 }
 function giveBirth(m) {
   const sp = m.babySpec, baby = m.baby;
