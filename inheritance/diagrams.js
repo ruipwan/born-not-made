@@ -124,7 +124,7 @@ function loop(canvas,W,H,dur,draw){
     [[1380,120],'top',900,'Quilted double wall','Two skins of Dragon Skin 30, 1.2 mm, webs of 0.8 mm, air in the cells.'],
     [[1760,300],'right',95,'Mouth','The newborn leaves here, inflating on the way.'],
     [[1500,700],'right',260,'Gel','A shallow layer in the lower head, 5.2 kg.'],
-    [[1330,650],'right',400,'The next body','Printed folded flat in 18 layers, 143 x 194 x 79 mm.'],
+    [[1330,650],'right',400,'The next body','Printed folded flat in 18 layers, 143 x 194 x 79 mm; its pod adds about 23 mm.'],
     [[920,470],'bottom',300,'Tools','In saddles on the tail wall: a magnet holder that picks up parts, and the printing needle.'],
     [[680,600],'bottom',560,'Steel plate','Under the arm base. With the relay steel, 1.9 kg that keeps the tail upright.'],
     [[985,420],'bottom',820,'Docks from behind','Gel face to gel face. The tail moves on to the next head.']];
@@ -151,141 +151,242 @@ function loop(canvas,W,H,dur,draw){
   });
 })();
 
-/* 3 · How a part gets into the wall. Close up section of the wall being printed flat in the gel, 8 px to the mm.
-   Method from the sources listed under the canvas: a tapered rim, a bed of fresh silicone, the pod pressed in wet (Valentine 2017,
-   Wehner 2016), the cover printed wet on wet within the pot life of Dragon Skin 30 (Smooth-On bulletin). */
+/* 3 · How a part gets into the wall. First the kit is composed on one plate (top view, 3.5 px to the mm), then the plate is potted into one pod,
+   then the pod goes into the wall (side section, 2.8 px to the mm; skins and beads drawn about twice their thickness so they read).
+   Parts and numbers: Raspberry Pi 5 mechanical drawing and documentation (raspberrypi.com), TI DRV8833 datasheet SLVSAR1E,
+   Pololu S13V30F5 product page, the AITIAO 3 to 4.5 V pump as recorded in build/data/components.json (no maker sheet exists),
+   the 18650 cell as in simulator/doublewall/quilt.json. Sensor breakout sizes are assumed. */
 (function(){
   const cv=document.getElementById('d-wall');if(!cv)return;
-  const W=1600,H=800,DUR=34;
-  const X0=380,X1=1560,LB=600,LT=590,UT=572,PX=960,PH=120,PT=522,PB=578; // lower skin bottom/top, upper skin top, pod half width, pod top/bottom
-  const WEBS=[383,470,560,650,1270,1360,1450,1537], MAG={x:40,w:280,y:210,h:340}, MSP=108;
-  const GS=130; // gel surface
-  function pod(c,x,y,a,ports){ // x = center, y = bottom
-    c.save();c.globalAlpha*=a;
-    c.fillStyle='#000';c.strokeStyle=ink(.85);c.lineWidth=1.3;
-    c.beginPath();c.roundRect(x-PH,y-56,2*PH,48,8);c.fill();c.stroke();
-    // flange with holes, the lock for the fresh silicone
-    c.beginPath();c.rect(x-PH-12,y-8,2*PH+24,8);c.fill();c.stroke();
-    c.fillStyle='#000';c.strokeStyle=ink(.6);[-1,1].forEach(s=>[0,1].forEach(k=>{const hx=x+s*(PH+2-k*20)-4;c.fillRect(hx,y-7,8,6);c.strokeRect(hx,y-7,8,6)}));
-    // the parts inside, faint
-    c.strokeStyle=ink(.35);c.lineWidth=1;c.strokeRect(x-PH+16,y-46,92,28);c.strokeRect(x-PH+120,y-42,46,20);c.strokeRect(x+60,y-44,44,24);
-    if(ports){c.strokeStyle=ink(.85);c.lineWidth=1.3;[x+70,x+94].forEach(px=>{c.beginPath();c.moveTo(px-4,y-56);c.lineTo(px-4,y-104);c.moveTo(px+4,y-56);c.lineTo(px+4,y-104);c.stroke();c.fillStyle=ink(.85);c.fillRect(px-6,y-110,12,6)})}
-    c.restore();
+  const W=1600,H=860,TC=34,DUR=TC+36;
+  /* ---------- the plate, top view, mm ---------- */
+  const K=3.5,OX=470,OY=196, P=(x,y)=>[OX+x*K,OY+y*K];
+  const PL={w:152,h:84};
+  const PART={
+    pumpA:{x:0,y:3,w:42.6,h:23.9}, pumpB:{x:0,y:30,w:42.6,h:23.9},
+    drv:{x:47,y:4,w:14,h:12}, pi:{x:64,y:0,w:85,h:56},
+    cell:{x:0,y:62,w:65.25,h:18.75}, reg:{x:69,y:60,w:22.9,h:22.9},
+    imu:{x:96,y:60,w:20,h:18}, mic:{x:119,y:60,w:14,h:14}, amp:{x:136,y:60,w:14,h:14},
+    ghost:{x:158,y:60,w:20,h:18}};
+  // GPIO header: 2 x 20 at 2.54 mm, starting 7.1 mm from the left edge of the Pi; even pins on the outer row
+  const pin=n=>{const col=Math.floor((n-1)/2),x=PART.pi.x+7.1+1.27+col*2.54,y=PART.pi.y+(n%2?4.77:2.23);return [x,y]};
+  const cen=p=>[p.x+p.w/2,p.y+p.h/2];
+  function rectMM(c,p,dx,dy,a,fill){const [x,y]=P(p.x+dx,p.y+dy);c.save();c.globalAlpha*=a;c.fillStyle=fill||'#000';c.strokeStyle=ink(.85);c.lineWidth=1.2;c.beginPath();c.roundRect(x,y,p.w*K,p.h*K,3);c.fill();c.stroke();c.restore()}
+  function piBoard(c,a){const p=PART.pi;rectMM(c,p,0,0,a,'#060606');c.save();c.globalAlpha*=a;c.strokeStyle=ink(.5);c.lineWidth=1;
+    const R=(x,y,w,h)=>{const [X,Y]=P(p.x+x,p.y+y);c.strokeRect(X,Y,w*K,h*K)};
+    R(7.1,0.9,50.8,5.1);                       // 40 pin header
+    c.fillStyle=ink(.45);for(let n=1;n<=40;n++){const [x,y]=P(...pin(n));c.fillRect(x-1,y-1,2,2)}
+    R(24,14,14,14);R(46,14,8,8);                // SoC, RP1
+    R(70.5,2,17.5,14);R(70.5,20,17.5,14);R(67,37,21,16); // USB, USB, Ethernet, 3 mm over the edge
+    R(7.2,52,8,5);R(22.8,53,6,3.5);R(36.2,53,6,3.5);         // USB C, micro HDMI x2
+    R(44,38,3,12);R(51,38,3,12);                // two MIPI connectors
+    R(-0.5,20,3,14);                            // PCIe connector
+    [[3.5,3.5],[61.5,3.5],[3.5,52.5],[61.5,52.5]].forEach(([x,y])=>{const [X,Y]=P(p.x+x,p.y+y);c.beginPath();c.arc(X,Y,1.35*K,0,7);c.stroke()});
+    c.restore()}
+  function pump(c,p,dx,dy,a){rectMM(c,p,dx,dy,a);c.save();c.globalAlpha*=a;c.strokeStyle=ink(.6);c.lineWidth=1;
+    const [nx,ny]=P(p.x+dx-6,p.y+dy+p.h/2-2.5);c.strokeRect(nx,ny,6*K,5*K);                 // outlet nozzle
+    const [ix,iy]=P(p.x+dx+28,p.y+dy+p.h/2);c.beginPath();c.arc(ix,iy,4*K,0,7);c.stroke();   // inlet, underneath
+    c.restore()}
+  function small(c,p,dx,dy,a,chip){rectMM(c,p,dx,dy,a);if(chip){c.save();c.globalAlpha*=a;c.strokeStyle=ink(.55);const [x,y]=P(p.x+dx+p.w/2-2.5,p.y+dy+p.h/2-2.2);c.strokeRect(x,y,5*K,4.4*K);c.restore()}}
+  function cell(c,p,dx,dy,a){const [x,y]=P(p.x+dx,p.y+dy);c.save();c.globalAlpha*=a;c.fillStyle='#000';c.strokeStyle=ink(.85);c.lineWidth=1.2;c.beginPath();c.roundRect(x,y,p.w*K,p.h*K,p.h*K/2);c.fill();c.stroke();
+    c.strokeStyle=ink(.5);c.beginPath();c.moveTo(x+(p.w-2)*K,y+4);c.lineTo(x+(p.w-2)*K,y+p.h*K-4);c.stroke();c.restore()}
+  /* wires: kind 0 signal, 1 power, 2 water; slack 1 = long lead, 0 = short lead on the plate */
+  function wire(c,pts,kind,u,slack,a){if(u<=0)return;const Q=pts.map(q=>P(...q));c.save();c.globalAlpha*=a;
+    c.strokeStyle=kind===0?col(1,.95):kind===1?col(0,.95):col(2,.95);c.lineWidth=kind===1?2.6:1.5;if(kind===2)c.setLineDash([6,5]);
+    // sample a smooth path through the points, bowed out by the slack, and draw the first fraction u
+    const S=[];for(let i=0;i<Q.length-1;i++){const [x0,y0]=Q[i],[x1,y1]=Q[i+1],dx=x1-x0,dy=y1-y0,L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L,b=slack*Math.min(22,L*.18);
+      for(let k=0;k<=20;k++){const s=k/20,w=Math.sin(Math.PI*s)*b;S.push([x0+dx*s+nx*w,y0+dy*s+ny*w])}}
+    let tot=0;for(let i=1;i<S.length;i++)tot+=Math.hypot(S[i][0]-S[i-1][0],S[i][1]-S[i-1][1]);let lim=tot*u,acc=0;
+    c.beginPath();c.moveTo(...S[0]);for(let i=1;i<S.length;i++){const d=Math.hypot(S[i][0]-S[i-1][0],S[i][1]-S[i-1][1]);if(acc+d>lim){const f=(lim-acc)/d;c.lineTo(S[i-1][0]+(S[i][0]-S[i-1][0])*f,S[i-1][1]+(S[i][1]-S[i-1][1])*f);break}acc+=d;c.lineTo(...S[i])}c.stroke();c.restore()}
+  function lab(c,s,x,y,ax,ay,a,align){c.save();c.globalAlpha*=a;if(ax!==undefined){c.strokeStyle=ink(.35);c.lineWidth=1;c.beginPath();c.moveTo(ax,ay);c.lineTo(align==='right'?x+6:x-6,y-4);c.stroke();c.fillStyle=ink(.8);c.beginPath();c.arc(ax,ay,2.2,0,7);c.fill()}
+    text(c,s,x,y,11,.75,mono,align||'left',1.1);c.restore()}
+  const fly=(t,t0,t1,dist)=>(1-ease(t,t0,t1))*dist;
+  function compose(c,t){
+    const plate=ease(t,23,24.5), slack=1-ease(t,24.5,27), pot=ease(t,27,29.5), cap=ease(t,29.5,30.5);
+    // plate: aluminum carrier, all parts on top
+    if(plate>0){c.save();c.globalAlpha*=plate;const [x,y]=P(-1,-1);c.fillStyle='rgba(255,255,255,.05)';c.strokeStyle=ink(.55);c.lineWidth=1.2;c.setLineDash([2,4]);c.fillRect(x,y,(PL.w+2)*K,(PL.h+2)*K);c.strokeRect(x,y,(PL.w+2)*K,(PL.h+2)*K);c.restore()}
+    // a: the Pi 5 alone
+    piBoard(c,ease(t,.2,1.4));
+    // b: sensors beside the Pi, one I2C chain and one I2S pair
+    const sA=ease(t,4.5,6),sB=ease(t,5.5,7),sC=ease(t,6,7.5);
+    small(c,PART.imu,fly(t,4.5,6,60),0,sA,true);small(c,PART.mic,fly(t,5.5,7,60),0,sB,true);small(c,PART.amp,fly(t,6,7.5,60),0,sC,true);
+    if(sC>0){c.save();c.globalAlpha*=sC;c.strokeStyle=ink(.7);const [x,y]=P(PART.amp.x+PART.amp.w/2,PART.amp.y+PART.amp.h+5);c.beginPath();c.arc(x+fly(t,6,7.5,60)*K,y,5*K,0,7);c.stroke();c.restore()}
+    const g=ease(t,8.5,9.5)*(1-ease(t,26,27.5));if(g>0){c.save();c.globalAlpha*=g;const [x,y]=P(PART.ghost.x,PART.ghost.y);c.strokeStyle=ink(.5);c.setLineDash([4,4]);c.strokeRect(x,y,PART.ghost.w*K,PART.ghost.h*K);c.restore()}
+    // the free connector blinks: the bus goes on
+    if(t>8.5&&t<27){const on=(Math.floor(t*2.5)%2)===0;const [x,y]=P(PART.imu.x+PART.imu.w-1.5,PART.imu.y+4);c.fillStyle=col(1,on?.95:.25);c.fillRect(x-4,y,8,12)}
+    wire(c,[pin(3),[pin(3)[0],22],[94,22],[94,66],[PART.imu.x,66]],0,ease(t,6.5,8),slack,1);                       // I2C, GPIO 2 and 3, with 3.3 V and ground
+    wire(c,[pin(12),[pin(12)[0],30],[126,30],[126,PART.mic.y]],0,ease(t,7,8.5),slack,1);                                // I2S to the microphone
+    wire(c,[pin(40),[pin(40)[0],34],[143,34],[143,PART.amp.y]],0,ease(t,7.3,8.8),slack,1);                              // I2S to the amplifier
+    wire(c,[[PART.imu.x+PART.imu.w,64],[PART.ghost.x,64]],0,ease(t,8.6,9.6),0,.6*(1-ease(t,26,27.5)));
+    // c: driver, two PWM lines, then the pumps
+    const d=ease(t,11,12.5);small(c,PART.drv,0,-fly(t,11,12.5,40),d,true);
+    wire(c,[pin(32),[pin(32)[0],-6],[56,-6],[56,PART.drv.y]],0,ease(t,12.5,14),slack,1);
+    wire(c,[pin(33),[pin(33)[0],9],[60,9],[60,10]],0,ease(t,12.8,14.2),slack,1);
+    pump(c,PART.pumpA,-fly(t,13.5,15,70),0,ease(t,13.5,15));pump(c,PART.pumpB,-fly(t,14,15.5,70),0,ease(t,14,15.5));
+    wire(c,[[PART.drv.x,8],[42.6,10]],1,ease(t,15,16),slack,1);wire(c,[[PART.drv.x,13],[47,40],[42.6,40]],1,ease(t,15.3,16.3),slack,1);
+    // water: in under each pump, out at the nozzle
+    [PART.pumpA,PART.pumpB].forEach((p,i)=>{const yy=p.y+p.h/2;wire(c,[[-6,yy],[-20,yy]],2,ease(t,16+i*.3,17+i*.3),0,1);wire(c,[[28,yy+9],[28,yy+16]],2,ease(t,16.3+i*.3,17.3+i*.3),0,i?0:1)});
+    // d: cell and regulator; 5 V to the Pi, the cell straight to the driver
+    cell(c,PART.cell,-fly(t,18,19.5,60),0,ease(t,18,19.5));small(c,PART.reg,0,fly(t,18.5,20,40),ease(t,18.5,20),true);
+    wire(c,[[65.25,71],[PART.reg.x,71]],1,ease(t,19.8,20.6),slack,1);
+    wire(c,[[PART.reg.x+PART.reg.w/2,PART.reg.y],[80,40],[pin(4)[0],40],pin(4)],1,ease(t,20.3,21.6),slack,1);
+    wire(c,[[30,62],[30,58],[54,58],[54,PART.drv.y+PART.drv.h]],1,ease(t,20.8,22),slack,1);
+    // e: potted into one pod, flange of holes, four capped tubes, metal face
+    if(pot>0){c.save();const [x,y]=P(-2-1*pot,-2-1*pot),w=(PL.w+4+2*pot)*K,h=(PL.h+4+2*pot)*K;c.globalAlpha*=pot;c.fillStyle='rgba(225,235,238,.14)';c.strokeStyle=ink(.9);c.lineWidth=1.5;c.beginPath();c.roundRect(x,y,w,h,14);c.fill();c.stroke();
+      const [fx,fy]=P(-6,-6),fw=(PL.w+12)*K,fh=(PL.h+12)*K;c.strokeStyle=ink(.6);c.beginPath();c.roundRect(fx,fy,fw,fh,18);c.stroke();
+      c.fillStyle=ink(.6);const n=[Math.round(fw/26),Math.round(fh/26)];for(let i=0;i<n[0];i++){const xx=fx+(i+.5)*fw/n[0];[fy+7,fy+fh-7].forEach(yy=>{c.beginPath();c.arc(xx,yy,2.2,0,7);c.fill()})}
+      for(let i=1;i<n[1]-1;i++){const yy=fy+(i+.5)*fh/n[1];[fx+7,fx+fw-7].forEach(xx=>{c.beginPath();c.arc(xx,yy,2.2,0,7);c.fill()})}c.restore()}
+    if(cap>0)[PART.pumpA,PART.pumpB].forEach(p=>{[[-3,p.y+p.h/2],[28,p.y+p.h/2]].forEach(([x,y])=>{const [X,Y]=P(x,y);c.save();c.globalAlpha*=cap;c.fillStyle=col(2,.9);c.beginPath();c.arc(X,Y,7,0,7);c.fill();c.strokeStyle=ink(.9);c.lineWidth=1.2;c.stroke();c.restore()})});
+    // labels: each part once, with its real name
+    const L=(s,x,y,a,ax,ay,al)=>lab(c,s,x,y,ax,ay,a,al);
+    const la=ease(t,1,2)*(1-ease(t,TC-1.2,TC-.4));
+    {const [ax,ay]=P(PART.pi.x+80,PART.pi.y+10);L('RASPBERRY PI 5, 85 X 56 MM',1040,150,la,ax,ay)}
+    {const [ax,ay]=P(PART.pi.x+30,PART.pi.y+1);L('40 PIN GPIO HEADER',1040,176,la*(1-pot),ax,ay)}
+    {const [ax,ay]=P(PART.pi.x+52,PART.pi.y+44);L('2 X MIPI, CAMERA OR DISPLAY',1040,520,la*(1-pot),ax,ay)}
+    {const [ax,ay]=P(PART.pi.x+1,PART.pi.y+27);L('PCIE',600,150,la*(1-pot)*(1-ease(t,11,12)),ax,ay,'right')}
+    {const [ax,ay]=P(PART.imu.x+10,PART.imu.y+18);L('IMU, I2C, STEMMA QT',1040,560,ease(t,6,7)*(1-pot),ax,ay)}
+    {const [ax,ay]=P(PART.mic.x+7,PART.mic.y+14);L('I2S MICROPHONE',1040,585,ease(t,7,8)*(1-pot),ax,ay)}
+    {const [ax,ay]=P(PART.amp.x+7,PART.amp.y+17);L('I2S AMPLIFIER AND SPEAKER',1040,610,ease(t,7.5,8.5)*(1-pot),ax,ay)}
+    {const [ax,ay]=P(PART.ghost.x+20,PART.ghost.y+4);L('NEXT SENSOR, SAME FOUR WIRES',1100,470,g*(1-pot),ax,ay)}
+    {const [ax,ay]=P(PART.drv.x+7,PART.drv.y);L('DRV8833 DUAL H BRIDGE',430,150,d*(1-pot),ax,ay,'right')}
+    {const [ax,ay]=P(PART.pumpA.x+20,PART.pumpA.y);L('WATER PUMP A, 3 TO 4.5 V, 0.18 A',430,180,ease(t,14,15)*(1-pot),ax,ay,'right')}
+    {const [ax,ay]=P(PART.pumpB.x+20,PART.pumpB.y+PART.pumpB.h);L('WATER PUMP B',430,420,ease(t,14.5,15.5)*(1-pot),ax,ay,'right')}
+    {const [ax,ay]=P(PART.cell.x+20,PART.cell.y+PART.cell.h);L('18650 CELL, 3.6 V, 3500 MAH',430,560,ease(t,18.5,19.5)*(1-pot),ax,ay,'right')}
+    {const [ax,ay]=P(PART.reg.x+11,PART.reg.y+PART.reg.h);L('5 V REGULATOR, 3 A',700,600,ease(t,19,20)*(1-pot),ax,ay,'right')}
+    {const [ax,ay]=P(pin(32)[0],-6);L('PWM, GPIO 12 AND 13',700,140,ease(t,13,14)*(1-pot)*(1-ease(t,17,18)),ax,ay,'right')}
+    {const [ax,ay]=P(94,30);L('I2C, GPIO 2 AND 3',780,130,ease(t,7,8)*(1-pot)*(1-ease(t,12,13)),ax,ay,'right')}
+    {const [ax,ay]=P(140,34);L('I2S, GPIO 18 TO 21',1040,128,ease(t,7.5,8.5)*(1-pot)*(1-ease(t,12,13)),ax,ay)}
+    {const [ax,ay]=P(pin(4)[0],40);L('5 V INTO GPIO PINS 2 AND 4',1040,200,ease(t,21,22)*(1-pot),ax,ay)}
+    {const [ax,ay]=P(-20,PART.pumpA.y+PART.pumpA.h/2);L('WATER OUT',300,250,ease(t,16.5,17.5)*(1-pot),ax,ay,'right')}
+    {const [ax,ay]=P(-6,-6);L('ONE POD, FLANGE OF HOLES',430,120,pot*(1-ease(t,TC-1.2,TC-.4)),ax,ay,'right')}
+    {const [ax,ay]=P(-3,PART.pumpA.y+PART.pumpA.h/2);L('FOUR CAPPED TUBES, WATER IN AND OUT',430,640,cap*(1-ease(t,TC-1.2,TC-.4)),ax,ay,'right')}
+    {const [ax,ay]=P(PL.w,PL.h);L('ALUMINUM CARRIER, FACE TO THE OUTER SKIN',1040,660,plate*(1-ease(t,TC-1.2,TC-.4)),ax,ay)}
+    // f: one piece
+    const f=ease(t,30.5,31.5)*(1-ease(t,TC-.8,TC));if(f>0){c.save();c.globalAlpha*=f;c.font='34px Georgia';c.fillStyle=ink(.95);c.textAlign='center';c.fillText('One piece, one grab.',OX+PL.w*K/2,OY+PL.h*K+120);c.restore();
+      text(c,'156 x 88 x 27 MM, ABOUT 0.5 KG',OX+PL.w*K/2,OY+PL.h*K+150,11,.7*f,mono,'center',1.2)}
   }
+  /* ---------- the wall, side section ---------- */
+  const S=2.8, X0=560, X1=1570, LB=640, SK=6, LT=LB-SK, GS=230;      // px per mm, patch, lower skin bottom and top, gel surface
+  const PX=1060, PLEN=156, PHT=26.2, FL=164;                          // pod: 156 x 88 x 26.2 mm, flange 164 mm
+  const PW=PLEN*S/2, PHh=PHT*S, FW=FL*S/2, PB=LT-6, PT=PB-PHh-4;      // pod half width px, pod height px, flange half width, pod bottom and top
+  const RIM=FW+10, WEBS=[];for(let k=0;k<6;k++){const d=RIM+24+k*18*S;if(PX+d<X1-4)WEBS.push(PX-d<X0+4?null:PX-d,PX+d)}
+  const WB=WEBS.filter(x=>x!==null).sort((a,b)=>a-b), UT=LT-SK-3;
+  const MAG={x:14,w:FW*2+24,y:250,h:400}, MSP=125;
+  function podSide(c,x,y,a,cut){ // x center, y bottom (flange underside)
+    c.save();c.globalAlpha*=a;c.fillStyle='#000';c.strokeStyle=ink(.85);c.lineWidth=1.3;
+    c.beginPath();c.rect(x-FW,y-4,2*FW,4);c.fill();c.stroke();                      // flange
+    c.fillStyle='#000';c.strokeStyle=ink(.55);for(let i=0;i<16;i++){const hx=x-FW+6+i*(2*FW-12)/15;if(Math.abs(hx-x)<PW-4)continue;c.fillRect(hx-2,y-4,4,4);c.strokeRect(hx-2,y-4,4,4)}
+    c.fillStyle='rgba(225,235,238,.08)';c.strokeStyle=ink(.85);c.beginPath();c.roundRect(x-PW,y-4-PHh,2*PW,PHh,6);c.fill();c.stroke();
+    c.fillStyle=ink(.5);c.fillRect(x-PW+6,y-4-PHh+5,2*PW-12,1.5*S);                  // aluminum face, up
+    c.strokeStyle=ink(.4);c.lineWidth=1;const top=y-4-PHh+5+1.5*S;
+    c.strokeRect(x-PW+6,top,42.6*S,22.7*S);                                         // pumps, side by side, one seen
+    c.strokeRect(x-PW+6+65*S,top,85*S,1.6*S);c.strokeRect(x-PW+6+65*S+60*S,top+1.6*S,22*S,14*S);c.strokeRect(x-PW+6+65*S+8*S,top+1.6*S,51*S,6*S); // Pi 5 board, jacks, header (hanging)
+    c.beginPath();c.roundRect(x-PW+6+47*S,top+2,18*S,18.75*S,18.75*S/2);c.stroke();                                 // the 18650, seen end on
+    c.fillStyle=ink(.85);c.fillRect(x-10*S,y-4-PHh-1*S,20*S,1*S);                    // steel disk for the magnet
+    [x-PW+14,x-PW+30].forEach(px=>{c.strokeStyle=ink(.85);c.lineWidth=1.3;c.beginPath();c.moveTo(px-3,y-4-PHh);c.lineTo(px-3,y-4-PHh-22);c.moveTo(px+3,y-4-PHh);c.lineTo(px+3,y-4-PHh-22);c.stroke();c.fillStyle=col(2,.9);c.fillRect(px-5,y-4-PHh-27,10,6)});
+    c.restore()}
   function needle(c,x,y,a){c.save();c.globalAlpha*=a;c.strokeStyle=ink(.85);c.fillStyle='#000';c.lineWidth=1.3;
     c.beginPath();c.moveTo(x-9,y-190);c.lineTo(x+9,y-190);c.lineTo(x+9,y-40);c.lineTo(x+2,y);c.lineTo(x-2,y);c.lineTo(x-9,y-40);c.closePath();c.fill();c.stroke();
     c.strokeStyle=ink(.3);c.beginPath();c.moveTo(x,y-190);c.lineTo(x,-10);c.stroke();c.restore()}
   function holder(c,x,y,a,on){c.save();c.globalAlpha*=a;c.strokeStyle=ink(.85);c.fillStyle='#000';c.lineWidth=1.3;
-    c.beginPath();c.rect(x-5,y-170,10,130);c.fill();c.stroke();c.beginPath();c.rect(x-40,y-40,80,40);c.fill();c.stroke();
-    if(on){c.fillStyle=ink(.85);c.fillRect(x-30,y-6,60,4)}
-    c.strokeStyle=ink(.3);c.beginPath();c.moveTo(x,y-170);c.lineTo(x,-10);c.stroke();c.restore()}
+    c.beginPath();c.rect(x-5,y-150,10,108);c.fill();c.stroke();c.beginPath();c.rect(x-10*S,y-15*S,20*S,15*S);c.fill();c.stroke();
+    if(on){c.fillStyle=col(0,.9);c.fillRect(x-10*S+4,y-5,20*S-8,3)}
+    c.strokeStyle=ink(.3);c.beginPath();c.moveTo(x,y-150);c.lineTo(x,-10);c.stroke();c.restore()}
   function tag(c,s,x,y,ax,ay,a,align){c.save();c.globalAlpha*=a;if(ax!==undefined){c.strokeStyle=ink(.35);c.lineWidth=1;c.font='11px '+mono;const tw=c.measureText(s).width+s.length*1.2,left=align==='right'?x-tw:x,ex=ax<left?left-6:ax>left+tw?left+tw+6:ax;c.beginPath();c.moveTo(ax,ay);c.lineTo(ex,ax>=left&&ax<=left+tw?y+4:y-4);c.stroke();c.fillStyle=ink(.8);c.beginPath();c.arc(ax,ay,2.2,0,7);c.fill()}
     text(c,s,x,y,11,.6,mono,align||'left',1.2);c.restore()}
   const STEPS=[
-    [0,5.5,'1 · Lower skin','The needle prints the lower skin, the webs and a low rim.','The rim is tapered. It will center the pod, so a small error at the tool change does no harm.'],
-    [5.5,8.5,'2 · A bed','Into the rim goes a bed of fresh silicone, so no gel stays there.','Gel left in the rim would stay as a film and stop the bond. The bed pushes the gel out first.'],
-    [8.5,10.5,'Tool change','Tool change in the tail: the needle off, the magnet holder on.',''],
-    [10.5,17.5,'3 · The pod','The holder brings a sealed pod from the dry magazine and presses the pod into the wet bed.','The pod is cast in Dragon Skin 30 beforehand, with a flange full of holes. Bed and gel squeeze out at the rim.'],
-    [17.5,19.5,'Tool change','Tool change: the holder off, the needle back on.',''],
-    [19.5,26,'4 · The cover','Wet on wet, the needle prints around the pod, over the pod, then the upper skin.','All within the 45 minutes of pot life of Dragon Skin 30, so bed, flange holes and cover cure as one.'],
-    [26,DUR,'5 · Cured, then “birth”','After the cure the pod is a solid island between the two skins. Air fills the cells around it.','16 hours of cure. No wire crosses the skin: Bluetooth from the controller, charging by a coil through the skin. A pump pod adds two capped ports.']];
-  const ctl=loop(cv,W,H,DUR,(c,t)=>{
-    const fade=1-ease(t,DUR-.6,DUR);c.globalAlpha=fade;
+    [0,4.5,'1 · The brain','A Raspberry Pi 5: 40 pin header, two MIPI connectors, USB, PCIe. It needs 5 V and draws about 0.8 A.','Board 85 x 56 mm. Typical draw of the bare board 800 mA (Raspberry Pi documentation).'],
+    [4.5,11,'2 · Sensors on one bus','Sensors sit beside the Pi. The IMU chains on I2C with four wire STEMMA QT leads; microphone and speaker share I2S.','A new sensor plugs into the free connector: same bus, same board. The camera would take a MIPI connector.'],
+    [11,18,'3 · A driver for the pumps','A GPIO pin is a 3.3 V signal of a few milliamps; each pump draws 0.18 A. A driver is needed.','The DRV8833 switches the cell to the two pumps; GPIO 12 and 13 set each speed by PWM. Run one harder to steer.'],
+    [18,23,'4 · Power','One 18650 cell. A 5 V regulator feeds the Pi; the pumps run straight from the cell through the driver.','Pi 4.0 W / 0.9 + pumps 1.3 W = 5.8 W; 12.6 Wh / 5.8 W = about 2.2 h with both pumps on.'],
+    [23,30.5,'5 · One plate, one pod','Every part sits on one aluminum plate, every lead is short and soldered. The plate is cast into one silicone pod.','No wire runs in the print: the wires are inside the pod. Only water crosses the skin, through four capped tubes.'],
+    [30.5,TC,'6 · One piece','One piece, one grab for the arm.','156 x 88 x 27 mm with the flange of holes, about 0.5 kg.'],
+    [TC+0,TC+5.5,'7 · Lower skin','The needle prints the lower skin, the webs and a low rim.','The rim is tapered. It will center the pod, so a small error at the tool change does no harm.'],
+    [TC+5.5,TC+8.5,'8 · A bed','Into the rim goes a bed of fresh silicone, so no gel stays there.','Gel left in the rim would stay as a film and stop the bond. The bed pushes the gel out first.'],
+    [TC+8.5,TC+10.5,'Tool change','Tool change in the tail: the needle off, the magnet holder on.',''],
+    [TC+10.5,TC+17.5,'9 · The pod','The holder takes the pod from the dry magazine and presses the pod into the wet bed, metal face up.','Bed and gel squeeze out at the rim and rise through the flange holes.'],
+    [TC+17.5,TC+19.5,'Tool change','Tool change: the holder off, the needle back on.',''],
+    [TC+19.5,TC+26,'10 · The cover','Wet on wet, the needle prints around the pod, over the pod, then the upper skin.','The pod is 27 mm tall; the flat wall is 3.4 mm. The pod is a thick island in the wall.'],
+    [TC+26,DUR,'11 · Cured, then “birth”','After the cure the pod is a solid island between the two skins. Air fills the cells around it.','16 hours of cure. Only the four capped tubes cross the skin. Data by radio; charging is still open.']];
+  function wall(c,T){const t=T-TC;
     // gel, tail and dock
     c.fillStyle='rgba(255,255,255,.025)';c.fillRect(X0-40,GS,W-X0+40,LB+40-GS);
     c.strokeStyle=ink(.25);c.lineWidth=1;c.beginPath();for(let x=X0-40;x<=W;x+=10){const y=GS+1.2*Math.sin(x*.02+t*.7);x>X0-40?c.lineTo(x,y):c.moveTo(x,y)}c.stroke();
     c.setLineDash([4,6]);c.beginPath();c.moveTo(X0-40,GS-30);c.lineTo(X0-40,LB+40);c.stroke();c.setLineDash([]);
     text(c,'TAIL',X0-56,GS-14,11,.5,mono,'right',1.2);text(c,'HEAD',X0-24,GS-14,11,.5,mono,'left',1.2);
     tag(c,'GEL, CARBOPOL',W-30,GS+30,undefined,undefined,1,'right');
-    // magazine, dry, in the tail
     c.strokeStyle=ink(.6);c.lineWidth=1.2;c.beginPath();c.moveTo(MAG.x,MAG.y);c.lineTo(MAG.x,MAG.y+MAG.h);c.lineTo(MAG.x+MAG.w,MAG.y+MAG.h);c.lineTo(MAG.x+MAG.w,MAG.y);c.stroke();
-    text(c,'MAGAZINE, DRY',MAG.x,MAG.y-62,11,.6,mono,'left',1.2);text(c,'IN THE TAIL',MAG.x,MAG.y-46,11,.6,mono,'left',1.2);
-    const taken=t>=12.2&&t<DUR-.6;
-    for(let k=0;k<(taken?2:3);k++)pod(c,MAG.x+MAG.w/2,MAG.y+MAG.h-8-k*MSP,1,true);
-    // the wall: lower skin and webs and rim
-    const sk=ease(t,.3,3.2), wb=ease(t,3.2,4.4), rim=ease(t,4.2,5.5), bed=ease(t,5.8,8.2);
-    const inflate=ease(t,27,30), cell=lerp(8,64,inflate);
-    c.fillStyle=ink(.16);c.strokeStyle=ink(.8);c.lineWidth=1;
-    // fresh silicone is glossy and brighter; it turns matte in the cure
-    const wet=1-ease(t,26,27.6), FR=a=>'rgba(250,246,226,'+a+')';
-    // lower skin as beads in section, laid one by one behind the needle tip
-    const xs=lerp(X0,X1,sk);if(sk>0){for(let x=X0+5;x<=xs;x+=10){const nw=clamp(1-(xs-x)/160);c.fillStyle=nw>0&&wet>0?FR(.18+.5*nw*wet):ink(.16+.1*wet);c.beginPath();c.arc(x,LB-5,5.4,0,7);c.fill()}
-      c.strokeStyle=ink(.8);c.strokeRect(X0,LT,xs-X0,LB-LT)}
-    WEBS.forEach((x,i)=>{const a=ease(t,3.2+i*.15,3.5+i*.15);if(a<=0)return;const h=Math.max(cell*a,2);c.fillStyle=a<1?FR(.6):ink(.16+.1*wet);c.fillRect(x-3,LT-h,6,h);c.strokeStyle=ink(.8);c.strokeRect(x-3,LT-h,6,h)});
-    if(rim>0){c.globalAlpha=fade*rim;[-1,1].forEach(s=>{c.beginPath();c.moveTo(PX+s*136,LT);c.lineTo(PX+s*146,LT-32);c.lineTo(PX+s*154,LT-32);c.lineTo(PX+s*144,LT);c.closePath();c.fill();c.stroke()});c.globalAlpha=fade}
-    if(bed>0){const rows=bed*3;for(let r=0;r<Math.ceil(rows);r++){const f=Math.min(1,rows-r),y=LT-3-r*5.3,xe=r%2?PX+132-264*f:PX-132+264*f;
-        for(let x=PX-131;x<=PX+131;x+=8){if(r%2?x<xe:x>xe)continue;c.fillStyle=FR(t<19.5?.32+.25*(r===Math.ceil(rows)-1&&bed<1):.18+.2*wet);c.beginPath();c.arc(x,y,4,0,7);c.fill()}}
-      // the gel in the rim is pushed out over the edge
-      const g=Math.sin(Math.PI*clamp((t-5.8)/2.6));if(g>0){c.strokeStyle=ink(.55*g);c.lineWidth=1.2;[-1,1].forEach(s2=>{const x=PX+s2*120,y=LT-30;c.beginPath();c.moveTo(x,y+14);c.quadraticCurveTo(x+s2*20,y-14-10*g,x+s2*48,y-6);c.stroke();c.beginPath();c.moveTo(x+s2*48,y-6);c.lineTo(x+s2*40,y-12);c.moveTo(x+s2*48,y-6);c.lineTo(x+s2*38,y-2);c.stroke()});
-        text(c,'GEL PUSHED OUT',PX,LT-70,11,.6*g,mono,'center',1.2)}}
-    // squeeze out at the rim when the pod goes in
-    const sq=ease(t,14.4,15.6);
-    if(sq>0&&t<19.5+3){[-1,1].forEach(s=>{c.fillStyle=ink(.3);c.beginPath();c.ellipse(PX+s*150,LT-34,7*sq,5*sq,0,0,7);c.fill()})}
-    // the tool: position and kind
-    let tool='needle',tx=PX,ty=LT,on=false,carry=false;
-    const zz=(u,x0,x1,n)=>lerp(x0,x1,Math.abs((u*n%2)-1));
-    if(t<3.2){tx=lerp(X0,X1,sk);ty=LB-2}
-    else if(t<4.4){const i=Math.min(WEBS.length-1,Math.floor((t-3.2)/.15));tx=WEBS[i];ty=LT-8}
-    else if(t<5.5){tx=t<4.85?PX-150:PX+150;ty=LT-30}
-    else if(t<8.5){tx=zz(bed,PX-128,PX+128,6);ty=LT-16*bed}
-    else if(t<10.5){const u=(t-8.5)/2,away=[MAG.x+MAG.w/2,-40];tool=u<.5?'needle':'holder';const v=u<.5?ease(u,0,.5):1-ease(u,.5,1);
-      const from=u<.5?[PX,LT-16]:[MAG.x+MAG.w/2,MAG.y-60];tx=lerp(from[0],away[0],v);ty=lerp(from[1],away[1]+100,v)}
-    else if(t<17.5){tool='holder';const top=[MAG.x+MAG.w/2,MAG.y+MAG.h-8-2*MSP-56],seat=[PX,PT];
-      if(t<12){tx=top[0];ty=lerp(MAG.y-60,top[1],ease(t,10.5,11.8))}
-      else if(t<12.4){tx=top[0];ty=top[1];on=t>=12.1;carry=on}
-      else if(t<15.6){on=true;carry=true;const u=ease(t,12.4,14.2),d=ease(t,14.2,15.6);tx=lerp(top[0],seat[0],u);ty=t<14.2?lerp(top[1],PT-60,u)-80*Math.sin(Math.PI*u):lerp(PT-60,PT,d)}
-      else if(t<16.1){tx=PX;ty=PT;on=false}
-      else{tx=PX;ty=lerp(PT,PT-130,ease(t,16.1,17.4))}}
-    else if(t<19.5){const u=(t-17.5)/2;tool=u<.5?'holder':'needle';const v=u<.5?ease(u,0,.5):1-ease(u,.5,1);
-      const from=u<.5?[PX,PT-130]:[PX-170,LT-20];tx=lerp(from[0],MAG.x+MAG.w/2,v);ty=lerp(from[1],60,v)}
-    else if(t<26){const u=ease(t,19.5,23.5),w=ease(t,23.5,25.8);
-      if(t<23.5){tx=zz(u,PX-168,PX+168,10);ty=lerp(LT-20,PT-18,u)}else{tx=w<.5?lerp(PX-170,WEBS[0],w*2):lerp(PX+170,WEBS[WEBS.length-1],(w-.5)*2);ty=UT}}
-    else{tool='none'}
-    // the pod in the wall, once placed
-    const placed=t>=15.6;
-    if(placed)pod(c,PX,PB,1,true);
-    if(carry){pod(c,tx,ty+56,1,true)}
-    // the cover, printed from the bottom up, and the upper skin outward
-    const cov=ease(t,19.5,23.5), us=ease(t,23.5,25.8);
-    if(cov>0){const top=lerp(LT,PT-16,cov);c.save();c.beginPath();c.rect(0,top,W,H);c.clip();
-      const P=new Path2D();P.moveTo(PX-170,LT);P.lineTo(PX-170,PT+4);P.quadraticCurveTo(PX-170,PT-16,PX-140,PT-16);P.lineTo(PX+140,PT-16);P.quadraticCurveTo(PX+170,PT-16,PX+170,PT+4);P.lineTo(PX+170,LT);P.closePath();
-      c.fillStyle=wet>0?FR(.1+.14*wet):ink(.13);c.fill(P);c.save();c.clip(P);c.strokeStyle=ink(.22);c.lineWidth=1;for(let y=LT-5;y>PT-20;y-=5.3){c.beginPath();c.moveTo(PX-172,y);c.lineTo(PX+172,y);c.stroke()}c.restore();
-      c.strokeStyle=ink(.8);c.lineWidth=1;c.stroke(P);c.restore();pod(c,PX,PB,.25*cov,true)}
-    if(us>0){c.fillStyle=wet>0?FR(.16+.3*wet):ink(.16);c.strokeStyle=ink(.8);c.lineWidth=1;
-      const xl=lerp(PX-170,WEBS[0],us),xr=lerp(PX+170,WEBS[WEBS.length-1],us),yb=LT-cell;
-      // upper skin: flat while printed, cells bulge when inflated
-      const seg=(xa,xb)=>{const P=new Path2D();const pts=[xa,...WEBS.filter(x=>x>xa&&x<xb),xb];P.moveTo(xa,yb);
-        for(let i=1;i<pts.length;i++){const m=(pts[i-1]+pts[i])/2;P.quadraticCurveTo(m,yb-26*inflate,pts[i],yb)}
-        P.lineTo(xb,yb-10);for(let i=pts.length-1;i>0;i--){const m=(pts[i-1]+pts[i])/2;P.quadraticCurveTo(m,yb-10-26*inflate,pts[i-1],yb-10)}P.closePath();c.fill(P);c.stroke(P)};
-      seg(xl,PX-170);seg(PX+170,xr)}
-    // cells and links after "birth"
-    if(inflate>0){tag(c,'CELL, AIR',1010+320,LT-cell-70,1315,LT-cell/2,inflate);
-      const r=ease(t,29.5,31);if(r>0)for(let k=0;k<3;k++){c.strokeStyle=ink(.5*r*(1-((t*0.8+k/3)%1)));c.lineWidth=1;c.beginPath();c.arc(PX-40,PT-16,30+((t*0.8+k/3)%1)*70,-Math.PI*.85,-Math.PI*.15);c.stroke()}}
+    text(c,'MAGAZINE, DRY, IN THE TAIL',MAG.x,MAG.y-50,11,.6,mono,'left',1.2);
+    const MC=MAG.x+MAG.w/2, slot=k=>MAG.y+MAG.h-8-k*MSP;
+    const taken=t>=12.2&&t<DUR-TC-.6;for(let k=0;k<(taken?2:3);k++)podSide(c,MC,slot(k),1);
+    const sk=ease(t,.3,3.2),rim=ease(t,4.2,5.5),bed=ease(t,5.8,8.2),inflate=ease(t,27,30),cell=lerp(3,3+5.5*S*2,inflate),wet=1-ease(t,26,27.6),FR=a=>'rgba(250,246,226,'+a+')';
+    // lower skin as beads, laid behind the needle
+    const xs=lerp(X0,X1,sk);if(sk>0){for(let x=X0+3;x<=xs;x+=6){const nw=clamp(1-(xs-x)/160);c.fillStyle=nw>0&&wet>0?FR(.18+.5*nw*wet):ink(.16+.1*wet);c.beginPath();c.arc(x,LB-SK/2,3.2,0,7);c.fill()}c.strokeStyle=ink(.8);c.lineWidth=1;c.strokeRect(X0,LT,xs-X0,SK)}
+    WB.forEach((x,i)=>{const a=ease(t,3.2+i*.12,3.45+i*.12);if(a<=0)return;const h=Math.max(cell*a,2);c.fillStyle=a<1?FR(.6):ink(.16+.1*wet);c.fillRect(x-2,LT-h,4,h);c.strokeStyle=ink(.8);c.strokeRect(x-2,LT-h,4,h)});
+    if(rim>0){c.globalAlpha=rim;c.fillStyle=ink(.16);c.strokeStyle=ink(.8);[-1,1].forEach(s=>{c.beginPath();c.moveTo(PX+s*(RIM-4),LT);c.lineTo(PX+s*(RIM+2),LT-14);c.lineTo(PX+s*(RIM+8),LT-14);c.lineTo(PX+s*(RIM+4),LT);c.closePath();c.fill();c.stroke()});c.globalAlpha=1}
+    if(bed>0){const rows=bed*2;for(let r=0;r<Math.ceil(rows);r++){const f=Math.min(1,rows-r),y=LT-3-r*4.5,xe=r%2?PX+RIM-6-2*(RIM-6)*f:PX-RIM+6+2*(RIM-6)*f;
+        for(let x=PX-RIM+6;x<=PX+RIM-6;x+=6){if(r%2?x<xe:x>xe)continue;c.fillStyle=FR(t<19.5?.32+.25*(r===Math.ceil(rows)-1&&bed<1):.18+.2*wet);c.beginPath();c.arc(x,y,3,0,7);c.fill()}}
+      const g=Math.sin(Math.PI*clamp((t-5.8)/2.6));if(g>0){c.strokeStyle=ink(.55*g);c.lineWidth=1.2;[-1,1].forEach(s2=>{const x=PX+s2*(RIM-20),y=LT-16;c.beginPath();c.moveTo(x,y+10);c.quadraticCurveTo(x+s2*24,y-14-10*g,x+s2*50,y-6);c.stroke();c.beginPath();c.moveTo(x+s2*50,y-6);c.lineTo(x+s2*42,y-12);c.moveTo(x+s2*50,y-6);c.lineTo(x+s2*40,y-2);c.stroke()});
+        text(c,'GEL PUSHED OUT',PX,LT-60,11,.6*g,mono,'center',1.2)}}
+    const sq=ease(t,14.4,15.6);if(sq>0){[-1,1].forEach(s=>{c.fillStyle=ink(.3);c.beginPath();c.ellipse(PX+s*(RIM+5),LT-16,7*sq,5*sq,0,0,7);c.fill()})}
     // the tool
-    if(tool==='needle'){needle(c,tx,ty,1);const pr=(t<5.5)||(t>5.8&&t<8.3)||(t>19.5&&t<25.8);if(pr){c.fillStyle=FR(.95);c.beginPath();c.arc(tx,ty,3.4,0,7);c.fill();c.strokeStyle=FR(.35);c.lineWidth=1;c.beginPath();c.arc(tx,ty,8+3*Math.sin(t*12),0,7);c.stroke()}}else if(tool==='holder')holder(c,tx,ty,1,on);
-    // tags
-    tag(c,'LOWER SKIN, 1.2 MM',W-30,LB+30,X1-60,LB-5,sk,'right');
-    tag(c,'WEB',WEBS[5]-60,LB+30,WEBS[5],LT-4,wb*(1-inflate),'right');
-    tag(c,'RIM',PX-260,LT-70,PX-150,LT-24,rim*(1-ease(t,19.5,20.5)),'right');
-    tag(c,'FRESH BED',PX+300,LT-70,PX+100,LT-8,bed*(1-ease(t,10.5,11.5)),'left');
-    tag(c,'POD',PX+300,PT-70,PX+PH,PT+20,ease(t,15.6,16.2)*(1-ease(t,19.5,20)),'left');
-    tag(c,'FLANGE HOLES',PX+300,PT-40,PX+PH-4,PB-4,ease(t,15.8,16.4)*(1-ease(t,19.5,20)),'left');
-    tag(c,'CAPPED PORTS, PUMP POD',PX+300,PT-110,PX+94,PB-110,ease(t,16,16.6)*(1-ease(t,27,27.5)),'left');
-    tag(c,'COVER',PX-300,PT-40,PX-150,PT+20,ease(t,20,20.6)*(1-ease(t,27,27.5)),'right');
-    tag(c,'UPPER SKIN',X0+120,LT-cell-56,X0+80,LT-cell-4,us,'left');
-    if(t>=26){text(c,'16 HOURS LATER',W-30,GS+60,11,.6*ease(t,26,26.5),mono,'right',1.2)}
-    // caption
-    const S=STEPS.find(s=>t>=s[0]&&t<s[1])||STEPS[STEPS.length-1];
-    text(c,S[2].toUpperCase(),64,H-104,12,.55,mono,'left',1.6);
-    c.save();c.font='26px Georgia';const w=c.measureText(S[3]).width;c.restore();
-    text(c,S[3],64,H-68,Math.min(26,26*1470/w),.95,'Georgia');
-    if(S[4])text(c,S[4],64,H-36,14,.6);
-    c.globalAlpha=1;return S[2]+'. '+S[3]+' '+S[4];
+    let tool='needle',tx=PX,ty=LT,on=false,carry=false;const zz=(u,x0,x1,n)=>lerp(x0,x1,Math.abs((u*n%2)-1));
+    const top=[MC,slot(2)-4-PHh-1*S],seat=[PX,PB-4-PHh-1*S],away=[MC,60];
+    if(t<3.2){tx=xs;ty=LB-2}
+    else if(t<4.4){const i=Math.min(WB.length-1,Math.floor((t-3.2)/.12));tx=WB[i];ty=LT-4}
+    else if(t<5.5){tx=t<4.85?PX-RIM-3:PX+RIM+3;ty=LT-14}
+    else if(t<8.5){tx=zz(bed,PX-RIM+8,PX+RIM-8,4);ty=LT-4-5*bed}
+    else if(t<10.5){const u=(t-8.5)/2;tool=u<.5?'needle':'holder';const v=u<.5?ease(u,0,.5):1-ease(u,.5,1);const from=u<.5?[PX,LT-10]:[MC,MAG.y-70];tx=lerp(from[0],away[0],v);ty=lerp(from[1],away[1]+60,v)}
+    else if(t<17.5){tool='holder';
+      if(t<12){tx=top[0];ty=lerp(MAG.y-70,top[1],ease(t,10.5,11.8))}
+      else if(t<12.4){tx=top[0];ty=top[1];on=t>=12.1;carry=on}
+      else if(t<15.6){on=true;carry=true;const u=ease(t,12.4,14.2),d=ease(t,14.2,15.6);tx=lerp(top[0],seat[0],u);ty=t<14.2?lerp(top[1],seat[1]-40,u)-70*Math.sin(Math.PI*u):lerp(seat[1]-40,seat[1],d)}
+      else if(t<16.1){tx=PX;ty=seat[1];on=false}
+      else{tx=PX;ty=lerp(seat[1],seat[1]-110,ease(t,16.1,17.4))}}
+    else if(t<19.5){const u=(t-17.5)/2;tool=u<.5?'holder':'needle';const v=u<.5?ease(u,0,.5):1-ease(u,.5,1);const from=u<.5?[PX,seat[1]-110]:[PX-PW-20,LT-20];tx=lerp(from[0],MC,v);ty=lerp(from[1],60,v)}
+    else if(t<26){const u=ease(t,19.5,23.5),w=ease(t,23.5,25.8);if(t<23.5){tx=zz(u,PX-PW-16,PX+PW+16,12);ty=lerp(LT-10,PT-6,u)}else{tx=w<.5?lerp(PX-RIM-12,WB[0],w*2):lerp(PX+RIM+12,WB[WB.length-1],(w-.5)*2);ty=UT}}
+    else tool='none';
+    const placed=t>=15.6;if(placed)podSide(c,PX,PB,1);if(carry)podSide(c,tx,ty+4+PHh+1*S,1);
+    // the cover, from the bottom up, then the upper skin outward
+    const cov=ease(t,19.5,23.5),us=ease(t,23.5,25.8);
+    if(cov>0){const tp=lerp(LT,PT-10,cov);c.save();c.beginPath();c.rect(0,tp,W,H);c.clip();const L2=PW+16;
+      const Pp=new Path2D();Pp.moveTo(PX-RIM-10,LT);Pp.lineTo(PX-L2,PT+10);Pp.quadraticCurveTo(PX-L2,PT-10,PX-L2+20,PT-10);Pp.lineTo(PX+L2-20,PT-10);Pp.quadraticCurveTo(PX+L2,PT-10,PX+L2,PT+10);Pp.lineTo(PX+RIM+10,LT);Pp.closePath();
+      c.fillStyle=wet>0?FR(.1+.14*wet):ink(.13);c.fill(Pp);c.save();c.clip(Pp);c.strokeStyle=ink(.2);c.lineWidth=1;for(let y=LT-4;y>PT-14;y-=4.5){c.beginPath();c.moveTo(PX-L2-20,y);c.lineTo(PX+L2+20,y);c.stroke()}c.restore();
+      c.strokeStyle=ink(.8);c.lineWidth=1;c.stroke(Pp);c.restore();podSide(c,PX,PB,.3*cov)}
+    if(us>0){c.fillStyle=wet>0?FR(.16+.3*wet):ink(.16);c.strokeStyle=ink(.8);c.lineWidth=1;const xl=lerp(PX-RIM-10,WB[0],us),xr=lerp(PX+RIM+10,WB[WB.length-1],us),yb=LT-cell;
+      const seg=(xa,xb)=>{const Pq=new Path2D();const pts=[xa,...WB.filter(x=>x>xa&&x<xb),xb];Pq.moveTo(xa,yb);for(let i=1;i<pts.length;i++){const m=(pts[i-1]+pts[i])/2;Pq.quadraticCurveTo(m,yb-5.5*S*2*inflate,pts[i],yb)}
+        Pq.lineTo(xb,yb-SK);for(let i=pts.length-1;i>0;i--){const m=(pts[i-1]+pts[i])/2;Pq.quadraticCurveTo(m,yb-SK-5.5*S*2*inflate,pts[i-1],yb-SK)}Pq.closePath();c.fill(Pq);c.stroke(Pq)};
+      seg(xl,PX-RIM-10);seg(PX+RIM+10,xr)}
+    if(inflate>0)tag(c,'CELL, AIR',W-30,LT-cell-70,WB[WB.length-2]+20,LT-cell/2,inflate,'right');
+    if(tool==='needle'){needle(c,tx,ty,1);const pr=(t<5.5)||(t>5.8&&t<8.3)||(t>19.5&&t<25.8);if(pr){c.fillStyle=FR(.95);c.beginPath();c.arc(tx,ty,3.4,0,7);c.fill();c.strokeStyle=FR(.35);c.lineWidth=1;c.beginPath();c.arc(tx,ty,8+3*Math.sin(t*12),0,7);c.stroke()}}
+    else if(tool==='holder')holder(c,tx,ty,1,on);
+    tag(c,'LOWER SKIN, 1.2 MM',W-30,LB+30,X1-60,LB-3,sk,'right');
+    tag(c,'WEB, 0.8 MM',X0+20,LB+30,WB[1],LT-2,ease(t,3.5,4.4)*(1-inflate),'left');
+    tag(c,'RIM',PX-RIM-120,LT-70,PX-RIM-2,LT-10,rim*(1-ease(t,19.5,20.5)),'right');
+    tag(c,'FRESH BED',PX+RIM+60,LT-70,PX+RIM-30,LT-4,bed*(1-ease(t,10.5,11.5)),'left');
+    tag(c,'POD, METAL FACE UP',PX+RIM+60,PT-30,PX+PW-10,PT+10,ease(t,15.6,16.2)*(1-ease(t,19.5,20)),'left');
+    tag(c,'CAPPED TUBES',PX-PW-140,PT-60,PX-PW+14,PT-22,ease(t,16,16.6)*(1-ease(t,27,27.5)),'right');
+    tag(c,'COVER',PX+RIM+60,PT-30,PX+PW+10,PT+20,ease(t,20,20.6)*(1-ease(t,27,27.5)),'left');
+    tag(c,'UPPER SKIN',X0+30,LT-cell-56,X0+60,LT-cell-4,us,'left');
+    if(t>=26)text(c,'16 HOURS LATER',W-30,GS+60,11,.6*ease(t,26,26.5),mono,'right',1.2);
+  }
+  function legend(c){const x=W-260,y=36;[[0,'SIGNAL'],[1,'POWER'],[2,'WATER']].forEach(([k,s],i)=>{const yy=y+i*18;c.save();c.strokeStyle=k===0?col(1,.95):k===1?col(0,.95):col(2,.95);c.lineWidth=k===1?2.6:1.5;if(k===2)c.setLineDash([6,5]);c.beginPath();c.moveTo(x,yy);c.lineTo(x+36,yy);c.stroke();c.restore();text(c,s,x+46,yy+4,11,.6,mono,'left',1.2)})}
+  const ctl=loop(cv,W,H,DUR,(c,t)=>{
+    const fade=1-ease(t,DUR-.6,DUR);c.globalAlpha=fade;
+    if(t<TC){c.globalAlpha=fade*(1-ease(t,TC-.6,TC));compose(c,t)}else{c.globalAlpha=fade*ease(t,TC,TC+.6);wall(c,t)}
+    c.globalAlpha=fade;legend(c);
+    const St=STEPS.find(s=>t>=s[0]&&t<s[1])||STEPS[STEPS.length-1];
+    text(c,St[2].toUpperCase(),64,H-112,12,.55,mono,'left',1.6);
+    c.save();c.font='26px Georgia';const w=c.measureText(St[3]).width;c.restore();
+    text(c,St[3],64,H-74,Math.min(26,26*1470/w),.95,'Georgia');
+    if(St[4])text(c,St[4],64,H-40,14,.6);
+    c.globalAlpha=1;return St[2]+'. '+St[3]+' '+St[4];
   });
-  // play, pause and scrub under the canvas
-  const pb=document.getElementById('wplay'),sk=document.getElementById('wseek'),tm=document.getElementById('wtime');
-  if(pb&&sk){const lab=s=>Math.floor(s/60)+':'+String(Math.floor(s)%60).padStart(2,'0');sk.max=DUR;
-    ctl.onframe=t=>{sk.value=t;if(tm)tm.textContent=lab(t)+' / '+lab(DUR);const p=ctl.playing?'Pause':'Play';if(pb.textContent!==p)pb.textContent=p};
+  // play, pause and scrub under the canvas; step marks on the slider
+  const pb=document.getElementById('wplay'),sk=document.getElementById('wseek'),tm=document.getElementById('wtime'),dl=document.getElementById('wsteps');
+  if(pb&&sk){const lab2=s=>Math.floor(s/60)+':'+String(Math.floor(s)%60).padStart(2,'0');sk.max=DUR;
+    if(dl){dl.innerHTML=STEPS.map(s=>'<option value="'+s[0]+'"></option>').join('')}
+    ctl.onframe=t=>{sk.value=t;if(tm)tm.textContent=lab2(t)+' / '+lab2(DUR);const p=ctl.playing?'Pause':'Play';if(pb.textContent!==p)pb.textContent=p};
     pb.onclick=()=>ctl.playing?ctl.pause():ctl.play();sk.oninput=()=>{ctl.pause();ctl.seek(sk.value)}}
 })();
 
