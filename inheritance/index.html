@@ -6,18 +6,27 @@
 <style>
 *{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:#0c0c0c;color:#eee;font:14px/1.5 Inter,Arial,sans-serif}
 main{max-width:1600px;margin:auto;padding:0 0 6px}
-canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#0c0c0c}
+canvas{display:block;width:100%;height:auto;background:#0c0c0c}
+section{padding:28px 0 10px}section+section{border-top:1px solid #1c1c1c}
+.hd{padding:0 clamp(12px,2.2vw,36px) 8px}.hd p{margin:0;color:#8d8c86;font:11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase}.hd h2{margin:4px 0 0;font:400 clamp(22px,2.6vw,34px)/1.2 Georgia,serif}
 footer{display:flex;gap:16px;align-items:center;padding:8px clamp(12px,2.2vw,36px)}
 button{color:#bcbcbc;font:inherit;background:none;border:0;padding:4px 0;cursor:pointer}button:hover{color:#fff}
 input{flex:1;min-width:20px;accent-color:#ddd}time{color:#9b9a94;font:12px ui-monospace,monospace;white-space:nowrap}
 button:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:3px}
 </style></head><body><main>
-<canvas width="1600" height="900" role="img" aria-label="A lineage of robots: print, distill, birth, and learning."></canvas>
-<footer aria-label="Playback"><button type="button" id="play">Pause</button><input id="seek" type="range" min="0" max="62" step=".05" value="0" aria-label="Position"><time></time></footer>
-</main><script>
+<section><div class="hd"><p>1 · Why “birth”</p><h2>Copy, update, “birth”</h2></div>
+<canvas id="d-why" width="1600" height="780" style="aspect-ratio:1600/780" role="img" aria-label="Copy, update and birth compared."></canvas></section>
+<section><div class="hd"><p>2 · The body</p><h2>Head and tail</h2></div>
+<canvas id="d-body" width="1600" height="700" style="aspect-ratio:1600/700" role="img" aria-label="The head and the tail."></canvas></section>
+<section><div class="hd"><p>3 · Lineage</p><h2>It inherits, then learns, and gives “birth” too</h2></div>
+<canvas id="d-lineage" width="1600" height="900" style="aspect-ratio:16/9" role="img" aria-label="A lineage of robots: print, distill, birth, and learning."></canvas>
+<footer aria-label="Playback"><button type="button" id="play">Pause</button><input id="seek" type="range" min="0" max="62" step=".05" value="0" aria-label="Position"><time></time></footer></section>
+<section><div class="hd"><p>4 · The tail</p><h2>The tail copies itself</h2></div>
+<canvas id="d-tail" width="1600" height="700" style="aspect-ratio:1600/700" role="img" aria-label="A tail prints the next tail and hands over the arm."></canvas></section>
+</main><script src="diagrams.js"></script><script>
 /* One shot, one frame. Side view of the simplified bodies (profiles from simulator/simple/simple.json, meters).
    Time is compressed: one print, about two hours, plays in six seconds; the distillation runs in the same window. */
-const cv=document.querySelector('canvas'), g=cv.getContext('2d');
+const cv=document.getElementById('d-lineage'), g=cv.getContext('2d');
 const W=1600,H=900,S=700,FLOAT=.14,DOCK=.032;
 const TOP=[[-0.43,0.125],[-0.413,0.147],[-0.397,0.167],[-0.38,0.185],[-0.363,0.202],[-0.347,0.218],[-0.33,0.233],[-0.313,0.248],[-0.297,0.261],[-0.28,0.273],[-0.264,0.284],[-0.247,0.294],[-0.23,0.303],[-0.213,0.311],[-0.197,0.318],[-0.18,0.323],[-0.164,0.326],[-0.147,0.329],[-0.13,0.33],[-0.03,0.33],[0.036,0.33],[0.07,0.33],[0.086,0.329],[0.103,0.328],[0.119,0.327],[0.136,0.325],[0.153,0.323],[0.17,0.321],[0.186,0.318],[0.203,0.314],[0.22,0.31],[0.236,0.305],[0.253,0.299],[0.269,0.292],[0.286,0.284],[0.304,0.274]];
 const BOT=[[-0.43,0.125],[-0.413,0.083],[-0.397,0.053],[-0.38,0.03],[-0.363,0.014],[-0.347,0.003],[-0.33,0],[0.243,0],[0.249,0.04],[0.253,0.055],[0.256,0.065],[0.263,0.081],[0.269,0.091],[0.276,0.098],[0.283,0.102],[0.296,0.104],[0.366,0.104]];
@@ -330,7 +339,7 @@ let t=0,run=!matchMedia('(prefers-reduced-motion: reduce)').matches,last=perform
 const lab=s=>Math.floor(s/60)+':'+String(Math.floor(s)%60).padStart(2,'0');
 function size(){const r=Math.min(2,devicePixelRatio||1),w=Math.round(cv.clientWidth*r);if(w&&cv.width!==w){cv.width=w;cv.height=Math.round(w*9/16)}}
 function show(){size();const d=frame(t);if(cv.getAttribute('aria-label')!==d)cv.setAttribute('aria-label',d);seek.value=t;clock.textContent=lab(t)+' / '+lab(END);play.textContent=run?'Pause':'Play'}
-function tick(now){if(run){t+=(now-last)/1000;if(t>=END)t=0}last=now;show();requestAnimationFrame(tick)}
+function tick(now){if(run){t=Math.max(0,t+(now-last)/1000);if(t>=END)t=0}last=now;show();requestAnimationFrame(tick)}
 play.onclick=()=>{run=!run;last=performance.now();show()};
 seek.oninput=()=>{t=+seek.value;run=false;show()};
 document.addEventListener('visibilitychange',()=>{last=performance.now()});
