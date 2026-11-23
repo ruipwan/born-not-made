@@ -761,7 +761,8 @@ function dexPen(r, q, tool, hold, detail, psi = 0) { if (!DEX.data) return 0; co
 
 const waterY = (s) => -s.B + 0.09;      // the bodies float high, as the real design stands in 89 mm of water: the inner water surface is 90 mm above the floor
 // the base: fixed, 147 mm behind the head joint, on a 5 mm plate on the tail floor; raised in steps if the fixed base would meet the curved floor
-function armDims(r) { const s = r.s, bx = -s.Lh / 2 - DEX.BACK; r.B0 = [bx, floorY(s, true, bx, 0) + DEX.PLATE];
+const baseY = (s, bx) => { let y = -9; for (const dx of [-0.07, -0.035, 0, 0.035, 0.07]) for (const dz of [-0.07, -0.035, 0, 0.035, 0.07]) y = Math.max(y, floorY(s, true, bx + dx, dz)); return y; };      // the base plate rests on the highest floor under its footprint
+function armDims(r) { const s = r.s, bx = -s.Lh / 2 - DEX.BACK; r.B0 = [bx, baseY(s, bx) + DEX.PLATE];
   if (DEX.data) for (let i = 0; i < 30; i++) { const M = rootOf(r).multiply(dexMats(DREST).B_Fix), v = DEX.samp.B_Fix; let w = 0; for (let j = 0; j < v.length; j += 3) { _v3.set(v[j], v[j + 1], v[j + 2]).applyMatrix4(M); w = Math.max(w, penAt(s, true, _v3.x, _v3.y, _v3.z, 0)); } if (w < 0.0005) break; r.B0[1] += 0.002; }
   if (r.kit) r.pk = r.kit.map((p, i) => pocketOf(s, p, i, 1.0));
   // where a part is taken: it floats in through the mouth onto the water inside the head, as far as the arm reaches at the water
@@ -773,7 +774,11 @@ const safeY = (r) => waterY(r.s) + 0.06;      // the height the arm carries thin
 const SHELF = { z: 0.105, h: 0.03, w: 0.04 };
 function rackPos(r, i, p = r.nk[i]) { const x0 = r.B0[0] + 0.215, xm = r.B0[0] + 0.315; let x = x0, side = -1;
   const step = (q) => (q ? Math.max(q.l, VMIN) : 0.008) + 2 * COLLAR + 0.004;
-  for (let k = 0; k <= i; k++) { const q = k === i ? p : r.nk[k], w = step(q); if (x + w > xm) { side = -side; x = x0; } if (k === i) { const xx = x + w / 2, z = side * SHELF.z; return [xx, shelfY(r, xx, z), side * 0.097, -side * Math.PI / 4]; } x += w; } }
+  for (let k = 0; k <= i; k++) { const q = k === i ? p : r.nk[k], w = step(q); if (x + w > xm) { side = -side; x = x0; } if (k === i) { const xx = x + w / 2, z = side * SHELF.z, yS = shelfY(r, xx, z); return [xx, yS, side * rackZ(r, xx, yS, q), -side * Math.PI / 4]; } x += w; } }
+// a part on the rack stands 97 mm out from the centre line, or less where a wide part would meet the wall (its half size, its collar and 4 mm of air, up to the holder's carrying height)
+function rackZ(r, x, y, p) { const key = r.s; if (p && p._rz && p._rz.k === key && p._rz.x === x) return p._rz.v; const half = (p ? Math.max(p.l, p.w, VMIN) / 2 : 0.006) + COLLAR + 0.004; let zm = 0.097;
+  for (const yy of [y + 0.003, y + 0.02, safeY(r)]) { let lo = 0, hi = 0.6; for (let k = 0; k < 16; k++) { const m = (lo + hi) / 2; if (shellF(r.s, true, x, yy, m) < 1) lo = m; else hi = m; } zm = Math.min(zm, lo - half); }
+  const v = Math.max(0.04, zm); if (p) p._rz = { k: key, x, v }; return v; }
 const shelfY = (r, x, z) => Math.min(Math.max(floorY(r.s, true, x, z), floorY(r.s, true, x, z + Math.sign(z) * SHELF.w * 0.4)) + SHELF.h, waterY(r.s) - 0.015);
 /* where eaten parts wait: two kit magazines on the head floor, built like the quilted head study's (two rails 5 x 2 mm on posts 4 x 4 mm, end stops
    5 x 3 x 8 mm, from quilt.json), and the study's two tool saddles beside the arm base (holder and needle), placed from the base as there.
@@ -820,12 +825,16 @@ function armStep(r, dt) { const A = r.arm;
 }
 const lerp3 = (a, b, t) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
 // a pick: the robot has swum over the part, so it floats inside the head; the magnet comes down onto it, lifts it, and lays it on the rack (or, in a swap, sets it into the body)
+// how high above its place the holder lets a part go: 4 mm, and on a sloping wall enough more that the magnet and the part's edge clear the wall; the part then settles in
+const hover = (q, p) => { const tilt = Math.acos(clamp(Math.abs(q.n ? q.n[1] : 1), 0, 1)); return 0.004 + Math.max(Math.max(p.l, p.w, VMIN) / 2 + COLLAR, DEX.MAG.r + 0.005) * Math.tan(Math.min(tilt, 1.2)); };
 function startPick(r, F) {
   const own = !r.forage, pp = F.p; F.st = "wait"; F.claim = r; r.pickT0 = simT; r.pick = { F, own, slot: own ? r.selfSlot : r.nk.length }; if (r.forage) r.forage.tgt = null; r.self = null; r.vx = r.vz = 0;
   const w = waterY(r.s), xp = r.pickX, top = [xp, w + 0.0015 + pp.h + 0.002, 0];
   hop(r, top, "mag", 1.4, { hold: F, fn: () => { F.st = "held"; r.pickHoldT = simT; ripple(F.x, F.z, 0.5); flash([F.x, WL + 0.01, F.z], 0.5, 0.09, 3.5); } });      // magnet on: a small bright pulse, and a ring in the water where the part was
-  if (own) { const q = r.pk[r.pick.slot], at = [q.x, q.y + pp.h / 2 + 0.004, q.z];
-    hop(r, at, "mag", 1.2, { fn: () => swapIn(r, F) }, q.ledge ? 0 : inward(q.z));
+  if (own) { const q = pocketOf(r.s, pp, r.pick.slot, 1.0), q0 = r.pk[r.pick.slot], old = r.kit[r.pick.slot], at = [q.x, q.y + pp.h / 2 + hover(q, pp), q.z], at0 = [q0.x, q0.y + old.h / 2 + hover(q0, old), q0.z]; r.pick.q = q; r.pick.q0 = q0;
+    // the new part is set into its own place (a thick part on the inner ledge, a thin one in a wall pocket), then the holder takes the old part out of its place and sheds it
+    hop(r, at, "mag", 1.2, { hold: null, fn: () => { swapIn(r, F); F.y = -9; } }, q.ledge ? 0 : inward(q.z));
+    hop(r, at0, "mag", 1.0, { hold: F }, q0.ledge ? 0 : inward(q0.z));
     hop(r, top, "mag", 1.2, { hold: null, fn: () => { const c = Math.cos(r.h), sn = Math.sin(r.h); F.x = r.x + c * xp; F.z = r.z + sn * xp; F.y = WL; F.vx = c * 0.02; F.vz = sn * 0.02; F.st = "float"; F.t = 0; F.claim = null; F.exitR = r; F.exitT = simT + 8; r.pick = null; r.backT = simT + 4; ripple(F.x, F.z, 0.12); } });      // the shed part goes back on the water inside the head; the robot backs away and it leaves through the mouth
   } else { const rp = rackPos(r, r.nk.length, pp), at = [rp[0], rp[1] + 0.003 + pp.h + 0.003, rp[2]];
     hop(r, at, "mag", 1.2, { psiEnd: rp[3], hold: null, fn: () => { const t = Object.assign({}, pp, { col: true }); r.nk.push(t); { const ii = r.nk.length - 1; flash(() => { const q = rackPos(r, ii); return worldOf(r, [q[0], q[1] + 0.01, q[2]]); }, 1.8, 0.06, 1.5); } r.nkn = kitN(r.nk); const fi = floats.indexOf(F); if (fi >= 0) floats.splice(fi, 1); picks++; r.pick = null;
@@ -847,7 +856,7 @@ function pauseAndPlace(r, i) {
   const sp = r.babySpec, t = r.nk[i], q = sp.pocket[i], bp = babyPt(r, q), L = Math.max(1, Math.round(sp.pf[i] * NLAY)), rp = rackPos(r, i), at = [rp[0], rp[1] + 0.003 + t.h + 0.003, rp[2]];
   r.needle = null; r.paused = true; r.arm.needleOn = false;
   hop(r, at, "mag", 1.0, { hold: t, psiEnd: rp[3] });
-  hop(r, [bp[0], bp[1] + t.h / 2 + 0.004, bp[2]], "mag", 1.0, { psiEnd: q.ledge ? 0 : inward(bp[2]), hold: null, fn: () => { t.inBaby = true; t.setT = simT; r.paused = false; sp.next++; if (!q.ledge) dtag(() => worldOf(r, babyPt(r, q)), `POCKET ${(t.h * 1000).toFixed(1)} MM DEEP · ${t.name.toUpperCase()}, SET FLUSH`, 4); flash(() => worldOf(r, babyPt(r, q)), 1.4, 0.07, 2.2); log(`#${r.id} pauses the print at layer ${L} of ${NLAY} and sets ${FAM[t.f]}, ${t.name}, ${q.ledge ? "on the inner ledge" : "into the wall"}`); } });
+  hop(r, [bp[0], bp[1] + t.h / 2 + hover(q, t), bp[2]], "mag", 1.0, { psiEnd: q.ledge ? 0 : inward(bp[2]), hold: null, fn: () => { t.inBaby = true; t.setT = simT; r.paused = false; sp.next++; if (!q.ledge) dtag(() => worldOf(r, babyPt(r, q)), `POCKET ${(t.h * 1000).toFixed(1)} MM DEEP · ${t.name.toUpperCase()}, SET FLUSH`, 4); flash(() => worldOf(r, babyPt(r, q)), 1.4, 0.07, 2.2); log(`#${r.id} pauses the print at layer ${L} of ${NLAY} and sets ${FAM[t.f]}, ${t.name}, ${q.ledge ? "on the inner ledge" : "into the wall"}`); } });
 }
 // the arm drawn: the link meshes of the printing simulator, and its tool modules, for each robot that holds a tail
 const TOOLG = {};      // the tool meshes, made once and shared by every arm
@@ -918,7 +927,7 @@ const modsAfloat = (m) => { let n = 0; for (const M of mods) if (M.m === m && M.
 const tW = (T, p) => { const c = Math.cos(T.h), s = Math.sin(T.h), X = p[0] + (T.ox || 0); return [T.x + X * c - p[2] * s, WL - waterY(T.s) + p[1], T.z + X * s + p[2] * c]; };
 const tL = (T, w) => { const c = Math.cos(T.h), s = Math.sin(T.h), dx = w[0] - T.x, dz = w[2] - T.z; return [dx * c + dz * s - (T.ox || 0), w[1] - (WL - waterY(T.s)), -dx * s + dz * c]; };
 const frameW = (T) => Tm([T.x, WL - waterY(T.s), T.z]).multiply(M4().makeRotationY(-T.h)).multiply(Tm([T.ox || 0, 0, 0]));
-function tailArm(T) { const s = T.s, bx = -s.Lh / 2 - DEX.BACK; T.B0 = [bx, floorY(s, true, bx, 0) + DEX.PLATE]; T.ox = s.Lh / 2 + s.Lt / 2; if (!T.arm) T.arm = newArm(); }
+function tailArm(T) { const s = T.s, bx = -s.Lh / 2 - DEX.BACK; T.B0 = [bx, baseY(s, bx) + DEX.PLATE]; T.ox = s.Lh / 2 + s.Lt / 2; if (!T.arm) T.arm = newArm(); }
 const faceX = (T) => -T.s.Lh / 2;
 
 /* the two segments of a tail: the tail shell cut across, N (nose) behind, F (face) in front */
@@ -1576,7 +1585,7 @@ function buildLights() {
     fragmentShader: "varying float vK; void main() { vec2 c = gl_PointCoord - 0.5; float d = length(c) * 2.0; if (d > 1.0) discard; float a = exp(-d * d * 6.0) * (1.0 - d) + 0.6 * exp(-d * d * 60.0); gl_FragColor = vec4(vec3(1.0, 0.97, 0.92) * vK * a, 1.0); }" });
   LT.pts = new THREE.Points(g, m); LT.pts.frustumCulled = false; LT.pts.renderOrder = 40; R3.sc.add(LT.pts);
 }
-const worldOf = (r, p) => { _p.set(p[0], p[1], p[2]).applyMatrix4(r.grp.matrix); return [_p.x, _p.y, _p.z]; };
+const worldOf = (r, p) => { if (!r.grp) return [0, -9, 0]; _p.set(p[0], p[1], p[2]).applyMatrix4(r.grp.matrix); return [_p.x, _p.y, _p.z]; };
 // a brief light at a place, or following a thing: at(t) gives the world position
 function flash(at, dur, size, k) { LT.list.push({ at, t0: simT, dur, size, k }); }      // in simulation time, so the cues keep pace at 3x and 8x
 function updateLights() {
@@ -1790,9 +1799,11 @@ function armTest(n = 10) { const out = { worst: 0, where: "", n: 0, by: {}, over
     const kit = Array.from({ length: KIT }, (_, i) => makePart(kinds[(g + i * 3) % kinds.length]));
     const r = { id: -1, s: shapeOf(genes), tail: true, x: 0, z: 0, h: 0, arm: newArm(), nk: [], nkn: [0, 0, 0, 0, 0, 0, 0], need: [0, 0, 0, 0, 0, 0, 0], plan: [], forage: { t: 0 }, memory: [], g: genes };
     armDims(r); setKit(r, kit);
-    const run = (label) => { for (let k = 0; k < 4000 && (r.arm.cur || r.arm.seg.length); k++) { armStep(r, 0.03); const c = r.arm.cur, near = c && c.fn && c.p && (r.pick && r.pick.own || r.paused) && Math.hypot(...dexFK(r, r.arm.q, r.arm.tool, r.arm.psi).map((v, k) => v - c.p[k])) < 0.03;      // a part entering its own pocket is meant to meet the wall
+    const run = (label) => { for (let k = 0; k < 4000 && (r.arm.cur || r.arm.seg.length); k++) { armStep(r, 0.03); const c = r.arm.cur, tip = dexFK(r, r.arm.q, r.arm.tool, r.arm.psi), pq = r.pick && r.pick.own ? [r.pick.q, r.pick.q0].find((q) => Math.hypot(tip[0] - q.x, tip[2] - q.z) < 0.03) : null;
+      // a part going into its own place is meant to meet the wall there: within 30 mm of that place sideways and 50 mm above it, before and just after the part is let go (the segment that set it in has ended)
+      const near = (c && c.fn && c.p && r.paused && Math.hypot(...tip.map((v, k) => v - c.p[k])) < 0.03) || (pq && tip[1] - pq.y < 0.05);
       const [p, wh] = dexPen(r, r.arm.q, r.arm.tool, near ? null : r.arm.hold, true, r.arm.psi); out.n++; if (p > 0.002) out.over2++; if (p > 0.005) out.over5++;
-      const key = label.split(" ")[0] + " " + wh.split(" at ")[0]; out.by[key] = Math.max(out.by[key] || 0, +(p * 1000).toFixed(1)); if (p > out.worst) { out.worst = p; out.where = `${label}, genome ${g}, ${wh}`; } } };
+      const key = label.split(" ")[0] + " " + wh.split(" at ")[0]; out.by[key] = Math.max(out.by[key] || 0, +(p * 1000).toFixed(1)); if (p > out.worst) { out.worst = p; out.where = `${label}, genome ${g}, ${wh}` + (r.pick && r.pick.q ? `, ${[r.pick.q, r.pick.q0].map((q) => (Math.hypot(tip[0] - q.x, tip[2] - q.z) * 1000).toFixed(0)).join(" and ")} mm from the new and the old place, seg ${r.arm.cur ? (r.arm.cur.fn ? "fn " : "") + (r.arm.cur.p || []).map((v) => (v * 1000).toFixed(0)) : "none"}` : ""); } } };
     run("rest");
     for (const f of [FC, FS, FD, FP, FL, FY]) { const F = { p: makePart(f), f, x: 0.5, z: 0, st: "float", h: 0 }; r.forage = { t: 0 }; startPick(r, F); run("pick " + F.p.name); }
     r.forage = null; for (let i = 0; i < kit.length; i++) { if (kit[i].f === FC) continue; r.selfSlot = i; const F = { p: makePart(kit[i].f), x: 0.5, z: 0, st: "float", h: 0 }; F.f = F.p.f; startPick(r, F); run("swap " + kit[i].name + (r.pk[i].ledge ? " ledge" : " pocket")); }
@@ -1807,7 +1818,7 @@ window.__society = { get robots() { return robots; }, get floats() { return floa
     fam: Object.fromEntries(FAM.map((x, i) => [x, famTotals()[i]])), kits: new Set(robots.map((r) => r.kn.join(""))).size, meanTiles: +(robots.reduce((a, r) => a + r.kit.length, 0) / Math.max(1, robots.length)).toFixed(2), coreAfloat: coreAfloat(), armWorstMM: +(armWorst * 1000).toFixed(1), armWorstAt, forageT: robots.filter((r) => r.forage).map((r) => Math.round(r.forage.t)).join(" "), ready: robots.filter(ready).length }),
   forceSwap: (r, f) => { const [i] = swapSlot(r, f); if (i < 0) return false; const F = addFloat(makePart(f), r.x + Math.cos(r.h) * r.pickX, r.z + Math.sin(r.h) * r.pickX); r.selfSlot = i; r.forage = null; startPick(r, F); return true; },
   forcePick: (r, f, kind) => { let p = makePart(f); for (let k = 0; k < 200 && kind && p.kind !== kind; k++) p = makePart(f); const F = addFloat(p, r.x + Math.cos(r.h) * r.pickX, r.z + Math.sin(r.h) * r.pickX); F.h = -r.h; if (!r.forage) { r.plan = [FC, FP, f]; r.forage = { t: 0 }; } startPick(r, F); return p.name; },
-  DIR, CINE, director, armTest, dbg: { DEX, ikArm, dexFK, dexPen, rackPos, babyPt, armDims, setKit, shapeOf, newArm, pocketOf, makePart, floorY, tW, faceX, V3: THREE.Vector3, segSecs, quiltSeg, qShape, babyPen, birthTest, birthPose, prof: (n = 30, dt = 1 / 60) => { const gl = R3.r.getContext(), px = new Uint8Array(4), T = { step: 0, scene: 0, dir: 0, render: 0, diag: 0 }, now = () => performance.now();
+  DIR, CINE, director, armTest, dbg: { DEX, ikArm, dexFK, dexPen, rackPos, babyPt, armDims, setKit, shapeOf, newArm, pocketOf, makePart, floorY, tW, faceX, V3: THREE.Vector3, segSecs, quiltSeg, qShape, babyPen, birthTest, birthPose, armStep, prof: (n = 30, dt = 1 / 60) => { const gl = R3.r.getContext(), px = new Uint8Array(4), T = { step: 0, scene: 0, dir: 0, render: 0, diag: 0 }, now = () => performance.now();
     for (let i = 0; i < n; i++) { let t = now(); step(dt); T.step += now() - t; t = now(); U.uTime.value += dt; updateScene(dt); T.scene += now() - t; t = now(); director(dt); R3.ctl.update(); updateLights(dt); T.dir += now() - t;
       t = now(); R3.r.info.autoReset = false; R3.r.info.reset(); R3.r.shadowMap.needsUpdate = true; cineRender(performance.now() / 1000, dt); R3.r.info.autoReset = true; gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); T.render += now() - t; t = now(); drawDiagram(dt); labels(); T.diag += now() - t; }
     for (const k in T) T[k] = +(T[k] / n).toFixed(2); T.calls = R3.r.info.render.calls; T.tris = R3.r.info.render.triangles; return T; } }, clear: () => { robots.forEach(disposeRobot); robots = []; [...loose].forEach(disposeLoose); loose = []; floats = []; pickable.length = 0; } };
