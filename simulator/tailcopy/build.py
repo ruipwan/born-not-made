@@ -318,7 +318,7 @@ def birth_stages(C, label, lead):
         tip = t_h * (1 - st.crank) + t_c * st.crank
         st.q = arm_to(tip, CUP, label='birth b')
     stage_birth('birthb', 'Birth: push while inflating', 12, (B['rc'] - B['r1']) / 0.002,
-                f'The holder, then its folding crank, pushes the rim at 2 mm/s; air is fed with the advance, so each section opens only outside: across first, then the quilt. Inside and on the lip the strip stays flat and cupped. The rim goes {(B["rc"]-B["r1"])*1000:.0f} mm, the last lengthwise folds open as it goes, and the nose comes down onto the tank floor.', f_b, C, short='Push')
+                (f'The holder pushes the rim at 2 mm/s (its folding crank stays folded: the holder reaches the whole way);' if B['push_c'] < 0.001 else f'The holder, then its folding crank, pushes the rim at 2 mm/s;') + f' air is fed with the advance, so each section opens only outside: across first, then the quilt. Inside and on the lip the strip stays flat and cupped. The rim goes {(B["rc"]-B["r1"])*1000:.0f} mm, the last lengthwise folds open as it goes, and the nose comes down onto the tank floor.', f_b, C, short='Push')
     def f_d(u, s0):
         w = seg(u, 0.05, 0.75); st.crank = 1 - seg(u, 0.0, 0.15)
         back = B['back'] * w
@@ -783,7 +783,7 @@ def trip(pid, first=False):
     stage('place' + pid, f'{label.capitalize()}: set down', 8, 240, PLACE_TEXT[pid], f_place, short=f'{label.capitalize()}: set')
 
 PICK_TEXT = {
-    'M1': 'It turns to the tray. The base stands in its floor bay on its drive frame, in its sealed shroud. The magnet lands on the steel pad of the grip boss on the turret, the ball needle enters the socket 28 mm ahead: the magnet holds, the needle keeps the base from turning. The base is lifted 12 mm, no more: at this depth the water carries most of it.',
+    'M1': 'It turns to the tray. The base stands in its floor bay on its drive frame, in its sealed shroud. The magnet lands on the steel pad of the grip boss on the turret, the ball needle enters the socket 28 mm ahead: the magnet holds, the needle keeps the base from turning. The base is lifted ' + f'{LIFT_M1*1000:.0f}' + ' mm, no more: at this depth the water carries most of it.',
     'P': 'The power pack (three 18650 cells in series in a sealed sleeve) stands in its cradle. Magnet on the pad, needle in the socket, lifted out of the cradle.',
     'M2': 'The upper arm with the elbow block lies in its cradle in the attitude it will go on. Magnet on the pad of its boss, needle in the socket; lifted clear of the cradle walls.',
     'M3': 'The forearm in its cradle, in the attitude it will go on. Magnet on the pad of its boss, needle in the socket; lifted.',
