@@ -98,57 +98,37 @@ function loop(canvas,W,H,dur,draw){
   });
 })();
 
-/* 2 · Head and tail */
+/* 2 · Head and tail: a still from the quilted head simulator (simulator/doublewall, print stage), labels on top */
 (function(){
   const cv=document.getElementById('d-body');if(!cv)return;
-  const W=1600,H=700,S=1000,Yb=600,XD=840,DUR=13;
-  const SP=spots(11,40);
+  const W=1600,H=900,DUR=14,IX=150,IY=175,IS=1300/1908;
+  const img=new Image();img.src='body-section.jpg?v=1';
+  const P=(x,y)=>[IX+x*IS,IY+y*IS];
+  const LB=[ // anchor in the image, label x, top or bottom, title, line
+    [[860,230],330,'top','Arm','The only part not in the wall. It prints, and picks up parts.'],
+    [[1380,120],760,'top','Quilted double wall','Brain, battery, pump, motor and sensors, sealed between two skins.'],
+    [[1760,300],1200,'top','Mouth','The newborn leaves here, inflating on the way.'],
+    [[380,380],150,'bottom','Tail','Reproduces. Holds the arm and its tools.'],
+    [[985,420],520,'bottom','Docks from behind','Gel face to gel face. It moves on to the next head.'],
+    [[1240,690],880,'bottom','The next body','Printed folded flat in the gel, its parts set in first.'],
+    [[1560,640],1220,'bottom','Gel','A shallow layer held by the lower part of the head.']];
   loop(cv,W,H,DUR,(c,t)=>{
-    const fade=1-ease(t,DUR-.6,DUR), dock=ease(t,.3,2.2), Xd=lerp(XD-170,XD,dock);
-    c.globalAlpha=fade;
-    // water outside
-    c.strokeStyle=ink(.2);c.beginPath();for(let x=0;x<=W;x+=10){const y=Yb-150+1.4*Math.sin(x*.012+t)};c.stroke();
-    const m=headMap(XD,Yb,S,{}), tm=tailMap(Xd,Yb,S);
-    // head: double wall, gel, brain, parts
-    const P=drawHead(c,m,1,.03);
-    // double wall: a band inside the outline; gel fills the space it encloses
-    const B=.035*S, C=m(.2,.17);
-    c.save();c.clip(P);
-    c.fillStyle='rgba(156,200,236,.07)';c.fillRect(0,m(0,.1)[1],W,H);
-    c.strokeStyle='rgba(156,200,236,.25)';c.beginPath();c.moveTo(0,m(0,.1)[1]);c.lineTo(W,m(0,.1)[1]);c.stroke();
-    c.lineWidth=2*B+1.6;c.strokeStyle=ink(.35);c.stroke(P);c.lineWidth=2*B;c.strokeStyle='#161616';c.stroke(P);
-    c.restore();c.strokeStyle=ink(.8);c.lineWidth=1.4;c.stroke(P);mouth(c,m,1);
-    // everything but the arm sits in the wall
-    const inW=(x,z)=>{const [px,py]=m(x,z),dx=C[0]-px,dy=C[1]-py,d=Math.hypot(dx,dy);return [px+dx/d*B*.5,py+dy/d*B*.5]};
-    const [bx,by]=inW(.14,.36);const pulse=.5+.5*Math.sin(t*3);
-    c.fillStyle=ink(.85);c.fillRect(bx-24,by-6,48,12);c.fillStyle='#0c0c0c';c.fillRect(bx-7,by-4,14,8);
-    for(let i=0;i<5;i++){c.fillStyle=col(i%4,.4+.5*pulse);c.beginPath();c.arc(bx-20+i*10,by-12,1.8,0,7);c.fill()}
-    const parts=[[.15,0,30,10],[.24,.012,14,10],[.06,.012,14,10],[.3,.33,10,10],[.35,.12,10,10]];
-    const PP=parts.map(([x,z,w,h])=>{const [px,py]=inW(x,z);c.fillStyle=ink(.7);c.fillRect(px-w/2,py-h/2,w,h);return [px,py]});
-    // tail
-    drawTail(c,tm,1);
-    const [kx,ky]=tm(-.3,.16);for(let i=0;i<3;i++){c.strokeStyle=ink(.5);c.beginPath();c.moveTo(kx+i*12,ky);c.lineTo(kx+i*12,ky+30);c.stroke()}// tool rack
-    const pr=ease(t,2.4,3.4),ph=t*2.2;
-    const tip=dock>.99?[lerp(tm(.0,.1)[0],m(.12+.08*(Math.sin(ph)+1),.06)[0],pr),lerp(tm(0,.1)[1],m(0,.06+.02*Math.sin(ph*.5))[1],pr)]:tm(-.02,.12);
-    arm(c,tm,S,tip,1);
-    // labels appear one by one
-    const L=(i,anchor,x,y,head,body,align)=>{const a=ease(t,2.6+i*.7,3.1+i*.7);if(a<=0)return;c.save();c.globalAlpha*=a;
-      c.strokeStyle=ink(.35);c.lineWidth=1;c.beginPath();c.moveTo(...anchor);c.lineTo(align==='right'?x+8:x-8,y-5);c.stroke();
-      c.fillStyle=ink(.9);c.beginPath();c.arc(anchor[0],anchor[1],2.5,0,7);c.fill();
-      text(c,head,x,y,15,.95,'Arial',align);if(align==='right')text(c,body,x,y+19,13,.55,'Arial',align);else wrap(c,body,x,y+19,260,13,.55,17);c.restore()};
-    L(0,[bx,by-6],1310,250,'Brain','A microcontroller with a small local model, in the wall.');
-    L(1,m(.2,.06),1310,340,'Gel','A shallow layer on the floor of the head. The next body is printed in it.');
-    L(2,PP[0],1310,430,'Double wall','Battery, pump, motor and sensors, sealed between two skins.');
-    L(3,m(.345,.22),1310,520,'Mouth','The newborn leaves here, inflating on the way.');
-    L(4,tm(-.17,.22),470,300,'Arm','The only part not in the wall. Prints in the gel, picks up parts.','right');
-    L(5,[kx+12,ky+15],470,410,'Tools','Syringe, holder, the gel line.','right');
-    L(6,tm(DOCK,.16),470,520,'Docks from behind','Not part of the head. It moves on.','right');
-    text(c,'Head',m(.2,.36)[0],m(.2,.36)[1]-50,28,ease(t,2,2.6),'Georgia','center');
-    text(c,'thinks, senses, holds the gel',m(.2,.36)[0],m(.2,.36)[1]-28,12,.55*ease(t,2,2.6),mono,'center',1);
-    text(c,'Tail',tm(-.2,.33)[0],tm(-.2,.33)[1]-50,28,ease(t,2,2.6),'Georgia','center');
-    text(c,'reproduces',tm(-.2,.33)[0],tm(-.2,.33)[1]-28,12,.55*ease(t,2,2.6),mono,'center',1);
-    c.globalAlpha=1;
-    return 'The head holds the gel, the brain and the parts. The tail holds the arm and docks from behind; it is the part that reproduces.';
+    const fade=1-ease(t,DUR-.6,DUR);
+    const iw=1908*IS,ih=838*IS;
+    if(img.complete&&img.naturalWidth){c.drawImage(img,IX,IY,iw,ih);
+      // soften the frame so the still sits in the page
+      const E=70,edges=[[IX,0,IX+E,0,IX,IY,E,ih],[IX+iw,0,IX+iw-E,0,IX+iw-E,IY,E,ih],[0,IY,0,IY+E,IX,IY,iw,E],[0,IY+ih,0,IY+ih-E,IX,IY+ih-E,iw,E]];
+      for(const [x0,y0,x1,y1,rx,ry,rw,rh] of edges){const gr=c.createLinearGradient(x0,y0,x1,y1);gr.addColorStop(0,'#0c0c0c');gr.addColorStop(1,'rgba(12,12,12,0)');c.fillStyle=gr;c.fillRect(rx,ry,rw,rh)}}
+    LB.forEach(([an,x,side,h,body],i)=>{
+      const a=ease(t,.6+i*.9,1.2+i*.9)*fade;if(a<=0)return;
+      const [ax,ay]=P(...an), y=side==='top'?70:IY+838*IS+45;
+      c.save();c.globalAlpha=a;
+      c.strokeStyle=ink(.45);c.lineWidth=1;c.beginPath();c.moveTo(ax,ay);c.lineTo(ax,side==='top'?y+48:y-22);c.lineTo(x,side==='top'?y+48:y-22);c.stroke();
+      c.fillStyle=ink(.95);c.beginPath();c.arc(ax,ay,3.5,0,7);c.fill();c.strokeStyle='#0c0c0c';c.lineWidth=1.5;c.stroke();
+      text(c,h,x,y,16,.95);wrap(c,body,x,y+20,300,13,.6,17);
+      c.restore();
+    });
+    return 'A still of the quilted head simulator: tail with the arm, head with the quilted double wall, gel, the next body printed in it, and the mouth.';
   });
 })();
 
