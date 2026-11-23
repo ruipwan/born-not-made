@@ -1,5 +1,5 @@
 ; Born, Not Made, quilted shell variant: the next head folded flat, 53 layers of 1.5 mm, Dragon Skin 30 in Carbopol gel
-; SCHEMATIC: these are the contours of the smooth envelope of the folded body only; the pleat flanks between them are not in this file. The whole skin needs about 662 m of bead (1231 mL); this file holds the envelope part
+; SCHEMATIC: these are the contours of the smooth envelope of the folded body only; the pleat flanks between them are not in this file. The whole skin needs about 631 m of bead (1174 mL); this file holds the envelope part
 ; frame: X toward the opening, Y port, Z up, mm, origin on the docking plane on the tank floor
 ; E is the bead volume in cubic millimeters
 G21

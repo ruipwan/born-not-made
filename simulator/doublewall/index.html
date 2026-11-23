@@ -235,7 +235,7 @@ html.bnm-embed .bottom .area, html.bnm-embed .info { overflow: visible; }
 
 <section class="doc" id="how">
   <h2>Every head a quilted double membrane</h2>
-  <p>One head form for every generation: the head of the simple version (the spindle head, the roof falling in one arc to the mouth, the oval mouth leaning back, the long lower lip, the gel held by its own lower part, the docking face), made as an inflated double membrane of silicone, quilted like a down jacket: two skins joined by short webs into small irregular cells, smallest at the docking rim, the mouth and the lip, largest on the roof, their direction turning along the body. The interior is open. The first head is made that way beforehand, outside the tank; every newborn is such a head. Only the tail (arm, tools, store) stays a hard print.</p>
+  <p>One head form for every generation: the head of the simple version (the spindle head, the roof falling in one arc to the mouth, the oval mouth leaning back, the long lower lip, the gel held by its own lower part, the docking face; in side view the lower outline is one smooth line: the floor of the lobe flat on the tank floor, a fillet, the front wall, a second fillet and the lip rising 3 degrees to the rolled mouth edge), made as an inflated double membrane of silicone, quilted like a down jacket: two skins joined by short webs into small irregular cells, smallest at the docking rim and the mouth, largest on the roof, one depth along the lower line, their direction turning along the body. The interior is open. The first head is made that way beforehand, outside the tank; every newborn is such a head. Only the tail (arm, tools, store) stays a hard print.</p>
   <p>The lower part of the head was enlarged so that the next head fits there folded flat: the gel lobe is 224 mm wide instead of 96, the rest of the form is unchanged. The arm prints the next head folded flat, 18 layers, around its kit, in the gel of the head. The birth (round 2) is keel first and mouth end first: a band of two tubes along the floor centerline of the newborn is filled first; it straightens the folds and carries the push. The soft strip passes the mouth cupped, its edges riding up the lower contour of the mouth. The holder pushes the rim while air is fed into the cells from the mouth end, so each section opens across only outside the lip; a folding crank on the holder carries the rim the last part, 20 mm past the lip; the rim fills last. The newborn slides off the lip and lies in front of the mouth, a quilted head of the same form. The relay and the next cycle are not run in this round.</p>
   <h4>Point by point</h4>
   <table id="verdict"></table>
@@ -641,6 +641,12 @@ function quiltTextures(img) {
   const mk = (d) => { const cv = document.createElement("canvas"); cv.width = W; cv.height = H; cv.getContext("2d").putImageData(d, 0, 0); const t = new THREE.CanvasTexture(cv); t.anisotropy = 4; t.wrapS = THREE.RepeatWrapping; return t; };
   return { map: mk(col), bump: mk(bump) };
 }
+function applyDip(d) {
+  if (!PARTS.dipG || Math.abs(d - (PARTS.dipD || 0)) < 2e-5) return; PARTS.dipD = d; const xs = J.read.x_s, xl = J.mouth.lip[0];
+  for (const [g, b] of PARTS.dipG) { const p = g.attributes.position.array;
+    for (let k = 0; k < p.length; k += 3) { const x = b[k], y = b[k + 1]; if (x <= xs || b[k + 2] > 0.13 || Math.abs(y) >= 0.12) continue; const xi = Math.min(1, (x - xs) / (xl - xs)), wy = 0.5 + 0.5 * Math.cos(Math.PI * y / 0.12); p[k + 2] = b[k + 2] - d * xi * xi * (3 - xi) / 2 * wy; }
+    g.attributes.position.needsUpdate = true; }
+}
 function quiltGeo(P, na, nv) {
   const n1 = nv + 1, pos = new Float32Array(na * n1 * 3), uv = new Float32Array(na * n1 * 2), idx = [];
   for (let i = 0; i < na; i++) for (let j = 0; j <= nv; j++) { const s = (i * nv + (j % nv)) * 3, d = i * n1 + j; pos[3 * d] = P[s]; pos[3 * d + 1] = P[s + 1]; pos[3 * d + 2] = P[s + 2]; uv[2 * d] = i / (na - 1); uv[2 * d + 1] = 1 - j / nv; }
@@ -655,8 +661,10 @@ function buildQuilt() {
   const outer = new THREE.Mesh(og, outerM); outer.renderOrder = 7.2; R3.chamber.add(outer); const inner = new THREE.Mesh(ig, innerM); inner.renderOrder = 7.0; R3.chamber.add(inner); PARTS.chamber = outer; PARTS.qInner = inner;
   // the cuff at the docking rim and the rolled edge of the mouth: the two skins joined
   const cap = (i) => { const pos = [], ix = []; for (let j = 0; j <= nv; j++) { const s = (i * nv + (j % nv)) * 3; pos.push(O[s], O[s + 1], O[s + 2], I[s], I[s + 1], I[s + 2]); if (j) ix.push(2 * j - 2, 2 * j - 1, 2 * j, 2 * j - 1, 2 * j + 1, 2 * j); }
-    const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(ix); g.computeVertexNormals(); const m = new THREE.Mesh(g, clayMat(0xe9edee, { opacity: 0.75, side: THREE.DoubleSide, sub: 0.3, clip })); m.renderOrder = 7.3; R3.chamber.add(m); };
-  cap(0); cap(na - 1);
+    const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(ix); g.computeVertexNormals(); const m = new THREE.Mesh(g, clayMat(0xe9edee, { opacity: 0.75, side: THREE.DoubleSide, sub: 0.3, clip })); m.renderOrder = 7.3; R3.chamber.add(m); return g; };
+  cap(0); const mg = cap(na - 1);
+  // round 3, point 0: the lip edge dips elastically under the keel of the newborn in phase d (S.dip); the base positions are kept
+  PARTS.dipG = [og, ig, mg].map(g => [g, Float32Array.from(g.attributes.position.array)]);
   const img = new Image(); img.onload = () => { const t = quiltTextures(img); outerM.map = t.map; outerM.needsUpdate = true; if (NB.mat) { NB.mat.map = t.map; NB.mat.needsUpdate = true; } }; img.onerror = () => log("quilt texture did not load", "w"); img.src = Q.tex;
   // the six circuits, through the cell centers, filled from the mouth end
   const cc = [0xc98b2b, 0xc98b2b, 0x5f8f4e, 0x5f8f4e, 0x4a7fb0, 0x4a7fb0]; PARTS.circ = [];
@@ -869,7 +877,7 @@ function updateTrack(st) {
 function scrubTo(clientX) {
   const segs = $("#track").querySelectorAll(".seg"); for (let i = 0; i < segs.length; i++) { const r = segs[i].getBoundingClientRect(); if (clientX <= r.right || i === segs.length - 1) { const f = clamp((clientX - r.left) / r.width, 0, 0.999); TL.T = TL.stages[i].d0 + f * TL.stages[i].disp; break; } }
 }
-const NUM = ["mdy", "q0", "q1", "q2", "kx", "ky", "kz", "kyaw", "gel", "dock", "pr", "pz", "tx", "ty", "tz", "th", "bend", "ub", "yaw", "roll", "drain", "fill", "jets", "ballast", "v", "F", "Fz", "pen", "crank", "pbar", "front", "rimx", "Fn", "nbi"], DIS = ["tool", "pP", "pN", "kit", "vac", "air", "nv", "note"];
+const NUM = ["mdy", "q0", "q1", "q2", "kx", "ky", "kz", "kyaw", "gel", "dock", "pr", "pz", "tx", "ty", "tz", "th", "bend", "ub", "yaw", "roll", "drain", "fill", "jets", "ballast", "v", "F", "Fz", "pen", "crank", "pbar", "front", "rimx", "Fn", "nbi", "dip"], DIS = ["tool", "pP", "pN", "kit", "vac", "air", "nv", "note"];
 function evalState(T) {
   const st = stageAt(T), s = st.s, F = J.fr, x = s.i0 + st.f * (s.i1 - 1 - s.i0), i = Math.min(s.i1 - 1, Math.floor(x)), j = Math.min(s.i1 - 1, i + 1), f = x - i, S = { st, k: s.key, i };
   for (const n of NUM) S[n] = lerp(F[n][i], F[n][j], f); for (const n of DIS) S[n] = F[n][i];
@@ -882,7 +890,7 @@ function applyState(S, now) {
   CLOCK = S.clock; R3.tail.position.x = S.dock; const wl = J.read.wl[S.i]; UW.uWL.value = wl; J.WL = Math.max(wl, 0.002); WATER.surf.visible = wl > 0.003;
   poseArm([S.q0, S.q1, S.q2], S.tool, S, now);
   PARTS.parkP.visible = !!S.pP; PARTS.parkN.visible = !!S.pN; setGel(S.gel, S.dock);
-  setNewborn(S.nbi); const nb = S.nv > 0.5; R3.baby.visible = nb;
+  setNewborn(S.nbi); applyDip(S.dip || 0); const nb = S.nv > 0.5; R3.baby.visible = nb;
   if (nb) { R3.baby.matrix.copy(Tm([S.tx, S.ty, S.tz])).multiply(M4().makeRotationZ(S.yaw)).multiply(M4().makeRotationY(-S.th)).multiply(M4().makeRotationX(S.roll)); R3.baby.matrixWorldNeedsUpdate = true;
     PRINTCLIP.constant = S.k === "print" ? S.pz + 0.0008 : 100; }
   const K = J.kit;
@@ -943,6 +951,7 @@ const CAMS = {
   sidecam: () => ({ p: [-0.03, -1.55, 0.17], t: [-0.03, 0, 0.16] }),
   dockcam: () => ({ p: [-0.03, -1.4, 0.28], t: [-0.03, 0, 0.15] }),
   plancam: () => ({ p: [-0.03, -0.03, 2.0], t: [-0.03, 0, 0.1] }),
+  lipcam: () => ({ p: [0.82, -0.52, 0.33], t: [0.28, 0.0, 0.075] }),
   mouthcam: () => ({ p: [0.98, -0.2, 0.3], t: [0.32, 0, 0.15] }),
   fullcam: () => { const b = nbPos(); return { p: [b.x * 0.5 + 0.3, -2.2, 0.75], t: [b.x * 0.5 + 0.15, 0, 0.12] }; },
   magazine: () => ({ p: [0.42, -0.05, 0.42], t: [-0.004, 0, 0.05] }),
@@ -1012,7 +1021,7 @@ function renderProps() {
       `<div class="pnl"><h3>Penetration, every pair, every frame</h3><dl class="kv">${J.pairs.map((p) => `<dt>${esc(p.name)}</dt><dd>${f2(p.mm)} mm</dd>`).join("")}</dl><p>${J.fr.pen.length} frames tested. Limit 1 mm.</p></div>`; }
   else if (TAB === "birth") { const R = J.r2, q = J.q;
     el.innerHTML = `<div class="pnl"><h3>The keel first birth, round 2</h3><p>Mouth end first. (a) The ball needle of the holder in the valve at the rim; the keel, fed first, straightens the three lengthwise folds and the mouth end slides over the lower lip, cupped, lying on the keel. (b) The holder pushes the rim while the six serpentines are fed from the mouth end, in steps matched to the advance, so each section opens across only past the lip. (c) The holder takes the valve again with its folding crank and pushes the rim ${f0(R.reach.crank_rim_x * 1000 - J.mouth.lip[0] * 1000)} mm past the lip at most (20 mm used); the rim zone fills only then. (d) The needle leaves, the newborn slides off the lip and lies in front of the mouth.</p></div>` +
-      `<div class="pnl"><h3>Gates</h3><dl class="kv"><dt>Cupped strip in the mouth</dt><dd>radius ${f0(R.cup.R)} mm, ${f1(R.cup.clear - 2)} mm spare</dd><dt>Keel</dt><dd>2 rows, ${f0(2 * R.keel.r_mm)} mm, ${f1(R.keel.p_kpa)} kPa of ${f1(R.keel.p_allow_kpa)}</dd><dt>Keel axial capacity</dt><dd>${f1(R.keel.axial_N)} N, needs ${f1(R.keel.need_N)} N</dd><dt>Push a, b, c</dt><dd>${f2(R.push.a)}, ${f2(R.push.b)}, ${f2(R.push.c)} N of ${f2(J.read.payload_N)}</dd><dt>Wrist moment</dt><dd>${f2(R.wrist.holder)}, ${f2(R.wrist.crank)} N m</dd><dt>Rim reached</dt><dd>${f0(R.reach.crank_rim_x * 1000)} mm, needs 386</dd><dt>Air per mm of advance</dt><dd>${f0(R.front.air_per_mm_mL)} mL</dd><dt>Lip load, phase d</dt><dd>${f2(R.lip.load_N)} N (lip webs ${R.lip.hw_mm} mm)</dd><dt>Deepest overlap, birth</dt><dd>${f2(R.pen_birth * 1000)} mm</dd></dl></div>` +
+      `<div class="pnl"><h3>Gates</h3><dl class="kv"><dt>Cupped strip in the mouth</dt><dd>radius ${f0(R.cup.R)} mm, ${f1(R.cup.clear - 2)} mm spare</dd><dt>Keel</dt><dd>2 rows, ${f0(2 * R.keel.r_mm)} mm, ${f1(R.keel.p_kpa)} kPa of ${f1(R.keel.p_allow_kpa)}</dd><dt>Keel axial capacity</dt><dd>${f1(R.keel.axial_N)} N, needs ${f1(R.keel.need_N)} N</dd><dt>Push a, b, c</dt><dd>${f2(R.push.a)}, ${f2(R.push.b)}, ${f2(R.push.c)} N of ${f2(J.read.payload_N)}</dd><dt>Wrist moment</dt><dd>${f2(R.wrist.holder)}, ${f2(R.wrist.crank)} N m</dd><dt>Rim reached</dt><dd>${f0(R.reach.crank_rim_x * 1000)} mm, needs 386</dd><dt>Air per mm of advance</dt><dd>${f0(R.front.air_per_mm_mL)} mL</dd><dt>Lip load, phase d</dt><dd>${f2(R.lip.load_N)} N (lip circuit gel at ${f1(R.lip.p_lip_kpa)} kPa, edge dips ${f1(R.lip.dip_mm)} mm)</dd><dt>Deepest overlap, birth</dt><dd>${f2(R.pen_birth * 1000)} mm</dd></dl></div>` +
       `<div class="pnl"><h3>Round 1, kept as history</h3>${q.q1.attempts.map((a, i) => `<p><b>${esc(a.name)}.</b> ${esc(a.why)}</p>`).join("")}</div>`; }
   else if (TAB === "masses") { const M = J.masses; el.innerHTML = M.map((g) => `<div class="pnl"><h3>${esc(g.name)}</h3><dl class="kv">${g.rows.map((r) => `<dt>${esc(r[0])}</dt><dd>${esc(r[1])}</dd>`).join("")}</dl>${g.note ? `<p>${esc(g.note)}</p>` : ""}</div>`).join(""); }
   else { const K = J.kit; el.innerHTML = `<div class="pnl"><h3>${esc(K.name)}, ${f0(K.mass * 1000)} g</h3><dl class="kv">${K.parts.map((p) => `<dt>${p.url ? `<a href="${esc(p.url)}" style="color:inherit">${esc(p.name)}</a>` : esc(p.name)}</dt><dd>${f1(p.mass * 1000)} g</dd>`).join("")}</dl><p>Picked by the electromagnet on the steel disk, placed in the gel before printing, then the next head is printed around it. The ball needle of the holder hangs clear in front of the kit while the magnet holds. The parts stay visible through the clear skin. One AITIAO micro submersible pump. The magazine in the tail holds three kits, one for each birth; after a birth a module leaving its saddle slides the next kit along two rails into the pick pocket. The air valve of the newborn is a black rubber ball inflation valve core, which closes when the needle leaves.</p></div><div class="pnl"><h3>Parts in the tail: the store sits in the rear print</h3><dl class="kv">${[...new Map(J.equip.map((e) => [e.grp, e])).values()].map((e) => `<dt>${esc(e.name)}${e.est ? " (estimate)" : ""}<br><span style="color:var(--dim);font-size:11px">${esc(e.src)}</span></dt><dd>${f0(1000 * J.equip.filter((q) => q.grp === e.grp).reduce((a, q) => a + q.kg, 0))} g</dd>`).join("")}</dl></div>`; }
