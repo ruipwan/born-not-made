@@ -588,7 +588,7 @@ function pocketOf(s, p, i, k) {
   if (thick(p)) { const x = -s.Lh / 2 + s.Lh * (0.38 + 0.06 * (i % 4)), side = i % 2 ? 1 : -1, y = -0.66 * s.B;
     return { x, y: y + p.h / 2, z: side * 0.28 * s.A, rx: 0, n: [0, 1, 0], ledge: true }; }
   const u = 0.4 + 0.06 * Math.sin(i * 2.4 + 0.7), x = -s.Lh / 2 + s.Lh * u, a = s.As + (s.A - s.As) * (1 - Math.pow(u, s.q)), b = s.B * (1 - 0.12 * Math.pow(u, 4));
-  const el = [-1.25, -1.05, -0.85][Math.floor(i / 2) % 3] + 0.05 * Math.sin(i * 1.7), th = i % 2 ? el : Math.PI - el, e = 2 / s.n, c = Math.cos(th), sn = Math.sin(th);      // three on each side, in the lower wall: the DexArm's tool only hangs straight down, so a pocket must face up from inside from inside
+  const el = [-1.25, -0.98, -0.72][Math.floor(i / 2) % 3] + 0.05 * Math.sin(i * 1.7) - clamp((p.h - 0.0012) * 30, 0, 0.1), th = i % 2 ? el : Math.PI - el, e = 2 / s.n, c = Math.cos(th), sn = Math.sin(th);      // three on each side, in the lower wall from near the keel up the flank (a thicker part a little lower), so they fall on different layers of the print: the DexArm's tool only hangs straight down, so a pocket must face up from inside from inside
   const kk = k * (1 - 0.6 * s.lobeD);
   return { x, y: 0.01 * u + b * kk * Math.sign(sn) * Math.pow(Math.abs(sn), e), z: a * kk * Math.sign(c) * Math.pow(Math.abs(c), e), rx: Math.PI / 2 - th, n: [0, sn, c] };
 }
@@ -806,11 +806,15 @@ function seg(r, o) { const A = r.arm; o.dur *= 0.6; if (o.tool && o.tool !== (A.
   A.seg.push(o); if (o.p) { A.pp = o.p.slice(); A.ppRest = false; A.psiP = o.psi ?? 0; } }
 const armRest = (r, dur, fn) => { r.arm.seg.push({ rest: true, dur, fn }); r.arm.pp = dexFK(r, DREST, r.arm.toolP || r.arm.tool); r.arm.ppRest = true; r.arm.psiP = 0; };
 // up to the carrying height, across, and down onto p
+function zIn(r, x, y, z) { if (!r.s || shellF(r.s, true, x, y, 0) === 0) return z; let lo = 0, hi = 0.6; for (let k = 0; k < 16; k++) { const m = (lo + hi) / 2; if (shellF(r.s, true, x, y, m) < 1) lo = m; else hi = m; }
+  const zm = Math.max(0, lo - 0.024); return Math.abs(z) > zm ? Math.sign(z) * zm : z; }
 function hop(r, p, tool, dur, last = {}, psi = 0) { if (last.psiEnd !== undefined) psi = last.psiEnd; const A = r.arm, ys = safeY(r), c = A.pp || dexFK(r, A.q, tool, A.psi), fromRest = A.ppRest || (!A.pp && !A.cur && !A.seg.length);
   // out of the folded pose the joints move together (straight up from the base is out of reach); after that the tool point moves in straight lines
-  if (fromRest || (tool !== (A.toolP || A.tool))) seg(r, { p: [p[0], Math.max(ys, p[1]), p[2]], tool, psi, dur: dur * 0.55, joint: true });
-  else { if (c[1] < ys - 0.004) seg(r, { p: [c[0], ys, c[2]], tool, psi: A.psiP ?? 0, dur: dur * 0.25 });
-    seg(r, { p: [p[0], Math.max(ys, p[1]), p[2]], tool, psi, dur: dur * 0.45 }); }
+  // above a place on the flank the wall curves in, so the carrying points move in where needed: the held part stays 24 mm clear of the shell sideways
+  const yo = Math.max(ys, p[1]), po = [p[0], yo, zIn(r, p[0], yo, p[2])];
+  if (fromRest || (tool !== (A.toolP || A.tool))) seg(r, { p: po, tool, psi, dur: dur * 0.55, joint: true });
+  else { if (c[1] < ys - 0.004) seg(r, { p: [c[0], ys, zIn(r, c[0], ys, c[2])], tool, psi: A.psiP ?? 0, dur: dur * 0.25 });
+    seg(r, { p: po, tool, psi, dur: dur * 0.45 }); }
   seg(r, Object.assign({ p, tool, psi, dur: dur * 0.3 }, last)); }
 function armStep(r, dt) { const A = r.arm;
   if (!A.cur && A.seg.length) { const c = A.seg.shift(); A.cur = c; A.t = 0; A.on = true; c.q0 = A.q.slice(); c.p0 = dexFK(r, A.q, A.tool, A.psi);
@@ -830,7 +834,7 @@ function armStep(r, dt) { const A = r.arm;
 const lerp3 = (a, b, t) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
 // a pick: the robot has swum over the part, so it floats inside the head; the magnet comes down onto it, lifts it, and lays it on the rack (or, in a swap, sets it into the body)
 // how high above its place the holder lets a part go: 4 mm, and on a sloping wall enough more that the magnet and the part's edge clear the wall; the part then settles in
-const hover = (q, p) => { const tilt = Math.acos(clamp(Math.abs(q.n ? q.n[1] : 1), 0, 1)); return 0.004 + Math.max(Math.max(p.l, p.w, VMIN) / 2 + COLLAR, DEX.MAG.r + 0.005) * Math.tan(Math.min(tilt, 1.2)); };
+const hover = (q, p) => { const tilt = Math.acos(clamp(Math.abs(q.n ? q.n[1] : 1), 0, 1)); return 0.004 + Math.max(Math.max(p.l, p.w, VMIN) / 2 + COLLAR, DEX.MAG.r + 0.011) * Math.tan(Math.min(tilt, 1.2)); };
 function startPick(r, F) {
   const own = !r.forage, pp = F.p; F.st = "wait"; F.claim = r; r.pickT0 = simT; r.pick = { F, own, slot: own ? r.selfSlot : r.nk.length }; if (r.forage) r.forage.tgt = null; r.self = null; r.vx = r.vz = 0;
   const w = waterY(r.s), xp = r.pickX, top = [xp, w + 0.0015 + pp.h + 0.002, 0];
@@ -857,7 +861,7 @@ const BABYX = 0.02;
 const GELGEO = new THREE.SphereGeometry(1, 28, 10, 0, Math.PI * 2, 0, Math.PI / 2), GELMAT = waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xd5dbde), roughness: 0.15, metalness: 0, transparent: true, opacity: 0.16, depthWrite: false, side: THREE.DoubleSide }), { fres: "0.25" });      // where the newborn is printed: in the middle of the arm's reach on the head floor
 const babyPt = (r, q) => [BABYX + q.x * 0.4, -r.s.B * 0.28 + q.y * 0.44, q.z * 0.44];
 function pauseAndPlace(r, i) {
-  const sp = r.babySpec, t = r.nk[i], q = sp.pocket[i], bp = babyPt(r, q), L = Math.max(1, Math.round(sp.pf[i] * NLAY)), rp = rackPos(r, i), at = [rp[0], rp[1] + 0.003 + t.h + 0.003, rp[2]];
+  const sp = r.babySpec, t = r.nk[i], q = sp.pocket[i], bp = babyPt(r, q), L = clamp(Math.ceil(sp.pf[i] * NLAY), 1, NLAY), rp = rackPos(r, i), at = [rp[0], rp[1] + 0.003 + t.h + 0.003, rp[2]];
   r.needle = null; r.paused = true; r.arm.needleOn = false;
   hop(r, at, "mag", 1.0, { hold: t, psiEnd: rp[3] });
   hop(r, [bp[0], bp[1] + t.h / 2 + hover(q, t), bp[2]], "mag", 1.0, { psiEnd: q.ledge ? 0 : inward(bp[2]), hold: null, fn: () => { t.inBaby = true; t.setT = simT; r.paused = false; sp.next++; if (!q.ledge) dtag(() => worldOf(r, babyPt(r, q)), `POCKET ${(t.h * 1000).toFixed(1)} MM DEEP · ${t.name.toUpperCase()}, SET FLUSH`, 4); flash(() => worldOf(r, babyPt(r, q)), 1.4, 0.07, 2.2); log(`#${r.id} pauses the print at layer ${L} of ${NLAY} and sets ${FAM[t.f]}, ${t.name}, ${q.ledge ? "on the inner ledge" : "into the wall"}`); } });
@@ -1193,11 +1197,12 @@ function startPrint(r) {
   const mk = (m) => clipMat(m, plane);
   mouthDark(geo); const baby = new THREE.Mesh(geo, [mk(MAT.clay), mk(MAT.clay), mk(MAT.mouth)]); baby.material[1].color.set(0xeceae4);
   baby.updateMorphTargets(); baby.morphTargetInfluences[0] = 1; baby.renderOrder = 4; baby.userData.plane = plane; baby.userData.len = geo.userData.len; baby.userData.back = geo.userData.back; baby.userData.full = geo.attributes.position.array.slice();
-  { const k = (0.6 * r.s.B + 0.02) / NLAY, a = geo.attributes.aTex.array; for (let i = 0; i < a.length; i += 4) { a[i] = 0; a[i + 1] = k; a[i + 2] = 0.0006; a[i + 3] = 0; } geo.attributes.aTex.needsUpdate = true; }      // its 18 layers show as ridges on the folded newborn
+  { const W = geo.morphAttributes.position[0].array; let lo = 9, hi = -9; for (let i = 1; i < W.length; i += 3) { lo = Math.min(lo, W[i]); hi = Math.max(hi, W[i]); } r.babySpec.py = [-r.s.B * 0.28 + lo, -r.s.B * 0.28 + hi]; }      // the folded pack, bottom to top: the 18 layers span it
+  { const k = (r.babySpec.py[1] - r.babySpec.py[0]) / NLAY, a = geo.attributes.aTex.array; for (let i = 0; i < a.length; i += 4) { a[i] = 0; a[i + 1] = k; a[i + 2] = 0.0006; a[i + 3] = 0; } geo.attributes.aTex.needsUpdate = true; }      // its 18 layers show as ridges on the folded newborn
   baby.userData.A = s.A; baby.userData.B = s.B; baby.frustumCulled = false;
   r.grp.add(baby); r.baby = baby; r.carry = 0.0001; r.paused = false;
   // one pocket per tile; the print pauses when it reaches the layer of each pocket
-  sp.pocket = r.nk.map((p, i) => pocketOf(s, p, i, 1.0)); const y0 = -0.6 * r.s.B, y1 = 0.02;
+  sp.pocket = r.nk.map((p, i) => pocketOf(s, p, i, 1.0)); const [y0, y1] = sp.py;
   sp.pf = sp.pocket.map((q) => clamp((babyPt(r, q)[1] - y0) / (y1 - y0), 0.04, 0.96)); sp.order = sp.pf.map((_, i) => i).sort((a, b) => sp.pf[a] - sp.pf[b]); sp.next = 0;
   if (r.forage && r.forage.tgt) r.forage.tgt.claim = null; r.forage = null;
   log(`#${r.id} has ${r.nk.map((t) => FAM[t.f]).join(", ")} and prints the next one`); focusOn(r, 6);
@@ -1325,7 +1330,7 @@ function step(dt) {
       if (r.carry < 0.75) {
         const sp = r.babySpec, nx = sp.order[sp.next];
         if (!r.paused) { const c1 = Math.min(0.75, r.carry + dt / P.gest); if (nx !== undefined && c1 / 0.75 >= sp.pf[nx]) { r.carry = sp.pf[nx] * 0.75; pauseAndPlace(r, nx); } else r.carry = c1; }
-        if (!r.paused && r.carry < 0.75) { const a = simT * 2.2; r.needle = [BABYX + Math.cos(a) * 0.1 * r.baby.userData.len, lerp(-0.6 * r.s.B, 0.02, r.carry / 0.75) + 0.008, Math.sin(a) * 0.045]; }      // the needle goes round the outline of the layer
+        if (!r.paused && r.carry < 0.75) { const a = simT * 2.2; r.needle = [BABYX + Math.cos(a) * 0.1 * r.baby.userData.len, lerp(r.babySpec.py[0], r.babySpec.py[1], r.carry / 0.75) + 0.008, Math.sin(a) * 0.045]; }      // the needle goes round the outline of the layer
         if (r.carry >= 0.75) { r.needle = null; r.arm.needleOn = false; armRest(r, 0.8); }
       } else if (r.carry < 1) { r.carry = Math.min(1, r.carry + dt / P.gest); if (r.carry >= 1) { r.birthT = 0.0001; focusOn(r, 8); } }
       else { const b0 = r.birthT; r.birthT += dt / 10;      // 10 s: keel, slide, sections opening past the lip, rim last
@@ -1468,7 +1473,7 @@ function updateScene(dtReal) {
       const exitX = reach(r) - b.userData.back * sx + 0.01 - 0.12 * (1 - u);
       bx = lerp(BABYX, exitX, e1); by = lerp(-r.s.B * 0.28, 0, u); b.position.set(bx, by, 0);
       b.updateMatrixWorld(true);
-      const y0 = r.grp.position.y - r.s.B * 0.6, y1 = r.grp.position.y + 0.02;
+      const y0 = r.grp.position.y + r.babySpec.py[0], y1 = r.grp.position.y + r.babySpec.py[1];
       b.userData.plane.constant = out > 0 ? 10 : lerp(y0, y1, pr);
       b.visible = r.carry > 0.002; }
     }
