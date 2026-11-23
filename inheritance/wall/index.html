@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>How a part gets into the wall, in 3D · Born, Not Made</title>
+<meta name="description" content="A close up of one patch of the quilted head wall printed in the gel, cut open: lower skin and webs, a tapered rim, a bed of fresh silicone, a sealed pod pressed in wet, the cover printed wet on wet, the cure, and air in the cells after birth. Real dimensions in millimeters.">
+<meta name="theme-color" content="#000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout after simulator/simple: a viewport with the caption on the picture, readouts on the right, a stage timeline across the bottom.
+   The page flows: nothing is fixed, sticky, or scrolls on its own. With ?embed=1 only the viewport and the timeline show, sized to the frame. */
+:root { --bg: #000; --line: #2a2a2c; --ink: #ecebe6; --muted: #9b9a94; --dim: #67665f; --gel: #9cc8ec; --warn: #e3b36a;
+  --serif: "Cormorant Garamond", Georgia, serif; --sans: "Inter", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { background: #000; color: var(--ink); margin: 0; }
+body { font: 12.5px/1.45 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+.app { display: grid; gap: 2px; padding: 2px; grid-template-columns: minmax(0, 1fr) 360px; grid-template-rows: 40px auto auto;
+  grid-template-areas: "top top" "view side" "time time"; align-items: start; }
+.top { grid-area: top; display: flex; align-items: center; gap: 14px; padding: 0 12px; height: 40px; border-bottom: 1px solid #1c1c1e; }
+.top .file { font: 500 20px/1 var(--serif); white-space: nowrap; }
+.top .sub { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.top .sp { flex: 1; }
+.home { font: 500 12px var(--sans); color: var(--muted); text-decoration: none; white-space: nowrap; }
+.home:hover { color: #fff; }
+.view { grid-area: view; display: flex; flex-direction: column; min-width: 0; }
+.ahead { height: 30px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 8px; color: var(--muted); font-size: 11.5px; white-space: nowrap; overflow: hidden; }
+.ahead b { color: var(--ink); font-weight: 500; }
+.ahead .sp { flex: 1; }
+#vp { position: relative; height: clamp(440px, calc(100vh - 170px), 900px); background: #000; overflow: hidden; }
+#vp > canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.ov { position: absolute; left: 12px; top: 10px; right: 12px; pointer-events: none; line-height: 1.35; max-width: 640px;
+  background: linear-gradient(90deg, rgb(0 0 0 / 70%), rgb(0 0 0 / 40%) 70%, rgb(0 0 0 / 0%)); padding: 6px 10px 7px; }
+.ov .stg { font: 500 26px/1.1 var(--serif); }
+.ov .stepl { color: #cfcdc6; font-size: 13px; margin-top: 3px; max-width: 580px; }
+.ov .clk { font: 500 12px var(--mono); color: var(--gel); margin-top: 6px; }
+.ov .clk span { color: var(--muted); font-weight: 400; }
+.lab { position: absolute; left: 0; top: 0; pointer-events: none; color: rgb(255 255 255 / 78%); font: 500 9.5px/1 var(--mono); letter-spacing: .09em; text-transform: uppercase;
+  text-shadow: 0 0 5px #000, 0 0 2px #000; padding: 0 0 12px; white-space: nowrap; transform: translate(-50%, -100%); }
+.lab::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 1px; height: 9px; background: rgb(255 255 255 / 45%); }
+.scale { position: absolute; right: 14px; bottom: 12px; pointer-events: none; font: 10px var(--mono); color: var(--muted); text-align: center; }
+.scale i { display: block; height: 1px; background: var(--muted); margin-bottom: 3px; }
+.btn { font: 500 11.5px var(--sans); color: var(--muted); background: none; border: 0; padding: 3px 7px; cursor: pointer; white-space: nowrap; }
+.btn:hover { color: #fff; }
+.btn.on, .btn[aria-pressed="true"] { color: #fff; font-weight: 700; }
+button:focus-visible, .track:focus-visible, a:focus-visible { outline: 1px solid #fff; outline-offset: 2px; }
+.side { grid-area: side; padding: 30px 10px 10px; }
+.rg h4 { margin: 10px 0 4px; font: 500 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+.rr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding: 2px 0; border-bottom: 1px solid #1c1c1e; }
+.rr span:first-child { color: var(--muted); }
+.rr span:last-child { font: 500 12px var(--mono); text-align: right; white-space: nowrap; }
+.rr.hot span:last-child { color: var(--gel); }
+.rr.st { grid-template-columns: 1fr; gap: 0; } .rr.st span:last-child { text-align: left; white-space: normal; color: #cfcdc6; font-weight: 400; }
+.bar { height: 3px; background: #151517; margin: 3px 0 5px; }
+.bar i { display: block; height: 100%; background: var(--gel); }
+.time { grid-area: time; display: flex; align-items: stretch; gap: 8px; padding: 6px 8px; height: 62px; }
+.ctl { display: flex; gap: 2px; align-items: center; }
+.track { flex: 1; position: relative; display: flex; gap: 2px; min-width: 0; cursor: pointer; touch-action: none; user-select: none; }
+.seg { position: relative; background: #111; border: 1px solid #222; overflow: hidden; display: flex; align-items: flex-end; padding: 3px 5px; color: var(--muted); font-size: 11px; min-width: 0; }
+.seg span { position: relative; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; pointer-events: none; }
+.seg .fill { position: absolute; inset: 0 auto 0 0; width: 0; background: #1d2731; pointer-events: none; }
+.seg.on { color: #fff; border-color: #555; }
+.head { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--gel); pointer-events: none; }
+.doc { padding: 30px 16px 56px; max-width: 980px; margin: 0 auto; color: #cfcdc6; font-size: 14.5px; line-height: 1.62; }
+.doc h2 { font: 500 30px/1.1 var(--serif); margin: 0 0 10px; color: var(--ink); }
+.doc h4 { font: 500 19px/1.2 var(--serif); margin: 24px 0 6px; color: var(--ink); }
+.doc ul { margin: 0 0 10px; padding-left: 18px; } .doc li { margin: 0 0 4px; }
+.doc a { color: #cfcdc6; }
+.doc .est { color: var(--warn); font: 500 10px var(--mono); letter-spacing: .06em; margin-left: 6px; }
+@media (max-width: 980px) {
+  .app { grid-template-columns: minmax(0, 1fr); grid-template-areas: "top" "view" "time" "side"; }
+  .top .sub { display: none; } .side { padding-top: 6px; }
+  .time { height: auto; flex-wrap: wrap; } .track { flex-basis: 100%; height: 34px; }
+  .ov .stg { font-size: 21px; }
+}
+/* embedded: viewport and timeline only, exactly the size of the frame */
+html.embed, html.embed body { height: 100%; overflow: hidden; }
+html.embed .app { height: 100%; padding: 0; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; grid-template-areas: "view" "time"; align-items: stretch; }
+html.embed .top, html.embed .side, html.embed .doc, html.embed .opt, html.embed .speed { display: none; }
+html.embed .view { min-height: 0; }
+html.embed #vp { height: auto; flex: 1; min-height: 0; }
+html.embed .time { height: 46px; padding: 4px 6px; }
+html.embed .ov .stg { font-size: clamp(16px, 2.2vw, 24px); }
+html.embed .ov .stepl { font-size: clamp(11px, 1.3vw, 13px); }
+@media (max-width: 760px) { html.embed .ahead .cams .btn { padding: 3px 4px; font-size: 10.5px; } html.embed .seg span { display: none; } }
+</style>
+<script>if (new URLSearchParams(location.search).get("embed") === "1") document.documentElement.classList.add("embed");</script>
+</head><body>
+<div class="app">
+  <header class="top">
+    <span class="file">How a part gets into the wall</span>
+    <span class="sub">Born, Not Made · one patch of the head wall printed in the gel, cut open, in millimeters</span>
+    <span class="sp"></span>
+    <a class="home" href="../">Inheritance</a>
+    <a class="home" href="../../">Home</a>
+  </header>
+
+  <section class="view" aria-label="3D viewport">
+    <div class="ahead"><b>3D</b><span class="opt">section through the pod, gel shown faint</span><span class="sp"></span>
+      <div class="cams" role="group" aria-label="Camera">
+        <button class="btn" data-cam="section">Section</button><button class="btn" data-cam="close">Close</button><button class="btn" data-cam="top">Top</button><button class="btn" data-cam="magazine">Magazine</button>
+      </div>
+      <button class="btn on" id="autoCam" aria-pressed="true" title="The camera follows the stage">Auto</button>
+    </div>
+    <div id="vp">
+      <div class="ov"><div class="stg" id="ovStage">Loading</div><div class="stepl" id="ovStep"></div><div class="clk" id="ovClock"></div></div>
+      <div id="labs"></div>
+      <div class="scale" id="scale"><i id="scaleBar" style="width:60px"></i>10 mm</div>
+    </div>
+  </section>
+
+  <aside class="side" aria-label="Readouts"><div id="ro"></div></aside>
+
+  <section class="time" aria-label="Timeline">
+    <div class="ctl">
+      <button class="btn" id="play" aria-pressed="true">Pause</button>
+      <span class="speed"><button class="btn on" data-speed="1">1×</button><button class="btn" data-speed="2">2×</button><button class="btn" data-speed="4">4×</button></span>
+    </div>
+    <div class="track" id="track" tabindex="0" role="slider" aria-label="Timeline, drag to scrub" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+  </section>
+</div>
+
+<section class="doc" id="how">
+  <h2>One part, into the wall</h2>
+  <p>No electronic part sits in the gel or on the gel floor. Every part except the arm ends up sealed between the two skins of the double wall. This page follows one pod, a pump pod, from the dry magazine in the tail into one patch of the wall, at full scale. The wall is cut open through the middle of the pod, so the inside is visible. The view is a time lapse; the clock shows process time.</p>
+  <p>Carbopol is a solid below its yield stress, so an empty cup in the print stays full of gel. The bed of fresh silicone pushes the gel out first. The pocket is filled solid; it is not an air cell. Fresh silicone may not bond to the cured capsule, so it locks through the holes in the flange. The tapered rim centers the pod after the tool change. A pump pod needs capped tubes for its ports.</p>
+  <h4>Numbers</h4>
+  <ul id="nums"></ul>
+  <h4>Assumptions</h4>
+  <ul id="assume"></ul>
+  <h4>Open questions</h4>
+  <ul id="openq"></ul>
+  <h4>Sources</h4>
+  <ul>
+    <li><a href="../../simulator/doublewall/quilt.json">simulator/doublewall/quilt.json</a>: skins 1.2 mm, webs 0.8 mm, channels 18 mm, quilt at most 14.8 mm thick, flat pack layers of 4.4 mm with 1 mm gel gaps, 763 m of bead and 1.42 L in 43,887 s of print, kit parts, electromagnet, tool lengths, the quick release head, one tool change of 60 s, a kit placement of 75 s.</li>
+    <li><a href="https://www.smooth-on.com/tb/files/DRAGON_SKIN_SERIES_TB.pdf">Smooth-On, Dragon Skin series technical bulletin</a>: Dragon Skin 30, pot life 45 min, cure 16 h, specific gravity 1.08; tin, sulfur and latex stop the cure.</li>
+    <li><a href="https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/5561/mp6%20micropumps.pdf">Bartels mp6 micropump datasheet</a>: 30 x 15 x 3.8 mm, 2 g. <a href="https://bartels-mikrotechnik.de/wp-content/uploads/2025/03/datasheet-electronic-driver.pdf">Bartels mp-Lowdriver datasheet</a>: 25.6 x 10.3 x 5.0 mm.</li>
+    <li><a href="https://www.adafruit.com/products/3872">Adafruit 3872 electromagnet</a>: 20 mm across, 15 mm tall, 2.5 kg holding force.</li>
+    <li><a href="https://doi.org/10.1002/adma.201703817">Valentine et al., Hybrid 3D printing of soft electronics, Adv. Mater. 2017</a>; <a href="https://doi.org/10.1126/sciadv.1500655">Bhattacharjee et al., Writing in the granular gel medium, Sci. Adv. 2015</a>; <a href="https://www.doi.org/10.1038/NATURE19100">Wehner et al., Nature 2016</a>. The 2D diagram on the <a href="../#d-wall">Inheritance page</a> lists them in full.</li>
+  </ul>
+</section>
+
+<script src="../../assets/vendor/three-r147/three.min.js"></script>
+<script src="../../assets/vendor/three-r147/OrbitControls.js"></script>
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const sm = (u) => { u = clamp(u); return u * u * (3 - 2 * u); };
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const hms = (s) => { s = Math.max(0, s); const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = Math.floor(s % 60); return h + ":" + String(m).padStart(2, "0") + ":" + String(x).padStart(2, "0"); };
+const V = (x, y, z) => new THREE.Vector3(x, y, z);
+const EMBED = document.documentElement.classList.contains("embed");
+const QP = new URLSearchParams(location.search);
+
+/* ============================================================ numbers, all in mm, s, g
+   QJ = simulator/doublewall/quilt.json. "assume" marks a number this page had to choose; those are listed under Assumptions. */
+const D = {
+  skin: 1.2,          // QJ masses: "two skins of 1.2 mm and webs of 0.8 mm"
+  web: 0.8,           // QJ masses, same line
+  gap: 1.0,           // flat as printed: QJ checks, layers of 4.4 mm with 1 mm gel gaps; 4.4 - 1.0 - 2 x 1.2 = 1.0 mm between the skins
+  channel: 18,        // QJ checks: "channels 18 mm wide"
+  quiltMax: 14.8,     // QJ checks: "the quilt 14.8 mm thick at most"
+  bead: 1.54,         // QJ stages print: 763 m of bead, 1.42 L; area 1.86 mm2, a round bead of 1.54 mm
+  speed: 17.4,        // QJ stages print: 763 m in 43,887 s
+  travel: 30,         // assume: travel speed of the tool in the gel
+  potlife: 45 * 60,   // Smooth-On bulletin, Dragon Skin 30
+  cure: 16 * 3600,    // Smooth-On bulletin, Dragon Skin 30
+  sg: 1.08,           // Smooth-On bulletin, Dragon Skin 30
+  toolChange: 60,     // QJ stages change: real 60 s
+  needleLen: 100,     // QJ arm.tools.needle 0.1 m
+  holderLen: 55,      // QJ arm.tools.cup 0.055 m
+  head: [30, 40, 52], // QJ arm.HEAD: the quick release block, f 30, w 40, h 52 mm
+  magnet: [20, 15],   // QJ sources magnet: Adafruit 3872, 20 mm across, 15 mm tall
+  disk: [20, 1, 2.47],// QJ kit parts: steel disk 20 x 1 mm, 2.47 g
+  mp6: [30, 15, 3.8, 2],      // QJ kit parts: Bartels mp6, 30 x 15 x 3.8 mm, 2 g
+  drv: [25.6, 10.3, 5.0, 2],  // QJ kit parts: Bartels mp-Lowdriver, 25.6 x 10.3 x 5.0 mm, 2 g
+  cap: [36, 30, 8],   // assume: the cured capsule around the two parts, walls about 1 mm and more
+  flange: [43, 37, 1],// assume: flange 3.5 mm wide all round, 1 mm thick
+  hole: 1.6,          // assume: flange holes 1.6 mm, every 4 mm
+  rimH: 2.4,          // assume: rim of two beads, 2.4 mm tall, the upper bead 0.55 mm further out (the taper)
+  gelTop: 30,         // assume: gel surface 30 mm over the lower skin of this patch
+  bulge: 5.5,         // from QJ quiltMax: (14.8 - 3.4) / 2 for each skin at the crown of a channel
+  airTime: 60,        // assume: the cells of this patch fill in a minute at "birth"
+};
+const BR = D.bead / 2, SZ = D.skin / D.bead;
+const ZS1 = D.skin, ZW = D.skin + D.gap, ZS2 = ZW + D.skin; // 1.2, 2.2, 3.4
+const PX = 45, PY = 22;                                    // patch half size
+const WEBX = [26, 44];                                     // webs at +-26 and +-44: channels of 18 mm
+const SEAT = 1.8;                                          // flange bottom: 0.6 mm into the 1.2 mm bed
+const FH = [D.flange[0] / 2, D.flange[1] / 2], CH = [D.cap[0] / 2, D.cap[1] / 2];
+const RIM1 = [FH[0] + 0.8 + BR, FH[1] + 0.8 + BR], RIM2 = [RIM1[0] + 0.55, RIM1[1] + 0.55];
+const PORTS = [[12, -4], [12, -9]];
+const MAG = { x: -138, y: 0, z: [0, 19, 38], top: 56 };    // assume: the dry magazine, 3 pods on shelves
+const DOCKX = -92, SAD = { needle: V(-100, -72, 12), holder: V(-100, -46, 12) };
+const ASSUME = [
+  ["Travel speed of the tool in the gel", "30 mm/s"],
+  ["Pod capsule (cured Dragon Skin 30 around mp6 and driver)", "36 x 30 x 8 mm"],
+  ["Flange", "3.5 mm wide, 1 mm thick, holes 1.6 mm every 4 mm"],
+  ["Rim", "two beads, 2.4 mm tall, upper bead 0.55 mm out"],
+  ["Bed", "one layer, 1.2 mm; the flange sinks 0.6 mm into it"],
+  ["Pod placed in", "75 s, as the kit stage of the doublewall build"],
+  ["Gel over this patch", "30 mm"],
+  ["Tail drawn close", "docking plane 47 mm from the patch edge; farther in the build"],
+  ["Bulge of a cell", "5.5 mm a skin, from the 14.8 mm quilt"],
+  ["Cells fill", "in about 1 minute"],
+];
+const OPENQ = [
+  "No published source places a part in a gel bath during a silicone print. This is untested.",
+  "Fresh Dragon Skin 30 on a fully cured capsule may not bond. The flange holes lock without a bond.",
+  "A gel film may stay on the pod after the pass through the gel.",
+  "Tin or sulfur in the potting would stop the platinum cure around the pod.",
+  "The holder may lift the pod when the magnet lets go.",
+  "Water may reach the electronics through the silicone over months.",
+  "The capped ports of a pump pod are untested.",
+];
+
+/* ============================================================ toolpaths */
+function rrect(hx, hy, z, r = 3, step = 1) { // rounded rectangle loop, closed
+  const p = [], seg = (a, b) => { const n = Math.max(1, Math.ceil(a.distanceTo(b) / step)); for (let i = 0; i < n; i++) p.push(a.clone().lerp(b, i / n)); };
+  const arc = (cx, cy, a0) => { for (let i = 0; i < 6; i++) { const a = a0 + (i / 6) * Math.PI / 2; p.push(V(cx + r * Math.cos(a), cy + r * Math.sin(a), z)); } };
+  seg(V(-hx + r, -hy, z), V(hx - r, -hy, z)); arc(hx - r, -hy + r, -Math.PI / 2);
+  seg(V(hx, -hy + r, z), V(hx, hy - r, z)); arc(hx - r, hy - r, 0);
+  seg(V(hx - r, hy, z), V(-hx + r, hy, z)); arc(-hx + r, hy - r, Math.PI / 2);
+  seg(V(-hx, hy - r, z), V(-hx, -hy + r, z)); arc(-hx + r, -hy + r, Math.PI);
+  p.push(p[0].clone()); return p;
+}
+function linesY(xs, y0, y1, z, skip) { // zigzag lines along y, one bead each; skip(x,y) breaks a line
+  const out = []; xs.forEach((x, i) => { const a = i % 2 ? y1 : y0, b = i % 2 ? y0 : y1, n = Math.ceil(Math.abs(b - a)); let cur = [];
+    for (let k = 0; k <= n; k++) { const y = lerp(a, b, k / n); if (skip && skip(x, y)) { if (cur.length > 1) out.push(cur); cur = []; } else cur.push(V(x, y, z)); }
+    if (cur.length > 1) out.push(cur); }); return out;
+}
+const range = (a, b, s) => { const o = []; for (let x = a; x <= b + 1e-6; x += s) o.push(+x.toFixed(3)); return o; };
+const L = {}; // layers: name -> {paths, r, sz}
+L.skin = { paths: linesY(range(-PX + BR, PX - BR, D.bead), -PY, PY, ZS1 / 2), r: BR, sz: SZ, name: "lower skin" };
+L.webs = { paths: [-WEBX[1], -WEBX[0], WEBX[0], WEBX[1]].map((x, i) => i % 2 ? [V(x, PY, ZS1 + .5), V(x, -PY, ZS1 + .5)] : [V(x, -PY, ZS1 + .5), V(x, PY, ZS1 + .5)]), r: D.web / 2, sz: 1.25, name: "webs" };
+L.rim = { paths: [rrect(RIM1[0], RIM1[1], ZS1 + .6), rrect(RIM2[0], RIM2[1], ZS1 + 1.8)], r: BR, sz: SZ, name: "rim" };
+L.bed = { paths: (() => { const o = []; range(-RIM1[1] + 1.4, RIM1[1] - 1.4, 1.5).forEach((y, i) => { const xa = RIM1[0] - 1.3; o.push(i % 2 ? [V(xa, y, ZS1 + .6), V(-xa, y, ZS1 + .6)] : [V(-xa, y, ZS1 + .6), V(xa, y, ZS1 + .6)]); }); return o; })(), r: BR, sz: SZ, name: "bed" };
+L.cover = { paths: [
+    rrect(CH[0] + 1.5, CH[1] + 1.5, SEAT + 1.6), rrect(CH[0] + 3.0, CH[1] + 3.0, SEAT + 1.6),
+    ...[2.8, 4.0, 5.2, 6.4, 7.6, 8.8].map((h) => rrect(CH[0] + BR, CH[1] + BR, SEAT + h)),
+    ...linesY(range(-CH[0] + 1, CH[0] - 1, D.bead), -CH[1] + .5, CH[1] - .5, SEAT + 10.6, (x, y) => PORTS.some(([px, py]) => Math.hypot(x - px, y - py) < 2.1)),
+  ], r: BR, sz: SZ, name: "cover" };
+L.upper = { paths: linesY([...range(-PX + BR, -RIM2[0] - BR - .2, D.bead), ...range(RIM2[0] + BR + .2, PX - BR, D.bead)], -PY, PY, ZW + D.skin / 2), r: BR, sz: SZ, name: "upper skin" };
+const ORDER = ["skin", "webs", "rim", "bed", "cover", "upper"];
+for (const k of ORDER) { let len = 0; L[k].paths.forEach((p) => { for (let i = 1; i < p.length; i++) len += p[i].distanceTo(p[i - 1]); }); L[k].len = len; L[k].beads = L[k].paths.length; }
+const AREA = Math.PI * BR * BR * SZ; // mm2 of a bead (flattened to the layer height)
+
+/* ============================================================ moves and stages */
+const POD_TOP = 10; // disk top over the flange bottom
+const STAGES = [];
+function stage(k, name, cap, disp) { const s = { k, name, cap, disp, moves: [], real: 0 }; STAGES.push(s); return s; }
+let CUR = { tool: "needle", p: V(-PX, -PY, 14) };
+function mv(s, to, o = {}) { const from = CUR.p.clone(), d = from.distanceTo(to), dur = o.dur ?? (o.print ? d / D.speed : Math.max(.4, d / D.travel));
+  s.moves.push({ a: from, b: to.clone(), dur, tool: o.tool ?? CUR.tool, print: o.print || null, carry: !!o.carry, ev: o.ev || null, wrist: !!o.wrist, mag: o.mag ?? null }); s.real += dur; CUR.p = to.clone(); if (o.tool !== undefined) CUR.tool = o.tool; }
+function wait(s, dur, o = {}) { mv(s, CUR.p, Object.assign({ dur }, o)); }
+function printLayer(s, k) { for (const p of L[k].paths) { const a = p[0]; if (CUR.p.distanceTo(a) > 3) { mv(s, V(CUR.p.x, CUR.p.y, Math.max(CUR.p.z, a.z) + 2)); mv(s, V(a.x, a.y, a.z + 2)); } mv(s, a); for (let i = 1; i < p.length; i++) mv(s, p[i], { print: k }); } }
+const tipZ = (z) => V(0, 0, z);
+{
+  const s1 = stage("skin", "Lower skin", "The needle lays beads side by side in the gel: the lower skin, then the webs.", 16);
+  printLayer(s1, "skin"); printLayer(s1, "webs");
+  const s2 = stage("rim", "Rim", "A low tapered rim is printed where the pod will sit.", 6);
+  printLayer(s2, "rim");
+  const s3 = stage("bed", "Bed", "The needle fills the rim with fresh silicone. The gel inside is pushed out over the rim.", 8);
+  printLayer(s3, "bed"); mv(s3, V(CUR.p.x, CUR.p.y, 8));
+  const s4 = stage("change", "Tool change", "The arm leaves the needle in its saddle on the tail wall and takes the magnet holder.", 8);
+  const n0 = SAD.needle, h0 = SAD.holder;
+  mv(s4, V(n0.x + 40, n0.y, 14)); mv(s4, V(n0.x, n0.y, n0.z)); wait(s4, 8, { ev: "needle off" });
+  CUR.tool = null; CUR.p = V(n0.x, n0.y, n0.z + D.needleLen);
+  mv(s4, V(n0.x, n0.y, n0.z + D.needleLen + 6), { tool: null, wrist: true }); mv(s4, V(h0.x, h0.y, h0.z + D.holderLen + 6), { tool: null, wrist: true }); mv(s4, V(h0.x, h0.y, h0.z + D.holderLen), { tool: null, wrist: true, dur: 2 });
+  wait(s4, Math.max(4, D.toolChange - s4.real), { tool: null, wrist: true, ev: "holder on" });
+  CUR.tool = "holder"; CUR.p = h0.clone();
+  const s5 = stage("pod", "Pod", "The holder carries a sealed pod from the dry magazine, through the gel, and presses the pod into the wet bed.", 16);
+  const topPod = V(MAG.x, MAG.y, MAG.z[2] + POD_TOP);
+  mv(s5, V(h0.x, h0.y, 64)); mv(s5, V(MAG.x, MAG.y, 64)); mv(s5, topPod); wait(s5, 3, { mag: true, ev: "magnet on" });
+  mv(s5, V(MAG.x, MAG.y, 64), { carry: true, mag: true }); mv(s5, V(0, 0, 64), { carry: true, mag: true }); mv(s5, V(0, 0, SEAT + POD_TOP + 4), { carry: true, mag: true });
+  mv(s5, V(0, 0, SEAT + POD_TOP), { carry: true, mag: true, dur: 6, ev: "press" }); wait(s5, 3, { carry: true, mag: true }); wait(s5, 2, { mag: false, ev: "magnet off" });
+  mv(s5, V(0, 0, SEAT + POD_TOP + 1.5), { dur: 2 }); mv(s5, V(0, 0, 40));
+  const s6 = stage("cover", "Cover", "Back to the needle. Beads go round the pod and over the flange, then the upper skin closes over the pod and the webs, wet on wet.", 18);
+  mv(s6, V(h0.x, h0.y, 40)); mv(s6, h0); wait(s6, 6, { ev: "holder off" }); CUR.tool = null; CUR.p = V(h0.x, h0.y, h0.z + D.holderLen);
+  mv(s6, V(h0.x, h0.y, h0.z + D.holderLen + 50), { tool: null, wrist: true }); mv(s6, V(n0.x, n0.y, n0.z + D.needleLen + 6), { tool: null, wrist: true }); mv(s6, V(n0.x, n0.y, n0.z + D.needleLen), { tool: null, wrist: true, dur: 2 }); wait(s6, 6, { tool: null, wrist: true, ev: "needle on" });
+  CUR.tool = "needle"; CUR.p = n0.clone(); mv(s6, V(n0.x + 40, n0.y, 14)); mv(s6, V(-10, 0, 16));
+  printLayer(s6, "cover"); printLayer(s6, "upper"); mv(s6, V(CUR.p.x, CUR.p.y, 14));
+  const s7 = stage("cure", "Cure", "Time passes. The fresh silicone turns from glossy to matte. Bed, flange holes and cover cure as one.", 7);
+  mv(s7, V(n0.x + 40, n0.y, 14)); mv(s7, n0); wait(s7, D.cure - s7.real, { ev: "cure" });
+  const s8 = stage("air", "Air", "After “birth” air fills the cells around the pod. The skins bulge between the webs like a quilt. The pod stays a solid island.", 8);
+  wait(s8, D.airTime);
+}
+{ let d = 0, r = 0; STAGES.forEach((s, i) => { s.i = i; s.d0 = d; s.r0 = r; d += s.disp; r += s.real; let t = 0; s.moves.forEach((m) => { m.t0 = t; t += m.dur; }); }); }
+const TOTAL = STAGES.reduce((a, s) => a + s.disp, 0);
+const BED_T0 = STAGES[2].r0, COVER_T1 = STAGES[5].r0 + STAGES[5].real;
+
+/* state at display time T: tool, tip, printed length of each layer, pod place, press */
+function evalState(T) {
+  T = clamp(T, 0, TOTAL - 1e-4);
+  let si = STAGES.findIndex((s) => T < s.d0 + s.disp); if (si < 0) si = STAGES.length - 1;
+  const s = STAGES[si], f = clamp((T - s.d0) / s.disp), tau = f * s.real;
+  const st = { si, s, f, tau, clock: s.r0 + tau, printed: {}, tool: null, tip: null, wrist: null, carry: false, mag: false, placed: false, press: 0, podAt: null, layer: null, bead: 0 };
+  ORDER.forEach((k) => (st.printed[k] = 0));
+  // layers done in earlier stages
+  for (let i = 0; i <= si; i++) { const S = STAGES[i]; for (const m of S.moves) { if (i === si && m.t0 >= tau) break; if (!m.print) continue; const u = i === si ? clamp((tau - m.t0) / m.dur) : 1; st.printed[m.print] += m.a.distanceTo(m.b) * u; if (i === si && u > 0) { st.layer = m.print; } } }
+  // current move
+  let m = s.moves[s.moves.length - 1]; for (const x of s.moves) { if (tau < x.t0 + x.dur) { m = x; break; } }
+  const u = clamp((tau - m.t0) / m.dur), p = m.a.clone().lerp(m.b, m.print ? u : sm(u));
+  st.tool = m.tool; st.carry = m.carry; st.mag = m.mag === true; st.move = m;
+  if (m.wrist || !m.tool) { st.wrist = p; st.tip = null; } else st.tip = p;
+  st.placed = si > 4 || (si === 4 && !m.carry && s.moves.indexOf(m) > s.moves.findIndex((x) => x.ev === "press"));
+  if (st.carry && st.tip) st.podAt = V(st.tip.x, st.tip.y, st.tip.z - POD_TOP);
+  const pz = st.carry ? st.podAt.z : st.placed ? SEAT : null; st.press = pz === null ? 0 : clamp((SEAT + 4 - pz) / 4);
+  if (st.placed) st.press = 1;
+  const taken = si > 4 || (si === 4 && s.moves.indexOf(m) > s.moves.findIndex((x) => x.ev === "magnet on"));
+  st.taken = taken;
+  if (st.layer) { const L0 = L[st.layer]; let acc = 0, b = 0; for (const pth of L0.paths) { let l = 0; for (let i = 1; i < pth.length; i++) l += pth[i].distanceTo(pth[i - 1]); if (acc + l <= st.printed[st.layer] + 1e-6) { acc += l; b++; } else break; } st.bead = Math.min(L0.beads, b + 1); }
+  st.vol = ORDER.reduce((a, k) => a + st.printed[k], 0) * AREA / 1000; // mL
+  st.cure = si === 6 ? f : si > 6 ? 1 : 0;
+  st.air = si === 7 ? sm(clamp((f - .12) / .7)) : 0;
+  st.gelFade = si === 7 ? sm(f / .2) : 0;
+  return st;
+}
+
+/* ============================================================ three */
+let R, SCN, CAM, CTRL, CUT;
+const Q = { low: 0, mid: 1, high: 2 }[QP.get("q")] ?? 2;
+const RAD = [6, 8, 10][Q];
+const OBJ = {};
+function initThree() {
+  const vp = $("#vp");
+  R = new THREE.WebGLRenderer({ antialias: Q > 0, powerPreference: "high-performance" });
+  R.setPixelRatio(Math.min(devicePixelRatio || 1, [1, 1.5, 2][Q])); R.localClippingEnabled = true; R.outputEncoding = THREE.sRGBEncoding; R.setClearColor(0x000000, 1);
+  vp.prepend(R.domElement);
+  SCN = new THREE.Scene();
+  CAM = new THREE.PerspectiveCamera(32, 1, 0.5, 3000); CAM.up.set(0, 0, 1);
+  CTRL = new THREE.OrbitControls(CAM, R.domElement); CTRL.enableDamping = true; CTRL.dampingFactor = .12;
+  CTRL.addEventListener("start", () => { if (AUTO) setAuto(false); CAMGOAL = null; });
+  SCN.add(new THREE.HemisphereLight(0xdfe8ff, 0x101010, .5));
+  const d1 = new THREE.DirectionalLight(0xffffff, .75); d1.position.set(60, 140, 160); SCN.add(d1);
+  const d2 = new THREE.DirectionalLight(0xbfd6ff, .35); d2.position.set(-120, -60, 80); SCN.add(d2);
+  CUT = [new THREE.Plane(V(0, -1, 0), 0)]; // keep y <= 0: the wall is cut open through the middle of the pod
+  build();
+  new ResizeObserver(resize).observe(vp); resize();
+}
+function resize() { const vp = $("#vp"), w = vp.clientWidth, h = vp.clientHeight; if (!w || !h) return; R.setSize(w, h, false); CAM.aspect = w / h; CAM.updateProjectionMatrix(); }
+/* silicone: back faces of a cut solid are painted flat, so the section reads as solid */
+function silMat(o = {}) {
+  const m = new THREE.MeshStandardMaterial(Object.assign({ color: 0xf2eedf, roughness: .25, metalness: 0, side: THREE.DoubleSide, clippingPlanes: CUT }, o));
+  m.onBeforeCompile = (sh) => { sh.fragmentShader = sh.fragmentShader.replace("#include <dithering_fragment>", "#include <dithering_fragment>\n if (!gl_FrontFacing) gl_FragColor.rgb = diffuseColor.rgb * 0.62;"); };
+  return m;
+}
+const FRESH = new THREE.Color(0xe9e2c8), CURED = new THREE.Color(0x8f8c84);
+function beadGeo(paths, r, sz) { // tubes along each path, caps at both ends; marks[] maps printed length to index count
+  const pos = [], nor = [], idx = [], marks = [[0, 0]]; let len = 0, vbase = 0;
+  const ring = (p, T) => { let N = V(0, 0, 1); if (Math.abs(T.z) > .9) N = V(1, 0, 0); const B = new THREE.Vector3().crossVectors(T, N).normalize(); N = new THREE.Vector3().crossVectors(B, T).normalize();
+    for (let j = 0; j < RAD; j++) { const a = (j / RAD) * Math.PI * 2, c = Math.cos(a), s = Math.sin(a); pos.push(p.x + r * (c * B.x + s * sz * N.x), p.y + r * (c * B.y + s * sz * N.y), p.z + r * (c * B.z + s * sz * N.z)); const n = V(c * B.x + s * N.x / sz, c * B.y + s * N.y / sz, c * B.z + s * N.z / sz).normalize(); nor.push(n.x, n.y, n.z); } };
+  const cap = (p, T, ringStart, flip) => { pos.push(p.x, p.y, p.z); nor.push(flip ? T.x : -T.x, flip ? T.y : -T.y, flip ? T.z : -T.z); const c = pos.length / 3 - 1; for (let j = 0; j < RAD; j++) { const a = ringStart + j, b = ringStart + ((j + 1) % RAD); flip ? idx.push(c, a, b) : idx.push(c, b, a); } };
+  for (const p of paths) {
+    const start = pos.length / 3;
+    for (let i = 0; i < p.length; i++) { const T = (i < p.length - 1 ? p[i + 1].clone().sub(p[i]) : p[i].clone().sub(p[i - 1])).normalize(); if (i > 0 && i < p.length - 1) T.add(p[i].clone().sub(p[i - 1]).normalize()).normalize(); ring(p[i], T); }
+    const T0 = p[1].clone().sub(p[0]).normalize(), T1 = p[p.length - 1].clone().sub(p[p.length - 2]).normalize();
+    cap(p[0], T0, start, false); marks.push([len, idx.length]);
+    for (let i = 1; i < p.length; i++) { const a = start + (i - 1) * RAD, b = start + i * RAD; for (let j = 0; j < RAD; j++) { const j1 = (j + 1) % RAD; idx.push(a + j, b + j, a + j1, a + j1, b + j, b + j1); } len += p[i].distanceTo(p[i - 1]); marks.push([len, idx.length]); }
+    cap(p[p.length - 1], T1, start + (p.length - 1) * RAD, true); marks.push([len + 1e-4, idx.length]);
+  }
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3)); g.setIndex(idx);
+  return { g, marks };
+}
+function growTo(o, len) { const M = o.marks; let lo = 0, hi = M.length - 1; if (len <= 0) { o.mesh.geometry.setDrawRange(0, 0); return; } while (hi - lo > 1) { const m = (lo + hi) >> 1; if (M[m][0] <= len) lo = m; else hi = m; } o.mesh.geometry.setDrawRange(0, M[lo][1]); }
+function roundBox(w, d, h, r) { const s = new THREE.Shape(), x = w / 2 - r, y = d / 2 - r; s.moveTo(-x, -d / 2); s.lineTo(x, -d / 2); s.absarc(x, -y, r, -Math.PI / 2, 0); s.lineTo(w / 2, y); s.absarc(x, y, r, 0, Math.PI / 2); s.lineTo(-x, d / 2); s.absarc(-x, y, r, Math.PI / 2, Math.PI); s.lineTo(-w / 2, -y); s.absarc(-x, -y, r, Math.PI, Math.PI * 1.5);
+  return new THREE.ExtrudeGeometry(s, { depth: h, bevelEnabled: true, bevelThickness: .8, bevelSize: .8, bevelSegments: 2, curveSegments: 4 }); }
+function box(w, d, h, mat, x = 0, y = 0, z = 0) { const m = new THREE.Mesh(new THREE.BoxGeometry(w, d, h), mat); m.position.set(x, y, z + h / 2); return m; }
+function cyl(r, h, mat, seg = 20) { const g = new THREE.CylinderGeometry(r, r, h, seg); g.rotateX(Math.PI / 2); g.translate(0, 0, h / 2); return new THREE.Mesh(g, mat); }
+function makePod(clip) {
+  const G = new THREE.Group(), cp = clip ? CUT : [];
+  const capM = new THREE.MeshStandardMaterial({ color: 0xeef6f8, roughness: .15, transparent: true, opacity: .2, emissive: 0x1a2022, depthWrite: false, side: THREE.DoubleSide, clippingPlanes: cp });
+  const flM = new THREE.MeshStandardMaterial({ color: 0xe6eef0, roughness: .3, transparent: true, opacity: .55, side: THREE.DoubleSide, clippingPlanes: cp });
+  // flange with holes all round
+  const s = new THREE.Shape(); s.moveTo(-FH[0], -FH[1]); s.lineTo(FH[0], -FH[1]); s.lineTo(FH[0], FH[1]); s.lineTo(-FH[0], FH[1]); s.lineTo(-FH[0], -FH[1]);
+  const holes = []; const ring = (hx, hy) => { const per = 4 * (hx + hy), n = Math.floor(per / 4); for (let i = 0; i < n; i++) { let d = (i + .5) * per / n, x, y; if (d < 2 * hx) { x = -hx + d; y = -hy; } else if ((d -= 2 * hx) < 2 * hy) { x = hx; y = -hy + d; } else if ((d -= 2 * hy) < 2 * hx) { x = hx - d; y = hy; } else { d -= 2 * hx; x = -hx; y = hy - d; } holes.push([x, y]); } };
+  ring(FH[0] - 1.6, FH[1] - 1.6);
+  holes.forEach(([x, y]) => { const h = new THREE.Path(); h.absarc(x, y, D.hole / 2, 0, Math.PI * 2, true); s.holes.push(h); });
+  const fl = new THREE.Mesh(new THREE.ExtrudeGeometry(s, { depth: D.flange[2], bevelEnabled: false, curveSegments: 6 }), flM); G.add(fl);
+  const cap = new THREE.Mesh(roundBox(D.cap[0] - 1.6, D.cap[1] - 1.6, D.cap[2] - 1.6, 3), capM); cap.position.z = D.flange[2] + .8; cap.renderOrder = 2; G.add(cap);
+  const board = new THREE.MeshStandardMaterial({ color: 0x2e5a3a, roughness: .7, clippingPlanes: cp }), chip = new THREE.MeshStandardMaterial({ color: 0x1b1b1d, roughness: .5, clippingPlanes: cp }), pump = new THREE.MeshStandardMaterial({ color: 0x9aa3a8, roughness: .35, metalness: .5, clippingPlanes: cp });
+  G.add(box(32, 26, .8, board, 0, 0, 2.2));
+  G.add(box(D.mp6[0], D.mp6[1], D.mp6[2], pump, -1, -7, 3.0));
+  G.add(box(D.drv[0], D.drv[1], D.drv[2] * .7, chip, -1, 6.6, 3.0));
+  G.add(box(4, 4, 1, chip, 12, 6.6, 3.0 + D.drv[2] * .7));
+  const steel = new THREE.MeshStandardMaterial({ color: 0x8d9298, roughness: .35, metalness: .85, clippingPlanes: cp });
+  const disk = cyl(D.disk[0] / 2, D.disk[1], steel, 28); disk.position.z = POD_TOP - D.disk[1]; G.add(disk);
+  const tube = new THREE.MeshStandardMaterial({ color: 0xd8d6cf, roughness: .5, clippingPlanes: cp }), capc = new THREE.MeshStandardMaterial({ color: 0x3a3a3c, roughness: .6, clippingPlanes: cp });
+  PORTS.forEach(([x, y]) => { const t = cyl(1, 7, tube, 12); t.position.set(x, y, D.flange[2] + D.cap[2]); G.add(t); const c = cyl(1.5, 1.6, capc, 12); c.position.set(x, y, D.flange[2] + D.cap[2] + 7); G.add(c); });
+  G.userData.holes = holes;
+  return G;
+}
+function build() {
+  // grid floor 10 mm, under the gel
+  const grid = new THREE.GridHelper(300, 30, 0x2a2a2c, 0x161618); grid.rotation.x = Math.PI / 2; grid.position.set(-50, 0, -10); SCN.add(grid);
+  // gel: a faint clipped volume with a visible surface
+  const gelM = new THREE.MeshStandardMaterial({ color: 0x9cc8ec, transparent: true, opacity: .07, depthWrite: false, side: THREE.DoubleSide, clippingPlanes: CUT, roughness: .1 });
+  OBJ.gel = new THREE.Mesh(new THREE.BoxGeometry(170, 170, D.gelTop + 10), gelM); OBJ.gel.position.set(-25, 0, (D.gelTop - 10) / 2); OBJ.gel.renderOrder = 5; SCN.add(OBJ.gel);
+  const sg = new THREE.PlaneGeometry(170, 85, 48, 20); sg.translate(-25, -42.5, D.gelTop);
+  OBJ.surfM = new THREE.MeshStandardMaterial({ color: 0xb6d8f4, transparent: true, opacity: .2, depthWrite: false, side: THREE.DoubleSide, roughness: .05, metalness: .1 });
+  OBJ.surf = new THREE.Mesh(sg, OBJ.surfM); OBJ.surf.renderOrder = 6; OBJ.surf.userData.z0 = Float32Array.from(sg.attributes.position.array); SCN.add(OBJ.surf);
+  const edge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(170, 85, D.gelTop + 10)), new THREE.LineBasicMaterial({ color: 0x4d6c86, transparent: true, opacity: .5 }));
+  edge.position.set(-25, -42.5, (D.gelTop - 10) / 2); OBJ.gelEdge = edge; SCN.add(edge);
+  // tail side: docking plane, a plain plate, the two saddles, the dry magazine
+  const petg = new THREE.MeshStandardMaterial({ color: 0x8b8f93, roughness: .6, transparent: true, opacity: .22, side: THREE.DoubleSide, depthWrite: false });
+  const plane = new THREE.Mesh(new THREE.PlaneGeometry(190, 80), petg); plane.rotation.y = Math.PI / 2; plane.position.set(DOCKX - 1, -25, 30); SCN.add(plane);
+  const pl = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(190, 80)), new THREE.LineBasicMaterial({ color: 0x77797c })); pl.rotation.y = Math.PI / 2; pl.position.copy(plane.position); SCN.add(pl);
+  const solid = new THREE.MeshStandardMaterial({ color: 0x5f6266, roughness: .7 });
+  [SAD.needle, SAD.holder].forEach((s, i) => { const z = s.z + (i ? D.holderLen : D.needleLen) - 6; const f = box(16, 16, 3, solid, s.x - 2, s.y, z); SCN.add(f); const arm = box(10, 6, 3, solid, DOCKX - 4, s.y, z); SCN.add(arm); });
+  const magM = new THREE.MeshStandardMaterial({ color: 0x9aa0a4, roughness: .5, transparent: true, opacity: .16, side: THREE.DoubleSide, depthWrite: false });
+  const mg = new THREE.BoxGeometry(50, 44, MAG.top + 8); OBJ.mag = new THREE.Mesh(mg, magM); OBJ.mag.position.set(MAG.x, MAG.y, (MAG.top - 8) / 2); SCN.add(OBJ.mag);
+  const ml = new THREE.LineSegments(new THREE.EdgesGeometry(mg), new THREE.LineBasicMaterial({ color: 0x8a8e92 })); ml.position.copy(OBJ.mag.position); SCN.add(ml);
+  MAG.z.forEach((z) => SCN.add(box(46, 40, 1, solid, MAG.x, MAG.y, z - 1)));
+  OBJ.magPods = MAG.z.map((z) => { const p = makePod(false); p.position.set(MAG.x, MAG.y, z); SCN.add(p); return p; });
+  // the layers
+  OBJ.lay = {};
+  for (const k of ORDER) { const { g, marks } = beadGeo(L[k].paths, L[k].r, L[k].sz); const mat = silMat(); const mesh = new THREE.Mesh(g, mat); g.setDrawRange(0, 0); SCN.add(mesh); OBJ.lay[k] = { mesh, marks, mat }; }
+  // the pod that goes in
+  OBJ.pod = makePod(true); SCN.add(OBJ.pod); OBJ.podC = makePod(false); SCN.add(OBJ.podC);
+  // fresh silicone through the flange holes, and the squeeze out at the rim
+  const hm = silMat(); const hg = new THREE.CylinderGeometry(D.hole / 2, D.hole / 2 * 1.5, 1, 8); hg.rotateX(Math.PI / 2); hg.translate(0, 0, .5);
+  OBJ.holes = new THREE.InstancedMesh(hg, hm, OBJ.pod.userData.holes.length); OBJ.holeMat = hm; SCN.add(OBJ.holes);
+  const sq = beadGeo([rrect(RIM2[0] + .2, RIM2[1] + .2, ZS1 + 2.6)], .9, .7); OBJ.squeeze = new THREE.Mesh(sq.g, silMat()); SCN.add(OBJ.squeeze);
+  // gel pushed out of the rim by the bed: particles
+  const N = 260, gp = new Float32Array(N * 3), seeds = []; for (let i = 0; i < N; i++) { const x = (Math.random() * 2 - 1) * (RIM1[0] - 2), y = -Math.random() * (RIM1[1] - 2), z = ZS1 + .3 + Math.random() * 2.5; seeds.push([x, y, z, Math.random()]); }
+  const pg = new THREE.BufferGeometry(); pg.setAttribute("position", new THREE.BufferAttribute(gp, 3));
+  OBJ.gelP = new THREE.Points(pg, new THREE.PointsMaterial({ color: 0x9cc8ec, size: .9, sizeAttenuation: true, transparent: true, opacity: .9, depthWrite: false })); OBJ.gelP.userData.seeds = seeds; SCN.add(OBJ.gelP);
+  // tools: needle with its static mixer, holder with its electromagnet, the quick release head and a line for the arm
+  const steel = new THREE.MeshStandardMaterial({ color: 0xc9cdd1, roughness: .25, metalness: .9 }), body = new THREE.MeshStandardMaterial({ color: 0x3c3f43, roughness: .55 }), clear = new THREE.MeshStandardMaterial({ color: 0xd7e3e6, roughness: .2, transparent: true, opacity: .5 });
+  const nd = new THREE.Group(); const nt = cyl(.9, 26, steel, 12); nd.add(nt); const cone = new THREE.Mesh(new THREE.CylinderGeometry(4, 1.2, 6, 16).rotateX(Math.PI / 2).translate(0, 0, 29), clear); nd.add(cone);
+  const mix = cyl(4, 40, clear, 16); mix.position.z = 32; nd.add(mix); const nb = cyl(6, 28, body, 16); nb.position.z = 72; nd.add(nb); OBJ.needle = nd; SCN.add(nd);
+  const tip = new THREE.Mesh(new THREE.SphereGeometry(1.1, 12, 8), new THREE.MeshBasicMaterial({ color: 0xfff6d8 })); OBJ.tipGlow = tip; SCN.add(tip);
+  const hd = new THREE.Group(); const mgc = cyl(D.magnet[0] / 2, D.magnet[1], new THREE.MeshStandardMaterial({ color: 0x6d7378, roughness: .4, metalness: .6 }), 28); hd.add(mgc);
+  const st = cyl(2.5, D.holderLen - D.magnet[1], body, 12); st.position.z = D.magnet[1]; hd.add(st);
+  OBJ.magLed = cyl(D.magnet[0] / 2 + .3, 1.2, new THREE.MeshBasicMaterial({ color: 0xe3b36a })); OBJ.magLed.position.z = 3; hd.add(OBJ.magLed); OBJ.holder = hd; SCN.add(hd);
+  OBJ.wrist = box(D.head[0], D.head[1], D.head[2], new THREE.MeshStandardMaterial({ color: 0x2b2d30, roughness: .6 }), 0, 0, 0); SCN.add(OBJ.wrist);
+  OBJ.armLine = cyl(3, 260, new THREE.MeshStandardMaterial({ color: 0x46494d, roughness: .6 }), 10); SCN.add(OBJ.armLine);
+  // the cured wall after "birth": a profile across x, extruded along y, rebuilt as the cells fill
+  OBJ.wallM = silMat({ color: CURED.getHex(), roughness: .9 }); OBJ.airM = new THREE.MeshStandardMaterial({ color: 0x9cc8ec, transparent: true, opacity: .14, depthWrite: false, side: THREE.DoubleSide, clippingPlanes: CUT });
+  OBJ.wall = new THREE.Group(); SCN.add(OBJ.wall);
+}
+function bump(x, a) { const ax = Math.abs(x); return ax > WEBX[0] && ax < WEBX[1] ? a * Math.sin(Math.PI * (ax - WEBX[0]) / D.channel) : 0; }
+function profileGeo(lo, hi, x0, x1) { const s = new THREE.Shape(), n = Math.max(2, Math.ceil((x1 - x0) / 1)); for (let i = 0; i <= n; i++) { const x = lerp(x0, x1, i / n); i ? s.lineTo(x, lo(x)) : s.moveTo(x, lo(x)); } for (let i = n; i >= 0; i--) { const x = lerp(x0, x1, i / n); s.lineTo(x, hi(x)); }
+  const g = new THREE.ExtrudeGeometry(s, { depth: 2 * PY, bevelEnabled: false }); g.rotateX(Math.PI / 2); g.translate(0, PY, 0); return g; }
+let WALL_A = -1;
+function buildWall(a) {
+  if (Math.abs(a - WALL_A) < .02) return; WALL_A = a;
+  OBJ.wall.children.forEach((c) => c.geometry.dispose()); OBJ.wall.clear();
+  const add = (g, m) => OBJ.wall.add(new THREE.Mesh(g, m));
+  add(profileGeo((x) => -bump(x, a), (x) => ZS1 - bump(x, a), -PX, PX), OBJ.wallM);
+  [[-PX, -RIM2[0] - BR], [RIM2[0] + BR, PX]].forEach(([x0, x1]) => add(profileGeo((x) => ZW + bump(x, a), (x) => ZS2 + bump(x, a), x0, x1), OBJ.wallM));
+  [-WEBX[1], -WEBX[0], WEBX[0], WEBX[1]].forEach((x) => add(profileGeo(() => ZS1, () => ZW, x - D.web / 2, x + D.web / 2), OBJ.wallM));
+  [[-WEBX[1] + .4, -WEBX[0] - .4], [WEBX[0] + .4, WEBX[1] - .4]].forEach(([x0, x1]) => add(profileGeo((x) => ZS1 - bump(x, a), (x) => ZW + bump(x, a), x0, x1), OBJ.airM));
+}
+
+/* ============================================================ apply a state */
+let STATE = null;
+const _m = new THREE.Matrix4();
+function applyState(st) {
+  const fresh = (k) => st.printed[k] > 0;
+  for (const k of ORDER) { const o = OBJ.lay[k]; growTo(o, st.printed[k]); const c = st.cure; o.mat.color.copy(FRESH).lerp(CURED, c); o.mat.roughness = lerp(.22, .92, c); o.mat.emissive.setRGB(.05 * (1 - c), .045 * (1 - c), .03 * (1 - c));
+    o.mesh.visible = st.air <= 0 || !["skin", "webs", "upper"].includes(k); }
+  OBJ.wall.visible = st.si === 7; if (st.si === 7) buildWall(st.air * D.bulge);
+  // pod
+  const pod = OBJ.pod; pod.visible = st.placed || (st.carry && st.podAt.z < SEAT + 6); OBJ.podC.visible = st.carry && !pod.visible;
+  if (st.carry) { pod.position.copy(st.podAt); OBJ.podC.position.copy(st.podAt); } else if (st.placed) pod.position.set(0, 0, SEAT);
+  OBJ.magPods[2].visible = !st.taken;
+  // holes and squeeze out
+  const H = pod.userData.holes, pr = st.press; OBJ.holes.visible = pr > 0;
+  H.forEach(([x, y], i) => { _m.makeScale(1, 1, Math.max(.01, 1.6 * pr)); _m.setPosition(x, y, SEAT - .3); OBJ.holes.setMatrixAt(i, _m); }); OBJ.holes.instanceMatrix.needsUpdate = true;
+  OBJ.squeeze.visible = pr > 0; OBJ.squeeze.scale.set(1, 1, 1); OBJ.squeeze.material = OBJ.lay.bed.mat; OBJ.squeeze.geometry.setDrawRange(0, pr > 0 ? Infinity : 0);
+  OBJ.squeeze.scale.setScalar(1); OBJ.squeeze.visible = pr > .2; OBJ.holes.material = OBJ.lay.bed.mat;
+  // gel particles pushed out over the rim as the bed fills
+  const bedU = st.printed.bed / L.bed.len, P = OBJ.gelP.geometry.attributes.position.array, S = OBJ.gelP.userData.seeds;
+  OBJ.gelP.visible = st.si <= 3 && (st.si < 2 ? false : true);
+  for (let i = 0; i < S.length; i++) { const [x, y, z, r] = S[i]; const yy = -RIM1[1] + 1.4 + (y + RIM1[1]) * 1; const reach = clamp((bedU * (2 * RIM1[1]) - (yy + RIM1[1])) / 6 + r * .2); const out = sm(reach);
+    const sx = Math.sign(x) || 1, ex = sx * (RIM2[0] + 3 + r * 6); P[i * 3] = lerp(x, ex, out); P[i * 3 + 1] = y; P[i * 3 + 2] = z + Math.sin(Math.PI * out) * 4 + out * 2; }
+  OBJ.gelP.geometry.attributes.position.needsUpdate = true; OBJ.gelP.material.opacity = st.si === 3 ? .9 * (1 - st.f) : .9;
+  // tools
+  const tn = st.tool === "needle" && st.tip, th = st.tool === "holder" && st.tip;
+  const nP = tn ? st.tip : SAD.needle, hP = th ? st.tip : SAD.holder;
+  OBJ.needle.position.copy(nP); OBJ.holder.position.copy(hP);
+  OBJ.magLed.visible = st.mag;
+  const wr = st.wrist ? st.wrist : tn ? V(nP.x, nP.y, nP.z + D.needleLen) : th ? V(hP.x, hP.y, hP.z + D.holderLen) : V(-110, 0, 160);
+  OBJ.wrist.position.set(wr.x, wr.y, wr.z + D.head[2] / 2); OBJ.armLine.position.set(wr.x, wr.y, wr.z + D.head[2]);
+  OBJ.wrist.visible = OBJ.armLine.visible = CAMNAME !== "top";
+  const printing = st.move && st.move.print; OBJ.tipGlow.visible = !!(tn && printing); if (tn) OBJ.tipGlow.position.copy(nP);
+  // gel
+  const g = 1 - st.gelFade; OBJ.gel.material.opacity = .07 * g; OBJ.surfM.opacity = .2 * g; OBJ.gelEdge.material.opacity = .5 * g; OBJ.gel.visible = OBJ.surf.visible = OBJ.gelEdge.visible = g > .01;
+  STATE = st;
+}
+function waveSurface(t) { const p = OBJ.surf.geometry.attributes.position, z0 = OBJ.surf.userData.z0; for (let i = 0; i < p.count; i++) { const x = z0[i * 3], y = z0[i * 3 + 1]; p.array[i * 3 + 2] = z0[i * 3 + 2] + .25 * Math.sin(x * .09 + t * .8) * Math.cos(y * .12 + t * .5); } p.needsUpdate = true; OBJ.surf.geometry.computeVertexNormals(); }
+
+/* ============================================================ cameras */
+const CAMS = {
+  section: () => ({ p: V(0, 100, 28), t: V(0, 0, 6) }),
+  close: () => ({ p: V(46, 58, 44), t: V(0, -4, 5) }),
+  top: () => ({ p: V(0, -40, 190), t: V(0, -8, 0) }),
+  magazine: () => ({ p: V(-30, 175, 90), t: V(-85, 0, 28) }),
+};
+let CAMNAME = "section", CAMGOAL = null, AUTO = true, SNAP = false;
+function setCam(name, snap = false) { if (!CAMS[name]) return; CAMNAME = name; CAMGOAL = CAMS[name](); if (snap) SNAP = true; document.querySelectorAll("[data-cam]").forEach((b) => b.classList.toggle("on", b.dataset.cam === name)); }
+function setAuto(on) { AUTO = on; $("#autoCam").classList.toggle("on", on); $("#autoCam").setAttribute("aria-pressed", String(on)); }
+function autoCam(st) { const k = st.s.k, f = st.f; let w = "section";
+  if (k === "change") w = "magazine"; else if (k === "pod") w = f < .55 ? "magazine" : "close"; else if (k === "cover") w = f < .3 ? "magazine" : "close"; else if (k === "cure") w = "close"; else if (k === "rim" || k === "bed") w = "close";
+  if (w !== CAMNAME) setCam(w); }
+function camStep(dt) { if (!CAMGOAL) return; const k = SNAP ? 1 : 1 - Math.exp(-dt * 2.4); CAM.position.lerp(CAMGOAL.p, k); CTRL.target.lerp(CAMGOAL.t, k); SNAP = false; if (CAM.position.distanceTo(CAMGOAL.p) < .05 && CTRL.target.distanceTo(CAMGOAL.t) < .05) CAMGOAL = null; }
+
+/* ============================================================ labels */
+const LABS = [
+  ["Lower skin, 1.2 mm", (s) => s.printed.skin > 30 && s.si < 5 ? V(-34, 0, 0) : null],
+  ["Web, 0.8 mm", (s) => s.printed.webs > 40 && s.si < 7 ? V(-26, 0, ZW) : null],
+  ["Rim, tapered", (s) => s.printed.rim > 60 && s.si < 5 ? V(-RIM2[0], 0, ZS1 + 2.4) : null],
+  ["Fresh bed", (s) => s.printed.bed > 40 && s.si < 4 ? V(8, 0, ZS1 + 1.2) : null],
+  ["Gel pushed out", (s) => s.si === 2 && s.f > .2 ? V(RIM2[0] + 4, 0, ZS1 + 5) : null],
+  ["Gel, Carbopol", (s) => s.si < 7 ? V(32, 0, D.gelTop) : null],
+  ["Needle", (s) => s.tool === "needle" && s.tip ? V(s.tip.x, s.tip.y, s.tip.z + 34) : null],
+  ["Magnet holder", (s) => s.tool === "holder" && s.tip ? V(s.tip.x, s.tip.y, s.tip.z + 30) : null],
+  ["Magazine, dry", (s) => s.si >= 3 && s.si <= 5 ? V(MAG.x, MAG.y, MAG.top + 6) : null],
+  ["Docking plane", (s) => s.si >= 3 && s.si <= 5 ? V(DOCKX, 0, 70) : null],
+  ["Pod", (s) => (s.carry || s.placed) && s.si < 7 ? (s.carry ? s.podAt.clone().add(V(-14, 0, 9)) : V(-14, 0, SEAT + 9)) : null],
+  ["Flange holes", (s) => s.si === 4 && s.placed ? V(-FH[0] + 1.6, 0, SEAT + 1) : null],
+  ["Capped ports", (s) => (s.carry || s.placed) && s.si < 7 ? (s.carry ? s.podAt.clone().add(V(PORTS[0][0], PORTS[1][1], 17.5)) : V(PORTS[0][0], PORTS[1][1], SEAT + 17.5)) : null],
+  ["Cover", (s) => s.printed.cover > 200 && s.si >= 5 ? V(-CH[0] - 2, 0, SEAT + 6) : null],
+  ["Upper skin", (s) => s.printed.upper > 100 ? V(-38, 0, ZS2 + bump(-38, s.air * D.bulge)) : null],
+  ["Air", (s) => s.si === 7 && s.air > .3 ? V(35, 0, ZW + 1) : null],
+  ["Solid island", (s) => s.si === 7 && s.air > .3 ? V(0, 0, SEAT + 12) : null],
+];
+const LABEL_EL = [];
+function initLabels() { const box = $("#labs"); LABS.forEach(([t]) => { const d = document.createElement("div"); d.className = "lab"; d.textContent = t; d.style.display = "none"; box.appendChild(d); LABEL_EL.push(d); }); }
+const _v = new THREE.Vector3();
+function placeLabels(st) { const vp = $("#vp"), w = vp.clientWidth, h = vp.clientHeight; const used = [];
+  LABS.forEach(([, f], i) => { const el = LABEL_EL[i], p = f(st); if (!p) { el.style.display = "none"; return; } _v.copy(p).project(CAM); if (_v.z > 1 || Math.abs(_v.x) > 1.05 || Math.abs(_v.y) > 1.05) { el.style.display = "none"; return; }
+    const x = (_v.x * .5 + .5) * w, y = (-_v.y * .5 + .5) * h; if (y < 40 || (x < Math.min(660, w * .55) && y < 175) || used.some(([a, b]) => Math.abs(a - x) < 90 && Math.abs(b - y) < 16)) { el.style.display = "none"; return; }
+    used.push([x, y]); el.style.display = ""; el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -100%)`; });
+  // 10 mm scale bar at the target distance
+  const d = CAM.position.distanceTo(CTRL.target), px = 10 / (2 * d * Math.tan(CAM.fov * Math.PI / 360)) * h; $("#scaleBar").style.width = clamp(px, 4, 400).toFixed(0) + "px";
+}
+
+/* ============================================================ readouts, timeline */
+const TL = { T: 0, playing: true, speed: 1 };
+const fmtT = (s) => s < 3600 ? Math.floor(s / 60) + " min " + String(Math.floor(s % 60)).padStart(2, "0") + " s" : (s / 3600).toFixed(1) + " h";
+const POD = (() => { const vCap = D.cap[0] * D.cap[1] * D.cap[2], vFl = (D.flange[0] * D.flange[1] - D.cap[0] * D.cap[1]) * D.flange[2], vParts = D.mp6[0] * D.mp6[1] * D.mp6[2] + D.drv[0] * D.drv[1] * D.drv[2];
+  const sil = (vCap + vFl - vParts) / 1000 * D.sg; return { g: sil + D.mp6[3] + D.drv[3] + D.disk[2], sil }; })();
+function renderRO(st) {
+  const s = st.s, rr = (a, b, hot) => `<div class="rr${hot ? " hot" : ""}"><span>${esc(a)}</span><span>${b}</span></div>`;
+  const comp = s.real / s.disp;
+  let pot = "", potU = 0;
+  if (st.clock < BED_T0) pot = "not started"; else if (st.si <= 5) { const used = st.clock - BED_T0; potU = used / D.potlife; pot = fmtT(Math.max(0, D.potlife - used)) + " left"; } else { potU = (COVER_T1 - BED_T0) / D.potlife; pot = "closed at " + fmtT(COVER_T1 - BED_T0); }
+  const lay = st.layer ? `${L[st.layer].name}, bead ${st.bead} of ${L[st.layer].beads}` : "none";
+  const tool = st.tool === "needle" ? (st.move && st.move.print ? "needle, printing at " + D.speed + " mm/s" : "needle, travel") : st.tool === "holder" ? (st.carry ? "holder, pod on the magnet" : "holder") : "tool change";
+  $("#ro").innerHTML = `<div class="rg"><h4>Process</h4>${rr("Stage", (st.si + 1) + " of 8, " + esc(s.name), true)}${rr("Process time", hms(st.clock), true)}${rr("Time lapse", st.si === 6 ? Math.round(comp).toLocaleString("en-US") + "×" : f1(comp) + "×")}${rr("Tool", esc(tool))}
+    ${rr("Wet on wet window, 45 min", pot)}<div class="bar"><i style="width:${(clamp(potU) * 100).toFixed(1)}%"></i></div>
+    ${rr("Cure, 16 h", st.si < 6 ? "not yet" : st.si === 6 ? f0(st.f * 100) + " %" : "cured")}</div>
+    <div class="rg"><h4>Print</h4>${rr("Layer", esc(lay))}${rr("Silicone laid", f2(st.vol) + " mL")}${rr("Bead", D.bead + " mm, " + D.speed + " mm/s")}
+    ${ORDER.map((k) => rr(L[k].name, f0(st.printed[k]) + " of " + f0(L[k].len) + " mm")).join("")}</div>
+    <div class="rg"><h4>Pod</h4>${rr("Kind", "pump pod: mp6 and driver")}${rr("Capsule", D.cap.join(" x ") + " mm")}${rr("Flange", D.flange[0] + " x " + D.flange[1] + " mm")}${rr("Mass", f1(POD.g) + " g")}${rr("Holes", OBJ.pod.userData.holes.length + " of " + D.hole + " mm")}${rr("Pressed in", f0(st.press * 100) + " %")}</div>
+    <div class="rg"><h4>Assumptions</h4>${ASSUME.map(([a, b]) => `<div class="rr st"><span>${esc(a)}</span><span>${esc(b)}</span></div>`).join("")}</div>
+    <div class="rg"><h4>Open questions</h4>${OPENQ.map((q) => `<div class="rr"><span style="white-space:normal">${esc(q)}</span><span></span></div>`).join("")}</div>`;
+}
+const f0 = (x) => (+x).toFixed(0), f1 = (x) => (+x).toFixed(1), f2 = (x) => (+x).toFixed(2);
+function renderTrack() { const el = $("#track"); el.innerHTML = STAGES.map((s, i) => `<div class="seg" data-i="${i}" title="${esc((i + 1) + ". " + s.name)}"><div class="fill"></div><span>${i + 1} ${esc(s.name)}</span></div>`).join("") + `<div class="head" id="head"></div>`;
+  el.querySelectorAll(".seg").forEach((d, i) => (d.style.flex = `${STAGES[i].disp} 1 0`)); }
+function updateTrack(st) { const segs = $("#track").querySelectorAll(".seg"); segs.forEach((el, i) => { el.classList.toggle("on", i === st.si); el.querySelector(".fill").style.width = i < st.si ? "100%" : i === st.si ? (st.f * 100).toFixed(1) + "%" : "0"; });
+  const tr = $("#track").getBoundingClientRect(), r = segs[st.si].getBoundingClientRect(); $("#head").style.left = (r.left - tr.left + st.f * r.width - 1) + "px"; $("#track").setAttribute("aria-valuenow", String(Math.round(TL.T / TOTAL * 100))); }
+function scrubTo(cx) { const segs = $("#track").querySelectorAll(".seg"); for (let i = 0; i < segs.length; i++) { const r = segs[i].getBoundingClientRect(); if (cx <= r.right || i === segs.length - 1) { TL.T = STAGES[i].d0 + clamp((cx - r.left) / r.width, 0, .999) * STAGES[i].disp; break; } } }
+function setPlay(on) { TL.playing = on; $("#play").textContent = on ? "Pause" : "Play"; $("#play").setAttribute("aria-pressed", String(on)); }
+function wireUI() {
+  $("#play").onclick = () => setPlay(!TL.playing);
+  document.querySelectorAll("[data-speed]").forEach((b) => (b.onclick = () => { TL.speed = +b.dataset.speed; document.querySelectorAll("[data-speed]").forEach((x) => x.classList.toggle("on", x === b)); }));
+  document.querySelectorAll("[data-cam]").forEach((b) => (b.onclick = () => { setAuto(false); setCam(b.dataset.cam); }));
+  $("#autoCam").onclick = () => setAuto(!AUTO);
+  const tr = $("#track"); let drag = false;
+  tr.addEventListener("pointerdown", (e) => { drag = true; tr.setPointerCapture(e.pointerId); setPlay(false); scrubTo(e.clientX); });
+  tr.addEventListener("pointermove", (e) => { if (drag) scrubTo(e.clientX); }); tr.addEventListener("pointerup", () => (drag = false));
+  tr.addEventListener("keydown", (e) => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { setPlay(false); TL.T = clamp(TL.T + (e.key === "ArrowRight" ? 1 : -1), 0, TOTAL - .01); e.preventDefault(); } else if (e.key === " ") { setPlay(!TL.playing); e.preventDefault(); } });
+}
+function renderDoc() {
+  $("#assume").innerHTML = ASSUME.map(([a, b]) => `<li>${esc(a)}: ${esc(b)}<span class="est">ASSUMED</span></li>`).join("");
+  $("#openq").innerHTML = OPENQ.map((q) => `<li>${esc(q)}</li>`).join("");
+  $("#nums").innerHTML = [
+    `Skins ${D.skin} mm, webs ${D.web} mm, channels ${D.channel} mm, ${D.gap} mm between the skins as printed flat (from the 4.4 mm layers with 1 mm gel gaps).`,
+    `Bead ${D.bead} mm at ${D.speed} mm/s, both from 763 m of bead and 1.42 L laid in 43,887 s.`,
+    `This patch: ${PX * 2} x ${PY * 2} mm. Lower skin ${L.skin.beads} beads, ${f0(L.skin.len)} mm; rim ${f0(L.rim.len)} mm; bed ${f0(L.bed.len)} mm; cover ${f0(L.cover.len)} mm; upper skin ${f0(L.upper.len)} mm.`,
+    `From the first bead of the bed to the last bead of the cover: ${fmtT(COVER_T1 - BED_T0)} of the 45 min pot life.`,
+    `Pod: ${D.cap.join(" x ")} mm capsule on a ${D.flange[0]} x ${D.flange[1]} mm flange, ${f1(POD.g)} g (silicone ${f1(POD.sil)} g, mp6 2 g, driver 2 g, steel disk ${D.disk[2]} g). The electromagnet holds 2.5 kg.`,
+  ].map((x) => `<li>${esc(x)}</li>`).join("");
+}
+
+/* ============================================================ loop */
+let last = performance.now(), vis = true, roT = 0;
+function frame(now) {
+  const dt = Math.min(.1, (now - last) / 1000); last = now;
+  if (vis && !document.hidden) {
+    if (TL.playing) { TL.T += dt * TL.speed; if (TL.T >= TOTAL) TL.T = 0; }
+    const st = evalState(TL.T); applyState(st);
+    if (AUTO) autoCam(st); camStep(dt); CTRL.update();
+    waveSurface(now / 1000);
+    R.render(SCN, CAM); placeLabels(st);
+    $("#ovStage").textContent = (st.si + 1) + " · " + st.s.name; $("#ovStep").textContent = st.s.cap;
+    $("#ovClock").innerHTML = `${hms(st.clock)} <span>process time · time lapse ${st.si === 6 ? Math.round(st.s.real / st.s.disp).toLocaleString("en-US") : f0(st.s.real / st.s.disp)}×${st.si === 6 ? " · cure " + f0(st.f * 16) + " of 16 h" : st.si >= 2 && st.si <= 5 ? " · pot life " + f0((st.clock - BED_T0) / 60) + " of 45 min used" : ""}</span>`;
+    updateTrack(st);
+    if (!EMBED && now - roT > 120) { roT = now; renderRO(st); }
+  }
+  requestAnimationFrame(frame);
+}
+window.BNM = {
+  go(k, f = .5) { const s = STAGES.find((x) => x.k === k || x.i === k || x.i + 1 === k); if (s) { TL.T = s.d0 + s.disp * clamp(f, 0, .999); setPlay(false); } },
+  stages: () => STAGES.map((s) => s.k), state: () => STATE, setCam: (n) => { setAuto(false); setCam(n, true); }, setAuto, settle: () => { SNAP = true; }, quality: () => Q,
+};
+try {
+  initThree(); initLabels(); wireUI(); renderTrack(); renderDoc(); setCam("section", true);
+  if ("IntersectionObserver" in window) new IntersectionObserver((e) => { vis = e[e.length - 1].isIntersecting; }).observe($("#vp"));
+  const t0 = QP.get("t"); if (t0 !== null && isFinite(+t0)) { TL.T = +t0; setPlay(false); }
+  requestAnimationFrame(frame);
+} catch (e) { $("#ovStage").textContent = "This view needs WebGL"; $("#ovStep").textContent = String(e && e.message || e); console.error(e); }
+</script>
+</body></html>
