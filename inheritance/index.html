@@ -1,622 +1,311 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0c0c0c"><title>Memory inheritance · Born, Not Made</title>
+<meta name="theme-color" content="#0c0c0c"><title>Inheritance · Born, Not Made</title>
+<meta name="description" content="One continuous shot of a lineage. The tail with the arm docks into a head, takes a new part from the water, prints the newborn in gel while the parent's local model is distilled into the newborn's, then pushes the newborn out, inflating. Each newborn keeps part of the parent's model, gathers its own data, and differs in shape, print and parts.">
 <style>
-*{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:#0c0c0c;color:#eee;font:15px/1.55 Inter,Arial,sans-serif}
-main{max-width:1600px;margin:auto;padding:15px clamp(12px,2.2vw,36px) 24px}
-header,footer,nav{display:flex;gap:18px;align-items:center}header{justify-content:space-between;padding-bottom:12px}
-header a{text-decoration:none}header span,time,footer a,nav,summary{font-size:14px}header span,time,nav,details{color:#bcbcbc}
-a,button{color:inherit;font:inherit}a{text-underline-offset:.22em}button{background:none;border:0;padding:6px 0;cursor:pointer}
-a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid white;outline-offset:3px}
-canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#0b0b0b}footer{padding:8px 0;gap:15px}
-input{min-width:20px;flex:1;accent-color:#ddd}time{font-variant-numeric:tabular-nums;white-space:nowrap}
-nav{flex-wrap:wrap;gap:6px 21px}nav button:hover,summary:hover{color:white;text-decoration:underline}
-details{max-width:74ch;margin-top:10px}summary{cursor:pointer;width:fit-content}details p{margin:.55em 0}details strong{color:#e6e6e6}
-main:fullscreen{max-width:none;width:100%;height:100%;padding:0;background:#080808;display:grid;place-items:center}main:fullscreen canvas{max-height:100vh;object-fit:contain}main:fullscreen>:not(canvas){display:none}
-@media(max-width:760px){main{padding:10px 12px 20px}canvas{aspect-ratio:720/840}header{padding-bottom:8px}footer{gap:10px}nav{gap:0 14px}body{font-size:14px}time,footer a,nav,summary{font-size:13px}}
-@media(max-width:365px){time{display:none}}
+*{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:#0c0c0c;color:#eee;font:14px/1.5 Inter,Arial,sans-serif}
+main{max-width:1600px;margin:auto;padding:0 0 6px}
+canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#0c0c0c}
+footer{display:flex;gap:16px;align-items:center;padding:8px clamp(12px,2.2vw,36px)}
+button{color:#bcbcbc;font:inherit;background:none;border:0;padding:4px 0;cursor:pointer}button:hover{color:#fff}
+input{flex:1;min-width:20px;accent-color:#ddd}time{color:#9b9a94;font:12px ui-monospace,monospace;white-space:nowrap}
+button:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:3px}
 </style></head><body><main>
-<header><a href="../#inheritance" target="_top">Born, Not Made</a><span>Inheritance</span></header>
-<canvas width="1600" height="900" role="img" aria-label="Three generations of robots learn from encounters."></canvas>
-<noscript><p><a href="inheritance.mp4?v=sparse-2">Watch the film (MP4)</a></p></noscript>
-<footer aria-label="Playback"><button type="button" id="play">Play</button><input id="seek" type="range" min="0" max="68" step=".05" value="0" aria-label="Film position"><time></time><button type="button" id="again">Replay</button><button type="button" id="present">Fullscreen</button><a href="inheritance.mp4?v=sparse-2" download>MP4</a></footer>
-<nav class="chapters" aria-label="Film chapters"><button data-time="0">First encounter</button><button data-time="9">I → II</button><button data-time="20">The returning visitor</button><button data-time="45">II → III</button><button data-time="56">Still water</button></nav>
-<details><summary>How does one robot teach the next?</summary>
-<p>The film follows one encounter at a time. Its simulation replays a longer history of visitor, peer and water cues to train each robot’s own model. Each of the three models has the same 19 cues and seven possible actions. A cue and the action learned for it count as one pattern once the model predicts that action with at least 60% probability.</p>
-<p><strong>Which encounters become lessons?</strong> In this artwork, the teacher chooses from ten learned patterns and gives priority to the cues it encountered most often. The first robot selects two patterns (20%). The second selects one (10%). These percentages set the teaching budget for this story. Each teacher keeps its own weights and experience.</p>
-<p><strong>What does the student learn?</strong> For each selected cue, the teacher predicts a probability for each of the seven actions. The student updates its own weights to match the teacher’s softened distribution (temperature 2). After teaching, it can respond independently and train on its own encounters.</p>
-<p id="probability-example"></p>
-<p>The model runs in this page. The Raspberry Pi 5 8GB drawn inside each shell is the proposed onboard computer. The film compresses time. Training on the physical robots has yet to be tested.</p>
-<p><a href="https://arxiv.org/abs/1503.02531" target="_blank" rel="noreferrer">Hinton, Vinyals and Dean, <i>Distilling the Knowledge in a Neural Network</i></a></p>
-</details></main><script>
-
+<canvas width="1600" height="900" role="img" aria-label="A lineage of robots: print, distill, birth, and learning."></canvas>
+<footer aria-label="Playback"><button type="button" id="play">Pause</button><input id="seek" type="range" min="0" max="62" step=".05" value="0" aria-label="Position"><time></time></footer>
+</main><script>
+/* One shot, one frame. Side view of the simplified bodies (profiles from simulator/simple/simple.json, meters).
+   Time is compressed: one print, about two hours, plays in six seconds; the distillation runs in the same window. */
 const cv=document.querySelector('canvas'), g=cv.getContext('2d');
-const tau=Math.PI*2, duration=68;
-const clamp=x=>Math.min(1,Math.max(0,x));
-function ease(t,a,b){let x=clamp((t-a)/(b-a));return x*x*(3-2*x)}
-function lerp(a,b,u){return a+(b-a)*u}
-function ink(a){return 'rgba(234,234,232,'+clamp(a)+')'}
-function path(d,fill,stroke,w=1){const p=new Path2D(d);if(fill){g.fillStyle=fill;g.fill(p)}if(stroke){g.lineWidth=w;g.strokeStyle=stroke;g.stroke(p)}}
-function ellipse(x,y,rx,ry,color,stroke,w=1){g.beginPath();g.ellipse(x,y,rx,ry,0,0,tau);if(color){g.fillStyle=color;g.fill()}if(stroke){g.lineWidth=w;g.strokeStyle=stroke;g.stroke()}}
-function label(s,x,y,size=17,color='#bbb',face='Arial'){g.fillStyle=color;g.font=size+'px '+face;g.fillText(s,x,y)}
-function rect(x,y,w,h,fill){g.fillStyle=fill;g.fillRect(x,y,w,h)}
-function gradient(x,y,x1,y1,stops){let p=g.createLinearGradient(x,y,x1,y1);for(const [at,color] of stops)p.addColorStop(at,color);return p}
-function board(){
- // Diagrammatic component placement. Keep the connector edge, processor, and GPIO header distinct.
- g.save();g.rotate(-.07);g.transform(1,0,-.13,.85,0,0);
- path('M-50 -32 H47 Q51 -32 51 -28 V29 Q51 32 47 32 H-48 Q-52 32 -52 28 V-28 Q-52 -32 -50 -32Z','#292929','#a3a3a1',1.2);
- for(let k=0;k<20;k++)for(let j=0;j<2;j++)rect(-43+3.05*k,-28+3.7*j,1.9,2.1,'#cdcdca');
- for(const [x,y] of [[-47,-27],[44,-27],[-47,26],[44,26]])ellipse(x,y,2.3,2.3,'#111','#aaa',.8);
- for(let i=0;i<9;i++)path('M-5 '+(4+i*1.7)+' h9 l5 4 h9',null,'#555',.6);
- rect(-19,-14,22,23,'#a9a9a5');rect(-17,-12,18,19,'#777773');rect(-34,-11,11,18,'#090909');rect(6,3,16,14,'#111');
- for(const [y,h] of [[-25,13],[-9,13],[9,17]]){rect(30,y,23,h,'#a6a6a2');rect(33,y+2,18,h-4,'#626260');rect(49,y+2,4,h-4,'#252525')}
- for(const x of [-38,-17,0]){rect(x,26,11,6,'#a4a4a2');rect(x+2,29,7,3,'#414141')}
- g.restore();
-}
-const shell='M 157 -46 C 119 -103 36 -121 -45 -108 C -132 -94 -194 -36 -207 4 C -197 32 -143 74 -83 96 C -4 126 110 98 157 45 C 170 29 170 -25 157 -46Z';
-function body(t,x,y,scale,rot,kind,opening,mem,alpha=1){
- g.save();g.translate(x,y);g.rotate(rot);g.scale(scale,scale);g.globalAlpha*=alpha;
- const wet=gradient(0,-115,8,114,[[0,'#888884'],[.055,'#777774'],[.10,'#353535'],[.28,'#252525'],[.48,'#141414'],[.78,'#252525'],[.93,'#434342'],[1,'#949490']]);
- path(shell,wet,ink(.68),1.6);
- g.save();g.clip(new Path2D(shell));
- // Longitudinal seams and thin optical highlights describe the transparent wall.
- for(let j=0;j<5;j++)path('M-208 '+(11+j*2)+' Q-135 '+(-88+j*3)+' -41 '+(-102+j*3)+' Q70 '+(-130+j*3)+' 151 '+(-49+j*2),null,ink(.28-j*.045),1.2);
- for(let j=0;j<5;j++)path('M-182 '+(29+j*2)+' Q-40 '+(156-j*3)+' 157 '+(44-j*2),null,ink(.21-j*.029),1.05);
- for(let j=0;j<8;j++){const u=j/7,xx=lerp(-100,105,u);path('M'+xx+' '+(-87-14*Math.sin(u*Math.PI))+' Q'+(xx+24)+' -10 '+(xx-6)+' '+(85+14*Math.sin(u*Math.PI)),null,ink(kind? .115:.065),1)}
- path('M-99 36 Q-47 60 0 40 L24 28',null,ink(.3),2);
- g.save();g.translate(-60,0);g.scale(0.425,0.425);board();g.restore();
- 
- // Recessed front chamber remains visible through the near wall.
- ellipse(70,6,58,47,'rgba(5,5,5,.38)',ink(.23),1);
- path('M20 33 Q70 56 134 23',null,ink(.21),1.1);
- g.restore();
- const lift=opening*20;
- ellipse(151,0,14,43+lift,'#171717',ink(.35),2);
- path('M136 -46 Q148 '+(-41-lift)+' 161 '+(-36-lift),null,ink(.83),3);
- path('M135 46 Q148 '+(43+lift)+' 160 '+(35+lift),null,ink(.75),2.4);
- g.restore();
-}
-const stars=Array.from({length:62},(_,i)=>[(i*349.33)%1640,(i*163.81)%560+38,((i*37)%10)/10]);
-function water(t){
- rect(0,0,1600,900,'#0b0b0b');
- const glow=g.createRadialGradient(850,283,15,850,283,815);glow.addColorStop(0,'#222222');glow.addColorStop(.5,'#141414');glow.addColorStop(1,'#0b0b0b');rect(0,0,1600,692,glow);
- for(const [x,y,z] of stars)ellipse((x+t*(.5+z))%1630-12,y+3*Math.sin(t*.30+z*8),.6+z,.6+z,ink(.08+z*.17));
- for(let j=0;j<6;j++){g.beginPath();for(let x=0;x<=1600;x+=8){const y=104+j*4+9*Math.sin(x*.004+t*.13)+4*Math.sin(x*.016+j*.2+t*.2);if(x)g.lineTo(x,y);else g.moveTo(x,y)}g.strokeStyle=ink(.05-j*.005);g.lineWidth=.8;g.stroke()}
-}
+const W=1600,H=900,S=700,FLOAT=.14,DOCK=.032;
+const TOP=[[-0.43,0.125],[-0.413,0.147],[-0.397,0.167],[-0.38,0.185],[-0.363,0.202],[-0.347,0.218],[-0.33,0.233],[-0.313,0.248],[-0.297,0.261],[-0.28,0.273],[-0.264,0.284],[-0.247,0.294],[-0.23,0.303],[-0.213,0.311],[-0.197,0.318],[-0.18,0.323],[-0.164,0.326],[-0.147,0.329],[-0.13,0.33],[-0.03,0.33],[0.036,0.33],[0.07,0.33],[0.086,0.329],[0.103,0.328],[0.119,0.327],[0.136,0.325],[0.153,0.323],[0.17,0.321],[0.186,0.318],[0.203,0.314],[0.22,0.31],[0.236,0.305],[0.253,0.299],[0.269,0.292],[0.286,0.284],[0.304,0.274]];
+const BOT=[[-0.43,0.125],[-0.413,0.083],[-0.397,0.053],[-0.38,0.03],[-0.363,0.014],[-0.347,0.003],[-0.33,0],[0.243,0],[0.249,0.04],[0.253,0.055],[0.256,0.065],[0.263,0.081],[0.269,0.091],[0.276,0.098],[0.283,0.102],[0.296,0.104],[0.366,0.104]];
+const LIP=[0.366,0.104];
+const topAt=x=>{for(let i=1;i<TOP.length;i++)if(TOP[i][0]>=x){const [a,b]=TOP[i-1],[c,d]=TOP[i];return b+(d-b)*(x-a)/(c-a)}return TOP.at(-1)[1]};
+const headTop=TOP.filter(p=>p[0]>=DOCK), headBot=BOT.filter(p=>p[0]>=DOCK);headTop.unshift([DOCK,topAt(DOCK)]);headBot.unshift([DOCK,0]);
+const tailTop=TOP.filter(p=>p[0]<=DOCK).concat([[DOCK,.33]]), tailBot=BOT.filter(p=>p[0]<=DOCK).concat([[DOCK,0]]);
 
-// Board-to-shell ratio: 85 mm PCB / 723.3 mm main chamber.
-// Board width in drawing units is 103; the chamber silhouette spans about 374.
-// The tail assembly is outside this schematic. Depth changes screen size, not the ratio.
-/*
- * A nineteen-cue, seven-action softmax policy. Each generation has an independent
- * weight matrix. A cue activates one row. Local training targets come from the
- * scripted observed encounters. Inheritance fits soft targets on selected cues.
- * World cues, outcomes, retention threshold, and time compression are authored.
- *
- * growthState(seconds) is deterministic and seekable. It returns counts,
- * selected cues, action distributions, and the active stage for the film.
- */
-const growthState = (() => {
-  const actions=['Stay close','Wait','Yield','Approach','Answer','Follow','Drift'];
-  // Each item identifies one observable cue-response pair; several cues can
-  // elicit the same action. A retained pair contributes one unit to coverage.
-  const patterns=[
-    ['company','Someone asks for company','Stay close','Stay close'],
-    ['pause','A peer asks for a pause','Wait','Wait'],
-    ['wake','A crossing wake arrives','Yield','Yield to a wake'],
-    ['invitation','A visitor invites contact','Approach','Accept an invitation'],
-    ['hello','A visitor says hello','Answer','Answer a greeting'],
-    ['guide','A peer offers to lead','Follow','Follow a guide'],
-    ['eddy','A gentle eddy forms','Drift','Drift in an eddy'],
-    ['crossing','Two peers cross paths','Yield','Give way at a crossing'],
-    ['edge','Water reaches a boundary','Wait','Pause at the edge'],
-    ['beside','A peer travels alongside','Stay close','Keep a peer company'],
-    ['return','A visitor returns','Approach','Approach'],
-    ['call','Another robot calls','Answer','Answer a peer'],
-    ['current','A steady current forms','Follow','Follow a current'],
-    ['quiet','A visitor requests quiet','Wait','Share a quiet moment'],
-    ['distance','A peer requests space','Yield','Make room'],
-    ['rain','Rain stipples the surface','Drift','Drift in rain'],
-    ['near','A visitor stays nearby','Stay close','Linger nearby'],
-    ['turn','A peer changes direction','Follow','Follow a turn'],
-    ['still','The water settles','Drift','Drift']
-  ].map(([id,cue,action,name])=>({id,cue,action,name,actionIndex:actions.indexOf(action)}));
-  const selectionBudgets=[.20,.10];
-  const temperature=2;
-  const stages = [
-    [0,5,0,'encounter','Encounters become memories','Context + episode buffer'],
-    [5,9,0,'update','Experience becomes a tendency','Local weight update'],
-    [9,13,0,'select','Some memories are selected','Representative cue selection'],
-    [13,20,0,'distill','Only part is inherited','Soft-target distillation'],
-    [20,31,1,'encounter','A life of its own','New context + local episodes'],
-    [31,37,1,'update','Experience changes the model','Local weight update'],
-    [37,41,1,'encounter','Life continues','New context + local episodes'],
-    [41,45,1,'update','A tendency deepens','Second local weight update'],
-    [45,49,1,'select','Memory is compressed again','Representative cue selection'],
-    [49,56,1,'distill','What survives another life','Soft-target distillation'],
-    [56,60,2,'encounter','A new life begins','New context + local episodes'],
-    [60,63,2,'update','A new response takes root','Local weight update'],
-    [63,64,2,'hold','Inheritance continues','Independent local models']
-  ].map(([start,end,gen,phase,title,tech])=>({start,end,gen,phase,title,tech}));
-  const inputs = [
-    [.15,0,'human','"Stay a moment."','company'],
-    [.48,0,'machine','"Wait for me."','pause'],
-    [.80,0,'water','A wake crosses from the left.','wake'],
-    [1.10,0,'human','"Come closer."','invitation'],
-    [1.40,0,'human','"Hello there."','hello'],
-    [1.70,0,'machine','"Follow me."','guide'],
-    [2.00,0,'water','Water circles behind a stone.','eddy'],
-    [2.30,0,'machine','"Crossing your path."','crossing'],
-    [2.60,0,'human','"Will you stay here?"','company'],
-    [2.90,0,'water','The current reaches an edge.','edge'],
-    [3.22,0,'machine','"Hold here with me."','pause'],
-    [3.68,0,'machine','"I am beside you."','beside'],
-    [4.39,0,'human','"A little longer."','company'],
-    [20.40,1,'human','"I came back."','return'],
-    [21.30,1,'machine','"Can you hear me?"','call'],
-    [22.20,1,'water','A current carries past.','current'],
-    [23.15,1,'human','"Let us be quiet."','quiet'],
-    [24.05,1,'machine','"A little more space?"','distance'],
-    [24.90,1,'water','Rain breaks the surface.','rain'],
-    [25.80,1,'human','"Here I am again."','return'],
-    [26.65,1,'machine','"Are you there?"','call'],
-    [27.60,1,'water','The current gathers again.','current'],
-    [29.20,1,'human','"Do you remember me?"','return'],
-    [37.30,1,'human','"It is me again."','return'],
-    [38.15,1,'human','"I will be right here."','near'],
-    [38.98,1,'machine','"Turning this way."','turn'],
-    [39.90,1,'human','"I found you."','return'],
-    [56.25,2,'water','The surface falls still.','still'],
-    [57.30,2,'water','Ripples settle nearby.','still'],
-    [58.70,2,'water','Still water surrounds it.','still']
-  ].map(([at,gen,kind,label,pattern])=>{
-    const key=patterns.findIndex(p=>p.id===pattern);
-    return {at,gen,kind,label,pattern,key,action:patterns[key].action};
-  });
+const clamp=x=>Math.min(1,Math.max(0,x)), lerp=(a,b,u)=>a+(b-a)*u;
+const ease=(t,a,b)=>{const x=clamp((t-a)/(b-a));return x*x*(3-2*x)};
+const ink=a=>'rgba(236,235,230,'+clamp(a)+')';
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const shuffle=(a,r)=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 
-  const epochs=36, keepThreshold=.60;
-  const freshMatrix=()=>patterns.map(()=>actions.map(()=>0));
-  const copyMatrix=m=>m.map(row=>row.slice());
-  function distribution(logits,temp=1){
-    const max=Math.max(...logits);
-    const exps=logits.map(v=>Math.exp((v-max)/temp));
-    const sum=exps.reduce((a,b)=>a+b,0);
-    return exps.map(v=>v/sum);
-  }
-  const neutral=actions.map(()=>1/actions.length);
-  function countEpisodes(gen,cutoff){
-    const counts=patterns.map(()=>0);
-    for(const e of inputs)if(e.gen===gen && e.at<=cutoff)counts[e.key]++;
-    return counts;
-  }
-  function selection(gen,weights,cutoff){
-    const counts=countEpisodes(gen,cutoff);
-    const available=patterns.map((_,i)=>i).filter(i=>{
-      const p=distribution(weights[i]);
-      return p[patterns[i].actionIndex]>=keepThreshold;
-    });
-    // The artwork sets a budget over learned cue-response pairs. Pick the
-    // cues seen most often in this generation's own encounters; ties follow
-    // the stable cue order. An inherited cue may be eligible for selection.
-    const ranked=available.slice().sort((a,b)=>counts[b]-counts[a] || a-b);
-    const budget=selectionBudgets[gen];
-    const selected=ranked.slice(0,Math.floor(available.length*budget));
-    return {selected,available,budget,episodeCount:counts.reduce((a,b)=>a+b,0)};
-  }
-  const batches=[];
-  const finalWeights=[freshMatrix(),freshMatrix(),freshMatrix()];
-  const selections=new Map();
-  const provenance=Array.from({length:3},()=>patterns.map(()=>null));
-
-  for(const s of stages){
-    if(s.phase==='select'){
-      selections.set(s.gen,selection(s.gen,finalWeights[s.gen],s.start));
-      continue;
-    }
-    if(s.phase!=='update' && s.phase!=='distill')continue;
-    const distilling=s.phase==='distill';
-    const gen=s.gen+Number(distilling);
-    const localEpisodes=inputs.filter(e=>e.gen===gen && e.at<s.start);
-    // Each local phase replays that individual's accumulated episodes.
-    const samples=distilling?selections.get(s.gen).selected.map(key=>({
-      key,target:distribution(finalWeights[s.gen][key],temperature)
-    })):localEpisodes.map(e=>({
-      key:e.key,target:actions.map((_,j)=>j===patterns[e.key].actionIndex ? .86 : .14/(actions.length-1))
-    }));
-    const weights=copyMatrix(finalWeights[gen]);
-    const history=[copyMatrix(weights)];
-    for(const sample of samples){
-      if(provenance[gen][sample.key]===null)provenance[gen][sample.key]=distilling?'inherited':'acquired';
-    }
-    // Full-policy optimization. Only the active one-hot cue has a nonzero
-    // gradient. distillation never writes to the source model.
-    for(let epoch=0;epoch<epochs;epoch++){
-      for(const {key,target} of samples){
-        // For T² KL(p_source,T || p_successor,T), the gradient with
-        // respect to successor logits is T*(p_successor,T - p_source,T).
-        const temp=distilling?temperature:1;
-        const pred=distribution(weights[key],temp);
-        for(let j=0;j<actions.length;j++)weights[key][j]+=.55*temp*(target[j]-pred[j]);
-      }
-      history.push(copyMatrix(weights));
-    }
-    finalWeights[gen]=weights;
-    batches.push({gen,start:s.start,end:s.end,distilling,history,sampleCount:samples.length,
-      trainedEpisodes:distilling?0:localEpisodes.length});
-  }
-
-  function stateAt(seconds){
-    const t=Math.max(0,Math.min(64,Number(seconds)||0));
-    const stage=stages.find(s=>t<s.end)||stages[stages.length-1];
-    const matrix=[freshMatrix(),freshMatrix(),freshMatrix()];
-    const versions=[0,0,0],updates=[0,0,0],trained=[0,0,0];
-    for(const b of batches){
-      if(t<b.start)break;
-      const epoch=Math.min(epochs,Math.floor(epochs*(t-b.start)/(b.end-b.start)));
-      matrix[b.gen]=b.history[epoch];
-      updates[b.gen]+=epoch*b.sampleCount;
-      if(epoch>0)versions[b.gen]++;
-      if(epoch>0 && !b.distilling)trained[b.gen]=b.trainedEpisodes;
-    }
-    const models=matrix.map((m,i)=>{
-      const acquiredNames=[],inheritedNames=[];
-      m.forEach((row,k)=>{
-        if(distribution(row)[patterns[k].actionIndex]<keepThreshold)return;
-        (provenance[i][k]==='inherited'?inheritedNames:acquiredNames).push(patterns[k].name);
-      });
-      const episodes=inputs.filter(e=>e.gen===i&&e.at<=t).length;
-      return {inherited:inheritedNames.length,acquired:acquiredNames.length,
-        episodes,trainedEpisodes:trained[i],updates:updates[i],version:versions[i],acquiredNames,inheritedNames};
-    });
-    const progress=(t-stage.start)/(stage.end-stage.start);
-    let transfer=null;
-    if(stage.phase==='select'||stage.phase==='distill'){
-      const src=stage.gen,dst=src+1,s=selections.get(src);
-      const idx=Math.min(s.selected.length-1,Math.floor(progress*s.selected.length)),key=s.selected[idx];
-      const sourceDist=distribution(matrix[src][key]),targetDist=distribution(matrix[dst][key]);
-      const sourceSoftDist=distribution(matrix[src][key],temperature),targetSoftDist=distribution(matrix[dst][key],temperature);
-      const actionIndex=patterns[key].actionIndex;
-      transfer={src,dst,selected:s.selected.map(k=>patterns[k].name),available:s.available.map(k=>patterns[k].name),
-        omitted:s.available.filter(k=>!s.selected.includes(k)).map(k=>patterns[k].name),
-        episodeCount:s.episodeCount,selectedCount:s.selected.length,availableCount:s.available.length,
-        omittedCount:s.available.length-s.selected.length,coverage:s.selected.length/s.available.length,
-        budget:s.budget,temperature,sourceSoftDist,targetSoftDist,
-        cue:patterns[key].cue,action:patterns[key].action,sourceProb:sourceDist[actionIndex],targetProb:targetDist[actionIndex],
-        sourceDist,targetDist,progress};
-    }
-    const seen=inputs.filter(e=>e.at<=t);
-    const latest=seen.filter(e=>e.gen===stage.gen).at(-1);
-    const key=latest?.key??0;
-    const localDist=distribution(matrix[stage.gen][key]),actionIndex=patterns[key].actionIndex,localProb=localDist[actionIndex];
-    // A transient demonstration in a short context can bias the immediate reply.
-    // This readout never modifies logits or contributes to the retention count.
-    const context=seen.filter(e=>e.gen===stage.gen && t-e.at<2.5).slice(-2);
-    const contextMatch=context.some(e=>e.key===key);
-    const contextDist=contextMatch?localDist.map((p,j)=>.55*p+.45*Number(j===actionIndex)):localDist.slice();
-    const contextProb=contextDist[actionIndex];
-    return {t,stage,generation:stage.gen,phase:stage.phase,models,inputs:seen,transfer,
-      latest:latest||null,pattern:latest?.action||null,localProb,localDist,contextProb,contextDist,context,progress};
-  }
-  stateAt.stages=stages;
-  stateAt.inputs=inputs;
-  stateAt.patterns=patterns;
-  stateAt.retentionThreshold=keepThreshold;
-  stateAt.neutral=neutral;
-  stateAt.actions=actions;
-  stateAt.temperature=temperature;
-  stateAt.selectionBudgets=selectionBudgets;
-  return stateAt;
-})();
-if(typeof module!=='undefined'&&module.exports)module.exports=growthState;
-
-// Each shot lingers on one witnessed encounter. The policy replays a longer history.
-const sparseShots = [
-  [0,  'encounter', 'Visitor', '“Stay a moment.”', 'Stay close', 'Its hull slows. The first robot holds its place beside the visitor.'],
-  [5,  'update', '', '', 'Stay close', 'After the visitor leaves, the robot learns from the encounter.'],
-  [9,  'select', '', '', '', 'Two familiar responses are chosen for the next life.'],
-  [13, 'distill', '', '', '', 'The second robot learns how to stay close and when to wait.'],
-  [20, 'encounter', 'Returning visitor', '“I came back.”', 'Approach', 'The second robot turns toward the familiar voice.'],
-  [31, 'update', '', '', 'Approach', 'With each return, approaching becomes more likely.'],
-  [37, 'encounter', 'Another robot', '“Turning this way.”', 'Follow', 'It turns with the other robot and follows for a moment.'],
-  [41, 'update', '', '', 'Follow', 'Those encounters change how the second robot responds.'],
-  [45, 'select', '', '', '', 'Of all its encounters, the visitor’s return recurred most often.'],
-  [49, 'distill', '', '', '', 'The third robot learns to approach a returning visitor.'],
-  [56, 'encounter', 'Water', 'The surface falls still.', 'Drift', 'In quiet water, the third robot begins to drift.'],
-  [60, 'update', '', '', 'Drift', 'It learns to drift from its own encounters with still water.'],
-  [63, 'hold', '', '', '', 'Each robot keeps learning in its own stretch of water.']
-].map(([at,type,who,voice,action,caption])=>({at,type,who,voice,action,caption}));
-const numerals=['I','II','III'];
-const phaseName={encounter:'Encounter',update:'Local learning',select:'Memory selection',distill:'Model distillation',hold:'Inheritance'};
-function centered(text,x,y,size,color,face='Arial'){
-  g.save();g.textAlign='center';label(text,x,y,size,color,face);g.restore();
-}
-function ledger(model){
-  return model.inherited+' inherited   ·   '+model.acquired+' learned here';
-}
-function drawSignal(start,end,u,alpha,packets=false,lift=72){
-  if(u<=0||alpha<=0)return;
-  const [ax,ay]=start,[bx,by]=end;
-  const pos=k=>[lerp(ax,bx,k),lerp(ay,by,k)-4*lift*k*(1-k)];
-  const tangent=k=>Math.atan2(by-ay-4*lift*(1-2*k),bx-ax);
-  g.save();g.strokeStyle=ink(alpha*.77);g.lineWidth=1.55;
-  g.beginPath();g.moveTo(ax,ay);
-  const control=[(ax+bx)/2,(ay+by)/2-2*lift],head=pos(u);
-  g.quadraticCurveTo(lerp(ax,control[0],u),lerp(ay,control[1],u),...head);g.stroke();
-  const angle=tangent(u),tip=packets?10:7;
-  g.beginPath();
-  for(const sign of [-1,1]){
-    g.moveTo(...head);g.lineTo(head[0]-tip*Math.cos(angle+sign*.4),head[1]-tip*Math.sin(angle+sign*.4));
-  }
-  g.stroke();
-  if(packets){
-    const elapsed=packets.elapsed;
-    // Two glints share one trajectory and move only while the receiver is updating.
-    for(let i=0;i<2;i++){
-      const k=(elapsed*.25+i*.09)%1;
-      if(k>u)continue;
-      const [x,y]=pos(k);
-      const fade=Math.sin(k*Math.PI);
-      ellipse(x,y,2.1-i*.55,2.1-i*.55,ink(fade*alpha*(1-i*.3)));
-    }
-  }
-  g.restore();
-}
-function transferStat(f){
-  return f.selectedCount+' of '+f.availableCount+' learned patterns   ·   '+Math.round(100*f.coverage)+'% selected';
-}
-function castForShot(s,shot){
-  if(shot.type==='hold')return [0,1,2];
-  if(shot.type==='distill')return [s.transfer.src,s.transfer.dst];
-  return [s.generation];
-}
-function robotPose(t,s,shot,i,cx,cy,scale,mobile){
-  let x=cx+19*scale, y=cy+Math.sin(t*.45+i)*2.5, angle=-.065;
-  let opacity=1, fold=null;
-  const motion=mobile?.50:1, dt=t-shot.at;
-  if(shot.type==='encounter' || shot.type==='update'){
-    // Position follows the stimulus. Each local update begins where its encounter ended.
-    if(shot.action==='Stay close'){
-      const stop=1-ease(t,0,2.4);
-      x-=85*motion*stop; y+=12*motion*stop; angle-=.08*stop;
-    }else if(shot.action==='Approach'){
-      const near=ease(t,20.9,26.8);
-      x+=(near-.51)*173*motion; y-=near*42*motion;
-      angle-=.19*(ease(t,20.8,22.9)-ease(t,25,29));
-    }else if(shot.action==='Follow'){
-      const turn=ease(t,37.4,39.1), glide=ease(t,38.0,40.8);
-      x+=(glide-.48)*142*motion; y-=(glide-.5)*28*motion;
-      angle+=.12*(1-turn)-.23*turn;
-    }else if(shot.action==='Drift'){
-      const drift=ease(t,56.45,62.6);
-      x+=(drift-.5)*177*motion; y+=(drift-.5)*44*motion;
-      angle+=drift*.17;
-    }
-  }else if(shot.type==='distill' && i===s.transfer.dst){
-    // The receiver takes shape here; its rigid board stays at the same physical scale.
-    const release=ease(dt,3.7,6.9);
-    x-=(1-release)*75*motion; y+=(1-release)*21*motion;
-    angle+=.07*(1-release);
-    opacity=.16+.84*ease(dt,.15,5.0);
-    fold={unfold:ease(dt,1.4,6.1), alpha:.2+.70*ease(dt,0,1.5)-.78*ease(dt,5.6,7)};
-  }else if(shot.type==='hold'){
-    x+=(i-1)*7*motion*ease(dt,0,4); y+=i*2*ease(dt,0,4);
-  }
-  return {x,y,angle,scale,opacity,fold};
-}
-// Project the near half of an eight-bay folded sleeve in the recipient's front chamber.
-function chamberPleats(u,alpha){
-  if(alpha<=0)return;
-  const left=52-37*u, right=78+48*u, mid=(left+right)/2, r=18+9*u;
-  const point=(j,k)=>{
-    const x=lerp(left,right,j/8);
-    const phi=-Math.PI/2+(k+(j%2)*.42)*Math.PI/8;
-    const radius=r*(1-.21*((x-mid)/((right-left)/2))**2);
-    return [x+4*Math.cos(phi),5+radius*Math.sin(phi)];
-  };
-  g.save();g.globalAlpha*=alpha;
-  for(let j=0;j<8;j++){
-    for(let k=0;k<8;k++){
-      const a=point(j,k),b=point(j+1,k),c=point(j,k+1),d=point(j+1,k+1);
-      for(const [tri,light] of [[[a,b,c],.18+.26*(1-k/8)],[[c,b,d],.08+.14*(1-k/8)]]){
-        g.beginPath();g.moveTo(...tri[0]);g.lineTo(...tri[1]);g.lineTo(...tri[2]);g.closePath();
-        g.fillStyle=ink(light);g.fill();
-        g.strokeStyle=ink(.32);g.lineWidth=.55;g.stroke();
-      }
-    }
-  }
-  g.restore();
-}
-function drawIndividual(t,p){
-  body(t,p.x,p.y,p.scale,p.angle,0,0,0,p.opacity);
-  if(p.fold){
-    g.save();g.translate(p.x,p.y);g.rotate(p.angle);g.scale(p.scale,p.scale);
-    chamberPleats(p.fold.unfold,p.fold.alpha);g.restore();
-  }
-  return [p.x-60*p.scale*Math.cos(p.angle),p.y-60*p.scale*Math.sin(p.angle)];
-}
-function desktopFrame(t,s,shot){
-  water(t);
-  const f=s.transfer, cast=castForShot(s,shot), count=cast.length;
-  const centers=count===3?[305,800,1295]:count===2?[492,1123]:[800];
-  const scale=count===3?1.04:count===2?1.19:1.48;
-  const anchors=[];
-  for(const [index,gen] of cast.entries()){
-    const cy=count===2?407-13*index:392;
-    const pose=robotPose(t,s,shot,gen,centers[index],cy,scale,false);
-    anchors.push(drawIndividual(t,pose));
-    centered(numerals[gen],centers[index],601,32,ink(.88),'Georgia');
-    centered(ledger(s.models[gen]),centers[index],635,20,ink(.78));
-  }
-  const [bx,by]=anchors[0],tx=shot.action==='Approach'||shot.action==='Follow'?981:800;
-  if(shot.type==='encounter'){
-    centered(shot.who,tx,122,19,ink(.72));
-    centered(shot.voice,tx,168,37,ink(.98),'Georgia');
-    drawSignal([tx,191],[bx+4,by-21],ease(t,shot.at+.16,shot.at+1.5),.68,false,0);
-  }else if(f){
-    centered(f.selected.join('   /   '),800,153,38,ink(.97),'Georgia');
-    centered(transferStat(f),800,194,21,ink(.82));
-    if(shot.type==='distill'){
-      const [destX,destY]=anchors[1];
-      drawSignal([bx+20,by-7],[destX-20,destY-7],ease(t,shot.at,shot.at+1.45),
-        .92*(1-ease(t,shot.at+5.45,shot.at+6.65)),{elapsed:t-shot.at},113);
-    }
-  }else if(shot.type==='update'){
-    centered('Local weight update',800,126,20,ink(.70));
-    centered(shot.action,800,173,38,ink(.98),'Georgia');
-    const u=ease(t,shot.at,Math.min(s.stage.end,shot.at+2.5));
-    rect(768,196,64,1,ink(.2));rect(768,196,64*u,1.5,ink(.68));
-  }
-  if(t<5){
-    const a=1-ease(t,3.6,5);
-    path('M'+bx+' '+(by+17)+' l-72 80 h-88',null,ink(.46*a),1);
-    label('Pi 5   85 x 56 mm',bx-163,by+125,17,ink(.77*a));
-  }
-  label('BORN, NOT MADE',64,56,17,ink(.73));
-  g.save();g.textAlign='right';label('Memory inheritance',1536,56,24,ink(.87),'Georgia');g.restore();
-  label(phaseName[shot.type],66,750,19,ink(.68));
-  g.font='39px Georgia';
-  const width=g.measureText(shot.caption).width;
-  label(shot.caption,64,814,Math.min(39,39*1465/width),ink(.99),'Georgia');
-}
-const portraitMedia=matchMedia('(max-width: 760px)');
-function frame(t,pixelRatio=1){
-  const s=growthState(Math.min(64,t));
-  const shot=sparseShots.findLast(shot=>shot.at<=t)||sparseShots[0];
-  const portrait=portraitMedia.matches;
-  const width=portrait?720:1600,height=portrait?840:900;
-  const rw=Math.round(width*pixelRatio),rh=Math.round(height*pixelRatio);
-  if(cv.width!==rw||cv.height!==rh){cv.width=rw;cv.height=rh;}
-  g.setTransform(pixelRatio,0,0,pixelRatio,0,0);
-  if(portrait)drawPortrait(t,s,shot);else desktopFrame(t,s,shot);
-  const phase=phaseName[shot.type];
-  const info=s.transfer?transferStat(s.transfer):shot.voice;
-  const desc=[phase,info,shot.caption,...castForShot(s,shot).map(i=>'Generation '+numerals[i]+', '+ledger(s.models[i]))].filter(Boolean).join('. ');
-  if(cv.getAttribute('aria-label')!==desc)cv.setAttribute('aria-label',desc);
-}
-
-function drawPortrait(t, s, shot) {
-  // Keep the plot and the caption in separate bands at narrow viewport widths.
-  g.save();
-  g.scale(720 / 1600, 618 / 692);
-  water(t);
-  g.restore();
-  rect(0, 618, 720, 222, '#0b0b0b');
-
-  label('BORN, NOT MADE', 37, 52, 21, ink(.72));
-  g.save();
-  g.textAlign = 'right';
-  label('Memory inheritance', 683, 52, 27, ink(.90), 'Georgia');
-  g.restore();
-
-  const f = s.transfer;
-  const hold = shot.type === 'hold';
-  const generations = castForShot(s, shot);
-  const paired = generations.length === 2;
-  const centers = hold ? [120, 360, 600] : paired ? [174, 543] : [360];
-  const scale = hold ? .56 : paired ? .81 : 1.27;
-  const board = [];
-  const signalX = shot.action === 'Approach' || shot.action === 'Follow' ? 432 : 360;
-  if (shot.type === 'encounter') {
-    centered(shot.who, signalX, 127, 23, ink(.68));
-    centered(shot.voice, signalX, 177, 41, ink(.98), 'Georgia');
-  } else if (shot.type === 'update') {
-    centered('Local weight update', 360, 127, 23, ink(.68));
-    centered(shot.action, 360, 177, 41, ink(.98), 'Georgia');
-    const elapsed = ease(t, shot.at, Math.min(s.stage.end, shot.at + 2.5));
-    rect(327, 203, 66, 1.5, ink(.19));
-    rect(327, 203, 66 * elapsed, 1.5, ink(.70));
-  } else if (f) {
-    centered(f.selected.join('   /   '), 360, 164, 39, ink(.98), 'Georgia');
-    centered(transferStat(f), 360, 209, 23, ink(.78));
-  }
-
-  const arrival = ease(t, shot.at, shot.at + 1.6);
-  for (const [index, gen] of generations.entries()) {
-    const cx = centers[index];
-    const y = (hold ? 345 : 373) - (paired ? 12 * index : 0);
-    board[index] = drawIndividual(t, robotPose(t, s, shot, gen, cx, y, scale, true));
-    const model = s.models[gen];
-    const textY = hold ? 454 : paired ? 505 : 544;
-    centered(numerals[gen], cx, textY, 32, ink(.9), 'Georgia');
-    if (generations.length === 1) {
-      centered(ledger(model), cx, textY + 38, 24, ink(.83));
-    } else {
-      centered(model.inherited + ' inherited', cx, textY + 34, 22, ink(.83));
-      centered(model.acquired + ' learned here', cx, textY + 63, 22, ink(.83));
-    }
-  }
-  if (shot.type === 'encounter') {
-    drawSignal([signalX, 202], [board[0][0] + 3, board[0][1] - 22], arrival, .64, false, 0);
-    if (t < 5) {
-      const alpha = 1 - ease(t, 3.8, 5), [bx, by] = board[0];
-      g.save();
-      g.strokeStyle = ink(.46 * alpha);
-      g.lineWidth = 1;
-      g.beginPath(); g.moveTo(bx - 7, by + 13); g.lineTo(190, 452); g.lineTo(92, 452); g.stroke();
-      label('Pi 5   85 × 56 mm', 78, 482, 19, ink(.78 * alpha));
-      g.restore();
-    }
-  } else if (shot.type === 'distill') {
-    drawSignal([board[0][0] + 15, board[0][1] - 8],
-      [board[1][0] - 15, board[1][1] - 8], arrival, .90 * (1 - ease(t, shot.at + 5.45, shot.at + 6.65)), {elapsed: t - shot.at}, 93);
-  }
-
-  label(phaseName[shot.type], 38, 672, 23, ink(.68));
-  g.save();
-  g.font = '38px Georgia';
-  let line = '', y = 726;
-  for (const word of shot.caption.split(/\s+/)) {
-    const next = line ? line + ' ' + word : word;
-    if (line && g.measureText(next).width > 644) {
-      label(line, 36, y, 38, ink(.98), 'Georgia');
-      y += 44;
-      line = word;
-    } else {
-      line = next;
-    }
-  }
-  if (line) label(line, 36, y, 38, ink(.98), 'Georgia');
-  g.restore();
-}
-
-
-const play=document.getElementById('play'), seek=document.getElementById('seek'), clock=document.querySelector('time');
-const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
-let t=0, run=false, last=0, id=0;
-function timeLabel(seconds){return Math.floor(seconds/60)+':'+String(Math.floor(seconds)%60).padStart(2,'0')}
-function show(){
-  frame(t); seek.value=t; seek.setAttribute('aria-valuetext',timeLabel(t)+' of '+timeLabel(duration));
-  clock.textContent=timeLabel(t)+' / '+timeLabel(duration); play.textContent=run?'Pause':t>=duration?'Replay':'Play';
-}
-function tick(now){
-  if(!run)return;
-  t=Math.min(duration,t+(now-last)/1000); last=now;
-  if(t>=duration)run=false;
-  show(); if(run)id=requestAnimationFrame(tick);
-}
-function start(){cancelAnimationFrame(id);run=true;last=performance.now();show();id=requestAnimationFrame(tick)}
-function pause(){run=false;cancelAnimationFrame(id);show()}
-play.onclick=()=>{if(run){pause();return}if(t>=duration)t=0;start()};
-document.getElementById('again').onclick=()=>{t=0;start()};
-document.querySelectorAll('.chapters button').forEach(button=>button.onclick=()=>{t=Number(button.dataset.time);if(reducedMotion.matches)pause();else start()});
-seek.oninput=()=>{t=Number(seek.value);pause()};
-const main=document.querySelector('main'), present=document.getElementById('present');
-present.hidden=!document.fullscreenEnabled;
-present.onclick=()=>main.requestFullscreen().catch(()=>{present.hidden=true});
-document.addEventListener('keydown',event=>{
-  if(event.code==='Space' && ['BODY','MAIN','CANVAS'].includes(document.activeElement.tagName)){
-    event.preventDefault();play.click();
-  }
+/* The lineage. Every head is printed, so every head differs a little: proportion, crown, layer pitch, parts. */
+const C=18, BIRTHS=3, END=62, N=32, RATE=.3;
+const NUM=['I','II','III','IV'];
+const TILES=[null,['Sense','a microphone'],['Link','a radio link'],['Display','a small light']];
+const robots=[
+ {l:1,   h:1,   crown:0,     pitch:.012, kit:['Core','Power','Drive']},
+ {l:1.06,h:.93, crown:.014,  pitch:.009, kit:['Core','Power','Drive','Sense']},
+ {l:.95, h:1.05,crown:-.012, pitch:.016, kit:['Core','Power','Sense','Link']},
+ {l:1.02,h:.97, crown:.02,   pitch:.011, kit:['Core','Power','Drive','Sense','Display']}
+];
+/* Model cells: 0 empty, 1 inherited (distilled from the parent), 2 learned here. */
+robots.forEach((r,i)=>{
+  const R=rng(17+i*101);
+  r.birth=i?(i-1)*C+13:-30; r.distill=i?(i-1)*C+4.5:null;
+  if(!i){r.inh=[];r.own=shuffle([...Array(N).keys()],R);r.own0=9;return}
+  const p=robots[i-1], snap=cells(p,r.distill).map((s,k)=>s?k:-1).filter(k=>k>=0);
+  r.inh=shuffle(snap,R).slice(0,Math.round(snap.length*.7));
+  const empty=[...Array(N).keys()].filter(k=>!r.inh.includes(k));
+  r.own=shuffle(empty,R).concat(shuffle(r.inh,R).slice(0,4)); r.own0=0;
 });
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&run)pause()});
-portraitMedia.addEventListener('change',show);
-const shotStart=growthState(49).transfer;
-const shotEnd=growthState(55.99).transfer;
-const percent=p=>Math.round(p*100)+'%';
-document.getElementById('probability-example').textContent='For example, Robot II selects one of its ten patterns for teaching. When a visitor returns, Robot II assigns a probability of '+percent(shotStart.sourceProb)+' to “Approach”. During the final teaching shot, Robot III’s own chance of approaching rises from '+percent(shotStart.targetProb)+' to '+percent(shotEnd.targetProb)+'. These are response probabilities for the same cue, measured at the normal inference temperature.';
-const requestedTime=new URLSearchParams(location.search).get('t');
-if(requestedTime!==null && requestedTime.trim()!=='' && Number.isFinite(Number(requestedTime))){
-  t=Math.max(0,Math.min(duration,Number(requestedTime)));show();
-}else if(reducedMotion.matches){show()}else start();
+function cells(r,t){
+  const s=new Array(N).fill(0);
+  r.inh.forEach((k,j)=>{if(t>=r.distill+6*(j+1)/(r.inh.length+1)+.8)s[k]=1});
+  const n=Math.min(r.own.length,r.own0+Math.max(0,Math.floor(RATE*(t-Math.max(0,r.birth)))));
+  if(r.birth<=t||!r.distill)for(let j=0;j<n;j++)s[r.own[j]]=2;
+  return s;
+}
+const count=(r,t)=>{const s=cells(r,t);return [s.filter(v=>v===1).length,s.filter(v=>v===2).length]};
+
+/* Poses. A head pose: X0 = screen x of the back face, Yb = screen y of the body floor, sc = depth scale, mx/mz = fold. */
+const FG_W=520, FG_YB=FG_W+FLOAT*S, BG_W=215, BG_SC=.42, BG_YB=BG_W+FLOAT*S*BG_SC;
+const DOCKX=720, FREEX=1150;
+const bgSlot=i=>({X0:170+i*215-.167*S*BG_SC,Yb:BG_YB,sc:BG_SC,mx:1,mz:1,a:.62});
+const fgPose=X=>({X0:X,Yb:FG_YB,sc:1,mx:1,mz:1,a:1});
+const mix=(p,q,u)=>({X0:lerp(p.X0,q.X0,u),Yb:lerp(p.Yb,q.Yb,u),sc:lerp(p.sc,q.sc,u),mx:lerp(p.mx,q.mx,u),mz:lerp(p.mz,q.mz,u),a:lerp(p.a,q.a,u)});
+function hx(r,p,x){return p.X0+(x-DOCK)*r.l*S*p.sc*p.mx}
+function hz(r,p,x,z){const c=r.crown*Math.sin(Math.PI*clamp((x-DOCK)/.3))*(z>.2?1:0);return p.Yb-(z*r.h+c)*S*p.sc*p.mz}
+
+function headPath(r,p){
+  const P=new Path2D();
+  headTop.forEach(([x,z],i)=>{i?P.lineTo(hx(r,p,x),hz(r,p,x,z)):P.moveTo(hx(r,p,x),hz(r,p,x,z))});
+  P.lineTo(hx(r,p,LIP[0]),hz(r,p,LIP[0],LIP[1]));
+  for(let i=headBot.length-1;i>=0;i--){const [x,z]=headBot[i];P.lineTo(hx(r,p,x),hz(r,p,x,z))}
+  P.closePath();return P;
+}
+function drawHead(r,p,t,opts={}){
+  const P=headPath(r,p);
+  g.save();g.globalAlpha*=p.a;
+  g.fillStyle=ink(.055);g.fill(P);
+  g.save();g.clip(P);
+  // Print layers: the pitch is this body's own.
+  const step=r.pitch*S*p.sc*p.mz*r.h, y0=p.Yb, y1=hz(r,p,.15,.34);
+  g.strokeStyle=ink(.13);g.lineWidth=.8;g.beginPath();
+  for(let y=y0-step;y>y1;y-=step){g.moveTo(p.X0-5,y);g.lineTo(hx(r,p,.4)+5,y)}
+  g.stroke();
+  if(opts.wrinkle>0){ // folded skin before it inflates
+    g.strokeStyle=ink(.5*opts.wrinkle);g.lineWidth=1;g.beginPath();
+    for(let k=1;k<9;k++){const x=hx(r,p,DOCK+k*.037);g.moveTo(x,p.Yb);for(let j=1;j<=6;j++)g.lineTo(x+(j%2?3:-3)*p.sc,p.Yb-j*.055*S*p.sc*p.mz)}
+    g.stroke();
+  }
+  // Parts sealed in the wall, the newest outlined.
+  const ks=.017*S*p.sc*Math.min(p.mx,1);
+  r.kit.forEach((k,i)=>{
+    if(opts.kitUpTo!==undefined&&i>=opts.kitUpTo)return;
+    const x=hx(r,p,.07)+i*(ks+3*p.sc), y=p.Yb-.25*S*p.sc*p.mz*r.h-ks/2;
+    g.fillStyle=ink(.62);g.fillRect(x,y,ks,ks);
+  });
+  g.restore();
+  g.strokeStyle=ink(.78);g.lineWidth=1.5*Math.max(.6,p.sc);g.stroke(P);
+  // the mouth, an opening
+  g.strokeStyle='#0c0c0c';g.lineWidth=2.4*Math.max(.6,p.sc);g.beginPath();
+  g.moveTo(lerp(hx(r,p,.304),hx(r,p,LIP[0]),.12),lerp(hz(r,p,.304,.274),hz(r,p,LIP[0],LIP[1]),.12));
+  g.lineTo(lerp(hx(r,p,.304),hx(r,p,LIP[0]),.88),lerp(hz(r,p,.304,.274),hz(r,p,LIP[0],LIP[1]),.88));g.stroke();
+  g.restore();
+}
+function drawTail(Xd,Yb){
+  const P=new Path2D(),tx=x=>Xd+(x-DOCK)*S,tz=z=>Yb-z*S;
+  tailTop.forEach(([x,z],i)=>i?P.lineTo(tx(x),tz(z)):P.moveTo(tx(x),tz(z)));
+  for(let i=tailBot.length-1;i>=0;i--)P.lineTo(tx(tailBot[i][0]),tz(tailBot[i][1]));
+  P.closePath();
+  g.fillStyle=ink(.035);g.fill(P);g.strokeStyle=ink(.55);g.lineWidth=1.3;g.stroke(P);
+  return {base:[tx(-.115),tz(.2)],floor:[tx(-.115),tz(.005)],roof:tz(.3),front:tx(DOCK),docked:Xd>=DOCKX-1};
+}
+function drawArm(tail,tip){
+  const [bx,by]=tail.base,L=.26*S;
+  let dx=tip[0]-bx,dy=tip[1]-by,d=Math.hypot(dx,dy);
+  if(d>2*L-1){tip=[bx+dx/d*(2*L-1),by+dy/d*(2*L-1)];dx=tip[0]-bx;dy=tip[1]-by;d=2*L-1}
+  const a=Math.atan2(dy,dx), b=Math.acos(clamp(d/(2*L)));
+  // elbow up, kept under the roof and, when the tail is alone, inside the tail
+  const ex=Math.min(bx+L*Math.cos(a-b),tail.docked?1e9:tail.front-10), ey=Math.max(by+L*Math.sin(a-b),tail.roof);
+  g.strokeStyle=ink(.7);g.lineWidth=2;g.beginPath();
+  g.moveTo(...tail.floor);g.lineTo(bx,by);g.lineTo(ex,ey);g.lineTo(...tip);g.stroke();
+  g.fillStyle=ink(.85);g.beginPath();g.arc(tip[0],tip[1],2.6,0,7);g.fill();
+  return tip;
+}
+function gridGeom(r,p){
+  const cs=Math.max(4.5,10*p.sc), gap=cs*.4, w=8*cs+7*gap;
+  const cx=hx(r,p,.18), y=hz(r,p,.18,.33)-24*p.sc-4*cs-3*gap;
+  return {cs,gap,x:cx-w/2,y,w};
+}
+const cellXY=(G,k)=>[G.x+(k%8)*(G.cs+G.gap)+G.cs/2,G.y+Math.floor(k/8)*(G.cs+G.gap)+G.cs/2];
+function drawGrid(G,s,a=1){
+  g.save();g.globalAlpha*=a;
+  s.forEach((v,k)=>{
+    const [x,y]=cellXY(G,k),h=G.cs/2;
+    if(v===0){g.strokeStyle=ink(.2);g.lineWidth=1;g.strokeRect(x-h+.5,y-h+.5,G.cs-1,G.cs-1)}
+    else{g.fillStyle=v===1?'#7b7b77':'#ecebe6';g.fillRect(x-h,y-h,G.cs,G.cs)}
+  });
+  g.restore();
+}
+function text(s,x,y,size,a,font='Arial',align='left',track=0){
+  g.save();g.textAlign=align;g.fillStyle=ink(a);g.font=size+'px '+font;
+  if(track&&'letterSpacing' in g)g.letterSpacing=track+'px';g.fillText(s,x,y);g.restore();
+}
+const mono='ui-monospace, "JetBrains Mono", Menlo, monospace';
+function ledger(r,i,p,t,a=1){
+  const [ni,no]=count(r,t), cx=hx(r,p,.2), y=p.Yb+(p.sc>.6?40:26);
+  g.save();g.globalAlpha*=a*p.a;
+  text(NUM[i],cx,y,Math.round(26*Math.max(.62,p.sc)),.92,'Georgia','center');
+  text(ni+' inherited · '+no+' own',cx,y+(p.sc>.6?24:17),Math.round(13*Math.max(.8,p.sc)),.75,mono,'center');
+  text(r.kit.join(' ').toUpperCase(),cx,y+(p.sc>.6?43:31),Math.round(10*Math.max(.85,p.sc)),.5,mono,'center',1.2);
+  g.restore();
+}
+const hms=s=>{s=Math.round(s);return Math.floor(s/3600)+':'+String(Math.floor(s/60)%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+const PRINT=6815, DISTILL=6480; // print time from simple.json; distillation set to land just before the print ends
+
+function frame(t){
+  g.setTransform(cv.width/W,0,0,cv.height/H,0,0);
+  g.fillStyle='#0c0c0c';g.fillRect(0,0,W,H);
+  // far and near water lines
+  g.strokeStyle=ink(.08);g.lineWidth=1;g.beginPath();g.moveTo(0,BG_W);g.lineTo(W,BG_W);g.stroke();
+  g.strokeStyle=ink(.22);g.beginPath();for(let x=0;x<=W;x+=10){const y=FG_W+1.6*Math.sin(x*.012+t*.8);x?g.lineTo(x,y):g.moveTo(x,y)}g.stroke();
+  g.fillStyle='rgba(255,255,255,.018)';g.fillRect(0,FG_W,W,H-FG_W);
+
+  const cyc=Math.min(BIRTHS-1,Math.floor(t/C)), done=t>=BIRTHS*C, u=t-cyc*C; // u: time inside the cycle
+  const par=robots[cyc], kid=robots[cyc+1];
+  let phase, caption;
+
+  // tail position
+  let Xd;
+  if(cyc===0&&u<2)Xd=lerp(560,DOCKX,ease(u,0,2));
+  else if(u<2)Xd=lerp(DOCKX-60,DOCKX,ease(u,0,2));
+  else if(u<13)Xd=DOCKX;
+  else Xd=lerp(DOCKX,DOCKX-60,ease(u,13,15));
+  if(done)Xd=DOCKX-60;
+
+  // elders in the far line
+  for(let i=0;i<robots.length;i++){
+    const r=robots[i];
+    const gone=(i<cyc)||(done&&i<BIRTHS);
+    if(!gone)continue;
+    const p=bgSlot(i);drawHead(r,p,t);drawGrid(gridGeom(r,p),cells(r,t),.8);ledger(r,i,p,t);
+  }
+  // the parent of this cycle
+  let pp=fgPose(DOCKX);
+  if(!done&&u>15)pp=mix(fgPose(DOCKX),bgSlot(cyc),ease(u,15,18));
+  if(!done){drawHead(par,pp,t);}
+  const tail=drawTail(Xd,FG_YB);
+  // the newborn
+  let kp=null, wr=0, kitUpTo, printU=0;
+  if(!done&&u>=4.5){
+    const at=(x,z)=>[hx(par,fgPose(DOCKX),x),fgPose(DOCKX).Yb-z*par.h*S];
+    const fold={mx:.45,mz:.27};
+    if(u<10.5){ // printing inside the parent, in gel
+      printU=clamp((u-4.5)/6);
+      const [X0,Yb]=at(.075,.004);kp={X0,Yb,sc:1,...fold,a:1};wr=1;
+    }else if(u<13){
+      const v=clamp((u-10.5)/2.5), lift=.11*Math.sin(Math.PI*v);
+      const [X0,Yb]=at(lerp(.075,.40,v),.004+lift);const inf=ease(v,.3,1);
+      kp={X0,Yb,sc:1,mx:lerp(.45,1,inf),mz:lerp(.27,1,inf),a:1};wr=1-inf;
+    }else{
+      const [X0,Yb]=at(.40,.004), from={X0,Yb,sc:1,mx:1,mz:1,a:1};
+      kp=mix(from,fgPose(FREEX),ease(u,13,15));
+      if(u>15)kp=mix(fgPose(FREEX),fgPose(DOCKX),ease(u,15,18));
+    }
+  }
+  if(done)kp=fgPose(DOCKX);
+  const child=done?robots[BIRTHS]:kid, ci=done?BIRTHS:cyc+1;
+  if(kp){
+    if(!done&&u<10.5){ // grow layer by layer
+      g.save();const top=kp.Yb-.09*S*printU;g.beginPath();g.rect(0,top,W,H);g.clip();
+      drawHead(child,kp,t,{wrinkle:wr});g.restore();
+      g.strokeStyle=ink(.55);g.lineWidth=1;g.beginPath();g.moveTo(hx(child,kp,DOCK),top);g.lineTo(hx(child,kp,.366),top);g.stroke();
+    }else drawHead(child,kp,t,{wrinkle:wr});
+  }
+
+  // the arm
+  const rest=[tail.base[0]+.1*S,tail.base[1]+.08*S];
+  let tip=rest, tile=null;
+  if(!done&&TILES[cyc+1]){
+    const T=TILES[cyc+1], seat=[hx(par,fgPose(DOCKX),.2),FG_YB-.04*S];
+    const water=[hx(par,fgPose(DOCKX),.41)+4*Math.sin(t),FG_W-5];
+    let tp=[lerp(1660,water[0],ease(u,-1+C*(cyc>0?0:0),2.4)),water[1]+2*Math.sin(t*1.3)];
+    if(cyc===0&&u<2.4)tp[0]=lerp(1660,water[0],ease(u,0,2.4));
+    if(u<2){tip=rest}
+    else if(u<3.1){tip=[lerp(rest[0],tp[0],ease(u,2,3.1)),lerp(rest[1],tp[1],ease(u,2,3.1))]}
+    else if(u<4.5){tip=[lerp(tp[0],seat[0],ease(u,3.3,4.4)),lerp(tp[1],seat[1],ease(u,3.3,4.4))];tp=tip}
+    if(u<4.4)tile={p:tp,name:T[0]};
+    if(u>=4.5&&u<10.5){const k=printU*28;tip=[hx(child,kp,.06+.22*Math.abs((k%2)-1)),kp.Yb-.09*S*printU]}
+    if(u>=10.5&&u<12.6){const v=clamp((u-10.5)/2.1);tip=v<.55?[hx(child,kp,DOCK)-4,kp.Yb-.05*S*kp.mz]:[lerp(hx(child,kp,DOCK)-4,rest[0],ease(v,.55,1)),lerp(kp.Yb-.05*S*kp.mz,rest[1],ease(v,.55,1))]}
+  }
+  const armTip=drawArm(tail,tip);
+  if(tile){
+    const [x,y]=tile.p;g.fillStyle=ink(.85);g.fillRect(x-7,y-7,14,14);
+    text(tile.name.toUpperCase(),x,y-16,10.5,.8,mono,'center',1.4);
+  }
+
+  // models: the parent's, and the newborn's while it is being distilled
+  if(!done){
+    const pa=u>15?1-ease(u,15,16):1;
+    drawGrid(gridGeom(par,pp),cells(par,t),pa);
+    if(u<15)ledger(par,cyc,pp,t);
+    if(kp&&u>=4.5){
+      let G;
+      if(u<13){const pg=gridGeom(par,fgPose(DOCKX));G={...pg,x:pg.x+pg.w+60};}
+      else G=gridGeom(child,kp);
+      if(u>13&&u<15){const pg=gridGeom(par,fgPose(DOCKX)),from={...pg,x:pg.x+pg.w+60},v=ease(u,13,15);G={...G,x:lerp(from.x,G.x,v),y:lerp(from.y,G.y,v)}}
+      drawGrid(G,cells(child,t));
+      if(u<13)text(NUM[cyc+1],G.x+G.w+14,G.y+G.cs*1.4,20,.85,'Georgia');
+      // what crosses over: a compressed part of the parent, never the whole
+      if(u<11){
+        const PG=gridGeom(par,fgPose(DOCKX));
+        child.inh.forEach((k,j)=>{
+          const t1=child.distill+6*(j+1)/(child.inh.length+1), v=(t-t1)/.8;
+          if(v<0||v>1)return;
+          const [ax,ay]=cellXY(PG,k),[bx,by]=cellXY(G,k),e=v*v*(3-2*v);
+          const x=lerp(ax,bx,e),y=lerp(ay,by,e)-40*Math.sin(Math.PI*e);
+          g.fillStyle=ink(.9*Math.sin(Math.PI*v)+.1);g.fillRect(x-3,y-3,6,6);
+        });
+      }
+      if(u>=13)ledger(child,cyc+1,kp,t,ease(u,13,14));
+    }
+  }else{drawGrid(gridGeom(child,kp),cells(child,t));ledger(child,ci,kp,t)}
+
+  // the two clocks: print and distillation, in the same two hours
+  if(!done&&u>=4.5&&u<15){
+    const a=u<10.5?1:1-ease(u,13,15), v=printU||1, x=64, y=732;
+    const row=(name,sec,total,yy)=>{
+      text(name,x,yy,12,.6*a,mono,'left',1.4);
+      text(hms(Math.min(sec,total))+(sec>=total?'  done':''),x+110,yy,13,.92*a,mono);
+      g.fillStyle=ink(.15*a);g.fillRect(x+250,yy-5,200,1);g.fillStyle=ink(.8*a);g.fillRect(x+250,yy-5.5,200*Math.min(1,sec/total),2);
+      text(hms(total),x+462,yy,12,.5*a,mono);
+    };
+    row('PRINT',v*PRINT,PRINT,y);row('DISTILL',v*PRINT,DISTILL,y+24);
+  }
+
+  // legend
+  const lg=(x,fill,label)=>{if(fill)g.fillStyle=fill,g.fillRect(x,40,10,10);else{g.strokeStyle=ink(.3);g.strokeRect(x+.5,40.5,9,9)}text(label,x+16,49,11,.6,mono,'left',1)};
+  lg(64,'#7b7b77','INHERITED');lg(184,'#ecebe6','LEARNED HERE');lg(328,null,'EMPTY');
+  text('Local model, one cell per learned pattern',1536,49,12,.45,mono,'right');
+
+  // caption
+  if(done){phase='Lineage';caption='Inherited in the model. Different in body, parts and data.'}
+  else if(u<2){phase='Dock';caption=cyc?'The tail moves to the newborn and docks from behind. Only the head is born.':'The tail docks from behind. The tail and its arm pass from head to head.'}
+  else if(u<4.5){phase='A new part';caption='The arm takes '+TILES[cyc+1][1]+' from the water. The parent never had one.'}
+  else if(u<10.5){phase='Print and distill';caption='The body is printed in gel while the parent’s local model is distilled into the newborn’s.'}
+  else if(u<13){phase='Birth';caption='Pushed out through the mouth, inflating on the way, full size as it leaves.'}
+  else if(u<15){phase='A different body';caption='Printed, not cast: shape, layers and parts all differ from the parent’s.'}
+  else{phase='Own data';caption='The newborn starts learning from what it meets. The parent stays, and keeps learning.'}
+  text(phase.toUpperCase(),64,808,12,.55,mono,'left',1.6);
+  g.save();g.font='34px Georgia';const w=g.measureText(caption).width;g.restore();
+  text(caption,64,852,Math.min(34,34*1470/w),.97,'Georgia');
+  return phase+'. '+caption;
+}
+
+const play=document.getElementById('play'),seek=document.getElementById('seek'),clock=document.querySelector('time');
+let t=0,run=!matchMedia('(prefers-reduced-motion: reduce)').matches,last=performance.now();
+const lab=s=>Math.floor(s/60)+':'+String(Math.floor(s)%60).padStart(2,'0');
+function size(){const r=Math.min(2,devicePixelRatio||1),w=Math.round(cv.clientWidth*r);if(w&&cv.width!==w){cv.width=w;cv.height=Math.round(w*9/16)}}
+function show(){size();const d=frame(t);if(cv.getAttribute('aria-label')!==d)cv.setAttribute('aria-label',d);seek.value=t;clock.textContent=lab(t)+' / '+lab(END);play.textContent=run?'Pause':'Play'}
+function tick(now){if(run){t+=(now-last)/1000;if(t>=END)t=0}last=now;show();requestAnimationFrame(tick)}
+play.onclick=()=>{run=!run;last=performance.now();show()};
+seek.oninput=()=>{t=+seek.value;run=false;show()};
+document.addEventListener('visibilitychange',()=>{last=performance.now()});
+const q=new URLSearchParams(location.search).get('t');if(q!==null&&isFinite(+q)){t=+q;run=false}
+requestAnimationFrame(tick);
 </script></body></html>
