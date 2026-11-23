@@ -299,7 +299,7 @@ function log(msg, cls = "") {
 
 const UW = { uTime: { value: 0 }, uWL: { value: -0.13 } };
 /* the gallery: one square glass tank on a dark plinth, one spotlight straight above. CU holds what every shader needs to know about the light, the tank and the inner lights. */
-const TANK = { x0: -1.128, x1: 0.982, y0: -0.285, y1: 0.285, zf: -0.003, zt: 0.582, th: 0.015, zr: -0.95, lamp: [0.32, 0, 2.6] };   /* UNS 150U, inner size */
+const TANK = { x0: -1.128, x1: 0.982, y0: -0.400, y1: 0.400, zf: -0.003, zt: 0.582, th: 0.015, zr: -0.95, lamp: [0.32, 0, 2.6] };   /* round 7: the tank made to order, inner size from quilt.json (was the 0.57 m UNS 150U) */
 const LAMP_ANG = 0.56;
 /* the tank as drawn is made to order: no stock aquarium found is wide enough. Clear acrylic 1190 kg/m3; the volume is the water up to the waterline, the weight is that water plus the four walls. */
 const TANKF = () => { const T = TANK, W = T.x1 - T.x0, D = T.y1 - T.y0, dep = J.WL - T.zf, V = W * D * dep, walls = (2 * (W + 2 * T.th) + 2 * D) * T.th * (T.zt - T.zf) * 1190; return { W, D, dep, L: V * 1000, kg: V * 1000 + walls }; };
@@ -721,7 +721,9 @@ function buildBody() {
   const dk = H.dock.slice(), dk2 = H.dock.slice(), XD = J.read.dock_x; for (let i = 0; i < dk.length; i += 3) { dk[i] = XD + 0.002; dk2[i] = XD - 0.002; }
   loopTube(dk, 0.002, rimM, R3.chamber); loopTube(dk2, 0.002, rimM, R3.tail);
   if (H.joint) loopTube(H.joint, 0.0014, rimM, R3.tail);          // the bonded joint of the two tail prints
-  for (const mg of J.magnets) { const a = new THREE.Mesh(new THREE.CylinderGeometry(0.0095, 0.0095, 0.0032, 20).rotateZ(Math.PI / 2), clayMat(0x9aa0a8, { rough: 0.3 })); a.position.set(mg.c[0] - 0.0036, mg.c[1], mg.c[2]); R3.tail.add(a);
+  PARTS.tmag = [];
+  for (const mg of J.magnets) { const a = new THREE.Mesh(new THREE.CylinderGeometry(0.0095, 0.0095, 0.0032, 20).rotateZ(Math.PI / 2), clayMat(0x9aa0a8, { rough: 0.3 }));          // round 7: each tail magnet on a tab hinged at its upper edge (the tilt release)
+    const piv = new THREE.Group(); piv.position.set(mg.c[0] - 0.002, mg.c[1], mg.c[2] + 0.0095); a.position.set(-0.0016, 0, -0.0095); piv.add(a); R3.tail.add(piv); PARTS.tmag.push(piv);
     const s = new THREE.Mesh(new THREE.CylinderGeometry(0.0095, 0.0095, 0.002, 20).rotateZ(Math.PI / 2), clayMat(0xc9ccd0, { rough: 0.35 })); s.position.set(mg.c[0] + 0.003, mg.c[1], mg.c[2]); R3.chamber.add(s); }
   const white = clayMat(0xe9e7e1, { sub: 0.4, clip }), soft = clayMat(0xe4e9ee, { opacity: 0.5, sub: 0.4, clip, side: THREE.DoubleSide });
   // rack forks and kit store: printed with the tail; kit seat bumps: printed with the gel chamber
@@ -759,12 +761,29 @@ function buildBody() {
   for (const c of J.chan) for (let i = 0; i < c.pts.length - 1; i++) { const a = c.pts[i], b = c.pts[i + 1]; let bx = b[0], by = b[1]; if (bx > XD_) { const t = (XD_ - a[0]) / (bx - a[0]); bx = XD_; by = a[1] + t * (by - a[1]); } const len = Math.hypot(bx - a[0], by - a[1]); if (len > 0.004) trough((a[0] + bx) / 2, (a[1] + by) / 2, len + 2 * c.w * 0.6, 2 * c.w, Math.atan2(by - a[1], bx - a[0]), c.zf); }
 }
 const GELCLIP = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
-function setGel(z, dock = 0) {
-  const G_ = J.hull.gel, p = PARTS.gelTop.geometry.attributes.position, zs = G_.z, XD = J.read.dock_x, apart = dock < -0.001; let k = 0; while (k < zs.length - 2 && zs[k + 1] < z) k++; const f = clamp((z - zs[k]) / (zs[k + 1] - zs[k]), 0, 1);
-  const ih = G_.x.findIndex((x) => x >= XD);
-  for (let i = 0; i < G_.x.length; i++) { const t = G_.x[i] < XD; let w = lerp(G_.hw[k][i], G_.hw[k + 1][i], f) * 0.985; if (apart && (i === ih || i === ih - 1)) w = 0; p.setXYZ(2 * i, G_.x[i] + (t ? dock : 0), w, z); p.setXYZ(2 * i + 1, G_.x[i] + (t ? dock : 0), -w, z); }
-  if (PARTS.gelFaces) for (const m of PARTS.gelFaces) m.visible = apart;
-  p.needsUpdate = true; PARTS.gelTop.geometry.computeVertexNormals(); PARTS.gelTop.visible = z > 0.004; PARTS.gelBody.visible = z > 0.004; for (const c of PARTS.chanGel) { const h = z - c.zf; c.g.visible = h > 0.002; if (h > 0.002) { c.g.scale.z = h; c.g.position.z = c.zf + h / 2; } } GELCLIP.constant = z;
+// round 7: the gel top as a strip over the head part (x >= the docking plane) at z and the tail part at zt, the tail part offset by (ox, oy) from its place on the head
+function gelStrip(p, z, zt, ox, oy, cut, tailOn, headOn) {
+  const G_ = J.hull.gel, zs = G_.z, XD = J.read.dock_x, ih = G_.x.findIndex((x) => x >= XD);
+  const lev = (zz) => { let k = 0; while (k < zs.length - 2 && zs[k + 1] < zz) k++; return [k, clamp((zz - zs[k]) / (zs[k + 1] - zs[k]), 0, 1)]; }, [k, f] = lev(z), [kt, ft] = lev(zt);
+  for (let i = 0; i < G_.x.length; i++) { const t = G_.x[i] < XD; let w = (t ? lerp(G_.hw[kt][i], G_.hw[kt + 1][i], ft) : lerp(G_.hw[k][i], G_.hw[k + 1][i], f)) * 0.985;
+    if ((cut && (i === ih || i === ih - 1)) || (t && !tailOn) || (!t && !headOn)) w = 0; const x = G_.x[i] + (t ? ox : 0), y0 = t ? oy : 0, zz = t ? zt : z; p.setXYZ(2 * i, x, y0 + w, zz); p.setXYZ(2 * i + 1, x, y0 - w, zz); }
+  p.needsUpdate = true;
+}
+function setGel(z, S) {
+  const dock = S.dock || 0, ox = dock + (S.tdx || 0) - (S.hdx || 0), oy = (S.tdy || 0) - (S.hdy || 0), apart = Math.hypot(ox, oy) > 0.001, R = J.read;
+  const nbDocked = R.nb_dock_tdx !== undefined && (S.tdx || 0) >= R.nb_dock_tdx - 0.001, zt = nbDocked ? (S.zt || z) : z;
+  gelStrip(PARTS.gelTop.geometry.attributes.position, z, zt, ox, oy, apart, true, true);
+  if (PARTS.gelFaces) { PARTS.gelFaces[0].visible = apart; PARTS.gelFaces[1].visible = apart && !nbDocked; }
+  PARTS.gelTop.geometry.computeVertexNormals(); PARTS.gelTop.visible = z > 0.004; PARTS.gelBody.visible = z > 0.004; for (const c of PARTS.chanGel) { const h = z - c.zf; c.g.visible = h > 0.002; if (h > 0.002) { c.g.scale.z = h; c.g.position.z = c.zf + h / 2; } } GELCLIP.constant = z;
+  // the gel of the newborn, filled in the relay (its own lobe; the tail part is drawn with the tail above)
+  if (NBG.top) { const on = (S.gn || 0) > 1e-3 && S.nbi >= 0; NBG.grp.visible = on;
+    if (on) { const T = R.nb_T; NBG.grp.position.set(T[0], T[1], T[2]); gelStrip(NBG.top.geometry.attributes.position, S.zn, S.zn, 0, 0, true, false, true); NBG.top.geometry.computeVertexNormals(); NBCLIP.constant = T[2] + S.zn; } }
+}
+const NBG = { grp: null, top: null }, NBCLIP = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+function buildNewbornGel() {
+  NBG.grp = new THREE.Group(); NBG.grp.visible = false; R3.scene.add(NBG.grp);
+  NBG.top = new THREE.Mesh(PARTS.gelTop.geometry.clone(), clayMat(0xdfeaf0, { opacity: 0.42, side: THREE.DoubleSide, sub: 0.2, rough: 0.25, clip: [SECT] })); NBG.top.renderOrder = 6; NBG.grp.add(NBG.top);
+  const b = new THREE.Mesh(PARTS.gelBody.geometry, clayMat(0xd5e3ec, { opacity: 0.2, side: THREE.DoubleSide, sub: 0.2, clip: [NBCLIP, SECT] })); b.renderOrder = 4; b.scale.set(1, 0.985, 1); NBG.grp.add(b);
 }
 /* ---------------------------------------------------------------- the arm: Stage 2 link meshes on a fixed base, tool modules on the front of the end effector */
 const M4 = () => new THREE.Matrix4(), Tm = (v) => M4().makeTranslation(v[0], v[1], v[2]);
@@ -877,7 +896,7 @@ function updateTrack(st) {
 function scrubTo(clientX) {
   const segs = $("#track").querySelectorAll(".seg"); for (let i = 0; i < segs.length; i++) { const r = segs[i].getBoundingClientRect(); if (clientX <= r.right || i === segs.length - 1) { const f = clamp((clientX - r.left) / r.width, 0, 0.999); TL.T = TL.stages[i].d0 + f * TL.stages[i].disp; break; } }
 }
-const NUM = ["mdy", "q0", "q1", "q2", "kx", "ky", "kz", "kyaw", "gel", "dock", "pr", "pz", "tx", "ty", "tz", "th", "bend", "ub", "yaw", "roll", "drain", "fill", "jets", "ballast", "v", "F", "Fz", "pen", "crank", "pbar", "front", "rimx", "Fn", "nbi", "dip", "tdx", "tdy", "hdx", "hdy"], DIS2 = ["kset"], DIS = ["tool", "pP", "pN", "kit", "vac", "air", "nv", "note"];
+const NUM = ["mdy", "q0", "q1", "q2", "kx", "ky", "kz", "kyaw", "gel", "dock", "pr", "pz", "tx", "ty", "tz", "th", "bend", "ub", "yaw", "roll", "drain", "fill", "jets", "ballast", "v", "F", "Fz", "pen", "crank", "pbar", "front", "rimx", "Fn", "nbi", "dip", "tdx", "tdy", "hdx", "hdy", "gv", "gn", "lc", "zn", "zt"], DIS2 = ["kset"], DIS = ["tool", "pP", "pN", "kit", "vac", "air", "nv", "note"];
 function evalState(T) {
   const st = stageAt(T), s = st.s, F = J.fr, x = s.i0 + st.f * (s.i1 - 1 - s.i0), i = Math.min(s.i1 - 1, Math.floor(x)), j = Math.min(s.i1 - 1, i + 1), f = x - i, S = { st, k: s.key, i };
   for (const n of NUM) S[n] = lerp(F[n][i], F[n][j], f); for (const n of DIS) S[n] = F[n][i]; for (const n of DIS2) S[n] = F[n] ? F[n][i] : 1;
@@ -889,7 +908,8 @@ const kitM = M4();
 function applyState(S, now) {
   CLOCK = S.clock; R3.tail.position.x = S.dock + (S.tdx || 0); R3.tail.position.y = S.tdy || 0; R3.chamber.position.set(S.hdx || 0, S.hdy || 0, 0); const wl = J.read.wl[S.i]; UW.uWL.value = wl; J.WL = Math.max(wl, 0.002); WATER.surf.visible = wl > 0.003;
   poseArm([S.q0, S.q1, S.q2], S.tool, S, now);
-  PARTS.parkP.visible = !!S.pP; PARTS.parkN.visible = !!S.pN; setGel(S.gel, S.dock);
+  PARTS.parkP.visible = !!S.pP; PARTS.parkN.visible = !!S.pN; setGel(S.gel, S);
+  { const f = S.st.f, sst = (u) => { u = clamp(u, 0, 1); return u * u * (3 - 2 * u); }, tilt = S.k === "relay_release" ? 0.35 * sst(f / 0.3) * (1 - sst((f - 0.75) / 0.25)) : 0; if (PARTS.tmag) PARTS.tmag.forEach((g) => { g.rotation.y = tilt; }); }          // the tabs tilt about their upper edge (the lower edge swings back off the disk), then return
   setNewborn(S.nbi); applyDip(S.dip || 0); const nb = S.nv > 0.5; R3.baby.visible = nb;
   if (nb) { R3.baby.matrix.copy(Tm([S.tx, S.ty, S.tz])).multiply(M4().makeRotationZ(S.yaw)).multiply(M4().makeRotationY(-S.th)).multiply(M4().makeRotationX(S.roll)); R3.baby.matrixWorldNeedsUpdate = true;
     PRINTCLIP.constant = S.k === "print" ? S.pz + 0.0008 : 100; }
@@ -908,7 +928,10 @@ const LABELS = [], ws = new THREE.Vector3();
 function buildLabels() {
   const mk = (txt, cls, fn) => { const d = document.createElement("div"); d.className = "lab " + cls; d.textContent = txt; $("#vp").appendChild(d); LABELS.push({ d, fn }); };
   const inS = (...ks) => ks.includes(STATE.k);
-  mk("Tail", "", () => [-0.12 + STATE.dock, 0, 0.36]); mk("Head: quilted double membrane", "", () => [0.14, 0, 0.39]);
+  const relayS = () => /^relay|^next$/.test(STATE.k);
+  mk("Tail", "", () => [-0.12 + STATE.dock + (STATE.tdx || 0), STATE.tdy || 0, 0.36]); mk("Head: quilted double membrane", "", () => relayS() ? null : [0.14, 0, 0.39]);
+  mk("Old head", "", () => relayS() && STATE.k !== "relay_back" ? [0.17 + (STATE.hdx || 0), STATE.hdy || 0, 0.34] : null);          // round 7: the relay names its bodies where they are
+  mk("Newborn, the next head", "", () => relayS() ? [J.read.nb_T[0] + 0.2, 0, 0.34] : null);
   mk("Docking from behind, in the water, gel face to gel face: magnets in the tail face, steel disks in the cuff", "", () => inS("dock") ? [J.read.dock_x, 0, 0.3] : null);
   mk("Open gel face, level with the water", "w", () => inS("dock") && STATE.dock < -0.01 ? [J.read.dock_x + 0.004, -0.06, STATE.gel - 0.02] : null);
   mk("Mouth", "", () => inS("dock", "gel", "birth_a") ? [J.mouth.top[0] + 0.02, 0, J.mouth.top[2] + 0.02] : null);
@@ -919,7 +942,7 @@ function buildLabels() {
   mk("Kit magazine in the tail: one kit for each of three births", "", () => inS("gel", "dock") ? [J.kit.store[0] + STATE.dock, J.kit.store[1], J.kit.store[2] + 0.05] : null);
   mk("Reload: the holder slides the next kit into the pick pocket", "k", () => inS("swim") && STATE.mdy > 0.001 && STATE.mdy < 0.0499 ? [J.mag[0].c[0], J.mag[0].c[1] + STATE.mdy, J.mag[0].c[2] + 0.06] : null);
   mk("Joint of the two tail prints, bonded and sealed", "", () => inS("dock", "gel") ? [J.printing.joint_x + STATE.dock, 0, 0.33] : null);
-  mk("Water outlet: mp6 trim pump, a few mL a minute", "", () => (STATE && STATE.nbi >= 0 && BB.nbT) ? portWorld(BB.nbT[0], "out") : null);
+  mk("Water outlet: mp6 trim pump, a few mL a minute", "", () => (STATE && STATE.nbi >= 0 && BB.nbT && /^birth_d|^free$/.test(STATE.k)) ? portWorld(BB.nbT[0], "out") : null);
   mk("Pockets: mp6 and driver; LiPo and CodeCell", "k", () => (STATE && STATE.k === "cure" && BB.parT) ? new THREE.Vector3().setFromMatrixPosition(BB.parT[1].matrix).add(new THREE.Vector3(0, 0, 0.03)) : null);
   mk("Tile sets", "k", () => inS("kit", "change") ? new THREE.Vector3().setFromMatrixPosition(BB.kitG.matrix).add(new THREE.Vector3(0, 0, 0.04)).toArray() : null);
   mk("Waterline", "w", () => J.read.wl[STATE.i] > 0.01 ? [0.75, -0.26, J.read.wl[STATE.i]] : null);
@@ -991,8 +1014,11 @@ function viewFade() {
 }
 function updateLabels() {
   const w = R3.host.clientWidth, h = R3.host.clientHeight, ov = $(".ov").getBoundingClientRect(), hr = R3.host.getBoundingClientRect(), ox1 = ov.right - hr.left, oy1 = ov.bottom - hr.top + 14;
-  const far = R3.camera.position.distanceTo(R3.controls.target) > 2.4, quiet = CALL.on;
-  for (const L of LABELS) { const p = STATE && !far && !quiet ? L.fn() : null; if (!p) { L.d.style.display = "none"; continue; } ws.set(...p).project(R3.camera); const px = (ws.x + 1) / 2 * w, py = (1 - ws.y) / 2 * h; const on = ws.z < 1 && Math.abs(ws.x) < 0.96 && Math.abs(ws.y) < 0.96 && !(px < ox1 + 40 && py < oy1); L.d.style.display = on ? "" : "none"; if (on) L.d.style.transform = `translate(${px.toFixed(0)}px, ${py.toFixed(0)}px) translate(-50%, -130%)`; }
+  const far = R3.camera.position.distanceTo(R3.controls.target) > 2.8, quiet = CALL.on;
+  const taken = [];          // round 7: a label that would overlap one already placed is left out (labels earlier in the list win)
+  for (const L of LABELS) { const p = STATE && !far && !quiet ? L.fn() : null; if (!p) { L.d.style.display = "none"; continue; } ws.set(...p).project(R3.camera); const px = (ws.x + 1) / 2 * w, py = (1 - ws.y) / 2 * h; let on = ws.z < 1 && Math.abs(ws.x) < 0.96 && Math.abs(ws.y) < 0.96 && !(px < ox1 + 40 && py < oy1);
+    if (on) { L.d.style.display = ""; const lw = L.d.offsetWidth, lh = L.d.offsetHeight, r = [px - lw / 2 - 3, py - 1.3 * lh - 3, px + lw / 2 + 3, py - 0.3 * lh + 3]; if (r[0] < ox1 && r[1] < oy1 - 14 || taken.some((q) => r[0] < q[2] && q[0] < r[2] && r[1] < q[3] && q[1] < r[3])) on = false; else taken.push(r); }
+    L.d.style.display = on ? "" : "none"; if (on) L.d.style.transform = `translate(${px.toFixed(0)}px, ${py.toFixed(0)}px) translate(-50%, -130%)`; }
 }
 /* ---------------------------------------------------------------- cameras: from the port side, tail on the left */
 let AUTO = true, CAM = "overview", camGoal = null, CAMMOVE = false, CAMSNAP = false;
@@ -1014,7 +1040,7 @@ const CAMS = {
   sidecam: () => ({ p: [-0.03, -1.55, 0.17], t: [-0.03, 0, 0.16] }),
   dockcam: () => ({ p: [-0.03, -1.4, 0.28], t: [-0.03, 0, 0.15] }),
   plancam: () => ({ p: [-0.03, -0.03, 2.0], t: [-0.03, 0, 0.1] }),
-  lanecam: () => ({ p: [-0.15, -0.9, 2.3], t: [-0.15, 0, 0.05] }),
+  lanecam: () => ({ p: [-0.02, -0.72, 2.3], t: [-0.02, 0.13, 0.05] }),
   lipcam: () => ({ p: [0.82, -0.52, 0.33], t: [0.28, 0.0, 0.075] }),
   mouthcam: () => ({ p: [0.98, -0.2, 0.3], t: [0.32, 0, 0.15] }),
   fullcam: () => { const b = nbPos(); return { p: [b.x * 0.5 + 0.3, -2.2, 0.75], t: [b.x * 0.5 + 0.15, 0, 0.12] }; },
@@ -1066,10 +1092,16 @@ function renderReadouts(S) {
   h += `<div class="rg"><h4>Arm, fixed base</h4>${rr("Base, J1, J2", `${f1(S.q0 * D)}, ${f1(S.q1 * D)}, ${f1(S.q2 * D)}`, "deg")}${rr("Tool tip x, y, z", `${mm(ARM.tip[0])}, ${mm(ARM.tip[1])}, ${mm(ARM.tip[2])}`, "mm")}${rr("Tool", TOOLN[S.tool])}`;
   if (S.vac) h += rr("Magnet lifts", f2(R.suction_N), "N", true) + rr("Kit weight, margin", `${f2(R.kit_N)} N, ${f1(R.suction_N / R.kit_N)} x`) ;
   if (false) h += rr("Force on the valve", f2(S.F), "N", true) + bar(S.F / R.payload_N, S.F > R.payload_N) + rr("Limit (payload 500 g)", f2(R.payload_N), "N");
-  h += `</div><div class="rg"><h4>Head and gel</h4>${rr("Gel level", mm(S.gel), "mm")}${rr("Gel volume", f2(R.gel_L * gelFrac(S.gel)), "L of " + f2(R.gel_L))}${rr("Lip above the gel, the water", `${mm(R.lip_z - S.gel)}, ${mm(R.lip_z - R.wlz)}`, "mm")}${rr("Kit", KITN[(S.nv > 0.5 && S.k !== "print") || S.nbi >= 0 ? 3 : S.kit])}</div>`;
+  const relay = /^relay|^next$/.test(S.k), TK = R.tankn;
+  if (!relay) h += `</div><div class="rg"><h4>Head and gel</h4>${rr("Gel level", mm(S.gel), "mm")}${rr("Gel in the head and the tail", f2(S.gv), "L")}${rr("Lip above the gel, the water", `${mm(R.lip_z - S.gel)}, ${mm(R.lip_z - R.wlz)}`, "mm")}${rr("Kit", S.nbi >= 0 ? "in the newborn" : KITN[(S.nv > 0.5 && S.k !== "print") ? 3 : S.kit])}</div>`;
+  else { const rel = S.k !== "relay_back", nbG = S.gn || 0;          // round 7: the relay shows its own numbers: the old head, the newborn as it fills, the tail
+    h += `</div><div class="rg"><h4>Old head${rel ? ", released" : ", still docked"}</h4>${rr("Gel level", mm(S.gel), "mm")}${rr("Gel", rel ? f2(R.gel_old_L) : f2(S.gv), "L", false)}${rr("Lip circuit", `gel at 9 kPa, ${f2(R.lipc_L)}`, "L")}</div>`;
+    h += `<div class="rg"><h4>Newborn</h4>${rr("Gel in the lobe", f2(nbG), "L of " + f2(R.gel_fill_L), S.k === "relay_gel")}${bar(nbG / R.gel_fill_L)}${rr("Gel level", nbG > 0.001 ? mm(S.zn) : "empty", nbG > 0.001 ? "mm" : "")}${rr("Lip circuit, gel at 9 kPa", f2(S.lc || 0), "L of " + f2(R.lipc_L), S.k === "relay_gel" && (S.lc || 0) > 0)}${rr("Gel the tail holds", rel ? f2(R.gel_tail_L) : "with the parent", rel ? "L" : "")}</div>`;
+    h += `<div class="rg"><h4>Tail on its wheels</h4>${rr("Moved x, y", `${mm(S.tdx)}, ${mm(S.tdy)}`, "mm")}</div>`; }
+  if (TK && (relay || S.k === "dock")) h += `<div class="rg"><h4>Tank, made to order</h4>${rr("Inner", TK.inner_mm.map((v) => f0(v)).join(" x "), "mm")}${rr("Water depth", f0(TK.depth_mm), "mm")}${rr("Water", `${f0(TK.water_L)} L, ${f0(TK.water_kg)}`, "kg")}${rr("Glass (estimate)", f0(TK.glass_kg), "kg")}${rr("Filled, with the parent body", f0(TK.filled_kg), "kg", true)}${rr("On the floor under it", f1(TK.floor_kPa), "kPa")}</div>`;
   if (S.k === "print") h += `<div class="rg"><h4>Print</h4>${rr("Progress", f0(S.pr * 100), "%", true)}${bar(S.pr)}${rr("Layer height z", f1(Math.min(S.pz, BB.box ? BB.box.max.z + J.read.axis_z : S.pz) * 1000), "mm")}${rr("Bead, silicone", `${f0(R.bead_m)} m, ${f2(R.sil_L)} L`)}</div>`;
   if (S.nv > 0.5 && S.k !== "print") h += `<div class="rg"><h4>Next head, folded</h4>${rr("Flat pack", J.pack.size_mm.map((v) => f0(v)).join(" x "), "mm", true)}${rr("Layers", J.pack.layers)}${rr("Silicone", f2(J.read.sil_L), "L")}</div>`;
-  if (S.nbi >= 0) h += `<div class="rg"><h4>Birth</h4>${rr("Keel pressure", f1(S.pbar), "kPa", true)}${rr("Inflation front x", S.front > 0 ? mm(S.front) : "none", S.front > 0 ? "mm" : "")}${rr("Rim x", mm(S.rimx), "mm", true)}${rr("Lower lip at x", mm(J.mouth.lip[0]), "mm")}${rr("Needle force", f2(S.Fn), "N")}${bar(S.Fn / J.read.payload_N)}${rr("Limit (payload 500 g)", f2(J.read.payload_N), "N")}${rr("Crank", S.crank > 0.99 ? "down" : S.crank > 0.01 ? "swinging" : "folded")}</div>`;
+  if (S.nbi >= 0 && /^birth|^free$/.test(S.k)) h += `<div class="rg"><h4>Birth</h4>${rr("Keel pressure", f1(S.pbar), "kPa", true)}${rr("Inflation front x", S.front > 0 ? mm(S.front) : "none", S.front > 0 ? "mm" : "")}${rr("Rim x", mm(S.rimx), "mm", true)}${rr("Lower lip at x", mm(J.mouth.lip[0]), "mm")}${rr("Needle force", f2(S.Fn), "N")}${bar(S.Fn / J.read.payload_N)}${rr("Limit (payload 500 g)", f2(J.read.payload_N), "N")}${rr("Crank", S.crank > 0.99 ? "down" : S.crank > 0.01 ? "swinging" : "folded")}</div>`;
   h += `<div class="rg"><h4>Penetration test, this frame</h4>${rr("Deepest overlap of any pair", f2(S.pen * 1000), "mm", S.pen > 0.001)}${rr("Worst over the whole timeline", f2(R.pen_max * 1000), "mm")}</div>`;
   $("#ro").innerHTML = h; $("#tlClock").textContent = hms(S.clock) + " of " + hms(TL.realTotal);
 }
@@ -1128,7 +1160,7 @@ async function loadAll() {
   const [j, a, g] = await Promise.all([getJSON("quilt.json"), getJSON("arm.json"), fetch("quilt_print.gcode").then((r) => r.ok ? r.text() : "").catch(() => "")]);
   if (!j || !a) { $("#ovStage").textContent = "The data files did not load"; throw new Error("data"); }
   J = j; await unpack(J); J.read.wlz = J.WL; UW.uWL.value = J.WL; Object.assign(ARMD, a); GCL = g.split("\n").filter((l) => l.length);
-  buildWater(); buildBody(); buildArm(); buildBaby(); buildGallery(); setShadows(); buildLabels(); buildCallouts(); renderDoc();
+  buildWater(); buildBody(); buildArm(); buildBaby(); buildNewbornGel(); buildGallery(); setShadows(); buildLabels(); buildCallouts(); renderDoc();
   log("quilt.json: " + J.fr.q0.length + " frames, " + J.checks.length + " checks", "a"); const bad = J.checks.filter((c) => !c.ok); for (const c of bad) log("fails: " + c.name, "w");
   log("penetration test: worst pair " + f2(J.read.pen_max * 1000) + " mm over " + J.fr.pen.length + " frames", J.read.pen_max > 0.001 ? "w" : "a");
 }
