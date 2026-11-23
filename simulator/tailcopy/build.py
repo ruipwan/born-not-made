@@ -23,7 +23,8 @@ WATER = 0.27                                  # variant: water level (doublewall
 GEL = J['read']['gel_z']                      # 0.100
 LIP = np.array(J['mouth']['lip']) + [OFF, 0]  # (x, z) of the lower lip
 MOUTH_TOP = np.array([J['mouth']['top'][0] + OFF, J['mouth']['top'][2]])
-TANK = J['tank']; TX1 = TANK['x1'] - TANK['glass']; TY1 = TANK['y1'] - TANK['glass']
+TANK = dict(L=2.438, W=0.914, H=0.406, glass=0.012, x0=-1.15, x1=1.288, y1=0.457, name='Glasscages rimless 96 x 36 x 16 in (the fertile build\'s tank)', url='https://glasscages.com/aquariums-rimless/')
+TX1 = TANK['x1'] - TANK['glass']; TY1 = TANK['y1'] - TANK['glass']
 CUP, NEEDLE = AR['tools']['cup'], AR['tools']['needle']
 CRANK = J['r2']['crank']['L']
 notes, checks = [], []
@@ -109,19 +110,21 @@ notes.append(f'The tail splits where the hard tail is already printed in two on 
 
 # ---------------------------------------------------------------- 2. the arm in four modules
 MASS = {'M1': 1.40, 'M2': 0.35, 'M3': 0.45, 'M4': 0.20}     # estimate, split of the DexArm's 2.4 kg (spec page)
-RHO_PART = 2000.0; RHO_FOAM = 35.0
-TRIMS = {'M1': 0.10, 'M2': -0.05, 'M3': -0.05, 'M4': -0.05}   # wet weight left (N): the base sinks a little, the links float a little
+TRIMS = {'M1': 0.10, 'M2': 0.35 * 9.81 * 0.5, 'M3': 0.45 * 9.81 * 0.5, 'M4': 0.20 * 9.81 * 0.5}   # wet weight (N): the base sealed and trimmed, the links as they are (mean density 2000, estimate)
 TRIM = 0.10
 floats = {}
+_lie = np.array([0.0, 0.0, math.radians(85)])
 for k, m in MASS.items():
-    Vs = m / RHO_PART
-    Vf = (m - 1000 * Vs - TRIMS[k] / 9.81) / (1000 - RHO_FOAM)
-    floats[k] = dict(mass=m, float_L=Vf * 1000)
+    lo_, hi_ = bounds(np.eye(4), _lie, MODS[k])
+    Vbox = float(np.prod(hi_ - lo_))
+    need = m / 1000 - TRIMS[k] / 9.81 / 1000                # m3 of water to displace for that wet weight
+    floats[k] = dict(mass=m, need_L=need * 1000, box_L=Vbox * 1000)
 chk('Arm', 'Four modules: base (with the three steppers), upper arm, forearm, end effector with the rotary flange; 2.4 kg in all', True, 'split estimated')
-chk('Arm', 'Collars: ' + ', '.join(f'{k} {v["float_L"]*1000:.0f} mL of foam' for k, v in floats.items()) + '; wet weight: base +0.10 N, each link -0.05 N (floats)',
-    TRIM < 2.45, f'holder magnet {2.45} N')
-notes.append('Each module floats in a foam collar trimmed so it floats the way it is joined and weighs 0.15 N in water: the parent\'s arm (500 g payload, a 2.45 N magnet) '
-             'could not lift its own base in air (1.4 kg), but it can steer it in water. This is why the arm is put together under water, and why the water stands at 270 mm.')
+chk('Arm', f'No floats. Only the base (1.4 kg) needs help: its housing is sealed and holds air, {floats["M1"]["need_L"]:.2f} L of displacement inside a {floats["M1"]["box_L"]:.2f} L housing, trimmed to weigh 0.10 N in water', floats['M1']['need_L'] < 0.6 * floats['M1']['box_L'], 'the slim links could not hold enough air; they do not need to')
+chk('Arm', 'Wet weight of each module against the holder\'s 2.45 N magnet: ' + ', '.join(f'{k} {TRIMS[k]:.2f} N' for k in ['M1', 'M2', 'M3', 'M4']), max(TRIMS.values()) < 2.45, 'the forearm is the heaviest, 10 % under the magnet')
+notes.append('No floats. Each module has a closed, sealed housing that holds air, trimmed with a little steel so it weighs 0.04 to 0.10 N in water and sits still on the shelf. '
+             'The parent\'s arm (500 g payload, a 2.45 N magnet) could not lift its own base in air (1.4 kg), but it can carry it under water. This is why the arm is put together under water, and why the water stands at 270 mm.')
+notes.append('The modules wait on a shelf hung on the tank\'s front glass, at the height of the lower lip. The shelf slopes to its middle, so when one module is taken the next slides into place. The parent drives its whole body up to the shelf, takes the four modules in through the mouth and puts the arm together in its bowl, then drives back.')
 
 # ---------------------------------------------------------------- 3. the child arm: folded pose, seat, lying pose
 RB = 0.070                                   # base radius (B_Fix: 128 x 146 mm)
@@ -191,7 +194,8 @@ for p in np.arange(0.0, 0.40, 0.005):
     if l[0] > LIP[0] + 0.03:
         PULL = p; break
 # the stand: sweep the tilt, the arm must stay clear of the parent's head (x < mouth top) and inside F's face port when it crosses the face
-POSE_PULL = (DOCK[0] + PULL + 0.04, 0.0, math.pi)
+POSE_PULL = DOCK
+BACK = PULL + 0.04                                 # the parent drives back this far
 clear_head, worst_port = 9.0, 9.0
 PORT_TOP = np.interp(0.032, prof[:, 0], prof[:, 3]) - 0.015       # inner skin of F at the face, less the cuff
 STAND_Q1 = math.radians(30)                  # it leans its upper arm toward its face as it rises, to pass under the top of F's face
@@ -201,34 +205,34 @@ for ph in np.linspace(math.pi / 2, 0, 61):
     W, _ = world_parts(root_tilt(POSE_PULL, ph), stand_q(ph))
     for n, M in W.items():
         v = PARTS[n][0][::7]; P = (M @ np.c_[v, np.ones(len(v))].T).T[:, :3]
-        clear_head = min(clear_head, (P[:, 0] - (LIP[0] + 0.0)).min())
+        clear_head = min(clear_head, (P[:, 0] - (LIP[0] - BACK)).min())
         face = POSE_PULL[0] - 0.032
         near = np.abs(P[:, 0] - face) < 0.01
         if near.any(): worst_port = min(worst_port, PORT_TOP - P[near, 2].max())
-chk('Birth', f'The shell backs off {(PULL+0.04)*1000:.0f} mm with the arm hooked, so the arm clears the parent\'s lip', True, f'tank front glass at {TX1*1000:.0f} mm, nose at {(POSE_PULL[0]+0.43)*1000:.0f}')
+chk('Birth', f'The parent backs {BACK*1000:.0f} mm away from the hooked arm, so the arm clears its lip', True, f'tail nose then at {(BASE[0]-0.315-BACK)*1000:.0f} mm, back glass at {(TANK["x0"]+TANK["glass"])*1000:.0f}')
 chk('Birth', f'Standing up about the hinge: closest approach to the parent\'s lip {clear_head*1000:.0f} mm', clear_head > 0.005)
 chk('Birth', f'Standing up through F\'s face: {worst_port*1000:.0f} mm under the top of the {PORT_TOP*1000:.0f} mm port (leaning joint 1 to 30 deg on the way up; upright and straight it would hit by 13 mm)', worst_port > 0.0)
 
 # forces (estimates, marked)
 GEL_TAU = 9.0
 push_N = 2 * GEL_TAU * 0.09 + 0.3 * 0.10      # gel drag on the lying arm (both faces) + friction of four trimmed modules
-chk('Forces', f'Push of the arm out of the gel and over the lip: {push_N:.2f} N', push_N < J['read']['payload_N'], f'arm gives {J["read"]["payload_N"]:.2f} N (estimate)')
+WARM = sum(TRIMS.values())
+push_N = 2 * GEL_TAU * 0.09 + 0.3 * WARM
+chk('Forces', f'The whole folded arm weighs {WARM:.1f} N in water: too much to lift over the lip ({J["read"]["payload_N"]:.1f} N payload), so the lower lip is vented and lies flat, and the arm slides out along the floor: {push_N:.2f} N', push_N < J['read']['payload_N'], 'friction 0.3 on silicone, gel drag at 9 Pa; the gel stays because the water stands over it (round 2 argument)')
 snap_N = 3.0
 chk('Forces', f'Snap of each joint: magnets close the last 2 mm, a spring latch needs {snap_N:.1f} N', snap_N < J['read']['payload_N'], 'estimate; bench test 2')
 jet = 0.039
 drag_pull = 0.5 * 1000 * 0.005 ** 2 * 1.0 * (0.30 * 0.30 + 0.15 * 0.13)
-chk('Forces', f'N\'s jet ({jet*1000:.0f} mN, the quilted head\'s estimate) draws the shell and the hooked arm at 5 mm/s: drag {drag_pull*1000:.1f} mN, plus the base sliding on F\'s floor {0.3*0.10*1000:.0f} mN',
-    jet > drag_pull + 0.3 * 0.10, 'the collars stay on until the arm stands')
-stand_T = 0.10 * 0.05
-chk('Forces', f'Standing up: the floating links pull the arm up about the hinge (0.15 N), the base weighs {stand_T:.3f} N m back; the arm\'s own joint 1 only steers it', True, 'it rises like a buoy on its foot')
+chk('Forces', f'N\'s jet ({jet*1000:.0f} mN) could not drag the hooked arm ({0.3*WARM:.1f} N of friction), so the parent backs away on its wheels instead, the crank under the elbow end ({WARM/2:.1f} N of the arm\'s {J["read"]["payload_N"]:.1f} N payload) until it rests on the tank floor', WARM / 2 < J['read']['payload_N'], 'the hook holds the base end in F')
+chk('Forces', f'Standing up: the arm weighs {WARM:.1f} N in water, about {WARM*0.12:.2f} N m about the hinge; it pushes its forearm on the floor with joint 1', WARM * 0.12 < 1.0, 'DexArm stepper with its reduction, estimate; bench test')
 hold = 3 * 54 * 0.5
-chk('Forces', f'Seat: three magnet pairs in the seat plate ({hold:.0f} N at half pull through 1.2 mm of silicone) and the arm\'s wet weight once the collars are shed ({(2.4-2.4*1000/RHO_PART/ (1) * 0 - 2.4*1000/RHO_PART)*9.81:.1f} N)', True, 'estimate')
+chk('Forces', f'Seat: three magnet pairs in the seat plate hold the base ({hold:.0f} N at half pull through 1.2 mm of silicone); with the arm\'s 5 N of wet weight they carry its reactions', True, 'estimate; a steel trim plate can be added to the base once it is seated')
 # water level consequences
 air_head = J['q']['silicone']['air_L']
 chk('Water', f'Water at {WATER*1000:.0f} mm (quilted head simulator: {J["WL"]*1000:.0f} mm): the quilted head\'s {air_head:.1f} L of cell air lifts {air_head*9.81:.0f} N against its {J["r2"]["float"]["weight_N"]:.1f} N',
     False, 'needs gel ballast in its low cells, as in round 2 (bench test 9 there)')
 chk('Water', 'Deep water for the hard tail too: it needs steel to keep its wheels on the floor', False, 'outer change, not sized here')
-chk('Births', 'Every birth (N, F, the arm) goes over the lower lip at 104.5 mm: the folded body is lifted out of the gel by the holder and pushed out, neutral in water', True, 'water above the mouth makes the lift free')
+chk('Births', 'N and F go over the lower lip at 104.5 mm: each folded body is lifted out of the gel and pushed out, about neutral in water', True, 'Dragon Skin 30, SG 1.08')
 
 # ---------------------------------------------------------------- 4. the timeline
 FPS = 10
@@ -239,6 +243,7 @@ MOD_ORDER = ['M1', 'M2', 'M3', 'M4']
 class S:  # state, carried from frame to frame
     pass
 st = S()
+st.px = 0.0
 st.q = REST.copy(); st.tool = 1; st.crank = 0.0; st.rot = 0.0
 st.N = dict(x=0.0, y=0.0, yaw=0.0, k=0.0, vis=0, pack=0.0, jet=0.0)
 st.F = dict(x=0.0, y=0.0, yaw=0.0, k=0.0, vis=0, pack=0.0)
@@ -266,7 +271,7 @@ def quat(R):
     return [x, y, z, w]
 
 def emit():
-    fr = dict(q=[R2(x) for x in st.q], tool=st.tool, crank=R2(st.crank), rot=R2(st.rot),
+    fr = dict(px=R2(st.px), q=[R2(x) for x in st.q], tool=st.tool, crank=R2(st.crank), rot=R2(st.rot),
               N=[R2(st.N['x']), R2(st.N['y']), R2(st.N['yaw']), R2(st.N['k']), st.N['vis'], R2(st.N['pack']), R2(st.N['jet'])],
               F=[R2(st.F['x']), R2(st.F['y']), R2(st.F['yaw']), R2(st.F['k']), st.F['vis'], R2(st.F['pack'])],
               pods=st.pods, root=mat7(st.root), cq=[R2(x) for x in st.cq], cv=st.childvis,
@@ -284,16 +289,18 @@ def arm_to(q_from, tip, tool, u, a=0.0, b=1.0):
     w = seg(u, a, b)
     return q_from + (q - q_from) * w if q is not None else q_from
 
+def BASEt():
+    return BASE + [st.px, 0, 0]
 def ikc(tip, Ls):
-    tip = np.array(tip, float)
+    tip = np.array(tip, float); BASE_ = BASEt()
     for k in range(60):
-        q = ik(tip, Ls, BASE)
+        q = ik(tip, Ls, BASE_)
         if q is not None: return q
-        d = tip[:2] - BASE[:2]; tip[:2] = BASE[:2] + d * 0.985; tip[2] = tip[2] * 0.99 + 0.12 * 0.01
-    return ik(tip, Ls, BASE, lim=False)
+        d = tip[:2] - BASE_[:2]; tip[:2] = BASE_[:2] + d * 0.985; tip[2] = tip[2] * 0.99 + 0.12 * 0.01
+    return ik(tip, Ls, BASE_, lim=False)
 
 def tip_of(q, tool):
-    p = tool_head(T(BASE), q); return p - [0, 0, CUP if tool == 1 else NEEDLE]
+    p = tool_head(T(BASEt()), q); return p - [0, 0, CUP if tool == 1 else NEEDLE]
 
 def stage(key, name, disp, real, text, fn):
     n = max(2, int(disp * FPS)); i0 = len(frames)
@@ -306,33 +313,43 @@ def stage(key, name, disp, real, text, fn):
 def copy_mods(s0):
     return {k: dict(G=v['G'].copy(), att=v['att'], vis=v['vis'], collar=v['collar']) for k, v in s0['mods'].items()}
 
-# where the floating modules start: in the free water in front of the mouth, port side, trimmed to float as they are joined
-def floating_G(k, x, y, bob=0.0):
-    """G moves the module from its place in the folded arm in the bowl to the water surface at (x, y)"""
-    W, _ = world_parts(R_BOWL, lie_q)
-    pts = np.vstack([(W[n] @ np.c_[PARTS[n][0][::9], np.ones(len(PARTS[n][0][::9]))].T).T[:, :3] for n in MODS[k]])
-    c = (pts.min(0) + pts.max(0)) / 2; top = pts[:, 2].max() - c[2]
-    return T([x - c[0], y - c[1], WATER - 0.012 - top - c[2] + bob])
+# the shelf on the front glass: its top at the lower lip, sloped toward the middle slot
 def mod_center(k, G=None):
     W, _ = world_parts(R_BOWL, lie_q)
     pts = np.vstack([(W[n] @ np.c_[PARTS[n][0][::9], np.ones(len(PARTS[n][0][::9]))].T).T[:, :3] for n in MODS[k]])
     c = (pts.min(0) + pts.max(0)) / 2
     if G is not None: c = (G @ np.r_[c, 1])[:3]
     return c
-START = {'M1': (0.47, -0.27), 'M2': (0.88, -0.27), 'M3': (0.68, -0.29), 'M4': (0.66, -0.10)}
+def mod_box(k):
+    W, _ = world_parts(R_BOWL, lie_q)
+    pts = np.vstack([(W[n] @ np.c_[PARTS[n][0][::9], np.ones(len(PARTS[n][0][::9]))].T).T[:, :3] for n in MODS[k]])
+    return pts.min(0), pts.max(0)
+SHELF_TOP = LIP[1] + 0.002
+SHELF_X = (TX1 - 0.15, TX1)                      # 150 mm deep, hung on the glass
+SHELF_Y = 0.40
+SLOT0 = {'M1': 0.0, 'M2': -0.20, 'M3': 0.20, 'M4': -0.36}
+def shelf_G(k, y):
+    lo_, hi_ = mod_box(k); c = (lo_ + hi_) / 2
+    x = SHELF_X[0] + 0.01 + (hi_[0] - lo_[0]) / 2
+    return T([x - c[0], y - c[1], SHELF_TOP - lo_[2]])
 for k in MOD_ORDER:
-    st.mods[k]['G'] = floating_G(k, *START[k])
+    st.mods[k]['G'] = shelf_G(k, SLOT0[k])
+DXS = SHELF_X[0] - 0.012 - LIP[0]               # how far the parent drives so its lip meets the shelf
+chk('Shelf', f'The shelf hangs on the front glass, its top at the lower lip ({SHELF_TOP*1000:.0f} mm), 150 mm deep and {2*SHELF_Y*1000:.0f} mm long; the parent drives {DXS*1000:.0f} mm to meet it',
+    True, 'the shelf slopes to the middle at 20 deg, steeper than the friction of a module in water (0.3)')
+chk('Shelf', 'The modules slide over the lip into the mouth level, no lift: the crank draws each one with ' + f'{0.3*0.10:.2f} N of friction at most', 0.03 < 0.039 * 100, 'the crank is on the arm, 4.9 N')
+chk('Water', 'Driving at 270 mm of water: the hard tail is buoyant and its wheels lose grip', False, 'steel in the tail, not sized here')
 
 PRINT_X = (np.array([J['q']['q4']['x0_mm'], J['q']['q4']['x1_mm']]) / 1000 + OFF)
 PRINT_C = np.array([PRINT_X.mean(), 0.0])
 HOME = tip_of(REST, 1)
-N_PARK = (0.86, -0.08, -math.pi / 2); F_PARK = (0.52, 0.22, math.pi / 2)
+N_PARK = (0.70, 0.015, math.pi / 2); F_PARK = (0.52, 0.395, math.pi / 2)    # both against the side glass, out of the parent's lane
 OUT = (LIP[0] + 0.20, 0.0)                      # where a born segment unfolds, in front of the mouth
 
 # 0
 def f_intro(u, s0):
     st.text = ''
-stage('intro', 'The parent and the parts', 4, 60, 'The parent, a hard tail with its DexArm and a quilted head, sits at the back of the tank. Four arm modules float in front of it in foam collars: base, upper arm, forearm, end effector.', f_intro)
+stage('intro', 'The parent and the parts', 4, 60, 'The parent, a hard tail with its DexArm and a quilted head, sits at the back of the tank. Four arm modules wait on a shelf hung on the front glass: base, upper arm, forearm, end effector, each in a sealed housing.', f_intro)
 
 def f_kit(u, s0):
     q0 = s0['q']
@@ -402,69 +419,70 @@ def f_moveF(u, s0):
     st.F['yaw'] = s0['F']['yaw'] + (F_PARK[2] - s0['F']['yaw']) * w
     # N pushes F from its port side
     st.N['jet'] = 1.0 if 0.05 < u < 0.95 else 0.0
-    nx = st.F['x'] + 0.33; ny = st.F['y']
+    nx = st.F['x']; ny = st.F['y'] - 0.33
     a = seg(u, 0.0, 0.2)
     st.N['x'] = s0['N']['x'] + (nx - s0['N']['x']) * a; st.N['y'] = s0['N']['y'] + (ny - s0['N']['y']) * a
-    st.N['yaw'] = s0['N']['yaw'] + (math.pi - s0['N']['yaw']) * a
+    st.N['yaw'] = s0['N']['yaw'] + (-math.pi / 2 - s0['N']['yaw']) * a
     if u > 0.85:
-        b = seg(u, 0.85, 1.0); st.N['x'] = nx + (N_PARK[0] - nx) * b; st.N['y'] = ny + (N_PARK[1] - ny) * b; st.N['yaw'] = math.pi + (N_PARK[2] - math.pi) * b
-stage('parkF', 'N moves F aside', 6, 240, 'N pushes F nose first to the port side, out of the way of the mouth.', f_moveF)
+        b = seg(u, 0.85, 1.0); st.N['x'] = nx + (N_PARK[0] - nx) * b; st.N['y'] = ny + (N_PARK[1] - ny) * b; st.N['yaw'] = -math.pi / 2 + (N_PARK[2] + math.pi / 2) * b
+stage('parkF', 'N moves F aside', 6, 240, 'N pushes F against the port glass and parks itself against the starboard glass: the middle of the tank is clear.', f_moveF)
 
-# the four modules: N herds, the crank hooks, the holder places and snaps
-W_BOWL, _ = world_parts(R_BOWL, lie_q)
+# drive to the shelf, take the four modules in, put the arm together, drive back
+def f_drive(u, s0):
+    st.px = DXS * seg(u, 0.05, 0.95); st.q = arm_to(s0['q'], HOME + [0, 0, 0], 1, u, 0, 0.3) if False else s0['q']
+stage('drive', 'To the shelf', 7, 240, f'The parent drives its whole body {DXS*1000:.0f} mm, tail and head together, between the two parked halves, until its lower lip meets the shelf on the front glass.', f_drive)
+
+def queue_y(k, idx_taken):
+    """where module k stands on the shelf after idx_taken modules were taken: the next one slides to the middle"""
+    order = MOD_ORDER
+    i = order.index(k)
+    if i == idx_taken: return 0.0
+    return SLOT0[k]
 for idx, k in enumerate(MOD_ORDER):
     label = {'M1': 'base', 'M2': 'upper arm', 'M3': 'forearm', 'M4': 'end effector'}[k]
     def f_gather(u, s0, k=k, idx=idx):
         st.mods = copy_mods(s0) if u == 0 else st.mods
         m = st.mods[k]
-        G0 = s0['mods'][k]['G']; c0 = mod_center(k, G0)
-        mouth_pt = np.array([LIP[0] + 0.06, 0.0])
         q0 = s0['q']
-        # 1. N herds the module to the mouth (0 .. 0.35)
-        if u <= 0.35:
-            w = seg(u, 0.0, 0.35)
-            tgt = c0[:2] + (mouth_pt - c0[:2]) * w
-            m['G'] = T([tgt[0] - c0[0], tgt[1] - c0[1], 0.004 * math.sin(u * 40)]) @ G0
-            d = mouth_pt - c0[:2]; d = d / (np.linalg.norm(d) + 1e-9)
-            st.N['x'] = tgt[0] - d[0] * 0.30 + 0.0; st.N['y'] = tgt[1] - d[1] * 0.30
-            st.N['yaw'] = math.atan2(d[1], d[0]); st.N['jet'] = 1.0
-            st.q = arm_to(q0, [LIP[0] - 0.12, 0, 0.20], 1, u, 0.15, 0.35); st.crank = 0.0
-            st.lip = 0.0
-        # 2. the crank swings forward and hooks the collar's loop, draws the module in under the upper lip (0.35 .. 0.6)
-        elif u <= 0.6:
-            st.N['jet'] = 0.0
-            w = seg(u, 0.35, 0.45); st.crank = w
-            Gm = T([mouth_pt[0] - c0[0], mouth_pt[1] - c0[1], 0]) @ G0
-            cm = mod_center(k, Gm)
-            hook_tip = np.array([LIP[0] - 0.10, 0, 0.19])
-            st.q = arm_to(ikc([LIP[0] - 0.12, 0, 0.20], CUP), hook_tip, 1, u, 0.35, 0.45)
-            dr = seg(u, 0.45, 0.6)
-            dest = mod_center(k, np.eye(4)) + [0, 0, 0.10]
-            pos = cm + (dest - cm) * dr
-            m['G'] = T(pos - cm) @ Gm
-            # holder follows the module
-            if u > 0.45:
-                q = ikc(pos + [-0.09 * (1 - dr), 0, 0.06], CUP)
-                if q is not None: st.q = q
-            st.N['x'] += (N_PARK[0] - st.N['x']) * 0.04; st.N['y'] += (N_PARK[1] - st.N['y']) * 0.04
-        # 3. the magnet takes it, the crank folds, the module goes down into the gel onto its place and snaps (0.6 .. 0.92)
-        else:
-            st.crank = 1 - seg(u, 0.6, 0.68)
-            w = seg(u, 0.62, 0.9)
-            dest = mod_center(k, np.eye(4))
-            Gup = T([0, 0, 0.10])
-            m['G'] = T([0, 0, 0.10 * (1 - w)])
-            q = ikc(dest + [0, 0, 0.06 + 0.10 * (1 - w)], CUP)
+        # 1. the next module slides down the shelf to the middle slot (0 .. 0.2)
+        y0 = SLOT0[k] if idx > 0 else 0.0
+        y = y0 * (1 - seg(u, 0.0, 0.2))
+        Gs = shelf_G(k, y)
+        if u <= 0.42:
+            m['G'] = Gs
+        cs = mod_center(k, Gs)
+        st.q = arm_to(q0, [LIP[0] + DXS - 0.12, 0, 0.20], 1, u, 0.0, 0.2) if u <= 0.2 else st.q
+        # 2. the crank swings out and hooks the eye on the module (0.2 .. 0.42)
+        if 0.2 < u <= 0.42:
+            st.crank = seg(u, 0.2, 0.32)
+            q = ikc([LIP[0] + DXS - 0.10, 0, cs[2] + 0.05], CUP)
+            st.q = q
+        # 3. draws it off the shelf over the lip, then the magnet carries it to its place in the arm (0.42 .. 0.92)
+        if u > 0.42:
+            dest = mod_center(k) + [DXS, 0, 0]
+            w1 = seg(u, 0.42, 0.62); w2 = seg(u, 0.62, 0.9)
+            mid = dest + [0, 0, 0.08]
+            p1 = cs + (np.array([LIP[0] + DXS - 0.06, 0, cs[2]]) - cs) * w1
+            pos = p1 + (mid - p1) * min(1, w2 * 1.6) if w2 > 0 else p1
+            if w2 > 0.6: pos = mid + (dest - mid) * ((w2 - 0.6) / 0.4)
+            c_home = mod_center(k)
+            m['G'] = T(pos - c_home)
+            st.crank = 1 - seg(u, 0.55, 0.65)
+            q = ikc(pos + [0, 0, 0.06], CUP)
             if q is not None: st.q = q
-            if u > 0.9:
-                m['att'] = 1; m['G'] = np.eye(4)
-            st.N['x'] += (N_PARK[0] - st.N['x']) * 0.05; st.N['y'] += (N_PARK[1] - st.N['y']) * 0.05
-            st.N['yaw'] += (N_PARK[2] - st.N['yaw']) * 0.05
-            st.childvis = 1
-    joint = {'M1': 'It lies on the gel floor of the bowl, the base plate toward the mouth.', 'M2': 'The upper arm drops onto the shoulder: magnets pull the last 2 mm and a spring latch clicks.',
-             'M3': 'The forearm drops onto the elbow and clicks.', 'M4': 'The end effector clicks onto the wrist. The arm is whole, folded, lying on its side in the gel.'}[k]
-    stage('get' + k, f'Module {idx+1}: {label}', 11, 600,
-          f'N noses the {label} to the mouth. The holder\'s crank, the hook it uses at a birth, reaches 25 mm past the lip, catches the loop on the collar and draws it in under water. {joint}', f_gather)
+            if u > 0.92:
+                m['att'] = 1; m['G'] = T([DXS, 0, 0])
+                st.childvis = 1
+        st.root = T([st.px, 0, 0]) @ R_BOWL
+    joint = {'M1': 'It goes down onto the gel floor of the bowl, the base plate toward the mouth.', 'M2': 'The upper arm goes down onto the shoulder: magnets pull the last 2 mm and a spring latch clicks.',
+             'M3': 'The forearm goes onto the elbow and clicks.', 'M4': 'The end effector clicks onto the wrist. The arm is whole, folded, lying in the gel.'}[k]
+    stage('get' + k, f'Module {idx+1}: {label}', 10, 600,
+          f'The {label} slides down the shelf to the middle. The holder\'s crank, the hook it uses at a birth, reaches 25 mm past the lip, catches the eye on the housing and draws it in over the lip. {joint}', f_gather)
+
+def f_back(u, s0):
+    st.px = DXS * (1 - seg(u, 0.05, 0.95)); st.root = T([st.px, 0, 0]) @ R_BOWL
+    for k in MOD_ORDER: st.mods[k]['G'] = T([st.px, 0, 0])
+stage('driveBack', 'Back', 7, 240, 'The parent drives back with the folded arm lying in its bowl.', f_back)
 
 def f_holdreach(u, s0):
     st.q = arm_to(s0['q'], HOME, 1, u, 0, 0.8)
@@ -504,7 +522,8 @@ stage('dockMouth', 'The shell docks on the mouth', 9, 300, 'The shell swims roun
 
 def f_birtharm(u, s0):
     q0 = s0['q']
-    lift = 0.11 * seg(u, 0.12, 0.35)
+    st.lip = seg(u, 0.0, 0.2)
+    lift = 0.0
     push = DELTA * seg(u, 0.38, 0.9)
     st.root = T([push, 0, lift]) @ R_BOWL
     if u < 0.12:
@@ -513,18 +532,17 @@ def f_birtharm(u, s0):
         q = ikc(np.array([push_from + push, 0, 0.06 + lift]), CUP)
         if q is not None: st.q = q
     st.gel = GEL
-stage('birthArm', 'Birth of the arm', 9, 240, f'The holder lifts the folded arm off the gel floor, over the lower lip, and pushes it base first out of the mouth into F: {DELTA*1000:.0f} mm, until the base plate hooks the hinge bar of the seat.', f_birtharm)
+stage('birthArm', 'Birth of the arm', 9, 240, f'The parent vents its lower lip, which folds down flat on the floor; the gel stays, the water stands over it. The holder pushes the folded arm base first along the floor, out of the mouth into F: {DELTA*1000:.0f} mm, until the base plate hooks the hinge bar of the seat.', f_birtharm)
 
 def f_pull(u, s0):
-    w = seg(u, 0.1, 1.0)
-    px = DOCK[0] + (POSE_PULL[0] - DOCK[0]) * w
-    for s_ in (st.F, st.N): s_['x'] = px; s_['y'] = 0.0; s_['yaw'] = math.pi
-    st.N['jet'] = 1.0 if 0.1 < u < 0.97 else 0.0
-    # the hooked arm comes along, and settles from the lip down to F's floor as it leaves the lip
-    drop = 0.11 * seg(u, 0.35, 0.9)
-    st.root = T([0, 0, 0.11 - drop]) @ root_tilt((px, 0, math.pi), math.pi / 2)
-    st.q = arm_to(s0['q'], HOME, 1, u, 0.0, 0.5)
-stage('pull', 'The shell backs off', 8, 240, 'The magnets of the face cuff let go (the tilt release of the tail). N\'s jet draws the shell back and the hooked arm slides out after it, down onto F\'s floor.', f_pull)
+    w = seg(u, 0.1, 0.9)
+    st.px = -BACK * w
+    st.root = root_tilt(DOCK, math.pi / 2)
+    # the holder keeps the elbow end of the arm while it can, then lets it down
+    q = ikc([LIP[0] - 0.05, 0, 0.08 + 0.01 * math.sin(math.pi * min(1, w * 3))], CUP)
+    st.q = q if w < 0.35 else arm_to(q, HOME - [BACK, 0, 0], 1, w, 0.35, 0.8)
+    st.lip = 1 - seg(u, 0.85, 1.0)
+stage('pull', 'The parent backs away', 8, 240, f'The magnets of the face cuff let go. The arm is hooked in F, so the parent backs {BACK*1000:.0f} mm away on its wheels; the holder carries the elbow end of the arm over the flat lip and sets it on the tank floor. The lip fills again.', f_pull)
 
 def f_stand(u, s0):
     ph = math.pi / 2 * (1 - seg(u, 0.12, 0.95))
@@ -538,9 +556,8 @@ stage('turn', 'It looks', 4, 20, 'It turns its base a little to one side and bac
 
 def f_unfold(u, s0):
     w = seg(u, 0.25, 1.0)
-    for k in MOD_ORDER: st.mods[k]['collar'] = 0 if u > 0.18 else 1
     F2 = np.array([0, STAND_Q1, FOLD[2]]); st.cq = F2 + (REST - F2) * w
-stage('unfold', 'It unfolds', 6, 30, 'The collars are shed and float up. The arm unfolds to its rest pose. The new tail is whole: N, F and an arm, and the parent kept its own.', f_unfold)
+stage('unfold', 'It unfolds', 6, 30, 'The arm unfolds to its rest pose. The new tail is whole: N, F and an arm, and the parent kept its own.', f_unfold)
 
 def f_end(u, s0):
     w = seg(u, 0.1, 1.0)
@@ -554,7 +571,7 @@ out = dict(
     off=OFF, water=WATER, gel=GEL, lip=[float(x) for x in LIP], mouth_top=[float(x) for x in MOUTH_TOP], base=[float(x) for x in BASE], tank=TANK,
     seg=dict(na=NA, nv=NV, secN=SECN, secF=SECF, perN=PER_N, perF=PER_F, joint=JOINT, pitch=J['q']['q4']['pitch_mm'], packN=packN, packF=packF,
              areaN=AN, areaF=AF, layN=layN, layF=layF),
-    print_x=[float(x) for x in PRINT_X], rbowl=[R2(x) for x in R_BOWL.T.reshape(-1)], lie_q=[float(x) for x in lie_q], rb=RB, out=[float(x) for x in OUT], dock=[float(x) for x in DOCK], mods=MODS, mod_order=MOD_ORDER, floats=floats, fold=[float(x) for x in FOLD], rest=[float(x) for x in REST], delta=float(DELTA),
+    shelf=dict(x0=float(SHELF_X[0]), x1=float(SHELF_X[1]), y=SHELF_Y, top=float(SHELF_TOP)), print_x=[float(x) for x in PRINT_X], rbowl=[R2(x) for x in R_BOWL.T.reshape(-1)], lie_q=[float(x) for x in lie_q], rb=RB, out=[float(x) for x in OUT], dock=[float(x) for x in DOCK], mods=MODS, mod_order=MOD_ORDER, floats=floats, fold=[float(x) for x in FOLD], rest=[float(x) for x in REST], delta=float(DELTA),
     stages=stages, fps=FPS, fr=frames, checks=checks, notes=notes,
     sources=dict(dex=J['sources']['dex'], ds30=J['sources']['ds30'], mag=J['sources']['mag']),
 )
