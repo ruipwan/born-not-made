@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Speculative design: a robot giving birth to another · Society</title>
-<meta name="description" content="Born, Not Made at the scale of a population. Robots in one glass tank eat parts: sealed electronic tiles that float on the water like food. A robot with a tail swims to the parts it wants, its arm lifts them in through the mouth, and it sets them into the wall of the newborn while printing it. The tiles decide what the newborn can do, so bodies differ in function as well as in form. A fixed stock of Core tiles limits how far the population can grow.">
+<meta name="description" content="Born, Not Made at the scale of a population. Robots in one glass tank eat parts: real small electronic parts, tiles, motors, cells, LEDs, each at its true size in a thin floating collar, scattered on the water at the start. A robot with a tail swims to the parts it wants, its arm lifts them in through the mouth, and it sets them into the wall of the newborn while printing it. The parts decide what the newborn can do, so bodies differ in function as well as in form. The Core parts on the water limit how far the population can grow.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 /* Society, simplified bodies: a tank close to square in a black room, sixteen small fixed spot lights above, close enough that their pools overlap. */
@@ -53,7 +53,7 @@ html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
     <canvas id="c" aria-label="Many robots in one tank under small spot lights"></canvas>
     <div class="grain" id="grain"></div><div class="vig"></div>
     <div id="labs"></div>
-    <div class="cap"><h1>Society</h1><p>Parts float on the water like food: sealed electronic tiles, each on a small float, dropped in from above. Two robots that relate touch mouth to mouth. The one holding a tail carries. It plans what the next one should be able to do, swims to the parts it wants, and its arm lifts them in through the mouth. It prints the newborn head and sets the tiles into its wall while printing, then pushes it out full size. The parts decide what each body can do.</p>
+    <div class="cap"><h1>Society</h1><p>Small electronic parts float on the water, each at its true size in a thin collar. They are all there will ever be. Two robots that relate touch mouth to mouth. The one holding a tail carries. It plans what the next one should be able to do, swims to the parts it wants, and its arm lifts them in through the mouth. It prints the newborn head and sets the parts into its wall while printing, then pushes it out full size. The parts decide what each body can do.</p>
       <div class="hud" id="hud"></div></div>
     <div class="views" id="views"><button data-cam="tank" class="on">Whole tank</button><button data-cam="follow">Follow</button><button data-cam="above">Above</button></div>
     <div class="ev" id="ev"></div>
@@ -69,11 +69,10 @@ html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
       <div class="ctl"><label for="inh">Inheritance</label><input type="range" id="inh" min="0" max="1" step="0.01" value="0.7"><output id="inhO"></output></div>
       <div class="ctl"><label for="drift">Drift</label><input type="range" id="drift" min="0" max="0.5" step="0.01" value="0.12"><output id="driftO"></output></div>
       <div class="ctl"><label for="rel">Relations to bear</label><input type="range" id="rel" min="0" max="5" step="1" value="1"><output id="relO"></output></div>
-      <div class="ctl"><label for="ppm">Parts per minute</label><input type="range" id="ppm" min="0" max="90" step="1" value="30"><output id="ppmO"></output></div>
-      <div class="ctl"><label for="fmax">Parts afloat, max</label><input type="range" id="fmax" min="10" max="200" step="5" value="110"><output id="fmaxO"></output></div>
-      <div class="ctl"><label for="cores">Core tiles in stock</label><input type="range" id="cores" min="10" max="150" step="1" value="60"><output id="coresO"></output></div>
+      <div class="ctl"><label for="parts">Parts at start</label><input type="range" id="parts" min="60" max="600" step="10" value="340"><output id="partsO"></output></div>
+      <div class="ctl"><label for="cores">Core parts at start</label><input type="range" id="cores" min="10" max="150" step="1" value="60"><output id="coresO"></output></div>
       <div class="ctl"><label for="gest">Gestation, s</label><input type="range" id="gest" min="6" max="40" step="1" value="14"><output id="gestO"></output></div>
-      <p class="note">Loose tails and Core tiles in stock apply on Reset. Every body needs one Core, so the stock of Core tiles sets how far the population can grow. Gestation is the print time without its pauses.</p></div>
+      <p class="note">Loose tails, Parts at start and Core parts at start apply on Reset. Every body needs one Core, so the Core parts on the water set how far the population can grow. Gestation is the print time without its pauses.</p></div>
     <div><h3>Send a signal into the water</h3>
       <div class="row"><input type="text" id="sig" placeholder="a word or a phrase" maxlength="40"><button id="send">Send</button></div>
       <p class="note">Births soon after carry it as a memory trace.</p></div>
@@ -82,12 +81,12 @@ html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
       <h3>Function diversity, distinct kits</h3><canvas class="spark" id="sp3"></canvas>
       <h3>Mean tiles per body</h3><canvas class="spark" id="sp4"></canvas></div>
     <div><h3>Selected</h3><div id="insp" class="note">Click a robot in the tank.</div></div>
-    <div><h3>Rules</h3><p class="note">The parts are Bergsonne tiles: sealed, epoxy encapsulated electrical subsystems in a standard surface mount body, all with one pad layout on one I2C/I3C bus, so any tile works in any pocket. There are seven families: Core, Sense, Drive, Link, Power, Store, Display. A real tile is 4 x 4 mm and 1 to 2 mm tall and would sink, so here each rides a float 70 mm square with a thin steel disc under the tile, and the tile is drawn at 16 mm so it can be seen. The dots on a float give its family, one for Core up to seven for Display.</p>
+    <div><h3>Rules</h3><p class="note">The parts are real small electronic parts at their true size. Core, Store and most Link and Sense parts are Bergsonne style tiles: sealed, on one pad layout and one I2C/I3C bus, T44 is 4 x 4 mm and T48 is 4 x 8 mm, 1 to 2 mm tall. Sense also has camera modules and MEMS microphones, Drive has coin and pager motors, Link has chip antennas, Power has LiPo pouch cells and coin cells, Display has single LEDs. Every part differs a little in size. Each floats in a thin pale collar 3 mm wider than the part on each side, just enough to keep it at the surface, and carries a small steel disc for the electromagnet. Parts smaller than 8 mm are drawn at 8 mm so they can be seen; all others are drawn at true size, so from the whole tank they are nearly invisible. A fixed set is scattered on the water at the start and nothing arrives later; parts shed in swaps go back onto the water.</p>
       <p class="note">The idea follows von Neumann's kinematic machine, which picks its parts from a lake of parts, and the digital materials of MIT's Center for Bits and Atoms, robots assembled from a small set of parts that join and come apart. It also follows Robot Metabolism, machines that grow by taking in parts from around them, and Print &amp; Place, where parts are set into a print while it is being made.</p>
-      <p class="note">The arm lives in the tail and cannot reach outside the shell. So a robot swims until the float is at its mouth, which sits at the waterline, and stops. The arm reaches forward through the head with an electromagnet, lifts the float in, puts the tile on a rack inside the head and lets the empty float go. The feeder lifts empty floats out from above, and parts left uneaten for four minutes too. Only a robot holding a tail can pick.</p>
-      <p class="note">What the tiles do. Core is needed to be alive, so no newborn is born without one. Power is needed too; each extra Power raises how much energy a body holds and lowers its idle drain. Sense sets how far it notices floats: 1 m with none, 0.6 m more for each. Drive sets swim speed. Link is a radio: robots with Link that relate share what they see and count each other from farther away. Store sets how many memory traces a body holds and passes on. Display is a small light, so others notice it a little more. Bodies charge in the pools of light.</p>
-      <p class="note">Two that relate touch mouth to mouth and exchange memory and form. The one with a tail carries and plans the newborn's kit on purpose: Core and Power, then a mix of both parents' kits, then one wish for what it ran short of. If it kept searching, Sense; if it swam far, Drive; if it ran low, Power; if it could not hold its memories, Store; and so on, with drift. It forages for those families, knowing only the floats it can sense or hear of by Link. After a while it takes substitutes, and later it goes with what it has, as long as Core and Power are there. Then it prints the newborn head bottom up. At the layer of each pocket the print pauses, the arm takes a tile from the rack and sets it into the wall, and the next layers seal it in. The head is pushed out through the mouth while filling with air, so it leaves full size, with its tiles in a loose band under the silicone skin. Only heads are born. The tails are a fixed number; after a birth the tail lets go and another head docks it from behind.</p>
-      <p class="note">A body has one pocket for each tile printed into it. A robot with a tail may change its own hardware: when it has felt a lack, it eats a float of that family, cuts out the tile it needs least and sets the new one in its place, and the shed tile goes back on the water on the same float for someone else. The feeder drops parts at a set rate up to a cap, favouring families that are scarce on the water, and holds a fixed stock of Core tiles. Every body needs one Core, so when the stock is used up the population stops growing. Nobody dies. Every printed body also differs in form: proportions, rings, crest, lobes, clay tone, print texture and how clear the silicone is are inherited and drift.</p></div>
+      <p class="note">The arm has its base in the tail: a yaw joint turns its working plane toward the target, then two links and a short tool. At rest it lies folded on the floor of the head. A robot swims until the part is at its mouth, which sits at the waterline, and stops. The arm reaches out through the mouth, sets the magnet on the part, lifts it just clear of the water, draws it straight back along the body through the opening, and lays it on a rack on the floor of the head. Every mouth is at least wide enough for the largest part; where a genome's mouth would be smaller, the nose drops less and the snout widens. The arm plans each move so that it and what it holds stay inside the shell. Only a robot holding a tail can pick.</p>
+      <p class="note">What the parts do. Core is needed to be alive, so no newborn is born without one. Power is needed too; a bigger cell holds more energy, and each extra Power lowers the idle drain. Sense sets how far it notices parts: 1 m with none, 0.6 m more for each. Drive sets swim speed. Link is a radio: robots with Link that relate share what they see and count each other from farther away. Store sets how many memory traces a body holds and passes on. Display is a small light, so others notice it a little more. Bodies charge in the pools of light.</p>
+      <p class="note">Two that relate touch mouth to mouth and exchange memory and form. The one with a tail carries and plans the newborn's kit on purpose: Core and Power, then a mix of both parents' kits, then one wish for what it ran short of. If it kept searching, Sense; if it swam far, Drive; if it ran low, Power; if it could not hold its memories, Store; and so on, with drift. It forages for those families, knowing only the parts it can sense or hear of by Link. After a while it takes substitutes, and later it goes with what it has, as long as Core and Power are there. Then it prints the newborn head bottom up. At the layer of each pocket the print pauses, the arm takes the part from the rack and sets it in, and the next layers seal it. The printed wall is 4 mm thick, so parts up to 3 mm thick go into pockets in a band around the head; thicker ones, LiPo cells, motors, cameras, sit on an inner ledge low in the head. The head is pushed out through the mouth while filling with air, so it leaves full size. Only heads are born. The tails are a fixed number; after a birth the tail lets go and another head docks it from behind.</p>
+      <p class="note">A body has one place for each part built into it. A robot with a tail may change its own hardware: when it has felt a lack, it eats a part of that family, cuts out the part it needs least and sets the new one in its place, and the shed part goes back out through the mouth on the same collar, for someone else. Every body needs one Core, so when the Core parts on the water are used up the population stops growing. Nobody dies. Every printed body also differs in form: proportions, rings, crest, lobes, clay tone, print texture and how clear the silicone is are inherited and drift.</p></div>
     <p class="links"><a href="bodies/">Bodies</a>: the same society with the earlier v2 bodies. <a href="old_/">Earlier 2D version</a>. <a href="../simulator/simple/">Printing simulator, simplified</a>. <a href="touch_/">Earlier version: touch and birth</a>. <a href="../">Home</a></p>
   </aside>
 </div>
@@ -108,7 +107,7 @@ const NL = LAMPS.length;
 const SPOT_A = Math.atan(POOL / LH);
 const MAXPOP = 160;
 const P = {};
-for (const id of ["loose", "inh", "drift", "rel", "ppm", "fmax", "cores", "gest", "room"]) { const el = $("#" + id), o = $("#" + id + "O"); const up = () => { P[id] = +el.value; o.textContent = el.value; }; el.oninput = up; up(); }
+for (const id of ["loose", "inh", "drift", "rel", "parts", "cores", "gest", "room"]) { const el = $("#" + id), o = $("#" + id + "O"); const up = () => { P[id] = +el.value; o.textContent = el.value; }; el.oninput = up; up(); }
 
 const cv = $("#c");
 const R3 = {};
@@ -273,7 +272,8 @@ function glow(color, size) { const s = new THREE.Sprite(new THREE.SpriteMaterial
 /* ---------- bodies: the simplified design, round 7: a blunt rounded tail holding the arm, and a clear head that narrows in a curve to a small slanted nose ---------- */
 // genome g[0..8] in 0..1. Every printed form differs a little; all are about the same size.
 const GENES = 19;
-function shapeOf(g) {
+function shapeOf(g) { return mouthFit(shapeOf0(g)); }
+function shapeOf0(g) {
   // proportions vary widely, then the whole body is scaled so every robot keeps about the same length
   const A = 0.11 + 0.065 * g[1], B = 0.12 + 0.065 * g[2], Lh = 0.2 + 0.14 * g[0], Lt = 0.14 + 0.2 * g[6], Ln = 0.02 + 0.07 * g[8];
   const k = 0.6 / (Lh + Lt + Ln);
@@ -283,8 +283,13 @@ function shapeOf(g) {
     crest: g[10] > 0.5 ? (0.02 + 0.1 * (g[10] - 0.5) * 2) * k : 0, fin: g[11] > 0.45 ? 0.25 + 1.1 * (g[11] - 0.45) / 0.55 : 0,
     lobeN: 3 + Math.floor(g[12] * 4), lobeD: g[12] > 0.4 ? 0.03 + 0.06 * (g[12] - 0.4) / 0.6 : 0, tone: 0.72 + 0.28 * g[13],
     // print texture: pattern (layers, spiral, crosshatch, waves, dimples, smooth), pitch, ridge depth, angle; silicone opacity and frost
-    tex: [Math.min(5, Math.floor(g[14] * 6)), 0.006 + 0.014 * g[15], g[16] < 0.15 ? 0 : 0.0008 + 0.0025 * g[16], 0.3 + 0.9 * g[17]], sil: [0.32 + 0.4 * g[18], 0.25 + 0.6 * (1 - g[18]) * 0.9 + 0.1 * g[16], 0, 0] };
+    tex: [Math.min(5, Math.floor(g[14] * 6)), 0.006 + 0.014 * g[15], g[16] < 0.15 ? 0 : 0.0008 + 0.0025 * g[16], 0.3 + 0.9 * g[17]], sil: [0.32 + 0.4 * g[18], 0.25 + 0.6 * (1 - g[18]) * 0.9 + 0.1 * g[16], 0, 0], nb: 0.45, nd: 0.45 };
 }
+// a minimum mouth: the opening must pass the largest part in its collar, held just clear of the water, with the arm's tool above it.
+// If a genome's mouth is too small, the nose drops less and then the snout widens, until it fits.
+function mouthFit(s) { const w = -0.1 * s.B, ok = () => { const Eb = 0.88 * s.B, yc = 0.01 - Eb * s.nd, hb = Eb * (1 - s.nb), ha = 0.9 * s.As * (1 - 0.5 * s.lobeD);
+    for (const y of [w - 0.002, w + 0.028]) if (Math.pow(0.02 / ha, s.n) + Math.pow(Math.abs(y - yc) / hb, s.n) > 1) return false; return true; };
+  for (let i = 0; i < 60 && !ok(); i++) { if (s.nd > 0.2) s.nd -= 0.025; else s.As = Math.min(s.A, s.As * 1.04); } return s; }
 function printAttrs(g, s, n) { const a = new Float32Array(n * 4), b = new Float32Array(n * 4); for (let i = 0; i < n; i++) { a.set(s.tex, i * 4); b.set(s.sil, i * 4); } g.setAttribute("aTex", new THREE.BufferAttribute(a, 4)); g.setAttribute("aSil", new THREE.BufferAttribute(b, 4)); }
 function bodyGeometry(s, tail) {
   const M = 40, st = [];
@@ -293,7 +298,7 @@ function bodyGeometry(s, tail) {
   else { const NR = 10; for (let i = 0; i <= NR; i++) { const t = i / NR, ph = t * Math.PI / 2; st.push({ x: x0 - s.R * Math.cos(ph), a: s.A * Math.sin(ph), b: s.B * Math.sin(ph), zc: 0, tail: 0, f: Math.sin(ph) }); } }
   const NH = 26; for (let i = 1; i <= NH; i++) { const u = i / NH; st.push({ x: x0 + s.Lh * u, a: s.As + (s.A - s.As) * (1 - Math.pow(u, s.q)), b: s.B * (1 - 0.12 * Math.pow(u, 4)), zc: 0.01 * u, f: 1 }); }
   const E = st[st.length - 1];
-  for (let i = 1; i <= 4; i++) { const v = i / 4; st.push({ x: E.x + s.Ln * v, a: E.a * (1 - 0.1 * v), b: E.b * (1 - 0.45 * v), zc: E.zc - E.b * 0.45 * v, f: 1 - 0.5 * v }); }
+  for (let i = 1; i <= 4; i++) { const v = i / 4; st.push({ x: E.x + s.Ln * v, a: E.a * (1 - 0.1 * v), b: E.b * (1 - s.nb * v), zc: E.zc - E.b * s.nd * v, f: 1 - 0.5 * v }); }
   const e = 2 / s.n, pos = [], wr = [], ang = [], xmin0 = st[0].x, xmax0 = st[st.length - 1].x;
   const ring = (k) => { const S = st[k]; for (let j = 0; j < M; j++) { const th = j / M * Math.PI * 2, c = Math.cos(th), sn = Math.sin(th);
     const u = (S.x - xmin0) / (xmax0 - xmin0), env = Math.sin(Math.PI * clamp(u, 0, 1));
@@ -331,29 +336,54 @@ function bodyMesh(r) {
   m.castShadow = true; m.receiveShadow = false; m.updateMorphTargets(); m.userData.robot = r; m.renderOrder = 5; return m;
 }
 
-/* ---------- parts: Bergsonne tiles, each riding a small float ---------- */
-// seven families, one pad layout, one I2C/I3C bus: any tile works in any pocket. A real tile is 4 x 4 mm and would sink, so each rides a float.
+/* ---------- parts: real electronic parts at their true size, each in a thin floating collar ---------- */
+// seven families. Tiles follow Bergsonne: sealed, one pad layout, one I2C/I3C bus, T44 is 4 x 4 mm, T48 is 4 x 8 mm, 1 to 2 mm tall.
+// the other parts are real small parts: camera module, MEMS microphone, coin and pager motors, chip antenna, LiPo pouch and coin cells, single LEDs.
 const FAM = ["Core", "Sense", "Drive", "Link", "Power", "Store", "Display"], FC = 0, FS = 1, FD = 2, FL = 3, FP = 4, FT = 5, FY = 6;
 const SUBS = ["motion", "pressure", "light", "touch", "environment"];
-const FEED_W = [0.24, 0.17, 0.14, 0.12, 0.17, 0.1, 0.1];       // the feeder's mix, before it balances what is already afloat
-const RAFT = 0.07, RAFT_T = 0.012, TILE = 0.016, KIT = 6, MAXF = 280, PITCH = 0.024, NLAY = 80;
+const START_W = [0, 0.2, 0.17, 0.14, 0.27, 0.1, 0.12];          // the mix of families at the start, after the Core parts
+const KIT = 6, MAXF = 700, NLAY = 80, COLLAR = 0.003, VMIN = 0.008, WALL = 0.004;     // collar: 3 mm each side; parts under 8 mm are drawn at 8 mm; the printed wall is 4 mm
 const SUB_T = 15, GO_T = 28, GIVEUP_T = 200;                 // foraging: substitutes after 15 s, go with Core and Power after 28 s, give up after 200 s without them
-const REST = [Math.PI - 0.25, 0.35, Math.PI - 0.3];          // the arm folded in the tail: three links in a zigzag
+const REST = [-0.06, Math.PI - 0.12, 0, 0];                  // the arm at rest: folded flat along the floor of the head, base in the tail
+const COL = { tile: 0x151516, chip: 0x1d1d1e, lipo: 0xb4b4b6, coin: 0x8c8c8e, motor: 0x9a9a9c, led: 0xf2f1ec, lens: 0x050505, collar: 0xe4e2dc };
+const RND = (a, b) => a + (b - a) * rnd(), MM = (v) => Math.round(v * 1000);
+// one part: its family, kind, shape (box, disc, or a cylinder lying along x) and true size in metres: l along x, w along z, h up
+function makePart(f) {
+  const tile = (n) => { const big = rnd() < 0.4; return { kind: "tile", name: `${n}tile ${big ? "T48" : "T44"}`, sh: "box", l: big ? 0.008 : 0.004, w: 0.004, h: RND(0.001, 0.002), c: COL.tile }; };
+  let p, sub = "";
+  if (f === FC) p = tile("");
+  else if (f === FS) { sub = SUBS[Math.floor(rnd() * SUBS.length)]; const u = rnd();
+    if (u < 0.15) { sub = "light"; p = { kind: "camera", name: "camera module", sh: "box", l: 0.008, w: 0.008, h: 0.005, c: COL.chip, lens: 0.0035 }; }
+    else if (u < 0.3) { sub = "pressure"; p = { kind: "mic", name: "MEMS microphone", sh: "box", l: 0.004, w: 0.003, h: 0.001, c: COL.chip }; }
+    else { p = tile(""); p.l = RND(0.004, 0.008); p.name = "tile"; } }
+  else if (f === FD) { const u = rnd();
+    if (u < 0.35) p = tile("driver ");
+    else if (u < 0.68) { const d = RND(0.008, 0.012); p = { kind: "coin motor", name: "coin vibration motor", sh: "disc", l: d, w: d, h: 0.003, c: COL.motor }; }
+    else { const d = RND(0.004, 0.007); p = { kind: "pager motor", name: "pager motor", sh: "cyl", l: RND(0.008, 0.012), w: d, h: d, c: COL.motor }; } }
+  else if (f === FL) { if (rnd() < 0.6) p = tile("radio "); else p = { kind: "antenna", name: "chip antenna", sh: "box", l: RND(0.008, 0.01), w: RND(0.0025, 0.0032), h: 0.001, c: COL.chip }; }
+  else if (f === FP) { if (rnd() < 0.6) { const w = RND(0.012, 0.02); p = { kind: "lipo", name: "LiPo cell", sh: "box", l: RND(Math.max(0.02, w + 0.004), 0.03), w, h: RND(0.003, 0.005), c: COL.lipo }; }
+    else { const d = RND(0.012, 0.02); p = { kind: "coin cell", name: "coin cell", sh: "disc", l: d, w: d, h: RND(0.0016, 0.0032), c: COL.coin }; } }
+  else if (f === FT) p = Object.assign(tile("memory "), { l: 0.004 });
+  else { if (rnd() < 0.6) { const a = RND(0.002, 0.003); p = { kind: "led", name: "LED", sh: "box", l: a, w: a, h: 0.0014, c: COL.led }; } else p = tile("LED driver "); }
+  p.f = f; p.sub = sub; p.name = p.name.trim(); return p;
+}
+const partDims = (p) => p.sh === "box" ? `${MM(p.l)} × ${MM(p.w)} × ${(p.h * 1000).toFixed(1).replace(/\.0$/, "")} mm` : p.sh === "disc" ? `${MM(p.l)} mm across, ${(p.h * 1000).toFixed(1).replace(/\.0$/, "")} mm thick` : `${MM(p.w)} × ${MM(p.l)} mm`;
+const partText = (p) => `${FAM[p.f]}${p.sub ? " (" + p.sub + ")" : ""}, ${p.name} ${partDims(p)}`;
+// a part thicker than the printed wall cannot sit in a wall pocket; it sits on an inner ledge of the head instead
+const thick = (p) => p.h > WALL - 0.001;
 
 function buildParts() {
-  const std = (c, r, m = 0) => waterAware(new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: m }));
-  const inst = (geo, mat, n, sh) => { const m = new THREE.InstancedMesh(geo, mat, n); m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); m.count = 0; m.frustumCulled = false; m.castShadow = !!sh; m.renderOrder = 5; R3.sc.add(m); return m; };
-  R3.raft = inst(new THREE.BoxGeometry(RAFT, RAFT_T, RAFT), std(0xdedcd5, 0.78), MAXF, true);
-  R3.disc = inst(new THREE.CylinderGeometry(0.012, 0.012, 0.0016, 20).translate(0, RAFT_T / 2 + 0.0008, 0), std(0x9c9c9e, 0.35, 0.35), MAXF);
-  R3.tile = inst(new THREE.BoxGeometry(TILE, 0.003, TILE).translate(0, RAFT_T / 2 + 0.0031, 0), std(0x141415, 0.4), MAXF);
-  R3.dot = inst(new THREE.BoxGeometry(0.0044, 0.0012, 0.0044), std(0x2c2c2d, 0.6), MAXF * 7);
-  R3.rack = inst(new THREE.BoxGeometry(KIT * PITCH + 0.008, 0.003, 0.024), std(0xd4d2cc, 0.6), MAXPOP);
-  R3.ktile = inst(new THREE.BoxGeometry(TILE, 0.004, TILE), std(0x141415, 0.4), MAXPOP * KIT * 2 + MAXPOP);
-  const armM = std(0xefeee9, 0.45);
-  R3.link = inst(new THREE.CylinderGeometry(0.0045, 0.0045, 1, 8), armM, MAXPOP * 3);
-  R3.joint = inst(new THREE.SphereGeometry(0.0085, 12, 8), armM, MAXPOP * 3);
-  R3.mag = inst(new THREE.CylinderGeometry(0.013, 0.013, 0.006, 16), std(0x5a5a5c, 0.4, 0.3), MAXPOP);
-  // the light of a Display tile: one steady white point on the head
+  const mat = (r, m = 0) => waterAware(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: r, metalness: m }));
+  const inst = (geo, mt, n) => { const m = new THREE.InstancedMesh(geo, mt, n); m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); m.setColorAt(0, new THREE.Color(1, 1, 1)); m.count = 0; m.frustumCulled = false; m.renderOrder = 5; R3.sc.add(m); return m; };
+  R3.pbox = inst(new THREE.BoxGeometry(1, 1, 1), mat(0.5), 6000);
+  R3.pcyl = inst(new THREE.CylinderGeometry(0.5, 0.5, 1, 18), mat(0.45, 0.2), 3000);
+  R3.rack = inst(new THREE.BoxGeometry(1, 1, 1), mat(0.6), MAXPOP);
+  const armM = waterAware(new THREE.MeshStandardMaterial({ color: 0xefeee9, roughness: 0.45 }));
+  const ai = (geo, n) => { const m = new THREE.InstancedMesh(geo, armM, n); m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); m.count = 0; m.frustumCulled = false; m.renderOrder = 5; R3.sc.add(m); return m; };
+  R3.link = ai(new THREE.CylinderGeometry(0.0045, 0.0045, 1, 8), MAXPOP * 3);
+  R3.joint = ai(new THREE.SphereGeometry(0.0075, 12, 8), MAXPOP * 3);
+  R3.mag = inst(new THREE.CylinderGeometry(0.008, 0.008, 0.004, 16), mat(0.4, 0.3), MAXPOP);
+  // the light of a Display part: one steady white point on the head
   const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(MAXPOP * 3), 3));
   R3.leds = new THREE.Points(g, new THREE.PointsMaterial({ map: glowTex, size: 0.07, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xffffff, opacity: 0.85 }));
   R3.leds.frustumCulled = false; R3.leds.renderOrder = 16; R3.sc.add(R3.leds);
@@ -362,29 +392,46 @@ function buildParts() {
 /* ---------- the society ---------- */
 const SEED = ["slow tide", "three pulses", "an open ring", "light above", "the low pump"];
 const LEX = ["salt", "current", "fold", "glass", "echo", "shadow", "warmth", "valve", "pressure", "silt", "hum", "drift"];
-let loose = [], robots = [], floats = [], nextId = 1, fid = 1, simT = 0, speed = 1, running = true, broadcast = null, selected = null, events = [], births = 0, picks = 0, swaps = 0, ripI = 0, camMode = "tank", showRel = true;
-const feeder = { core: 0, acc: 0 };
+let loose = [], robots = [], floats = [], nextId = 1, fid = 1, simT = 0, speed = 1, running = true, broadcast = null, selected = null, events = [], births = 0, picks = 0, swaps = 0, ripI = 0, camMode = "tank", showRel = true, armWorst = 0;
 const hist = { pop: [], parts: [], div: [], tiles: [] };
 const pickable = [];
-const tileOf = (f) => ({ f, sub: f === FS ? SUBS[Math.floor(rnd() * SUBS.length)] : "" });
 const kitN = (kit) => { const n = [0, 0, 0, 0, 0, 0, 0]; for (const t of kit) n[t.f]++; return n; };
-const kitText = (kit) => kit.map((t) => FAM[t.f] + (t.sub ? " (" + t.sub + ")" : "")).join(", ");
-// what the kit lets a body do; every number here acts in the simulation
-function abilities(r) { const n = r.kn;
-  return { sense: 1.0 + 0.6 * n[FS], speed: 0.11 + 0.05 * r.g[4] + 0.045 * n[FD], ecap: 1 + 0.3 * Math.max(0, n[FP] - 1), drain: 0.016 / (1 + 0.4 * Math.max(0, n[FP] - 1)), mem: 4 + 2 * n[FT], link: n[FL] > 0, disp: n[FY] }; }
-function setKit(r, kit) { r.kit = kit; r.kn = kitN(kit); r.ab = abilities(r); if (r.memory && r.memory.length > r.ab.mem) { r.need[FT] += 0.3 * (r.memory.length - r.ab.mem); r.memory = r.memory.slice(0, r.ab.mem); } }
-// the pocket of tile i: a loose band around the head, just under the silicone skin (k < 1) or on the surface (k = 1)
-function skinPt(s, i, k) {
-  const u = 0.42 + 0.1 * Math.sin(i * 2.4 + 0.7), x = -s.Lh / 2 + s.Lh * u, a = s.As + (s.A - s.As) * (1 - Math.pow(u, s.q)), b = s.B * (1 - 0.12 * Math.pow(u, 4));
-  const th = i / KIT * Math.PI * 2 + 0.35 + 0.25 * Math.sin(i * 1.7), e = 2 / s.n, c = Math.cos(th), sn = Math.sin(th);
-  return { x, y: 0.01 * u + b * k * Math.sign(sn) * Math.pow(Math.abs(sn), e), z: a * k * Math.sign(c) * Math.pow(Math.abs(c), e), rx: Math.PI / 2 - th };
+const kitText = (kit) => kit.map((t) => FAM[t.f]).join(", ");
+// what the kit lets a body do; every number here acts in the simulation. A bigger cell holds more energy.
+const cellCap = (p) => p.kind === "lipo" ? 0.3 + 0.5 * (p.l * p.w * p.h) / (0.03 * 0.02 * 0.005) : 0.3 + 0.15 * p.l / 0.02;
+function abilities(r) { const n = r.kn; let cap = 0.7; for (const p of r.kit) if (p.f === FP) cap += cellCap(p);
+  return { sense: 1.0 + 0.6 * n[FS], speed: 0.11 + 0.05 * r.g[4] + 0.045 * n[FD], ecap: Math.max(1, cap), drain: 0.016 / (1 + 0.4 * Math.max(0, n[FP] - 1)), mem: 4 + 2 * n[FT], link: n[FL] > 0, disp: n[FY] }; }
+function setKit(r, kit) { r.kit = kit; r.kn = kitN(kit); r.ab = abilities(r); r.pk = kit.map((p, i) => pocketOf(r.s, p, i, 0.95)); if (r.memory && r.memory.length > r.ab.mem) { r.need[FT] += 0.3 * (r.memory.length - r.ab.mem); r.memory = r.memory.slice(0, r.ab.mem); } }
+// where part i of a kit sits: thin parts in a wall pocket, in a loose band around the head just under the skin; thick parts on an inner ledge low in the head
+function pocketOf(s, p, i, k) {
+  if (thick(p)) { const x = -s.Lh / 2 + s.Lh * (0.38 + 0.09 * (i % 4)), side = i % 2 ? 1 : -1, y = -0.66 * s.B;
+    return { x, y: y + p.h / 2, z: side * 0.28 * s.A, rx: 0, n: [0, 1, 0], ledge: true }; }
+  const u = 0.5 + 0.1 * Math.sin(i * 2.4 + 0.7), x = -s.Lh / 2 + s.Lh * u, a = s.As + (s.A - s.As) * (1 - Math.pow(u, s.q)), b = s.B * (1 - 0.12 * Math.pow(u, 4));
+  const el = [-0.45, 0.05, 0.55][Math.floor(i / 2) % 3] + 0.12 * Math.sin(i * 1.7), th = i % 2 ? el : Math.PI - el, e = 2 / s.n, c = Math.cos(th), sn = Math.sin(th);      // three on each side, kept off the top and the floor so the arm can reach them from inside
+  const kk = k * (1 - 0.6 * s.lobeD);
+  return { x, y: 0.01 * u + b * kk * Math.sign(sn) * Math.pow(Math.abs(sn), e), z: a * kk * Math.sign(c) * Math.pow(Math.abs(c), e), rx: Math.PI / 2 - th, n: [0, sn, c] };
 }
-function armDims(r) { const D = r.mesh.geometry.userData.front + r.s.Lh / 2, L = 0.53 * Math.hypot(D + 0.04, 0.12 + 0.5 * r.s.B) + 0.01; r.armL = [L, L, 0.05]; r.armB = [-r.s.Lh / 2, -0.5 * r.s.B]; r.skin = Array.from({ length: KIT }, (_, i) => skinPt(r.s, i, 0.93)); }
-const slotX = (r, i) => r.s.Lh / 2 - 0.155 + i * PITCH, rackY = (r) => -0.6 * r.s.B;
+// the inside of the body at x: superellipse half width a, half height b, centre zc; lobes can pull the wall in, so they count against the inside
+const SH = { m: 1 };
+function shellF(s, tail, x, y, z) { const x0 = -s.Lh / 2, xf = s.Lh / 2 + s.Ln; let a, b, zc;
+  if (x > xf + 0.004) { SH.m = 1; return 0; }                    // open water in front of the mouth
+  if (x < x0) { if (tail) { if (x < x0 - s.Lt) { SH.m = 0.01; return 9; } const t = 1 - (x0 - x) / s.Lt, f = Math.pow(Math.max(1e-4, 1 - Math.pow(1 - t, s.tp)), 1 / s.tp); a = s.A * f; b = s.B * Math.pow(f, 0.95); zc = s.drop * (1 - t) * (1 - t); }
+    else { if (x < x0 - s.R) { SH.m = 0.01; return 9; } const ph = Math.acos(clamp((x0 - x) / s.R, 0, 1)); a = s.A * Math.sin(ph); b = s.B * Math.sin(ph); zc = 0; } }
+  else if (x <= s.Lh / 2) { const u = (x - x0) / s.Lh; a = s.As + (s.A - s.As) * (1 - Math.pow(u, s.q)); b = s.B * (1 - 0.12 * Math.pow(u, 4)); zc = 0.01 * u; }
+  else { const v = clamp((x - s.Lh / 2) / s.Ln, 0, 1), Eb = 0.88 * s.B; a = s.As * (1 - 0.1 * v); b = Eb * (1 - s.nb * v); zc = 0.01 - Eb * s.nd * v; }
+  const k = 1 - s.lobeD; a = Math.max(1e-4, a * k); b = Math.max(1e-4, b * k); SH.m = Math.min(a, b);
+  return Math.pow(Math.pow(Math.abs(z / a), s.n) + Math.pow(Math.abs(y - zc) / b, s.n), 1 / s.n); }
+const penAt = (s, tail, x, y, z, rad) => { const f = shellF(s, tail, x, y, z); return f === 0 ? 0 : Math.max(0, (f - 1) * SH.m + rad); };
+const waterY = (s) => -0.1 * s.B;                               // the waterline in the body's own frame
+function armDims(r) { const s = r.s, fr = s.Lh / 2 + s.Ln, bx = -s.Lh / 2, by = -0.6 * s.B, L3 = 0.045 + 0.5 * s.Ln, yl = waterY(s) + 0.016;
+  const need = Math.hypot(fr + 0.02 - L3 - bx, yl - by); r.armL = [0.56 * need + 0.01, 0.56 * need + 0.01, L3]; r.armB = [bx, by]; if (r.arm && !r.arm.cur) { r.arm.a = REST.slice(); r.arm.p = restTip(r); r.arm.th = 0; r.arm.el = -1; } if (r.kit) r.pk = r.kit.map((p, i) => pocketOf(s, p, i, 0.95)); }
+// the rack: parts eaten and not yet built in lie in a row on the floor of the head, to one side, each in its own slot
+function rackPos(r, i, p = r.nk[i]) { let x = -0.03 * r.s.Lh / 0.25; for (let k = 0; k < i; k++) x += (r.nk[k] ? Math.max(r.nk[k].l, VMIN) : 0.008) + 2 * COLLAR + 0.004;
+  return [x + (p ? Math.max(p.l, VMIN) / 2 + COLLAR : 0.006), -0.55 * r.s.B, -0.26 * r.s.A]; }
 
 function newRobot(o) {
   const r = Object.assign({ id: nextId++, x: 0, z: 0, vx: 0, vz: 0, h: rnd() * 6.283, age: 30, energy: 1, inflate: 1, adult: true, carry: 0, birthT: 0, pair: null, phase: "", phaseT: 0, cool: 0, near: new Map(), relTo: new Map(), links: [], rel: 0, gen: 0, parents: null, bob: rnd() * 6.283,
-    kit: [], nk: [], nkn: [0, 0, 0, 0, 0, 0, 0], need: [0, 0, 0, 0, 0, 0, 0], plan: null, forage: null, pick: null, self: null, selfT: 50 + 60 * rnd(), paused: false, needle: null, arm: { a: REST.slice(), q: [], cur: null, on: false, hold: null, tool: "mag" } }, o);
+    kit: [], nk: [], nkn: [0, 0, 0, 0, 0, 0, 0], need: [0, 0, 0, 0, 0, 0, 0], plan: null, forage: null, pick: null, self: null, selfT: 50 + 60 * rnd(), paused: false, needle: null, arm: newArm() }, o);
   r.s = shapeOf(r.g); r.mesh = bodyMesh(r); r.len = r.mesh.geometry.userData.len; armDims(r); setKit(r, r.kit); r.grp = new THREE.Group(); r.grp.add(r.mesh); r.grp.matrixAutoUpdate = false;
   r.glow = glow(0xffc890, 0.5); r.glow.position.set(0, 0, 0); r.grp.add(r.glow);
   R3.sc.add(r.grp); pickable.push(r.mesh); robots.push(r); return r;
@@ -405,31 +452,29 @@ function disposeLoose(T) { R3.sc.remove(T.grp); T.mesh.geometry.dispose(); loose
 function rebuildBody(r) { const i = pickable.indexOf(r.mesh); r.grp.remove(r.mesh); r.mesh.geometry.dispose(); r.mesh = bodyMesh(r); r.len = r.mesh.geometry.userData.len; armDims(r); r.mesh.morphTargetInfluences[0] = 1 - r.inflate; r.grp.add(r.mesh); if (i >= 0) pickable[i] = r.mesh; else pickable.push(r.mesh); }
 function attachTail(r, T) {
   r.g = r.g.slice(); r.g[6] = T.g[6]; r.g[7] = T.g[7]; r.s = shapeOf(r.g); r.tail = true; rebuildBody(r); disposeLoose(T); r.dock = null; r.dockT = 0;
-  r.arm = { a: REST.slice(), q: [], cur: null, on: false, hold: null, tool: "mag" };
+  r.arm = newArm();
   ripple(r.x, r.z, 0.8); log(`#${r.id} takes the tail${T.from ? " of #" + T.from : ""} from behind`); focusOn(r, 5);
 }
 function disposeRobot(r) { R3.sc.remove(r.grp); r.mesh.geometry.dispose(); if (r.baby) { r.baby.geometry.dispose(); r.baby.material.forEach((m) => m.dispose()); } r.glow.material.dispose(); }
 
-/* floats: dropped in from above like food, up to a cap; the feeder balances the families already afloat and holds a fixed stock of Core tiles */
-function dropFloat(x, z, f, fall) { if (floats.length >= MAXF) return null; const t = tileOf(f);
-  const F = { id: fid++, f, sub: t.sub, x, z, vx: 0, vz: 0, h: rnd() * 6.283, bob: rnd() * 6.283, y: fall ? WL + 1.2 + 0.5 * rnd() : WL, vy: 0, st: fall ? "fall" : "float", claim: null, t: 0, shedBy: 0, shedT: 0 };
+/* parts on the water: a fixed set scattered at the start; nothing arrives later. Parts shed in swaps go back onto the water. */
+function addFloat(p, x, z) { if (floats.length >= MAXF) return null;
+  const F = { id: fid++, p, f: p.f, x, z, vx: 0, vz: 0, h: rnd() * 6.283, bob: rnd() * 6.283, y: WL, st: "float", claim: null, t: 0, shedBy: 0, shedT: 0, rad: Math.hypot(Math.max(p.l, VMIN), Math.max(p.w, VMIN)) / 2 + COLLAR };
   floats.push(F); return F; }
-function feedFamily() { const n = [0, 0, 0, 0, 0, 0, 0]; for (const F of floats) if (F.f >= 0) n[F.f]++;
-  let s = 0; const w = FEED_W.map((v, i) => { const x = i === FC && feeder.core <= 0 ? 0 : v / (1 + 0.5 * n[i]); s += x; return x; });
-  let u = rnd() * s; for (let i = 0; i < 7; i++) { u -= w[i]; if (u <= 0) return i; } return FY; }
-function feedOne(fall) { const f = feedFamily(); if (f === FC) feeder.core--; return dropFloat((rnd() * 2 - 1) * (TX - 0.5), (rnd() * 2 - 1) * (TZ - 0.5), f, fall); }
-const partsAfloat = () => { let n = 0; for (const F of floats) if (F.f >= 0 && F.st !== "held" && F.st !== "lift") n++; return n; };
+const partsAfloat = () => { let n = 0; for (const F of floats) if (F.st !== "held") n++; return n; };
+const coreAfloat = () => { let n = 0; for (const F of floats) if (F.f === FC && F.st !== "held") n++; return n; };
 
 function reset() {
-  robots.forEach(disposeRobot); robots = []; [...loose].forEach(disposeLoose); loose = []; floats = []; pickable.length = 0; nextId = 1; fid = 1; simT = 0; births = 0; picks = 0; swaps = 0; events = []; selected = null; focus = null; for (const k in hist) hist[k] = [];
-  feeder.core = P.cores; feeder.acc = 0;
-  // it begins small: two whole robots, each with Core, Power and one or two other tiles in its skin, a few loose tails, parts on the water
-  const OTHER = [FS, FD, FL, FT, FY], seedKit = () => { const k = [tileOf(FC), tileOf(FP)], n = 1 + Math.floor(rnd() * 2); for (let i = 0; i < n; i++) k.push(tileOf(OTHER[Math.floor(rnd() * OTHER.length)])); return k; };
+  robots.forEach(disposeRobot); robots = []; [...loose].forEach(disposeLoose); loose = []; floats = []; pickable.length = 0; nextId = 1; fid = 1; simT = 0; births = 0; picks = 0; swaps = 0; events = []; selected = null; focus = null; armWorst = 0; for (const k in hist) hist[k] = [];
+  // it begins small: two whole robots, each with Core, Power and one or two other parts in its body, a few loose tails, and every part there will ever be, on the water
+  const OTHER = [FS, FD, FL, FT, FY], seedKit = () => { const k = [makePart(FC), makePart(FP)], n = 1 + Math.floor(rnd() * 2); for (let i = 0; i < n; i++) k.push(makePart(OTHER[Math.floor(rnd() * OTHER.length)])); return k; };
   const mk = (x, z, h, cool) => { const r = newRobot({ g: Array.from({ length: GENES }, () => rnd()), tail: true, kit: seedKit(), memory: SEED.map((t) => ({ t, w: 0.6 + 0.4 * rnd() })), energy: 1, age: 40, cool }); r.x = x; r.z = z; r.h = h; return r; };
   mk(-0.6, 0.15, 0.3, 2); mk(0.7, -0.2, Math.PI - 0.2, 4);
   for (let i = 0; i < P.loose; i++) { const L = LAMPS[(i * 4 + 1) % LAMPS.length], j = rnd() * 6.283; newLoose({ g: Array.from({ length: GENES }, () => rnd()), x: L.x + Math.cos(j) * 0.4, z: L.z + Math.sin(j) * 0.4 }); }
-  for (let i = 0; i < Math.min(40, P.fmax); i++) feedOne(false);
-  log(`two robots, ${P.loose} loose tails and ${floats.length} parts on the water`);
+  const nC = Math.min(P.cores, P.parts), sw = START_W.reduce((a, b) => a + b, 0), spot = () => [(rnd() * 2 - 1) * (TX - 0.4), (rnd() * 2 - 1) * (TZ - 0.4)];
+  for (let i = 0; i < nC; i++) addFloat(makePart(FC), ...spot());
+  for (let i = nC; i < P.parts; i++) { let u = rnd() * sw, f = 1; for (; f < 6; f++) { u -= START_W[f]; if (u <= 0) break; } addFloat(makePart(f), ...spot()); }
+  log(`two robots, ${P.loose} loose tails and ${floats.length} parts on the water, ${nC} of them Core`);
 }
 function log(t) { events.push({ t: simT, text: t }); if (events.length > 5) events.shift(); $("#ev").innerHTML = events.map((e) => `<div>${fmt(e.t)}  ${esc(e.text)}</div>`).join(""); }
 const fmt = (t) => { const m = Math.floor(t / 60), s = Math.floor(t % 60); return m + ":" + String(s).padStart(2, "0"); };
@@ -440,47 +485,121 @@ function overlap(a, b) { const ma = a.mm || new Map(a.map((x) => [x.t, x.w])), m
 function like(a, b) { let s = 0; for (let i = 0; i < a.length; i++) s += (a[i] - b[i]) ** 2; return 1 - Math.sqrt(s / a.length); }
 // a Display light makes a body noticed a little more
 function relation(a, b) { a.memory.mm = a.memory.mm || new Map(a.memory.map((x) => [x.t, x.w])); b.memory.mm = b.memory.mm || new Map(b.memory.map((x) => [x.t, x.w])); return 0.5 * overlap(a.memory, b.memory) + 0.3 * like(a.g, b.g) + 0.2 * Math.min(1, (a.near.get(b.id) || 0) / 10) + (a.tail !== b.tail ? 0.03 : 0) + 0.04 * Math.min(2, b.ab.disp); }
-const reach = (r) => r.mesh.geometry.userData.front;     // center to the mouth, along the body
+const reach = (r) => r.s.Lh / 2 + r.s.Ln;     // center to the mouth, along the body
 const ready = (r) => r.adult && !r.carry && !r.babySpec && !r.pair && !r.dock && !r.forage && !r.pick && !r.self && r.cool <= 0 && r.energy > 0.8;
 
-/* ---------- the arm: three thin links in the vertical plane of the body, analytic IK for the wrist, the tool pointing down ---------- */
-function ik(r, x, y, phi) {
-  const [L1, L2, L3] = r.armL, wx = x - L3 * Math.cos(phi) - r.armB[0], wy = y - L3 * Math.sin(phi) - r.armB[1];
-  const d = clamp(Math.hypot(wx, wy), Math.abs(L1 - L2) + 1e-3, L1 + L2 - 1e-3), a1 = Math.atan2(wy, wx) + Math.acos(clamp((L1 * L1 + d * d - L2 * L2) / (2 * L1 * d), -1, 1));
-  return [a1, Math.atan2(wy - L1 * Math.sin(a1), wx - L1 * Math.cos(a1)), phi];
+/* ---------- the arm: a base yaw joint in the tail turns the working plane toward the target; in that plane two links and a short tool link, analytic IK for the wrist ---------- */
+const newArm = () => ({ a: REST.slice(), q: [], cur: null, on: false, hold: null, tool: "mag", p: null, th: 0, el: 0, needleOn: false });
+const H_RNG = [-0.7, 0.35], DOWN = [-Math.PI / 2 - 1.0, -Math.PI / 2 + 1.0];
+const lerp3 = (a, b, t) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
+// tip p in the body frame, tool angle th inside the turned plane, elbow el = +1 or -1; returns [a1, a2, a3 (absolute in the plane), yaw, shortfall]
+function ikP(r, p, th, el) {
+  const [L1, L2, L3] = r.armL, bx = r.armB[0], by = r.armB[1], psi = Math.atan2(p[2], Math.max(1e-4, p[0] - bx));
+  const tu = Math.hypot(Math.max(1e-4, p[0] - bx), p[2]), wu = tu - L3 * Math.cos(th), wv = p[1] - by - L3 * Math.sin(th);
+  const d = Math.hypot(wu, wv), dc = clamp(d, Math.abs(L1 - L2) + 1e-4, L1 + L2 - 1e-4);
+  const a1 = Math.atan2(wv, wu) + el * Math.acos(clamp((L1 * L1 + dc * dc - L2 * L2) / (2 * L1 * dc), -1, 1));
+  return [a1, Math.atan2(wv - L1 * Math.sin(a1), wu - L1 * Math.cos(a1)), th, psi, Math.max(0, d - dc)];
 }
-function armFK(r, o) { const a = r.arm.a, L = r.armL; o[0] = r.armB[0]; o[1] = r.armB[1]; for (let k = 0; k < 3; k++) { o[2 * k + 2] = o[2 * k] + L[k] * Math.cos(a[k]); o[2 * k + 3] = o[2 * k + 1] + L[k] * Math.sin(a[k]); } return o; }
-const armTo = (r, x, y, dur, fn, tool) => r.arm.q.push({ x, y, phi: -Math.PI / 2, dur, fn, tool });
-const armRest = (r, dur, fn) => r.arm.q.push({ rest: true, dur, fn });
+// base, elbow, wrist, tip in the body frame
+function armPts(r, a, o) { const L = r.armL, c = Math.cos(a[3]), s = Math.sin(a[3]); let u = 0, v = 0;
+  o[0] = r.armB[0]; o[1] = r.armB[1]; o[2] = 0;
+  for (let k = 0; k < 3; k++) { u += L[k] * Math.cos(a[k]); v += L[k] * Math.sin(a[k]); o[3 * k + 3] = r.armB[0] + u * c; o[3 * k + 4] = r.armB[1] + v; o[3 * k + 5] = u * s; } return o; }
+const toolDir = (a) => [Math.cos(a[2]) * Math.cos(a[3]), Math.sin(a[2]), Math.cos(a[2]) * Math.sin(a[3])];
+// where a held thing sits: under the magnet when the tool lies flat, beyond the tip along the tool otherwise
+function heldCenter(a, tip, p, out) { const d = toolDir(a), hh = p.h / 2 + (p.col ? 0.002 : 0);
+  if (Math.abs(d[1]) < 0.7) { out[0] = tip[0]; out[1] = tip[1] - 0.002 - hh; out[2] = tip[2]; } else { out[0] = tip[0] + d[0] * (0.002 + hh); out[1] = tip[1] + d[1] * (0.002 + hh); out[2] = tip[2] + d[2] * (0.002 + hh); } return out; }
+const PTS = new Float64Array(12), HC = [0, 0, 0];
+// how far any part of the arm, or the thing it holds, pokes out through the shell, in metres
+function armPen(r, a, hold) { armPts(r, a, PTS); const s = r.s; let w = 0;
+  for (let k = 0; k < 3; k++) for (let j = 0; j <= 5; j++) { const f = j / 5; w = Math.max(w, penAt(s, true, lerp(PTS[3 * k], PTS[3 * k + 3], f), lerp(PTS[3 * k + 1], PTS[3 * k + 4], f), lerp(PTS[3 * k + 2], PTS[3 * k + 5], f), 0.0045)); }
+  if (hold) { const p = hold.p || hold; heldCenter(a, [PTS[9], PTS[10], PTS[11]], p, HC); const c = hold.st || p.col ? COLLAR : 0, hl = Math.max(p.l, VMIN) / 2 + c, hw = Math.max(p.w, VMIN) / 2 + c, hh = p.h / 2 + 0.001;
+    for (const sx of [-1, 1]) for (const sy of [-1, 1]) for (const sz of [-1, 1]) w = Math.max(w, penAt(s, true, HC[0] + sx * hl, HC[1] + sy * hh, HC[2] + sz * hw, 0)); }
+  return w; }
+function bestPose(r, p, rng, el, hold) { let best = null, bp = 1e9; for (let i = 0; i <= 12; i++) { const a = ikP(r, p, lerp(rng[0], rng[1], i / 12), el), pen = armPen(r, a, hold) + a[4] * 20; if (pen < bp) { bp = pen; best = a; } } return [best, bp]; }
+// each move: a straight line of the tip when it can keep its elbow, otherwise eased joints; the elbow and tool angle are chosen to stay inside the shell
+// one move from state S (joints a, tip p, tool angle th, elbow el) to tip p1: try both elbows, straight line or eased joints, and keep the way that pokes out least
+function planLeg(r, S, p1, rng, hold, el1) { let best = null;
+  for (const el of (el1 ? [el1] : FORCE_EL ? [FORCE_EL] : [1, -1])) { const [a1, pe] = bestPose(r, p1, rng, el, hold);
+    for (const lin of (S.p && (S.el === el || S.el === 0) ? [true, false] : [false])) { let pen = pe;
+      for (let f = 1 / 24; f < 1 && pen < (best ? best.pen : 1e9); f += 1 / 24) { const a = lin ? ikP(r, lerp3(S.p, p1, f), lerp(S.th, a1[2], f), el) : S.a.map((v, k) => angLerp(v, a1[k], f)); pen = Math.max(pen, armPen(r, a, hold)); }
+      if (!best || pen < best.pen - 1e-5) best = { el, a1, pen, lin }; } }
+  return best; }
+const restTip = (r) => { const P = armPts(r, REST, new Float64Array(12)); return [P[9], P[10], P[11]]; };
+const VIA_RNG = [-Math.PI / 2 - 0.7, 0.5];
+function startSeg(r, c) { const A = r.arm; A.cur = c; A.t = 0; A.on = true; if (c.tool) A.tool = c.tool; c.a0 = A.a.slice();
+  if (c.rest) { c.p = restTip(r); c.rng = [-0.4, 0.4]; }      // rest is a pose like any other: the tip folded back near the base, low; either elbow
+  const S = { a: A.a.slice(), p: A.p, th: A.th, el: A.el };
+  let best = planLeg(r, S, c.p, c.rng, A.hold, c.el1);
+  // if the direct way bends the arm through the shell, try going by a point on the body's axis
+  if (best.pen > 0.0015 && !c.via && A.p) { let bv = null;
+    const vias = []; for (const vx of [A.p[0], (A.p[0] + c.p[0]) / 2, c.p[0]]) for (const vy of [0.25 * r.s.B, 0, -0.2 * r.s.B]) vias.push({ V: [vx, vy, 0], rng: VIA_RNG });
+    // or by the arm stretched straight, where both elbows meet, so the elbow can change sides without sweeping
+    const [L1, L2, L3] = r.armL; for (const ev of [0.05, 0.2, 0.35]) { const R = (L1 + L2) * 0.999, wx = r.armB[0] + R * Math.cos(ev), wy = r.armB[1] + R * Math.sin(ev); vias.push({ V: [wx - L3, wy, 0], rng: [Math.PI, Math.PI], st: true }); vias.push({ V: [wx + L3 * Math.cos(ev), wy + L3 * Math.sin(ev), 0], rng: [ev, ev], st: true }); }
+    for (const vv of vias) { const V = vv.V;
+      const l1 = planLeg(r, S, V, vv.rng, A.hold); if (bv && l1.pen >= bv.pen) continue;
+      const l2 = planLeg(r, { a: l1.a1.slice(0, 4), p: V, th: l1.a1[2], el: vv.st ? 0 : l1.el }, c.p, c.rng, A.hold, c.el1), pen = Math.max(l1.pen, l2.pen);
+      if (!bv || pen < bv.pen) bv = { V, pen, rng: vv.rng, st: vv.st }; }
+    if (bv && bv.pen < best.pen - 0.001) { const v = { p: bv.V, rng: bv.rng, dur: c.dur * 0.55, via: true, st: bv.st }; c.dur *= 0.6; c.via = true; A.q.unshift(c); startSeg(r, v); return; } }
+  c.el = best.el; c.a1 = best.a1; c.lin = best.lin; c.p0 = A.p ? A.p.slice() : null; c.th0 = A.th; c.pen = best.pen; armWorst = Math.max(armWorst, best.pen);
+}
 function armStep(r, dt) { const A = r.arm;
-  if (!A.cur && A.q.length) { A.cur = A.q.shift(); A.from = A.a.slice(); A.to = A.cur.rest ? REST : ik(r, A.cur.x, A.cur.y, A.cur.phi); A.t = 0; A.on = true; if (A.cur.tool) A.tool = A.cur.tool; }
-  if (A.cur) { A.t += dt / A.cur.dur; const e = sstep(0, 1, A.t); for (let k = 0; k < 3; k++) A.a[k] = angLerp(A.from[k], A.to[k], e);
-    if (A.t >= 1) { const c = A.cur; A.cur = null; if (c.rest && !A.q.length) A.on = false; if (c.fn) c.fn(); } return; }
-  if (r.needle) { A.a = ik(r, r.needle[0], r.needle[1], -Math.PI / 2); A.on = true; A.tool = "needle"; }      // printing: the needle traces the layer
+  if (!A.cur && A.q.length) startSeg(r, A.q.shift());
+  if (A.cur) { const c = A.cur; A.t = Math.min(1, A.t + dt / c.dur); const e = sstep(0, 1, A.t);
+    if (c.lin) { const p = lerp3(c.p0, c.p, e), th = lerp(c.th0, c.a1[2], e), a = ikP(r, p, th, c.el); for (let k = 0; k < 4; k++) A.a[k] = a[k]; }
+    else for (let k = 0; k < 4; k++) A.a[k] = angLerp(c.a0[k], c.a1[k], e);
+    if (A.t >= 1) { A.cur = null; A.p = c.p.slice(); A.th = c.a1[2]; A.el = c.st ? 0 : c.el; if (c.hold !== undefined) A.hold = c.hold; if (c.fn) c.fn(); if (c.rest && !A.q.length) A.on = false; }
+    return; }
+  // printing: the needle traces the layer, the tool pointing down
+  if (r.needle) { if (!A.needleOn) { A.q.push({ p: r.needle.slice(), rng: DOWN, dur: 0.6, tool: "needle", fn: () => (A.needleOn = true) }); return; }
+    const a = ikP(r, r.needle, -Math.PI / 2, A.el || 1); for (let k = 0; k < 4; k++) A.a[k] = a[k]; A.p = r.needle.slice(); A.th = -Math.PI / 2; A.on = true; A.tool = "needle"; }
 }
-// a pick, about 4 s: reach through the head to the mouth, magnet on, lift in, place, let the float go, fold back
+let FORCE_EL = 0;
+const seg = (r, o) => r.arm.q.push(o);
+// the range of tool angles for a pocket: from inside, pointing out along the wall's normal; onto a ledge, from above
+function pocketRng(r, q) { if (q.ledge) return DOWN; const psi = Math.atan2(q.z, Math.max(1e-4, q.x - r.armB[0])), dh = q.n[0] * Math.cos(psi) + q.n[2] * Math.sin(psi), t = Math.atan2(q.n[1], dh); return [t - 0.9, t + 0.9]; }
+function pocketTip(q, p) { const k = 0.002 + p.h / 2 + (p.col ? 0.002 : 0); return q.ledge ? [q.x, q.y + k, q.z] : [q.x - q.n[0] * k, q.y - q.n[1] * k, q.z - q.n[2] * k]; }
+const pocketIn = (q) => q.ledge ? [q.x, q.y + 0.03, q.z] : [q.x - q.n[0] * 0.035, q.y - q.n[1] * 0.035, q.z - q.n[2] * 0.035];
+// a pick: reach out through the mouth, magnet down onto the part, lift it just clear of the water, draw it straight back along the body through the mouth, then onto the rack (or into the skin, in a swap)
 function startPick(r, F) {
-  const own = !r.forage; F.st = "wait"; F.claim = r; r.pick = { F, own, slot: own ? r.selfSlot : r.nk.length }; if (r.forage) r.forage.tgt = null; r.self = null; r.vx = r.vz = 0;
-  const fr = reach(r), yF = 0.003 + RAFT_T / 2 - r.s.B * 0.1;
-  armTo(r, fr + 0.04, yF + 0.05, 0.9, null, "mag");
-  armTo(r, fr + 0.04, yF + 0.006, 0.3, () => { F.st = "held"; r.arm.hold = F; ripple(F.x, F.z, 0.18); });
-  armTo(r, fr - 0.06, 0.02, 0.6);
-  if (own) { const p = r.skin[r.pick.slot]; armTo(r, p.x, p.y + 0.02, 0.7, () => swapIn(r, F)); }
-  else armTo(r, slotX(r, r.pick.slot), rackY(r) + RAFT_T + 0.012, 0.6, () => { const t = { f: F.f, sub: F.sub }; r.nk.push(t); r.nkn = kitN(r.nk); F.f = -1; picks++; log(`#${r.id} eats ${FAM[t.f]}${t.sub ? " (" + t.sub + ")" : ""} for the next one, ${r.nk.length} of ${r.plan.length}`); });
-  armTo(r, fr + 0.04, yF + 0.012, 0.6, () => { const c = Math.cos(r.h), s = Math.sin(r.h); F.x = r.x + c * (fr + 0.045); F.z = r.z + s * (fr + 0.045); F.y = WL; F.vx = c * 0.03; F.vz = s * 0.03; F.st = F.f < 0 ? "empty" : "float"; F.t = 0; F.claim = null; r.arm.hold = null; r.pick = null; ripple(F.x, F.z, 0.15); });
-  armRest(r, 0.8);
+  const own = !r.forage, pp = F.p; F.st = "wait"; F.claim = r; r.pick = { F, own, slot: own ? r.selfSlot : r.nk.length }; if (r.forage) r.forage.tgt = null; r.self = null; r.vx = r.vz = 0;
+  const s = r.s, fr = reach(r), w = waterY(s), L = Math.max(pp.l, VMIN), xo = fr + 0.006 + L / 2 + COLLAR, yC = w + 0.0015 + pp.h + 0.002, yL = w + 0.008 + pp.h, xi = s.Lh / 2 - 0.03 - L / 2;
+  seg(r, { p: [fr - 0.04, yL, 0], rng: H_RNG, dur: 0.6, tool: "mag" });
+  seg(r, { p: [xo, yL, 0], rng: H_RNG, dur: 0.35 });
+  seg(r, { p: [xo, yC, 0], rng: H_RNG, dur: 0.2, hold: F, fn: () => { F.st = "held"; ripple(F.x, F.z, 0.12); } });
+  seg(r, { p: [xo, yL, 0], rng: H_RNG, dur: 0.2 });
+  seg(r, { p: [xi, yL, 0], rng: H_RNG, dur: 0.4 });
+  if (own) { const q = r.pk[r.pick.slot], rg = pocketRng(r, q);
+    seg(r, { p: pocketIn(q), rng: rg, dur: 0.45 });
+    seg(r, { p: pocketTip(q, pp), rng: rg, dur: 0.25, fn: () => swapIn(r, F) });
+    seg(r, { p: pocketIn(q), rng: rg, dur: 0.25 });
+    seg(r, { p: [xi, yL, 0], rng: H_RNG, dur: 0.45 });
+    seg(r, { p: [xo, yL, 0], rng: H_RNG, dur: 0.4 });
+    seg(r, { p: [xo, yC, 0], rng: H_RNG, dur: 0.2, hold: null, fn: () => { const c = Math.cos(r.h), sn = Math.sin(r.h); F.x = r.x + c * xo; F.z = r.z + sn * xo; F.y = WL; F.vx = c * 0.03; F.vz = sn * 0.03; F.st = "float"; F.t = 0; F.claim = null; r.pick = null; ripple(F.x, F.z, 0.12); } });
+    seg(r, { p: [fr - 0.04, yL, 0], rng: H_RNG, dur: 0.4 });
+  } else { const rp = rackPos(r, r.nk.length, pp), top = rp[1] + 0.0015 + 0.002 + pp.h + 0.002;
+    seg(r, { p: [rp[0], top + 0.015, rp[2]], rng: H_RNG, dur: 0.35 });
+    seg(r, { p: [rp[0], top, rp[2]], rng: H_RNG, dur: 0.25, hold: null, fn: () => { const t = Object.assign({}, pp, { col: true }); r.nk.push(t); r.nkn = kitN(r.nk); const fi = floats.indexOf(F); if (fi >= 0) floats.splice(fi, 1); picks++; r.pick = null;
+      log(`#${r.id} eats ${FAM[t.f]}, ${t.name} ${partDims(t)}, for the next one, ${r.nk.length} of ${r.plan.length}`); } });
+  }
+  armRest(r, 0.6);
 }
-// self improvement is a swap: a body has one pocket per tile printed into it, so it cuts one tile out and sets the new one in its place; the shed tile leaves on the same float
-function swapIn(r, F) { const i = r.pick.slot, old = r.kit[i], t = { f: F.f, sub: F.sub }, kit = r.kit.slice(); kit[i] = t; setKit(r, kit); r.need[t.f] = 0;
-  F.f = old.f; F.sub = old.sub; F.shedBy = r.id; F.shedT = simT + 90; swaps++; picks++; log(`#${r.id} cuts ${FAM[old.f]} out of its skin and sets ${FAM[t.f]} in its place`); }
-// the tile a body can shed for family f: never Core, never its only Power, the one it needs least
+const armRest = (r, dur, fn) => r.arm.q.push({ rest: true, dur, fn });
+// self improvement is a swap: a body has one pocket per part built into it, so it cuts one out and sets the new one in its place; the shed part leaves through the mouth on the same collar
+function swapIn(r, F) { const i = r.pick.slot, old = r.kit[i], t = Object.assign({}, F.p, { col: false }), kit = r.kit.slice(); kit[i] = t; setKit(r, kit); r.need[t.f] = 0;
+  F.p = Object.assign({}, old, { col: false }); F.f = old.f; F.rad = Math.hypot(Math.max(old.l, VMIN), Math.max(old.w, VMIN)) / 2 + COLLAR; F.shedBy = r.id; F.shedT = simT + 90; swaps++; picks++;
+  r.swapT = simT; r.swapTxt = `${FAM[old.f]} for ${FAM[t.f]}`; log(`#${r.id} swaps: cuts ${FAM[old.f]} (${old.name}) out of its body and sets ${FAM[t.f]} (${t.name}) in its place`); }
+// the part a body can shed for family f: never Core, never its only Power, the one it needs least
 function swapSlot(r, f) { let best = -1, bv = 1e9; r.kit.forEach((t, i) => { if (t.f === f || t.f === FC || (t.f === FP && r.kn[FP] < 2)) return; const v = r.need[t.f] + (r.kn[t.f] === 1 ? 0.25 : 0); if (v < bv) { bv = v; best = i; } }); return [best, bv]; }
-// print and place: the head is printed bottom up; at the layer of each pocket the print pauses, the arm takes the tile from the rack and sets it into the wall
+// print and place: the head is printed bottom up; at the layer of each pocket the print pauses, the arm takes the part from the rack and sets it into the wall, or onto the inner ledge
+const babyPt = (r, q) => [-0.01 + q.x * 0.4, -r.s.B * 0.28 + q.y * 0.44, q.z * 0.44];
 function pauseAndPlace(r, i) {
-  const sp = r.babySpec, t = r.nk[i], p = sp.pocket[i], px = -0.01 + p.x * 0.4, py = -r.s.B * 0.28 + p.y * 0.44, L = Math.max(1, Math.round(sp.pf[i] * NLAY));
-  r.needle = null; r.paused = true;
-  armTo(r, slotX(r, i), rackY(r) + 0.02, 0.5, () => { r.arm.hold = t; }, "mag");
-  armTo(r, px, py + 0.012, 0.55, () => { t.inBaby = true; r.arm.hold = null; r.paused = false; sp.next++; log(`#${r.id} pauses the print at layer ${L} of ${NLAY} and sets ${FAM[t.f]} into the wall`); });
+  const sp = r.babySpec, t = r.nk[i], q = sp.pocket[i], bp = babyPt(r, q), L = Math.max(1, Math.round(sp.pf[i] * NLAY)), rp = rackPos(r, i), top = rp[1] + 0.0015 + 0.002 + t.h + 0.002;
+  r.needle = null; r.paused = true; r.arm.needleOn = false;
+  seg(r, { p: [rp[0], top + 0.015, rp[2]], rng: DOWN, dur: 0.4, tool: "mag" });
+  seg(r, { p: [rp[0], top, rp[2]], rng: DOWN, dur: 0.15, hold: t });
+  seg(r, { p: [rp[0], top + 0.015, rp[2]], rng: DOWN, dur: 0.15 });
+  seg(r, { p: [bp[0], bp[1] + 0.015 + t.h, bp[2]], rng: DOWN, dur: 0.4 });
+  seg(r, { p: [bp[0], bp[1] + 0.004 + t.h / 2, bp[2]], rng: DOWN, dur: 0.2, hold: null, fn: () => { t.inBaby = true; r.paused = false; sp.next++; log(`#${r.id} pauses the print at layer ${L} of ${NLAY} and sets ${FAM[t.f]}, ${t.name}, ${q.ledge ? "on the inner ledge" : "into the wall"}`); } });
 }
 
 function conceive(bearer, other) {
@@ -520,15 +639,15 @@ function startPrint(r) {
   baby.updateMorphTargets(); baby.morphTargetInfluences[0] = 1; baby.renderOrder = 4; baby.userData.plane = plane; baby.userData.len = geo.userData.len; baby.userData.back = geo.userData.back;
   r.grp.add(baby); r.baby = baby; r.carry = 0.0001; r.paused = false;
   // one pocket per tile; the print pauses when it reaches the layer of each pocket
-  sp.pocket = r.nk.map((_, i) => skinPt(s, i, 1.04)); const y0 = -0.6 * r.s.B, y1 = 0.02;
-  sp.pf = sp.pocket.map((p) => clamp((-r.s.B * 0.28 + p.y * 0.44 - y0) / (y1 - y0), 0.04, 0.96)); sp.order = sp.pf.map((_, i) => i).sort((a, b) => sp.pf[a] - sp.pf[b]); sp.next = 0;
+  sp.pocket = r.nk.map((p, i) => pocketOf(s, p, i, 1.0)); const y0 = -0.6 * r.s.B, y1 = 0.02;
+  sp.pf = sp.pocket.map((q) => clamp((babyPt(r, q)[1] - y0) / (y1 - y0), 0.04, 0.96)); sp.order = sp.pf.map((_, i) => i).sort((a, b) => sp.pf[a] - sp.pf[b]); sp.next = 0;
   if (r.forage && r.forage.tgt) r.forage.tgt.claim = null; r.forage = null;
   log(`#${r.id} has ${r.nk.map((t) => FAM[t.f]).join(", ")} and prints the next one`); focusOn(r, 6);
 }
 function giveBirth(m) {
   const sp = m.babySpec, baby = m.baby;
   const c = Math.cos(m.h), s = Math.sin(m.h), d = reach(m) - m.baby.userData.back + 0.01;      // where the full size newborn sits as it leaves the opening
-  const kit = m.nk.map((t) => ({ f: t.f, sub: t.sub }));
+  const kit = m.nk.map((t) => Object.assign({}, t, { col: false, inBaby: false }));
   const kid = newRobot({ g: sp.g, tail: false, kit, memory: sp.memory, gen: sp.gen, parents: sp.parents, age: 0, adult: false, inflate: 1, energy: 0.4, h: m.h, cool: 30 });
   kid.x = m.x + c * d; kid.z = m.z + s * d; kid.vx = c * 0.2; kid.vz = s * 0.2;
   m.grp.remove(baby); baby.geometry.dispose(); baby.material.forEach((x) => x.dispose()); m.baby = null; m.babySpec = null; m.nk = []; m.nkn = kitN(m.nk); m.plan = null;
@@ -538,7 +657,7 @@ function giveBirth(m) {
   if (m.tail) {
     const off = m.s.Lh / 2 + m.s.Lt / 2 + 0.03, T = newLoose({ g: m.g.slice(), h: m.h, from: m.id, notUntil: simT + 40 });
     T.x = m.x - c * off; T.z = m.z - s * off; T.vx = -c * 0.06; T.vz = -s * 0.06;
-    m.tail = false; m.needle = null; m.arm = { a: REST.slice(), q: [], cur: null, on: false, hold: null, tool: "mag" }; rebuildBody(m); m.vx += c * 0.08; m.vz += s * 0.08;
+    m.tail = false; m.needle = null; m.arm = newArm(); rebuildBody(m); m.vx += c * 0.08; m.vz += s * 0.08;
     log(`#${m.id} lets go of the tail`);
   }
   focusOn(kid, 7);
@@ -555,8 +674,8 @@ function look(r) {
   if (r.forage) { const F_ = r.forage, n = r.nkn, cp = n[FC] > 0 && n[FP] > 0, L = leftOf(r), sum = L.reduce((a, b) => a + b, 0);
     if (cp && (sum === 0 || r.nk.length >= r.plan.length || r.nk.length >= KIT || F_.t > GO_T)) { startPrint(r); return; }
     if (!cp && F_.t > GIVEUP_T) { if (F_.tgt) F_.tgt.claim = null; r.forage = null; r.plan = null; r.babySpec = null; r.cool = 20;
-      // it keeps Core and Power in stock and sets the other tiles back on the water, on floats
-      const c = Math.cos(r.h), s = Math.sin(r.h), fr = reach(r) + 0.06; r.nk = r.nk.filter((t, i) => { if (t.f === FC || t.f === FP) return true; const F = dropFloat(r.x + c * fr + (rnd() - 0.5) * 0.1, r.z + s * fr + (rnd() - 0.5) * 0.1, t.f, false); if (F) { F.sub = t.sub; F.shedBy = r.id; F.shedT = simT + 60; } return false; }); r.nkn = kitN(r.nk);
+      // it keeps Core and Power in stock and sets the other parts back on the water through the mouth
+      const c = Math.cos(r.h), s = Math.sin(r.h), fr = reach(r) + 0.06; r.nk = r.nk.filter((t, i) => { if (t.f === FC || t.f === FP) return true; const F = addFloat(Object.assign({}, t, { col: false }), r.x + c * fr + (rnd() - 0.5) * 0.06, r.z + s * fr + (rnd() - 0.5) * 0.06); if (F) { F.shedBy = r.id; F.shedT = simT + 60; } return false; }); r.nkn = kitN(r.nk);
       log(`#${r.id} gives up looking for ${n[FC] ? "Power" : "a Core"} for now`); return; }
     if (!F_.tgt) { const F = findFloat(r, wantMask(r)); if (F) { F.claim = r; F_.tgt = F; F_.tt = 0; } else { r.need[FS] += 0.5 / 30; if (!r.ab.link) r.need[FL] += 0.5 / 60; } }
     return; }
@@ -564,7 +683,7 @@ function look(r) {
     r.selfT = simT + 6; let bf = -1, bv = 0.4, bs = -1;
     for (let f = 1; f < 7; f++) { const v = r.need[f] + (r.kn[f] ? 0 : 0.25); if (v <= bv) continue; const [i, sv] = swapSlot(r, f); if (i >= 0 && sv < v - 0.2) { bf = f; bv = v; bs = i; } }
     if (bf < 0) return; const mask = [0, 0, 0, 0, 0, 0, 0]; mask[bf] = 1; const F = findFloat(r, mask);
-    if (F) { F.claim = r; r.self = F; r.selfSlot = bs; r.selfT0 = simT; r.selfT = simT + 90 + 90 * rnd(); log(`#${r.id} swims to a ${FAM[bf]} tile for itself`); }
+    if (F) { F.claim = r; r.self = F; r.selfSlot = bs; r.selfT0 = simT; r.selfT = simT + 90 + 90 * rnd(); log(`#${r.id} swims to a ${FAM[bf]} part for itself`); }
   }
 }
 
@@ -574,8 +693,6 @@ function step(dt) {
   // relations; robots with Link that relate count each other from farther away
   if (tick) { for (const r of robots) { r.relTo.clear(); r.links.length = 0; let rc = 0; for (const o of robots) { if (o === r) continue; const both = r.ab.link && o.ab.link, d = Math.hypot(o.x - r.x, o.z - r.z); if (d > (both ? 5 : 3)) continue; const v = relation(r, o); r.relTo.set(o, v); if (v > 0.42) { rc++; if (both) r.links.push(o); } } r.rel = rc; }
     for (const r of robots) look(r); }
-  // the feeder
-  feeder.acc += dt * P.ppm / 60; while (feeder.acc >= 1) { feeder.acc--; if (partsAfloat() < P.fmax) feedOne(true); }
   for (const r of robots) {
     r.age += dt; r.cool -= dt; for (let f = 1; f < 7; f++) r.need[f] *= 1 - dt / 150;
     if (!r.adult && r.age > 30) { r.adult = true; }
@@ -629,8 +746,8 @@ function step(dt) {
       if (r.carry < 0.75) {
         const sp = r.babySpec, nx = sp.order[sp.next];
         if (!r.paused) { const c1 = Math.min(0.75, r.carry + dt / P.gest); if (nx !== undefined && c1 / 0.75 >= sp.pf[nx]) { r.carry = sp.pf[nx] * 0.75; pauseAndPlace(r, nx); } else r.carry = c1; }
-        if (!r.paused && r.carry < 0.75) r.needle = [-0.01 + Math.sin(simT * 3.3) * 0.16 * r.baby.userData.len, lerp(-0.6 * r.s.B, 0.02, r.carry / 0.75) + 0.008];
-        if (r.carry >= 0.75) { r.needle = null; armRest(r, 0.8); }
+        if (!r.paused && r.carry < 0.75) r.needle = [-0.01 + Math.sin(simT * 3.3) * 0.16 * r.baby.userData.len, lerp(-0.6 * r.s.B, 0.02, r.carry / 0.75) + 0.008, 0];
+        if (r.carry >= 0.75) { r.needle = null; r.arm.needleOn = false; armRest(r, 0.8); }
       } else if (r.carry < 1) { r.carry = Math.min(1, r.carry + dt / P.gest); if (r.carry >= 1) { r.birthT = 0.0001; focusOn(r, 8); } }
       else { r.birthT += dt / 7; r.vx *= 0.9; r.vz *= 0.9; if (r.birthT >= 1) giveBirth(r); }
     }
@@ -640,11 +757,11 @@ function step(dt) {
     if (T) {
       if (T.claim !== r || T.st !== "float") { if (r.forage) r.forage.tgt = null; else r.self = null; }
       else {
-        const dx = T.x - r.x, dz = T.z - r.z, d = Math.hypot(dx, dz) || 1e-3, fr = reach(r), want = fr + 0.045, c = Math.cos(r.h), s = Math.sin(r.h), dm = Math.hypot(T.x - r.x - c * fr, T.z - r.z - s * fr);
+        const dx = T.x - r.x, dz = T.z - r.z, d = Math.hypot(dx, dz) || 1e-3, fr = reach(r), want = fr + 0.006 + Math.max(T.p.l, VMIN) / 2 + COLLAR, c = Math.cos(r.h), s = Math.sin(r.h), dm = Math.hypot(T.x - r.x - c * fr, T.z - r.z - s * fr);
         if (d > want + 0.25) { ax += dx / d * 0.3; az += dz / d * 0.3; r.need[FD] += dt / 90; }
         else { const k = Math.min(1, dt * 2); r.vx *= 1 - k; r.vz *= 1 - k; r.h = angLerp(r.h, Math.atan2(dz, dx), Math.min(1, dt * 2.5)); lock = true;
           const g = clamp((d - want) * 1.5, -0.1, 0.15); ax += dx / d * g; az += dz / d * g;
-          if (dm < 0.07 && Math.abs(d - want) < 0.04) { startPick(r, T); focusOn(r, 5); } }
+          if (dm < 0.06 && Math.abs(d - want) < 0.02) { startPick(r, T); focusOn(r, 5); } }
         if (r.forage) { r.forage.tt += dt; if (r.forage.tt > 40) { T.claim = null; r.forage.tgt = null; r.need[FD] += 0.3; } }
         else if (simT - r.selfT0 > 30) { T.claim = null; r.self = null; }
       }
@@ -678,28 +795,22 @@ function step(dt) {
     r.energy = clamp(r.energy + e - dt * 0.02 * v, -1, r.ab.ecap);
   }
   // floats: drift slowly, bob, are pushed by walls, bodies, tails and each other
-  let gone = false;
   for (let i = 0; i < floats.length; i++) { const F = floats[i];
     F.t += dt;
-    if (F.st === "fall") { F.vy -= 9.8 * dt; F.y += F.vy * dt; if (F.y <= WL) { F.y = WL; F.vy = 0; F.st = "float"; ripple(F.x, F.z, 0.35); } continue; }
     if (F.st === "held") continue;
-    if (F.st === "lift") { F.y += dt * 0.7; if (F.y > WL + 2.6) { F.gone = gone = true; } continue; }
-    if (F.st === "wait") { const r = F.claim; if (!r || !robots.includes(r)) { F.st = "float"; F.claim = null; continue; } const fr = reach(r) + 0.045, k = Math.min(1, dt * 3);
+    if (F.st === "wait") { const r = F.claim; if (!r || !robots.includes(r)) { F.st = "float"; F.claim = null; continue; } const fr = reach(r) + 0.006 + Math.max(F.p.l, VMIN) / 2 + COLLAR, k = Math.min(1, dt * 3);
       F.x = lerp(F.x, r.x + Math.cos(r.h) * fr, k); F.z = lerp(F.z, r.z + Math.sin(r.h) * fr, k); F.h = angLerp(F.h, -r.h, k); continue; }
     if (F.claim && !(F.claim.self === F || (F.claim.forage && F.claim.forage.tgt === F))) F.claim = null;
-    if (F.st === "empty" && F.t > 16) { F.st = "lift"; continue; }            // the feeder takes empty floats back out from above
-    if (F.st === "float" && !F.claim && F.t > 240) { F.st = "lift"; if (F.f === FC) feeder.core++; continue; }      // and parts left uneaten for a long while, so the mix on the water keeps turning over; a Core goes back to the stock
     let ax = Math.sin(simT * 0.13 + F.id * 1.7) * 0.004 + 0.003 * Math.sin(F.z * 0.9 + simT * 0.05), az = Math.cos(simT * 0.11 + F.id * 2.3) * 0.004 + 0.003 * Math.cos(F.x * 0.8 - simT * 0.04);
     const mw = 0.35; if (F.x < -TX + mw) ax += 0.25 * (-TX + mw - F.x); if (F.x > TX - mw) ax -= 0.25 * (F.x - TX + mw); if (F.z < -TZ + mw) az += 0.25 * (-TZ + mw - F.z); if (F.z > TZ - mw) az -= 0.25 * (F.z - TZ + mw);
     for (const r of robots) { if (r === F.claim) continue; const dx = F.x - r.x, dz = F.z - r.z; if (Math.abs(dx) > 0.6 || Math.abs(dz) > 0.6) continue;
-      const c = Math.cos(r.h), s = Math.sin(r.h), ud = r.mesh.geometry.userData, al = clamp(dx * c + dz * s, ud.back, ud.front), px = dx - c * al, pz = dz - s * al, d = Math.hypot(px, pz) || 1e-3, minD = r.s.A + 0.045;
+      const c = Math.cos(r.h), s = Math.sin(r.h), ud = r.mesh.geometry.userData, al = clamp(dx * c + dz * s, ud.back, ud.front), px = dx - c * al, pz = dz - s * al, d = Math.hypot(px, pz) || 1e-3, minD = r.s.A + F.rad + 0.01;
       if (d < minD) { const k = (minD - d) / minD; ax += px / d * 0.8 * k; az += pz / d * 0.8 * k; if (d < minD * 0.7) { F.x += px / d * (minD * 0.7 - d) * 0.5; F.z += pz / d * (minD * 0.7 - d) * 0.5; } } }
     for (const Tl of loose) { const dx = F.x - Tl.x, dz = F.z - Tl.z, d = Math.hypot(dx, dz) || 1e-3; if (d < 0.25) { ax += dx / d * 0.5 * (0.25 - d) / 0.25; az += dz / d * 0.5 * (0.25 - d) / 0.25; } }
-    for (let j = i + 1; j < floats.length; j++) { const Q = floats[j]; if (Q.st !== "float" && Q.st !== "empty") continue; const dx = F.x - Q.x, dz = F.z - Q.z; if (Math.abs(dx) > 0.11 || Math.abs(dz) > 0.11) continue; const d = Math.hypot(dx, dz) || 1e-3; if (d < 0.11) { const k = 0.12 * (0.11 - d) / 0.11; F.vx += dx / d * k * dt * 10; F.vz += dz / d * k * dt * 10; Q.vx -= dx / d * k * dt * 10; Q.vz -= dz / d * k * dt * 10; } }
+    for (let j = i + 1; j < floats.length; j++) { const Q = floats[j]; if (Q.st !== "float") continue; const dx = F.x - Q.x, dz = F.z - Q.z; if (Math.abs(dx) > 0.06 || Math.abs(dz) > 0.06) continue; const d = Math.hypot(dx, dz) || 1e-3, md = F.rad + Q.rad + 0.004; if (d < md) { const k = 0.12 * (md - d) / md; F.vx += dx / d * k * dt * 10; F.vz += dz / d * k * dt * 10; Q.vx -= dx / d * k * dt * 10; Q.vz -= dz / d * k * dt * 10; } }
     F.vx = (F.vx + ax * dt) * (1 - dt * 0.7); F.vz = (F.vz + az * dt) * (1 - dt * 0.7); const v = Math.hypot(F.vx, F.vz); if (v > 0.05) { F.vx *= 0.05 / v; F.vz *= 0.05 / v; }
     F.x = clamp(F.x + F.vx * dt, -TX + 0.06, TX - 0.06); F.z = clamp(F.z + F.vz * dt, -TZ + 0.06, TZ - 0.06); F.h += Math.sin(simT * 0.07 + F.id) * dt * 0.06;
   }
-  if (gone) floats = floats.filter((F) => !F.gone);
   if (Math.floor(simT / 3) !== Math.floor((simT - dt) / 3)) sample();
   for (const Tl of loose) {
     if (Tl.claim && (!robots.includes(Tl.claim) || Tl.claim.dock !== Tl)) Tl.claim = null;
@@ -714,12 +825,20 @@ function step(dt) {
 }
 
 /* ---------- drawing ---------- */
-const tmpV = new THREE.Vector3(), _m = new THREE.Matrix4(), _m2 = new THREE.Matrix4(), _l = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3(), AX = new THREE.Vector3(1, 0, 0), AZ = new THREE.Vector3(0, 0, 1), FK = new Float32Array(8);
-const tgtV = new THREE.Vector3();
+const tmpV = new THREE.Vector3(), _m = new THREE.Matrix4(), _b = new THREE.Matrix4(), _l = new THREE.Matrix4(), _q = new THREE.Quaternion(), _qI = new THREE.Quaternion(), _qL = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 2), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3(), _d = new THREE.Vector3(), AX = new THREE.Vector3(1, 0, 0), AY = new THREE.Vector3(0, 1, 0), _c = new THREE.Color();
+const tgtV = new THREE.Vector3(), PT2 = new Float64Array(12), HC2 = [0, 0, 0];
+let nB = 0, nC = 0;
+function emitBox(Mb, x, y, z, sx, sy, sz, col) { _l.compose(_p.set(x, y, z), _qI, _s.set(sx, sy, sz)); _m.multiplyMatrices(Mb, _l); R3.pbox.setMatrixAt(nB, _m); R3.pbox.setColorAt(nB++, _c.setHex(col)); }
+function emitCyl(Mb, x, y, z, d, len, lying, col) { _l.compose(_p.set(x, y, z), lying ? _qL : _qI, _s.set(d, len, d)); _m.multiplyMatrices(Mb, _l); R3.pcyl.setMatrixAt(nC, _m); R3.pcyl.setColorAt(nC++, _c.setHex(col)); }
+// a part centred on the origin of frame Mb, lying flat with its length along x; with its collar when it floats or waits on the rack
+function drawPart(Mb, p, col) { const l = Math.max(p.l, VMIN), w = Math.max(p.w, VMIN), h = p.h;
+  if (col) { if (p.sh === "disc") emitCyl(Mb, 0, -h / 2 - 0.001, 0, l + 2 * COLLAR, 0.002, false, COL.collar); else emitBox(Mb, 0, -h / 2 - 0.001, 0, l + 2 * COLLAR, 0.002, w + 2 * COLLAR, COL.collar); }
+  if (p.sh === "box") emitBox(Mb, 0, 0, 0, l, h, w, p.c); else if (p.sh === "disc") emitCyl(Mb, 0, 0, 0, l, h, false, p.c); else emitCyl(Mb, 0, 0, 0, w, l, true, p.c);
+  if (p.lens) emitCyl(Mb, 0, h / 2 + 0.0008, 0, p.lens, 0.0016, false, COL.lens); }
+const frameAt = (M, x, y, z, rx) => { _q.setFromAxisAngle(AX, rx); _l.compose(_p.set(x, y, z), _q, _s.set(1, 1, 1)); return _b.multiplyMatrices(M, _l); };
 function updateScene(dtReal) {
   const t = U.uTime.value;
-  let nr = 0, nt = 0, nl = 0, nj = 0, nm = 0, nd = 0; const led = R3.leds.geometry.attributes.position.array;
-  const putTile = (M, x, y, z, rx) => { _q.setFromAxisAngle(AX, rx); _l.compose(_p.set(x, y, z), _q, _s.set(1, 1, 1)); _m.multiplyMatrices(M, _l); R3.ktile.setMatrixAt(nt++, _m); };
+  let nl = 0, nj = 0, nm = 0, nd = 0; nB = 0; nC = 0; const led = R3.leds.geometry.attributes.position.array;
   for (const r of robots) {
     const touching = r.phase === "touch";
     r.grp.position.set(r.x, WL + r.s.B * 0.1 + Math.sin(t * 0.8 + r.bob) * 0.007, r.z);
@@ -727,11 +846,9 @@ function updateScene(dtReal) {
     r.mesh.morphTargetInfluences[0] = 1 - r.inflate;
     const swell = r.carry ? 1 + 0.06 * sstep(0.6, 1, r.carry) + 0.05 * Math.sin(r.birthT * Math.PI) : 1; r.mesh.scale.set(1, swell, swell);
     const M = r.grp.matrix;
-    // its own kit: tiles embedded in the silicone skin, in a loose band around the head
-    for (let i = 0; i < r.kit.length; i++) { const p = r.skin[i]; putTile(M, p.x, p.y * swell, p.z * swell, p.rx); }
+    // its own kit: thin parts in wall pockets, a loose band around the head; thick parts on the inner ledge
+    for (let i = 0; i < r.kit.length; i++) { const q = r.pk[i]; drawPart(frameAt(M, q.x, q.y * swell, q.z * swell, q.rx), r.kit[i], false); }
     if (r.ab.disp) { _p.set(-r.s.Lh * 0.1, r.s.B * swell * 1.02, 0).applyMatrix4(M); led.set([_p.x, _p.y, _p.z], nd * 3); nd++; }
-    // the stock: tiles eaten and not yet built in, on the rack inside the head
-    if (r.nk.length || r.forage) { _l.makeTranslation(slotX(r, (KIT - 1) / 2), rackY(r) - 0.0035, 0); _m.multiplyMatrices(M, _l); R3.rack.setMatrixAt(nr++, _m); }
     // the newborn inside: printed bottom up with pauses, then a little air, then pushed out through the mouth
     let w = 0, bx = 0, by = 0;
     if (r.baby) {
@@ -746,36 +863,34 @@ function updateScene(dtReal) {
       b.userData.plane.constant = out > 0 ? 10 : lerp(y0, y1, pr);
       b.visible = r.carry > 0.002;
     }
+    // the stock: parts eaten and not yet built in, each on its slot of the rack on the floor of the head
     for (let i = 0; i < r.nk.length; i++) { const k = r.nk[i]; if (k === r.arm.hold) continue;
-      if (k.inBaby && r.babySpec && r.babySpec.pocket) { const p = r.babySpec.pocket[i], sx = 1 - 0.6 * w, sy = 1 - 0.56 * w; putTile(M, bx + p.x * sx, by + p.y * sy, p.z * sy, p.rx); }
-      else putTile(M, slotX(r, i), rackY(r) + 0.0005, 0, 0); }
-    // the arm, only drawn while it works; at rest it is folded inside the opaque tail
-    if (r.tail && r.arm.on) { armFK(r, FK);
-      for (let k = 0; k < 3; k++) { const x0 = FK[2 * k], y0 = FK[2 * k + 1], x1 = FK[2 * k + 2], y1 = FK[2 * k + 3], len = Math.hypot(x1 - x0, y1 - y0);
-        _q.setFromAxisAngle(AZ, Math.atan2(y1 - y0, x1 - x0) - Math.PI / 2); _l.compose(_p.set((x0 + x1) / 2, (y0 + y1) / 2, 0), _q, _s.set(k === 2 && r.arm.tool === "needle" ? 0.5 : 1, len, k === 2 && r.arm.tool === "needle" ? 0.5 : 1)); _m.multiplyMatrices(M, _l); R3.link.setMatrixAt(nl++, _m);
-        _l.makeTranslation(x0, y0, 0); _m.multiplyMatrices(M, _l); R3.joint.setMatrixAt(nj++, _m); }
-      const tx = FK[6], ty = FK[7];
-      if (r.arm.tool === "mag") { _q.setFromAxisAngle(AZ, r.arm.a[2] - Math.PI / 2); _l.compose(_p.set(tx, ty, 0), _q, _s.set(1, 1, 1)); _m.multiplyMatrices(M, _l); R3.mag.setMatrixAt(nm++, _m); }
-      const hd = r.arm.hold;
-      if (hd && hd.st === "held") { _p.set(tx, ty - 0.006 - RAFT_T / 2, 0).applyMatrix4(M); hd.x = _p.x; hd.z = _p.z; hd.y = _p.y - 0.003; hd.h = -r.h; }
-      else if (hd) putTile(M, tx, ty - 0.005, 0, 0);
+      if (k.inBaby && r.babySpec && r.babySpec.pocket) { const q = r.babySpec.pocket[i], sx = 1 - 0.6 * w, sy = 1 - 0.56 * w; drawPart(frameAt(M, bx + q.x * sx, by + q.y * sy, q.z * sy, q.rx), k, false); }
+      else { const rp = rackPos(r, i); emitBox(M, rp[0], rp[1], rp[2], Math.max(k.l, VMIN) + 2 * COLLAR + 0.004, 0.003, 0.03, 0xd4d2cc); drawPart(frameAt(M, rp[0], rp[1] + 0.0035 + k.h / 2, rp[2], 0), k, true); } }
+    if (r.forage && !r.nk.length) { const rp = rackPos(r, 0, { l: 0.008 }); emitBox(M, rp[0], rp[1], rp[2], 0.016, 0.003, 0.03, 0xd4d2cc); }
+    // the arm: always drawn while it works; at rest it lies folded on the floor of the head
+    if (r.tail) { const A = r.arm; armPts(r, A.a, PT2);
+      for (let k = 0; k < 3; k++) { _p.set(PT2[3 * k], PT2[3 * k + 1], PT2[3 * k + 2]); _d.set(PT2[3 * k + 3] - _p.x, PT2[3 * k + 4] - _p.y, PT2[3 * k + 5] - _p.z); const len = _d.length(); _q.setFromUnitVectors(AY, _d.multiplyScalar(1 / Math.max(1e-6, len)));
+        const th = k === 2 && A.tool === "needle" ? 0.5 : 1; _l.compose(_p.set((PT2[3 * k] + PT2[3 * k + 3]) / 2, (PT2[3 * k + 1] + PT2[3 * k + 4]) / 2, (PT2[3 * k + 2] + PT2[3 * k + 5]) / 2), _q, _s.set(th, len, th)); _m.multiplyMatrices(M, _l); R3.link.setMatrixAt(nl++, _m);
+        _l.makeTranslation(PT2[3 * k], PT2[3 * k + 1], PT2[3 * k + 2]); _m.multiplyMatrices(M, _l); R3.joint.setMatrixAt(nj++, _m); }
+      const tip = [PT2[9], PT2[10], PT2[11]], td = toolDir(A.a);
+      if (A.tool === "mag") { if (Math.abs(td[1]) < 0.7) _q.identity(); else _q.setFromUnitVectors(AY, _d.set(td[0], td[1], td[2])); _l.compose(_p.set(tip[0], tip[1], tip[2]), _q, _s.set(1, 1, 1)); _m.multiplyMatrices(M, _l); R3.mag.setMatrixAt(nm, _m); R3.mag.setColorAt(nm++, _c.setHex(0x5a5a5c)); }
+      const hd = A.hold;
+      if (hd && hd.st === "held") { heldCenter(A.a, tip, Object.assign({ col: true }, hd.p), HC2); _p.set(HC2[0], HC2[1], HC2[2]).applyMatrix4(M); hd.x = _p.x; hd.z = _p.z; hd.y = _p.y; hd.h = -r.h; }
+      else if (hd) { heldCenter(A.a, tip, hd, HC2); drawPart(frameAt(M, HC2[0], HC2[1], HC2[2], 0), hd, hd.col); }
     }
     const gI = r.carry ? (0.35 + 0.25 * Math.sin(t * 3 + r.id)) * Math.min(1, r.carry * 6) * (r.birthT ? 1.6 : 1) : touching ? 0.25 + 0.2 * Math.sin(t * 6) : 0;
     r.glow.material.opacity = lerp(r.glow.material.opacity, gI, Math.min(1, dtReal * 4)); r.glow.visible = r.glow.material.opacity > 0.01;
     r.glow.position.set(touching ? reach(r) : 0, -0.02, 0); r.glow.scale.setScalar(touching ? 0.35 : 0.55);
   }
-  // the floats: a pale raft, a steel disc, the dark tile, and 1 to 7 dots for the family
-  let nf = 0, ntl = 0;
+  // the parts on the water, each in its thin collar, at true size
   for (const F of floats) {
-    const onW = F.st === "float" || F.st === "empty" || F.st === "wait", bob = onW ? Math.sin(t * 1.3 + F.bob) * 0.0025 : 0;
-    _e.set(onW ? Math.sin(t * 1.1 + F.bob) * 0.03 : 0, F.st === "held" ? F.h : F.h, onW ? Math.cos(t * 0.9 + F.bob) * 0.03 : 0, "YXZ"); _q.setFromEuler(_e);
-    _m.compose(_p.set(F.x, F.y + 0.003 + bob, F.z), _q, _s.set(1, 1, 1));
-    R3.raft.setMatrixAt(nf, _m); R3.disc.setMatrixAt(nf, _m); nf++;
-    if (F.f >= 0) { R3.tile.setMatrixAt(ntl++, _m); for (let k = 0; k <= F.f; k++) { _l.makeTranslation((k - F.f / 2) * 0.0068, RAFT_T / 2 + 0.0006, -0.026); _m2.multiplyMatrices(_m, _l); R3.dot.setMatrixAt(nd2++, _m2); } }
+    const held = F.st === "held", bob = held ? 0 : Math.sin(t * 1.3 + F.bob) * 0.0012;
+    _e.set(held ? 0 : Math.sin(t * 1.1 + F.bob) * 0.03, F.h, held ? 0 : Math.cos(t * 0.9 + F.bob) * 0.03, "YXZ"); _q.setFromEuler(_e);
+    _b.compose(_p.set(F.x, held ? F.y : WL + 0.0015 + F.p.h / 2 + bob, F.z), _q, _s.set(1, 1, 1)); drawPart(_b, F.p, true);
   }
-  R3.raft.count = R3.disc.count = nf; R3.tile.count = ntl; R3.dot.count = nd2; nd2 = 0;
-  R3.rack.count = nr; R3.ktile.count = nt; R3.link.count = nl; R3.joint.count = nj; R3.mag.count = nm;
-  for (const k of ["raft", "disc", "tile", "dot", "rack", "ktile", "link", "joint", "mag"]) R3[k].instanceMatrix.needsUpdate = true;
+  R3.pbox.count = nB; R3.pcyl.count = nC; R3.link.count = nl; R3.joint.count = nj; R3.mag.count = nm;
+  for (const k of ["pbox", "pcyl", "link", "joint", "mag"]) { R3[k].instanceMatrix.needsUpdate = true; if (R3[k].instanceColor) R3[k].instanceColor.needsUpdate = true; }
   R3.leds.geometry.setDrawRange(0, nd); R3.leds.geometry.attributes.position.needsUpdate = true;
   for (const T of loose) { T.grp.position.set(T.x, WL + T.s.B * 0.1 + Math.sin(t * 0.7 + T.bob) * 0.006, T.z); T.grp.rotation.set(Math.sin(t * 0.5 + T.bob) * 0.03, -T.h, Math.sin(t * 0.6 + T.bob * 1.3) * 0.025, "YXZ"); }
   // what the follow camera looks at: a birth, a touch, a pick, a print, or a robot foraging
@@ -795,9 +910,8 @@ function updateScene(dtReal) {
   R3.rel.geometry.setDrawRange(0, n * 2); R3.rel.geometry.attributes.position.needsUpdate = true; R3.rel.geometry.attributes.color.needsUpdate = true;
   if (selected && robots.includes(selected)) { R3.selRing.visible = true; R3.selRing.position.set(selected.x, WL + 0.006, selected.z); R3.selRing.scale.setScalar(selected.len * 1.3); } else R3.selRing.visible = false;
   // camera modes
-  if (camMode === "follow") { const want = new THREE.Vector3(R3.lampT.x, 0.25, R3.lampT.z); R3.ctl.target.lerp(want, Math.min(1, dtReal * 1.5)); const off = R3.cam.position.clone().sub(R3.ctl.target); const L = off.length(); if (L > 3.2) R3.cam.position.copy(R3.ctl.target).add(off.multiplyScalar(lerp(1, 3.2 / L, Math.min(1, dtReal * 1.5)))); }
+  if (camMode === "follow") { const want = new THREE.Vector3(R3.lampT.x, 0.25, R3.lampT.z); R3.ctl.target.lerp(want, Math.min(1, dtReal * 1.5)); const off = R3.cam.position.clone().sub(R3.ctl.target); const L = off.length(); const Lmax = focus && focus.pick ? 1.6 : 3.2; if (L > Lmax) R3.cam.position.copy(R3.ctl.target).add(off.multiplyScalar(lerp(1, Lmax / L, Math.min(1, dtReal * 1.5)))); }
 }
-let nd2 = 0;
 function labels() {
   const out = [], W = cv.clientWidth, H = cv.clientHeight;
   const put = (x, y, z, text) => { tmpV.set(x, y, z).project(R3.cam); if (tmpV.z > 1 || Math.abs(tmpV.x) > 1.05 || Math.abs(tmpV.y) > 1.05) return; out.push(`<div class="tg" style="left:${((tmpV.x + 1) / 2 * W).toFixed(1)}px;top:${((1 - tmpV.y) / 2 * H).toFixed(1)}px">${esc(text)}</div>`); };
@@ -818,7 +932,7 @@ function labels() {
 function famTotals() { const n = [0, 0, 0, 0, 0, 0, 0]; for (const r of robots) for (let f = 0; f < 7; f++) n[f] += r.kn[f]; return n; }
 function hud() {
   const tails = robots.filter((r) => r.tail).length, forg = robots.filter((r) => r.forage).length, pr = robots.filter((r) => r.carry).length, gens = robots.reduce((m, r) => Math.max(m, r.gen), 0), ft = famTotals();
-  $("#hud").innerHTML = `t <b>${fmt(simT)}</b> · robots <b>${robots.length}</b> · with a tail <b>${tails}</b> · loose tails <b>${loose.length}</b> · foraging <b>${forg}</b> · printing <b>${pr}</b> · births <b>${births}</b> · generation <b>${gens}</b><br>parts afloat <b>${partsAfloat()}</b> · Core left in the feeder <b>${Math.max(0, feeder.core)}</b> · eaten <b>${picks}</b> · swaps <b>${swaps}</b>${broadcast && simT - broadcast.t < 25 ? ` · signal: <b>${esc(broadcast.text)}</b>` : ""}<br>in bodies: ${FAM.map((x, i) => `${x} <b>${ft[i]}</b>`).join(" · ")}`;
+  $("#hud").innerHTML = `t <b>${fmt(simT)}</b> · robots <b>${robots.length}</b> · with a tail <b>${tails}</b> · loose tails <b>${loose.length}</b> · foraging <b>${forg}</b> · printing <b>${pr}</b> · births <b>${births}</b> · generation <b>${gens}</b><br>parts afloat <b>${partsAfloat()}</b> · Core afloat <b>${coreAfloat()}</b> · eaten <b>${picks}</b> · swaps <b>${swaps}</b>${broadcast && simT - broadcast.t < 25 ? ` · signal: <b>${esc(broadcast.text)}</b>` : ""}<br>in bodies: ${FAM.map((x, i) => `${x} <b>${ft[i]}</b>`).join(" · ")}`;
 }
 function sample() {
   if (!robots.length) return; const N = robots.length, kinds = new Set(robots.map((r) => r.kn.join("")));
@@ -835,13 +949,13 @@ function spark(id, data, fixedMax) {
 function inspect() {
   const r = selected; if (!r || !robots.includes(r)) { $("#insp").textContent = "Click a robot in the tank."; return; }
   const mm = (v) => Math.round(v * 1000), ab = r.ab;
-  const stage = r.birthT ? "giving birth" : r.carry ? (r.paused ? "print paused, setting a tile into the wall" : r.carry < 0.75 ? `printing the next one, ${Math.round(r.carry / 0.75 * 100)}%` : "filling the next one with air") : r.pick ? `picking ${FAM[r.pick.F.f >= 0 ? r.pick.F.f : FC]}` : r.forage ? (r.forage.tgt ? `foraging, swimming to ${FAM[r.forage.tgt.f]}` : "foraging, searching") : r.self ? `swimming to ${FAM[r.self.f]} for itself` : r.phase === "touch" ? `touching #${r.pair.id}` : r.phase === "seek" ? `swimming toward #${r.pair.id}` : r.dock ? "swimming to a loose tail" : r.adult ? "adult" : "young";
+  const stage = r.birthT ? "giving birth" : r.carry ? (r.paused ? "print paused, setting a part into the wall" : r.carry < 0.75 ? `printing the next one, ${Math.round(r.carry / 0.75 * 100)}%` : "filling the next one with air") : r.pick ? `picking ${partText(r.pick.F.p)}` : r.forage ? (r.forage.tgt ? `foraging, swimming to ${FAM[r.forage.tgt.f]}` : "foraging, searching") : r.self ? `swimming to ${FAM[r.self.f]} for itself` : r.phase === "touch" ? `touching #${r.pair.id}` : r.phase === "seek" ? `swimming toward #${r.pair.id}` : r.dock ? "swimming to a loose tail" : r.adult ? "adult" : "young";
   let lk = -1, lv = 0.3; for (let f = 1; f < 7; f++) if (r.need[f] > lv) { lv = r.need[f]; lk = f; }
   $("#insp").innerHTML = `<dl class="kv"><dt>robot</dt><dd>#${r.id}, generation ${r.gen}${r.parents ? ", from #" + r.parents[0] + " and #" + r.parents[1] : ", founder"}</dd>
     <dt>tail</dt><dd>${r.tail ? "yes, holds the arm, can pick and carry" : "no, cannot pick"}</dd><dt>stage</dt><dd>${stage}</dd>
-    <dt>kit</dt><dd>${kitText(r.kit) || "none"}</dd>
+    <dt>kit</dt><dd>${r.kit.map(partText).join("<br>") || "none"}</dd>
     <dt>can</dt><dd>notices floats at ${ab.sense.toFixed(1)} m${ab.link ? ", and hears what related Link robots see" : ""}; swims ${ab.speed.toFixed(2)} m/s; holds energy ${ab.ecap.toFixed(1)}; keeps ${ab.mem} memory traces${ab.disp ? "; a light others notice" : ""}</dd>
-    ${r.plan ? `<dt>next one</dt><dd>wants ${r.plan.map((f) => FAM[f]).join(", ")}; has ${r.nk.map((t) => FAM[t.f]).join(", ") || "nothing yet"}</dd>` : r.nk.length ? `<dt>stock</dt><dd>${kitText(r.nk)}</dd>` : ""}
+    ${r.plan ? `<dt>next one</dt><dd>wants ${r.plan.map((f) => FAM[f]).join(", ")}; has ${r.nk.map((t) => FAM[t.f]).join(", ") || "nothing yet"}</dd>` : r.nk.length ? `<dt>stock</dt><dd>${r.nk.map(partText).join("<br>")}</dd>` : ""}
     ${lk > 0 ? `<dt>short of</dt><dd>${FAM[lk]}</dd>` : ""}
     <dt>body</dt><dd>${mm(r.len)} × ${mm(2 * r.s.A)} × ${mm(2 * r.s.B)} mm</dd><dt>relations</dt><dd>${r.rel}</dd><dt>energy</dt><dd>${r.energy.toFixed(2)}</dd>
     <dt>memory</dt><dd>${r.memory.map((m) => esc(m.t) + " (" + m.w.toFixed(2) + ")").join(", ") || "none"}</dd></dl>`;
@@ -872,10 +986,25 @@ let downAt = null; cv.addEventListener("pointerdown", (e) => (downAt = [e.client
 cv.addEventListener("pointerup", (e) => { if (!downAt || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 5) return; const b = cv.getBoundingClientRect(); const rc = new THREE.Raycaster(); rc.setFromCamera({ x: (e.clientX - b.left) / b.width * 2 - 1, y: -(e.clientY - b.top) / b.height * 2 + 1 }, R3.cam); const hit = rc.intersectObjects(pickable, false)[0]; selected = hit ? hit.object.userData.robot : null; inspect(); });
 initThree(); tankCam(); R3.ctl.addEventListener("start", () => (R3.moved = true));
 const embedSync = () => { const e = document.documentElement.classList.contains("bnm-embed"); R3.ctl.enableZoom = !e; }; embedSync(); new MutationObserver(embedSync).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] }); reset(); requestAnimationFrame(loop);
-window.__society = { get robots() { return robots; }, get floats() { return floats; }, get simT() { return simT; }, get births() { return births; }, feeder, R3, P, setSpeed: (s) => (speed = s), step, newRobot, conceive, startPick, disposeRobot, reset,
+// a check that the arm and what it holds stay inside the shell: random genomes, every kind of part, every move
+function armTest(n = 12) { const out = { worst: 0, where: "", n: 0, by: {}, over2: 0, over5: 0 }; const save = armWorst, saveLog = events.slice();
+  for (let g = 0; g < n; g++) { const genes = Array.from({ length: GENES }, () => rnd()), kinds = [FC, FS, FS, FD, FD, FL, FP, FP, FT, FY];
+    const kit = Array.from({ length: KIT }, (_, i) => makePart(kinds[(g + i * 3) % kinds.length]));
+    const r = { id: -1, s: shapeOf(genes), tail: true, x: 0, z: 0, h: 0, arm: newArm(), nk: [], nkn: [0, 0, 0, 0, 0, 0, 0], need: [0, 0, 0, 0, 0, 0, 0], plan: [], forage: { t: 0 }, memory: [], g: genes };
+    armDims(r); setKit(r, kit);
+    const run = (label) => { const nq = r.arm.q.length; for (let k = 0; k < 2000 && (r.arm.cur || r.arm.q.length); k++) { armStep(r, 0.02); const p = armPen(r, r.arm.a, r.arm.hold); out.n++; if (p > 0.002) out.over2++; if (p > 0.005) out.over5++; const key = label.split(" ")[0] + (label.includes("ledge") ? " ledge" : label.includes("wall") || label.includes("pocket") ? " wall" : "") + " #" + (nq - r.arm.q.length) + (r.arm.cur ? (r.arm.cur.lin ? "L" : "J") : ""); out.by[key] = Math.max(out.by[key] || 0, +(p * 1000).toFixed(1)); if (p > out.worst) { const c = r.arm.cur; out.worst = p; out.where = label + " genome " + g + (c ? ` planned ${(c.pen * 1000).toFixed(1)} lin ${c.lin} via ${!!c.via} st ${!!c.st} t ${r.arm.t.toFixed(2)} el ${c.el} p0 ${c.p0 && c.p0.map((v) => v.toFixed(3))} p ${c.p.map((v) => v.toFixed(3))} a0 ${c.a0.map((v) => v.toFixed(2))} a1 ${c.a1.map((v) => v.toFixed(2))}` : ""); } } };
+    for (const f of [FC, FS, FD, FP, FL, FY]) { const F = { p: makePart(f), f, x: 0.5, z: 0, st: "float", h: 0 }; r.forage = { t: 0 }; startPick(r, F); run("pick " + F.p.name); }
+    r.forage = null; for (let i = 0; i < kit.length; i++) { r.selfSlot = i; const F = { p: makePart(kit[i].f === FC ? FS : kit[i].f), x: 0.5, z: 0, st: "float", h: 0 }; F.f = F.p.f; startPick(r, F); run("swap into " + kit[i].name + (r.pk[i].ledge ? " ledge" : " pocket")); }
+    r.nk = kit.map((p) => Object.assign({}, p, { col: true })); r.babySpec = { pocket: r.nk.map((p, i) => pocketOf(shapeOf(genes.map((v) => clamp(v + (rnd() - 0.5) * 0.2, 0, 1))), p, i, 1.0)), pf: r.nk.map(() => 0.5), next: 0 };
+    for (let i = 0; i < r.nk.length; i++) { pauseAndPlace(r, i); run("place " + r.nk[i].name + (r.babySpec.pocket[i].ledge ? " ledge" : " wall")); }
+    armRest(r, 0.6); run("rest"); }
+  armWorst = save; events = saveLog; return { worstMM: +(out.worst * 1000).toFixed(2), where: out.where, samples: out.n, over2mm: out.over2, over5mm: out.over5, by: out.by }; }
+window.__society = { get robots() { return robots; }, get floats() { return floats; }, get simT() { return simT; }, get births() { return births; }, R3, P, setSpeed: (s) => (speed = s), step, newRobot, conceive, startPick, disposeRobot, reset,
   select: (r) => { selected = r; inspect(); }, focus: (r) => { focus = r; focusUntil = simT + 30; }, setCam: (m) => document.querySelector(`[data-cam="${m}"]`).click(),
-  stats: () => ({ t: Math.round(simT), pop: robots.length, tails: robots.filter((r) => r.tail).length, afloat: partsAfloat(), coreLeft: feeder.core, births, picks, swaps, foraging: robots.filter((r) => r.forage).length, printing: robots.filter((r) => r.carry).length,
-    fam: Object.fromEntries(FAM.map((x, i) => [x, famTotals()[i]])), kits: new Set(robots.map((r) => r.kn.join(""))).size, meanTiles: +(robots.reduce((a, r) => a + r.kit.length, 0) / Math.max(1, robots.length)).toFixed(2), coreAfloat: floats.filter((F) => F.f === FC).length, forageT: robots.filter((r) => r.forage).map((r) => Math.round(r.forage.t)).join(" "), ready: robots.filter(ready).length }),
-  clear: () => { robots.forEach(disposeRobot); robots = []; [...loose].forEach(disposeLoose); loose = []; floats = []; pickable.length = 0; } };
+  stats: () => ({ t: Math.round(simT), pop: robots.length, tails: robots.filter((r) => r.tail).length, afloat: partsAfloat(), births, picks, swaps, foraging: robots.filter((r) => r.forage).length, printing: robots.filter((r) => r.carry).length,
+    fam: Object.fromEntries(FAM.map((x, i) => [x, famTotals()[i]])), kits: new Set(robots.map((r) => r.kn.join(""))).size, meanTiles: +(robots.reduce((a, r) => a + r.kit.length, 0) / Math.max(1, robots.length)).toFixed(2), coreAfloat: coreAfloat(), armWorstMM: +(armWorst * 1000).toFixed(1), forageT: robots.filter((r) => r.forage).map((r) => Math.round(r.forage.t)).join(" "), ready: robots.filter(ready).length }),
+  forceSwap: (r, f) => { const [i] = swapSlot(r, f); if (i < 0) return false; const fr = reach(r), F = addFloat(makePart(f), r.x + Math.cos(r.h) * (fr + 0.02), r.z + Math.sin(r.h) * (fr + 0.02)); r.selfSlot = i; r.forage = null; startPick(r, F); return true; },
+  forcePick: (r, f, kind) => { let p = makePart(f); for (let k = 0; k < 200 && kind && p.kind !== kind; k++) p = makePart(f); const fr = reach(r), L = Math.max(p.l, VMIN), F = addFloat(p, r.x + Math.cos(r.h) * (fr + 0.006 + L / 2 + COLLAR), r.z + Math.sin(r.h) * (fr + 0.006 + L / 2 + COLLAR)); F.h = -r.h; if (!r.forage) { r.plan = [FC, FP, f]; r.forage = { t: 0 }; } startPick(r, F); return p.name; },
+  armTest, setEl: (e) => (FORCE_EL = e), dbg: { rackPos, pocketRng, pocketTip, pocketIn, babyPt, armDims, setKit, shapeOf, newArm, armPen, ikP, shellF, penAt, bestPose, pocketOf, armPts, REST, makePart, H_RNG, DOWN }, clear: () => { robots.forEach(disposeRobot); robots = []; [...loose].forEach(disposeLoose); loose = []; floats = []; pickable.length = 0; } };
 </script>
 </body></html>
