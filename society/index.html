@@ -599,7 +599,7 @@ function shellF(s, tail, x, y, z) { const x0 = -s.Lh / 2, xf = s.Lh / 2 + s.Ln; 
     else { if (x < x0 - s.R) { SH.m = 0.01; return 9; } const ph = Math.acos(clamp((x0 - x) / s.R, 0, 1)); a = s.A * Math.sin(ph); b = s.B * Math.sin(ph); zc = 0; } }
   else if (x <= s.Lh / 2) { const u = (x - x0) / s.Lh; a = s.As + (s.A - s.As) * (1 - Math.pow(u, s.q)); b = s.B * (1 - 0.12 * Math.pow(u, 4)); zc = 0.01 * u; }
   else { const v = clamp((x - s.Lh / 2) / s.Ln, 0, 1), Eb = 0.88 * s.B; a = s.As * (1 - 0.1 * v); b = Eb * (1 - s.nb * v); zc = 0.01 - Eb * s.nd * v; }
-  const k = 1 - s.lobeD; a = Math.max(1e-4, a * k); b = Math.max(1e-4, b * k); SH.m = Math.min(a, b);
+  const k = 1 - s.lobeD; a = Math.max(1e-4, a * k); b = Math.max(1e-4, b * k); SH.m = Math.min(a, b); SH.zc = zc;
   return Math.pow(Math.pow(Math.abs(z / a), s.n) + Math.pow(Math.abs(y - zc) / b, s.n), 1 / s.n); }
 const penAt = (s, tail, x, y, z, rad) => { const f = shellF(s, tail, x, y, z); return f === 0 ? 0 : Math.max(0, (f - 1) * SH.m + rad); };
 
@@ -1127,21 +1127,35 @@ function clipMat(m, plane) { const c = m.clone(); c.clippingPlanes = [plane]; c.
    past the lip, so the folded part never has to pass the mouth open; the rim, at the back, opens last */
 const _bo = [0, 0, 0];
 function birthMap(b, out, x, y, z, fx, fy, fz, o) { const U = b.userData, ka = sstep(0, 0.22, out), lx = lerp(fx, x, ka), X = U.bx + lx;
-  const keel = sstep(-0.55 * U.B, -0.85 * U.B, y) * (1 - sstep(0.12 * U.A, 0.3 * U.A, Math.abs(z))), past = sstep(U.lip - 0.03, U.lip + 0.06, X), kc = Math.max(past, 0.45 * keel * ka);
+  const keel = sstep(-0.55 * U.B, -0.85 * U.B, y) * (1 - sstep(0.12 * U.A, 0.3 * U.A, Math.abs(z))), past = sstep(U.lip + 0.005, U.lip + 0.08, X), kc = Math.max(past, 0.45 * keel * ka);
   const yo = U.fy * (1 - 0.75 * sstep(U.lip - 0.22, U.lip, X));      // the folded part rides up the floor toward the lip
-  o[0] = X; o[1] = lerp(fy + yo, y, kc); o[2] = lerp(fz, z, kc); return o; }
+  o[0] = X; o[1] = lerp(fy + yo, y, kc); o[2] = lerp(fz, z, kc);
+  if (U.ps) { const f = shellF(U.ps, U.pt, X, o[1], o[2]); if (f > 0.93) { const k = 0.93 / f; o[1] = SH.zc + (o[1] - SH.zc) * k; o[2] *= k; } }      // cupped: inside the parent the pack is drawn in to clear the inner face (the shell is a norm, so this scale lands it 7 % inside)
+  return o; }
 function birthPose(r, b, out) { const g = b.geometry, U = b.userData, a = g.attributes.position.array, F = U.full, W = g.morphAttributes.position[0].array;
-  U.lip = reach(r); U.fy = -r.s.B * 0.28; U.bx = lerp(BABYX, reach(r) - U.back + 0.01, sstep(0.12, 0.97, out));
+  U.ps = r.s; U.pt = r.tail; U.lip = reach(r); U.fy = -r.s.B * 0.28; U.bx = lerp(BABYX, reach(r) - U.back + 0.01, sstep(0.12, 0.97, out));
   b.morphTargetInfluences[0] = 0; b.position.set(0, 0, 0);
   for (let i = 0; i < a.length; i += 3) { birthMap(b, out, F[i], F[i + 1], F[i + 2], W[i], W[i + 1], W[i + 2], _bo); a[i] = _bo[0]; a[i + 1] = _bo[1]; a[i + 2] = _bo[2]; }
   g.attributes.position.needsUpdate = true; g.computeVertexNormals(); b.updateMatrixWorld(true); b.userData.plane.constant = 10; }
+// how far the newborn passes through the parent's own shell (inside face), in m, at birth share out (or as it now is); a check like the arm's
+function babyPen(r, out) { const b = r.baby; if (!b) return [0, ""]; const g = b.geometry, a = g.attributes.position.array; let w = 0, at = "";
+  if (out !== undefined) birthPose(r, b, out);
+  const born = (out ?? r.birthT) > 0, F = b.userData.full, W = g.morphAttributes.position[0].array, m = 1, px = BABYX, py = -r.s.B * 0.28;      // before the birth: the folded pack where it is printed
+  for (let i = 0; i < a.length; i += 9) { let x, y, z; if (born) { x = a[i]; y = a[i + 1]; z = a[i + 2]; } else { x = px + lerp(F[i], W[i], m); y = py + lerp(F[i + 1], W[i + 1], m); z = lerp(F[i + 2], W[i + 2], m); }
+    const p = penAt(r.s, r.tail, x, y, z, 0); if (p > w) { w = p; at = `x ${(x * 1000).toFixed(0)} y ${(y * 1000).toFixed(0)} z ${(z * 1000).toFixed(0)} mm`; } }
+  return [w, at]; }
+function birthTest(n = 30) { const out = { worst: 0, at: "", byOut: {} }; for (const r of robots) { if (!r.baby) continue; const b0 = r.birthT;
+    for (let k = 0; k <= n; k++) { const o = k / n; const [p, at] = babyPen(r, Math.max(1e-4, o)); const key = o.toFixed(1); out.byOut[key] = Math.max(out.byOut[key] || 0, +(p * 1000).toFixed(1)); if (p > out.worst) { out.worst = p; out.at = `#${r.id} out ${o.toFixed(2)} ${at}`; } }
+    if (b0 <= 0) { r.baby.geometry.attributes.position.array.set(r.baby.userData.full); r.baby.geometry.attributes.position.needsUpdate = true; r.baby.geometry.computeVertexNormals(); } }
+  out.worstMM = +(out.worst * 1000).toFixed(1); return out; }
 function startPrint(r) {
   const sp = r.babySpec, s = shapeOf(sp.g), geo = bodyGeometry(s, false);
   const plane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0);
   const mk = (m) => clipMat(m, plane);
   mouthDark(geo); const baby = new THREE.Mesh(geo, [mk(MAT.clay), mk(MAT.clay), mk(MAT.mouth)]); baby.material[1].color.set(0xeceae4);
   baby.updateMorphTargets(); baby.morphTargetInfluences[0] = 1; baby.renderOrder = 4; baby.userData.plane = plane; baby.userData.len = geo.userData.len; baby.userData.back = geo.userData.back; baby.userData.full = geo.attributes.position.array.slice();
-  { const k = (0.6 * r.s.B + 0.02) / NLAY, a = geo.attributes.aTex.array; for (let i = 0; i < a.length; i += 4) { a[i] = 0; a[i + 1] = k; a[i + 2] = 0.0006; a[i + 3] = 0; } geo.attributes.aTex.needsUpdate = true; }      // its 18 layers show as ridges on the folded newborn baby.userData.A = s.A; baby.userData.B = s.B; baby.frustumCulled = false;
+  { const k = (0.6 * r.s.B + 0.02) / NLAY, a = geo.attributes.aTex.array; for (let i = 0; i < a.length; i += 4) { a[i] = 0; a[i + 1] = k; a[i + 2] = 0.0006; a[i + 3] = 0; } geo.attributes.aTex.needsUpdate = true; }      // its 18 layers show as ridges on the folded newborn
+  baby.userData.A = s.A; baby.userData.B = s.B; baby.frustumCulled = false;
   r.grp.add(baby); r.baby = baby; r.carry = 0.0001; r.paused = false;
   // one pocket per tile; the print pauses when it reaches the layer of each pocket
   sp.pocket = r.nk.map((p, i) => pocketOf(s, p, i, 1.0)); const y0 = -0.6 * r.s.B, y1 = 0.02;
@@ -1405,10 +1419,10 @@ function updateScene(dtReal) {
     if (r.tail) { if (r.gelS !== r.s) { r.gelS = r.s; r.gelY = floorY(r.s, true, BABYX, 0); } _l.compose(_p.set(BABYX, r.gelY + 0.003, 0), _qI, _s.set(0.15 * r.s.Lh / 0.4, 0.05, 0.1)); instPut(GELGEO, GELMAT, _m.multiplyMatrices(M, _l), { ro: 4.5 }); }
     if (r.inflate > 0.97) { r.mesh.updateMatrix(); _MB.multiplyMatrices(M, r.mesh.matrix); for (const D of r.mesh.userData.rims[0].userData.discs) instPut(DISCGEO, STEELMAT, _m.multiplyMatrices(_MB, D), { ro: 5.5 }); }
     if (r.baby) {
-      const b = r.baby, pr = clamp(r.carry / 0.75, 0, 1), inf = sstep(0.75, 1, r.carry), out = r.birthT;
+      const b = r.baby, pr = clamp(r.carry / 0.75, 0, 1), out = r.birthT;      // no air goes in before the birth: the pack stays folded inside the parent, as in the study
       if (out > 0) { birthPose(r, b, out); bx = b.userData.bx; by = 0; w = 0; b.visible = true; }
       else {
-      const e1 = sstep(0, 0.3, out), u = sstep(0.2, 1, out); w = lerp(1 - 0.25 * inf, 0, u); const sx = 1 - 0.6 * w;
+      const e1 = sstep(0, 0.3, out), u = sstep(0.2, 1, out); w = lerp(1, 0, u); const sx = 1 - 0.6 * w;
       b.morphTargetInfluences[0] = w;
       const exitX = reach(r) - b.userData.back * sx + 0.01 - 0.12 * (1 - u);
       bx = lerp(BABYX, exitX, e1); by = lerp(-r.s.B * 0.28, 0, u); b.position.set(bx, by, 0);
@@ -1763,7 +1777,7 @@ window.__society = { get robots() { return robots; }, get floats() { return floa
     fam: Object.fromEntries(FAM.map((x, i) => [x, famTotals()[i]])), kits: new Set(robots.map((r) => r.kn.join(""))).size, meanTiles: +(robots.reduce((a, r) => a + r.kit.length, 0) / Math.max(1, robots.length)).toFixed(2), coreAfloat: coreAfloat(), armWorstMM: +(armWorst * 1000).toFixed(1), armWorstAt, forageT: robots.filter((r) => r.forage).map((r) => Math.round(r.forage.t)).join(" "), ready: robots.filter(ready).length }),
   forceSwap: (r, f) => { const [i] = swapSlot(r, f); if (i < 0) return false; const F = addFloat(makePart(f), r.x + Math.cos(r.h) * r.pickX, r.z + Math.sin(r.h) * r.pickX); r.selfSlot = i; r.forage = null; startPick(r, F); return true; },
   forcePick: (r, f, kind) => { let p = makePart(f); for (let k = 0; k < 200 && kind && p.kind !== kind; k++) p = makePart(f); const F = addFloat(p, r.x + Math.cos(r.h) * r.pickX, r.z + Math.sin(r.h) * r.pickX); F.h = -r.h; if (!r.forage) { r.plan = [FC, FP, f]; r.forage = { t: 0 }; } startPick(r, F); return p.name; },
-  DIR, CINE, director, armTest, dbg: { DEX, ikArm, dexFK, dexPen, rackPos, babyPt, armDims, setKit, shapeOf, newArm, pocketOf, makePart, floorY, tW, faceX, V3: THREE.Vector3, segSecs, quiltSeg, qShape, prof: (n = 30, dt = 1 / 60) => { const gl = R3.r.getContext(), px = new Uint8Array(4), T = { step: 0, scene: 0, dir: 0, render: 0, diag: 0 }, now = () => performance.now();
+  DIR, CINE, director, armTest, dbg: { DEX, ikArm, dexFK, dexPen, rackPos, babyPt, armDims, setKit, shapeOf, newArm, pocketOf, makePart, floorY, tW, faceX, V3: THREE.Vector3, segSecs, quiltSeg, qShape, babyPen, birthTest, prof: (n = 30, dt = 1 / 60) => { const gl = R3.r.getContext(), px = new Uint8Array(4), T = { step: 0, scene: 0, dir: 0, render: 0, diag: 0 }, now = () => performance.now();
     for (let i = 0; i < n; i++) { let t = now(); step(dt); T.step += now() - t; t = now(); U.uTime.value += dt; updateScene(dt); T.scene += now() - t; t = now(); director(dt); R3.ctl.update(); updateLights(dt); T.dir += now() - t;
       t = now(); R3.r.info.autoReset = false; R3.r.info.reset(); R3.r.shadowMap.needsUpdate = true; cineRender(performance.now() / 1000, dt); R3.r.info.autoReset = true; gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); T.render += now() - t; t = now(); drawDiagram(dt); labels(); T.diag += now() - t; }
     for (const k in T) T[k] = +(T[k] / n).toFixed(2); T.calls = R3.r.info.render.calls; T.tris = R3.r.info.render.triangles; return T; } }, clear: () => { robots.forEach(disposeRobot); robots = []; [...loose].forEach(disposeLoose); loose = []; floats = []; pickable.length = 0; } };
