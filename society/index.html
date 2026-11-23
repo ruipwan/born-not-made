@@ -803,7 +803,11 @@ const newArm = () => ({ psi: 0, q: DREST.slice(), seg: [], cur: null, on: false,
 let tailsHeld = 0, armWorstAt = "";
 // the moves: straight lines of the tool point, the joints solved at every step; a tool change goes by the folded pose in the tail
 function seg(r, o) { const A = r.arm; o.dur *= 0.6; if (o.tool && o.tool !== (A.toolP || A.tool)) { A.seg.push({ rest: true, dur: 0.6 }); A.seg.push({ dwell: true, dur: 0.8, tool: o.tool }); A.toolP = o.tool; A.pp = dexFK(r, DREST, o.tool); A.ppRest = true; o.joint = true; }
+  if (o.p) o.p = reachable(r, o.p, o.tool || A.toolP || A.tool, o.psi ?? 0);
   A.seg.push(o); if (o.p) { A.pp = o.p.slice(); A.ppRest = false; A.psiP = o.psi ?? 0; } }
+// a target the DexArm cannot reach inside its official joint ranges is moved, along the line toward a point the arm reaches with ease, to the nearest point it reaches
+function reachable(r, p, tool, psi = 0) { if (!r.B0 || ikArm(r, p, tool, null, psi).err < 1e-6) return p; const m = dexFK(r, [Math.atan2(-p[2], p[0] - r.B0[0]), 0.45, 0.35], tool, psi); if (ikArm(r, m, tool, null, psi).err > 1e-6) return p;
+  let lo = 0, hi = 1; for (let k = 0; k < 14; k++) { const t = (lo + hi) / 2; if (ikArm(r, lerp3(m, p, t), tool, null, psi).err < 1e-6) lo = t; else hi = t; } return lerp3(m, p, lo); }
 const armRest = (r, dur, fn) => { r.arm.seg.push({ rest: true, dur, fn }); r.arm.pp = dexFK(r, DREST, r.arm.toolP || r.arm.tool); r.arm.ppRest = true; r.arm.psiP = 0; };
 // up to the carrying height, across, and down onto p
 function zIn(r, x, y, z) { if (!r.s || shellF(r.s, true, x, y, 0) === 0) return z; let lo = 0, hi = 0.6; for (let k = 0; k < 16; k++) { const m = (lo + hi) / 2; if (shellF(r.s, true, x, y, m) < 1) lo = m; else hi = m; }
@@ -819,7 +823,7 @@ function hop(r, p, tool, dur, last = {}, psi = 0) { if (last.psiEnd !== undefine
 function armStep(r, dt) { const A = r.arm;
   if (!A.cur && A.seg.length) { const c = A.seg.shift(); A.cur = c; A.t = 0; A.on = true; c.q0 = A.q.slice(); c.p0 = dexFK(r, A.q, A.tool, A.psi);
     if (c.tool && !c.dwell) A.tool = c.tool;
-    c.psi0 = A.psi; c.psi1 = c.psi ?? A.psi; if (c.rest) c.psi1 = 0; if (c.p) { const e = ikArm(r, c.p, A.tool, A.q, c.psi1); c.q1 = e.q; if (e.err > 1e-5) { DEX.oor++; DEX.oorMax = Math.max(DEX.oorMax, e.err); (DEX.oorLog = DEX.oorLog || []).push([r.paused ? "place" : r.pick ? (r.pick.own ? "swap" : "pick") : r.needle ? "needle" : "other", A.tool, c.p.map((v, k) => +(v - (k < 2 ? r.B0[k] : 0)).toFixed(3)), +e.err.toFixed(3)]); } } }
+    c.psi0 = A.psi; c.psi1 = c.psi ?? A.psi; if (c.rest) c.psi1 = 0; if (c.p) { const e = ikArm(r, c.p, A.tool, A.q, c.psi1); c.q1 = e.q; if (e.err > 1e-5) { DEX.oor++; DEX.oorMax = Math.max(DEX.oorMax, e.err); (DEX.oorLog = DEX.oorLog || []).push([r.job ? "free tail " + r.job.st : r.tjob ? "tail print " + r.tjob.st : r.paused ? "place" : r.pick ? (r.pick.own ? "swap" : "pick") : r.needle ? "needle" : "other", A.tool, c.p.map((v, k) => +(v - (k < 2 ? r.B0[k] : 0)).toFixed(3)), +e.err.toFixed(3)]); } } }
   if (A.cur) { const c = A.cur; A.t = Math.min(1, A.t + dt / c.dur); const e = sstep(0, 1, A.t);
     A.psi = angLerp(c.psi0, c.psi1, e); A.psi = Math.atan2(Math.sin(A.psi), Math.cos(A.psi));
     if (c.rest) for (let k = 0; k < 3; k++) A.q[k] = lerp(c.q0[k], DREST[k], e);
@@ -829,7 +833,7 @@ function armStep(r, dt) { const A = r.arm;
     return; }
   // printing: the needle follows the layer
   if (r.needle) { if (!A.needleOn) { seg(r, { p: r.needle.slice(), tool: "needle", dur: 0.8, fn: () => (A.needleOn = true) }); return; }
-    A.q = ikArm(r, r.needle, "needle", A.q, 0).q; A.psi = 0; A.on = true; }
+    if (r.needleR !== r.needle) { r.needleR = r.needle; r.needleT = reachable(r, r.needle, "needle"); } A.q = ikArm(r, r.needleT, "needle", A.q, 0).q; A.psi = 0; A.on = true; }
 }
 const lerp3 = (a, b, t) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
 // a pick: the robot has swum over the part, so it floats inside the head; the magnet comes down onto it, lifts it, and lays it on the rack (or, in a swap, sets it into the body)
