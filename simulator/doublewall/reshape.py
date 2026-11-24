@@ -479,5 +479,5 @@ for st in q['stages']: st['text'] = _txt(st['text'])
 q['notes'] = [_txt(t) for t in q['notes']]
 json.dump(q, open(os.path.join(HERE, 'quilt.json'), 'w'))
 q['notes'] = [t.replace('The newborn, free, on the tank floor. It does not move by itself.', q['stages'][[s_['key'] for s_ in q['stages']].index('free')]['text']).replace('The tail drives forward in the lane past the old head.', 'Released, the tail drives forward in the starboard lane past the old head to the newborn.') for t in q['notes']]
-for c in q['checks']: c['name'] = c['name'].replace('it lies level in front of the mouth and does not swim off by itself', 'it lies level on the floor; it swims only on its own pump')
+for c in q['checks']: c['name'] = c['name'].replace(', not propulsion. The newborn does not move by itself', ', and, jetted backward through the outlet, a slow glide of the newborn after the birth').replace('it lies level in front of the mouth and does not swim off by itself', 'it lies level on the floor; it swims only on its own pump')
 json.dump(q, open(os.path.join(HERE, 'quilt.json'), 'w'))
