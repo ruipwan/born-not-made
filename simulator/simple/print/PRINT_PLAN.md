@@ -6,7 +6,7 @@ Three prints, each in one piece: the head, the front of the tail and the rear of
 
 | Part | File | Watertight (trimesh) | Bodies | Plastic, cm3 | Mass, kg | Time, h | Box on the plate, mm | Margin to 340 x 320 x 340, mm |
 |---|---|---|---|---|---|---|---|---|
-| Head | `bnm_simple_head.stl` | yes | 1 | 733 | 0.93 | 21 | 336 x 314 x 335 | 4, 6, 5 |
+| Head | `bnm_simple_head.stl` | yes | 1 | 746 | 0.95 | 22 | 336 x 314 x 335 | 4, 6, 5 |
 | Tail, front | `bnm_simple_tail_front.stl` | yes | 1 | 803 | 1.02 | 23 | 336 x 314 x 251 | 4, 6, 89 |
 | Tail, rear | `bnm_simple_tail_rear.stl` | yes | 1 | 375 | 0.48 | 11 | 318 x 222 x 226 | 22, 98, 114 |
 
@@ -39,10 +39,10 @@ Nothing else is printed. No baffle, no ballast block, no separate mouth piece.
 
 | Part | Orientation | Box, mm | Fits | Margin, mm | Overhang beyond 45 degrees, cm2 |
 |---|---|---|---|---|---|
-| Head | on the docking face | 336 x 314 x 335 | yes | 4, 6, 5 | 226 |
-| Head | on the floor | 335 x 314 x 336 | yes | 5, 6, 4 | 1096 |
-| Head | on the side | 335 x 336 x 314 | no | 4, -16, 26 | 1520 |
-| Head | on the mouth | 336 x 314 x 335 | yes | 4, 6, 5 | 266 |
+| Head | on the docking face | 336 x 314 x 335 | yes | 4, 6, 5 | 231 |
+| Head | on the floor | 335 x 314 x 336 | yes | 5, 6, 4 | 1131 |
+| Head | on the side | 335 x 336 x 314 | no | 4, -16, 26 | 1518 |
+| Head | on the mouth | 336 x 314 x 335 | yes | 4, 6, 5 | 272 |
 | Tail, front | on the docking face | 336 x 314 x 251 | yes | 4, 6, 89 | 661 |
 | Tail, front | on the floor | 251 x 314 x 336 | yes | 89, 6, 4 | 753 |
 | Tail, front | on the side | 251 x 336 x 314 | yes | 4, 69, 26 | 1434 |
