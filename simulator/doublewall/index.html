@@ -658,6 +658,11 @@ function quiltTextures(img) {
   return { map: mk(col), bump: mk(bump) };
 }
 function tileMat(r) { const c = new THREE.Vector3(r[0], r[1], r[2]), ex = new THREE.Vector3(r[3], r[4], r[5]), ey = new THREE.Vector3(r[6], r[7], r[8]), ez = ex.clone().cross(ey); return new THREE.Matrix4().makeBasis(ex, ey, ez).setPosition(c); }
+const KITC = [[0.113, 0, -0.0056], [0.163, 0, -0.0056]], PUMPC = [0.21, 0.035, -0.0041];          // outline round 4: kit and pump between the skins of the bowl floor (12 to 8 mm between the skins there)
+// the mp6 trim pump at true size (30 x 15 x 3.8 mm), its outlet a short tube down through the outer skin
+function pumpGroup() { const g = new THREE.Group(), m = clayMat(0xb9bcc2, { rough: 0.35, sub: 0.4 });
+  const b = new THREE.Mesh(new THREE.BoxGeometry(0.030, 0.015, 0.0038), m); g.add(b); edgeLines(b, 30, 0.4, 0x6c7680);
+  const t = new THREE.Mesh(new THREE.CylinderGeometry(0.0012, 0.0012, 0.008, 10).rotateX(Math.PI / 2), m); t.position.set(0.012, 0, -0.005); g.add(t); g.userData.out = t; return g; }
 function placeTiles(S) {          // round 5: which tile set rides on the magnet, the first set on its floor after its trip, the sets in the newborn and in the parent
   if (!BB.tileSets) return; const k = S.kset || 1, birth = S.nbi >= 0;
   BB.tileSets[0].visible = k === 1; BB.tileSets[1].visible = k === 2;
@@ -665,11 +670,13 @@ function placeTiles(S) {          // round 5: which tile set rides on the magnet
     BB.nbT = BB.tileSets.map((g) => { const c = g.clone(); c.visible = true; c.matrixAutoUpdate = false; R3.scene.add(c); return c; });
     BB.parT = BB.tileSets.map((g, i) => { const c = g.clone(); c.visible = true; c.matrixAutoUpdate = false; c.matrix.copy(tileMat(J.read.tilep[i])); R3.chamber.add(c); return c; }); }
   BB.seat1.visible = k === 2 && !birth;          // round 7: the first set stays on the gel floor during the second trip (it vanished before the print)
-  BB.nbT.forEach((c, i) => { c.visible = birth; if (!birth) return; const F = J.read.tilef[i], nk = J.nbk.frames.length, k0 = Math.min(nk - 1, Math.floor(S.nbi)), k1 = Math.min(nk - 1, k0 + 1), f = S.nbi - k0, r = [];
+  if (!BB.pump) { BB.pump = pumpGroup(); R3.chamber.add(BB.pump); BB.pump.position.set(...PUMPC); BB.pumpN = pumpGroup(); NB.hi.add(BB.pumpN); BB.pumpN.position.set(...PUMPC); }
+  BB.nbT.forEach((c, i) => { c.visible = birth; if (!birth) return;
+    if (NB.hi && NB.hi.visible) { NB.hi.updateMatrixWorld(true); c.matrix.copy(NB.hi.matrixWorld).multiply(Tm(KITC[i])); c.matrixWorldNeedsUpdate = true; return; } const F = J.read.tilef[i], nk = J.nbk.frames.length, k0 = Math.min(nk - 1, Math.floor(S.nbi)), k1 = Math.min(nk - 1, k0 + 1), f = S.nbi - k0, r = [];
     for (let j = 0; j < 9; j++) r.push(F[9 * k0 + j] * (1 - f) + F[9 * k1 + j] * f); c.matrix.copy(tileMat(r));
     if (NB.F) { const Fc = NB.F; c.matrix.copy(sillTile(c.matrix, 1, (p) => [p.clone().sub(Fc.c0).dot(Fc.ex) + SILL.xd, p.clone().sub(Fc.kp).dot(Fc.ez) - 0.0025], NB.dir, Fc.ey)); c.matrix.premultiply(Tm([0, 0, NB.dz])); }          // round 23: the tile sets ride the bolster and float with the newborn
     c.matrixWorldNeedsUpdate = true; });
-  const uh = 1; BB.parT.forEach((c, i) => { c.matrix.copy(sillTile(tileMat(J.read.tilep[i]), uh, (p) => [p.x, p.z], new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 1, 0))); c.matrixWorldNeedsUpdate = true; });
+  BB.parT.forEach((c, i) => { c.matrix.copy(Tm(KITC[i])); c.matrixWorldNeedsUpdate = true; });
 }
 function applyDip(d) {
   if (!PARTS.dipG || Math.abs(d - (PARTS.dipD || 0)) < 2e-5) return; PARTS.dipD = d; const xs = J.read.x_s, xl = J.mouth.lip[0];
@@ -856,7 +863,7 @@ function nbFrame(P) {
 }
 function setNewborn(nbi) {
   if (!NB.mesh) return; const vis = nbi >= 0; for (const m of [NB.mesh, NB.inner, NB.keel, ...NB.caps]) m.visible = vis; if (!vis) { if (NB.hi) NB.hi.visible = false; NB.last = -2; return; }
-  const sk = [NB.u, NB.fl, J.WL].join(); if (Math.abs(nbi - NB.last) < 1e-4 && sk === NB.skey) return; NB.last = nbi; NB.skey = sk;
+  const sk = [NB.u, NB.fl, J.WL, NB.ox, !!NB.g2].join(); if (Math.abs(nbi - NB.last) < 1e-4 && sk === NB.skey) return; NB.last = nbi; NB.skey = sk;
   const K = J.nbk, nk = K.frames.length, k0 = Math.min(nk - 1, Math.floor(nbi)), k1 = Math.min(nk - 1, k0 + 1), f = nbi - k0, n = NB.n, sc = NB.sc, na = NB.na, nv = NB.nv, n1 = nv + 1;
   const A = NB.mesh.geometry.attributes.position.array, B = NB.inner.geometry.attributes.position.array, NA = NB.mesh.geometry.attributes.normal.array, KA = NB.keys, kp = NB.keel.geometry.attributes.position.array, jk = Math.floor(nv / 2);
   const o0 = k0 * n * 3, o1 = k1 * n * 3, g = 1 - f;
@@ -895,7 +902,8 @@ function setNewborn(nbi) {
   NB.mesh.geometry.attributes.position.needsUpdate = true; NB.inner.geometry.attributes.position.needsUpdate = true; NB.mesh.geometry.attributes.normal.needsUpdate = true;
   NB.mesh.geometry.computeBoundingSphere(); NB.keel.geometry.attributes.position.needsUpdate = true;
   const hi = NB.atRest && NB.hi; NB.mat.visible = !hi; NB.innerM.visible = !hi; NB.capM.visible = !hi; if (NB.hi) NB.hi.visible = !!hi;
-  if (hi) { NB.hi.position.set(J.read.nb_dock_tdx, 0, J.read.nb_T[2] + NB.dz);
+  for (const m of [NB.mesh, NB.inner, NB.keel, ...NB.caps]) m.position.x = NB.ox;
+  if (hi) { if (NB.g2) NB.hi.position.set(NB.g2[0], NB.g2[1], J.read.nb_T[2]); else NB.hi.position.set(J.read.nb_dock_tdx + NB.ox, 0, J.read.nb_T[2] + NB.dz);
     if (Math.abs(NB.u - NB.hiU) > 1e-4) { NB.hiU = NB.u; for (const h of NB.hiG) { if (!h.item) continue; const p = h.g.attributes.position.array, it = h.item; for (let k = 0; k < it.ix.length; k++) p[it.ix[k]] = it.b[k] + NB.u * it.dz[k]; h.g.attributes.position.needsUpdate = true; if (h.g.index && it.ix.length) h.g.computeVertexNormals(); } } }
 }
 // round 23: the cut outs of the head and the tail follow the bodies (they stayed where the parent body stands at the start); under a raised sill there is water again
@@ -916,7 +924,7 @@ function nbMask(A, n1) {
     if (n) rows.push([xs / n, hb]); }
   if (rows.length < 2) return; rows.sort((p, q) => p[0] - q[0]); const x0 = rows[0][0], dx = (rows[rows.length - 1][0] - x0) / 63;
   for (let k = 0, r = 0; k < 64; k++) { const x = x0 + k * dx; while (r < rows.length - 2 && rows[r + 1][0] < x) r++; const p = rows[r], q = rows[r + 1]; out[k] = lerp(p[1], q[1], clamp((x - p[0]) / Math.max(q[0] - p[0], 1e-6), 0, 1)); }
-  WMASK.uNF.value.set(0, 0, x0, Math.max(dx, 1e-5));
+  WMASK.uNF.value.set(0, 0, x0 + (NB.ox || 0), Math.max(dx, 1e-5));
 }
 function buildBody() {
   const H = J.hull, clip = [SECT];
@@ -984,13 +992,13 @@ function gelStrip(p, z, zt, ox, oy, cut, tailOn, headOn, su = 0) {
 }
 function setGel(z, S) {
   const dock = S.dock || 0, ox = dock + (S.tdx || 0) - (S.hdx || 0), oy = (S.tdy || 0) - (S.hdy || 0), apart = Math.hypot(ox, oy) > 0.001, R = J.read;
-  const nbDocked = R.nb_dock_tdx !== undefined && (S.tdx || 0) >= R.nb_dock_tdx - 0.001, zt = nbDocked ? (S.zt || z) : z;
+  const nbDocked = R.nb_dock_tdx !== undefined && (S.tdx || 0) >= R.nb_dock_tdx + (R.nb_shift || 0) - 0.001 && !S.g2, zt = nbDocked ? (S.zt || z) : z;
   gelStrip(PARTS.gelTop.geometry.attributes.position, z, zt, ox, oy, apart, true, true); SILLCLIP.constant = 100;
   if (PARTS.gelFaces) { PARTS.gelFaces[0].visible = false; PARTS.gelFaces[1].visible = false; }          // each gel stays behind its wall
   PARTS.gelTop.geometry.computeVertexNormals(); PARTS.gelTop.visible = z > 0.004; PARTS.gelBody.visible = z > 0.004; for (const c of PARTS.chanGel) { const h = z - c.zf; c.g.visible = h > 0.002; if (h > 0.002) { c.g.scale.z = h; c.g.position.z = c.zf + h / 2; } } GELCLIP.constant = z;
   // the gel of the newborn, filled in the relay (its own lobe; the tail part is drawn with the tail above)
   if (NBG.top) { const on = (S.gn || 0) > 1e-3 && S.nbi >= 0; NBG.grp.visible = on;
-    if (on) { const T = R.nb_T; NBG.grp.position.set(R.nb_dock_tdx, 0, T[2]); gelStrip(NBG.top.geometry.attributes.position, S.zn, S.zn, 0, 0, true, false, true); NBG.top.geometry.computeVertexNormals(); NBCLIP.constant = T[2] + S.zn; } }
+    if (on) { const T = R.nb_T; NBG.grp.position.set(R.nb_dock_tdx + (S.nbx || 0), 0, T[2]); gelStrip(NBG.top.geometry.attributes.position, S.zn, S.zn, 0, 0, true, false, true); NBG.top.geometry.computeVertexNormals(); NBCLIP.constant = T[2] + S.zn; } }
 }
 const NBG = { grp: null, top: null }, NBCLIP = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
 function buildNewbornGel() {
@@ -1125,10 +1133,10 @@ function updateTrack(st) {
 function scrubTo(clientX) {
   const segs = $("#track").querySelectorAll(".seg"); for (let i = 0; i < segs.length; i++) { const r = segs[i].getBoundingClientRect(); if (clientX <= r.right || i === segs.length - 1) { const f = clamp((clientX - r.left) / r.width, 0, 0.999); TL.T = TL.stages[i].d0 + f * TL.stages[i].disp; break; } }
 }
-const NUM = ["mdy", "q0", "q1", "q2", "kx", "ky", "kz", "kyaw", "gel", "dock", "pr", "pz", "tx", "ty", "tz", "th", "bend", "ub", "yaw", "roll", "drain", "fill", "jets", "ballast", "v", "F", "Fz", "pen", "crank", "pbar", "front", "rimx", "Fn", "nbi", "dip", "tdx", "tdy", "hdx", "hdy", "gv", "gn", "lc", "zn", "zt"], DIS2 = ["kset"], DIS = ["tool", "pP", "pN", "kit", "vac", "air", "nv", "note"];
+const NUM = ["mdy", "q0", "q1", "q2", "kx", "ky", "kz", "kyaw", "gel", "dock", "pr", "pz", "tx", "ty", "tz", "th", "bend", "ub", "yaw", "roll", "drain", "fill", "jets", "ballast", "v", "F", "Fz", "pen", "crank", "pbar", "front", "rimx", "Fn", "nbi", "dip", "tdx", "tdy", "hdx", "hdy", "gv", "gn", "lc", "zn", "zt", "nbx"], DIS2 = ["kset"], DIS = ["tool", "pP", "pN", "kit", "vac", "air", "nv", "note"];
 function evalState(T) {
   const st = stageAt(T), s = st.s, F = J.fr, x = s.i0 + st.f * (s.i1 - 1 - s.i0), i = Math.min(s.i1 - 1, Math.floor(x)), j = Math.min(s.i1 - 1, i + 1), f = x - i, S = { st, k: s.key, i };
-  for (const n of NUM) S[n] = lerp(F[n][i], F[n][j], f); for (const n of DIS) S[n] = F[n][i]; for (const n of DIS2) S[n] = F[n] ? F[n][i] : 1;
+  for (const n of NUM) S[n] = F[n] ? lerp(F[n][i], F[n][j], f) : 0; for (const n of DIS) S[n] = F[n][i]; for (const n of DIS2) S[n] = F[n] ? F[n][i] : 1;
   S.lam = [0];
   if (F.nv[i] !== F.nv[j]) { for (const n of ["tx", "ty", "tz", "th", "pz"]) S[n] = F[n][j]; }
   S.clock = s.r0 + st.f * s.real; return S;
@@ -1141,14 +1149,17 @@ function applyState(S, now) {
   sillWaterMasks(S, SS.uh);
   PARTS.parkP.visible = !!S.pP; PARTS.parkN.visible = !!S.pN; setGel(S.gel, S);
   { const f = S.st.f, sst = (u) => { u = clamp(u, 0, 1); return u * u * (3 - 2 * u); }, tilt = S.k === "relay_release" ? 0.35 * sst(f / 0.3) * (1 - sst((f - 0.75) / 0.25)) : 0; if (PARTS.tmag) PARTS.tmag.forEach((g) => { g.rotation.y = tilt; }); }          // the tabs tilt about their upper edge (the lower edge swings back off the disk), then return
+  S.g2 = S.st.s.gen === 2; NB.ox = S.nbx || 0; NB.g2 = S.g2 ? [J.fr.hdx[S.st.s.i0 - 1], J.fr.hdy[S.st.s.i0 - 1]] : null;
   setNewborn(S.nbi); applyDip(S.dip || 0); const nb = S.nv > 0.5; R3.baby.visible = nb;
   if (nb) { R3.baby.matrix.copy(Tm([S.tx, S.ty, S.tz])).multiply(M4().makeRotationZ(S.yaw)).multiply(M4().makeRotationY(-S.th)).multiply(M4().makeRotationX(S.roll)); R3.baby.matrixWorldNeedsUpdate = true;
-    PRINTCLIP.constant = S.k === "print" ? S.pz + 0.0008 : 100; }
+    if (S.g2) R3.baby.matrix.premultiply(Tm([S.hdx, S.hdy, 0]));
+    PRINTCLIP.constant = S.k.startsWith("print") ? S.pz + 0.0008 + (S.g2 ? 0 : 0) : 100; }
   const K = J.kit;
   if (false) { const ub0 = BB.u[J.body.params.BAND], ub1 = BB.u[J.body.params.BAND + 1], uc = 0.5 * (ub0 + ub1) + J.read.kit_df * (ub1 - ub0) / 0.07, kz = -BB.rb + 0.0065 + K.size[2] / 2; BB.kitG.matrix.copy(R3.baby.matrix).multiply(Tm([uc, 0, kz])); if (BB.sadFit) BB.sadFit(BB.rb);
     BB.jets.forEach((j, i) => { j.position.set(uc + BB.jetEnd[i][0] - 0.004, BB.jetEnd[i][1], kz + BB.jetEnd[i][2]); setJet(j, S.jets, now); }); }
   else { BB.kitG.matrix.copy(Tm([S.kx + (S.kit === 0 ? S.dock : 0), S.ky, S.kz + 0.003])).multiply(M4().makeRotationZ(S.kyaw)); if (BB.jets) BB.jets.forEach((j) => { j.visible = false; }); }
-  BB.kitG.matrixWorldNeedsUpdate = true; BB.kitG.visible = !(S.nbi >= 0); placeTiles(S);
+  if (S.g2) BB.kitG.matrix.premultiply(Tm([S.hdx, S.hdy, 0]));
+  BB.kitG.matrixWorldNeedsUpdate = true; BB.kitG.visible = !(S.nbi >= 0) || S.g2; placeTiles(S);
   // the two spare kits in the magazine, in the tail (the starboard kit slides to the pick pocket in the reload)
   if (!BB.spares && J.mag) BB.spares = J.mag.map(() => { const c = BB.kitG.clone(); c.matrixAutoUpdate = true; R3.tail.add(c); return c; });
   if (BB.spares) BB.spares.forEach((c, k) => { const m = J.mag[k].c; c.position.set(m[0], m[1] + (k === 0 ? S.mdy || 0 : 0), m[2] + 0.003); c.rotation.set(0, 0, 0); });
@@ -1173,7 +1184,7 @@ function buildLabels() {
   mk("Kit magazine in the tail: one kit for each of three births", "", () => inS("gel", "dock") ? [J.kit.store[0] + STATE.dock, J.kit.store[1], J.kit.store[2] + 0.05] : null);
   mk("Reload: the holder slides the next kit into the pick pocket", "k", () => inS("swim") && STATE.mdy > 0.001 && STATE.mdy < 0.0499 ? [J.mag[0].c[0], J.mag[0].c[1] + STATE.mdy, J.mag[0].c[2] + 0.06] : null);
   mk("Joint of the two tail prints, bonded and sealed", "", () => inS("dock", "gel") ? [J.printing.joint_x + STATE.dock, 0, 0.33] : null);
-  mk("Water outlet: mp6 trim pump, a few mL a minute", "", () => (STATE && STATE.nbi >= 0 && BB.nbT && /^birth_d|^free$/.test(STATE.k)) ? portWorld(BB.nbT[0], "out") : null);
+  mk("Water outlet: mp6 trim pump, a few mL a minute", "", () => (STATE && BB.pumpN && NB.hi && NB.hi.visible && /^free$/.test(STATE.k)) ? new THREE.Vector3().setFromMatrixPosition(BB.pumpN.userData.out.matrixWorld).toArray() : null);
   mk("Pockets: mp6 and driver; LiPo and controller", "k", () => (STATE && STATE.k === "cure" && BB.parT) ? new THREE.Vector3().setFromMatrixPosition(BB.parT[1].matrix).add(new THREE.Vector3(0, 0, 0.03)) : null);
   mk("Tile sets", "k", () => inS("kit", "change") ? new THREE.Vector3().setFromMatrixPosition(BB.kitG.matrix).add(new THREE.Vector3(0, 0, 0.04)).toArray() : null);
   mk("Waterline", "w", () => J.read.wl[STATE.i] > 0.01 ? [0.75, -0.26, J.read.wl[STATE.i]] : null);
@@ -1259,7 +1270,7 @@ const CAMS = {
   overview: () => ({ p: [-0.02, -1.7, 0.3], t: [-0.02, 0, 0.15] }),
   section: () => ({ p: [-0.03, -1.55, 0.2], t: [-0.03, 0, 0.16] }),
   rack: () => ({ p: [-0.14, -0.62, 0.72], t: [-0.07, 0, 0.09] }),
-  print: () => ({ p: [0.24, -0.62, 0.2], t: [0.17, 0, 0.075] }),
+  print: () => { const o = R3.chamber.position; return { p: [0.24 + o.x, -0.62 + o.y, 0.2], t: [0.17 + o.x, o.y, 0.075] }; },
   push: () => ({ p: [0.42, -0.95, 0.28], t: [0.26, 0, 0.14] }),
   opening: () => ({ p: [1.0, -0.7, 0.4], t: [0.3, 0, 0.16] }),
   birthcam: () => ({ p: [0.72, -1.15, 0.36], t: [0.4, 0, 0.14] }),
@@ -1271,7 +1282,7 @@ const CAMS = {
   sidecam: () => ({ p: [-0.03, -1.55, 0.17], t: [-0.03, 0, 0.16] }),
   dockcam: () => ({ p: [-0.03, -1.4, 0.28], t: [-0.03, 0, 0.15] }),
   plancam: () => ({ p: [-0.03, -0.03, 2.0], t: [-0.03, 0, 0.1] }),
-  lanecam: () => ({ p: [-0.02, -0.72, 2.3], t: [-0.02, 0.13, 0.05] }),
+  lanecam: () => ({ p: [0.42, -0.72, 2.3], t: [0.42, 0.13, 0.05] }),
   lipcam: () => ({ p: [0.82, -0.52, 0.33], t: [0.28, 0.0, 0.075] }),
   mouthcam: () => ({ p: [0.82, -0.17, 0.28], t: [0.32, 0, 0.14] }),          // round 7: inside the front glass (at 0.98 the camera sat on the glass plane at x 0.982 and the glass and water cut the shell)
   fullcam: () => { const b = nbPos(); return { p: [b.x * 0.5 + 0.3, -2.2, 0.75], t: [b.x * 0.5 + 0.15, 0, 0.12] }; },
@@ -1284,7 +1295,7 @@ const CAMS = {
 };
 function setCam(name, snap = false) { CAM = name; camGoal = CAMS[name](); SECT.constant = name === "section" ? 0 : 100; document.querySelectorAll("[data-cam]").forEach((b) => b.classList.toggle("on", b.dataset.cam === name)); if (snap) CAMSNAP = true; }
 function setAuto(v) { AUTO = v; $("#autoCam").classList.toggle("on", v); $("#autoCam").setAttribute("aria-pressed", String(v)); }
-function autoCam(S) { const want = { dock: S.st.f < 0.45 ? "wide" : "overview", gel: "overview", kit: "rack", change: "rack", print: "print", cure: "rack", drain: "push", push: "push", fill: "birthcam", float: "birthcam", swim: "swimcam", birth_a: "push", birth_b: "push", birth_c: "push", birth_d: "birthcam", free: "freecam", relay_back: "lanecam", relay_release: "lanecam", relay_lane: "lanecam", relay_dock: "lanecam", relay_gel: "lanecam", next: "lanecam" }[S.k] || "overview"; if (want !== CAM) setCam(want); }
+function autoCam(S) { const want = { dock: S.st.f < 0.45 ? "wide" : "overview", gel: "overview", kit: "rack", change: "rack", print: "print", cure: "rack", print2: "print", cure2: "print", drain: "push", push: "push", fill: "birthcam", float: "birthcam", swim: "swimcam", birth_a: "push", birth_b: "push", birth_c: "push", birth_d: "birthcam", free: "freecam", relay_back: "lanecam", relay_release: "lanecam", relay_lane: "lanecam", relay_dock: "lanecam", relay_gel: "lanecam", next: "lanecam" }[S.k] || "overview"; if (want !== CAM) setCam(want); }
 const CAMV = { p: new THREE.Vector3(), t: new THREE.Vector3(), gp: new THREE.Vector3(), gt: new THREE.Vector3(), d: new THREE.Vector3() };
 function damp(cur, goal, vel, tau, dt) {      // critically damped: the camera eases off and arrives without a stop
   for (const a of ["x", "y", "z"]) { const om = 2 / (a === "z" ? tau * 1.35 : tau), x = om * dt, ex = 1 / (1 + x + 0.48 * x * x + 0.235 * x * x * x), ch = cur[a] - goal[a], tmp = (vel[a] + om * ch) * dt; vel[a] = (vel[a] - om * tmp) * ex; cur[a] = goal[a] + (ch + tmp) * ex; }
@@ -1302,7 +1313,7 @@ function stepCam(dt, S) {
 function stepInner(S, now, dt) {
   INNER.mix += ((INNER.on ? 1 : 0) - INNER.mix) * (1 - Math.exp(-dt * 1.6)); const boost = S.k === "push" ? 1 + 1.5 * S.st.f : S.k === "fill" ? 2.6 : S.k === "float" ? 2.2 - 0.8 * S.st.f : S.k === "swim" ? 1.4 : 1, lamm = S.lam.reduce((a, b) => a + b, 0) / S.lam.length;
   INNER.lights.forEach((o, i) => { const br = 0.5 - 0.5 * Math.cos(2 * Math.PI * now / o.period + o.ph); let I = o.base * (0.45 + 0.55 * br) * INNER.mix;
-    if (i === 3) { I *= S.nv > 0.5 && S.k !== "print" ? (0.35 + 0.65 * lamm) * boost : 0; o.l.position.x = (BB.L || 0.15) / 2; o.gl.scale.setScalar(0.1 + 0.2 * lamm); } else I *= 0.6 + 0.4 * boost;
+    if (i === 3) { I *= S.nv > 0.5 && !S.k.startsWith("print") ? (0.35 + 0.65 * lamm) * boost : 0; o.l.position.x = (BB.L || 0.15) / 2; o.gl.scale.setScalar(0.1 + 0.2 * lamm); } else I *= 0.6 + 0.4 * boost;
     o.l.intensity = I; o.gl.material.opacity = Math.min(1, I * 3.2); o.gl.visible = I > 1e-4; o.l.getWorldPosition(wv); CU.uIL.value[i].set(wv.x, wv.y, wv.z, I); });
 }
 const wv = new THREE.Vector3();
@@ -1324,14 +1335,14 @@ function renderReadouts(S) {
   if (S.vac) h += rr("Magnet lifts", f2(R.suction_N), "N", true) + rr("Kit weight, margin", `${f2(R.kit_N)} N, ${f1(R.suction_N / R.kit_N)} x`) ;
   if (false) h += rr("Force on the valve", f2(S.F), "N", true) + bar(S.F / R.payload_N, S.F > R.payload_N) + rr("Limit (payload 500 g)", f2(R.payload_N), "N");
   const relay = /^relay|^next$/.test(S.k), TK = R.tankn;
-  if (!relay) h += `</div><div class="rg"><h4>Head and gel</h4>${rr("Gel level", mm(S.gel), "mm")}${rr("Gel in the head and the tail", f2(S.gv), "L")}${rr("Lip above the gel, the water", `${mm(R.lip_z - S.gel)}, ${mm(R.lip_z - R.wlz)}`, "mm")}${rr("Rear wall", sillTxt(S.sill.uh, "flat, a tail docked"))}${rr("Kit", S.nbi >= 0 ? "in the newborn" : KITN[(S.nv > 0.5 && S.k !== "print") ? 3 : S.kit])}</div>`;
+  if (!relay) h += `</div><div class="rg"><h4>Head and gel</h4>${rr("Gel level", mm(S.gel), "mm")}${rr("Gel in the head and the tail", f2(S.gv), "L")}${rr("Lip above the gel, the water", `${mm(R.lip_z - S.gel)}, ${mm(R.lip_z - R.wlz)}`, "mm")}${rr("Rear wall", sillTxt(S.sill.uh, "flat, a tail docked"))}${rr("Kit", S.nbi >= 0 ? "in the newborn" : KITN[(S.nv > 0.5 && !S.k.startsWith("print")) ? 3 : S.kit])}</div>`;
   else { const rel = S.k !== "relay_back", nbG = S.gn || 0;          // round 7: the relay shows its own numbers: the old head, the newborn as it fills, the tail
     h += `</div><div class="rg"><h4>Old head${rel ? ", released" : ", still docked"}</h4>${rr("Gel level", mm(S.gel), "mm")}${rr("Gel", rel ? f2(R.gel_old_L) : f2(S.gv), "L", false)}${rr("Lip circuit", `gel at 9 kPa, ${f2(R.lipc_L)}`, "L")}${rr("Rear wall", sillTxt(S.sill.uh, "flat, the tail docked"))}</div>`;
     h += `<div class="rg"><h4>Newborn</h4>${rr("Gel in the lobe", f2(nbG), "L of " + f2(R.gel_fill_L), S.k === "relay_gel")}${bar(nbG / R.gel_fill_L)}${rr("Gel level", nbG > 0.001 ? mm(S.zn) : "empty", nbG > 0.001 ? "mm" : "")}${rr("Lip circuit, gel at 9 kPa", f2(S.lc || 0), "L of " + f2(R.lipc_L), S.k === "relay_gel" && (S.lc || 0) > 0)}${rr("Gel the tail holds", rel ? f2(R.gel_tail_L) : "with the parent", rel ? "L" : "")}${rr("Rear wall", sillTxt(S.sill.un, "flat, the tail docked"))}${rr("Water", nbFloat(S), "", S.k === "relay_dock")}</div>`;
     h += `<div class="rg"><h4>Tail on its wheels</h4>${rr("Moved x, y", `${mm(S.tdx)}, ${mm(S.tdy)}`, "mm")}</div>`; }
   if (TK && (relay || S.k === "dock")) h += `<div class="rg"><h4>Tank, made to order</h4>${rr("Inner", TK.inner_mm.map((v) => f0(v)).join(" x "), "mm")}${rr("Water depth", f0(TK.depth_mm), "mm")}${rr("Water", `${f0(TK.water_L)} L, ${f0(TK.water_kg)}`, "kg")}${rr("Glass (estimate)", f0(TK.glass_kg), "kg")}${rr("Filled, with the parent body", f0(TK.filled_kg), "kg", true)}${rr("On the floor under it", f1(TK.floor_kPa), "kPa")}</div>`;
-  if (S.k === "print") h += `<div class="rg"><h4>Print</h4>${rr("Progress", f0(S.pr * 100), "%", true)}${bar(S.pr)}${rr("Layer height z", f1(Math.min(S.pz, BB.box ? BB.box.max.z + J.read.axis_z : S.pz) * 1000), "mm")}${rr("Bead, silicone", `${f0(R.bead_m)} m, ${f2(R.sil_L)} L`)}</div>`;
-  if (S.nv > 0.5 && S.k !== "print") h += `<div class="rg"><h4>Next head, folded</h4>${rr("Flat pack", J.pack.size_mm.map((v) => f0(v)).join(" x "), "mm", true)}${rr("Layers", J.pack.layers)}${rr("Silicone", f2(J.read.sil_L), "L")}</div>`;
+  if (S.k.startsWith("print")) h += `<div class="rg"><h4>Print</h4>${rr("Progress", f0(S.pr * 100), "%", true)}${bar(S.pr)}${rr("Layer height z", f1(Math.min(S.pz, BB.box ? BB.box.max.z + J.read.axis_z : S.pz) * 1000), "mm")}${rr("Bead, silicone", `${f0(R.bead_m)} m, ${f2(R.sil_L)} L`)}</div>`;
+  if (S.nv > 0.5 && !S.k.startsWith("print")) h += `<div class="rg"><h4>Next head, folded</h4>${rr("Flat pack", J.pack.size_mm.map((v) => f0(v)).join(" x "), "mm", true)}${rr("Layers", J.pack.layers)}${rr("Silicone", f2(J.read.sil_L), "L")}</div>`;
   if (S.nbi >= 0 && /^birth|^free$/.test(S.k)) h += `<div class="rg"><h4>Birth</h4>${rr("Keel pressure", f1(S.pbar), "kPa", true)}${rr("Inflation front x", S.front > 0 ? mm(S.front) : "none", S.front > 0 ? "mm" : "")}${rr("Rim x", mm(S.rimx), "mm", true)}${rr("Lower lip at x", mm(J.mouth.lip[0]), "mm")}${rr("Needle force", f2(S.Fn), "N")}${bar(S.Fn / J.read.payload_N)}${rr("Limit (payload 500 g)", f2(J.read.payload_N), "N")}${rr("Crank", S.crank > 0.99 ? "down" : S.crank > 0.01 ? "swinging" : "folded")}${rr("Rear wall", sillTxt(S.sill.un, "flat"))}${rr("Water", nbFloat(S))}</div>`;
   h += `<div class="rg"><h4>Penetration test, this frame</h4>${rr("Deepest overlap of any pair", f2(S.pen * 1000), "mm", S.pen > 0.001)}${rr("Worst over the whole timeline", f2(R.pen_max * 1000), "mm")}</div>`;
   $("#ro").innerHTML = h; $("#tlClock").textContent = hms(S.clock) + " of " + hms(TL.realTotal);
@@ -1363,7 +1374,7 @@ function drawChart() {
   if (STATE && STATE.i >= i0 && STATE.i < i1) { const x = (STATE.i - i0) / (i1 - 1 - i0) * W; g.strokeStyle = "#ecebe6"; g.lineWidth = 1; g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
 }
 function renderCode(S) {
-  if (!GCL.length) return; const cur = S.k === "print" ? Math.min(GCL.length - 1, Math.floor(S.pr * (GCL.length - 1))) : S.pr >= 1 ? GCL.length - 1 : 0, a = Math.max(0, cur - 4);
+  if (!GCL.length) return; const cur = S.k.startsWith("print") ? Math.min(GCL.length - 1, Math.floor(S.pr * (GCL.length - 1))) : S.pr >= 1 ? GCL.length - 1 : 0, a = Math.max(0, cur - 4);
   $("#code").innerHTML = GCL.slice(a, a + 10).map((l, i) => `<div class="${a + i === cur ? "cur" : ""}"><span class="ln">${a + i + 1}</span><span class="${l[0] === ";" ? "cm" : l.startsWith("G0") ? "g0" : l.startsWith("G1") ? "g1" : "mc"}">${esc(l)}</span></div>`).join(""); $("#gcPos").textContent = `line ${cur + 1} / ${GCL.length}`;
 }
 function renderDoc() {
@@ -1413,7 +1424,7 @@ function shapeAudit() {
     R3.chamber.updateMatrixWorld(true);
     put("parent", Math.max(...geos.map((g, k) => dev(g.attributes.position.array, ref[k])), Math.abs(R3.chamber.position.z - z0)), st.k);
     if (tl) put("tail", Math.max(dev(PARTS.tail.geometry.attributes.position.array, tl), Math.abs(R3.tail.position.z - zt0)), st.k);
-    if (NB.hi && NB.hi.visible) { nHi++; put("newborn", Math.max(...NB.hi.children.map((m, k) => dev(m.geometry.attributes.position.array, ref[k])), Math.abs(NB.hi.position.z - z0)), st.k); } }
+    if (NB.hi && NB.hi.visible) { nHi++; put("newborn", Math.max(...NB.hi.children.slice(0, 4).map((m, k) => dev(m.geometry.attributes.position.array, ref[k])), Math.abs(NB.hi.position.z - z0)), st.k); } }
   const t = (k) => `${f1(W[k][0] * 1000)} mm${W[k][1] ? " (worst in " + W[k][1] + ")" : ""}`;
   J.checks.push({ group: "Outline", name: `One rigid shape per body, measured in this page: every stage at 8 points, every drawn head mesh (outer skin, inner skin, cuff, rolled lip) in its own frame against the parent's head at stage 1, and its height: the parent's head and the old head ${t("parent")}; the newborn at rest (${nHi} samples) ${t("newborn")}; the tail shell ${t("tail")}`, ok: W.parent[0] < 1e-5 && W.tail[0] < 1e-5 && W.newborn[0] < 1e-5, value: "measured at load" });
 }

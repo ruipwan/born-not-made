@@ -22,7 +22,7 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 BASE = '970a0ac'                       # quilt.json as the round 7 generator wrote it
 KEEL = 0.012                           # depth of the keel below the inner floor, head and tail (m)
-TANK_DX = 0.050                        # the tank moves this far toward the mouth relative to the bodies (m)
+TANK_DX = 0.603                        # the tank moves this far toward the mouth relative to the bodies (m)
 BAND = 0.030                           # how far above the old underside the outer surface follows the keel (m)
 HEAD_XM, HEAD_XJ = 0.070, 0.280        # head: lowest point of the arc, and where it joins the old ramp under the lip
 TAIL_XM, TAIL_XJ = -0.010, -0.340      # tail: lowest point, and where it joins the old rear taper
@@ -234,12 +234,54 @@ T['zf'] = round(-0.003 - KEEL, 4); T['zt'] = round(T['zf'] + T['H'] - 0.015, 4)
 T['lamp'] = [round((T['x0'] + T['x1']) / 2, 4), 0.0, 2.6]
 glass_z = T['zf']
 
+# ---------------------------------------------------------------- 4b. start at the tail end of the tank; the relay goes forward
+# The parent starts with its tail close to the rear glass. With no room behind, the parent first pushes the newborn forward along the floor
+# with its lower lip (NBX), then backs to its own place and moves to the port side; everything after that is the round 7 relay moved forward
+# by NBX (the old head parks at the port side near the start place, the tail goes round it in the starboard lane and docks on the newborn).
+NBX = 0.60; LIPGAP = 0.045
+fr = q['fr']; nfr0 = len(fr['tdx'])
+def srng(k): s_ = next(x for x in q['stages'] if x['key'] == k); return s_['i0'], s_['i1']
+fr['nbx'] = [0.0] * nfr0
+a0, a1 = srng('relay_back')
+mv = [i for i in range(a0, a1) if abs(fr['tdx'][i] - fr['tdx'][a0]) > 1e-6 or abs(fr['tdy'][i]) > 1e-6]
+m0, m1 = mv[0] - 1, a1 - 1; x0_ = fr['tdx'][a0]; xpush = x0_ + LIPGAP + NBX; xend = fr['hdx'][a1 - 1] + NBX
+ss = lambda u: u * u * (3 - 2 * u)
+for i in range(m0, a1):
+    u = (i - m0) / (m1 - m0)
+    if u < 0.55: x = x0_ + (xpush - x0_) * ss(u / 0.55); y = 0.0
+    else: v = ss((u - 0.55) / 0.45); x = xpush + (xend - xpush) * v; y = 0.2 * v
+    fr['tdx'][i] = fr['hdx'][i] = round(x, 5); fr['tdy'][i] = fr['hdy'][i] = round(y, 5)
+    fr['nbx'][i] = round(min(NBX, max(0.0, x - x0_ - LIPGAP)), 5)
+for i in range(a1, nfr0):
+    fr['nbx'][i] = NBX; fr['tdx'][i] = round(fr['tdx'][i] + NBX, 5); fr['hdx'][i] = round(fr['hdx'][i] + NBX, 5)
+q['read']['nb_shift'] = NBX
+for st in q['stages']:
+    if st['key'] == 'relay_back': st['text'] = 'The parent drives forward and pushes the newborn ahead along the tank floor with its lower lip, then backs to its place and moves to the port side, the head with it.'
+    if st['key'] == 'relay_lane': st['text'] = 'The tail goes round the old head in the starboard lane, forward, and comes in behind the newborn.'
+q['notes'][43] = f'The parent drives {NBX*1000:.0f} mm forward on the wheels of its tail; its lower lip meets the cuff of the newborn and pushes it ahead along the tank floor. Then it backs to its place and moves 200 mm to port, the head with it.'
+# the second generation: docked to the newborn, the tail prints the next head in it; the timeline ends when that print is done (a short cure)
+p0, p1 = srng('print'); c0, c1 = srng('cure'); dk = fr['tdx'][nfr0 - 1]
+add_ = list(range(p0, p1)) + list(range(c0, c0 + 60))
+for k, arr in fr.items():
+    if isinstance(arr, list) and len(arr) == nfr0: arr.extend([arr[i] for i in add_])
+q['read']['wl'].extend([q['read']['wl'][nfr0 - 1]] * len(add_))
+for j in range(nfr0, nfr0 + len(add_)):
+    fr['tdx'][j] = fr['hdx'][j] = dk; fr['tdy'][j] = fr['hdy'][j] = 0.0; fr['nbx'][j] = NBX; fr['nbi'][j] = fr['nbi'][nfr0 - 1]
+ps = next(x for x in q['stages'] if x['key'] == 'print'); cs = next(x for x in q['stages'] if x['key'] == 'cure')
+q['stages'].append(dict(ps, key='print2', name='Second generation: print', i0=nfr0, i1=nfr0 + (p1 - p0), gen=2,
+    text='The second generation: docked to the newborn, now its head, the tail prints the next head folded flat on the bowl floor, layer by layer. The old head stays at the port side.'))
+q['stages'].append(dict(cs, key='cure2', name='Second generation: cured', i0=nfr0 + (p1 - p0), i1=nfr0 + len(add_), real=600, disp=3.0, gen=2,
+    text='The new baby is printed, folded on the bowl floor of the second generation head. The cycle has come round once.'))
+def _t4(t): return t.replace('over the two walls at the docking plane,', 'through the docking plane,')
+for st in q['stages']: st['text'] = _t4(st['text'])
+q['notes'] = [_t4(t) for t in q['notes']]
+
 # ---------------------------------------------------------------- 5. numbers that follow
 fr = q['fr']
 def stage_rng(key):
     s = next(s for s in q['stages'] if s['key'] == key); return s['i0'], s['i1']
 tail_x0 = -0.43; tail_rear_min = tail_x0 + min(fr['tdx'])
-nb_front_max = float(new[..., 0].max()); nb_front_rest = float(new[-1, ..., 0].max())
+nb_front_max = float(new[..., 0].max()); nb_front_rest = float(new[-1, ..., 0].max()) + NBX
 parent_front0 = float(O2[..., 0].max())
 clear_rear = tail_rear_min - T['x0']          # inner face of the rear glass to the tail's rear tip (relay, backed away)
 clear_front_birth = T['x1'] - nb_front_max
@@ -403,7 +445,7 @@ for st in q['stages']:
 # where the rigid part sits against the lip: points of the newborn moved behind the lip edge and below its top by the fit
 pen_lip = 0.0
 for k in range(nk):
-    gi = K['frames'][k]; hdx = q['fr']['hdx'][gi]; m = (new[k][..., 0] < lip_x + hdx) & (new[k][..., 2] < lip_z) & (wfill_all[k][:, None] > 0.01)
+    gi = K['frames'][k]; hdx = q['fr']['hdx'][gi] - q['fr']['nbx'][gi]; m = (new[k][..., 0] < lip_x + hdx) & (new[k][..., 2] < lip_z) & (wfill_all[k][:, None] > 0.01)
     if m.any(): pen_lip = max(pen_lip, float((lip_x + hdx - new[k][..., 0])[m].max()))
 chk('Outline', 'One fixed shape per body, every stage sampled at 0, 1/4, 1/2, 3/4 and the end: the head of the parent (and the old head) and the tail 0.0 mm from the design in every sample (moved only as rigid bodies); the newborn, the part outside the mouth and filled, worst per stage in mm: ' + ', '.join(rows_out),
     worst_nb < 0.0015, 'quilt.json keyframes; the page measures the parent at load')
@@ -425,7 +467,7 @@ def _txt(t):
     t = t.replace("its gel face against the gel face of the head; the last 10 mm slowly.", "its front wall against the rear wall of the head, the two walls meeting in a cusp above the water; the last 10 mm slowly.")
     t = t.replace("each part holds its own gel at the open docking face, level with the water.", "each part holds its own gel behind its wall: the floor rises in an arc to the rim, above the gel and the water.")
     t = t.replace("the two gel faces meet and the water between them is squeezed out.", "the face of the tail meets the cuff of the head above the two walls.")
-    t = t.replace("through the gel, across the seam,", "over the two walls at the docking plane,")
+    t = t.replace("through the gel, across the seam,", "through the docking plane,")
     return t
 for st in q['stages']: st['text'] = _txt(st['text'])
 q['notes'] = [_txt(t) for t in q['notes']]
