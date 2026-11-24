@@ -1,0 +1,66 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Grow, for the deck</title>
+<style>html,body{margin:0;background:#000}canvas{display:block;width:100%;height:auto}</style></head><body>
+<canvas id="c" width="2400" height="1160"></canvas>
+<script>
+/* Black, white and grey only. Numbers from grow/index.html (simulator/simple/simple.json "grow", Adafruit 4699, Faraday's law). */
+const cv=document.getElementById('c'),g=cv.getContext('2d'),W=2400,H=1160;
+const w=a=>'rgba(255,255,255,'+a+')',F='Arial, Helvetica, sans-serif',M='ui-monospace, Menlo, monospace';
+function t(s,x,y,size,a,align='left',font=F,bold=false){g.font=(bold?'bold ':'')+size+'px '+font;g.fillStyle=w(a);g.textAlign=align;g.fillText(s,x,y)}
+function line(x1,y1,x2,y2,a=.8,lw=2){g.strokeStyle=w(a);g.lineWidth=lw;g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke()}
+function egg(cx,cy,L,Hh,fold,a=.9,fill=.08){const n=9,P=[];for(let i=0;i<=200;i++){const th=i/200*Math.PI*2,c=Math.cos(th);let x=L/2*c,y=Hh/2*Math.sin(th)*(1-.12*c);
+  const mid=Math.max(0,1-Math.pow(Math.abs(c)/.8,6)),tri=Math.abs(((x/L*n)%1+1)%1-.5)*2;y-=Math.sign(y)*fold*mid*Hh*.07*tri;P.push([cx+x,cy+y])}
+  g.beginPath();P.forEach((p,i)=>i?g.lineTo(...p):g.moveTo(...p));g.closePath();g.fillStyle=w(fill);g.fill();g.strokeStyle=w(a);g.lineWidth=2.4;g.stroke();
+  if(fold){g.save();g.clip();g.strokeStyle=w(.35*fold);g.lineWidth=1.4;for(let k=1;k<n;k++){const x=cx-L/2+k*L/n;if(Math.abs(x-cx)>L*.4)continue;g.beginPath();g.moveTo(x,cy-Hh);g.lineTo(x,cy+Hh);g.stroke()}g.restore()}}
+function bubbles(pts){g.strokeStyle=w(.75);g.lineWidth=1.6;pts.forEach(([x,y,r])=>{g.beginPath();g.arc(x,y,r,0,7);g.stroke()})}
+function water(x,y,ww,h){g.fillStyle=w(.06);g.fillRect(x,y,ww,h);g.setLineDash([6,6]);line(x,y,x+ww,y,.4,1.4);g.setLineDash([])}
+
+// header: from born to grown, to scale
+t('AFTER “BIRTH”, THE SAME TARGET FOR ALL THREE',60,62,22,.55,'left',M);
+egg(200,170,190,109,1,.9,.06);t('at “birth”',200,262,22,.6,'center');t('7.14 L · 365 × 210 mm',200,292,22,.85,'center',M);
+line(330,170,440,170,.6,2);line(428,162,440,170,.6,2);line(428,178,440,170,.6,2);
+t('+4.76 L of gas',385,150,26,.95,'center',F,true);
+egg(600,170,222,128,0,.9,.06);t('grown, the folds open',600,262,22,.6,'center');t('11.90 L · 426 × 246 mm',600,292,22,.85,'center',M);
+t('Trigger: the needle lets go, the chip feels the pressure drop and starts.',820,150,26,.85);
+t('Stop: a pressure sensor reads 1.58 kPa, the chip stops.',820,192,26,.85);
+t('Pump, chip and 500 mAh battery are in the kit inside the body.',820,234,26,.55);
+
+// three columns
+function lab(s,x1,y1,x2,y2){line(x1,y1,x2,y2,.45,1.2);t(s,x2+8,y2+7,21,.7)}
+const C=[
+ {n:'1',name:'Mini air pump',time:'3 min',x:60,
+  need:['ZR370 air pump, 2.5 L/min, 0.5 A','10 s on, 5 s off; 17 mAh','snorkel to a float above water'],
+  risk:'The inlet must stay above water.',
+  draw:(x,y)=>{water(x,y+30,640,200);egg(x+300,y+130,330,180,.5);line(x+215,y+125,x+215,y-25,.85,2.2);g.strokeStyle=w(.85);g.lineWidth=2;g.beginPath();g.ellipse(x+215,y-32,26,9,0,0,7);g.stroke();
+   g.strokeRect(x+185,y+130,60,38);g.beginPath();g.arc(x+215,y+149,12,0,7);g.stroke();bubbles([[x+255,y+118,6],[x+278,y+96,7],[x+300,y+78,5]]);
+   lab('float, air in',x+241,y-32,x+330,y-32);lab('air pump',x+245,y+160,x+500,y+235)}},
+ {n:'2',name:'Baking soda',time:'59 min',x:840,
+  need:['29.7 g tablet: 16.8 g baking soda','+ 12.8 g citric acid, kept dry','89 mL of tank water at 1.5 mL/min'],
+  risk:'CO₂ leaks out through silicone, so it slowly shrinks.',
+  draw:(x,y)=>{water(x,y+30,640,200);egg(x+300,y+130,330,180,.5);g.fillStyle=w(.9);g.fillRect(x+190,y+150,64,22);
+   g.fillStyle=w(.75);[[x+222,y+104],[x+222,y+120],[x+222,y+136]].forEach(([a,b])=>{g.beginPath();g.arc(a,b,4,0,7);g.fill()});
+   bubbles([[x+266,y+122,6],[x+288,y+98,7],[x+308,y+80,5],[x+256,y+94,4]]);
+   lab('water drops',x+226,y+104,x+150,y-10);lab('tablet',x+254,y+165,x+500,y+235);lab('CO₂',x+310,y+78,x+480,y-10)}},
+ {n:'3',name:'Water electrolysis',time:'7.2 h',x:1620,
+  need:['7.16 Ah at 1 A, splits 2.4 g of water','kit battery covers only 7%','needs 3 more 18650 cells (8 Ah)'],
+  risk:'Hydrogen and oxygen mixed is explosive.',
+  draw:(x,y)=>{water(x,y+30,640,200);egg(x+300,y+130,330,180,.5);g.strokeStyle=w(.85);g.lineWidth=2;g.strokeRect(x+180,y+112,92,66);
+   g.fillStyle=w(.9);g.fillRect(x+198,y+120,7,52);g.fillRect(x+246,y+120,7,52);bubbles([[x+201,y+104,5],[x+249,y+100,6],[x+249,y+80,4.5],[x+201,y+86,4],[x+226,y+70,4.5]]);
+   lab('cell, two electrodes',x+272,y+160,x+500,y+235);lab('H₂ and O₂',x+252,y+78,x+420,y-10)}}
+];
+const Y0=360;
+C.forEach(c=>{
+  line(c.x,Y0,c.x+720,Y0,.35,1.2);
+  t(c.n,c.x,Y0+50,26,.55,'left',M);t(c.name,c.x+40,Y0+50,34,.95,'left',F,true);
+  t('full in',c.x+720,Y0+30,20,.5,'right',M);t(c.time,c.x+720,Y0+76,56,1,'right',F,true);
+  c.draw(c.x+20,Y0+175);
+  c.need.forEach((s,i)=>t(s,c.x,Y0+470+i*38,25,.82));
+  t('Risk. '+c.risk,c.x,Y0+600,24,.55);
+});
+// shared time axis, log scale
+const ax0=280,ax1=2300,ay=1080,lg=s=>ax0+(Math.log10(s)-0)/(Math.log10(36000))*(ax1-ax0);
+line(ax0,ay,ax1,ay,.5,1.6);
+[[1,'1 s'],[10,'10 s'],[60,'1 min'],[600,'10 min'],[3600,'1 h'],[36000,'10 h']].forEach(([s,l])=>{line(lg(s),ay-8,lg(s),ay+8,.5,1.4);t(l,lg(s),ay+38,20,.5,'center',M)});
+t('TIME TO FULL',60,ay+6,20,.5,'left',M);
+[[184,'1  pump'],[3561,'2  soda'],[25786,'3  electrolysis']].forEach(([s,l])=>{const x=lg(s);g.fillStyle='#fff';g.beginPath();g.moveTo(x,ay-12);g.lineTo(x+10,ay);g.lineTo(x,ay+12);g.lineTo(x-10,ay);g.closePath();g.fill();t(l,x,ay-24,22,.9,'center',M)});
+{const x=lg(1800);g.strokeStyle=w(.6);g.lineWidth=1.6;g.beginPath();g.arc(x,ay,8,0,7);g.stroke();t('kit battery empty',x,ay+38,18,.45,'center',M)}
+</script></body></html>
