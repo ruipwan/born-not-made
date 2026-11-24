@@ -169,6 +169,9 @@ html.bnm-embed .bottom .area, html.bnm-embed .info { overflow: visible; }
 .doc a { color: var(--gel); }
 @media (max-width: 980px) { .notes { right: 12px; } }
 .pnl ul.lim { margin: 6px 0; padding-left: 18px; } .pnl ul.lim li { margin: 4px 0; } .pnl .eq { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12px; overflow-wrap: anywhere; }
+
+#vp.notext .ov, #vp.notext .notes, #vp.notext .lab { display: none !important; }
+.ctl .tgl { display: inline-flex; gap: 2px; margin-left: 8px; padding-left: 8px; border-left: 1px solid #333; }
 </style>
 <link rel="stylesheet" href="../../assets/css/monochrome.css">
 </head><body>
@@ -231,6 +234,7 @@ html.bnm-embed .bottom .area, html.bnm-embed .info { overflow: visible; }
       <div class="ctl">
         <button class="btn" id="play" aria-pressed="true">Pause</button>
         <button class="btn on" data-speed="1">1×</button><button class="btn" data-speed="2">2×</button><button class="btn" data-speed="4">4×</button>
+        <span class="tgl"><button class="btn on" id="txtTgl" aria-pressed="true" title="Show or hide all text in the viewport">Text</button><button class="btn on" id="audTgl" aria-pressed="true" title="Show or hide the audience">Audience</button></span>
       </div>
       <div class="track" id="track" tabindex="0" role="slider" aria-label="Timeline, drag to scrub" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
     </div>
@@ -249,7 +253,7 @@ html.bnm-embed .bottom .area, html.bnm-embed .info { overflow: visible; }
   <p>A Python script (<code>bnm_design/simple/design.py</code>) builds the hull, the newborn and the arm, plans every move of the cycle, and writes <code>simple.json</code>; the browser replays and interpolates. The arm uses the link meshes and the kinematics of the Stage 2 DexArm model with the official joint ranges; each pose on the timeline is solved by inverse kinematics, and a pose outside the ranges is reported as a failed check. The newborn is the folded body of the full size study, resized: Kresling stories with sixteen radial star pleats, opened by air and finished by a 25 percent stretch of the skin. While the arm pushes, the body is a rigid body on a pin at the valve: the pitch is the smallest pitch at which the body clears the gel chamber and the rim, and the part outside droops until the water carries that part or the hull stops the droop, with a lag. The three slender stories at the tail end open inside the mouth; each wider segment opens after the segment has passed the lip, with a lag as well. After the nozzle lets go, the newborn is a rigid body in the vertical plane with gravity, buoyancy from forty slices, drag in heave, pitch and surge, a contact at the lip, the thrust of the two kit pumps and the ballast water; the roll is a damped oscillator with the righting moment of the calculated metacentric height. The clock shows process time; the view is a time lapse.</p>
   <p>Colliders: the two shells (the inner surface as a function, the wall as a 3 mm band), the rim of the opening, the saddles, the kit magazine and its two spare kits, the parts of the store, the seat, the eight arm links (their mesh vertices), the module head and stem, the magnet, the parked modules, the kit as a box, and the newborn as a dense point set in every state. Every frame of the timeline is tested for every pair; the Checks panel lists the deepest overlap of each pair. The ball needle in the valve and in the well of the kit, the print needle in the work, the magnet on the kit and the kit in the newborn are contacts by design and are left out.</p>
   <h4>Printing on the Bambu Lab H2S</h4>
-  <p>Two watertight STL files in millimeters, each lying on its docking face as it prints, with the 3 mm wall grown outward from the simulated inner surface (magnet pockets, alignment pins, the seam flange with the groove for the cord, the saddles, the kit magazine, the seat bumps). Checked with trimesh: watertight, one body each. The shorter tail now fits the Bambu Lab H2S (340 x 320 x 340 mm) in one print, with no joint. The head, 390 mm long like the double wall head, is longer than the bed: it needs a larger printer or a split, which is not shown. Mass and time come from the mesh volume at 12 mm3 per second; the slicer gives the real numbers. The earlier plan for the H2S (orientations, clear PETG settings, how the gel shell is made tight) is in <a href="print/PRINT_PLAN.md">PRINT_PLAN.md</a>; its part sizes are from round 14.</p>
+  <p>Two watertight STL files in millimeters, each lying on its docking face as it prints, with the 3 mm wall grown outward from the simulated inner surface (magnet pockets, alignment pins, the seam flange with the groove for the cord, the saddles, the kit magazine, the seat bumps). Checked with trimesh: watertight, one body each. The shorter tail now fits the Bambu Lab H2S (340 x 320 x 340 mm) in one print, with no joint. The head, 390 mm long like the double wall head, is longer than the bed: it needs a larger printer or a split, which is not shown. Mass and time come from the mesh volume at 12 mm3 per second; the slicer gives the real numbers. The plan for the H2S (orientations, clear PETG settings, how the gel shell is made tight) is in <a href="print/PRINT_PLAN.md">PRINT_PLAN.md</a>.</p>
   <table><tr><th>Part</th><th>File</th><th>Box on the plate</th><th>Margin</th><th>Plastic</th><th>Time</th></tr><tr><td>Tail</td><td><a href="print/bnm_simple_tail.stl">bnm_simple_tail.stl</a></td><td>336 x 314 x 335 mm</td><td>4, 6, 5 mm</td><td>942 cm3, 1.20 kg</td><td>about 27 h</td></tr><tr><td>Head</td><td><a href="print/bnm_simple_head.stl">bnm_simple_head.stl</a></td><td>336 x 314 x 390 mm</td><td>does not fit: longer than the bed</td><td>892 cm3, 1.13 kg</td><td>about 26 h</td></tr></table>
   <h4>The tank</h4>
   <p id="tankp"></p>
@@ -296,7 +300,7 @@ function log(msg, cls = "") {
 
 const UW = { uTime: { value: 0 }, uWL: { value: -0.13 } };
 /* the gallery: one square glass tank on a dark plinth, one spotlight straight above. CU holds what every shader needs to know about the light, the tank and the inner lights. */
-const TANK = { x0: -0.403, x1: 1.317, y0: -0.285, y1: 0.285, zf: -0.003, zt: 0.582, th: 0.015, zr: -0.95, lamp: [0.457, 0, 2.6] };   /* made to order, inner size; the lamp straight above the middle of the tank (round 15) */
+const TANK = { x0: -0.573, x1: 1.147, y0: -0.285, y1: 0.285, zf: -0.003, zt: 0.582, th: 0.015, zr: -0.95, lamp: [0.287, 0, 2.6] };   /* made to order, inner size; the lamp straight above the middle of the tank (round 15) */
 const LAMP_ANG = 0.56;
 /* the tank as drawn is made to order: no stock aquarium found is wide enough. Clear acrylic 1190 kg/m3; the volume is the water up to the waterline, the weight is that water plus the four walls. */
 const TANKF = () => { const T = TANK, W = T.x1 - T.x0, D = T.y1 - T.y0, dep = J.WL - T.zf, V = W * D * dep, walls = (2 * (W + 2 * T.th) + 2 * D) * T.th * (T.zt - T.zf) * 1190; return { W, D, dep, L: V * 1000, kg: V * 1000 + walls }; };
@@ -462,9 +466,10 @@ void main() {
   const lens = new THREE.Mesh(new THREE.CircleGeometry(0.05, 32), new THREE.MeshBasicMaterial({ color: new THREE.Color(60, 56, 50), side: THREE.DoubleSide })); lens.position.set(L[0], L[1], L[2] + 0.008); sc.add(lens);
   // people watching, dark against the pool of light
   const prof = [[0.13, 0], [0.16, 0.04], [0.175, 0.5], [0.185, 0.95], [0.2, 1.22], [0.205, 1.34], [0.17, 1.42], [0.075, 1.47], [0.058, 1.5], [0.062, 1.54], [0.092, 1.59], [0.104, 1.66], [0.098, 1.73], [0.066, 1.785], [0, 1.8]].map((p) => new THREE.Vector2(p[0], p[1]));
-  const fg = new THREE.LatheGeometry(prof, 28).rotateX(Math.PI / 2), fm = std(0x18181a, 0.85);
-  for (const [x, y, h, yaw] of [[-0.75, T.y1 + 1.0, 1.0, 0.2], [-0.2, T.y1 + 1.4, 0.94, -0.3], [1.0, T.y1 + 0.95, 1.03, 0.1], [2.1, T.y1 + 1.6, 0.97, 0.5]]) {
+  const fg = new THREE.LatheGeometry(prof, 28).rotateX(Math.PI / 2), fm = new THREE.MeshBasicMaterial({ color: 0x0c0c0e });
+  for (const [x, y, h, yaw] of [[cx - 1.25, T.y1 + 1.0, 1.0, 0.2], [cx - 0.65, T.y1 + 1.45, 0.94, -0.3], [cx + 0.55, T.y1 + 1.2, 1.03, 0.1], [cx + 1.3, T.y1 + 1.6, 0.97, 0.5], [cx - 1.9, T.y1 + 1.9, 0.9, 0.35], [cx + 2.0, T.y1 + 2.2, 0.86, -0.4]]) {
     const f = new THREE.Mesh(fg, fm); f.scale.set(0.92, 0.56, h); f.rotation.z = yaw; f.position.set(x, y, T.zr); f.castShadow = true; f.receiveShadow = true; sc.add(f); GAL.figures.push(f); }
+  GAL.front = []; for (const [x, y, h, yaw] of [[cx - 1.3, T.y0 - 1.25, 0.97, 2.9], [cx - 1.65, T.y0 - 1.8, 0.9, 3.3], [cx + 1.35, T.y0 - 1.35, 1.02, 3.4], [cx + 1.7, T.y0 - 2.0, 0.88, 2.8], [cx - 1.05, T.y0 - 2.4, 0.93, 3.1]]) { const f = new THREE.Mesh(fg, fm); f.scale.set(0.92, 0.56, h); f.rotation.z = yaw; f.position.set(x, y, T.zr); f.castShadow = false; f.receiveShadow = true; sc.add(f); GAL.front.push(f); }
   // particles: fine matter suspended in the water, dust in the light above
   const NP = 2600, pos = new Float32Array(NP * 3), seed = new Float32Array(NP * 2); let s = 7; const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
   for (let i = 0; i < NP; i++) { const air = i >= 2100, r = Math.sqrt(rnd()) * (air ? 1.1 : 1.0), a = rnd() * 2 * Math.PI;
@@ -901,7 +906,7 @@ const LABELS = [], ws = new THREE.Vector3();
 function buildLabels() {
   const mk = (txt, cls, fn) => { const d = document.createElement("div"); d.className = "lab " + cls; d.textContent = txt; $("#vp").appendChild(d); LABELS.push({ d, fn }); };
   const inS = (...ks) => ks.includes(STATE.k);
-  mk("Tail", "", () => [-0.12 + STATE.dock, 0, 0.36]); mk("Head, the gel chamber", "", () => [0.14, 0, 0.36]);
+  mk("Tail", "", () => [-0.16 + STATE.dock, 0, 0.36]); mk("Head, the gel chamber", "", () => [0.22, 0, 0.36]);
   mk("Docking from behind, in the water, gel face to gel face: three magnets, the seam on a cord", "", () => inS("dock") ? [J.read.dock_x, 0, 0.3] : null);
   mk("Open gel face, level with the water", "w", () => inS("dock") && STATE.dock < -0.01 ? [J.read.dock_x + 0.004, -0.06, STATE.gel - 0.02] : null);
   mk("Mouth", "", () => inS("dock", "gel", "push", "fill") ? [J.mouth.top[0] + 0.02, 0, J.mouth.top[2] + 0.02] : null);
@@ -918,8 +923,8 @@ function buildLabels() {
 }
 function updateLabels() {
   const w = R3.host.clientWidth, h = R3.host.clientHeight, ov = $(".ov").getBoundingClientRect(), hr = R3.host.getBoundingClientRect(), ox1 = ov.right - hr.left, oy1 = ov.bottom - hr.top + 14;
-  const far = R3.camera.position.distanceTo(R3.controls.target) > 2.4;
-  for (const L of LABELS) { const p = STATE && !far ? L.fn() : null; if (!p) { L.d.style.display = "none"; continue; } ws.set(...p).project(R3.camera); const px = (ws.x + 1) / 2 * w, py = (1 - ws.y) / 2 * h; const on = ws.z < 1 && Math.abs(ws.x) < 0.96 && Math.abs(ws.y) < 0.96 && !(px < ox1 + 40 && py < oy1); L.d.style.display = on ? "" : "none"; if (on) L.d.style.transform = `translate(${px.toFixed(0)}px, ${py.toFixed(0)}px) translate(-50%, -130%)`; }
+  const far = R3.camera.position.distanceTo(R3.controls.target) > 2.4, SHOWN = [];
+  for (const L of LABELS) { const p = STATE && !far ? L.fn() : null; if (!p) { L.d.style.display = "none"; continue; } ws.set(...p).project(R3.camera); const px = (ws.x + 1) / 2 * w, py = (1 - ws.y) / 2 * h; const on = ws.z < 1 && Math.abs(ws.x) < 0.96 && Math.abs(ws.y) < 0.96 && !(px < ox1 + 40 && py < oy1); L.d.style.display = on ? "" : "none"; if (on) { L.d.style.transform = `translate(${px.toFixed(0)}px, ${py.toFixed(0)}px) translate(-50%, -130%)`; const r = L.d.getBoundingClientRect(); if (SHOWN.some((q) => r.left < q.right + 4 && r.right > q.left - 4 && r.top < q.bottom + 2 && r.bottom > q.top - 2)) L.d.style.display = "none"; else SHOWN.push(r); } }          // round 16: a label that would overlap one already shown is hidden (narrow screens)
 }
 /* round 15: the shell is one uniform clear material on the tail and the head (no axial gradient, no dimming of the parts inside the tail) */
 /* ---------------------------------------------------------------- cameras: from the port side, tail on the left */
@@ -1069,10 +1074,17 @@ function frame() {
   const S = evalState(TL.T);
   if (S.st.i !== TL.lastStage) { TL.lastStage = S.st.i; log("stage " + S.st.s.n + ": " + S.st.s.name, "a"); }
   applyState(S, now); if (AUTO) autoCam(S); stepCam(dt, S);
-  R3.controls.update(); stepInner(S, now, dt); cineRender(now, dt); updateLabels();
+  R3.controls.update(); stepInner(S, now, dt); stepAudience(); cineRender(now, dt); updateLabels();
   if (now - lastRO > 0.12) { lastRO = now; renderReadouts(S); renderOverlay(S); renderCode(S); updateTrack(S.st); if (TAB === "birth") drawChart(); if (TAB === "growth" && S.gf > 0) renderProps(); }
 }
+// round 16: Text and Audience toggles (also ?text=0, ?audience=0 in the address)
+let SHOWTXT = true, SHOWAUD = true; const _qs = new URLSearchParams(location.search);
+function setText(v) { SHOWTXT = v; $("#vp").classList.toggle("notext", !v); const b = $("#txtTgl"); b.classList.toggle("on", v); b.setAttribute("aria-pressed", String(v)); }
+function setAudience(v) { SHOWAUD = v; const b = $("#audTgl"); b.classList.toggle("on", v); b.setAttribute("aria-pressed", String(v)); }
+function stepAudience() { if (!GAL.front) return; const c = R3.camera.position, wide = c.distanceTo(R3.controls.target) > 2.6; for (const f of GAL.figures) f.visible = SHOWAUD && wide; const on = SHOWAUD && wide && c.y < TANK.y0 - 2.7; for (const f of GAL.front) f.visible = on; }          // the audience shows only in the wide views
 function wireUI() {
+  $("#txtTgl").addEventListener("click", () => setText(!SHOWTXT)); $("#audTgl").addEventListener("click", () => setAudience(!SHOWAUD));
+  setText(_qs.get("text") !== "0"); setAudience(_qs.get("audience") !== "0");
   document.querySelectorAll("[data-cam]").forEach((b) => b.addEventListener("click", () => { setAuto(false); setCam(b.dataset.cam); CAMMOVE = true; }));
   document.querySelectorAll("[data-inner]").forEach((b) => b.addEventListener("click", () => setInner(b.dataset.inner === "on")));
   let inner0 = false; try { inner0 = localStorage.getItem("bnm.sim.innerLight") === "on"; } catch (e) { /* storage may be blocked */ }
@@ -1087,7 +1099,7 @@ function wireUI() {
   tr.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") TL.T = Math.min(TL.total - 0.01, TL.T + 1); else if (e.key === "ArrowLeft") TL.T = Math.max(0, TL.T - 1); else return; e.preventDefault(); });
   document.querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { TAB = b.dataset.tab; document.querySelectorAll("[data-tab]").forEach((x) => x.setAttribute("aria-selected", String(x === b))); renderProps(); }));
 }
-window.BNM = { go(k, f = 0.5) { const s = TL.stages.find((x) => x.k === k); if (s) { TL.T = s.d0 + s.disp * f; TL.playing = false; $("#play").textContent = "Play"; } }, stages: () => TL.stages.map((s) => s.k), state: () => STATE, setAuto, setCam, setInner, settle: () => { CAMSNAP = true; }, look(p, t) { setAuto(false); CAMS._look = () => ({ p, t }); setCam("_look", true); }, quality: () => CINE.q };
+window.BNM = { go(k, f = 0.5) { const s = TL.stages.find((x) => x.k === k); if (s) { TL.T = s.d0 + s.disp * f; TL.playing = false; $("#play").textContent = "Play"; } }, stages: () => TL.stages.map((s) => s.k), state: () => STATE, setAuto, setCam, setInner, setText, setAudience, settle: () => { CAMSNAP = true; }, look(p, t) { setAuto(false); CAMS._look = () => ({ p, t }); setCam("_look", true); }, quality: () => CINE.q };
 (async function main() {
   try { initThree(); await loadAll(); wireUI(); buildStages(); renderTrack(); STATE = evalState(0); applyState(STATE, 0); setCam("wide", true); renderProps(); requestAnimationFrame(frame); }
   catch (e) { console.error(e); $("#ovStage").textContent = "The simulator did not start"; $("#ovStep").textContent = String(e.message || e); }

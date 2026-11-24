@@ -1,85 +1,61 @@
-> Round 15 (24 Nov 2026): the form changed. The tail is shorter and prints in one piece, `bnm_simple_tail.stl`, 336 x 314 x 335 mm on its docking face (no joint, no sleeve). The head now has the length of the double wall head: `bnm_simple_head.stl`, 336 x 314 x 390 mm on its docking face, longer than the 340 mm bed of the H2S, so it needs a larger printer or a split (not worked out). The settings below (clear PETG, wall, docking face) still apply; the part sizes, times and the two tail prints described below are from round 14.
+# Print plan for the Bambu Lab H2S: simplified Born, Not Made
 
-# Print plan for the Bambu Lab H2S: simplified Born, Not Made, round 11
-
-Three prints, each in one piece: the head, the front of the tail and the rear of the tail. The two tail prints are joined for good (bonded and sealed) behind the arm. All files are in millimeters, watertight, already oriented as they lie on the plate (centered, lowest point at z = 0).
+Two prints: the head and the tail, each in one piece. All files are in millimeters, watertight, already oriented as they lie on the plate (centered, lowest point at z = 0). The tail fits the H2S (340 x 320 x 340 mm). The head, as long as the double wall head, does not: it needs a larger printer or a split, which is not worked out here.
 
 ## Files
 
 | Part | File | Watertight (trimesh) | Bodies | Plastic, cm3 | Mass, kg | Time, h | Box on the plate, mm | Margin to 340 x 320 x 340, mm |
 |---|---|---|---|---|---|---|---|---|
-| Head | `bnm_simple_head.stl` | yes | 1 | 746 | 0.95 | 22 | 336 x 314 x 335 | 4, 6, 5 |
-| Tail, front | `bnm_simple_tail_front.stl` | yes | 1 | 803 | 1.02 | 23 | 336 x 314 x 251 | 4, 6, 89 |
-| Tail, rear | `bnm_simple_tail_rear.stl` | yes | 1 | 375 | 0.48 | 11 | 318 x 222 x 226 | 22, 98, 114 |
+| Head | `bnm_simple_head.stl` | yes | 1 | 892 | 1.13 | 26 | 336 x 314 x 390 | does not fit (4, 6, -50) |
+| Tail | `bnm_simple_tail.stl` | yes | 1 | 942 | 1.20 | 27 | 336 x 314 x 335 | 4, 6, 5 |
 
-Files: `/home/claude/bnm_design/simple/print/` and, published, `simulator/simple/print/`. The script is `print_pkg.py` (run as `BNM_DBG0=print_pkg.py python3 design.py`); the numbers above are in `print/print_report.json`. The single tail file of rounds 8 to 10 (`bnm_simple_tail.stl`) is replaced by the two tail files.
+Files: `simulator/simple/print/`. The script is `print_pkg.py` (run as `BNM_DBG0=print_pkg.py python3 design.py`); the numbers above are in `print/print_report.json`.
 
-How the solids are made: the simulated inner surface is kept exactly. The 3 mm wall is grown outward from it, section by section, so the space the arm works in is the simulated one. The ridge of the tail shell that ends the gel is a solid rib (the outside floor runs flat under it). Checked with trimesh after writing and reading the STL again: watertight, consistent winding, one body, volume, bounding box.
+How the solids are made: the simulated inner surface is kept exactly. The 3 mm wall is grown outward from it, section by section, so the space the arm works in is the simulated one. Checked with trimesh after writing and reading the STL again: watertight, consistent winding, one body, volume, bounding box.
 
-Mass is mesh volume times 1.27 g per cm3 (PETG). Time is mesh volume divided by a flow of 12 mm3 per second, times 1.25 for travel and slow outer walls. The slicer gives the real numbers; supports are not in these figures (allow about 10 to 15 percent more plastic for the front of the tail).
-
-Round 11: the tail is longer (462 mm from the docking plane to the tip, round 10: 302 mm) and runs out in a slender taper to a small point, so it no longer fits one plate. It is cut once, at x = -215 mm, 247 mm behind the docking plane and 22 mm behind the rearmost point the arm reaches. The head is unchanged.
+Mass is mesh volume times 1.27 g per cm3 (PETG). Time is mesh volume divided by a flow of 12 mm3 per second, times 1.25 for travel and slow outer walls. The slicer gives the real numbers; supports are not in these figures.
 
 ## What is in each print
 
-Head: the shell from the docking plane to the mouth, with the lower shell that holds the gel and the long lower lip; three seat bumps; three bosses with pockets for steel discs; two pin sockets; the seam flange with the cord groove.
+Head: the shell from the docking plane to the mouth, with the lower shell that holds the gel, the floor rising in one long curve to the lower lip and the rolled rim of the mouth; three seat bumps; three bosses with pockets for steel discs; two pin sockets; the seam flange with the cord groove.
 
-Tail, front: the shell from the joint to the docking plane; the ridge in front of the arm base; the two saddles (ledges, stops, one plate under the ledges, one bracket to the wall each); the kit magazine (two rails on six posts, four end stops; three kits sit on it); three magnet bosses with pockets; two alignment pins; the seam flange round the gel and the floor sill; four bosses for the arm base. At the joint the front print ends in a plain open edge (the socket for the sleeve).
+Tail: the shell from the docking plane to the rounded tip; the ridge in front of the arm base; the two saddles; the kit magazine (two rails, three kits); three magnet bosses with pockets; two alignment pins; the seam flange round the gel and the floor sill; four bosses for the arm base. The store for one birth (two silicone cartridges, the stepper, three cells, the gel reservoir and pump, the board, the inflator) is seated after printing; its mounts are not in the file.
 
-Tail, rear: the slender taper from the joint to the tip, closed at the tip, open at the joint, with the sleeve of the joint: 12 mm long, 2.5 mm thick, standing out of the joint face, its outside 0.2 mm inside the inner surface of the front print. The store (two silicone cartridges, the stepper, nine cells, the gel reservoir and pump, the Raspberry Pi 5, the inflator) is seated in the rear print after printing; its mounts are not in the file.
-
-Nothing else is printed. No baffle, no ballast block, no separate mouth piece.
-
-## The joint of the two tail prints
-
-- Where: x = -215 mm in the frame of the simulation, behind the arm (the arm reaches -193 mm at most), where the section is 214 mm wide and 310 mm tall inside. The inside is dry; outside, the water stands 91.5 mm high on the lower part of the joint ring, so the joint must be sealed.
-- How it is aligned: the sleeve on the rear print slides 12 mm into the front print. The section is not round (flat floor, arched roof), so the sleeve fixes position and rotation by itself; no pins are needed.
-- How it is made: dry fit first. Then a PETG compatible structural adhesive (a two part methacrylate or epoxy) on the outside of the sleeve and on the end face, the rear print pushed home, wiped, clamped with tape for the cure. Then a bead of clear silicone sealant round the outside of the seam, at least up to 30 mm above the waterline. Leak test before any gel: tail standing in water to 95 mm for one hour, inside on paper.
-- The store goes in through the open joint before bonding: seat the cartridges, cells, reservoir, pump, board and inflator in the rear print, run the lines and wires forward through the joint, then bond.
+Nothing else is printed. No joint, no baffle, no ballast block, no separate mouth piece.
 
 ## Orientation: four compared for each part
 
 | Part | Orientation | Box, mm | Fits | Margin, mm | Overhang beyond 45 degrees, cm2 |
 |---|---|---|---|---|---|
-| Head | on the docking face | 336 x 314 x 335 | yes | 4, 6, 5 | 231 |
-| Head | on the floor | 335 x 314 x 336 | yes | 5, 6, 4 | 1131 |
-| Head | on the side | 335 x 336 x 314 | no | 4, -16, 26 | 1518 |
-| Head | on the mouth | 336 x 314 x 335 | yes | 4, 6, 5 | 272 |
-| Tail, front | on the docking face | 336 x 314 x 251 | yes | 4, 6, 89 | 661 |
-| Tail, front | on the floor | 251 x 314 x 336 | yes | 89, 6, 4 | 753 |
-| Tail, front | on the side | 251 x 336 x 314 | yes | 4, 69, 26 | 1434 |
-| Tail, front | on the joint face | 336 x 314 x 251 | yes | 4, 6, 89 | 632 |
-| Tail, rear | on the joint face (sleeve down) | 318 x 222 x 226 | yes | 22, 98, 114 | 66 |
-| Tail, rear | on the floor | 226 x 222 x 318 | yes | 114, 98, 22 | 253 |
-| Tail, rear | on the side | 226 x 318 x 222 | yes | 114, 2, 118 | 988 |
-| Tail, rear | on the tip | 318 x 222 x 226 | yes | 22, 98, 114 | 73 |
+| Head | on the docking face | 336 x 314 x 390 | no | 4, -16, -50 | 263 |
+| Head | on the floor | 390 x 314 x 336 | no | -50, -70, 4 | 1028 |
+| Head | on the side | 390 x 336 x 314 | no | -50, -70, 26 | 2016 |
+| Head | on the mouth | 336 x 314 x 390 | no | 4, -16, -50 | 295 |
+| Tail | on the docking face | 336 x 314 x 335 | yes | 4, 6, 5 | 1044 |
+| Tail | on the floor | 335 x 314 x 336 | yes | 5, 6, 4 | 765 |
+| Tail | on the side | 335 x 336 x 314 | no | 4, -16, 26 | 1694 |
+| Tail | on the tip | 336 x 314 x 335 | yes | 4, 6, 5 | 1030 |
 
-Choice: the head and the front of the tail on the docking face, the rear of the tail on its joint face.
+Choice: both parts on the docking face. The face that must seal (magnet pockets, pins, flange) is printed on the plate, flat and to size. For the head this is also the least overhang (263 cm2): the shell closes upward toward the mouth with steep walls. For the tail, lying on the floor has less overhang, but the docking face would then be a vertical, layered face.
 
-Reasons, head. Unchanged from round 9: on the docking face the head is a bell that closes upward toward the mouth with walls steeper than 45 degrees nearly everywhere; the overhang is the smallest, mainly the shoulder where the lower shell meets the wide upper shell and the underside of the lower lip. The mouth rim is printed last, as a clean open edge. On the side the head does not fit.
+Layer seam: set the seam to "aligned" and to the rear, so it runs along the keel line under the floor, away from the gel walls at the sides and away from the roof.
 
-Reasons, tail front. On the docking face and on the joint face the overhang is about the same (661 and 632 cm2). The docking face wins: the face that must seal against the head, with the magnet pockets, the pins and the flange, is printed on the plate as the flattest surface of the part, and the layers are rings round the body axis, so the water and the pull of the magnets load each layer in its own plane. The joint edge then prints last as a plain ring, which is all it needs to be. On the floor the whole inside of the roof needs support; on the side one flank carries supports.
-
-Reasons, tail rear. On the joint face the taper closes upward to the tip with walls steeper than 45 degrees everywhere but the last few centimeters at the tip: 66 cm2 of overhang, the least of the four. The sleeve is the first layers on the plate, so its fit is the most accurate part of the print; above it the shell steps 3.2 mm outward (a small ledge, part of the 66 cm2). On the tip the overhang is about the same but the part would stand on a point. On the floor the inside of the roof needs supports; on the side the margin is 2 mm and the overhang is the largest.
-
-Layer seam: set the seam to "aligned" and to the rear, so it runs along the keel line under the floor (all three parts), away from the gel walls at the sides and away from the roof.
-
-Margins are small for the head and the front of the tail: 4 mm in one plate direction and 6 mm in the other, 5 mm in height for the head. There is no room for a brim or a skirt on the 336 mm side: switch both off, and switch off the purge line and the prime tower (one material). The rear of the tail has room for a brim, which helps the rear print stand on the narrow sleeve.
+Margins are small for the tail: 4, 6, 5 mm. There is no room for a brim or a skirt on the 336 mm side: switch both off, and switch off the purge line and the prime tower.
 
 ## Material and settings
 
-- Material: clear PETG, dried (65 degrees C for 6 hours), from one batch for all three parts (about 2.7 kg with supports).
+- Material: clear PETG, dried (65 degrees C for 6 hours), from one batch for both parts (about 2.6 kg with supports).
 - Nozzle 0.6 mm hardened or stainless; layer height 0.24 mm for the shell. A 0.4 mm nozzle works with 0.2 mm layers and more loops, at about twice the time.
 - Wall: the 3 mm wall as five loops of 0.6 mm, no infill inside the wall (set wall loops to 5 or more, so the slicer fills the wall with loops only). Loops in one direction read clearer than loops plus infill.
 - For clarity: print slow and hot. Outer and inner walls 30 to 40 mm per second, 250 to 255 degrees C, part cooling fan 0 to 20 percent, flow raised 2 to 3 percent so the loops fuse without air lines. Volumetric flow kept under 12 mm3 per second.
 - What to expect: a 3 mm PETG wall printed this way is translucent, like ribbed or frosted glass, not optically clear. Shapes and movement inside are visible, the arm and the newborn read well against a lit background, fine detail does not. The layer lines run as rings round the body. A thin coat of clear epoxy or clear polyurethane outside and inside fills the lines and brings the wall much closer to glass clear; sanding to 2000 grit and polishing is the alternative for the outside.
 - Supports: tree supports, on build plate and on model, threshold 45 degrees, top interface 2 layers with 0.2 mm gap. Expected places are listed above. The saddles, the kit rails and the bosses are small and break clean.
 - Bed: textured PEI at 80 degrees C with glue stick as a release (PETG bonds hard to smooth PEI). Chamber closed, not heated above 45 degrees C.
-- First layer: the docking face (head, front of the tail) or the sleeve (rear of the tail). Elephant foot compensation 0.15 mm, so the pockets, the groove and the sleeve stay to size.
+- First layer: the docking face of each part. Elephant foot compensation 0.15 mm, so the pockets and the groove stay to size.
 
 ## Making the gel shell tight
 
-The gel is held by the printed shell itself: the lower shell of the head and of the front of the tail, and the docking seam.
+The gel is held by the printed shell itself: the lower shell of the head and of the tail, and the docking seam.
 
 1. Solid wall: five fused loops, no infill, flow slightly raised, as above. A wall printed this way usually holds water; pinholes sit at the layer seam.
 2. Seam placement: aligned, on the keel under the floor, as above, where a coat is easy to apply and not seen.
@@ -104,11 +80,10 @@ Four bosses on the tail floor, 10 mm across and 5 mm tall, with a blind bore of 
 
 ## Cuts
 
-One, by design: the joint of the two tail prints, described above. Each of the three parts prints in one piece. If a printer with less height is used, the earlier plan applies: split on the horizontal plane at half height, inner lips with M3 bolts on a 50 mm pitch, sealant below the waterline.
+None for the tail. The head is longer than the bed: a split on a plane across the head (with a flange and a seal, since the gel stands in the lower part) or a larger printer; neither is worked out here.
 
 ## Not checked here
 
-- The files were checked as meshes, not sliced: no slicer was run from here. Slice all three before ordering filament and read the real time, mass and support volume.
-- The sleeve fit (0.2 mm gap) and the bond of the joint need a test print of a short ring of each side first.
+- The files were checked as meshes, not sliced: no slicer was run from here. Slice both before ordering filament and read the real time, mass and support volume.
 - Tolerances of the pockets (19.3 mm), the pin sockets and the groove are first guesses for a tuned H2S; print the first 6 mm of each part as a test of the docking face.
 - The saddle ledges are thin (3 mm) and carry about 0.1 kg each; they are meant to be printed with the shell. If they sag, raise their thickness in the script.
