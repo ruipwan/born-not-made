@@ -902,20 +902,30 @@ function updateLabels() {
   for (const L of LABELS) { const p = STATE && !far ? L.fn() : null; if (!p) { L.d.style.display = "none"; continue; } ws.set(...p).project(R3.camera); const px = (ws.x + 1) / 2 * w, py = (1 - ws.y) / 2 * h; const on = ws.z < 1 && Math.abs(ws.x) < 0.96 && Math.abs(ws.y) < 0.96 && !(px < ox1 + 40 && py < oy1); L.d.style.display = on ? "" : "none"; if (on) L.d.style.transform = `translate(${px.toFixed(0)}px, ${py.toFixed(0)}px) translate(-50%, -130%)`; }
 }
 /* round 12: one shell look along the body axis: the tail frosted (matte, milky, the machinery only as soft shapes), the head clear; one smoothstep of the axial coordinate, the same on both parts, so the docking seam shows no break */
-const FROST = { uFr: { value: 1 }, goal: 1 }, FROST_VIEW = { section: 0.8, rack: 0.4, tailcam: 0.4, kit: 0.4, magazine: 0.4 };
+const FROST = { uFr: { value: 1 }, uTX: { value: 0 }, goal: 1 }, FROST_VIEW = { section: 0.8, rack: 0.4, tailcam: 0.4, kit: 0.4, magazine: 0.4 };
 function frostMat(a0, a1, clip) {
   const m = shellMat(a0, a1, clip), base = m.onBeforeCompile;
   m.onBeforeCompile = (sh) => { base(sh); sh.uniforms.uFr = FROST.uFr; sh.uniforms.uXD = { value: J.read.dock_x };
     let fs = sh.fragmentShader;
     fs = fs.replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\n float fz = uFr * (1.0 - smoothstep(uXD - 0.11, uXD + 0.05, vOPw.x)); roughnessFactor = mix(roughnessFactor, 0.82, fz);");
-    fs = fs.replace("gl_FragColor = vec4(milkS + totalSpecular + rimS + glowS, aS); }", `float aF = clamp(0.7 + 0.1 * fr, 0.0, 0.92); vec3 milkF = totalDiffuse * 0.8 * (0.9 + 0.1 * shS) + vec3(0.58, 0.6, 0.62) * 0.008;
+    fs = fs.replace("gl_FragColor = vec4(milkS + totalSpecular + rimS + glowS, aS); }", `float aF = clamp(0.88 + 0.06 * fr, 0.0, 0.96); vec3 milkF = totalDiffuse * 1.15 * (0.92 + 0.08 * shS) + vec3(0.58, 0.6, 0.62) * (0.016 + 0.05 * spotK(vWPw) * uLI);
       vec3 glowF = innerGlow(vWPw) * 0.22;
       gl_FragColor = vec4(mix(milkS + totalSpecular + rimS + glowS, milkF + totalSpecular * 0.18 + rimS * 0.3 + glowF, fz), mix(aS, aF, fz)); }`);
-    if (!/float fz/.test(fs) || !/milkF/.test(fs)) console.warn("frost shader hooks missing");
+    fs = fs.replace("belowW * uSub);", "belowW * uSub * (1.0 - 0.85 * fz));");
+    if (!/float fz/.test(fs) || !/milkF/.test(fs) || !/0\.85 \* fz/.test(fs)) console.warn("frost shader hooks missing");
     sh.fragmentShader = "uniform float uFr; uniform float uXD;\n" + fs; };
   m.customProgramCacheKey = () => "frost" + a0 + a1; return m;
 }
-function stepFrost(dt) { const g = FROST_VIEW[CAM] ?? 1; FROST.uFr.value = CAMSNAP ? g : FROST.uFr.value + (g - FROST.uFr.value) * Math.min(1, dt * 3); }
+/* the machinery inside the tail is dimmed toward the milky shell tone by the same axial function (axial coordinate in the tail frame), so through the frost it reads only as soft shapes */
+function dimInTail() {
+  const seen = new Set();
+  R3.tail.traverse((o) => { const m = o.material; if (!o.isMesh || !m || seen.has(m) || !m.isMeshStandardMaterial || m.isMeshPhysicalMaterial || !m.onBeforeCompile) return; seen.add(m);
+    const base = m.onBeforeCompile, key = m.customProgramCacheKey ? m.customProgramCacheKey.bind(m) : () => "";
+    m.onBeforeCompile = (sh, r) => { base(sh, r); if (!/varying vec3 vWPw/.test(sh.fragmentShader)) return; sh.uniforms.uFr = FROST.uFr; sh.uniforms.uTX = FROST.uTX; sh.uniforms.uXD = { value: J.read.dock_x };
+      sh.fragmentShader = "uniform float uFr; uniform float uTX; uniform float uXD;\n" + sh.fragmentShader.replace(/}\s*$/, " { float fzI = uFr * (1.0 - smoothstep(uXD - 0.11, uXD + 0.05, vWPw.x - uTX)); gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.05, 0.053, 0.058) + gl_FragColor.rgb * 0.25, 0.6 * fzI); }\n}"); };
+    m.customProgramCacheKey = () => "dimT" + key(); m.needsUpdate = true; });
+}
+function stepFrost(dt) { FROST.uTX.value = R3.tail.position.x; const g = FROST_VIEW[CAM] ?? 1; FROST.uFr.value = CAMSNAP ? g : FROST.uFr.value + (g - FROST.uFr.value) * Math.min(1, dt * 3); }
 /* ---------------------------------------------------------------- cameras: from the port side, tail on the left */
 let AUTO = true, CAM = "overview", camGoal = null, CAMMOVE = false, CAMSNAP = false;
 const nbPos = () => R3.baby.visible ? new THREE.Vector3(BB.L / 2, 0, 0).applyMatrix4(R3.baby.matrix) : new THREE.Vector3(0.18, 0, 0.06);
@@ -1037,7 +1047,7 @@ async function loadAll() {
   const [j, a, g] = await Promise.all([getJSON("simple.json"), getJSON("arm.json"), fetch("simple_print.gcode").then((r) => r.ok ? r.text() : "").catch(() => "")]);
   if (!j || !a) { $("#ovStage").textContent = "The data files did not load"; throw new Error("data"); }
   J = j; J.read.wlz = J.WL; UW.uWL.value = J.WL; Object.assign(ARMD, a); GCL = g.split("\n").filter((l) => l.length);
-  buildWater(); buildBody(); buildArm(); buildBaby(); buildGallery(); setShadows(); buildLabels(); renderDoc();
+  buildWater(); buildBody(); buildArm(); buildBaby(); buildGallery(); setShadows(); dimInTail(); buildLabels(); renderDoc();
   log("simple.json: " + J.fr.q0.length + " frames, " + J.checks.length + " checks", "a"); const bad = J.checks.filter((c) => !c.ok); for (const c of bad) log("fails: " + c.name, "w");
   log("penetration test: worst pair " + f2(J.read.pen_max * 1000) + " mm over " + J.fr.pen.length + " frames", J.read.pen_max > 0.001 ? "w" : "a");
 }
