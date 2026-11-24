@@ -242,23 +242,29 @@ NBX = 0.60; LIPGAP = 0.045
 fr = q['fr']; nfr0 = len(fr['tdx'])
 def srng(k): s_ = next(x for x in q['stages'] if x['key'] == k); return s_['i0'], s_['i1']
 fr['nbx'] = [0.0] * nfr0
-a0, a1 = srng('relay_back')
-mv = [i for i in range(a0, a1) if abs(fr['tdx'][i] - fr['tdx'][a0]) > 1e-6 or abs(fr['tdy'][i]) > 1e-6]
-m0, m1 = mv[0] - 1, a1 - 1; x0_ = fr['tdx'][a0]; xpush = x0_ + LIPGAP + NBX; xend = fr['hdx'][a1 - 1] + NBX
 ss = lambda u: u * u * (3 - 2 * u)
-for i in range(m0, a1):
-    u = (i - m0) / (m1 - m0)
-    if u < 0.55: x = x0_ + (xpush - x0_) * ss(u / 0.55); y = 0.0
-    else: v = ss((u - 0.55) / 0.45); x = xpush + (xend - xpush) * v; y = 0.2 * v
-    fr['tdx'][i] = fr['hdx'][i] = round(x, 5); fr['tdy'][i] = fr['hdy'][i] = round(y, 5)
-    fr['nbx'][i] = round(min(NBX, max(0.0, x - x0_ - LIPGAP)), 5)
+# the newborn swims away by itself in the stage 'free': its mp6 pump draws water from the keel cells and jets it backward through the outlet;
+# lighter, it glides just over the floor and settles again where it stops. Speed: jet thrust rho Q v_j against the drag 1/2 rho Cd A v^2
+MP6_Q = 12e-6 / 60; OUT_A = np.pi * 0.0006 ** 2; vj = MP6_Q / OUT_A; thrust = 1000 * MP6_Q * vj
+A_front, CD = 0.30 * 0.08, 1.0; SWIM_V = (2 * thrust / (1000 * CD * A_front)) ** 0.5
+f0_, f1_ = srng('free')
+for i in range(f0_, nfr0): fr['nbx'][i] = NBX if i >= f1_ else round(NBX * ss((i - f0_) / (f1_ - 1 - f0_)), 5)
+fs = next(x for x in q['stages'] if x['key'] == 'free'); fs['real'] = round(NBX / SWIM_V); fs['disp'] = 9.0
+fs['name'] = 'The newborn swims away'
+fs['text'] = f'The newborn swims away by itself: its mp6 pump draws water out of its keel cells and jets it backward through the outlet ({MP6_Q*6e7:.0f} mL a minute, jet {vj*1000:.0f} mm/s, thrust {thrust*1e6:.0f} micronewton); lighter, it glides just over the floor at about {SWIM_V*1000:.1f} mm/s, {NBX*1000:.0f} mm in {NBX/SWIM_V/60:.0f} minutes, and settles on the floor where it stops. The parent stands still.'
+# then the parent moves the shortest way aside (forward and to port), releases the old head there, and the tail goes round it in the starboard lane
+a0, a1 = srng('relay_back'); x0_ = fr['tdx'][a0]; xend = fr['hdx'][a1 - 1] + NBX
+for i in range(a0, a1):
+    v = ss((i - a0) / (a1 - 1 - a0)); fr['tdx'][i] = fr['hdx'][i] = round(x0_ + (xend - x0_) * v, 5); fr['tdy'][i] = fr['hdy'][i] = round(0.2 * v, 5)
 for i in range(a1, nfr0):
-    fr['nbx'][i] = NBX; fr['tdx'][i] = round(fr['tdx'][i] + NBX, 5); fr['hdx'][i] = round(fr['hdx'][i] + NBX, 5)
+    fr['tdx'][i] = round(fr['tdx'][i] + NBX, 5); fr['hdx'][i] = round(fr['hdx'][i] + NBX, 5)
 q['read']['nb_shift'] = NBX
 for st in q['stages']:
-    if st['key'] == 'relay_back': st['text'] = 'The parent drives forward and pushes the newborn ahead along the tank floor with its lower lip, then backs to its place and moves to the port side, the head with it.'
-    if st['key'] == 'relay_lane': st['text'] = 'The tail goes round the old head in the starboard lane, forward, and comes in behind the newborn.'
-q['notes'][43] = f'The parent drives {NBX*1000:.0f} mm forward on the wheels of its tail; its lower lip meets the cuff of the newborn and pushes it ahead along the tank floor. Then it backs to its place and moves 200 mm to port, the head with it.'
+    if st['key'] == 'relay_back': st['name'] = 'Relay: aside'; st['text'] = 'The parent moves aside, a short way forward and 200 mm to port, the head with it, clear of the lane to the newborn.'
+    if st['key'] == 'relay_lane': st['text'] = 'Released, the tail goes round the old head in the starboard lane, forward, to the newborn where it stopped.'
+q['notes'][43] = 'The parent moves aside on the wheels of its tail, a short way forward and 200 mm to port, the head with it.'
+q['read']['swim_mm_s'] = SWIM_V * 1000
+
 # the second generation: docked to the newborn, the tail prints the next head in it; the timeline ends when that print is done (a short cure)
 p0, p1 = srng('print'); c0, c1 = srng('cure'); dk = fr['tdx'][nfr0 - 1]
 add_ = list(range(p0, p1)) + list(range(c0, c0 + 60))
@@ -471,4 +477,7 @@ def _txt(t):
     return t
 for st in q['stages']: st['text'] = _txt(st['text'])
 q['notes'] = [_txt(t) for t in q['notes']]
+json.dump(q, open(os.path.join(HERE, 'quilt.json'), 'w'))
+q['notes'] = [t.replace('The newborn, free, on the tank floor. It does not move by itself.', q['stages'][[s_['key'] for s_ in q['stages']].index('free')]['text']).replace('The tail drives forward in the lane past the old head.', 'Released, the tail drives forward in the starboard lane past the old head to the newborn.') for t in q['notes']]
+for c in q['checks']: c['name'] = c['name'].replace('it lies level in front of the mouth and does not swim off by itself', 'it lies level on the floor; it swims only on its own pump')
 json.dump(q, open(os.path.join(HERE, 'quilt.json'), 'w'))
