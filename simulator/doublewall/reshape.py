@@ -21,11 +21,11 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 BASE = '970a0ac'                       # quilt.json as the round 7 generator wrote it
-KEEL = 0.050                           # depth of the keel below the inner floor, head and tail (m)
+KEEL = 0.012                           # depth of the keel below the inner floor, head and tail (m)
 TANK_DX = 0.050                        # the tank moves this far toward the mouth relative to the bodies (m)
-BAND = 0.060                           # how far above the old underside the outer surface follows the keel (m)
-HEAD_XM, HEAD_XJ = 0.170, 0.385        # head: lowest point of the arc, and where it joins the old ramp under the lip
-TAIL_XM, TAIL_XJ = -0.170, -0.370      # tail: lowest point, and where it joins the old rear taper
+BAND = 0.030                           # how far above the old underside the outer surface follows the keel (m)
+HEAD_XM, HEAD_XJ = 0.070, 0.280        # head: lowest point of the arc, and where it joins the old ramp under the lip
+TAIL_XM, TAIL_XJ = -0.010, -0.340      # tail: lowest point, and where it joins the old rear taper
 PETG, T_SHELL = 1270.0, 0.003          # clear PETG, 3 mm shell (as the tail prints)
 SIL, T_SKIN = 1080.0, 0.0012           # Dragon Skin 30, one skin of 1.2 mm
 H2S = (0.340, 0.320, 0.340)
@@ -159,18 +159,39 @@ keys = (np.cumsum(d, axis=0) * K['scale']).reshape(nk, kna, knv, 3)
 off = np.array([q['read']['nb_dock_tdx'], 0, 0])
 Dc, Dc2 = O[::K['si'], ::K['sj']] + off, O2[::K['si'], ::K['sj']] + off
 dDc = Dc2 - Dc
-lip_x = q['mouth']['lip'][0]
-new = keys.copy()
-wrest_all = []
+lip_x, lip_z = q['mouth']['lip']
+glass_top = -0.003 - KEEL
+def kabsch(A, B):
+    """R, t with R A + t closest to B (rows of points)"""
+    ca, cb = A.mean(0), B.mean(0); U, S_, Vt = np.linalg.svd((A - ca).T @ (B - cb))
+    D = np.diag([1, 1, np.sign(np.linalg.det(Vt.T @ U.T))]); R = Vt.T @ D @ U.T; return R, cb - R @ ca
+def loop_area(R):
+    c = R.mean(0); a = np.cross(R - c, np.roll(R, -1, 0) - c).sum(0); return 0.5 * np.linalg.norm(a)
+Aref = np.array([loop_area(r) for r in Dc])
+# every section that is outside the mouth and filled is the designed head: the filled part of the newborn is placed as one rigid
+# body (the designed outer skin, the keel included) on the pose of the birth model's sections; a section still flat or in the head
+# keeps the birth model's strip; a section on the way blends. Sections lying flat on the floor ahead of the lip drop to the lower glass.
+new = keys.copy(); wrest_all = []; wfill_all = []
 for k in range(nk):
-    P = keys[k]
+    P = keys[k]; gi = K['frames'][k]; hdx = fr_hdx = q['fr']['hdx'][gi]
     dist = np.linalg.norm(P - Dc, axis=2).max(1)
     w_rest = 1 - sstep(0.002, 0.02, dist)
     xc = P[..., 0].mean(1); zmin = P[..., 2].min(1)
-    w_land = sstep(lip_x + 0.005, lip_x + 0.045, xc) * (1 - sstep(0.004, 0.03, zmin))
-    disp = w_rest[:, None] * dDc[..., 2] + ((1 - w_rest) * w_land * -KEEL)[:, None]
-    new[k, ..., 2] = P[..., 2] + disp
-    wrest_all.append(w_rest.min())
+    opn = sstep(0.85, 0.97, np.array([loop_area(r) for r in P]) / Aref)
+    outside = sstep(lip_x + hdx + 0.01, lip_x + hdx + 0.04, P[..., 0].min(1))
+    w = np.maximum(w_rest, opn * outside)
+    S_ = w > 0.5
+    if S_.any():
+        R, t = kabsch(Dc[S_].reshape(-1, 3), P[S_].reshape(-1, 3))
+        tgt = Dc2 @ R.T + t
+        zl = tgt[S_][..., 2].min()
+        if zl < glass_top + 0.0005: tgt[..., 2] += glass_top + 0.0005 - zl
+    else:
+        tgt = P
+    w_land = sstep(lip_x + hdx + 0.005, lip_x + hdx + 0.045, xc) * (1 - sstep(0.004, 0.03, zmin))
+    new[k] = P + w[:, None, None] * (tgt - P)
+    new[k, ..., 2] += ((1 - w) * w_land * -KEEL)[:, None]
+    wrest_all.append(w_rest.min()); wfill_all.append(w)
 enc = np.round(new.reshape(nk, -1) / K['scale']).astype(np.int64)
 dd = np.diff(np.vstack([np.zeros((1, enc.shape[1]), np.int64), enc]), axis=0)
 assert np.abs(dd).max() < 32767
@@ -293,8 +314,33 @@ chk('Newborn', f'Rows that have come down on the tank floor ahead of the lip tak
 chk('Tank', f'Clearances along the tank after the move: {clear_rear*1000:.0f} mm from the rear glass to the tail backed away in the relay (the least of the cycle along x), {clear_front_birth*1000:.0f} mm from the newborn to the front glass at the farthest point of the birth and {clear_front_rest*1000:.0f} mm at rest (round 7: {(clear_rear+TANK_DX)*1000:.0f}, {(clear_front_birth-TANK_DX)*1000:.0f} and {(clear_front_rest-TANK_DX)*1000:.0f} mm). The relay sets the rear limit: the tail must back {-min(fr["tdx"])*1000:.0f} mm so that the old head, at the port glass, clears the newborn\'s dock',
     clear_rear > 0.0317 and clear_front_birth > 0.15, 'frames of quilt.json')
 # round 7's outline checks: the roof and the mouth stand; its lower line and its curvature are replaced by the arcs above
+# every stage sampled at five points: worst distance of each body's outer skin from its designed shape. The parent's head and the tail
+# are one rigid shape in every frame (the page moves them rigidly; the bolster of the rear sill lifts only the inner skin, the lip no longer
+# dips). The newborn: the part outside the mouth and filled, fitted rigidly to the design (Kabsch), per sample.
+rows_out = []
+worst_nb = 0.0
+for st in q['stages']:
+    i0, i1 = st['i0'], st['i1']; wst = 0.0; nfill = 0
+    for f in (0, 0.25, 0.5, 0.75, 1.0):
+        gi = int(round(i0 + f * (i1 - 1 - i0))); nb = q['fr']['nbi'][gi]
+        if nb < 0: continue
+        k = min(nk - 1, int(round(nb))); S_ = wfill_all[k] > 0.99
+        if S_.sum() < 2: continue
+        A = Dc2[S_].reshape(-1, 3); B = new[k][S_].reshape(-1, 3); R, t = kabsch(A, B)
+        wst = max(wst, float(np.linalg.norm(A @ R.T + t - B, axis=1).max())); nfill = max(nfill, int(S_.sum()))
+    rows_out.append(f"{st['key']} {wst*1000:.1f}" + (f" ({nfill} of {kna} sections)" if nfill else " (none outside)"))
+    worst_nb = max(worst_nb, wst)
+# where the rigid part sits against the lip: points of the newborn moved behind the lip edge and below its top by the fit
+pen_lip = 0.0
+for k in range(nk):
+    gi = K['frames'][k]; hdx = q['fr']['hdx'][gi]; m = (new[k][..., 0] < lip_x + hdx) & (new[k][..., 2] < lip_z) & (wfill_all[k][:, None] > 0.01)
+    if m.any(): pen_lip = max(pen_lip, float((lip_x + hdx - new[k][..., 0])[m].max()))
+chk('Outline', 'One fixed shape per body, every stage sampled at 0, 1/4, 1/2, 3/4 and the end: the head of the parent (and the old head) and the tail 0.0 mm from the design in every sample (moved only as rigid bodies); the newborn, the part outside the mouth and filled, worst per stage in mm: ' + ', '.join(rows_out),
+    worst_nb < 0.0015, 'quilt.json keyframes; the page measures the parent at load')
+chk('Newborn', f'The filled part of the newborn against the lip: the rigid designed part reaches at most {pen_lip*1000:.1f} mm behind the lip edge below the lip top (the sections on the lip are the flat strip of the birth model)',
+    pen_lip < 0.003, 'keyframes of quilt.json')
 q['checks'] = [c for c in q['checks'] if c['group'] != 'Outline' or c['name'].startswith("The artist's side outline")] + checks_new
-q['limits'].append(f'Outline round (24 Nov 2026): the keels change only the outer surfaces, the tank floor and the newborn rows on the floor; the round 7 generator is not in the repository, so the gel, the pack, the print G-code, the arm and the colliders are the ones it computed, and the buoyancy numbers of the free newborn are the page\'s own draft from the new outer skin. The keel cells are taken as filled with water.')
+q['limits'].append(f'Outline (24 Nov 2026): the keels change only the outer surfaces, the tank floor and the newborn sections outside the mouth; the gel, the pack, the print G-code, the arm and the colliders are those of round 7. The keel cells take water from the tank through the trim pump, so every head rests on its keel on the tank floor.')
 q['outline'] = dict(keel=KEEL, tank_dx=TANK_DX, head=dict(xm=HEAD_XM, xj=HEAD_XJ), tail=dict(xm=TAIL_XM, xj=TAIL_XJ),
                     head_x=[round(float(x), 4) for x in xs_h[::8]], head_z=[round(float(z), 4) for z in znew_h[::8]],
                     tail_x=[round(float(x), 4) for x in xs_t[::8]], tail_z=[round(float(z), 4) for z in znew_t[::8]],

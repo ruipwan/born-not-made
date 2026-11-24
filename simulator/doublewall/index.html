@@ -708,8 +708,9 @@ function buildSill(og, ig, cg, O, I, nv) {
   const n1 = nv + 1, items = [];
   const add = (g, zi) => { const p = g.attributes.position.array, ix = [], b = [], dz = []; for (let d = 0; d < p.length / 3; d++) { const v = zi(d); if (v.dz > 1e-6) { ix.push(3 * d + 2); b.push(p[3 * d + 2]); dz.push(v.dz); } } items.push({ g, ix: Int32Array.from(ix), b: Float32Array.from(b), dz: Float32Array.from(dz), nrm: true }); };
   const lv = (s, inner) => { const x = O[s], w = sillW(O[s + 2]); return { dz: sillL(x) * w + (inner ? sillRoll(x) * w : 0) }; };
-  add(og, (d) => lv((Math.floor(d / n1) * nv + (d % n1) % nv) * 3, false)); add(ig, (d) => lv((Math.floor(d / n1) * nv + (d % n1) % nv) * 3, true));
-  add(cg, (d) => lv(((Math.floor(d / 2)) % nv) * 3, d % 2 === 1));          // the cuff at row 0: outer, inner per column
+  add(og, () => ({ dz: 0 })); add(ig,          // outline round 2: the bolster fills between the skins, it lifts the inner skin only; the outer skin keeps its one designed shape
+    (d) => lv((Math.floor(d / n1) * nv + (d % n1) % nv) * 3, true));
+  add(cg, (d) => d % 2 === 1 ? lv(((Math.floor(d / 2)) % nv) * 3, true) : { dz: 0 });          // the cuff at row 0: outer, inner per column
   for (const l of PARTS.circ || []) add(l.geometry, (d) => { const p = l.geometry.attributes.position.array; return { dz: sillL(p[3 * d]) * sillW(p[3 * d + 2]) }; });
   PARTS.sill = { items, u: 0 };
 }
@@ -735,7 +736,7 @@ function sillDraft() {
 // round 23: the texts that had the newborn lying on the tank floor (quilt.json is kept as it is; the page states the new posture)
 function sillTexts() {
   const D = J.read.sill, mm = (v) => f0(v * 1000), sub = (i, fn) => { if (J.notes[i] !== undefined) J.notes[i] = fn(J.notes[i]); };
-  const flt = `floats level in front of the mouth, ${mm(D.d0)} mm deep (Archimedes: ${f1(J.r2.float.weight_N)} N against the water the closed bowl displaces), without any drive`;
+  const flt = `settles on the tank floor in front of the mouth at the height of its parent: as it opens, its low keel cells take water through the trim pump, so it rests on its keel like the parent's head`;
   const st = (k, t) => { const s = J.stages.find((x) => x.key === k); if (s) s.text = t; };
   sub(0, (t) => t.replace("each part holds its own gel at the open docking face, level with the water", "the tail holds the tail's gel at the open docking face, level with the water; the head holds the gel of the head behind the raised rear sill").replace("the two gel faces meet and the water between them is squeezed out", "the face of the tail meets the cuff of the head").replace("the cuff seals on the cord seat.", "the cuff seals on the cord seat. Until then the head waits with the rear sill up (the bolster on the lower arc of the rim filled), the gel of the head behind the sill; once the cuff has sealed the bolster is vented and lies flat, and the two gels meet."));
   st("dock", "Water in the tank and gel in both parts from the first frame. The tail slides forward and docks from behind; nine magnets in the tail face pull the steel disks in the cuff of the quilted head. Then the bolster of the rear sill is vented and the floor of the head runs flat to the rim; the gel of the head meets the gel face of the tail.");
@@ -745,18 +746,16 @@ function sillTexts() {
   st("free", `The newborn ${flt}; the tail comes to the newborn.`);
   sub(44, (t) => t + " Then the bolster of the old head fills and the rear sill of the old head rises: the old head is a closed bowl with the gel inside.");
   st("relay_release", "Tilt release of the dock magnets on the hinged tabs; the old head stays against the port side, and the rear sill of the old head rises: a closed bowl with the gel inside.");
-  sub(47, (t) => t.replace("The newborn has not moved: it lies where it came to rest.", "The newborn has not moved: the newborn floats where the newborn came to rest (no drive; drift in still water is not modeled)."));
-  sub(48, (t) => t + ` The docking face takes the rim and presses the floating newborn ${mm(D.zf - D.zb)} mm down to the docking height, on the floor; then the bolster is vented and the floor runs flat to the rim.`);
-  st("relay_dock", `The tail docks on the rim of the newborn: the docking face of the tail presses the floating newborn ${mm(D.zf - D.zb)} mm down to the floor, then the rear sill is vented and lies flat.`);
-  const ld = D.onFloor ? `with the gel in (${f2(D.m1)} kg) the closed bowl would need ${mm(D.d1)} mm of draft, more than the ${mm(D.depth)} mm of water: the newborn rests on the floor (${f1(D.floorN)} N), docked to the tail` : `with the gel in (${f2(D.m1)} kg) the newborn would float ${mm(D.d1)} mm deep`;
+  sub(47, (t) => t.replace("The newborn has not moved: it lies where it came to rest.", "The newborn has not moved: it stands where it came to rest, at the height of the old head."));
+  sub(48, (t) => t + ` The docking face takes the rim of the newborn, which stands at the docking height already; then the bolster is vented and the inner floor runs flat to the rim.`);
+  st("relay_dock", `The tail docks on the rim of the newborn, which stands at the docking height; then the rear sill is vented and lies flat.`);
+  const ld = `with the gel in (${f2(D.m1)} kg) the newborn rests on the floor, docked to the tail`;
   sub(49, (t) => t + " " + ld.charAt(0).toUpperCase() + ld.slice(1) + ".");
   st("relay_gel", "Gel into the newborn, then the lip circuit of the newborn at 9 kPa; " + ld + ".");
   for (const c of J.checks) {
-    if (/^Float: the free newborn does not float/.test(c.name)) c.name = `Float: with the rear sill up the free newborn is a closed bowl: ${f1(J.r2.float.weight_N)} N against the water the bowl displaces gives a draft of ${mm(D.d0)} mm in ${mm(D.depth)} mm of water; the newborn floats level, without any drive. Flooded, before the sill rises, the air in the cells of the newborn would leave ${f1(J.r2.float.floor_load_N)} N on the floor. Posture prescribed, not simulated`;
     c.name = c.name.replace("The newborn does not move by itself", "The newborn has no drive"); }
   J.checks.push({ group: "Rear sill", name: `Rear sill: an inflatable bolster on the lower arc of the docking rim; flat while a tail is docked, filled when the tail leaves, so an undocked head is a closed bowl (sill ${f0(D.sill_mm)} mm, gel ${f0(J.read.gel_z * 1000)} mm, water ${mm(J.WL)} mm). The posture is prescribed, not simulated`, ok: true, value: "" },
-    { group: "Rear sill", name: `Newborn empty: draft ${mm(D.d0)} mm (${f2(D.m0)} kg); with the gel and the lip circuit (${f2(D.m1)} kg): ${D.onFloor ? `draft ${mm(D.d1)} mm, more than the ${mm(D.depth)} mm of water, so the newborn rests on the floor` : `draft ${mm(D.d1)} mm`}`, ok: true, value: "" },
-    { group: "Rear sill", name: "Relay clearances: the vertical moves of the newborn (float, pressed down by the docking face) are drawn in the page; the horizontal clearances of the relay are those of the published timeline and unchanged", ok: true, value: "" },
+    { group: "Rear sill", name: "Relay clearances: the newborn rests on the floor and makes no vertical move; the horizontal clearances of the relay are those of the published timeline and unchanged", ok: true, value: "" },
     { group: "Rear sill", name: "Open: the seal of the bolster toward the side walls", ok: false, value: "open question" },
     { group: "Rear sill", name: `Open: the pressure the bolster needs to stand against the head of water (sill ${f0(D.sill_mm)} mm over a floor ${mm(J.WL)} mm under the water outside)`, ok: false, value: "open question" },
     { group: "Rear sill", name: "Open: the tile sets lie in the bolster zone (27 to 63 mm from the rim) and ride up the slope of the bolster when the bolster fills, tilted; a shorter bolster or tile sets further forward would keep the tile sets flat", ok: false, value: "open question" });
@@ -778,7 +777,7 @@ function buildQuilt() {
     const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(ix); g.computeVertexNormals(); const m = new THREE.Mesh(g, clayMat(0xe9edee, { opacity: 0.75, side: THREE.DoubleSide, sub: 0.3, clip })); m.renderOrder = 7.3; R3.chamber.add(m); (PARTS.qCapM = PARTS.qCapM || []).push(m); return g; };
   const cg = cap(0), mg = cap(na - 1);
   // round 3, point 0: the lip edge dips elastically under the keel of the newborn in phase d (S.dip); the base positions are kept
-  PARTS.dipG = [og, ig, mg].map(g => [g, Float32Array.from(g.attributes.position.array)]);
+  PARTS.dipG = [];          // outline round 2: the lip keeps its designed shape (the elastic dip of round 3 is no longer drawn)
   // round 22: the newborn and the folded pack share the texture (and the newborn and the pack also take its bump map)
   const img = new Image(); img.onload = () => { const t = quiltTextures(img); PARTS.qTex = t; outerM.map = t.map; outerM.needsUpdate = true; if (NB.mat) { NB.mat.map = t.map; NB.mat.bumpMap = t.bump; NB.mat.needsUpdate = true; } if (BB.quiltMats) for (const m of BB.quiltMats) { m.map = t.map; if (m.bumpScale) m.bumpMap = t.bump; m.needsUpdate = true; } }; img.onerror = () => log("quilt texture did not load", "w"); img.src = Q.tex;
   // the six circuits, through the cell centers, filled from the mouth end
@@ -853,7 +852,7 @@ function nbFrame(P) {
   return { c0, kp, ex, ey, ez };
 }
 function setNewborn(nbi) {
-  if (!NB.mesh) return; const vis = nbi >= 0; for (const m of [NB.mesh, NB.inner, NB.keel, ...NB.caps]) m.visible = vis; if (!vis) return;
+  if (!NB.mesh) return; const vis = nbi >= 0; for (const m of [NB.mesh, NB.inner, NB.keel, ...NB.caps]) m.visible = vis; if (!vis) { if (NB.hi) NB.hi.visible = false; NB.last = -2; return; }
   const sk = [NB.u, NB.fl, J.WL].join(); if (Math.abs(nbi - NB.last) < 1e-4 && sk === NB.skey) return; NB.last = nbi; NB.skey = sk;
   const K = J.nbk, nk = K.frames.length, k0 = Math.min(nk - 1, Math.floor(nbi)), k1 = Math.min(nk - 1, k0 + 1), f = nbi - k0, n = NB.n, sc = NB.sc, na = NB.na, nv = NB.nv, n1 = nv + 1;
   const A = NB.mesh.geometry.attributes.position.array, B = NB.inner.geometry.attributes.position.array, NA = NB.mesh.geometry.attributes.normal.array, KA = NB.keys, kp = NB.keel.geometry.attributes.position.array, jk = Math.floor(nv / 2);
@@ -868,9 +867,8 @@ function setNewborn(nbi) {
   // round 23: the bolster lifts the rear floor along the newborn's own up (its rest frame turned into its present pose), then the newborn floats: its lowest point not below the draft
   const Fc = nbFrame((i, j, c) => P(i, j % nv, c)), Fr = NB.Fr, dir = Fc.ex.clone().multiplyScalar(Fr.ex.z).add(Fc.ey.clone().multiplyScalar(Fr.ey.z)).add(Fc.ez.clone().multiplyScalar(Fr.ez.z)).normalize();
   NB.F = Fc; NB.dir = dir;
-  if (NB.u > 1e-4) for (let i = 0; i < na; i++) for (let j = 0; j <= nv; j++) { const d = (i * n1 + j) * 3, l = NB.u * NB.LV[i * nv + (j % nv)]; A[d] += dir.x * l; A[d + 1] += dir.y * l; A[d + 2] += dir.z * l; }
   let zmin = 9; for (let d = 2; d < A.length; d += 3) zmin = Math.min(zmin, A[d]);
-  NB.dz = NB.fl > 1e-4 && J.read.sill ? NB.fl * Math.max(0, J.read.sill.zf - zmin) : 0;
+  NB.dz = 0;          // outline round 2: the newborn rests on the floor at the parent's height (keel cells flooded); sillDraft keeps the draft of a closed bowl, unused
   if (NB.dz > 0) for (let d = 2; d < A.length; d += 3) A[d] += NB.dz;
   // normals by central differences on the grid, j wrapping (the seam j = 0 / j = nv gets one normal), one sided at the two end rows; the open fraction of each row from its enclosed area
   for (let i = 0; i < na; i++) { const ip = Math.min(na - 1, i + 1), im = Math.max(0, i - 1); let ax = 0, ay = 0, az = 0, cx = 0, cy = 0, cz = 0;
@@ -886,6 +884,7 @@ function setNewborn(nbi) {
   for (let i = 0; i < na; i++) { const o = NB.open[i]; for (let j = 0; j <= nv; j++) { const d = (i * n1 + j) * 3, t = sg * (TFLAT + (TF[i * nv + (j % nv)] - TFLAT) * o + NB.u * NB.RV[i * nv + (j % nv)]); B[d] = A[d] + NA[d] * t; B[d + 1] = A[d + 1] + NA[d + 1] * t; B[d + 2] = A[d + 2] + NA[d + 2] * t; } }
   { const DO = NB.DO, DI = NB.DI; for (let i = 0; i < na; i++) { const w = NB.wr[i]; if (w < 1e-3) continue; for (let j = 0; j <= nv; j++) { const d = (i * n1 + j) * 3, e = (i * nv + (j % nv)) * 3, t = sg * NB.u * NB.RV[i * nv + (j % nv)];
     for (let c = 0; c < 3; c++) B[d + c] = lerp(B[d + c], A[d + c] + DI[e + c] - DO[e + c] + NA[d + c] * t, w); } } }
+  if (NB.u > 1e-4) for (let i = 0; i < na; i++) for (let j = 0; j <= nv; j++) { const d = (i * n1 + j) * 3, l = NB.u * NB.LV[i * nv + (j % nv)]; B[d] += dir.x * l; B[d + 1] += dir.y * l; B[d + 2] += dir.z * l; }          // the bolster lifts the inner skin only
   for (const m of NB.caps) { const i = m.userData.row, C = m.geometry.attributes.position.array; for (let j = 0; j <= nv; j++) { const d = (i * n1 + j) * 3; C[6 * j] = A[d]; C[6 * j + 1] = A[d + 1]; C[6 * j + 2] = A[d + 2]; C[6 * j + 3] = B[d]; C[6 * j + 4] = B[d + 1]; C[6 * j + 5] = B[d + 2]; }
     m.geometry.attributes.position.needsUpdate = true; m.geometry.computeVertexNormals(); }
   for (let i = 0; i < na; i++) { const s = (i * n1 + jk) * 3; for (let c = 0; c < 3; c++) kp[3 * i + c] = A[s + c] + (c === 2 ? 0.001 : 0); }
@@ -1164,7 +1163,7 @@ function buildLabels() {
   mk("Docking from behind, in the water, gel face to gel face: magnets in the tail face, steel disks in the cuff", "", () => inS("dock") ? [J.read.dock_x, 0, 0.3] : null);
   mk("Open gel face of the tail, level with the water", "w", () => inS("dock") && STATE.dock < -0.01 ? [J.read.dock_x + STATE.dock - 0.004, -0.06, STATE.gel - 0.02] : null);
   mk("Rear sill up: the bolster filled, the head a closed bowl", "", () => inS("dock") && STATE.dock < -0.02 ? [J.read.dock_x + 0.01, 0.1, SILL.zs + 0.01] : null);          // round 23
-  mk("Rear sill up: the bolster filled, a closed bowl, afloat", "", () => inS("free") && J.read.sill ? [J.read.nb_dock_tdx + SILL.xd + 0.01, -0.1, J.read.sill.zf + SILL.zs + 0.01] : null);
+  mk("Rear sill up: the bolster filled between the skins, a closed bowl", "", () => inS("free") && J.read.sill ? [J.read.nb_dock_tdx + SILL.xd + 0.01, -0.1, SILL.zs + 0.01] : null);
   mk("Mouth", "", () => inS("dock", "gel", "birth_a") ? [J.mouth.top[0] + 0.02, 0, J.mouth.top[2] + 0.02] : null);
   mk("Gel, in from the first frame, held by the lower part of the head", "w", () => inS("gel", "kit", "print") ? [0.12, -0.05, STATE.gel + 0.005] : null);
   mk("Lower lip", "", () => inS("gel", "birth_a") ? [J.read.x_s + 0.04, -0.12, J.mouth.lip[1] - 0.06] : null);
@@ -1338,7 +1337,7 @@ function renderReadouts(S) {
 }
 // round 23: readouts of the rear sill and the float
 function sillTxt(u, flat) { return u > 0.98 ? `up, ${f0(SILL.zs * 1000)} mm` : u > 0.02 ? "filling or venting" : flat; }
-function nbFloat(S) { const D = J.read.sill; if (S.k === "relay_dock" && S.sill.fl < 0.98 && S.sill.fl > 0.02) return "pressed down to the floor"; if (S.sill.fl > 0.98) return `floats, ${f0(D.d0 * 1000)} mm deep`; if (/^relay_dock|^relay_gel|^next/.test(S.k)) return D.onFloor ? "on the floor, docked" : "docked"; if (S.sill.fl > 0.02) return "coming down to the draft"; return S.k === "birth_d" ? "on the parent's lip" : "in the parent's head"; }
+function nbFloat(S) { const D = J.read.sill; if (S.sill.fl > 0.02 && !/^relay_dock|^relay_gel|^next/.test(S.k)) return "on the tank floor, keel cells flooded"; if (/^relay_dock|^relay_gel|^next/.test(S.k)) return D.onFloor ? "on the floor, docked" : "docked"; return S.k === "birth_d" ? "on the parent's lip" : "in the parent's head"; }
 function gelFrac(z) { return clamp(z / J.read.gel_z, 0, 1) ** 1.25; }
 function renderOverlay(S) {
   $("#ovStage").textContent = S.st.s.n + ". " + S.st.s.name; $("#ovStep").textContent = J.notes[S.note] || S.st.s.text; $("#ovClock").innerHTML = hms(S.clock) + " <span>process time</span>";
@@ -1350,7 +1349,7 @@ function renderProps() {
     el.innerHTML = groups.map((g) => `<div class="pnl"><h3>${esc(g)}</h3>${J.checks.filter((c) => c.group === g).map((c) => `<div class="chk ${c.ok ? "" : "no"}"><i>${c.ok ? "ok" : "no"}</i><span>${esc(c.name)}${c.value ? " (" + esc(c.value) + ")" : ""}</span></div>`).join("")}</div>`).join("") +
       `<div class="pnl"><h3>Penetration, every pair, every frame</h3><dl class="kv">${J.pairs.map((p) => `<dt>${esc(p.name)}</dt><dd>${f2(p.mm)} mm</dd>`).join("")}</dl><p>${J.fr.pen.length} frames tested. Limit 1 mm.</p></div>`; }
   else if (TAB === "birth") { const R = J.r2, q = J.q;
-    el.innerHTML = `<div class="pnl"><h3>The keel first birth</h3><p>Mouth end first, on the outline of round 7 (a long ramp up to the lip at x ${f0(J.mouth.lip[0] * 1000)} mm). (a) The ball needle of the holder in the valve at the rim; the keel, fed first, straightens the lengthwise folds and the mouth end goes up the ramp and over the lip, cupped. (b) The holder pushes the rim while the circuits are fed from the mouth end, each section opening only past the lip. (c) The folding crank, swung down by a passive over center latch, pushes the rim to the end of the reach of the arm (x ${f0(R.reach.crank_rim_x * 1000)} mm). (d) The needle leaves; the parent body backs away ${f0(R.reach.back_mm)} mm on the wheels of the tail while the front of the newborn rests on the tank floor, so the rim slides over the lip; while the rim is up on the lip, above the water, the rear sill of the newborn fills, and the newborn comes down as a closed bowl and floats, ${f0(J.read.sill.d0 * 1000)} mm deep, without any drive. The birth shown is a kinematic model; the push up the ramp is over the payload (see the checks)</p></div><div class="pnl"><h3>Rear sill</h3><p>Rear sill: an inflatable bolster on the lower arc of the docking rim; flat while a tail is docked, filled when the tail leaves, so an undocked head is a closed bowl. The posture is prescribed, not simulated. Filled, the floor rises behind x ${f0(J.read.sill.xe_mm)} mm in one S curve to a sill of ${f0(J.read.sill.sill_mm)} mm at the rim (gel ${f0(J.read.gel_z * 1000)} mm, water ${f0(J.WL * 1000)} mm). Empty, the newborn floats ${f0(J.read.sill.d0 * 1000)} mm deep (${f2(J.read.sill.m0)} kg); with the gel (${f2(J.read.sill.m1)} kg) the bowl would need ${f0(J.read.sill.d1 * 1000)} mm${J.read.sill.onFloor ? `, more than the ${f0(J.read.sill.depth * 1000)} mm of water: the newborn rests on the floor` : ""}. Open: the seal of the bolster toward the side walls; the pressure needed to stand against the head of water.</p></div>` +
+    el.innerHTML = `<div class="pnl"><h3>The keel first birth</h3><p>Mouth end first, on the outline of round 7 (a long ramp up to the lip at x ${f0(J.mouth.lip[0] * 1000)} mm). (a) The ball needle of the holder in the valve at the rim; the keel, fed first, straightens the lengthwise folds and the mouth end goes up the ramp and over the lip, cupped. (b) The holder pushes the rim while the circuits are fed from the mouth end, each section opening only past the lip. (c) The folding crank, swung down by a passive over center latch, pushes the rim to the end of the reach of the arm (x ${f0(R.reach.crank_rim_x * 1000)} mm). (d) The needle leaves; the parent body backs away ${f0(R.reach.back_mm)} mm on the wheels of the tail while the front of the newborn rests on the tank floor, so the rim slides over the lip; while the rim is up on the lip, above the water, the rear sill of the newborn fills, and the newborn comes down onto the tank floor at the height of the parent's head, its keel cells flooded. The birth shown is a kinematic model; the push up the ramp is over the payload (see the checks)</p></div><div class="pnl"><h3>Rear sill</h3><p>Rear sill: an inflatable bolster on the lower arc of the docking rim; flat while a tail is docked, filled when the tail leaves, so an undocked head is a closed bowl. The posture is prescribed, not simulated. Filled, the floor rises behind x ${f0(J.read.sill.xe_mm)} mm in one S curve to a sill of ${f0(J.read.sill.sill_mm)} mm at the rim (gel ${f0(J.read.gel_z * 1000)} mm, water ${f0(J.WL * 1000)} mm). Its keel cells take water as it opens, so the newborn rests on the floor at the height of its parent. Open: the seal of the bolster toward the side walls; the pressure needed to stand against the head of water.</p></div>` +
       `<div class="pnl"><h3>Gates</h3><dl class="kv"><dt>Cupped strip in the mouth</dt><dd>radius ${f0(R.cup.R)} mm, ${f1(R.cup.clear - 2)} mm spare</dd><dt>Keel</dt><dd>2 rows, ${f0(2 * R.keel.r_mm)} mm, ${f1(R.keel.p_kpa)} kPa of ${f1(R.keel.p_allow_kpa)}</dd><dt>Keel axial capacity</dt><dd>${f1(R.keel.axial_N)} N, needs ${f1(R.keel.need_N)} N</dd><dt>Push a, b, c</dt><dd>${f2(R.push.a)}, ${f2(R.push.b)}, ${f2(R.push.c)} N of ${f2(J.read.payload_N)}</dd><dt>Wrist moment</dt><dd>${f2(R.wrist.holder)}, ${f2(R.wrist.crank)} N m</dd><dt>Rim reached by the crank</dt><dd>${f0(R.reach.crank_rim_x * 1000)} mm, needs ${f0(R.reach.need * 1000)}; the parent backs away ${f0(R.reach.back_mm)} mm</dd><dt>Air per mm of advance</dt><dd>${f0(R.front.air_per_mm_mL)} mL</dd><dt>Lip load, phase d</dt><dd>${f2(R.lip.load_N)} N (lip circuit gel at ${f1(R.lip.p_lip_kpa)} kPa)</dd><dt>Deepest overlap, birth</dt><dd>${f2(R.pen_birth * 1000)} mm</dd></dl></div>` +
       `<div class="pnl"><h3>Round 1, kept as history</h3>${q.q1.attempts.map((a, i) => `<p><b>${esc(a.name)}.</b> ${esc(a.why)}</p>`).join("")}</div>`; }
   else if (TAB === "masses") { const M = J.masses; el.innerHTML = M.map((g) => `<div class="pnl"><h3>${esc(g.name)}</h3><dl class="kv">${g.rows.map((r) => `<dt>${esc(r[0])}</dt><dd>${esc(r[1])}</dd>`).join("")}</dl>${g.note ? `<p>${esc(g.note)}</p>` : ""}</div>`).join(""); }
@@ -1399,6 +1398,16 @@ async function loadAll() {
   log("quilt.json: " + J.fr.q0.length + " frames, " + J.checks.length + " checks", "a"); const bad = J.checks.filter((c) => !c.ok); for (const c of bad) log("fails: " + c.name, "w");
   log("penetration test: worst pair " + f2(J.read.pen_max * 1000) + " mm over " + J.fr.pen.length + " frames", J.read.pen_max > 0.001 ? "w" : "a");
 }
+// outline round 2: play the whole timeline at five points of every stage and measure the outer skins drawn against their designed shape
+function shapeAudit() {
+  const G = PARTS.qG; if (!G) return; const base = Float32Array.from(G.og.attributes.position.array), hb = NB.hi ? Float32Array.from(NB.hi.children[0].geometry.attributes.position.array) : null;
+  const tl = PARTS.tail ? Float32Array.from(PARTS.tail.geometry.attributes.position.array) : null; let wP = 0, wN = 0, wT = 0, nHi = 0;
+  const dev = (a, b) => { let m = 0; for (let i = 0; i < a.length; i++) m = Math.max(m, Math.abs(a[i] - b[i])); return m; };
+  for (const st of TL.stages) for (const f of [0, 0.25, 0.5, 0.75, 0.999]) { const S = evalState(st.d0 + st.disp * f); applyState(S, 0);
+    wP = Math.max(wP, dev(G.og.attributes.position.array, base)); if (tl) wT = Math.max(wT, dev(PARTS.tail.geometry.attributes.position.array, tl));
+    if (hb && NB.hi.visible) { nHi++; wN = Math.max(wN, dev(NB.hi.children[0].geometry.attributes.position.array, hb)); } }
+  J.checks.push({ group: "Outline", name: `Measured in this page over the whole timeline (every stage at 0, 1/4, 1/2, 3/4 and its end): the outer skin of the parent's head and of the old head ${f1(wP * 1000)} mm from its designed shape, the tail shell ${f1(wT * 1000)} mm, the newborn at rest (${nHi} samples) ${f1(wN * 1000)} mm; the bodies move only as rigid bodies`, ok: wP < 1e-4 && wT < 1e-4 && wN < 1e-4, value: "measured at load" });
+}
 let lastNow = 0, lastRO = 0, DRAG = false;
 function frame() {
   requestAnimationFrame(frame);
@@ -1427,7 +1436,7 @@ function wireUI() {
 }
 window.BNM = { go(k, f = 0.5) { const s = TL.stages.find((x) => x.k === k); if (s) { TL.T = s.d0 + s.disp * f; TL.playing = false; $("#play").textContent = "Play"; } }, stages: () => TL.stages.map((s) => s.k), state: () => STATE, setAuto, setCam, setInner, settle: () => { CAMSNAP = true; }, quality: () => CINE.q };
 (async function main() {
-  try { initThree(); await loadAll(); wireUI(); buildStages(); renderTrack(); STATE = evalState(0); applyState(STATE, 0); setCam("wide", true); renderProps(); requestAnimationFrame(frame); }
+  try { initThree(); await loadAll(); wireUI(); buildStages(); renderTrack(); shapeAudit(); STATE = evalState(0); applyState(STATE, 0); setCam("wide", true); renderProps(); requestAnimationFrame(frame); }
   catch (e) { console.error(e); $("#ovStage").textContent = "The simulator did not start"; $("#ovStep").textContent = String(e.message || e); }
 })();
 
