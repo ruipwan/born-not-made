@@ -1,3 +1,1127 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>Society</title><meta http-equiv="refresh" content="0; url=../eating/"><link rel="icon" href="data:,"></head>
-<body style="background:#000;color:#ecebe6;font:13px system-ui"><p>The earlier Society page is now <a href="../eating/" style="color:inherit">Eating parts</a>. A new Society page follows.</p></body></html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Speculative design: a robot giving birth to another · Society</title>
+<meta name="description" content="Born, Not Made as a society. A fixed number of tailed ones, each holding an arm and gel, stay in one tank. Every other body is born from one of the tailed ones, has no tail, swims out, reads the light, the stream and the crowd, and comes back to tell. Talk fills a store of lines in the head of a tailed one. With enough lines the tailed one prints the next generation folded in gel and pushes the newborn out while a pump fills the newborn with air. Each generation differs in shape and in what the body can do.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Society: a few tailed ones and the generations born from the tailed ones, in one tank under a grid of small spot lights. Talk is drawn as small type between two bodies. */
+:root { --bg: #000; --panel: #0b0b0c; --line: #262628; --ink: #ecebe6; --muted: #9b9a94; --dim: #67665f; --mono: "JetBrains Mono", ui-monospace, monospace; --serif: "Cormorant Garamond", Georgia, serif; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 12.5px/1.45 "Inter", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.app { display: grid; grid-template-columns: minmax(0, 1fr) 320px; height: 100vh; min-height: 560px; }
+.view { position: relative; overflow: hidden; background: #000; }
+#c { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+#c:active { cursor: grabbing; }
+.cap { position: absolute; left: 16px; top: 12px; pointer-events: none; max-width: min(560px, calc(100% - 32px)); text-shadow: 0 0 6px #000; }
+.cap h1 { margin: 0; font: 400 26px/1.1 var(--serif); letter-spacing: -.01em; }
+.cap p { margin: 6px 0 0; color: #b9b8b2; font-size: 12px; }
+.hud { margin-top: 8px; font: 11px var(--mono); color: var(--muted); }
+.hud b { color: var(--ink); font-weight: 500; }
+.ev { position: absolute; left: 16px; bottom: 12px; pointer-events: none; font: 11px/1.6 var(--mono); color: #8d8c86; text-shadow: 0 0 5px #000; max-width: calc(100% - 330px); }
+.ev div:last-child { color: var(--ink); }
+#labs { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+/* a spoken line: small type between the two speakers, with who speaks to whom above */
+.sp { position: absolute; left: 0; top: 0; transform: translate(-50%, -100%); width: max-content; max-width: 250px; text-align: center; font: 400 11px/1.35 var(--mono); color: #f3f2ed; text-shadow: 0 0 5px #000, 0 0 2px #000; opacity: 0; transition: opacity .45s ease; padding-bottom: 9px; will-change: transform, opacity; }
+.sp.on { opacity: 1; }
+.sp i { display: block; font: 500 8.5px/1.5 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: rgb(255 255 255 / 55%); font-style: normal; }
+.wide .sp s { display: none; }
+.sp s { display: block; text-decoration: none; color: rgb(255 255 255 / 42%); font-size: 10px; }
+.sp::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 1px; height: 7px; background: rgb(255 255 255 / 34%); }
+.tg { position: absolute; left: 0; top: 0; pointer-events: none; transform: translate(-50%, -100%); font: 500 8.5px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: rgb(255 255 255 / 58%); text-shadow: 0 0 4px #000; white-space: nowrap; padding-bottom: 7px; }
+.tg::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 1px; height: 5px; background: rgb(255 255 255 / 30%); }
+.views { position: absolute; right: 12px; top: 12px; display: flex; gap: 2px; }
+aside { border-left: 1px solid var(--line); background: var(--panel); overflow-y: auto; padding: 12px 12px 40px; display: flex; flex-direction: column; gap: 16px; }
+aside h3 { margin: 0 0 7px; font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.row { display: flex; gap: 2px 4px; flex-wrap: wrap; align-items: center; }
+button { font: 500 11.5px "Inter", sans-serif; color: var(--muted); background: none; border: 0; padding: 3px 6px; cursor: pointer; }
+button:hover { color: #fff; } button.on { color: #fff; font-weight: 700; }
+.ctl { display: grid; grid-template-columns: 128px minmax(0, 1fr) 34px; align-items: center; gap: 8px; font-size: 12px; margin: 3px 0; }
+.ctl output { font: 11px var(--mono); color: var(--muted); text-align: right; }
+input[type=range] { width: 100%; accent-color: #fff; }
+.spd { position: absolute; right: 18px; bottom: 18px; z-index: 6; display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: rgba(12,12,12,0.78); border: 1px solid rgba(255,255,255,0.18); border-radius: 6px; font: 12px/1 var(--mono); color: #ddd; letter-spacing: 0.08em; text-transform: uppercase; }
+.spd input { width: 180px; accent-color: #eee; }
+.spd b { min-width: 3.2em; text-align: right; font-weight: 600; color: #fff; }
+canvas.spark { width: 100%; height: 40px; display: block; margin-bottom: 8px; }
+.note { color: var(--muted); font-size: 12px; margin: 6px 0 0; }
+.kv { display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 2px 8px; font-size: 12px; margin: 0; }
+.kv dt { color: var(--muted); } .kv dd { margin: 0; overflow-wrap: anywhere; }
+a { color: var(--ink); }
+.links { font-size: 12px; color: var(--muted); }
+/* the dialogue log: who said what to whom, newest at the bottom */
+.dlog { height: 230px; overflow-y: auto; border: 1px solid var(--line); padding: 6px 8px; font: 10.5px/1.5 var(--mono); color: #b4b3ad; scrollbar-width: thin; }
+.dlog div { margin: 0 0 3px; } .dlog div.gap { margin-top: 8px; } .dlog time { color: var(--dim); } .dlog b { color: var(--ink); font-weight: 500; } .dlog em { font-style: normal; color: var(--dim); }
+.dlog div.act { color: var(--ink); } .dlog div.fade { color: var(--dim); }
+/* the lineage: one column of generations for each tailed one */
+.lin { max-height: 330px; overflow-y: auto; border: 1px solid var(--line); padding: 6px 8px; scrollbar-width: thin; }
+.lin h4 { margin: 6px 0 4px; font: 500 10.5px var(--mono); letter-spacing: .06em; color: var(--ink); } .lin h4:first-child { margin-top: 0; } .lin h4 span { color: var(--dim); font-weight: 400; }
+.gen { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 2px 8px; align-items: center; padding: 3px 0; border-top: 1px solid #18181a; cursor: pointer; }
+.gen:hover { background: #121214; } .gen.gone { opacity: .45; }
+.gen svg { width: 62px; height: 34px; display: block; } .gen svg path { fill: none; stroke: #dedcd6; stroke-width: 1; } .gen svg path.q { stroke: #6d6c66; stroke-width: .6; }
+.gen p { margin: 0; font-size: 11px; line-height: 1.35; color: var(--muted); } .gen p b { color: var(--ink); font-weight: 500; font-family: var(--mono); font-size: 10.5px; }
+.bars { display: grid; grid-template-columns: 70px minmax(0, 1fr) 30px; gap: 3px 8px; align-items: center; font-size: 11.5px; color: var(--muted); }
+.bars i { display: block; height: 3px; background: #1d1d20; position: relative; } .bars i u { position: absolute; left: 0; top: 0; bottom: 0; background: #dedcd6; }
+.bars output { font: 10.5px var(--mono); text-align: right; }
+.mem { margin: 4px 0 0; padding: 0; list-style: none; font: 10.5px/1.5 var(--mono); color: #b4b3ad; } .mem li em { font-style: normal; color: var(--dim); }
+@media (max-width: 860px) { .app { grid-template-columns: minmax(0, 1fr); height: auto; } .view { height: 68vh; } aside { border-left: 0; border-top: 1px solid var(--line); } .ev { max-width: calc(100% - 32px); bottom: 70px; } }
+/* embedded in the home page: no scroll inside the page's scroll; the controls sit below the tank in columns and the page scrolls as a whole */
+html.bnm-embed .app { grid-template-columns: minmax(0, 1fr); height: auto; min-height: 0; }
+html.bnm-embed .view { height: 720px; }
+html.bnm-embed aside { display: block; overflow: visible; border-left: 0; border-top: 1px solid var(--line); columns: 3 260px; column-gap: 28px; padding: 16px 16px 24px; }
+html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
+</style>
+<link rel="stylesheet" href="../assets/css/monochrome.css">
+<link rel="icon" href="data:,">
+</head><body>
+<div class="app">
+  <div class="view">
+    <canvas id="c" aria-label="A few tailed robots and the generations born from the tailed ones, talking in one tank under small spot lights"></canvas>
+    <div id="labs"></div>
+    <div class="cap"><h1>Society</h1><p id="capt">A fixed number of tailed ones stay in the tank. Each tailed one holds an arm and gel. Every other body is born from a tailed one and has no tail. The bodies swim out, read the light, the stream and the crowd, and come back to tell. A tailed one keeps what is told as lines in the head. With enough lines, of enough kinds, the tailed one prints the next generation folded in the gel, then pushes the newborn out through the mouth while a pump fills the newborn with air. What was told shapes the next generation.</p>
+      <div class="hud" id="hud"></div></div>
+    <div class="views" id="views"><button data-cam="film" class="on">Film</button><button data-cam="tank">Whole tank</button><button data-cam="follow">Follow</button><button data-cam="above">Above</button></div>
+    <div class="ev" id="ev"></div>
+    <div class="spd" id="spd"><span class="spl">Speed</span><input type="range" id="spdR" min="0" max="7" step="1" value="2" aria-label="Simulation speed"><b id="spdV">1×</b></div>
+  </div>
+  <aside>
+    <div><h3>Run</h3>
+      <div class="row"><button id="run" class="on">Pause</button><button id="reset">Reset</button><span style="width:8px"></span><button id="talkBtn" class="on">Talk shown</button></div></div>
+    <div><h3>Conditions</h3>
+      <div class="ctl"><label for="tailed">Tailed ones</label><input type="range" id="tailed" min="1" max="6" step="1" value="3"><output id="tailedO"></output></div>
+      <div class="ctl"><label for="radius">Talk radius, m</label><input type="range" id="radius" min="0.4" max="2" step="0.1" value="0.9"><output id="radiusO"></output></div>
+      <div class="ctl"><label for="need">Lines to generate</label><input type="range" id="need" min="4" max="30" step="1" value="12"><output id="needO"></output></div>
+      <div class="ctl"><label for="mut">Mutation</label><input type="range" id="mut" min="0" max="0.4" step="0.01" value="0.12"><output id="mutO"></output></div>
+      <div class="ctl"><label for="room">Room light</label><input type="range" id="room" min="0" max="1" step="0.01" value="0.12"><output id="roomO"></output></div>
+      <p class="note">The number of tailed ones applies on Reset. The other sliders act at once.</p></div>
+    <div><h3>Dialogue</h3><div class="dlog" id="dlog" aria-live="off"></div>
+      <p class="note">Every line said in the tank, with the speaker and the listener. No language model runs here: a line is composed from what the speaker has read, kept or been told.</p></div>
+    <div><h3>Lineage</h3><div class="lin" id="lin"></div>
+      <p class="note">Each row is one generation of one tailed one: the outline from above, the traits that grew, the number alive, and the note every newborn of that generation was told. Click a row to follow a living body.</p></div>
+    <div><h3>Population</h3><canvas class="spark" id="sp1"></canvas>
+      <h3>Lines said, each 10 s</h3><canvas class="spark" id="sp2"></canvas>
+      <h3>Mean traits of the living</h3><div class="bars" id="bars"></div></div>
+    <div><h3>Selected</h3><div id="insp" class="note">Click a robot in the tank.</div></div>
+    <div><h3>Rules</h3>
+      <p class="note">The cast. The tailed ones are fixed in number and do not move far. A tailed one is two rounded parts: a clear quilted head of silicone with gel on the floor, and a tail holding a Rotrics DexArm at true size. Only a tailed one can make a body. Every body without a tail was born in this tank from one of the tailed ones, and no body without a tail makes another.</p>
+      <p class="note">The water. Sixteen small lamps hang over the tank. A patch of low lamps moves slowly across the grid, so a bright pool does not stay bright. A stream runs through the tank in a band that turns slowly; small motes on the surface show where the water moves. A body gains charge in light and shares the light with every body close by. Swimming, a strong stream and a large body all cost charge. In the dark a body without a lamp feels less far.</p>
+      <p class="note">Reading and telling. A body swims to a place, reads the light, the stream and the crowd there, and keeps the reading as a memory. A body holds only a few memories; the oldest drops out. Two robots closer than the talk radius may talk, a few turns each. A turn says one thing: a reading, how the body fared and what the body lacks, a trace handed down, a question, a request. A listener keeps what was said, so word travels from body to body. A body low on charge asks where light is and swims to the place named. A tailed one sends a body to read a place the store has no fresh word of.</p>
+      <p class="note">The store. A tailed one keeps what is told as lines, drawn as thin loops stacked in the head, and a ring on the water fills as the lines add up. A new line counts as one, a line that changes an old one counts as one, a line already held counts for little, and word passed on by a second speaker counts for less than a first reading. To generate, a tailed one needs the set number of lines, of at least three kinds, from at least two speakers. At the start no robot has anyone to ask, so a tailed one makes a first generation from three lines read at the tailed one's own place.</p>
+      <p class="note">The next generation. The tailed one weighs the store: word of strong streams pulls toward a narrower, faster body; word of darkness toward a lamp and a longer reach; word of crowds and of bodies that faded toward a body slower to drain; lost memories toward more room for traces. Every trait shares one budget, so no body is best at everything. Chance adds a little, set by Mutation. Shape follows function: a fast body is long and narrow, a body with long reach has a wide mouth and ridges, a lasting body is thick and ringed, a body that holds much is tall with fine quilting, a body with a lamp is clear and glows.</p>
+      <p class="note">Birth. The tailed one prints the newborn folded flat in the gel, layer on layer, with the needle of the arm. Then the arm pushes the folded pack to the mouth while the pump fills the newborn with air: the part past the lip swells like a balloon, the part still inside stays folded, and the newborn leaves at full size. A generation is one to three newborns of one design. At the birth the store is compacted. A few lines stay with the tailed one; the rest go with the newborn as traces, with one note on where light is and what to stay out of.</p>
+      <p class="note">Feedback. A body that fits the water stays charged, lives longer and tells more, so the shape that works is heard most. A body that runs out of charge lets the air go, sinks and fades. A body near enough to see tells of the fading; if none saw, the tailed one of that line notes that the body did not come back.</p>
+      <p class="note">The dialogue model follows the artist's <i>Raised by many</i> (Cognitive Agents, 2026), where each agent knows only what the agent read or was told, and a full memory is compacted at a birth. Here the lines are composed on this page from each speaker's state, without a language model.</p></div>
+    <p class="links"><a href="../eating/">Eating parts</a>: the earlier Society, robots eat electronic parts and reproduce tails. <a href="bodies/">Bodies</a>: an earlier society with the v2 bodies. <a href="old_/">Earlier 2D version</a>. <a href="touch_/">Earlier version: touch and birth</a>. <a href="../simulator/simple/">Printing simulator, simplified</a>. <a href="../">Home</a></p>
+  </aside>
+</div>
+<script src="../assets/vendor/three-r147/three.min.js"></script>
+<script src="../assets/vendor/three-r147/OrbitControls.js"></script>
+<script src="talk.js"></script>
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const QS = new URLSearchParams(location.search);
+let SEED = QS.has("seed") ? +QS.get("seed") >>> 0 : (Math.random() * 1e9) >>> 0, rnd = TALK.RNG(SEED);
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x)), lerp = (a, b, t) => a + (b - a) * t, sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const angLerp = (a, b, t) => { let d = ((b - a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI; return a + d * t; };
+const fmt = TALK.fmt, esc = (x) => String(x).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+/* ---------- the room: meters, y up; tank inner floor at y = 0. The room, the water, the lamps and the picture are those of the Eating parts page ---------- */
+const TX = 3.4, TZ = 3.0, WL = 0.5, TH = 0.72, GL = 0.02, PLINTH = 0.9;      // tank 6.8 x 6 m, water 0.5 m deep
+const LH = 4.0, POOL = 1.05, LAMPS = []; for (const z of [-2.25, -0.75, 0.75, 2.25]) for (const x of [-2.55, -0.85, 0.85, 2.55]) LAMPS.push(new THREE.Vector3(x, LH, z));
+const NL = LAMPS.length;
+const SPOT_A = Math.atan(POOL / LH);
+const MAXPOP = 60;      // every body in the tank, the tailed ones included
+const P = {};
+for (const id of ["tailed", "radius", "need", "mut", "room"]) { const el = $("#" + id), o = $("#" + id + "O"); const up = () => { P[id] = +el.value; o.textContent = el.value; }; el.oninput = up; up(); }
+
+const cv = $("#c");
+const R3 = {};
+// uLI: how bright each lamp is now, 0 to 1. A patch of low lamps moves slowly over the grid (the environment, below)
+const U = { uTime: { value: 0 }, uLamps: { value: LAMPS }, uLI: { value: new Array(NL).fill(1) }, uCos: { value: new THREE.Vector2(Math.cos(SPOT_A), Math.cos(SPOT_A * 0.15)) }, uWL: { value: WL },
+  uRip: { value: Array.from({ length: 10 }, () => new THREE.Vector4(0, 0, -99, 0)) },
+  uBodA: { value: Array.from({ length: 64 }, () => new THREE.Vector4(0, 0, 1, 0)) }, uBodB: { value: Array.from({ length: 64 }, () => new THREE.Vector2(0, 0)) }, uNB: { value: 0 } };
+const GLSL_SPOT = `uniform vec3 uLamps[${NL}]; uniform float uLI[${NL}]; uniform vec2 uCos; uniform float uTime; uniform float uWL;
+float spotK(vec3 p) { float k = 0.0; for (int i = 0; i < ${NL}; i++) { vec3 d = normalize(p - uLamps[i]); k = max(k, smoothstep(uCos.x, uCos.y, -d.y) * uLI[i]); } return k; }
+float causK(vec2 p, float t) { vec2 q = p * 2.6; float c = 0.0;
+  for (int i = 0; i < 3; i++) { float fi = float(i); q += 0.55 * vec2(sin(q.y * 1.31 + t * 0.55 + fi * 1.7), cos(q.x * 1.17 - t * 0.47 + fi * 2.3)); c += abs(sin(q.x) + sin(q.y)); }
+  c /= 3.0; return pow(max(0.0, 1.0 - 0.62 * c), 3.0) * 2.4; }`;
+const tmpV = new THREE.Vector3(), _m = new THREE.Matrix4(), _l = new THREE.Matrix4(), _MB = new THREE.Matrix4(), _p = new THREE.Vector3(), _d = new THREE.Vector3();
+
+function initThree() {
+  const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true, powerPreference: "high-performance" });
+  r.setPixelRatio(Math.min(2, devicePixelRatio || 1)); r.outputEncoding = THREE.LinearEncoding; r.toneMapping = THREE.NoToneMapping;      // ACES, bloom and the lens are applied in the last pass
+  r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.localClippingEnabled = true;
+  const sc = new THREE.Scene(); sc.background = new THREE.Color(0x000000); sc.fog = new THREE.FogExp2(0x000000, 0.035);
+  const cam = new THREE.PerspectiveCamera(30, 1, 0.05, 120); cam.position.set(0.9, 5.4, 13.8);
+  const ctl = new THREE.OrbitControls(cam, cv); ctl.target.set(0, 0.0, 0); ctl.enableDamping = true; ctl.dampingFactor = 0.08; ctl.maxPolarAngle = Math.PI * 0.49; ctl.minDistance = 0.5; ctl.maxDistance = 26;
+  Object.assign(R3, { r, sc, cam, ctl });
+  R3.spots = LAMPS.map((L) => { const sp = new THREE.SpotLight(0xfff4e6, 0.55, 0, SPOT_A * 1.02, 0.7, 0); sp.position.copy(L); sp.target.position.set(L.x, 0, L.z); sc.add(sp); sc.add(sp.target); return sp; });
+  // sixteen shadow maps would be too many; one soft light from straight above casts the shadows for all of them
+  const sh = new THREE.DirectionalLight(0xfff4e6, 0.35); sh.position.set(0.3, 6, 0.4); sh.castShadow = true; sh.shadow.mapSize.set(2048, 2048);
+  Object.assign(sh.shadow.camera, { left: -TX - 0.3, right: TX + 0.3, top: TZ + 0.3, bottom: -TZ - 0.3, near: 1, far: 9 }); sh.shadow.bias = -0.0005; sh.shadow.radius = 3; sc.add(sh); sc.add(sh.target); R3.sun = sh;
+  R3.hemi = new THREE.HemisphereLight(0xc8d2da, 0x0a0a0a, 0.3); sc.add(R3.hemi);
+  R3.fill = new THREE.DirectionalLight(0xdfe6ee, 0.2); R3.fill.position.set(-3, 6, 4); sc.add(R3.fill);
+  buildRoom(); buildWater(); buildBeam(); buildOverlays(); R3.lampT = new THREE.Vector3();
+  cineInit(); buildLights();
+  addEventListener("resize", resize); new ResizeObserver(resize).observe(cv.parentElement); resize();
+}
+function resize() { const b = cv.parentElement.getBoundingClientRect(); R3.r.setSize(b.width, b.height, false); const pr = R3.r.getPixelRatio(); cineTargets(Math.round(b.width * pr), Math.round(b.height * pr)); cv.style.width = b.width + "px"; cv.style.height = b.height + "px"; R3.cam.aspect = b.width / Math.max(1, b.height); R3.cam.updateProjectionMatrix(); if (typeof camMode !== "undefined" && camMode === "tank" && !R3.moved) tankCam(); }
+function tankCam() { const k = Math.max(1, 1.2 / R3.cam.aspect); R3.cam.position.set(0.7 * k, 7.6 * k, 12.4 * k); R3.ctl.target.set(0, -0.4, 0); }
+
+/* a standard material that knows the waterline: darker and cooler below, a thin bright line at the surface */
+function waterAware(m, opt = {}) {
+  m.onBeforeCompile = (sh) => {
+    Object.assign(sh.uniforms, U);
+    sh.vertexShader = "varying vec3 vWP;\n" + (opt.print ? "attribute vec4 aTex; attribute vec4 aSil; varying vec4 vTex; varying vec4 vSil; varying vec3 vObj;\n" : opt.quilt ? "varying vec3 vObj;\n" : "") + sh.vertexShader.replace("#include <project_vertex>", "#include <project_vertex>\n vec4 waP = vec4(transformed, 1.0);\n#ifdef USE_INSTANCING\n waP = instanceMatrix * waP;\n#endif\n vWP = (modelMatrix * waP).xyz;" + (opt.print ? " vTex = aTex; vSil = aSil; vObj = transformed;" : opt.quilt ? " vObj = transformed;" : ""));
+    let fs = "varying vec3 vWP;\n" + GLSL_SPOT + "\n" + sh.fragmentShader;
+    if (opt.print) {
+      // the printed surface: pattern type, pitch, depth, angle in aTex; silicone opacity and frost in aSil
+      fs = "varying vec4 vTex; varying vec4 vSil; varying vec3 vObj;\n" + `
+float tri(float x) { return 1.0 - 2.0 * abs(fract(x) - 0.5); }
+float printH(vec3 p, vec4 t) {
+  float k = t.y, ty = t.x;
+  if (ty < 0.5) return tri(p.y / k);                                                   // straight layers
+  if (ty < 1.5) return tri((p.y * cos(t.w) + p.x * sin(t.w)) / k);                     // spiral, layers at an angle
+  if (ty < 2.5) return max(tri((p.y + p.x) / k), tri((p.y - p.x + p.z) / k));           // crosshatch
+  if (ty < 3.5) return tri((p.y + 0.35 * k * sin(p.x / k * 1.7 + p.z / k * 0.9)) / k); // waves
+  if (ty < 4.5) { vec2 q = vec2(p.x + p.z * 0.7, p.y) / (k * 1.6); vec2 f = fract(q) - 0.5; return 1.0 - smoothstep(0.15, 0.42, length(f)); }   // dimples
+  return 0.0;                                                                           // smooth
+}
+float vnz(vec3 p) { vec3 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); float n = dot(i, vec3(1.0, 57.0, 113.0));
+  vec4 a = fract(sin(vec4(n, n + 1.0, n + 57.0, n + 58.0)) * 43758.5453), b = fract(sin(vec4(n + 113.0, n + 114.0, n + 170.0, n + 171.0)) * 43758.5453);
+  vec4 m = mix(a, b, f.z); vec2 q = mix(m.xy, m.zw, f.y); return mix(q.x, q.y, f.x); }
+float grainF(vec3 p) { return 0.6 * vnz(p * 60.0) + 0.4 * vnz(p * 420.0); }
+vec3 bumpN(vec3 sp, vec3 n, vec2 dH, float fd) { vec3 sx = dFdx(sp), sy = dFdy(sp); vec3 r1 = cross(sy, n), r2 = cross(n, sx); float det = dot(sx, r1) * fd; vec3 g = sign(det) * (dH.x * r1 + dH.y * r2); return normalize(abs(det) * n - g); }
+` + fs;
+      fs = fs.replace("#include <color_fragment>", "#include <color_fragment>\n" + (opt.sil ? "diffuseColor.a = vSil.x;\n" : "") + `{ float gF = 1.0 - smoothstep(0.0004, 0.002, fwidth(vObj.x)); diffuseColor.rgb *= 1.0 + ${opt.grain ?? "0.05"} * (grainF(vObj) - 0.5) * 2.0 * gF; }\n`);      // a fine grain of the print, only when near
+      fs = fs.replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\n" + (opt.sil ? "roughnessFactor = vSil.y;\n" : ""));
+      if (opt.printTex !== false) fs = fs.replace("#include <normal_fragment_maps>", `#include <normal_fragment_maps>
+  float pH = printH(vObj, vTex); float fade = 1.0 - smoothstep(0.025, 0.1, fwidth(vObj.y / vTex.y) + fwidth(vObj.x / vTex.y));      // the pattern blends to its average before it can alias
+  float hh = pH * vTex.z * fade; normal = bumpN(-vViewPosition, normal, vec2(dFdx(hh), dFdy(hh)), faceDirection);
+  diffuseColor.rgb *= 1.0 - 0.1 * (1.0 - pH) * fade * step(0.001, vTex.z);`);
+    }
+    // the quilted double wall, after the quilted head study (here the row height and the cell length vary from body to body, in aSil.z and aSil.w): long channels round the body, their welds staggered row to row; the cells puff, the welds are quiet lines.
+    // Drawn only near the camera (it fades out as a channel gets smaller than a few pixels), so the whole tank costs nothing.
+    if (opt.quilt) { if (!opt.print) fs = "varying vec3 vObj;\n" + fs;
+      fs = fs.replace("#include <normal_fragment_maps>", `#include <normal_fragment_maps>
+  { vec3 qp = vObj; float ang = atan(qp.z, qp.y + 0.02), rowc = (ang + 0.15 * sin(2.0 * ang)) * 0.16 / (0.0164 * (1.0 + vSil.z)), row = floor(rowc), fr = fract(rowc);      // channels a little wider at the flanks than at the crest, as in the study (11 to 18 mm)
+    float xs = qp.x / (0.11 * (1.0 + vSil.w)) + 0.45 * sin(qp.x * 5.0), xc = xs + 0.5 * mod(row, 2.0) + 0.23 * sin(row * 1.7), fx = fract(xc);      // cells shorter toward the mouth and longer toward the tail, staggered unevenly row to row
+    float puff = pow(sin(3.14159 * fr), 0.6) * pow(sin(3.14159 * fx), 0.25);
+    float wr = max(0.07, 1.5 * fwidth(rowc)), wx = max(0.07 / 0.24, 1.5 * fwidth(xs)); float ln = max(1.0 - smoothstep(0.0, wr, min(fr, 1.0 - fr)), 1.0 - smoothstep(0.0, wx, min(fx, 1.0 - fx))) * (1.0 - smoothstep(0.1, 0.3, fwidth(rowc)));      // a weld never thinner than a pixel and a half
+    // drawn on the near skin only: the far skin's pattern seen through the near one would beat against it
+    float qf = (1.0 - smoothstep(0.03, 0.12, fwidth(rowc) + 0.24 * fwidth(xs))) * ${opt.quilt} * step(0.0, faceDirection);
+    vec3 qsp = -vViewPosition; vec3 qsx = dFdx(qsp), qsy = dFdy(qsp); vec3 r1 = cross(qsy, normal), r2 = cross(normal, qsx); float det = dot(qsx, r1) * faceDirection;
+    float hq = puff * 0.0012 * qf;      // a light bump: screen derivatives jump at triangle edges, a strong one would show them vec3 gq = sign(det) * (dFdx(hq) * r1 + dFdy(hq) * r2); normal = normalize(abs(det) * normal - gq);
+    diffuseColor.rgb *= mix(1.0, (236.0 - 38.0 * ln - 22.0 * (1.0 - puff) * (1.0 - puff)) / 236.0, qf); }`); }
+    // light passing through: from the lamps above, the clear silicone glows on the side turned away, and the clay wraps the light a little round its form
+    if (opt.sss) fs = fs.replace("#include <lights_fragment_end>", `#include <lights_fragment_end>
+ { vec3 Lv = normalize((viewMatrix * vec4(0.0, 1.0, 0.0, 0.0)).xyz); float nl = dot(normal, Lv); float sk = spotK(vWP);
+   float back = clamp(0.45 - 0.65 * nl, 0.0, 1.0), wrap = clamp((nl + 0.5) / 1.5, 0.0, 1.0) - clamp(nl, 0.0, 1.0);
+   reflectedLight.directDiffuse += diffuseColor.rgb * sk * (${opt.sss} * back + 0.22 * wrap); }`);
+    if (opt.caus) fs = fs.replace("#include <lights_fragment_end>", "#include <lights_fragment_end>\n reflectedLight.directDiffuse *= 0.7 + 0.45 * causK(vWP.xz, uTime) * step(vWP.y, uWL);");
+    let tail = `{ float dW = vWP.y - uWL; float fw = max(fwidth(dW), 1e-4);
+      float und = smoothstep(0.002, -0.02, dW);
+      gl_FragColor.rgb *= mix(vec3(1.0), vec3(0.50, 0.57, 0.62), und * (0.55 + 0.45 * smoothstep(0.0, 0.35, -dW)));
+      gl_FragColor.rgb += vec3(0.75, 0.82, 0.86) * (1.0 - smoothstep(0.6, 1.8, abs(dW) / fw)) * (0.10 + 0.5 * spotK(vWP)) * ${opt.line ?? "1.0"}; }`;
+    if (opt.fres) tail += `{ vec3 nV = normalize(normal); float fr = pow(1.0 - abs(dot(nV, normalize(vViewPosition))), 3.0); gl_FragColor.a = clamp(gl_FragColor.a + fr * ${opt.fres}, 0.0, 1.0); gl_FragColor.rgb += vec3(0.85, 0.9, 0.95) * fr * (0.02 + 0.12 * spotK(vWP)); }`;
+    if (opt.rim) tail += `{ float fr = pow(1.0 - abs(dot(normalize(normal), normalize(vViewPosition))), 4.0); gl_FragColor.rgb += vec3(0.8, 0.85, 0.9) * fr * ${opt.rim} * (0.05 + spotK(vWP)); }`;
+    sh.fragmentShader = fs.replace("#include <output_fragment>", "#include <output_fragment>\n" + tail);
+  };
+  m.customProgramCacheKey = () => "wa2" + JSON.stringify(opt);
+  return m;
+}
+const MAT = {
+  clay: waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xe4e2dc), roughness: 0.62, metalness: 0, vertexColors: true }), { print: true, sss: "0.12", grain: "0.06", rim: "0.08" }),
+  // the head is printed silicone: translucent and milky, not glass; how clear and how frosted varies by print
+  shell: waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xf1efe9), roughness: 0.45, metalness: 0, transparent: true, opacity: 0.55, depthWrite: false, vertexColors: true, side: THREE.DoubleSide }), { fres: "0.22", line: "0.7", print: true, sil: true, sss: "0.55", grain: "0.035", quilt: "1.0" }),
+  // the founders' hard tails: clear printed resin as in the quilted head study, the arm and its base seen through it
+  hard: waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xe9ecee), roughness: 0.25, metalness: 0, transparent: true, opacity: 0.3, depthWrite: false, vertexColors: true, side: THREE.DoubleSide }), { fres: "0.3", print: true, grain: "0.02", rim: "0.1" }),
+  // a tail made in the tank: its quilted silicone, clear enough to see the arm inside
+  qtail: waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xeeece6), roughness: 0.5, metalness: 0, transparent: true, opacity: 0.62, depthWrite: false, vertexColors: true, side: THREE.DoubleSide }), { fres: "0.1", print: true, printTex: false, sss: "0.5", grain: "0.035", quilt: "1.0" }),
+  mouth: waterAware(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.55, metalness: 0, vertexColors: true, side: THREE.DoubleSide }), { sss: "0.3" }),      // the mouth face and the rolled lip, one draw: the colour is per vertex
+};
+
+function buildRoom() {
+  const sc = R3.sc;
+  const std = (c, rough) => new THREE.MeshStandardMaterial({ color: c, roughness: rough, metalness: 0 });
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), std(0x0d0d0e, 0.9)); floor.rotation.x = -Math.PI / 2; floor.position.y = -PLINTH - GL; floor.receiveShadow = true; sc.add(floor);
+  const pl = new THREE.Mesh(new THREE.BoxGeometry(2 * TX - 0.1, PLINTH - GL, 2 * TZ - 0.1), std(0x0a0a0b, 0.7)); pl.position.y = -GL - (PLINTH - GL) / 2; pl.castShadow = true; pl.receiveShadow = true; sc.add(pl);
+  const base = new THREE.Mesh(new THREE.BoxGeometry(2 * TX + 2 * GL, GL, 2 * TZ + 2 * GL), std(0x0b0b0c, 0.8)); base.position.y = -GL / 2; sc.add(base);
+  const tf = new THREE.Mesh(new THREE.PlaneGeometry(2 * TX, 2 * TZ), waterAware(new THREE.MeshStandardMaterial({ color: 0x2a2a2d, roughness: 0.92 }), { caus: true, line: "0.0" }));
+  tf.rotation.x = -Math.PI / 2; tf.position.y = 0.001; tf.receiveShadow = true; sc.add(tf);
+  // glass: faint walls and bright edges
+  const glass = new THREE.ShaderMaterial({ uniforms: Object.assign({}, U), transparent: true, depthWrite: false, side: THREE.DoubleSide,
+    vertexShader: `varying vec3 vW; varying vec3 vN; void main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; vN = normalize(mat3(modelMatrix) * normal); gl_Position = projectionMatrix * viewMatrix * w; }`,
+    fragmentShader: GLSL_SPOT + `varying vec3 vW; varying vec3 vN;
+      void main() { vec3 V = normalize(cameraPosition - vW); float fr = pow(1.0 - abs(dot(normalize(vN), V)), 4.0);
+        float und = step(vW.y, uWL); float s = spotK(vW);
+        vec3 c = vec3(0.82, 0.88, 0.92) * (0.05 + 0.5 * fr + 0.25 * s) + vec3(0.18, 0.22, 0.25) * und * 0.25;
+        gl_FragColor = vec4(c, 0.05 + 0.35 * fr + 0.06 * und); }` });
+  const wall = (w, h, x, z, ry) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), glass); m.position.set(x, TH / 2, z); m.rotation.y = ry; m.renderOrder = 20; sc.add(m); };
+  wall(2 * TX, TH, 0, TZ, 0); wall(2 * TX, TH, 0, -TZ, 0); wall(2 * TZ, TH, TX, 0, Math.PI / 2); wall(2 * TZ, TH, -TX, 0, Math.PI / 2);
+  const box = new THREE.BoxGeometry(2 * TX, TH, 2 * TZ); box.translate(0, TH / 2, 0);
+  const edges = new THREE.LineSegments(new THREE.EdgesGeometry(box), new THREE.LineBasicMaterial({ color: 0xd8dee2, transparent: true, opacity: 0.42 })); sc.add(edges);
+  // the glass is 15 mm thick, low iron, as the tank of the quilted head study: the outer face as fainter edges, the cut top edge as a thin pale rim
+  const GT = 0.015, box2 = new THREE.BoxGeometry(2 * TX + 2 * GT, TH, 2 * TZ + 2 * GT); box2.translate(0, TH / 2, 0);
+  sc.add(new THREE.LineSegments(new THREE.EdgesGeometry(box2), new THREE.LineBasicMaterial({ color: 0xc8d2d6, transparent: true, opacity: 0.18 })));
+  const rimM = new THREE.MeshBasicMaterial({ color: 0x9fb2b6, transparent: true, opacity: 0.55 }), rimS = (w, d, x, z) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d).rotateX(-Math.PI / 2), rimM); m.position.set(x, TH + 0.0005, z); sc.add(m); };
+  rimS(2 * TX + 2 * GT, GT, 0, TZ + GT / 2); rimS(2 * TX + 2 * GT, GT, 0, -TZ - GT / 2); rimS(GT, 2 * TZ, TX + GT / 2, 0); rimS(GT, 2 * TZ, -TX - GT / 2, 0);
+  const wlBox = new THREE.BoxGeometry(2 * TX, 0.001, 2 * TZ); wlBox.translate(0, WL, 0);
+  sc.add(new THREE.LineSegments(new THREE.EdgesGeometry(wlBox), new THREE.LineBasicMaterial({ color: 0x9fb0bb, transparent: true, opacity: 0.25 })));
+  // a small housing over each spot
+  const canBody = new THREE.CylinderGeometry(0.07, 0.06, 0.22, 24), lensG = new THREE.CircleGeometry(0.052, 24), rodG = new THREE.CylinderGeometry(0.006, 0.006, 6, 6);
+  const canM = std(0x0a0a0a, 0.5), lensM = new THREE.MeshBasicMaterial({ color: new THREE.Color(9, 8.6, 8) }), rodM = std(0x111111, 0.6);
+  for (const L of LAMPS) { const can = new THREE.Group(); const b = new THREE.Mesh(canBody, canM); b.position.y = 0.11; can.add(b);
+    const l = new THREE.Mesh(lensG, lensM.clone()); (R3.lenses = R3.lenses || []).push(l); l.rotation.x = Math.PI / 2; l.position.y = -0.001; can.add(l); const rod = new THREE.Mesh(rodG, rodM); rod.position.y = 3.2; can.add(rod);
+    can.position.copy(L); sc.add(can); }
+}
+function buildWater() {
+  const m = new THREE.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: false, side: THREE.DoubleSide,
+    vertexShader: `varying vec3 vW; void main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
+    fragmentShader: GLSL_SPOT + `uniform vec4 uRip[10]; uniform vec4 uBodA[64]; uniform vec2 uBodB[64]; uniform int uNB; varying vec3 vW;
+      vec2 grad(vec2 p, float t) { vec2 g = vec2(0.0);
+        g += 0.010 * vec2(cos(p.x * 3.1 + t * 0.9), 0.6 * cos(p.y * 2.3 - t * 0.7));
+        g += 0.006 * vec2(0.7 * cos((p.x + p.y) * 5.3 - t * 1.3), cos((p.x - p.y) * 4.7 + t * 1.1));
+        for (int i = 0; i < 10; i++) { vec4 r = uRip[i]; float age = t - r.z; if (age < 0.0 || age > 6.0) continue;
+          vec2 d = p - r.xy; float l = length(d) + 1e-4; float R = 0.35 * age; float x = l - R;
+          float w = r.w * exp(-x * x * 40.0) * exp(-age * 0.55) * cos(x * 40.0); g += d / l * w * 0.5; }
+        return g; }
+      void main() { vec2 g = grad(vW.xz, uTime); vec3 n = normalize(vec3(-g.x, 1.0, -g.y));
+        vec3 V = normalize(cameraPosition - vW); float fr = 0.02 + 0.98 * pow(1.0 - max(dot(n, V), 0.0), 5.0);
+        float s = spotK(vW), sp = 0.0;
+        for (int i = 0; i < ${NL}; i++) { vec3 L = normalize(uLamps[i] - vW); vec3 H = normalize(L + V); float k = smoothstep(uCos.x, uCos.y, -normalize(vW - uLamps[i]).y) * uLI[i]; sp += pow(max(dot(n, H), 0.0), 600.0) * k * 9.0 + pow(max(dot(n, H), 0.0), 60.0) * k * 0.25; }
+        float ring = 0.0; for (int i = 0; i < 10; i++) { vec4 r = uRip[i]; float age = uTime - r.z; if (age < 0.0 || age > 6.0) continue;
+          float x = length(vW.xz - r.xy) - 0.35 * age; ring += r.w * exp(-x * x * 900.0) * exp(-age * 0.6); }
+        // the meniscus: water climbs a few millimetres up each body, a thin bright line round the waterline, a faint dark one just outside it
+        float men = 0.0, dk = 0.0; for (int i = 0; i < 64; i++) { if (i >= uNB) break; vec4 A = uBodA[i]; vec2 B = uBodB[i]; vec2 d = vW.xz - A.xy; vec2 q = vec2(dot(d, A.zw), dot(d, vec2(-A.w, A.z)));
+          float e = length(q / B) - 1.0, dist = e * min(B.x, B.y); men += exp(-dist * dist / 0.00002) * step(0.0, dist + 0.004); dk += exp(-(dist - 0.02) * (dist - 0.02) / 0.0002); }
+        men = min(men, 1.0); dk = min(dk, 1.0);
+        vec3 c = vec3(0.40, 0.47, 0.52) * (0.004 + 0.05 * s) + vec3(0.80, 0.86, 0.90) * fr * (0.03 + 0.14 * s) + vec3(1.0) * sp + vec3(0.7, 0.8, 0.86) * ring * (0.25 + s) + vec3(0.78, 0.84, 0.88) * men * (0.05 + 0.4 * s);
+        c *= 1.0 - 0.25 * dk;
+        gl_FragColor = vec4(c, clamp(0.22 + 0.42 * fr + 0.06 * s + sp + ring * 0.4 + men * 0.35, 0.0, 1.0));      // a darker, denser surface: the floor shows through less
+        #include <tonemapping_fragment>
+        #include <encodings_fragment>
+      }` });
+  const g = new THREE.PlaneGeometry(2 * TX, 2 * TZ, 1, 1); g.rotateX(-Math.PI / 2);
+  const w = new THREE.Mesh(g, m); w.position.y = WL; w.renderOrder = 10; w.layers.enable(1); R3.sc.add(w); R3.water = w;
+}
+function buildBeam() {
+  const geo = new THREE.ConeGeometry(1, 1, 64, 1, true); geo.translate(0, -0.5, 0);      // apex at the origin, opening downward
+  const m = new THREE.ShaderMaterial({ uniforms: { uI: { value: 0.022 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+    vertexShader: `varying float vH; varying vec3 vN; varying vec3 vV; void main() { vH = -position.y; vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position, 1.0); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }`,
+    fragmentShader: `uniform float uI; varying float vH; varying vec3 vN; varying vec3 vV;
+      void main() { float rim = pow(abs(dot(normalize(vN), normalize(vV))), 2.2); float a = uI * rim * (1.0 - 0.75 * vH) * smoothstep(0.0, 0.06, vH) * smoothstep(1.0, 0.92, vH);
+        gl_FragColor = vec4(vec3(1.0, 0.97, 0.92) * a, 1.0); }` });
+  const len = LH + 0.15, br = len * Math.tan(SPOT_A), beams = LAMPS.map((L) => { const b = new THREE.Mesh(geo, m.clone()); b.renderOrder = 30; b.frustumCulled = false; b.position.copy(L); b.scale.set(br, len, br); R3.sc.add(b); return b; }); R3.beams = beams;
+  // dust in the beam
+  const N = 160, pos = new Float32Array(N * 3), seed = new Float32Array(N);
+  for (let i = 0; i < N; i++) { const h = Math.pow(rnd(), 0.8), a = rnd() * 6.283, rr = Math.sqrt(rnd()); pos.set([Math.cos(a) * rr, -h, Math.sin(a) * rr], i * 3); seed[i] = rnd(); }
+  const pg = new THREE.BufferGeometry(); pg.setAttribute("position", new THREE.BufferAttribute(pos, 3)); pg.setAttribute("seed", new THREE.BufferAttribute(seed, 1));
+  const pm = new THREE.ShaderMaterial({ uniforms: { uTime: U.uTime, uSc: { value: new THREE.Vector3(1, 1, 1) } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    vertexShader: `attribute float seed; uniform float uTime; uniform vec3 uSc; varying float vA;
+      void main() { vec3 p = position; p.x += 0.04 * sin(uTime * 0.2 + seed * 40.0); p.z += 0.04 * cos(uTime * 0.17 + seed * 30.0); p.y = -fract(-p.y + uTime * 0.004 * (0.5 + seed));
+        p.xz *= -p.y; vec4 mv = modelViewMatrix * vec4(p, 1.0); gl_Position = projectionMatrix * mv;
+        gl_PointSize = (0.6 + 1.2 * seed) * 6.0 / -mv.z * 0.5 * 4.0; vA = (0.25 + 0.75 * fract(seed * 7.3 + uTime * 0.05)) * smoothstep(0.0, 0.1, -p.y) * (1.0 - length(p.xz) / max(-p.y, 1e-3)); }`,
+    fragmentShader: `varying float vA; void main() { vec2 c = gl_PointCoord - 0.5; float d = dot(c, c); if (d > 0.25) discard; gl_FragColor = vec4(vec3(1.0, 0.96, 0.9) * vA * 0.35 * (1.0 - d * 4.0), 1.0); }` });
+  for (const b of beams) { const pts = new THREE.Points(pg, pm); pts.frustumCulled = false; pts.renderOrder = 31; b.add(pts); }
+}
+const glowTex = (() => { const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d"), gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, "rgba(255,255,255,0.9)"); gr.addColorStop(0.25, "rgba(255,255,255,0.35)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
+function glow(color, size) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0 })); s.scale.setScalar(size); s.renderOrder = 15; return s; }
+
+/* ---------- the picture: as in the printing simulator, the scene is drawn in linear light into a multisampled target, then bloom, a gentle depth of field on close shots, ACES, a soft vignette and a trace of fine grain ---------- */
+const CINE = { rt: null, w: 0, h: 0, focus: 8, ap: 0 };
+const FSV = "varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }";
+function fsMat(fs, uniforms, extra = {}) { return new THREE.ShaderMaterial(Object.assign({ vertexShader: FSV, fragmentShader: fs, uniforms, depthTest: false, depthWrite: false }, extra)); }
+function cineInit() {
+  const C = CINE, r = R3.r; C.half = r.capabilities.isWebGL2 || r.extensions.has("OES_texture_half_float") ? THREE.HalfFloatType : THREE.UnsignedByteType;
+  C.fs = { scene: new THREE.Scene(), cam: new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1), mesh: new THREE.Mesh(new THREE.PlaneGeometry(2, 2)) }; C.fs.mesh.frustumCulled = false; C.fs.scene.add(C.fs.mesh);
+  C.depthMat = new THREE.MeshBasicMaterial({ colorWrite: false, side: THREE.DoubleSide });
+  C.dof = fsMat(`uniform sampler2D tColor; uniform sampler2D tDepth; uniform vec2 uPx; uniform float uFocus; uniform float uAp; uniform float uMaxR; uniform float uNear; uniform float uFar; varying vec2 vUv;
+float dist(vec2 uv) { float d = texture2D(tDepth, uv).x; return (uNear * uFar) / (uFar - d * (uFar - uNear)); }
+float coc(float z) { return clamp(uAp * abs(z - uFocus) / (z * uFocus), 0.0, 1.0) * uMaxR; }
+void main() { float zc = dist(vUv), cc = coc(zc); vec3 acc = texture2D(tColor, vUv).rgb; float tot = 1.0;
+  float a0 = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715)))) * 6.2831;
+  for (int i = 1; i <= 32; i++) { float fi = float(i); float r = sqrt(fi / 32.0) * uMaxR; float an = fi * 2.39996 + a0; vec2 uv = vUv + vec2(cos(an), sin(an)) * r * uPx;
+    float zs = dist(uv); float cs = coc(zs); if (zs > zc) cs = min(cs, cc * 2.0);
+    float m = smoothstep(r - 0.5, r + 0.5, cs); acc += mix(acc / tot, texture2D(tColor, uv).rgb, m); tot += 1.0; }
+  gl_FragColor = vec4(acc / tot, 1.0); }`, { tColor: { value: null }, tDepth: { value: null }, uPx: { value: new THREE.Vector2() }, uFocus: { value: 2 }, uAp: { value: 0.2 }, uMaxR: { value: 4 }, uNear: { value: 0.05 }, uFar: { value: 120 } });
+  // light in the air and in the water, after the printing simulator: march each pixel's ray through the dusty air under the lamp grid and through the tank water, where slow shafts move
+  C.haze = fsMat(`uniform float uLI[16]; uniform sampler2D tDepth; uniform mat4 uPI; uniform mat4 uCW; uniform vec3 uCam; uniform float uAir; uniform float uWat; uniform float uTime; uniform vec2 uCos; varying vec2 vUv;
+vec2 boxT(vec3 ro, vec3 rd, vec3 a, vec3 b) { vec3 t0 = (a - ro) / rd, t1 = (b - ro) / rd; vec3 mn = min(t0, t1), mx = max(t0, t1); return vec2(max(max(mn.x, mn.y), mn.z), min(min(mx.x, mx.y), mx.z)); }
+float ign(vec2 p) { return fract(52.9829189 * fract(dot(p, vec2(0.06711056, 0.00583715)))); }
+float lampK(vec3 p) { float ix = clamp(floor((p.x + 3.4) / 1.7), 0.0, 3.0), iz = clamp(floor((p.z + 3.0) / 1.5), 0.0, 3.0); float lx = ix * 1.7 - 2.55, lz = iz * 1.5 - 2.25;
+  vec3 d = p - vec3(lx, ${LH.toFixed(2)}, lz); return smoothstep(uCos.x, uCos.y, -d.y / length(d)) * uLI[int(iz) * 4 + int(ix)]; }
+float shaftW(vec2 p, float t) { float a = sin(7.0 * p.x + 3.1 * p.y - 0.7 * t) + sin(-4.3 * p.x + 8.2 * p.y + 0.5 * t) + sin(11.0 * p.x - 9.0 * p.y - 0.9 * t + 1.3); return smoothstep(-1.2, 2.6, a); }
+float vn(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); vec4 h = fract(sin(vec4(dot(i, vec2(127.1, 311.7)), dot(i + vec2(1.0, 0.0), vec2(127.1, 311.7)), dot(i + vec2(0.0, 1.0), vec2(127.1, 311.7)), dot(i + vec2(1.0, 1.0), vec2(127.1, 311.7)))) * 43758.5453); return mix(mix(h.x, h.y, f.x), mix(h.z, h.w, f.x), f.y); }
+void main() {
+  float d = texture2D(tDepth, vUv).x; vec4 v = uPI * vec4(vUv * 2.0 - 1.0, d * 2.0 - 1.0, 1.0); v /= v.w; vec3 wp = (uCW * vec4(v.xyz, 1.0)).xyz; vec3 rd = wp - uCam; float tS = length(rd); rd /= tS; if (d > 0.999995) tS = 80.0;
+  rd += vec3(1e-5); float j = ign(gl_FragCoord.xy); vec3 acc = vec3(0.0);
+  vec2 tw = boxT(uCam, rd, vec3(-${TX.toFixed(2)}, 0.0, -${TZ.toFixed(2)}), vec3(${TX.toFixed(2)}, ${WL.toFixed(2)}, ${TZ.toFixed(2)})); tw.x = max(tw.x, 0.0); tw.y = min(tw.y, tS);
+  if (tw.y > tw.x) { float dt = (tw.y - tw.x) / 14.0;
+    for (int i = 0; i < 14; i++) { vec3 p = uCam + rd * (tw.x + (float(i) + j) * dt); float sh = shaftW(p.xz, uTime); acc += vec3(0.6, 0.85, 1.0) * lampK(p) * (0.25 + 1.6 * sh * sh) * exp(-(${WL.toFixed(2)} - p.y) * 1.6) * dt * uWat; } }
+  vec2 ta = boxT(uCam, rd, vec3(-4.4, ${WL.toFixed(2)}, -4.0), vec3(4.4, ${(LH - 0.15).toFixed(2)}, 4.0)); ta.x = max(ta.x, 0.0); ta.y = min(ta.y, tS);
+  if (ta.y > ta.x) { float dt = (ta.y - ta.x) / 16.0;
+    for (int i = 0; i < 16; i++) { vec3 p = uCam + rd * (ta.x + (float(i) + j) * dt); float dn = 0.7 + 0.6 * vn(p.xz * 1.7 + vec2(p.y * 1.3 - uTime * 0.03, uTime * 0.02)); acc += vec3(1.0, 0.96, 0.9) * lampK(p) * dn * dt * uAir * (0.25 + 0.75 * smoothstep(0.3, 3.0, p.y)); } }
+  gl_FragColor = vec4(acc, 1.0); }`, { tDepth: { value: null }, uPI: { value: new THREE.Matrix4() }, uCW: { value: new THREE.Matrix4() }, uCam: { value: new THREE.Vector3() }, uAir: { value: 0.013 }, uWat: { value: 0.015 }, uTime: U.uTime, uCos: U.uCos, uLI: U.uLI });
+  C.pre = fsMat("uniform sampler2D tColor; uniform sampler2D tHaze; uniform float uExp; varying vec2 vUv; void main() { vec3 c = min((texture2D(tColor, vUv).rgb + texture2D(tHaze, vUv).rgb) * uExp, vec3(24.0)); float br = max(c.r, max(c.g, c.b)); float w = clamp(br - 0.85, 0.0, 0.7); w = w * w / 1.4; gl_FragColor = vec4(c * max(w, br - 1.2) / max(br, 1e-4), 1.0); }", { tColor: { value: null }, tHaze: { value: null }, uExp: { value: 1 } });
+  C.down = fsMat("uniform sampler2D t; uniform vec2 hp; varying vec2 vUv; void main() { vec3 s = texture2D(t, vUv).rgb * 4.0 + texture2D(t, vUv - hp).rgb + texture2D(t, vUv + hp).rgb + texture2D(t, vUv + vec2(hp.x, -hp.y)).rgb + texture2D(t, vUv - vec2(hp.x, -hp.y)).rgb; gl_FragColor = vec4(s / 8.0, 1.0); }", { t: { value: null }, hp: { value: new THREE.Vector2() } });
+  C.up = fsMat("uniform sampler2D t; uniform vec2 hp; varying vec2 vUv; void main() { vec3 s = texture2D(t, vUv + vec2(-hp.x * 2.0, 0.0)).rgb + texture2D(t, vUv + vec2(-hp.x, hp.y)).rgb * 2.0 + texture2D(t, vUv + vec2(0.0, hp.y * 2.0)).rgb + texture2D(t, vUv + hp).rgb * 2.0 + texture2D(t, vUv + vec2(hp.x * 2.0, 0.0)).rgb + texture2D(t, vUv + vec2(hp.x, -hp.y)).rgb * 2.0 + texture2D(t, vUv + vec2(0.0, -hp.y * 2.0)).rgb + texture2D(t, vUv - hp).rgb * 2.0; gl_FragColor = vec4(s / 12.0, 1.0); }", { t: { value: null }, hp: { value: new THREE.Vector2() } }, { blending: THREE.AdditiveBlending, transparent: true });
+  C.fin = fsMat(`uniform sampler2D tColor; uniform sampler2D tHaze; uniform sampler2D tBloom; uniform float uExp; uniform float uBloom; uniform float uVig; uniform float uGrainK; uniform float uT; uniform vec2 uRes; varying vec2 vUv;
+vec3 fit(vec3 v) { vec3 a = v * (v + 0.0245786) - 0.000090537; vec3 b = v * (0.983729 * v + 0.4329510) + 0.238081; return a / b; }
+vec3 aces(vec3 c) { c *= 1.0 / 0.6; c = mat3(0.59719, 0.07600, 0.02840, 0.35458, 0.90834, 0.13383, 0.04823, 0.01566, 0.83777) * c; c = fit(c); c = mat3(1.60475, -0.10208, -0.00327, -0.53108, 1.10813, -0.07276, -0.07367, -0.00605, 1.07602) * c; return clamp(c, 0.0, 1.0); }
+float h21(vec2 p) { vec3 q = fract(vec3(p.xyx) * 0.1031); q += dot(q, q.yzx + 33.33); return fract((q.x + q.y) * q.z); }
+void main() { vec2 cu = vUv - 0.5; float r2 = dot(cu * vec2(1.0, uRes.y / uRes.x * 1.25), cu * vec2(1.0, uRes.y / uRes.x * 1.25));
+  vec2 ca = cu * r2 * 0.003;
+  vec3 c = vec3(texture2D(tColor, vUv - ca).r, texture2D(tColor, vUv).g, texture2D(tColor, vUv + ca).b);
+  vec2 ht = 1.0 / uRes; vec3 hz = (texture2D(tHaze, vUv + ht).rgb + texture2D(tHaze, vUv - ht).rgb + texture2D(tHaze, vUv + vec2(ht.x, -ht.y)).rgb + texture2D(tHaze, vUv + vec2(-ht.x, ht.y)).rgb) * 0.25;
+  c = (c + hz) * uExp + texture2D(tBloom, vUv).rgb * uBloom;
+  c *= 1.0 - uVig * smoothstep(0.08, 0.62, r2);
+  c = aces(c);
+  c = mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, c));
+  float g = (h21(gl_FragCoord.xy + floor(uT * 24.0) * 37.0) + h21(gl_FragCoord.xy * 0.5 + floor(uT * 24.0) * 11.0) - 1.0);
+  c += g * uGrainK * (0.35 + 0.65 * (1.0 - dot(c, vec3(0.33))));
+  gl_FragColor = vec4(c, 1.0); }`, { tColor: { value: null }, tHaze: { value: null }, tBloom: { value: null }, uExp: { value: 0.72 }, uBloom: { value: 0.16 }, uVig: { value: 0.6 }, uGrainK: { value: 0.012 }, uT: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) } });
+}
+function cineTargets(w, h) {
+  const C = CINE, mk = (ww, hh, o = {}) => new THREE.WebGLRenderTarget(Math.max(2, Math.round(ww)), Math.max(2, Math.round(hh)), Object.assign({ type: C.half, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false }, o));
+  if (C.w === w && C.h === h) return;
+  if (C.rt) for (const t of [C.rt.scene, C.rt.dof, C.rt.haze, ...C.rt.bloom]) if (t) { if (t.depthTexture) t.depthTexture.dispose(); t.dispose(); }
+  const dt = new THREE.DepthTexture(w, h); dt.type = THREE.UnsignedIntType; dt.minFilter = dt.magFilter = THREE.NearestFilter;
+  const rt = { scene: mk(w, h, { depthBuffer: true, depthTexture: dt, samples: R3.r.capabilities.isWebGL2 && !C.low ? 4 : 0 }), dof: mk(w, h), haze: mk(w / 2, h / 2), bloom: [] };
+  for (let i = 0, bw = w / 2, bh = h / 2; i < 6 && bw > 8 && bh > 8; i++, bw /= 2, bh /= 2) rt.bloom.push(mk(bw, bh));
+  C.rt = rt; C.w = w; C.h = h;
+}
+function cinePass(mat, target) { const C = CINE; C.fs.mesh.material = mat; R3.r.setRenderTarget(target); R3.r.render(C.fs.scene, C.fs.cam); }
+function cineRender(now, dt) {
+  const C = CINE, r = R3.r, cam = R3.cam, sc = R3.sc, rt = C.rt; if (!rt) return;
+  r.setRenderTarget(rt.scene); r.render(sc, cam);
+  const hz = C.haze.uniforms; hz.tDepth.value = rt.scene.depthTexture; hz.uPI.value.copy(cam.projectionMatrixInverse); hz.uCW.value.copy(cam.matrixWorld); hz.uCam.value.copy(cam.position); cinePass(C.haze, rt.haze);
+  // the clear heads and the water write depth after the picture is drawn, so the depth of field takes them as surfaces
+  let src = rt.scene;
+  if (C.ap > 0.002 && !C.noDof) {
+    r.autoClear = false; cam.layers.set(1); sc.overrideMaterial = C.depthMat; const bg = sc.background; sc.background = null; r.render(sc, cam); sc.background = bg; sc.overrideMaterial = null; cam.layers.set(0); r.autoClear = true;
+    const u = C.dof.uniforms; u.tColor.value = rt.scene.texture; u.tDepth.value = rt.scene.depthTexture; u.uPx.value.set(1 / C.w, 1 / C.h); u.uFocus.value = C.focus; u.uAp.value = C.ap; u.uMaxR.value = 0.009 * C.h; u.uNear.value = cam.near; u.uFar.value = cam.far; cinePass(C.dof, rt.dof); src = rt.dof; }
+  const B = rt.bloom, exp = C.fin.uniforms.uExp.value;
+  C.pre.uniforms.tHaze.value = rt.haze.texture; C.fin.uniforms.tHaze.value = rt.haze.texture;
+  C.pre.uniforms.tColor.value = src.texture; C.pre.uniforms.uExp.value = exp; cinePass(C.pre, B[0]);
+  for (let i = 1; i < B.length; i++) { C.down.uniforms.t.value = B[i - 1].texture; C.down.uniforms.hp.value.set(0.5 / B[i - 1].width, 0.5 / B[i - 1].height); cinePass(C.down, B[i]); }
+  r.autoClear = false; for (let i = B.length - 2; i >= 0; i--) { C.up.uniforms.t.value = B[i + 1].texture; C.up.uniforms.hp.value.set(0.5 / B[i + 1].width, 0.5 / B[i + 1].height); cinePass(C.up, B[i]); } r.autoClear = true;
+  const f = C.fin.uniforms; f.tColor.value = src.texture; f.tBloom.value = B[0].texture; f.uT.value = now; f.uRes.value.set(C.w, C.h);
+  cinePass(C.fin, null);
+  // if frames come slowly, first drop the depth of field, then render at a lower pixel ratio without multisampling
+  C.n = (C.n || 0) + 1; C.acc = (C.acc || 0) + dt; if (C.n >= 40) { const ft = C.acc / C.n; C.n = 0; C.acc = 0;
+    if (ft > 0.045 && !C.noDof) C.noDof = true; else if (ft > 0.06 && !C.low) { C.low = true; R3.r.setPixelRatio(1); C.w = 0; resize(); } }
+}
+
+/* ---------- bodies, as on the Eating parts page: the simplified design, round 7: a blunt rounded tail holding the arm, and a clear head that narrows in a curve to a small slanted nose ---------- */
+// genome g[0..8] in 0..1. Every printed form differs a little; all are about the same size.
+const GENES = 19;
+// the folded newborn: 0.4 of its length, 0.24 of its height and 0.5 of its width, a low wide pack like the study's (143 x 194 x 79 mm); it rests with its bottom at 0.9 B below the head's centre, on the gel near the floor, low enough for the needle to reach its top
+const FOLDY = 0.24, FOLDZ = 0.5, FOLDB = (s) => -(0.9 - FOLDY) * s.B;
+function shapeOf(g) { return mouthFit(shapeOf0(g)); }
+function shapeOf0(g) {
+  // proportions vary widely, then the whole body is scaled so every robot keeps about the same length
+  // sized after the real design of the printing simulator: about 0.8 m long, the head about 0.33 m, 0.36 to 0.4 m tall, so the DexArm stands in the tail at true scale
+  const A = 0.15 + 0.02 * g[1], B = 0.18 + 0.02 * g[2], Lh = 0.27 + 0.07 * g[0], Lt = 0.42 + 0.08 * g[6], Ln = 0.03 + 0.04 * g[8];
+  const k = 0.8 / (Lh + Lt + Ln);
+  return { Lh: Lh * k, A, B, n: 1.9 + 3.6 * g[3], As: (0.35 + 0.45 * g[5]) * A, q: 1.1 + 2.6 * g[4], Ln: Ln * k, Lt: Lt * k, tp: 2.5 + 2.5 * g[7], drop: -(0.03 * g[2] - 0.01), R: (0.04 + 0.05 * g[6]) * k,
+    // printed features: rings around the body, a crest along the back, a lobed section, clay tone
+    // relief is kept to a whisper: the bodies are two smooth rounded segments, as in the newest simulators
+    ribN: 2 + Math.floor(g[9] * 6), ribD: g[9] > 0.35 ? 0.004 + 0.006 * (g[9] - 0.35) / 0.65 : 0,
+    crest: 0, fin: 0,
+    lobeN: 3 + Math.floor(g[12] * 4), lobeD: g[12] > 0.4 ? 0.003 + 0.005 * (g[12] - 0.4) / 0.6 : 0, tone: 0.72 + 0.28 * g[13],
+    // print texture: pattern (layers, spiral, crosshatch, waves, dimples, smooth), pitch, ridge depth, angle; silicone opacity and frost
+    tex: [Math.min(5, Math.floor(g[14] * 6)), 0.006 + 0.014 * g[15], g[16] < 0.15 ? 0 : 0.00012 + 0.00035 * g[16], 0.3 + 0.9 * g[17]], sil: [0.32 + 0.4 * g[18], 0.25 + 0.6 * (1 - g[18]) * 0.9 + 0.1 * g[16], 0, 0], nb: 0.45, nd: 0.45 };
+}
+// a minimum mouth: the opening must pass the largest part in its collar, held just clear of the water, with the arm's tool above it.
+// If a genome's mouth is too small, the nose drops less and then the snout widens, until it fits.
+function mouthFit(s) { const w = -s.B + 0.09, ok = () => { const Eb = 0.88 * s.B, yc = 0.01 - Eb * s.nd, hb = Eb * (1 - s.nb), ha = 0.9 * s.As * (1 - 0.5 * s.lobeD);
+    for (const y of [w - 0.002, w + 0.03]) if (Math.pow(0.03 / ha, s.n) + Math.pow(Math.abs(y - yc) / hb, s.n) > 1) return false; return true; };
+  for (let i = 0; i < 60 && !ok(); i++) { if (s.nd > 0.2) s.nd -= 0.025; else s.As = Math.min(s.A, s.As * 1.04); } return s; }
+function printAttrs(g, s, n) { const a = new Float32Array(n * 4), b = new Float32Array(n * 4); for (let i = 0; i < n; i++) { a.set(s.tex, i * 4); b.set(s.sil, i * 4); } g.setAttribute("aTex", new THREE.BufferAttribute(a, 4)); g.setAttribute("aSil", new THREE.BufferAttribute(b, 4)); }
+function bodyGeometry(s, tail) {
+  const M = 56, st = [];      // 56 round: a smoother silhouette on the clear shells
+  const x0 = -s.Lh / 2, NT = 26;
+  if (tail) { for (let i = 0; i <= NT; i++) { const t = i / NT, f = Math.pow(1 - Math.pow(1 - t, s.tp), 1 / s.tp); st.push({ x: x0 - s.Lt * (1 - t), a: s.A * f, b: s.B * Math.pow(f, 0.95), zc: s.drop * (1 - t) * (1 - t), tail: 1, f }); } }
+  else { const NR = 10; for (let i = 0; i <= NR; i++) { const t = i / NR, ph = t * Math.PI / 2; st.push({ x: x0 - s.R * Math.cos(ph), a: s.A * Math.sin(ph), b: s.B * Math.sin(ph), zc: 0, tail: 0, f: Math.sin(ph) }); } }
+  const NH = 26; for (let i = 1; i <= NH; i++) { const u = i / NH; st.push({ x: x0 + s.Lh * u, a: s.As + (s.A - s.As) * (1 - Math.pow(u, s.q)), b: s.B * (1 - 0.12 * Math.pow(u, 4)), zc: 0.01 * u, f: 1 }); }
+  const E = st[st.length - 1];
+  for (let i = 1; i <= 4; i++) { const v = i / 4; st.push({ x: E.x + s.Ln * v, a: E.a * (1 - 0.1 * v), b: E.b * (1 - s.nb * v), zc: E.zc - E.b * s.nd * v, f: 1 - 0.5 * v }); }
+  const e = 2 / s.n, pos = [], wr = [], ang = [], xmin0 = st[0].x, xmax0 = st[st.length - 1].x;
+  const ring = (k) => { const S = st[k]; for (let j = 0; j < M; j++) { const th = j / M * Math.PI * 2, c = Math.cos(th), sn = Math.sin(th);
+    const u = (S.x - xmin0) / (xmax0 - xmin0), env = Math.sin(Math.PI * clamp(u, 0, 1));
+    const rad = 1 + s.ribD * Math.pow(Math.max(0, Math.sin(u * Math.PI * 2 * s.ribN)), 2) * env + s.lobeD * Math.cos(s.lobeN * th) * S.f;
+    let y = S.zc + S.b * rad * Math.sign(sn) * Math.pow(Math.abs(sn), e), z = S.a * rad * Math.sign(c) * Math.pow(Math.abs(c), e);
+    y += s.crest * Math.pow(Math.max(0, sn), 10) * env * S.f;                                   // crest along the back
+    if (S.tail) z *= 1 + s.fin * Math.pow(Math.abs(c), 10) * Math.sin(Math.PI * (1 - S.f) * 0.95) * (1 - Math.abs(sn));   // fins flare toward the tail end
+    pos.push(S.x, y, z); ang.push(th, k); } };
+  for (let k = 0; k < st.length; k++) ring(k);
+  const idx = [[], [], []], V = (k, j) => k * M + (j % M);
+  for (let k = 0; k < st.length - 1; k++) { const grp = st[k + 1].tail ? 0 : 1; for (let j = 0; j < M; j++) idx[grp].push(V(k, j), V(k + 1, j), V(k + 1, j + 1), V(k, j), V(k + 1, j + 1), V(k, j + 1)); }
+  // the opening: a flat face at the front of the snout
+  const base = pos.length / 3, last = st.length - 1, S = st[last];
+  for (let j = 0; j < M; j++) { pos.push(pos[V(last, j) * 3], pos[V(last, j) * 3 + 1], pos[V(last, j) * 3 + 2]); ang.push(j / M * Math.PI * 2, last); }
+  pos.push(S.x - 0.012, S.zc, 0); ang.push(0, -1);
+  for (let j = 0; j < M; j++) idx[2].push(base + j, base + M, base + (j + 1) % M);
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute("color", new THREE.Float32BufferAttribute(new Float32Array(pos.length).fill(s.tone), 3));     // each print a slightly different clay
+  printAttrs(g, s, pos.length / 3);
+  const all = idx[0].concat(idx[1], idx[2]); g.setIndex(all); g.addGroup(0, idx[0].length, 0); g.addGroup(idx[0].length, idx[1].length, 1); g.addGroup(idx[0].length + idx[1].length, idx[2].length, 2);
+  g.computeVertexNormals();
+  // folded: the printed newborn before air goes in, about 0.4 of the length, with wrinkles
+  const xmin = st[0].x, xmax = S.x;
+  for (let i = 0; i < pos.length / 3; i++) { const x = pos[i * 3], y = pos[i * 3 + 1], z = pos[i * 3 + 2], th = ang[i * 2], k = ang[i * 2 + 1];
+    const zc = k >= 0 ? st[k].zc : S.zc, ry = y - zc, rl = Math.hypot(ry, z) || 1, env = sstep(xmin, xmin + 0.08, x) * (k >= 0 ? 1 : 0);
+    const w = (0.022 * Math.sin(th * 5 + x * 22) + 0.014 * Math.sin(x * 38 - th * 3) + 0.01 * Math.sin(th * 11 + x * 9)) * env;      // thin fine folds that vanish as it fills
+    wr.push(x * 0.4, (zc + ry * (1 + w)) * FOLDY, z * (1 + w) * FOLDZ); }
+  const tmp = new THREE.BufferGeometry(); tmp.setAttribute("position", new THREE.Float32BufferAttribute(wr, 3)); tmp.setIndex(all); tmp.computeVertexNormals();
+  g.morphAttributes.position = [tmp.getAttribute("position")]; g.morphAttributes.normal = [tmp.getAttribute("normal")];
+  g.userData = { len: xmax - xmin, front: xmax, back: xmin, tailRing: tail ? NT * M : -1, M, mouthK: last, dockK: tail ? NT : 10, ringPos: pos };
+  return g;
+}
+/* the head's rims, after the quilted head study: the rolled edge of the mouth where the two skins join, and the docking face with nine magnet discs
+   (K&J DC2-N52, 19.05 x 3.17 mm, as in that study) that hold a tail */
+const LIPMAT = waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xd6d4ce), roughness: 0.6, metalness: 0 }), { sss: "0.3" });
+const STEELMAT = waterAware(new THREE.MeshStandardMaterial({ color: 0x8e9196, roughness: 0.3, metalness: 0.7 }));
+function rimMeshes(geo) { const U = geo.userData, P = U.ringPos, M = U.M, ringPts = (k) => Array.from({ length: M }, (_, j) => new THREE.Vector3(P[(k * M + j) * 3], P[(k * M + j) * 3 + 1], P[(k * M + j) * 3 + 2]));
+  const lip = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(ringPts(U.mouthK), true), 64, 0.007, 6, true), LIPMAT); lip.castShadow = true;
+  const dp = ringPts(U.dockK), discs = [];
+  const band = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(dp, true), 64, 0.006, 6, true);
+  for (let k = 0; k < 9; k++) { const t = (k + 0.5) / 9 * M, j = Math.floor(t), q = dp[j].clone().lerp(dp[(j + 1) % M], t - j), c = new THREE.Vector3(q.x, 0, 0), n = q.clone().sub(c).normalize(), o = q.clone().sub(n.multiplyScalar(0.012));
+    discs.push(new THREE.Matrix4().makeTranslation(o.x - 0.004, o.y, o.z)); }      // the nine discs are drawn instanced, for all bodies at once
+  // the lip and the cuff share one material, so one mesh (one draw call fewer per body)
+  const L = lip.geometry, merged = new THREE.BufferGeometry(), pa = [L, band].map((g) => g.attributes.position.array), na = [L, band].map((g) => g.attributes.normal.array), off = pa[0].length / 3;
+  const P2 = new Float32Array(pa[0].length + pa[1].length); P2.set(pa[0]); P2.set(pa[1], pa[0].length); const N2 = new Float32Array(P2.length); N2.set(na[0]); N2.set(na[1], na[0].length);
+  merged.setAttribute("position", new THREE.BufferAttribute(P2, 3)); merged.setAttribute("normal", new THREE.BufferAttribute(N2, 3)); merged.setIndex(Array.from(L.index.array).concat(Array.from(band.index.array, (i) => i + off)));
+  L.dispose(); band.dispose(); lip.geometry = merged;
+  lip.userData.discs = discs; return [lip]; }
+// the lip goes into the body's own mesh, in the mouth group: one draw call and one shadow draw fewer per body. Folded, it folds with the body.
+function mouthDark(g) { const col = g.attributes.color.array, U = g.userData, k = col[0]; for (let i = (U.mouthK + 1) * U.M; i < g.attributes.position.count; i++) col.set([0.54 * k, 0.54 * k, 0.55 * k], 3 * i); g.attributes.color.needsUpdate = true; }      // the mouth face (its own copied ring) dark
+function lipMerge(g, L) { const nb = g.attributes.position.count, nl = L.attributes.position.count, cat = (a, b) => { const o = new Float32Array(a.length + b.length); o.set(a); o.set(b, a.length); return o; };
+  const lp = L.attributes.position.array, ln = L.attributes.normal.array, fold = new Float32Array(lp.length); for (let i = 0; i < nl; i++) { fold[3 * i] = lp[3 * i] * 0.4; fold[3 * i + 1] = lp[3 * i + 1] * FOLDY; fold[3 * i + 2] = lp[3 * i + 2] * FOLDZ; }
+  const U = g.userData; mouthDark(g); const col = g.attributes.color.array;
+  const lc = new Float32Array(nl * 3); for (let i = 0; i < nl; i++) lc.set([0.84, 0.83, 0.81], 3 * i);
+  const o = new THREE.BufferGeometry(); o.setAttribute("position", new THREE.BufferAttribute(cat(g.attributes.position.array, lp), 3)); o.setAttribute("normal", new THREE.BufferAttribute(cat(g.attributes.normal.array, ln), 3));
+  o.setAttribute("color", new THREE.BufferAttribute(cat(col, lc), 3)); for (const a of ["aTex", "aSil"]) o.setAttribute(a, new THREE.BufferAttribute(cat(g.attributes[a].array, new Float32Array(nl * 4)), 4));
+  o.morphAttributes.position = [new THREE.BufferAttribute(cat(g.morphAttributes.position[0].array, fold), 3)]; o.morphAttributes.normal = [new THREE.BufferAttribute(cat(g.morphAttributes.normal[0].array, ln), 3)];
+  const idx = Array.from(g.index.array).concat(Array.from(L.index.array, (i) => i + nb)); o.setIndex(idx); for (const G of g.groups) o.addGroup(G.start, G.count, G.materialIndex); o.groups[2].count += L.index.count;
+  o.userData = U; g.dispose(); return o; }
+const DISCGEO = new THREE.CylinderGeometry(0.0095, 0.0095, 0.0032, 14).rotateZ(Math.PI / 2);
+/* small meshes that repeat across bodies (the cuff discs, the gel lobes, far arms and far modules) are drawn as one instanced mesh per mesh and material */
+const INST = new Map(), _MI = new THREE.Matrix4();
+function instPut(geo, mat, Mw, o = {}) { const key = geo.uuid + mat.uuid; let b = INST.get(key);
+  if (!b || b.n >= b.cap) { const cap = b ? b.cap * 2 : 64, im = new THREE.InstancedMesh(geo, mat, cap); im.frustumCulled = false; im.renderOrder = o.ro ?? 5; im.castShadow = !!o.shadow; if (o.depth) im.layers.enable(1);
+    if (b) { for (let i = 0; i < b.n; i++) { b.im.getMatrixAt(i, _MI); im.setMatrixAt(i, _MI); } R3.sc.remove(b.im); b.im.dispose(); b.im = im; b.cap = cap; } else { b = { im, n: 0, cap }; INST.set(key, b); } R3.sc.add(im); }
+  b.im.setMatrixAt(b.n++, Mw); }
+function instBegin() { for (const b of INST.values()) b.n = 0; }
+function instEnd() { for (const b of INST.values()) { b.im.count = b.n; b.im.visible = b.n > 0; b.im.instanceMatrix.needsUpdate = true; } }
+function bodyMesh(r) {
+  const geo0 = bodyGeometry(r.s, r.tail), [lip] = rimMeshes(geo0), geo = lipMerge(geo0, lip.geometry), m = new THREE.Mesh(geo, [r.qtail ? MAT.qtail : MAT.hard, MAT.shell, MAT.mouth]);
+  lip.geometry.dispose(); m.userData.rims = [lip];
+  m.castShadow = true; m.receiveShadow = false; m.updateMorphTargets(); m.userData.robot = r; m.renderOrder = 5; m.layers.enable(1); return m;
+}
+// the inside of the body at x: superellipse half width a, half height b, centre zc; lobes can pull the wall in, so they count against the inside
+const SH = { m: 1 };
+function shellF(s, tail, x, y, z) { const x0 = -s.Lh / 2, xf = s.Lh / 2 + s.Ln; let a, b, zc;
+  if (x > xf + 0.004) { SH.m = 1; return 0; }                    // open water in front of the mouth
+  if (x < x0) { if (tail) { if (x < x0 - s.Lt) { SH.m = 0.01; return 9; } const t = 1 - (x0 - x) / s.Lt, f = Math.pow(Math.max(1e-4, 1 - Math.pow(1 - t, s.tp)), 1 / s.tp); a = s.A * f; b = s.B * Math.pow(f, 0.95); zc = s.drop * (1 - t) * (1 - t); }
+    else { if (x < x0 - s.R) { SH.m = 0.01; return 9; } const ph = Math.acos(clamp((x0 - x) / s.R, 0, 1)); a = s.A * Math.sin(ph); b = s.B * Math.sin(ph); zc = 0; } }
+  else if (x <= s.Lh / 2) { const u = (x - x0) / s.Lh; a = s.As + (s.A - s.As) * (1 - Math.pow(u, s.q)); b = s.B * (1 - 0.12 * Math.pow(u, 4)); zc = 0.01 * u; }
+  else { const v = clamp((x - s.Lh / 2) / s.Ln, 0, 1), Eb = 0.88 * s.B; a = s.As * (1 - 0.1 * v); b = Eb * (1 - s.nb * v); zc = 0.01 - Eb * s.nd * v; }
+  const k = 1 - s.lobeD; a = Math.max(1e-4, a * k); b = Math.max(1e-4, b * k); SH.m = Math.min(a, b); SH.zc = zc;
+  return Math.pow(Math.pow(Math.abs(z / a), s.n) + Math.pow(Math.abs(y - zc) / b, s.n), 1 / s.n); }
+const penAt = (s, tail, x, y, z, rad) => { const f = shellF(s, tail, x, y, z); return f === 0 ? 0 : Math.max(0, (f - 1) * SH.m + rad); };
+
+/* ---------- the arm: the Rotrics DexArm of the printing simulator (its Stage 2 link meshes, its kinematics, the official joint ranges), at true size, on a fixed base in the tail ----------
+   four axes: the base turns about the vertical, the shoulder (J1) and the elbow (J2) swing the two 150 mm links, a parallel linkage keeps the end effector level, and the end effector turns the tool about its stem.
+   A tool always hangs straight down: the magnet holder for parts, the print needle for printing. Tools are changed in the tail, at the folded pose. */
+const D2R = Math.PI / 180;
+const DEX = { SF: 0.022, SZ: 0.127, L1: 0.150417552167292, L2: 0.15081922954318522, STEM_F: 0.077, HEAD_BOT: -0.022, HEAD: { f: 0.03, w: 0.04, h: 0.052 }, TL: { mag: 0.055, needle: 0.1 }, MAG: { off: 0.028, P: 0.015, r: 0.01, h: 0.015 },
+  S: [0, -0.022, 0.127], E: [0, -0.0332, 0.277], W: [0, -0.172, 0.218], O1: [0, -0.005, 0.301], O2: [0, -0.058, 0.307], A_REST: 0.07452837066112011, B_REST: 0.40193166956089965,
+  LIM: [[-110 * D2R, 110 * D2R], [0, 110 * D2R], [0, 85 * D2R]], BACK: 0.147, PLATE: 0.005, data: null, geo: {}, samp: {}, mat: null, oor: 0, oorMax: 0 };
+const DREST = [0, 0, 85 * D2R];
+DEX.gap = { grab: 0, part: 0, needle: 0 };      // the largest gaps measured between the tool point and what it should be at (m)      // folded, as in the printing simulator: the upper arm upright, the forearm folded down beside it
+fetch("../simulator/simple/arm.json").then((x) => x.json()).then(dexLoad).catch(() => log("the DexArm meshes did not load; the arm moves but is not drawn"));
+const b64f32 = (s) => { const b = atob(s), a = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) a[i] = b.charCodeAt(i); return new Float32Array(a.buffer); };
+const b64u32 = (s) => { const b = atob(s), a = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) a[i] = b.charCodeAt(i); return new Uint32Array(a.buffer); };
+function dexLoad(d) {
+  for (const n in d.parts) { const v = b64f32(d.parts[n].p), g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(v, 3)); g.setIndex(new THREE.BufferAttribute(b64u32(d.parts[n].i), 1)); g.computeVertexNormals(); DEX.geo[n] = g;
+    const k = Math.max(1, Math.floor(v.length / 3 / 260)), sm = []; for (let i = 0; i < v.length / 3; i += k) sm.push(v[i * 3], v[i * 3 + 1], v[i * 3 + 2]); DEX.samp[n] = new Float32Array(sm); }
+  // the arm material of the printing simulator: white clay, rough, a little light through it
+  DEX.mat = waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xecebe6), roughness: 0.6, metalness: 0 }), { sss: "0.1", rim: "0.05" });
+  DEX.toolMat = waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xdfe4ea), roughness: 0.55 }), {}); DEX.darkMat = waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0x8d9097), roughness: 0.4 }), {});
+  DEX.data = d; for (const q of Q) armDims(q);
+  // far versions of the arm parts and modules for the whole tank: the same mesh with its vertices clustered on an 8 mm grid, about a tenth of the triangles
+  DEX.geoLo = {}; for (const n in DEX.geo) DEX.geoLo[n] = clusterGeo(DEX.geo[n], 0.008);
+}
+const M4 = () => new THREE.Matrix4(), Tm = (v) => M4().makeTranslation(v[0], v[1], v[2]);
+const about = (p, a) => Tm(p).multiply(M4().makeRotationX(a)).multiply(Tm([-p[0], -p[1], -p[2]]));
+const rxv = (v, t) => { const c = Math.cos(t), s = Math.sin(t); return [v[0], c * v[1] - s * v[2], s * v[1] + c * v[2]]; };
+const ROOTR = M4().makeRotationX(-Math.PI / 2), BASER = M4().makeRotationZ(Math.PI / 2);
+// the arm frame of the printing simulator (x forward, z up, base at the origin) placed in the body (x forward, y up): a quarter turn about x
+const rootOf = (r) => Tm([r.B0[0] + (r.ox || 0), r.B0[1], 0]).multiply(ROOTR);
+// the matrices of the link meshes in the arm frame, exactly as the printing simulator poses them
+function dexMats(q) { const A = DEX, a = q[1] - A.A_REST, b = q[2] - A.B_REST, Sv = A.S, E = A.E, W = A.W;
+  const e2 = rxv([E[0] - Sv[0], E[1] - Sv[1], E[2] - Sv[2]], a), E2 = [Sv[0] + e2[0], Sv[1] + e2[1], Sv[2] + e2[2]];
+  const w2 = rxv([W[0] - E[0], W[1] - E[1], W[2] - E[2]], b), W2 = [E2[0] + w2[0], E2[1] + w2[1], E2[2] + w2[2]];
+  const Lp = [0, 1, 2].map((i) => A.O1[i] - (E[i] - Sv[i])), dE = [E2[0] - E[0], E2[1] - E[1], E2[2] - E[2]];
+  const mats = { B_Fix: M4(), B_Rot: M4(), In_1: about(Sv, a), Join: Tm(dE), In_2: Tm(dE).multiply(about(E, b)), EE: Tm([W2[0] - W[0], W2[1] - W[1], W2[2] - W[2]]), Out_1: about(Lp, a), Out_2: Tm(dE).multiply(about(A.O2, b)) };
+  const yb = BASER.clone().multiply(M4().makeRotationZ(q[0])); for (const n in mats) mats[n] = n === "B_Fix" ? BASER.clone() : yb.clone().multiply(mats[n]); return mats; }
+// the wrist from the joints, and where the tool module hangs (origin at its head underside on the stem axis)
+const dexWrist = (q) => [DEX.SF + DEX.L1 * Math.sin(q[1]) + DEX.L2 * Math.cos(q[2]), DEX.SZ + DEX.L1 * Math.cos(q[1]) - DEX.L2 * Math.sin(q[2])];
+function dexModule(q) { const [rw, zw] = dexWrist(q), rr = rw + DEX.STEM_F; return [rr * Math.cos(q[0]), rr * Math.sin(q[0]), zw + DEX.HEAD_BOT]; }
+// the working point of a tool below the module: the magnet face 28 mm behind the stem (axis 4 holds the holder square to the body), or the needle tip
+const toolDrop = (tool) => tool === "needle" ? DEX.TL.needle : DEX.TL.mag - DEX.MAG.P, toolBack = (tool) => tool === "needle" ? 0 : DEX.MAG.off;
+// axis 4 turns the holder about its stem: psi is the direction from the magnet to the stem in the body (0 forward, ±90 degrees toward a side), q3 = psi less the base turn
+const Q3LIM = 90 * D2R;
+function dexFK(r, q, tool, psi = 0) { const o = dexModule(q), b = toolBack(tool); return [r.B0[0] + o[0] - b * Math.cos(psi), r.B0[1] + o[2] - toolDrop(tool), -o[1] - b * Math.sin(psi)]; }
+// inverse kinematics for a tool point in the body frame; of the two elbow solutions the one inside the official ranges and nearest the present pose
+function ikArm(r, p, tool, prev, psi = 0) {
+  const b = toolBack(tool), X0 = p[0] - r.B0[0] + b * Math.cos(psi), Y0 = -(p[2] + b * Math.sin(psi)), Zt = p[1] - r.B0[1] + toolDrop(tool);
+  const q0 = Math.atan2(Y0, X0), rw = Math.hypot(X0, Y0) - DEX.STEM_F, zw = Zt - DEX.HEAD_BOT, X = rw - DEX.SF, Z = zw - DEX.SZ, d = Math.max(1e-6, Math.hypot(X, Z));
+  const c = (DEX.L1 * DEX.L1 + d * d - DEX.L2 * DEX.L2) / (2 * DEX.L1 * d); let best = null;
+  for (const sg of [1, -1]) { const al = Math.atan2(Z, X) + sg * Math.acos(clamp(c, -1, 1)), be = Math.atan2(Z - DEX.L1 * Math.sin(al), X - DEX.L1 * Math.cos(al));
+    let q = [q0, Math.PI / 2 - al, -be]; q[1] = Math.atan2(Math.sin(q[1]), Math.cos(q[1])); q[2] = Math.atan2(Math.sin(q[2]), Math.cos(q[2]));
+    let err = Math.abs(c) > 1 ? (Math.abs(c) - 1) * DEX.L1 : 0; for (let k = 0; k < 3; k++) err += Math.max(0, DEX.LIM[k][0] - q[k], q[k] - DEX.LIM[k][1]); err += Math.max(0, Math.abs(Math.atan2(Math.sin(psi + q0), Math.cos(psi + q0))) - Q3LIM);
+    const dist = prev ? Math.abs(q[1] - prev[1]) + Math.abs(q[2] - prev[2]) : 0;
+    if (!best || err < best.err - 1e-9 || (Math.abs(err - best.err) < 1e-9 && dist < best.dist)) best = { q, err, dist }; }
+  // never cheat the arm: a pose outside the ranges is held at the nearest limit and counted
+  for (let k = 0; k < 3; k++) best.q[k] = clamp(best.q[k], DEX.LIM[k][0], DEX.LIM[k][1]);
+  return best; }
+// the inside of the body: floor height at (x, z), from the same cross sections as the shell test
+function floorY(s, tail, x, z) { let lo = -s.B * 1.2, hi = s.B; for (let i = 0; i < 22; i++) { const m = (lo + hi) / 2; if (shellF(s, tail, x, m, z) > 1) lo = m; else hi = m; } return hi; }
+const _v3 = new THREE.Vector3();
+const waterY = (s) => -s.B + 0.09;      // the bodies float high, as the real design stands in 89 mm of water: the inner water surface is 90 mm above the floor
+// the base: fixed, 147 mm behind the head joint, on a 5 mm plate on the tail floor; raised in steps if the fixed base would meet the curved floor
+const baseY = (s, bx) => { let y = -9; for (const dx of [-0.07, -0.035, 0, 0.035, 0.07]) for (const dz of [-0.07, -0.035, 0, 0.035, 0.07]) y = Math.max(y, floorY(s, true, bx + dx, dz)); return y; };      // the base plate rests on the highest floor under its footprint
+const TOOLG = {};      // the tool meshes, made once and shared by every arm
+function dexModuleGroup(kind) { if (TOOLG[kind]) { const g = new THREE.Group(); for (const [geo, mat] of TOOLG[kind]) { const m = new THREE.Mesh(geo, mat); m.layers.enable(1); g.add(m); } return g; } const A = DEX, Ls = A.TL[kind], g = new THREE.Group();
+  const head = new THREE.Mesh(new THREE.BoxGeometry(A.HEAD.f, A.HEAD.w, A.HEAD.h).translate(0, 0, A.HEAD.h / 2), DEX.toolMat); g.add(head);
+  if (kind === "mag") { const M = A.MAG;      // the holder of the printing simulator, its 20 mm electromagnet on a bracket behind the stem; its ball inflation needle is left off here, so the magnet face is the lowest point
+    g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, Ls - 0.03, 12).rotateX(Math.PI / 2).translate(0, 0, -(Ls - 0.03) / 2), DEX.toolMat));
+    g.add(new THREE.Mesh(new THREE.CylinderGeometry(M.r, M.r, M.h, 24).rotateX(Math.PI / 2).translate(-M.off, 0, -Ls + M.P + M.h / 2), DEX.darkMat));
+    g.add(new THREE.Mesh(new THREE.BoxGeometry(M.off, 0.008, 0.003).translate(-M.off / 2, 0, -Ls + M.P + M.h + 0.0015), DEX.toolMat));
+  } else { g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, Ls - 0.025, 12).rotateX(Math.PI / 2).translate(0, 0, -(Ls - 0.025) / 2), DEX.toolMat));
+    g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.0014, 0.0009, 0.025, 8).rotateX(Math.PI / 2).translate(0, 0, -Ls + 0.0125), DEX.darkMat)); }
+  for (const m of g.children) m.layers.enable(1); TOOLG[kind] = g.children.map((m) => [m.geometry, m.material]); return g; }
+function dexObj(r) { if (r.dex) return r.dex; const root = new THREE.Group(); root.matrixAutoUpdate = false; const parts = {};
+  for (const n in DEX.geo) { const m = new THREE.Mesh(DEX.geo[n], DEX.mat); m.matrixAutoUpdate = false; m.renderOrder = 5; root.add(m); parts[n] = m; }
+  const tools = { mag: dexModuleGroup("mag"), needle: dexModuleGroup("needle") }; for (const k in tools) { tools[k].matrixAutoUpdate = false; root.add(tools[k]); }
+  r.grp.add(root); return (r.dex = { root, parts, tools }); }
+function clusterGeo(g, cell) { const p = g.attributes.position.array, ix = g.index ? g.index.array : null, key = new Map(), sum = [], rep = new Int32Array(p.length / 3);
+  for (let i = 0; i < p.length / 3; i++) { const k = Math.floor(p[3 * i] / cell) + "," + Math.floor(p[3 * i + 1] / cell) + "," + Math.floor(p[3 * i + 2] / cell); let c = key.get(k);
+    if (c === undefined) { c = sum.length / 4; key.set(k, c); sum.push(0, 0, 0, 0); } sum[4 * c] += p[3 * i]; sum[4 * c + 1] += p[3 * i + 1]; sum[4 * c + 2] += p[3 * i + 2]; sum[4 * c + 3]++; rep[i] = c; }
+  const nc = sum.length / 4, pos = new Float32Array(nc * 3); for (let c = 0; c < nc; c++) for (let k = 0; k < 3; k++) pos[3 * c + k] = sum[4 * c + k] / sum[4 * c + 3];
+  const idx = [], seen = new Set(), n = ix ? ix.length : p.length / 3;
+  for (let t = 0; t < n; t += 3) { const a = rep[ix ? ix[t] : t], b = rep[ix ? ix[t + 1] : t + 1], c = rep[ix ? ix[t + 2] : t + 2]; if (a === b || b === c || a === c) continue; const k = [a, b, c].sort((x, y) => x - y).join(); if (seen.has(k)) continue; seen.add(k); idx.push(a, b, c); }
+  const o = new THREE.BufferGeometry(); o.setAttribute("position", new THREE.BufferAttribute(pos, 3)); o.setIndex(idx); o.computeVertexNormals(); return o; }
+// far from the camera the arm and the floating modules use the clustered meshes; near, or when the Film camera's subject, the full ones
+const LOD_D = 2.6, farFrom = (x, y, z) => R3.cam.position.distanceTo(_lodV.set(x, y, z)) > LOD_D; const _lodV = new THREE.Vector3();
+function dexDrop(r) { if (r.dex) { r.grp.remove(r.dex.root); r.dex = null; } }
+function dexPose(r) { const X = dexObj(r), q = r.arm.q, mats = dexMats(q); X.root.matrix.copy(rootOf(r)); X.root.matrixWorldNeedsUpdate = true;
+  const lo = DEX.geoLo && farFrom(r.x, WL, r.z) && !(DIR.shot && DIR.shot.q === r);
+  const o = dexModule(q); X.root.visible = !lo;
+  if (lo) { const W = _MB.multiplyMatrices(r.grp.matrixWorld, X.root.matrix); for (const n in X.parts) instPut(DEX.geoLo[n], DEX.mat, _m.multiplyMatrices(W, mats[n]));      // far: one instanced draw per part for all far arms
+    _l.makeRotationZ(-r.arm.psi).setPosition(o[0], o[1], o[2]); W.multiply(_l); for (const [geo, mat] of TOOLG[r.arm.tool] || []) instPut(geo, mat, W); return; }
+  for (const n in X.parts) { X.parts[n].matrix.copy(mats[n]); X.parts[n].matrixWorldNeedsUpdate = true; }
+  for (const k in X.tools) { const g = X.tools[k]; g.visible = r.arm.tool === k; g.matrix.makeRotationZ(-r.arm.psi).setPosition(o[0], o[1], o[2]); g.matrixWorldNeedsUpdate = true; } }
+
+// a printed body clipped at the layer being laid, the fresh layer a little brighter: wet silicone just out of the needle
+function clipMat(m, plane) { const c = m.clone(); c.clippingPlanes = [plane]; c.customProgramCacheKey = () => m.customProgramCacheKey() + "edge";
+  c.onBeforeCompile = (sh, rr) => { m.onBeforeCompile(sh, rr); if (!sh.fragmentShader.includes("varying vec3 vWP")) return; sh.uniforms.uClipY = { get value() { return plane.constant; } };
+    sh.fragmentShader = "uniform float uClipY;\n" + sh.fragmentShader.replace("#include <output_fragment>", "#include <output_fragment>\n gl_FragColor.rgb += vec3(0.95, 0.93, 0.88) * (1.0 - smoothstep(0.0, 0.004, uClipY - vWP.y)) * 0.35 * step(uClipY, 5.0);"); };
+  return c; }
+const GELK = { depth: 0.1, H: 0.33 };
+function gelGeo(s) { const x0 = -s.Lh / 2 + 0.006, x1 = s.Lh / 2 + 0.4 * s.Ln, NX = 22, NA = 40, depth = GELK.depth * 2 * s.B / GELK.H, pos = [], idx = [];
+  for (let i = 0; i <= NX; i++) { const x = lerp(x0, x1, i / NX); shellF(s, true, x, 0, 0); const zc = SH.zc, yl = floorY(s, true, x, 0) + depth;
+    for (let j = 0; j < NA; j++) { const th = j / NA * Math.PI * 2, c = Math.cos(th), sn = Math.sin(th); let lo = 0, hi = 0.6;
+      for (let k = 0; k < 20; k++) { const m = (lo + hi) / 2; if (shellF(s, true, x, zc + m * sn, m * c) < 0.97) lo = m; else hi = m; }
+      pos.push(x, Math.min(zc + lo * sn, yl), lo * c); } }
+  for (let i = 0; i < NX; i++) for (let j = 0; j < NA; j++) { const a = i * NA + j, b = i * NA + (j + 1) % NA, c = a + NA, d = b + NA; idx.push(a, c, d, a, d, b); }
+  for (const i of [0, NX]) { const cI = pos.length / 3; let cy = 0; for (let j = 0; j < NA; j++) cy += pos[(i * NA + j) * 3 + 1] / NA; pos.push(pos[i * NA * 3], cy, 0); for (let j = 0; j < NA; j++) idx.push(cI, i * NA + j, i * NA + (j + 1) % NA); }
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); return g; }
+/* ---------- light cues: small soft lights drawn in linear light, so the bloom of the last pass carries them ---------- */
+const LT = { list: [], N: 600 };
+function buildLights() {
+  const g = new THREE.BufferGeometry(), N = LT.N; g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(N * 3), 3)); g.setAttribute("aSize", new THREE.BufferAttribute(new Float32Array(N), 1)); g.setAttribute("aK", new THREE.BufferAttribute(new Float32Array(N), 1));
+  const m = new THREE.ShaderMaterial({ uniforms: { uScale: { value: 500 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    vertexShader: "attribute float aSize; attribute float aK; uniform float uScale; varying float vK; void main() { vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mv; gl_PointSize = max(1.0, aSize * uScale / -mv.z); vK = aK; }",
+    fragmentShader: "varying float vK; void main() { vec2 c = gl_PointCoord - 0.5; float d = length(c) * 2.0; if (d > 1.0) discard; float a = exp(-d * d * 6.0) * (1.0 - d) + 0.6 * exp(-d * d * 60.0); gl_FragColor = vec4(vec3(1.0, 0.97, 0.92) * vK * a, 1.0); }" });
+  LT.pts = new THREE.Points(g, m); LT.pts.frustumCulled = false; LT.pts.renderOrder = 40; R3.sc.add(LT.pts);
+}
+const worldOf = (r, p) => { if (!r.grp) return [0, -9, 0]; _p.set(p[0], p[1], p[2]).applyMatrix4(r.grp.matrix); return [_p.x, _p.y, _p.z]; };
+// a brief light at a place, or following a thing: at(t) gives the world position
+function flash(at, dur, size, k) { LT.list.push({ at, t0: simT, dur, size, k }); }      // in simulation time, so the cues keep pace at 3x and 8x
+
+/* ---------- the environment: lamp pools that dim and move, a stream that turns, the crowd ---------- */
+const ENV = { ph: 0, th0: 0, dx: 0, dz: 0, sx: 0, sz: 0, th: 0, S: 0.085 }, _fl = [0, 0];
+function envUpdate(t) {
+  const a = ENV.ph + t * 2 * Math.PI / 440; ENV.dx = 2.3 * Math.cos(a); ENV.dz = 1.9 * Math.sin(a * 1.31 + 0.7);      // the middle of the patch of low lamps
+  for (let i = 0; i < NL; i++) { const L = LAMPS[i], d = Math.hypot(L.x - ENV.dx, L.z - ENV.dz); U.uLI.value[i] = 0.05 + 0.95 * sstep(0.9, 2.3, d); }
+  ENV.th = ENV.th0 + t * 2 * Math.PI / 600; ENV.sx = 1.3 * Math.cos(t / 131 + ENV.ph * 2); ENV.sz = 1.0 * Math.sin(t / 107 + ENV.ph);      // the stream: a band through (sx, sz) along th
+}
+function lightAt(x, z) { let k = 0; for (let i = 0; i < NL; i++) { const L = LAMPS[i], d = Math.hypot(x - L.x, z - L.z) / POOL; if (d < 1.5) k = Math.max(k, U.uLI.value[i] * (1 - sstep(0.6, 1.5, d))); } return k; }
+function flowAt(x, z, o) { const c = Math.cos(ENV.th), s = Math.sin(ENV.th), d = -(x - ENV.sx) * s + (z - ENV.sz) * c, g = Math.exp(-(d / 0.6) * (d / 0.6)), e = sstep(0, 0.5, TX - Math.abs(x)) * sstep(0, 0.5, TZ - Math.abs(z));
+  o[0] = (ENV.S * g * c - 0.006 * z / TZ) * e; o[1] = (ENV.S * g * s + 0.006 * x / TX) * e; return Math.hypot(o[0], o[1]) / ENV.S; }
+const placeOf = (x, z) => (z < -TZ / 3 ? 0 : z < TZ / 3 ? 1 : 2) * 3 + (x < -TX / 3 ? 0 : x < TX / 3 ? 1 : 2);
+const placeXY = (p) => [(p % 3 - 1) * TX * 2 / 3, (Math.floor(p / 3) - 1) * TZ * 2 / 3];
+function lampsDraw() { for (let i = 0; i < NL; i++) { const k = U.uLI.value[i]; R3.spots[i].intensity = 0.55 * k; if (R3.beams) R3.beams[i].material.uniforms.uI.value = 0.022 * k; if (R3.lenses) R3.lenses[i].material.color.setRGB(9 * k + 0.05, 8.6 * k + 0.05, 8 * k + 0.05); } }
+
+/* ---------- the society ---------- */
+let Q = [], F = [], convos = [], nextId = 1, simT = 0, speed = 1, running = true, selected = null, events = [], births = 0, faded = 0, said = 0, talks = 0, ripI = 0, camMode = "film", showTalk = true, saidWin = 0, linDirty = true, focus = null;
+const LIN = new Map(), hist = { pop: [], talk: [] }, pickable = [], byId = new Map();
+function log(t) { if (window.__logAll) window.__logAll.push(fmt(simT) + " " + t); events.push({ t: simT, text: t }); if (events.length > 4) events.shift(); $("#ev").innerHTML = events.map((e) => `<div>${fmt(e.t)}  ${esc(e.text)}</div>`).join(""); }
+function ripple(x, z, amp) { U.uRip.value[ripI++ % 10].set(x, z, U.uTime.value, amp); }
+const reach = (r) => r.s.Lh / 2 + r.s.Ln;     // centre of the head to the lip, along the body
+// a body without a tail floats half under; a tailed one floats high, as the real design stands
+const floatY = (a) => a.tailed ? WL - waterY(a.s) : WL + 0.15 * a.s.B * (a.k || 1);
+const headXY = (a, o) => { o[0] = a.x; o[1] = a.z; return o; };
+
+/* the shape of a body without a tail, from its five traits and a few inherited quirks. Shape follows function:
+   speed: long, narrow, a long nose and a long rear; sense: a wide mouth and ridges along the body; light: clear skin; memory: tall, boxy, fine quilting; endurance: thick, large, ringed */
+function kidShape(D, K) {
+  const k = clamp(0.72 + 0.24 * D.endurance + 0.08 * D.memory - 0.1 * D.speed, 0.66, 1.02);
+  const Lh = (0.2 + 0.17 * D.speed) * k, A = (0.1 - 0.034 * D.speed + 0.028 * D.memory + 0.022 * D.endurance) * k, B = (0.098 + 0.05 * D.memory + 0.022 * D.endurance - 0.022 * D.speed) * k;
+  return { k: 1, size: k, Lh, A, B, n: 2.0 + 1.5 * K[0] + 1.3 * D.memory, As: A * (0.42 + 0.5 * D.sense), q: 2.7 - 1.5 * D.speed, Ln: (0.028 + 0.05 * D.speed) * k, Lt: 0, tp: 3, drop: 0, R: (0.05 + 0.1 * D.speed + 0.03 * D.endurance) * k,
+    ribN: 2 + Math.round(4 * D.endurance + K[1]), ribD: D.endurance > 0.3 ? 0.04 * (D.endurance - 0.3) / 0.7 : 0, crest: 0, fin: 0,
+    lobeN: 3 + Math.floor(K[2] * 4), lobeD: D.sense > 0.3 ? 0.065 * (D.sense - 0.3) / 0.7 : 0, tone: 0.76 + 0.24 * K[3],
+    tex: [Math.min(5, Math.floor(K[4] * 6)), 0.005 + 0.012 * K[5], 0.00025, 0.3 + 0.9 * K[0]],
+    sil: [clamp(0.66 - 0.36 * D.light, 0.26, 0.7), 0.3 + 0.4 * (1 - D.light), clamp(0.9 - 1.3 * D.memory + 0.3 * (K[1] - 0.5), -0.45, 1.2), clamp(-0.5 + 0.35 * K[5] + 0.2 * D.speed, -0.6, 0.2)], nb: 0.4, nd: 0.42 * (1 - 0.6 * D.speed) };
+}
+// a body without a tail has no cuff for a tail: only the rolled lip of the mouth is added to the skin
+function kidGeometry(s) { const g0 = bodyGeometry(s, false), U_ = g0.userData, P_ = U_.ringPos, M = U_.M, k = U_.mouthK, pts = Array.from({ length: M }, (_, j) => new THREE.Vector3(P_[(k * M + j) * 3], P_[(k * M + j) * 3 + 1], P_[(k * M + j) * 3 + 2]));
+  const lip = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, true), 48, 0.0045, 6, true), g = lipMerge(g0, lip); lip.dispose(); return g; }
+function genGeo(G) { if (!G.geo) G.geo = kidGeometry(G.s); G.refs++; return G.geo; }
+function genDrop(G) { if (--G.refs <= 0 && G.geo) { G.geo.dispose(); G.geo = null; G.refs = 0; } }
+
+function armDims(r) { const s = r.s, bx = -s.Lh / 2 - DEX.BACK; r.B0 = [bx, baseY(s, bx) + DEX.PLATE];
+  if (DEX.data) for (let i = 0; i < 30; i++) { const M = rootOf(r).multiply(dexMats(DREST).B_Fix), v = DEX.samp.B_Fix; let w = 0; for (let j = 0; j < v.length; j += 3) { _v3.set(v[j], v[j + 1], v[j + 2]).applyMatrix4(M); w = Math.max(w, penAt(s, true, _v3.x, _v3.y, _v3.z, 0)); } if (w < 0.0005) break; r.B0[1] += 0.002; }
+  // where the pack is printed: as far forward on the head floor as the needle reaches round it
+  const yb = -0.9 * s.B + 0.02, ok = (x) => [[0.07, 0], [-0.07, 0], [0, 0.04], [0, -0.04]].every(([a, b]) => [yb, yb + 0.05].every((y) => ikArm(r, [x + a, y, b], "needle").err < 1e-6));
+  r.px = 0.0; for (let x = s.Lh / 2 - 0.08; x > -s.Lh / 2 + 0.06; x -= 0.01) if (ok(x)) { r.px = x; break; }
+}
+const GELMAT = waterAware(new THREE.MeshStandardMaterial({ color: new THREE.Color(0xd5dbde), roughness: 0.15, metalness: 0, transparent: true, opacity: 0.16, depthWrite: false, side: THREE.DoubleSide }), { fres: "0.25" });
+const PUMPGEO = new THREE.BoxGeometry(0.06, 0.034, 0.04), PUMPMAT = waterAware(new THREE.MeshStandardMaterial({ color: 0x55585e, roughness: 0.5 }), {});
+const HOSEMAT = new THREE.LineBasicMaterial({ color: 0xcfd4d8, transparent: true, opacity: 0.55 });
+
+function newTailed(i, n) {
+  const g = Array.from({ length: GENES }, rnd), a = (i + 0.3) / n * 2 * Math.PI + ENV.ph, hx = n === 1 ? 0.4 : 1.95 * Math.cos(a), hz = n === 1 ? 0.2 : 1.6 * Math.sin(a);
+  const q = { id: nextId++, tailed: true, tail: true, qtail: false, g, s: shapeOf(g), hx, hz, x: hx, z: hz, h: Math.atan2(-hz, -hx) + (rnd() - 0.5) * 0.6, gen: 0, E: 0.75, cap: 1, state: "listen", st: 0, brood: 0, cool: 5 + 5 * i, talks: 0, told: new Map(), mem: [], memCap: 99,
+    store: TALK.Store(), D: {}, K: Array.from({ length: 6 }, rnd), arm: { q: DREST.slice(), want: DREST, tool: "mag", psi: 0 }, readT: 1 + rnd() * 3, darkT: 0, bob: rnd() * 6.283, born: 0, sent: new Map(), pair: new Map(), flashT: -9, baby: null, G: null };
+  for (const k of TALK.TRAITS) q.D[k] = 0.22 + 0.2 * rnd();
+  q.line = q.id; q.mesh = bodyMesh(q); q.mesh.userData.agent = q; q.len = q.mesh.geometry.userData.len; armDims(q);
+  q.grp = new THREE.Group(); q.grp.matrixAutoUpdate = false; q.grp.add(q.mesh);
+  q.gelM = new THREE.Mesh(gelGeo(q.s), GELMAT); q.gelM.renderOrder = 4.5; q.grp.add(q.gelM);
+  { const px = q.B0[0] - 0.115; q.pump = new THREE.Mesh(PUMPGEO, PUMPMAT); q.pumpP = [px, floorY(q.s, true, px, 0) + 0.02, 0]; q.pump.position.set(...q.pumpP); q.grp.add(q.pump);
+    const hg = new THREE.BufferGeometry(); hg.setAttribute("position", new THREE.BufferAttribute(new Float32Array(14 * 3), 3)); q.hose = new THREE.Line(hg, HOSEMAT); q.hose.frustumCulled = false; q.hose.renderOrder = 5; q.grp.add(q.hose); }
+  R3.sc.add(q.grp); pickable.push(q.mesh); Q.push(q); byId.set(q.id, q); LIN.set(q.id, []); return q;
+}
+function newFree(q, G, ki, x, z, h) {
+  const D = G.D, b = { id: nextId++, tailed: false, line: q.id, gen: G.gen, G, D, s: G.s, k: ki, x, z, h, vx: Math.cos(h) * 0.09, vz: Math.sin(h) * 0.09, cap: 0.6 + 0.6 * D.endurance, vmax: (0.05 + 0.13 * D.speed) * (1 - 0.3 * D.endurance), senseR: 0.5 + 1.6 * D.sense, memCap: 3 + Math.round(7 * D.memory),
+    mem: [], told: new Map(), born: simT, age: 0, life: 320 + 160 * rnd(), mode: "explore", goalP: undefined, gx: x, gz: z, goalT: 0, carried: 0, carriedD: 0, searched: 0, lostDark: 0, darkT: 0, forgot: 0, readT: 4, seeT: 0, seen: null, reportT: simT, cool: new Map(), talk: null, wait: 0, fade: 0, crowd: 0, L: 0, fs: 0,
+    loss: { dark: 0, flow: 0, crowd: 0 }, bob: rnd() * 6.283, wander: h, wanderT: 0, note: G.note, said: 0, told0: 0 };
+  b.E = 0.7 * b.cap; b.len = (G.s.Lh + G.s.Ln + G.s.R) * ki; b.rad = Math.max(b.len * 0.36, G.s.A * ki);
+  // what the newborn carries: traces of the store, then the facts of the note, which the newborn acts on
+  for (const tr of G.traces) TALK.remember(b, TALK.fact({ k: "trace", g: G.gen, txt: tr.txt, t: tr.t, p: tr.p, src: q.id, hops: 1 }));
+  for (const f of G.noteFacts) TALK.remember(b, TALK.copyOf(f));
+  for (const m of b.mem) TALK.mark(b, q, m);      // nothing of this is news to the one that gave it
+  b.forgot = 0; b.lostWay = undefined;
+  b.mesh = new THREE.Mesh(genGeo(G), [MAT.hard, MAT.shell, MAT.mouth]); b.mesh.castShadow = true; b.mesh.updateMorphTargets(); b.mesh.userData.agent = b; b.mesh.renderOrder = 5; b.mesh.layers.enable(1);
+  b.grp = new THREE.Group(); b.grp.matrixAutoUpdate = false; b.grp.add(b.mesh); R3.sc.add(b.grp); pickable.push(b.mesh);
+  F.push(b); byId.set(b.id, b); G.ids.push(b.id); G.alive++; G.born++; linDirty = true; chooseGoal(b); return b;
+}
+function removeFree(b) { R3.sc.remove(b.grp); const i = pickable.indexOf(b.mesh); if (i >= 0) pickable.splice(i, 1); genDrop(b.G); F.splice(F.indexOf(b), 1); byId.delete(b.id); if (selected === b) selected = null; if (focus === b) focus = null; }
+function disposeTailed(q) { R3.sc.remove(q.grp); q.mesh.geometry.dispose(); q.gelM.geometry.dispose(); q.hose.geometry.dispose(); if (q.baby) { q.baby.geometry.dispose(); q.baby.material.forEach((m) => m.dispose()); } }
+
+function reset() {
+  for (const b of F.slice()) removeFree(b); for (const q of Q) disposeTailed(q); for (const L of LIN.values()) for (const G of L) if (G.geo) G.geo.dispose();
+  Q = []; F = []; convos = []; LIN.clear(); byId.clear(); pickable.length = 0; nextId = 1; simT = 0; births = 0; faded = 0; said = 0; talks = 0; saidWin = 0; selected = null; focus = null; events = []; hist.pop = []; hist.talk = []; linDirty = true;
+  if (!QS.has("seed")) SEED = (Math.random() * 1e9) >>> 0; rnd = TALK.RNG(SEED);
+  ENV.ph = rnd() * 6.283; ENV.th0 = rnd() * 6.283; envUpdate(0);
+  for (const s of SPEECH.values()) s.el.remove(); SPEECH.clear(); $("#dlog").innerHTML = ""; $("#ev").innerHTML = ""; LT.list = []; DIR.shot = null; DIR.last = null; MOTES.init = false;
+  for (let i = 0; i < P.tailed; i++) newTailed(i, P.tailed);
+  log(`${P.tailed === 1 ? "one tailed one" : P.tailed + " tailed ones"} in the tank; no other body yet`);
+}
+
+/* ---------- reading, choosing, swimming: a body without a tail ---------- */
+function read(b, full) { const p = placeOf(b.x, b.z), have = (k) => b.mem.find((m) => m.k === k && m.p === p && m.hops === 0), put = (k, v) => { const o = have(k); if (o && simT - o.t < 25 && TALK.band(o) === TALK.band({ k, v })) return; TALK.remember(b, TALK.fact({ k, p, v, t: simT, src: b.id, e: b.E / b.cap })); };
+  put("light", b.L); if (full || b.fs > 0.4) put("flow", Math.min(1, b.fs)); if (full || b.crowd >= 3) put("crowd", b.crowd); }
+function chooseGoal(b) { let best = 4, bs = -1e9;
+  for (let p = 0; p < 9; p++) { const own = b.mem.find((m) => m.k === "light" && m.p === p), fl = b.mem.find((m) => m.k === "flow" && m.p === p), xy = placeXY(p);
+    let sc = (own ? Math.min(200, simT - own.t) : 200) + 70 * rnd() - 14 * Math.hypot(xy[0] - b.x, xy[1] - b.z);
+    if (fl && fl.v > 0.6 && b.D.speed < 0.45) sc -= 150; if (own && own.v < 0.2 && b.D.light < 0.3) sc -= 70; if (sc > bs) { bs = sc; best = p; } }
+  setGoal(b, best, null); }
+function setGoal(b, p, why) { const xy = placeXY(p); b.goalP = p; b.goalWhy = why; b.gx = clamp(xy[0] + (rnd() - 0.5) * 1.1, -TX + 0.35, TX - 0.35); b.gz = clamp(xy[1] + (rnd() - 0.5) * 1.0, -TZ + 0.35, TZ - 0.35); b.goalT = 0; }
+const untoldN = (b, q) => { const t = b.told.get(q.id); let n = 0; for (const m of b.mem) if (m.src !== q.id && !(t && t.has(m.o))) n++; return n; };
+function decideNext(b) { const q = byId.get(b.line), n = q ? untoldN(b, q) : 0;
+  if (q && n >= 1 && (n >= 2 || simT - b.reportT > 60)) { b.mode = "report"; b.wait = 0; return; }
+  b.mode = "explore"; if (b.goalWhy === "sent" && b.goalT === 0) return; chooseGoal(b); }
+function startFade(b, why) { b.fade = 0.0001; b.why = why; faded++; b.G.alive--; linDirty = true; const p = placeOf(b.x, b.z); if (b.talk) endConvo(b.talk);
+  dline(null, null, `#${b.id} of #${b.line}'s line, generation ${b.gen}, fades ${TALK.AT[p]} after ${fmt(b.age)}. ${TALK.FADE_WHY[why]}`, "fade"); log(`#${b.id} fades ${TALK.AT[p]}`); ripple(b.x, b.z, 0.5);
+  // a body near enough to see keeps the fading as a memory and will tell of it; if none saw, the tailed one of the line notes that the body did not come back
+  let seen = false; for (const o of F) { if (o === b || o.fade) continue; if (Math.hypot(o.x - b.x, o.z - b.z) < Math.max(1.0, o.senseR)) { TALK.remember(o, TALK.fact({ k: "fade", who: b.id, why, p, t: simT, src: o.id })); seen = true; } }
+  const q = byId.get(b.line); if (!seen && q) { TALK.take(q.store, TALK.fact({ k: "fade", who: b.id, why, p, t: simT, src: q.id }), null, simT); q.flashT = simT; dline(q, null, `#${b.id} did not come back.`, "act"); } }
+function stepFree(b, dt) {
+  b.age = simT - b.born; const D = b.D;
+  if (b.fade > 0) { b.fade += dt / 8; const f = flowAt(b.x, b.z, _fl); b.x += _fl[0] * dt; b.z += _fl[1] * dt; if (b.fade >= 1) removeFree(b); return; }
+  const L = b.L = lightAt(b.x, b.z), fs = b.fs = flowAt(b.x, b.z, _fl), fx = _fl[0], fz = _fl[1], c = b.crowd, sp = Math.hypot(b.vx, b.vz);
+  // charge: light feeds, shared with the bodies close by; size, swimming, the stream and what the body carries all cost
+  const gain = 0.021 * L / (1 + 0.4 * c), drain = 0.0058 * (0.5 + 0.9 * b.s.size * b.s.size) * (1 - 0.4 * D.endurance) + 0.0035 * (sp / 0.18) * (sp / 0.18) + 0.016 * Math.min(1, fs) * (1 - D.speed) + 0.0009 * (D.speed + D.sense + D.light + D.memory);
+  b.E = Math.min(b.cap, b.E + (gain - drain) * dt);
+  // what the charge was lost to, for the word that is passed on when a body fades
+  if (L < 0.25) b.loss.dark += drain * dt; b.loss.flow += 0.016 * Math.min(1, fs) * (1 - D.speed) * dt; b.loss.crowd += 0.021 * L * (1 - 1 / (1 + 0.4 * c)) * dt; for (const k in b.loss) b.loss[k] *= 1 - dt / 120;
+  if (b.E <= 0 || b.age > b.life) { const l = b.loss; startFade(b, b.age > b.life ? "old" : l.flow >= l.dark && l.flow >= l.crowd ? "flow" : l.crowd > l.dark ? "crowd" : "dark"); return; }
+  if (fs > 0.35) { b.carriedD += ENV.S * fs * (1 - 0.8 * D.speed) * dt; if (b.carriedD > 0.35) { b.carriedD = 0; b.carried++; b.hardP = placeOf(b.x, b.z); } }
+  if (L < 0.18 && D.light < 0.35 && !b.talk) { b.darkT += dt; if (b.darkT > 10) { b.darkT = 0; b.lostDark++; b.hardP = placeOf(b.x, b.z); b.wander = rnd() * 6.283; b.wanderT = 4; } }
+  let tx = b.x, tz = b.z, v = b.vmax * (0.55 + 0.45 * clamp(b.E / b.cap * 2, 0, 1)), wantH = null;
+  if (b.talk) { const o = b.talk.a === b ? b.talk.b : b.talk.a; wantH = Math.atan2(o.z - b.z, o.x - b.x); v = 0; }
+  else {
+    if (b.E / b.cap < 0.38 && b.mode !== "feed") { b.mode = "feed"; if (b.goalWhy !== "light") b.goalWhy = null; }
+    b.readT -= dt; if (b.readT <= 0) { b.readT = 7 + 3 * rnd(); read(b, false); }
+    // what the body feels: the brightest point within reach. In the dark a body without a lamp feels less far
+    b.seeT -= dt; if (b.seeT <= 0) { b.seeT = 0.6; const sr = b.senseR * (0.35 + 0.65 * Math.max(L, D.light)); let bl = L + 0.08; b.seen = null;
+      for (let k = 0; k < 16; k++) { const a = k * Math.PI / 4, r = k < 8 ? sr : sr / 2, x = b.x + Math.cos(a) * r, z = b.z + Math.sin(a) * r; if (Math.abs(x) > TX - 0.25 || Math.abs(z) > TZ - 0.25) continue; const l = lightAt(x, z); if (l > bl) { bl = l; b.seen = [x, z]; } } }
+    if (b.mode === "feed") {
+      if (L < 0.5) b.searched += dt;
+      if (b.E / b.cap > 0.86) { b.goalWhy = null; decideNext(b); }
+      else if (L > 0.62 && !b.seen) v = 0.01;      // in a pool: stay and feed
+      else if (b.seen) { tx = b.seen[0]; tz = b.seen[1]; }
+      else { if (b.goalWhy !== "light") { const m = b.mem.filter((x) => x.k === "light" && x.v > 0.5).sort((x, y) => y.v * Math.exp(-(simT - y.t) / 150) - x.v * Math.exp(-(simT - x.t) / 150))[0]; if (m) setGoal(b, m.p, "light"); else if (b.lostWay !== undefined) { b.lostN = (b.lostN || 0) + 1; b.hardP = b.lostWay; b.lostWay = undefined; } }
+        if (b.goalWhy === "light") { tx = b.gx; tz = b.gz; b.goalT += dt; if (Math.hypot(tx - b.x, tz - b.z) < 0.45 || b.goalT > 90) { read(b, true); b.goalWhy = null; if (L < 0.4) { const i = b.mem.findIndex((x) => x.k === "light" && x.p === b.goalP && x.v > 0.5); if (i >= 0) b.mem.splice(i, 1); } } }
+        else { b.wanderT -= dt; if (b.wanderT <= 0) { b.wanderT = 5 + 4 * rnd(); b.wander = rnd() * 6.283; } tx = b.x + Math.cos(b.wander); tz = b.z + Math.sin(b.wander); } } }
+    if (b.mode === "explore") { tx = b.gx; tz = b.gz; b.goalT += dt; if (Math.hypot(tx - b.x, tz - b.z) < 0.4 || b.goalT > 80) { read(b, true); b.lastP = b.goalP; b.goalWhy = null; b.goalT = 1; decideNext(b); } }
+    else if (b.mode === "report") { const q = byId.get(b.line); if (!q) { b.mode = "explore"; chooseGoal(b); } else { const a = q.h + (b.id % 2 ? 1 : -1) * (0.7 + 0.5 * ((b.id * 7) % 5) / 5), d = clamp(P.radius * 0.75, 0.5, 0.95); tx = q.x + Math.cos(a) * d; tz = q.z + Math.sin(a) * d;
+        if (Math.hypot(q.x - b.x, q.z - b.z) < P.radius + 0.3) { b.wait += dt; if (b.wait > 28) { b.reportT = simT - 25; b.mode = "explore"; chooseGoal(b); } } } }
+    if (b.wanderT > 0 && b.lostDark && L < 0.18 && D.light < 0.35 && b.mode !== "feed") { b.wanderT -= dt; tx = b.x + Math.cos(b.wander); tz = b.z + Math.sin(b.wander); }      // lost in the dark for a while
+  }
+  const dx = tx - b.x, dz = tz - b.z, d = Math.hypot(dx, dz);
+  if (wantH === null) wantH = d > 0.02 ? Math.atan2(dz, dx) : b.h;
+  b.h = angLerp(b.h, wantH, Math.min(1, dt * 1.5)); const vv = lerp(sp, Math.min(v, d * 1.1 + 0.008), Math.min(1, dt * 1.1)), al = Math.max(0, Math.cos(wantH - b.h));
+  b.vx = Math.cos(b.h) * vv * al; b.vz = Math.sin(b.h) * vv * al;
+  const carry = (1 - 0.8 * D.speed) * (0.8 + 0.4 * D.endurance); b.x += (b.vx + fx * carry + b.px * 0.5) * dt; b.z += (b.vz + fz * carry + b.pz * 0.5) * dt;
+  const mx = TX - 0.12 - b.rad, mz = TZ - 0.12 - b.rad; if (Math.abs(b.x) > mx) { b.x = clamp(b.x, -mx, mx); b.wander = Math.PI - b.wander; } if (Math.abs(b.z) > mz) { b.z = clamp(b.z, -mz, mz); b.wander = -b.wander; }
+}
+// bodies keep clear of each other; the count of bodies close by is the crowd
+function neighbours() {
+  for (const b of F) { b.px = 0; b.pz = 0; b.crowd = 0; }
+  for (let i = 0; i < F.length; i++) { const a = F[i]; if (a.fade) continue;
+    for (let j = i + 1; j < F.length; j++) { const b = F[j]; if (b.fade) continue; const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz) || 1e-4; if (d < 0.8) { a.crowd++; b.crowd++; }
+      const m = a.rad + b.rad + 0.04; if (d < m) { const k = (m - d) / m * 0.25 / d; a.px -= dx * k; a.pz -= dz * k; b.px += dx * k; b.pz += dz * k; } }
+    for (const q of Q) { const c = Math.cos(q.h), s = Math.sin(q.h), off = -(q.s.Lh / 2 + q.s.Lt * 0.45);
+      for (const [ox, r] of [[0.03, q.s.A + 0.06], [off, q.s.A + 0.05], [off / 2, q.s.A + 0.07]]) { const dx = a.x - (q.x + c * ox), dz = a.z - (q.z + s * ox), d = Math.hypot(dx, dz) || 1e-4, m = r + a.rad; if (d < m) { const k = (m - d) / m * 0.5 / d; a.px += dx * k; a.pz += dz * k; } }
+      if (Math.hypot(a.x - q.x, a.z - q.z) < 0.8) a.crowd++; } }
+}
+
+/* ---------- a tailed one: reads its own place, listens, decides, prints, gives birth ---------- */
+const PRINT_S = 10, BIRTH_S = 8;
+const aloneQ = (q) => { for (const b of F) if (!b.fade && b.line === q.id) return false; return true; };
+const WORLD = { get t() { return simT; }, get need() { return P.need; }, place: (a) => placeOf(a.x, a.z), alone: aloneQ,
+  brightest(q) { let best = null, bv = 0.45; for (const l of q.store.lines) { if (l.k !== "light") continue; const v = l.v * Math.exp(-(simT - l.t) / 150); if (v > bv) { bv = v; best = l; } } return best; },
+  unknown(q) { let best = -1, bs = 60; for (let p = 0; p < 9; p++) { if (simT - (q.sent.get(p) ?? -99) < 40) continue; let t = -200; for (const l of q.store.lines) if (l.p === p && (l.k === "light" || l.k === "flow") && l.t > t) t = l.t; const age = simT - t + 20 * TALK.RNG(q.id * 97 + p + Math.floor(simT / 30))(); if (age > bs) { bs = age; best = p; } } if (best >= 0) q.sent.set(best, simT); return best; } };
+function stepTailed(q, dt) {
+  const L = q.L = lightAt(q.x, q.z); q.E = clamp(q.E + (0.011 * L - 0.0006) * dt, 0, 1); q.cool -= dt;
+  // a tailed one hardly moves; left in the dark for long, the tailed one drifts toward the place the store calls bright
+  if (q.state === "listen") { q.darkT = L < 0.3 ? q.darkT + dt : 0;
+    if (q.darkT > 25) { const b = WORLD.brightest(q); if (b && b.p !== placeOf(q.hx, q.hz)) { const xy = placeXY(b.p), dx = xy[0] - q.hx, dz = xy[1] - q.hz, d = Math.hypot(dx, dz) || 1; let nx = q.hx + dx / d * 0.03 * dt, nz = q.hz + dz / d * 0.03 * dt;
+        if (Q.every((o) => o === q || Math.hypot(o.hx - nx, o.hz - nz) > 1.5)) { q.hx = clamp(nx, -TX + 0.9, TX - 0.9); q.hz = clamp(nz, -TZ + 0.9, TZ - 0.9); } } } }
+  const k = Math.min(1, dt * 0.4); q.x = lerp(q.x, q.hx + 0.1 * Math.sin(simT * 0.06 + q.bob), k); q.z = lerp(q.z, q.hz + 0.1 * Math.cos(simT * 0.05 + q.bob * 1.7), k);
+  if (q.state === "listen") q.h = angLerp(q.h, Math.atan2(-q.hz, -q.hx) + 0.7 * Math.sin(simT * 0.021 + q.bob), Math.min(1, dt * 0.08));
+  q.readT -= dt; if (q.readT <= 0) { q.readT = 9; const p = placeOf(q.x, q.z), fs = flowAt(q.x, q.z, _fl); let n = 0; for (const b of F) if (!b.fade && Math.hypot(b.x - q.x, b.z - q.z) < 0.9) n++;
+    for (const [kk, v] of [["light", L], ["flow", Math.min(1, fs)]]) { const r = TALK.take(q.store, TALK.fact({ k: kk, p, v, t: simT, src: q.id }), null, simT); if (r.kind !== "known") q.flashT = simT; } }
+  if (q.state === "listen") { if (q.cool <= 0 && q.E >= 0.3 && Q.length + F.length < MAXPOP && TALK.ready(q.store, P.need, aloneQ(q))) decide(q); }
+  else if (q.state === "print") { q.st += dt / PRINT_S; if (q.st >= 1) { q.state = "birth"; q.st = 0; log(`#${q.id} pushes the newborn out; the pump fills the newborn with air`); ripple(q.x + Math.cos(q.h) * reach(q), q.z + Math.sin(q.h) * reach(q), 0.4); } }
+  else if (q.state === "birth") { q.st += dt / BIRTH_S; if (q.st >= 1) release(q); }
+  armDrive(q, dt);
+}
+function decide(q) {
+  const S = q.store, Pr = TALK.pressures(S, simT), D0 = q.D, D1 = TALK.compose(D0, Pr, P.mut, rnd), first = q.gen === 0;
+  q.K = q.K.map((v) => clamp(v + (rnd() - 0.5) * 2 * (0.05 + P.mut), 0, 1)); q.gen++;
+  const nt = TALK.note(S, simT), desc = first ? TALK.bodyText(D1) : TALK.describe(D0, D1), kinds = [...S.topics];
+  const G = { line: q.id, gen: q.gen, D: D1, D0, K: q.K.slice(), s: kidShape(D1, q.K), note: nt.text, noteFacts: nt.facts, traces: TALK.deal(S, 4, q.id + ":" + q.gen).map((l) => ({ txt: TALK.traceText(l), t: l.t, p: l.p })), desc, t: simT, ids: [], alive: 0, born: 0, lines: S.lines.length, kinds, speakers: S.speakers.size, geo: null, refs: 0, P: Pr };
+  LIN.get(q.id).push(G); q.G = G; q.D = D1; linDirty = true;
+  q.brood = 1 + (q.E > 0.45 ? 1 : 0) + (q.E > 0.8 && rnd() < 0.5 ? 1 : 0);
+  const text = first ? `No one to ask yet. First generation, from this place alone: ${desc}.` : `Enough is known. Generation ${q.gen} will be ${desc}.`;
+  dline(q, null, text, "act"); bubble("q" + q.id, q, null, text, 5); log(`#${q.id} decides: generation ${q.gen}, ${desc}`); q.flashT = simT; focus = q;
+  TALK.compact(S, simT); startPrint(q);
+}
+// a printed body clipped at the layer being laid. The pack is milky while folded, wall on wall, and clears as the air stretches it
+function startPrint(q) {
+  const G = q.G, s = G.s, ki = 0.95 + 0.1 * rnd(), geo = kidGeometry(s), plane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0), mk = (m) => clipMat(m, plane);
+  const a = geo.attributes.position.array, W = geo.morphAttributes.position[0].array; for (let i = 0; i < a.length; i++) { a[i] *= ki; W[i] *= ki; }
+  const baby = new THREE.Mesh(geo, [mk(MAT.shell), mk(MAT.shell), mk(MAT.mouth)]); baby.frustumCulled = false; baby.renderOrder = 4; baby.castShadow = false;
+  const U_ = geo.userData, len = U_.len * ki; let lo = 9, hi = -9; for (let i = 1; i < W.length; i += 3) { lo = Math.min(lo, W[i]); hi = Math.max(hi, W[i]); }
+  const y0 = -0.9 * q.s.B + 0.012 - lo;      // the pack rests in the gel just above the head floor
+  baby.userData = { plane, ki, len, back: U_.back * ki, front: U_.front * ki, full: a.slice(), W, y0, lo, hi, rx: 0.2 * len, rz: Math.max(0.02, 0.5 * s.A * ki), silA: s.sil[0], rearX: q.px - 0.2 * len, dy: floatY({ tailed: false, s, k: ki }) - floatY(q) };
+  q.grp.add(baby); q.baby = baby; q.state = "print"; q.st = 0; q.E -= 0.2; birthPose(q, 0);
+  log(`#${q.id} prints generation ${G.gen}, folded flat in the gel`);
+}
+/* the birth, in the simple version's way: the pump fills the newborn while the arm pushes. The pack slides to the lip; what has passed the lip swells
+   to full size like a balloon, a little over at first, and what is still inside stays folded. The physics is reduced to this map; the picture is kept. */
+const _bo = [0, 0, 0];
+function birthPose(q, out) {
+  const b = q.baby, U_ = b.userData, g = b.geometry, a = g.attributes.position.array, Fu = U_.full, W = U_.W, ps = q.s, lip = reach(q), len = U_.len;
+  const sl = sstep(0, 0.14, out), s = len * sstep(0.12, 0.96, out), e = sstep(0.9, 1, out), Xn = lerp(q.px + 0.2 * len, lip, sl), ym = 0.01 - 0.88 * ps.B * ps.nd, pulse = 0.012 * Math.sin(simT * 2 * Math.PI * 2.2);
+  for (let i = 0; i < a.length; i += 3) { const d = U_.front - Fu[i]; let X, kc = 0, ov = 1;
+    if (d <= s) { X = Xn + (s - d); kc = Math.max(sstep(0, 0.1, X - lip), e); ov = 1 + (0.09 * Math.sin(Math.PI * clamp((X - lip) / 0.22, 0, 1)) * (1 - e) + pulse * (1 - e)) * kc; } else X = Xn - (d - s) * 0.4;
+    let cy = X < lip ? lerp(U_.y0, ym, sstep(lip - 0.16, lip, X)) : lerp(lerp(ym, U_.dy, sstep(lip, lip + 0.2, X)), U_.dy, e);
+    let y = cy + lerp(W[i + 1], Fu[i + 1] * ov, kc), z = lerp(W[i + 2], Fu[i + 2] * ov, kc);
+    if (X < lip + 0.004) { const f = shellF(ps, true, X, y, z); if (f > 0.93) { const k = 0.93 / f; y = SH.zc + (y - SH.zc) * k; z *= k; } }      // inside the parent the pack is drawn in to clear the inner face
+    a[i] = X; a[i + 1] = y; a[i + 2] = z; }
+  g.attributes.position.needsUpdate = true; g.computeVertexNormals();
+  const sil = g.attributes.aSil.array, op = lerp(0.96, U_.silA, sstep(0.15, 1, out)), nb = sil.length / 4; for (let i = 0; i < nb; i++) sil[i * 4] = op; g.attributes.aSil.needsUpdate = true;
+  U_.rearX = Xn - (len - s) * 0.4; U_.out = out;
+}
+function release(q) {
+  const b = q.baby, U_ = b.userData, G = q.G, c = Math.cos(q.h), s = Math.sin(q.h), d = reach(q) - U_.back;
+  const kid = newFree(q, G, U_.ki, q.x + c * d, q.z + s * d, q.h);
+  q.grp.remove(b); b.geometry.dispose(); b.material.forEach((m) => m.dispose()); q.baby = null; births++; ripple(kid.x, kid.z, 1.0);
+  const hello = `#${kid.id}, generation ${G.gen} of #${q.id}'s line. Told: ${G.note}`;
+  dline(kid, q, hello, "act"); bubble("q" + q.id, kid, q, hello, 5); log(`#${kid.id} born from #${q.id}, generation ${G.gen}: ${TALK.bodyText(G.D)}`); focus = kid;
+  flash(() => [kid.x, floatY(kid) + 0.02, kid.z], 2.5, 0.4, 1.4);
+  if (--q.brood > 0 && q.E >= 0.25 && Q.length + F.length < MAXPOP) startPrint(q); else { q.state = "listen"; q.st = 0; q.cool = 8; q.brood = 0; }
+}
+// the arm: the needle draws the pack layer on layer; at the birth the holder pushes the rear of the pack toward the lip
+function armDrive(q, dt) { const A = q.arm; let want = DREST, tool = A.tool;
+  if (q.baby && DEX.data) { const U_ = q.baby.userData;
+    if (q.state === "print") { tool = "needle"; const a = q.st * 2 * Math.PI * 9; want = ikArm(q, [q.px + U_.rx * 0.95 * Math.cos(a), U_.y0 + lerp(U_.lo, U_.hi, q.st) + 0.006, U_.rz * 0.9 * Math.sin(a)], "needle", A.q).q; }
+    else { tool = "mag"; want = ikArm(q, [U_.rearX - 0.014, U_.y0 + U_.hi + 0.012 + 0.03 * sstep(0.2, 0.9, q.st), 0], "mag", A.q).q; } }
+  if (tool !== A.tool) { if (Math.abs(A.q[0]) + Math.abs(A.q[1] - DREST[1]) + Math.abs(A.q[2] - DREST[2]) > 0.05) want = DREST; else A.tool = tool; }      // tools are changed at the folded pose
+  for (let i = 0; i < 3; i++) A.q[i] += clamp(want[i] - A.q[i], -dt * 1.4, dt * 1.4); }
+
+/* ---------- conversations ---------- */
+const SPEECH = new Map();      // key -> { el, a, b, text, prev, until }
+function dline(from, to, text, cls) { const el = $("#dlog"), stick = el.scrollTop + el.clientHeight > el.scrollHeight - 30, d = document.createElement("div"); if (cls) d.className = cls;
+  d.innerHTML = `<time>${fmt(simT)}</time> ` + (from ? `<b>#${from.id}</b>` + (to ? ` <em>to</em> <b>#${to.id}</b>` : "") + ` ` : "") + esc(text); el.appendChild(d); while (el.childElementCount > 160) el.firstChild.remove(); if (stick) el.scrollTop = el.scrollHeight;
+  if (window.__lines) window.__lines.push({ t: simT, from: from ? from.id : 0, to: to ? to.id : 0, text }); }
+function bubble(key, a, b, text, hold) { let s = SPEECH.get(key); if (!s) { const el = document.createElement("div"); el.className = "sp"; $("#labs").appendChild(el); s = { el, text: "" }; SPEECH.set(key, s); }
+  s.off = 0; s.prev = s.a === a || key[0] === "q" ? "" : s.text; s.a = a; s.b = b; s.text = text; s.until = simT + hold; s.real = performance.now() + 2500;
+  s.el.innerHTML = `<i>#${a.id}${b ? " to #" + b.id : ""}</i>` + (s.prev ? `<s>${esc(s.prev)}</s>` : "") + esc(text); }
+function startConvo(a, b) { const C = TALK.Convo(a, b, simT); C.id = ++talks; C.nextT = simT + 0.5; C.lastT = simT; convos.push(C);
+  for (const x of [a, b]) { if (x.tailed) x.talks++; else x.talk = C; } return C; }
+function endConvo(C) { if (C.closed) return; C.closed = true; convos.splice(convos.indexOf(C), 1); const s = SPEECH.get("c" + C.id); if (s) s.until = Math.min(s.until, simT + 1.2);
+  for (const [x, o] of [[C.a, C.b], [C.b, C.a]]) { if (x.tailed) { x.talks = Math.max(0, x.talks - 1); x.pair.set(o.id, simT + (o.tailed ? 50 : 30)); continue; }
+    x.talk = null; x.cool.set(o.id, simT + (o.tailed ? 30 : 50)); if (x.fade) continue; if (o.tailed) { x.reportT = simT; x.wait = 0; }
+    if (x.goalWhy === "light") { setGoal(x, x.goalP, "light"); x.mode = "feed"; } else if (x.goalWhy === "sent") { setGoal(x, x.goalP, "sent"); x.mode = "explore"; } else decideNext(x); } }
+function convoStep() {
+  for (const C of convos.slice()) { if (simT < C.nextT) continue;
+    if (C.done || C.a.fade || C.b.fade) { endConvo(C); continue; }
+    const r = TALK.turn(C, WORLD); said++; saidWin++; r.from.said = (r.from.said || 0) + 1; C.lastT = simT; C.sp = r.from;
+    C.nextT = simT + clamp(1.2 + 0.042 * r.text.length, 1.7, 3.6);
+    dline(r.from, r.to, r.text, C.n === 1 ? "gap" : ""); bubble("c" + C.id, r.from, r.to, r.text, C.nextT - simT + 0.6);
+    flash(() => [r.from.x, floatY(r.from) + (r.from.tailed ? 0.05 : 0.03), r.from.z], 1.8, r.from.tailed ? 0.5 : 0.3, 1.1);
+    if (r.to.tailed && (r.kind === "report" || r.kind === "body") && C.res && C.res.kind !== "known") r.to.flashT = simT; }
+}
+// who may start to talk: two robots closer than the talk radius, both free, with something one has not yet told the other
+function matchStep() {
+  const R = P.radius;
+  for (const b of F) { if (b.talk || b.fade || b.age < 5) continue;
+    let done = false;
+    for (const q of Q) { if (q.talks >= 2) continue; const d = Math.hypot(q.x - b.x, q.z - b.z); if (d > R + 0.3) continue; if ((b.cool.get(q.id) || 0) > simT) continue;
+      if (b.mode === "report" && q.id === b.line || untoldN(b, q) >= 2 || (b.E / b.cap < 0.38 && b.mode === "feed" && !b.seen && b.L < 0.4)) { startConvo(b, q); done = true; break; } }
+    if (done) continue;
+    for (const o of F) { if (o.id <= b.id || o.talk || o.fade || o.age < 5) continue; if (Math.hypot(o.x - b.x, o.z - b.z) > R) continue; if ((b.cool.get(o.id) || 0) > simT || (o.cool.get(b.id) || 0) > simT) continue;
+      if (TALK.untold(b, o, simT) || TALK.untold(o, b, simT)) { startConvo(b, o); break; } } }
+  for (let i = 0; i < Q.length; i++) for (let j = i + 1; j < Q.length; j++) { const a = Q[i], b = Q[j]; if (a.talks >= 2 || b.talks >= 2 || (a.pair.get(b.id) || 0) > simT) continue; if (Math.hypot(a.x - b.x, a.z - b.z) > R * 2.2 + 0.6) continue;
+    if (a.store.lines.length > 2 && b.store.lines.length > 2) startConvo(a, b); else a.pair.set(b.id, simT + 10); }
+}
+
+let mAcc = 0, sAcc = 0;
+function step(dt) {
+  simT += dt; envUpdate(simT); neighbours();
+  for (const b of F.slice()) stepFree(b, dt);
+  for (const q of Q) stepTailed(q, dt);
+  convoStep(); mAcc += dt; if (mAcc > 0.3) { mAcc = 0; matchStep(); }
+  motesStep(dt);
+  sAcc += dt; if (sAcc >= 10) { sAcc = 0; hist.pop.push(F.filter((b) => !b.fade).length); hist.talk.push(saidWin); saidWin = 0; for (const k of ["pop", "talk"]) if (hist[k].length > 240) hist[k].shift(); }
+}
+
+/* ---------- thin lines over the water: the store of each tailed one, the link between two that talk, the motes that show the stream ---------- */
+const LN = { cap: 14000, n: 0 }, MOTES = { n: 380, p: null, init: false };
+function buildOverlays() {
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(LN.cap * 3), 3)); g.setAttribute("color", new THREE.BufferAttribute(new Float32Array(LN.cap * 3), 3));
+  const l = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })); l.frustumCulled = false; l.renderOrder = 12; R3.sc.add(l); R3.lines = l;
+  const ring = new THREE.Mesh(new THREE.RingGeometry(0.5, 0.512, 64).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.7, depthWrite: false })); ring.renderOrder = 13; ring.visible = false; R3.sc.add(ring); R3.selRing = ring;
+  MOTES.p = new Float32Array(MOTES.n * 3);
+}
+function seg(x0, y0, z0, x1, y1, z1, a, b = a) { if (LN.n + 2 > LN.cap) return; const P_ = R3.lines.geometry.attributes.position.array, C_ = R3.lines.geometry.attributes.color.array, i = LN.n * 3;
+  P_[i] = x0; P_[i + 1] = y0; P_[i + 2] = z0; P_[i + 3] = x1; P_[i + 4] = y1; P_[i + 5] = z1; C_[i] = C_[i + 1] = C_[i + 2] = a; C_[i + 3] = C_[i + 4] = C_[i + 5] = b; LN.n += 2; }
+function motesStep(dt) { const p = MOTES.p; if (!MOTES.init) { MOTES.init = true; for (let i = 0; i < MOTES.n; i++) { p[i * 3] = (rnd() * 2 - 1) * (TX - 0.1); p[i * 3 + 1] = (rnd() * 2 - 1) * (TZ - 0.1); p[i * 3 + 2] = rnd() * 40; } }
+  for (let i = 0; i < MOTES.n; i++) { const j = i * 3; flowAt(p[j], p[j + 1], _fl); p[j] += _fl[0] * dt; p[j + 1] += _fl[1] * dt; p[j + 2] -= dt;
+    if (p[j + 2] < 0 || Math.abs(p[j]) > TX - 0.06 || Math.abs(p[j + 1]) > TZ - 0.06) { p[j] = (Math.random() * 2 - 1) * (TX - 0.1); p[j + 1] = (Math.random() * 2 - 1) * (TZ - 0.1); p[j + 2] = 25 + Math.random() * 30; } } }
+const _w = new THREE.Vector3(), _w2 = new THREE.Vector3();
+function drawLines(t) {
+  LN.n = 0; const y = WL + 0.004;
+  // the motes: a short stroke along the water's motion, longer where the stream is strong
+  for (let i = 0, p = MOTES.p; i < MOTES.n; i++) { const j = i * 3, k = flowAt(p[j], p[j + 1], _fl), L = 0.05 + 0.3 * lightAt(p[j], p[j + 1]), fade = Math.min(1, p[j + 2] / 4), a = L * fade * (0.25 + 0.55 * Math.min(1, k)), m = Math.hypot(_fl[0], _fl[1]) || 1, len = 0.006 + 0.1 * Math.min(1, k);
+    seg(p[j], y, p[j + 1], p[j] - _fl[0] / m * len, y, p[j + 1] - _fl[1] / m * len, a, 0); }
+  for (const q of Q) { const S = q.store, alone = aloneQ(q), need = alone ? Math.min(P.need, 3) : P.need, busy = q.state !== "listen", fill = busy ? 1 : clamp(S.info / need, 0, 1), fl = Math.max(0, 1 - (simT - q.flashT) / 2.5);
+    // the ring on the water: how much of what is needed the store holds
+    const N = 72, rr = Math.max(q.s.A + 0.16, 0.34), cx = q.x, cz = q.z, a0 = -q.h + Math.PI;
+    for (let i = 0; i < N; i++) { const a1 = a0 + i / N * 6.283, a2 = a0 + (i + 1) / N * 6.283, on = (i + 0.5) / N <= fill, v = on ? 0.5 + 0.5 * fl + (busy ? 0.25 * Math.sin(t * 2.2 - i * 0.2) : 0) : 0.07; if (!on && i % 2) continue;
+      seg(cx + Math.cos(a1) * rr, y, cz + Math.sin(a1) * rr, cx + Math.cos(a2) * rr, y, cz + Math.sin(a2) * rr, v); }
+    // the lines of the store: thin loops stacked in the head, a broken loop for word passed on. Far from the camera they are left out
+    if (R3.cam.position.distanceTo(tmpV.set(q.x, WL, q.z)) > 6.5) continue; const M = q.grp.matrix, yb = waterY(q.s) + 0.035, yt = q.s.B * 0.8, n = S.lines.length;
+    for (let i = 0; i < n; i++) { const l = S.lines[i], yy = lerp(yb, yt, (i + 0.5) / 18), hgt = Math.sqrt(Math.max(0.05, 1 - (yy / q.s.B) * (yy / q.s.B))), ax = q.s.Lh * 0.36 * (l.k === "body" || l.k === "fade" ? 0.7 : 1), az = q.s.A * 0.62 * hgt, age = simT - (l.got ?? l.t), v = 0.2 + 0.8 * Math.max(0, 1 - age / 3) + (i === n - 1 ? 0.5 * fl : 0);
+      for (let k = 0; k < 24; k++) { if (l.hops > 0 && k % 3 === 2) continue; const a1 = k / 24 * 6.283, a2 = (k + 1) / 24 * 6.283; _w.set(ax * Math.cos(a1), yy, az * Math.sin(a1)).applyMatrix4(M); _w2.set(ax * Math.cos(a2), yy, az * Math.sin(a2)).applyMatrix4(M); seg(_w.x, _w.y, _w.z, _w2.x, _w2.y, _w2.z, v); } } }
+  // two that talk: a thin arc from one to the other, brighter for a moment at each turn
+  if (showTalk) for (const C of convos) { const a = C.a, b = C.b, ya = floatY(a) + 0.04, yb = floatY(b) + 0.04, d = Math.hypot(a.x - b.x, a.z - b.z), v = 0.16 + 0.6 * Math.max(0, 1 - (simT - C.lastT) / 1.6), dir = C.sp === b ? 1 : 0;
+    for (let k = 0; k < 14; k++) { const u0 = k / 14, u1 = (k + 1) / 14, h0 = Math.sin(Math.PI * u0) * 0.12 * d, h1 = Math.sin(Math.PI * u1) * 0.12 * d, tr = Math.max(0, 1 - Math.abs((dir ? 1 - u0 : u0) - (simT - C.lastT) / 0.9) * 4);
+      seg(lerp(a.x, b.x, u0), lerp(ya, yb, u0) + h0, lerp(a.z, b.z, u0), lerp(a.x, b.x, u1), lerp(ya, yb, u1) + h1, lerp(a.z, b.z, u1), v + tr); } }
+  const G_ = R3.lines.geometry; G_.setDrawRange(0, LN.n); G_.attributes.position.needsUpdate = true; G_.attributes.color.needsUpdate = true;
+}
+
+/* ---------- drawing ---------- */
+const tgtV = new THREE.Vector3();
+function updateScene(dtReal) {
+  const t = U.uTime.value; let n = 0; const put = (x, z, h, a, b) => { if (n >= 64) return; U.uBodA.value[n].set(x, z, Math.cos(h), Math.sin(h)); U.uBodB.value[n].set(a, b); n++; };
+  instBegin(); lampsDraw();
+  for (const q of Q) { const gu = q.mesh.geometry.userData, cx = (gu.front + gu.back) / 2, c = Math.cos(q.h), s = Math.sin(q.h); put(q.x + c * cx, q.z + s * cx, q.h, gu.len / 2, q.s.A + 0.002);
+    q.grp.position.set(q.x, floatY(q) + Math.sin(t * 0.5 + q.bob) * 0.006, q.z); q.grp.rotation.set(Math.sin(t * 0.4 + q.bob) * 0.02, -q.h, Math.sin(t * 0.45 + q.bob * 1.3) * 0.016, "YXZ"); q.grp.updateMatrix(); q.grp.updateMatrixWorld();
+    // the head breathes slowly, and swells a little while the newborn passes
+    const sw = 1 + 0.012 * Math.sin(t * 0.9 + q.bob) + (q.state === "birth" ? 0.05 * Math.sin(Math.PI * q.st) : q.state === "print" ? 0.02 * q.st : 0); q.mesh.scale.set(1, sw, sw); q.mesh.updateMatrix();
+    _MB.multiplyMatrices(q.grp.matrix, q.mesh.matrix); for (const D of q.mesh.userData.rims[0].userData.discs) instPut(DISCGEO, STEELMAT, _m.multiplyMatrices(_MB, D), { ro: 5.5 });
+    if (q.baby) { const b = q.baby; if (q.state === "birth") { birthPose(q, q.st); b.userData.plane.constant = 10; } else b.userData.plane.constant = q.grp.position.y + b.userData.y0 + lerp(b.userData.lo, b.userData.hi, q.st) + 0.002; }
+    if (DEX.data) { dexPose(q);      // the hose: from the pump in the tail along the arm to the tool
+      const tp = dexFK(q, q.arm.q, q.arm.tool, 0), o = dexModule(q.arm.q), top = [q.B0[0] + o[0], q.B0[1] + o[2] + 0.05, -o[1]], a = q.hose.geometry.attributes.position.array, P0 = q.pumpP, mid = [(P0[0] + top[0]) / 2, Math.max(P0[1], top[1]) + 0.05, 0.03];
+      for (let k = 0; k < 14; k++) { const u = k / 13, w0 = (1 - u) * (1 - u), w1 = 2 * u * (1 - u), w2 = u * u; a[k * 3] = w0 * P0[0] + w1 * mid[0] + w2 * top[0]; a[k * 3 + 1] = w0 * (P0[1] + 0.017) + w1 * mid[1] + w2 * top[1]; a[k * 3 + 2] = w0 * P0[2] + w1 * mid[2] + w2 * top[2]; } q.hose.geometry.attributes.position.needsUpdate = true; }
+  }
+  for (const b of F) { const s = b.s, f = b.fade, fe = sstep(0, 0.7, f), sp = Math.hypot(b.vx, b.vz) / 0.18, br = 1 + 0.022 * Math.sin(t * 1.1 + b.bob), sc = b.k * (1 - 0.45 * sstep(0.5, 1, f));
+    put(b.x, b.z, b.h, b.len / 2 * (1 - 0.6 * fe), s.A * b.k * (1 - 0.5 * fe));
+    b.grp.position.set(b.x, floatY(b) + Math.sin(t * 0.8 + b.bob) * 0.006 - 0.2 * sstep(0.25, 1, f), b.z);
+    b.grp.rotation.set(Math.sin(t * 0.6 + b.bob) * 0.03, -(b.h + 0.07 * sp * Math.sin(t * (2 + 3 * sp) + b.bob)), Math.sin(t * 0.7 + b.bob * 1.3) * 0.03 + 0.5 * fe, "YXZ"); b.grp.updateMatrix(); b.grp.updateMatrixWorld();
+    b.mesh.morphTargetInfluences[0] = fe * 0.92; b.mesh.scale.set(sc, sc * br, sc * br); }
+  U.uNB.value = n; drawLines(t); instEnd();
+  R3.hemi.intensity = 0.006 + 0.14 * P.room; R3.fill.intensity = 0.08 * P.room;
+  if (selected && !byId.has(selected.id)) selected = null; if (focus && !byId.has(focus.id)) focus = null;
+  if (selected) { R3.selRing.visible = true; R3.selRing.position.set(selected.x, WL + 0.006, selected.z); R3.selRing.scale.setScalar(selected.tailed ? 0.95 : selected.len * 1.5); } else R3.selRing.visible = false;
+  // Follow: the orbit centre glides with the selected body, or with what last happened
+  const f = selected || focus || Q[0]; if (f) R3.lampT.lerp(tgtV.set(f.x, 0, f.z), Math.min(1, dtReal * 1.2));
+  if (camMode === "follow" && f) { const want = tgtV.set(R3.lampT.x, WL, R3.lampT.z), d = _d.copy(want).sub(R3.ctl.target).multiplyScalar(Math.min(1, dtReal * 2)); R3.ctl.target.add(d); R3.cam.position.add(d); }
+}
+function updateLights() {
+  const t = simT, a = LT.pts.geometry.attributes, Pp = a.position.array, S = a.aSize.array, K = a.aK.array; let n = 0;
+  const put = (x, y, z, sz, k) => { if (n >= LT.N || k < 0.01) return; Pp[n * 3] = x; Pp[n * 3 + 1] = y; Pp[n * 3 + 2] = z; S[n] = sz; K[n] = k; n++; };
+  LT.list = LT.list.filter((L) => t - L.t0 < L.dur);
+  for (const L of LT.list) { const u = (t - L.t0) / L.dur, p = typeof L.at === "function" ? L.at() : L.at; if (p) put(p[0], p[1], p[2], L.size, L.k * Math.sin(Math.PI * Math.min(1, u * 4)) * (1 - u) * 1.6); }
+  // a body with a lamp glows from inside, and dims as the charge runs down
+  for (const b of F) if (b.D.light > 0.3 && !b.fade) put(b.x, floatY(b) + 0.01, b.z, 0.07 + 0.1 * b.D.light, (0.12 + 0.6 * (b.D.light - 0.3)) * (0.35 + 0.65 * b.E / b.cap) * (0.9 + 0.1 * Math.sin(U.uTime.value * 1.3 + b.bob)));
+  for (const q of Q) { if (q.state === "birth") { const w = worldOf(q, q.pumpP), k = 0.5 + 0.5 * Math.sin(simT * 2 * Math.PI * 2.2); put(w[0], w[1] + 0.03, w[2], 0.07, 0.5 + 1.2 * k); const m = worldOf(q, [q.baby ? q.baby.userData.rearX : 0, -0.5 * q.s.B, 0]); put(m[0], m[1], m[2], 0.2, 0.25 + 0.5 * k); }
+    else if (q.state === "print" && DEX.data) { const w = worldOf(q, dexFK(q, q.arm.q, "needle", 0)); put(w[0], w[1], w[2], 0.05, 1.3); }
+    const fl = Math.max(0, 1 - (simT - q.flashT) / 2.5); if (fl > 0) { const w = worldOf(q, [0, 0.02, 0]); put(w[0], w[1], w[2], 0.3, 0.9 * fl); } }
+  a.position.needsUpdate = a.aSize.needsUpdate = a.aK.needsUpdate = true; LT.pts.geometry.setDrawRange(0, n);
+  LT.pts.material.uniforms.uScale.value = CINE.h / (2 * Math.tan(R3.cam.fov * Math.PI / 360));
+}
+/* spoken lines: small type above the middle of the two speakers. Only the few nearest the camera's subject are shown, so the type can be read */
+const CAPB = { r: 0, b: 0, t: 0 };
+function speechDraw() { if (performance.now() - CAPB.t > 1000) { const c = $(".cap").getBoundingClientRect(), v = cv.getBoundingClientRect(); CAPB.r = c.right - v.left; CAPB.b = c.bottom - v.top; CAPB.t = performance.now(); }
+  const W = cv.clientWidth, H = cv.clientHeight, now = performance.now(), list = [];
+  for (const [key, s] of SPEECH) { const gone = (simT > s.until && now > s.real) || !byId.has(s.a.id); if (gone && now > (s.off || (s.off = now + 500))) { s.el.remove(); SPEECH.delete(key); continue; }
+    const a = s.a, b = s.b && byId.has(s.b.id) ? s.b : null, x = b ? (a.x + b.x) / 2 : a.x, z = b ? (a.z + b.z) / 2 : a.z, y = Math.max(floatY(a) + (a.tailed ? a.s.B : a.s.B * a.k), b ? floatY(b) + (b.tailed ? b.s.B : b.s.B * b.k) : 0) + 0.07;
+    tmpV.set(x, y, z).project(R3.cam); s.sx = (tmpV.x + 1) / 2 * W; s.sy = (1 - tmpV.y) / 2 * H; s.on = !gone && showTalk && tmpV.z < 1 && Math.abs(tmpV.x) < 0.94 && tmpV.y < 0.9 && tmpV.y > -0.95 && !(s.sx < CAPB.r + 130 && s.sy < CAPB.b + 70); s.d = R3.cam.position.distanceTo(_d.set(x, y, z));
+    s.pri = (DIR.shot && DIR.shot.C && key === "c" + DIR.shot.C.id ? -100 : 0) + (DIR.shot && DIR.shot.q && key === "q" + DIR.shot.q.id ? -90 : 0) + (selected && (a === selected || b === selected) ? -80 : 0) + s.d; list.push(s); }
+  list.sort((p, q) => p.pri - q.pri); const close = R3.cam.position.distanceTo(R3.ctl.target) < 4, shown = [], max = close ? 2 : 3; $("#labs").classList.toggle("wide", !close);
+  for (const s of list) { let ok = s.on && shown.length < max; if (ok) for (const o of shown) if (Math.abs(o.sx - s.sx) < 270 && Math.abs(o.sy - s.sy) < 90) { ok = false; break; }
+    if (ok) { shown.push(s); s.el.style.transform = `translate(-50%, -100%) translate(${s.sx.toFixed(1)}px, ${Math.max(70, s.sy).toFixed(1)}px)`; } s.el.classList.toggle("on", ok); }
+}
+
+/* ---------- the director: the Film camera goes between a slow wide shot of the tank and closer shots of a conversation or a birth ---------- */
+const DIR = { shot: null, t: 0, clock: 0, lastWide: -99, az: 0.3, last: null, log: [] };
+function eventShots() { const c = [];
+  for (const q of Q) { if (q.state === "birth") c.push({ kind: "birth", q, key: q, p: 6, dur: 13 }); else if (q.state === "print" && q.st > 0.5) c.push({ kind: "birth", q, key: q, p: 5, dur: 16 }); }
+  for (const C of convos) { if (C.done || C.n > 2) continue; const q = C.a.tailed ? C.a : C.b.tailed ? C.b : null; c.push({ kind: "talk", C, key: q || C.a, p: q ? 4 : 3, dur: 11 }); }
+  return c; }
+function shotTarget(S) { if (S.kind === "birth") { const q = S.q; if (S.kid && byId.has(S.kid.id)) return [S.kid.x, WL + 0.05, S.kid.z]; return worldOf(q, [reach(q) + 0.1, -0.04, 0]); }
+  const a = S.C.a, b = S.C.b; return [(a.x + b.x) / 2, WL + 0.1, (a.z + b.z) / 2]; }
+function director(dt) {
+  const C = CINE; if (camMode !== "film") { C.ap = camMode === "follow" ? 0.05 : 0; return; }
+  const D = DIR; D.t += dt; D.clock += dt; const S = D.shot;
+  if (S && S.kind === "birth") { if (S.t2 === undefined && S.q.state === "listen") S.t2 = D.t;
+    if (births !== S.b0) { S.b0 = births; const G = S.q.G, k = G && byId.get(G.ids[G.ids.length - 1]); if (k && k.age < 1) { S.kid = k; S.kidT = D.t; } }
+    if (S.kid && D.t - S.kidT > 3.2 && S.q.state !== "listen") S.kid = null; }      // the next of the brood: back to the mouth
+  const over = S && (S.kind === "wide" ? D.t > S.dur : S.kind === "talk" ? (S.C.closed && D.t - (S.tc ?? (S.tc = D.t)) > 1.2) || D.t > 30 : !byId.has(S.q.id) || (S.t2 !== undefined && D.t - S.t2 > 3) || D.t > 60);
+  const cutIn = S && S.kind === "wide" && D.t >= 4 && eventShots().some((e) => e.p >= 4);
+  const up = S && S.kind === "talk" && D.t >= 4 && eventShots().some((e) => e.kind === "birth" && e.q.state === "birth" && e.q.st < 0.3);
+  if (!S || (over && D.t >= 4) || cutIn || up) {
+    const ev = eventShots().filter((e) => !D.last || e.key !== D.last.key || e.kind !== D.last.kind || D.clock - D.lastEnd > 12); for (const e of ev) if (D.last && e.kind === D.last.kind) e.p -= 0.6; ev.sort((a, b) => b.p - a.p);
+    const since = D.clock - D.lastWide;
+    if (S && S.kind !== "wide") { D.last = S; D.lastEnd = D.clock; }
+    if (!ev.length || (S && S.kind !== "wide" && since > 34)) { D.shot = { kind: "wide", dur: ev.length ? 6 : 9, az: D.az }; D.lastWide = D.clock; D.az += 0.8; }
+    else { const e = ev[0]; e.side = rnd() < 0.5 ? 1 : -1; e.b0 = births; e.tgt = shotTarget(e); D.shot = e; }
+    D.t = 0; D.cut = true; }
+  const s = D.shot, u = clamp(D.t / (s.dur || 12), 0, 1); let pos, tgt;
+  if (s.kind === "wide") { const az = s.az + 0.03 * D.t, R = 12.6 - 0.6 * u; tgt = [0, -0.25, 0]; pos = [Math.sin(az) * R, 5.0 - 0.4 * u, Math.cos(az) * R]; C.ap = 0; }
+  else { const nt = shotTarget(s); s.tgt = D.cut ? nt : [0, 1, 2].map((i) => lerp(s.tgt[i], nt[i], Math.min(1, dt * 1.4))); tgt = s.tgt; let az, d;
+    if (s.kind === "birth") { az = s.q.h + s.side * (1.05 - 0.2 * u); d = 1.5 - 0.12 * u; }      // from in front and to one side of the mouth
+    else { const a = s.C.a, b = s.C.b, dd = Math.hypot(a.x - b.x, a.z - b.z), tq = a.tailed ? a : b.tailed ? b : null, o = tq === a ? b : a; d = clamp(dd * 1.1 + 1.15, 1.3, 2.5) * (1 - 0.06 * u);
+      if (s.ang === undefined) { s.ang = tq && !o.tailed ? Math.atan2(o.z - tq.z, o.x - tq.x) : Math.atan2(b.z - a.z, b.x - a.x) + Math.PI / 2; s.off = tq && !o.tailed ? 0.75 : 0.25;
+        const occ = (sd) => { const az0 = s.ang + sd * s.off, px = tgt[0] + Math.cos(az0) * d, pz = tgt[2] + Math.sin(az0) * d; let n = 0; for (const x of [...Q, ...F]) { if (x === a || x === b) continue; const ax = px - tgt[0], az_ = pz - tgt[2], t_ = clamp(((x.x - tgt[0]) * ax + (x.z - tgt[2]) * az_) / (ax * ax + az_ * az_), 0, 1); if (Math.hypot(tgt[0] + ax * t_ - x.x, tgt[2] + az_ * t_ - x.z) < (x.tailed ? 0.6 : 0.3)) n += x.tailed ? 3 : 1; } return n; };
+        s.side = occ(1) <= occ(-1) ? 1 : -1; }
+      az = s.ang + s.side * (s.off + 0.14 * u); }
+    pos = [tgt[0] + Math.cos(az) * d, tgt[1] + d * 0.42, tgt[2] + Math.sin(az) * d]; C.ap = 0.1; }
+  for (const q of Q) { const dx = pos[0] - q.x, dz = pos[2] - q.z; if (Math.hypot(dx, dz) < 0.75 && pos[1] < floatY(q) + q.s.B + 0.15) pos[1] = floatY(q) + q.s.B + 0.15; }
+  pos[1] = Math.max(pos[1], WL + 0.14);
+  if (D.cut) { R3.cam.position.set(...pos); R3.ctl.target.set(...tgt); D.cut = false; }
+  else { const k = Math.min(1, dt * 2.2); R3.cam.position.lerp(_d.set(...pos), k); R3.ctl.target.lerp(_d.set(...tgt), k); }
+  C.focus = R3.cam.position.distanceTo(R3.ctl.target);
+}
+
+/* ---------- panels ---------- */
+function hud() { const g = Q.map((q) => `#${q.id} <b>${q.gen}</b>`).join(" · "), live = F.filter((b) => !b.fade).length, st = Q.filter((q) => q.state !== "listen").length;
+  $("#hud").innerHTML = `t <b>${fmt(simT)}</b> · tailed ones <b>${Q.length}</b> · bodies without a tail <b>${live}</b> · births <b>${births}</b> · faded <b>${faded}</b><br>generations: ${g}<br>talking now <b>${convos.length}</b> · lines said <b>${said}</b> · printing or giving birth <b>${st}</b>`; }
+function spark(id, data) { const c = $(id), D = Math.min(2, devicePixelRatio || 1), w = c.clientWidth, h = c.clientHeight; if (!w) return; if (c.width !== w * D) { c.width = w * D; c.height = h * D; } const g = c.getContext("2d"); g.setTransform(D, 0, 0, D, 0, 0); g.clearRect(0, 0, w, h);
+  const mx = Math.max(4, ...data); g.strokeStyle = "#262628"; g.beginPath(); g.moveTo(0, h - 0.5); g.lineTo(w, h - 0.5); g.stroke(); if (!data.length) return;
+  g.strokeStyle = "#dedcd6"; g.lineWidth = 1; g.beginPath(); data.forEach((v, i) => { const x = data.length > 1 ? i / (data.length - 1) * w : 0, y = h - 2 - v / mx * (h - 6); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke();
+  g.fillStyle = "#9b9a94"; g.font = "10px JetBrains Mono, monospace"; g.fillText(String(data[data.length - 1]), 2, 10); }
+function bars() { const live = F.filter((b) => !b.fade), m = {}; for (const k of TALK.TRAITS) { m[k] = 0; for (const b of live) m[k] += b.D[k] / (live.length || 1); }
+  $("#bars").innerHTML = TALK.TRAITS.map((k) => `<span>${k}</span><i><u style="width:${(m[k] * 100).toFixed(0)}%"></u></i><output>${live.length ? m[k].toFixed(2) : ""}</output>`).join(""); }
+// the outline of a body from above, with a few lines for the quilting
+function outline(s) { const pts = [], x0 = -s.Lh / 2; for (let i = 0; i <= 8; i++) { const ph = i / 8 * Math.PI / 2; pts.push([x0 - s.R * Math.cos(ph), s.A * Math.sin(ph)]); }
+  for (let i = 1; i <= 12; i++) { const u = i / 12; pts.push([x0 + s.Lh * u, s.As + (s.A - s.As) * (1 - Math.pow(u, s.q))]); } pts.push([s.Lh / 2 + s.Ln, s.As * 0.9]);
+  const sc = 112, X = (x) => (31 + (x - (s.Ln - s.R) / 2) * sc).toFixed(1), Y = (y) => (17 + y * sc).toFixed(1);
+  let d = "M" + pts.map((p) => X(p[0]) + " " + Y(-p[1])).join(" L") + " L" + pts.slice().reverse().map((p) => X(p[0]) + " " + Y(p[1])).join(" L") + " Z", q = "";
+  const rows = clamp(Math.round(3 / (1 + s.sil[2])), 1, 5); for (let r = 1; r <= rows; r++) { const f = (r / (rows + 1)) * 2 - 1; q += "M" + pts.slice(3, -1).map((p) => X(p[0]) + " " + Y(p[1] * f)).join(" L") + " "; }
+  for (let r = 0; r < s.ribN && s.ribD > 0.004; r++) { const u = (r + 0.5) / s.ribN, x = x0 + s.Lh * u, a = s.As + (s.A - s.As) * (1 - Math.pow(u, s.q)); q += `M${X(x)} ${Y(-a)} L${X(x)} ${Y(a)} `; }
+  return `<svg viewBox="0 0 62 34" aria-hidden="true"><path class="q" d="${q}"/><path d="${d}"/></svg>`; }
+function grew(G) { const d = TALK.TRAITS.map((k) => [k, G.D[k] - G.D0[k]]).sort((a, b) => b[1] - a[1]), up = d.filter((x) => x[1] > 0.04).slice(0, 2).map((x) => x[0] + " up"), dn = d[d.length - 1][1] < -0.06 ? [d[d.length - 1][0] + " down"] : []; return up.concat(dn).join(", ") || "as the last"; }
+function lineage() { let h = "";
+  for (const q of Q) { const L = LIN.get(q.id), S = q.store, need = aloneQ(q) ? Math.min(P.need, 3) : P.need;
+    h += `<h4>#${q.id} <span>· ${L.length ? L.length + (L.length === 1 ? " generation" : " generations") : "no generation yet"} · ${q.state === "listen" ? "store " + Math.min(need, S.info).toFixed(1) + " of " + need : q.state === "print" ? "printing" : "giving birth"}</span></h4>`;
+    for (let i = L.length - 1; i >= 0; i--) { const G = L[i]; h += `<div class="gen${G.alive ? "" : " gone"}" data-q="${q.id}" data-g="${i}">${outline(G.s)}<p><b>G${G.gen}</b> · ${G.alive} of ${G.born} alive · ${esc(i === 0 ? "from own place" : grew(G))}<br>${esc(TALK.bodyText(G.D))}<br>Told: ${esc(G.note)}</p></div>`; } }
+  $("#lin").innerHTML = h; }
+$("#lin").addEventListener("click", (e) => { const el = e.target.closest(".gen"); if (!el) return; const G = LIN.get(+el.dataset.q)[+el.dataset.g], b = G.ids.map((id) => byId.get(id)).find((x) => x && !x.fade) || byId.get(+el.dataset.q); if (b) { selected = b; setCam("follow"); inspect(); } });
+function inspect() { const el = $("#insp"), a = selected; if (!a) { el.className = "note"; el.textContent = "Click a robot in the tank."; return; } el.className = "";
+  if (a.tailed) { const S = a.store, need = aloneQ(a) ? Math.min(P.need, 3) : P.need;
+    el.innerHTML = `<dl class="kv"><dt>Robot</dt><dd>#${a.id}, a tailed one, ${TALK.AT[placeOf(a.x, a.z)]}</dd><dt>Now</dt><dd>${a.state === "listen" ? "listening" : a.state === "print" ? "printing generation " + a.gen : "giving birth, generation " + a.gen}</dd><dt>Store</dt><dd>${S.info.toFixed(1)} of ${need} lines, ${S.topics.size} kinds, ${S.speakers.size} speakers</dd><dt>Gel, charge</dt><dd>${Math.round(a.E * 100)} percent</dd><dt>Design</dt><dd>${esc(TALK.bodyText(a.D))}</dd></dl><ul class="mem">${S.lines.slice().reverse().map((l) => `<li>${esc(TALK.cap(TALK.traceText(l)))}${l.from !== null && l.from !== undefined ? ` <em>from #${l.from}</em>` : " <em>read here</em>"}</li>`).join("")}</ul>`; }
+  else el.innerHTML = `<dl class="kv"><dt>Robot</dt><dd>#${a.id}, generation ${a.gen} of #${a.line}'s line</dd><dt>Body</dt><dd>${esc(TALK.bodyText(a.D))}</dd><dt>Traits</dt><dd>${TALK.TRAITS.map((k) => k + " " + a.D[k].toFixed(2)).join(", ")}</dd><dt>Charge</dt><dd>${Math.round(a.E / a.cap * 100)} percent</dd><dt>Age</dt><dd>${fmt(a.age)}</dd><dt>Now</dt><dd>${a.fade ? "fading" : a.talk ? "talking" : a.mode === "feed" ? "looking for light" : a.mode === "report" ? "going back to tell #" + a.line : "going to read " + TALK.PLACES[a.goalP ?? 4]}</dd><dt>Told at birth</dt><dd>${esc(a.note)}</dd></dl><ul class="mem">${a.mem.slice().reverse().map((m) => `<li>${esc(m.k === "trace" ? "Trace: " + m.txt : TALK.cap(TALK.traceText(m)))}${m.hops && m.k !== "trace" ? ` <em>by word of #${m.src}</em>` : ""}</li>`).join("")}</ul>`; }
+
+let last = performance.now(), acc = 0, lacc = 0;
+function frame(dtR) { U.uTime.value += dtR; updateScene(dtR); director(dtR); R3.ctl.update(); updateLights(); R3.r.shadowMap.needsUpdate = true; CINE.fin.uniforms.uExp.value = lerp(CINE.fin.uniforms.uExp.value, camMode === "above" ? 0.3 : 0.72, 0.1); cineRender(performance.now() / 1000, dtR); speechDraw(); }
+function loop(now) {
+  const dtR = Math.min(0.05, (now - last) / 1000); last = now;
+  if (running) { if (speed < 1) step(dtR * speed); else for (let i = 0; i < speed; i++) step(dtR); }
+  frame(dtR);
+  acc += dtR; if (acc > 0.5) { acc = 0; spark("#sp1", hist.pop); spark("#sp2", hist.talk); bars(); inspect(); hud(); }
+  lacc += dtR; if (linDirty || lacc > 2) { lacc = 0; linDirty = false; lineage(); }
+  requestAnimationFrame(loop);
+}
+const CAMS = { above: [[0, 16.5, 0.02], [0, 0, 0]] };
+function setCam(m) { camMode = m; document.querySelectorAll("[data-cam]").forEach((x) => x.classList.toggle("on", x.dataset.cam === m)); R3.moved = false; DIR.shot = null;
+  if (m === "tank") tankCam(); else if (CAMS[m]) { R3.cam.position.set(...CAMS[m][0]); R3.ctl.target.set(...CAMS[m][1]); } else if (m === "follow") { const f = selected || focus || Q[0]; if (f) { R3.lampT.set(f.x, 0, f.z); R3.cam.position.set(f.x + 0.9, 1.45, f.z + 2.0); R3.ctl.target.set(f.x, WL, f.z); } } }
+document.querySelectorAll("[data-cam]").forEach((b) => (b.onclick = () => setCam(b.dataset.cam)));
+$("#run").onclick = () => { running = !running; $("#run").textContent = running ? "Pause" : "Run"; $("#run").classList.toggle("on", running); };
+$("#reset").onclick = reset;
+$("#talkBtn").onclick = () => { showTalk = !showTalk; $("#talkBtn").classList.toggle("on", showTalk); $("#talkBtn").textContent = showTalk ? "Talk shown" : "Talk hidden"; };
+const SPEEDS = [0.25, 0.5, 1, 2, 3, 5, 8, 12];
+const setSpd = (v) => { speed = v; $("#spdV").textContent = v + "×"; $("#spdR").value = SPEEDS.indexOf(v) >= 0 ? SPEEDS.indexOf(v) : 2; };
+$("#spdR").oninput = () => setSpd(SPEEDS[+$("#spdR").value]);
+let downAt = null; cv.addEventListener("pointerdown", (e) => (downAt = [e.clientX, e.clientY]));
+cv.addEventListener("pointerup", (e) => { if (!downAt || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 5) return; const b = cv.getBoundingClientRect(); const rc = new THREE.Raycaster(); rc.setFromCamera({ x: (e.clientX - b.left) / b.width * 2 - 1, y: -(e.clientY - b.top) / b.height * 2 + 1 }, R3.cam); const hit = rc.intersectObjects(pickable, false)[0]; selected = hit ? hit.object.userData.agent : null; inspect(); });
+initThree(); tankCam(); R3.ctl.addEventListener("start", () => { R3.moved = true; if (camMode === "film") { camMode = "free"; document.querySelectorAll("[data-cam]").forEach((x) => x.classList.remove("on")); } });
+const embedSync = () => { const e = document.documentElement.classList.contains("bnm-embed"); R3.ctl.enableZoom = !e; }; embedSync(); new MutationObserver(embedSync).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+reset(); requestAnimationFrame(loop);
+// for tests: the state, and a way to run the model ahead without drawing
+window.__soc = { get Q() { return Q; }, get F() { return F; }, get convos() { return convos; }, get LIN() { return LIN; }, get simT() { return simT; }, get DIR() { return DIR; }, get seed() { return SEED; }, R3, CINE, setCam, setSpd, frame,
+  advance(sec, dt = 0.05) { for (let t = 0; t < sec; t += dt) step(dt); },
+  shot(e) { camMode = "film"; e.side = e.side || 1; e.b0 = births; e.dur = e.dur || 12; e.key = e.q || e.C.a; e.tgt = shotTarget(e); DIR.shot = e; DIR.t = 0; DIR.cut = true; },
+  stats() { const live = F.filter((b) => !b.fade); return { t: Math.round(simT), tailed: Q.length, bodies: live.length, births, faded, said, talks, gens: Q.map((q) => q.gen), meanAge: live.length ? Math.round(live.reduce((s, b) => s + b.age, 0) / live.length) : 0 }; } };
+</script>
+</body></html>
