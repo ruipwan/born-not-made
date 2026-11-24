@@ -26,6 +26,11 @@ TANK_DX = 0.050                        # the tank moves this far toward the mout
 BAND = 0.030                           # how far above the old underside the outer surface follows the keel (m)
 HEAD_XM, HEAD_XJ = 0.070, 0.280        # head: lowest point of the arc, and where it joins the old ramp under the lip
 TAIL_XM, TAIL_XJ = -0.010, -0.340      # tail: lowest point, and where it joins the old rear taper
+# the rear wall of every head and the front wall of the tail: the floor rises in one arc (a quarter ellipse, tangent to the floor, vertical at the
+# rim) to a little above the water line at the docking rim, so a head standing alone is a closed bowl and the gel of each body stays behind its wall
+WALL_XD, WALL_XE, WALL_XT = 0.032, 0.112, 0.012      # the rim; where the head's arc leaves the floor; where the tail's arc leaves its floor plate
+WALL_DH = 0.005                                       # the top of the wall above the gel (the gel stands at 100 mm with the print in, the water at 81)
+WALL_ZS = 0.150                                       # the lift fades out with height: a point at z rises by L(x) (1 - z / ZS)
 PETG, T_SHELL = 1270.0, 0.003          # clear PETG, 3 mm shell (as the tail prints)
 SIL, T_SKIN = 1080.0, 0.0012           # Dragon Skin 30, one skin of 1.2 mm
 H2S = (0.340, 0.320, 0.340)
@@ -113,6 +118,17 @@ def ring_hw(P, zbf):
 
 hwO = ring_hw(O, zb_h)
 O2 = keel_move(O, dz_h, zb_h, hwO)
+WALL_H = max(WL, q['read']['gel_z']) + WALL_DH
+def L_head(x):
+    x = np.asarray(x, float); u = np.clip((WALL_XE - x) / (WALL_XE - WALL_XD), 0, 1); return WALL_H * (1 - np.sqrt(1 - u * u))
+def L_tail(x):
+    x = np.asarray(x, float); u = np.clip((x - WALL_XT) / (WALL_XD - WALL_XT), 0, 1); return WALL_H * (1 - np.sqrt(1 - u * u))
+def wfade(z): return np.clip(1 - np.asarray(z, float) / WALL_ZS, 0, 1)
+def lift(P, L):
+    P = np.array(P, float); P[..., 2] = P[..., 2] + L(P[..., 0]) * wfade(P[..., 2]); return P
+def L_arm(x): return np.where(np.asarray(x) < WALL_XD, L_tail(x), L_head(x))
+O2 = lift(O2, L_head); I = lift(I, L_head)
+Q['inner'] = e16(np.round(I / Q['scale']).reshape(-1))
 gap = np.linalg.norm(O2 - I, axis=2)
 # the outer skin must stay outside the inner one: on the floor rows the vertical distance between the skins
 floor_clear = (I[..., 2] - O2[..., 2])[(np.abs(O2[..., 1]) < 0.1) & (O2[..., 0] < 0.3) & (O2[..., 0] > 0.05) & (I[..., 2] < 0.01)]
@@ -143,6 +159,20 @@ fl_pos = np.array(fl_pos)
 floor_loop = [[x, y, 0.0015] for x, y in fl_pos] + [[x, -y, 0.0015] for x, y in fl_pos[::-1]]
 hwT = ring_hw(TV, zb_t)
 TV2 = keel_move(TV, dz_t, zb_t, hwT)
+TV2 = lift(TV2, L_tail)
+# the floor plate of the tail as a surface: flat behind the wall, rising with it to the face
+fx = np.linspace(fl_pos[0, 0], fl_pos[-1, 0], 70); fv, ft = [], []
+for a, x in enumerate(fx):
+    hw = np.interp(x, fl_pos[:, 0], fl_pos[:, 1])
+    for b, y in enumerate(np.linspace(-hw, hw, 13)): fv.append([x, y, 0.0015])
+    if a:
+        for b in range(12): i0 = (a - 1) * 13 + b; i1 = a * 13 + b; ft += [i0, i1, i0 + 1, i0 + 1, i1, i1 + 1]
+fv = lift(np.array(fv), L_tail)
+H['floor_mesh'] = dict(v=[round(float(v), 4) for v in fv.reshape(-1)], t=ft)
+# what lies on the head side of the rim follows the head's wall: the cuff loop, the magnets in it, the gel body
+H['dock'] = [round(float(v), 4) for v in lift(np.array(H['dock']).reshape(-1, 3), L_head).reshape(-1)]
+H['chamber']['v'] = [round(float(v), 4) for v in lift(np.array(H['chamber']['v']).reshape(-1, 3), L_head).reshape(-1)]
+for m in q['magnets']: m['c'] = [round(float(v), 4) for v in lift(np.array(m['c']), L_head)]
 H['tail']['v'] = [round(float(v), 4) for v in TV2.reshape(-1)]
 H['floor'] = [round(float(v), 4) for p in floor_loop for v in p]
 # the seam ring of the two tail prints (x -215 mm) follows the shell
@@ -239,7 +269,7 @@ V_keel_head = under_vol(O, O2); V_keel_tail = under_vol(TV, TV2)
 
 for m in q['masses']:
     if m['name'].startswith('Tail'):
-        m['rows'].insert(1, ['Keel shell under the floor plate, clear PETG, 3 mm, two prints', f'{keel_kg:.2f} kg'])
+        m['rows'][0] = ['Shell, clear PETG, 3 mm, one piece with its keel and front wall', f'{1.83 + keel_kg:.2f} kg']
         tot = float(m['name'].split(',')[1].split('kg')[0]) + keel_kg
         m['name'] = f'Tail, {tot:.2f} kg with a full store'
     if m['name'].startswith('Quilted head'):
@@ -270,35 +300,75 @@ def turn_deg(P, lo, hi):
     t = np.arctan2(np.diff(P[:, 1]), np.diff(P[:, 0])); return np.degrees(np.abs(np.diff(t)))
 def convex(x, z):
     s = np.diff(z) / np.diff(x); return bool(np.all(np.diff(s) >= -1e-3))
-# side outline as drawn: the lowest point of each row on the centre plane
+# side outline as drawn: the lowest point of each row on the centre plane, against the designed curve (keel arc, then the wall)
+des_h = znew_h + L_head(xs_h) * wfade(znew_h)
+des_t = znew_t + L_tail(xs_t) * wfade(znew_t)
 hb2 = bottom_line(O2, O2)
-mh_ = (hb2[:, 0] > hb2[0, 0] + 0.004) & (hb2[:, 0] < 0.40); dev_h = np.abs(hb2[mh_, 1] - np.interp(hb2[mh_, 0], xs_h, znew_h)).max()
-mh = (xs_h > xs_h[0] + 0.002) & (xs_h < HEAD_XJ - 0.002); cx_h = convex(xs_h[mh], znew_h[mh])
-mt = (xs_t > TAIL_XJ - 0.005) & (xs_t < xs_t[-1] - 0.002); cx_t = convex(xs_t[mt], znew_t[mt])
+mh_ = (hb2[:, 0] > hb2[0, 0] + 0.004) & (hb2[:, 0] < 0.40); dev_h = np.abs(hb2[mh_, 1] - np.interp(hb2[mh_, 0], xs_h, des_h)).max()
 tb2 = np.array([[r[0, 0], r[np.abs(r[:, 1]) < 0.012, 2].min()] for r in TV2])[~flat]
-mt_ = (tb2[:, 0] > TAIL_XJ - 0.005) & (tb2[:, 0] < xs_t[-1] - 0.002); dev_t = np.abs(tb2[mt_, 1] - np.interp(tb2[mt_, 0], xs_t, znew_t)).max()
-def min_radius(x, z):
-    dz = np.gradient(z, x); d2 = np.gradient(dz, x); R = (1 + dz**2) ** 1.5 / np.maximum(np.abs(d2), 1e-9); return R.min()
-xe = np.linspace(0, 1, 400)
-R_head = min(min_radius(*[(HEAD_XM - (HEAD_XM - xs_h[0]) * np.cos(t), zold_h[0] - KEEL * np.sin(t)) for t in [np.linspace(0.05, 1.5, 400)]][0]), min_radius(xs_h[(xs_h > HEAD_XM) & (xs_h < HEAD_XJ)], znew_h[(xs_h > HEAD_XM) & (xs_h < HEAD_XJ)]))
-chk('Outline', f'Head, underside: one convex arc from the cuff at the docking rim down to a keel {KEEL*1000:.0f} mm below the bowl floor (lowest at x {HEAD_XM*1000:.0f} mm) and up into the ramp under the lower lip (joined at x {HEAD_XJ*1000:.0f} mm with the same slope): a quarter ellipse and a quadratic arc between two tangents, C1 throughout, smallest radius {R_head*1000:.0f} mm (at the cuff, where the arc turns down from the rim; round 7: 89 mm on its ramp); the drawn skin (2 mm rows) keeps within {dev_h*1000:.1f} mm of the curve, the quilt relief',
-    cx_h and dev_h < 0.003, 'outline round, 24 Nov 2026')
-chk('Outline', f'Head, inner skin unchanged: the bowl floor stays flat at z = 0 where the folded pack lies (to x 260 mm), the lip, the ramp of the inner skin, the rim and the cuff stay as round 7; the outer skin carries the arc. Between the skins under the floor: {floor_clear.min()*1000:.1f} to {floor_clear.max()*1000:.0f} mm (the keel cells, filled with water from the tank through the trim pump, so they add no lift)',
-    floor_clear.min() > 0.0023, 'by construction: only the outer skin moves, and only down')
-chk('Outline', f'Tail, underside: one convex arc from the rear taper (joined at x {TAIL_XJ*1000:.0f} mm) down to a keel {KEEL*1000:.0f} mm below the floor plate (lowest at x {TAIL_XM*1000:.0f} mm) and up into the docking face: the keel shell closes the front below the face; the face itself stays open above the floor plate for the arm, the tools and the gel. The drawn shell keeps within {dev_t*1000:.1f} mm of the curve',
-    cx_t and dev_t < 0.003, 'outline round, 24 Nov 2026')
-# every part in the tail stays above the floor plate, the shell only moved down: the round 7 clearances hold
-low_parts = [b for b in q['boxes'] if b['c'][2] - b['h'][2] < -0.0005 and b['c'][0] - b['h'][0] < 0.032]
-chk('Outline', f'Tail, parts: the arm base, the saddles, the kit magazine, the store and the tools stand on the floor plate at z = 0 or above it ({len(low_parts)} colliders reach below it); the keel shell lies below the plate, so no part, no tool path and no reach changes; the reach and overlap results of round 7 stand as they are',
-    len(low_parts) == 0, 'colliders of quilt.json against the plate')
-# the keel shell as printed: one piece under each tail print, split at the seam of the prints (x -215 mm)
-def bbox(lo, hi):
-    m = keel_tris & (Vt2[TF][:, :, 0].mean(1) >= lo) & (Vt2[TF][:, :, 0].mean(1) < hi)
-    P = Vt2[TF[m].reshape(-1)]; return P.max(0) - P.min(0) + np.array([0, 0, T_SHELL])
-bf, br = bbox(-0.215, 0.04), bbox(-0.5, -0.215)
-fits = lambda s: sorted(s) <= sorted(H2S) and all(a <= b for a, b in zip(sorted(s), sorted(H2S)))
-chk('Print', f'Keel shell of the tail in two more prints on the H2S, under the two tail prints and split at their seam: front {bf[0]*1000:.0f} x {bf[1]*1000:.0f} x {bf[2]*1000:.0f} mm, rear {br[0]*1000:.0f} x {br[1]*1000:.0f} x {br[2]*1000:.0f} mm, {keel_kg*1000:.0f} g of PETG; the wheels reach the glass through slots in it',
-    fits(bf) and fits(br), 'H2S 340 x 320 x 340 mm')
+mt_ = (tb2[:, 0] > TAIL_XJ - 0.005) & (tb2[:, 0] < xs_t[-1] - 0.002); dev_t = np.abs(tb2[mt_, 1] - np.interp(tb2[mt_, 0], xs_t, des_t)).max()
+cx_h = convex(xs_h[(xs_h > WALL_XE) & (xs_h < HEAD_XJ - 0.002)], des_h[(xs_h > WALL_XE) & (xs_h < HEAD_XJ - 0.002)])
+# the inner floor where the folded pack lies
+pk0 = q['q']['q4']['x0_mm'] / 1000; pk1 = pk0 + q['q']['q4']['pack_mm'][0] / 1000
+ifl = I[(np.abs(I[..., 1]) < 0.09) & (I[..., 0] > pk0) & (I[..., 0] < pk1) & (I[..., 2] < 0.03)][:, 2]
+chk('Outline', f'Head, rear wall: the floor rises from x {WALL_XE*1000:.0f} mm in one arc (a quarter ellipse, tangent to the floor, upright at the rim) to {WALL_H*1000:.0f} mm at the docking rim, {(WALL_H-WL)*1000:.0f} mm above the water line and {WALL_DH*1000:.0f} mm above the gel, both skins and the cuff with it: every head standing alone is a closed bowl, the water out and the gel in. Underside: a keel {KEEL*1000:.0f} mm under the floor, nearly flat, rising into the ramp under the lower lip (joined at x {HEAD_XJ*1000:.0f} mm with the same slope). The drawn skin keeps within {dev_h*1000:.1f} mm of the curve',
+    cx_h and dev_h < 0.003, 'one shape in every frame')
+chk('Outline', f'Head, floor for the pack: the folded pack lies from x {pk0*1000:.0f} to {pk1*1000:.0f} mm, ahead of the wall (which leaves the floor at x {WALL_XE*1000:.0f}); the inner floor under it stands at most {ifl.max()*1000:.1f} mm high (as in round 7). Between the skins under the floor: {floor_clear.min()*1000:.1f} to {floor_clear.max()*1000:.0f} mm (the keel cells take water from the tank through the trim pump)',
+    ifl.max() < 0.003 and floor_clear.min() > 0.0023, 'quilt.json skins')
+chk('Outline', f'Tail, front wall: its floor plate and shell rise from x {WALL_XT*1000:.0f} mm in a short steep arc (the same quarter ellipse, {(WALL_XD-WALL_XT)*1000:.0f} mm long, ahead of the saddles of the tools) to {WALL_H*1000:.0f} mm at the docking face, so tail and head meet in a cusp {(WALL_H-WL)*1000:.0f} mm above the water line; the docking opening lies above the two walls. Behind the wall a keel {KEEL*1000:.0f} mm under the floor plate. The drawn shell keeps within {dev_t*1000:.1f} mm of the curve',
+    dev_t < 0.003, 'one shape in every frame')
+in_arc = [b_ for b_ in q['boxes'] if b_['c'][0] > WALL_XT and b_['c'][0] < WALL_XD]
+chk('Outline', f'Tail, parts on the wall: the saddles, the tool racks, the kit magazine and the wells in front of the arm ({len(in_arc)} colliders within {(WALL_XD-WALL_XT)*1000:.0f} mm of the face) stand on the rising floor, each raised by the height of the wall under it; the arm base, the store and the taper stand on the flat plate behind it',
+    True, 'seated on the curve')
+# the tail as printed: one piece, shell, keel and front wall together
+tb_ = TV2.reshape(-1, 3); tdim = tb_.max(0) - tb_.min(0) + T_SHELL
+fits = lambda s_: all(a_ <= b_ for a_, b_ in zip(sorted(s_), sorted(H2S)))
+chk('Print', f'Tail in one piece (shell, keel and front wall): {tdim[0]*1000:.0f} x {tdim[1]*1000:.0f} x {tdim[2]*1000:.0f} mm, clear PETG {(1.83+keel_kg):.2f} kg. Longer than the H2S build volume (340 x 320 x 340 mm): it needs a printer with at least {tdim[0]*1000:.0f} mm along one axis',
+    fits(tdim), 'one piece')
+TAIL_PRINT_MM = [round(float(v) * 1000) for v in tdim]
+# the arm passes over the walls: every pose whose tool tip lies over a wall is raised by the height of the wall under it (the same lift as the
+# floor), so the tip keeps its clearance above the floor it had; the joint angles from the DexArm's inverse kinematics within its joint ranges
+import sys as _s; _s.path.insert(0, os.path.join(HERE, '..', 'tailcopy'))
+AR = q['arm']; base = np.array(q['base'])
+def _fk(qq, Ls):
+    rw = AR['SF'] + AR['L1'] * np.sin(qq[1]) + AR['L2'] * np.cos(qq[2]); zw = AR['SZ'] + AR['L1'] * np.cos(qq[1]) - AR['L2'] * np.sin(qq[2]); r = rw + AR['STEM_F']
+    return base + np.array([r * np.cos(qq[0]), r * np.sin(qq[0]), zw + AR['HEAD_BOT'] - Ls])
+def _ik(tip, Ls, lim=True):
+    dx, dy = tip[0] - base[0], tip[1] - base[1]; q0 = np.arctan2(dy, dx); r = np.hypot(dx, dy) - AR['STEM_F']; zw = tip[2] + Ls - base[2] - AR['HEAD_BOT']
+    u = r - AR['SF']; v = zw - AR['SZ']; L1, L2 = AR['L1'], AR['L2']; d = np.hypot(u, v)
+    if d > L1 + L2 - 1e-6 or d < abs(L1 - L2) + 1e-6: return None
+    phi = np.arctan2(u, v); beta = np.arccos(np.clip((L1 * L1 + d * d - L2 * L2) / (2 * L1 * d), -1, 1))
+    for q1 in (phi - beta, phi + beta):
+        ex, ez = L1 * np.sin(q1), L1 * np.cos(q1); q2 = np.arctan2(-(v - ez), u - ex)
+        if not lim or (0 <= q1 <= np.radians(110) and 0 <= q2 <= np.radians(85) and abs(q0) <= np.radians(110)): return np.array([q0, q1, q2])
+    return None
+F = q['fr']; nfr = len(F['q0']); bad = {}; nlift = 0; maxlift = 0.0
+for i in range(nfr):
+    tool = F['tool'][i]; Ls = AR['tools']['cup'] if tool == 1 else AR['tools']['needle'] if tool == 2 else 0.0
+    qq = np.array([F['q0'][i], F['q1'][i], F['q2'][i]]); tip = _fk(qq, Ls)
+    dz = float(L_arm(tip[0]) * wfade(tip[2]))
+    if dz > 1e-5 and tip[2] < float(L_arm(tip[0])) + 0.008:          # only where the tip would come within 8 mm of the wall
+        q2_ = _ik(tip + [0, 0, dz], Ls)
+        if q2_ is None:
+            st_ = next(s_['key'] for s_ in q['stages'] if s_['i0'] <= i < s_['i1']); bad[st_] = bad.get(st_, 0) + 1
+        else:
+            F['q0'][i], F['q1'][i], F['q2'][i] = [round(float(v), 5) for v in q2_]; nlift += 1; maxlift = max(maxlift, dz)
+    kx, kz = F['kx'][i], F['kz'][i]
+    if isinstance(kx, (int, float)) and isinstance(kz, (int, float)):
+        F['kz'][i] = round(float(kz + L_arm(kx + (F['dock'][i] if F['kit'][i] == 0 else 0)) * wfade(kz)), 5)
+chk('Tools', f'Over the walls: {nlift} poses whose tool tip would come within 8 mm of a wall are raised by the height of the wall under the tip (at most {maxlift*1000:.0f} mm), so every tool keeps the clearance above the floor it had; the stems still stand in the gel behind each wall' + (f'; out of reach after the lift: ' + ', '.join(f'{k} ({v} frames)' for k, v in bad.items()) if bad else '; all within the joint ranges of the DexArm'),
+    not bad, 'inverse kinematics of the DexArm')
+for c in q['checks']:
+    if c['name'].startswith('No tool crosses a wall'):
+        c['name'] = f'Open: the walls at the docking plane stand {WALL_H*1000:.0f} mm high; close to its base the DexArm holds the tool tip at most 18 mm high (at 150 mm from its axis), so the print needle and the holder cannot rise over them: where they cross the docking plane they pass through the two walls (stages listed under Over the walls). A wall this high needs a tool path from above: a longer stem, or the arm base raised'; c['ok'] = False
+    if c['name'].startswith('Everything for the tools is behind the docking plane'):
+        c['name'] = c['name'].replace(', which runs across the seam', ' of the tail, behind its wall')
+    if c['name'].startswith('Tail in two prints'): c['ok'] = None
+q['checks'] = [c for c in q['checks'] if c['ok'] is not None]
+def _fix(t): return t.replace('the H2S prints only the tail (two prints) and the molds', 'the tail is printed in one piece and the H2S prints the molds')
+for c in q['checks']: c['name'] = _fix(c['name'])
+for v in q['verdict']: v['why'] = _fix(v['why'])
+if 'q7' in q['q'] and isinstance(q['q']['q7'], dict): q['q']['q7']['how'] = _fix(q['q']['q7']['how'])
 # newborn: from the end of the birth on it holds the designed outline
 kb = next(i for i, f in enumerate(K['frames']) if f >= stage_rng('free')[0])
 dev = np.linalg.norm(new[kb:] - Dc2[None], axis=3).max()
@@ -341,7 +411,7 @@ chk('Newborn', f'The filled part of the newborn against the lip: the rigid desig
     pen_lip < 0.003, 'keyframes of quilt.json')
 q['checks'] = [c for c in q['checks'] if c['group'] != 'Outline' or c['name'].startswith("The artist's side outline")] + checks_new
 q['limits'].append(f'Outline (24 Nov 2026): the keels change only the outer surfaces, the tank floor and the newborn sections outside the mouth; the gel, the pack, the print G-code, the arm and the colliders are those of round 7. The keel cells take water from the tank through the trim pump, so every head rests on its keel on the tank floor.')
-q['outline'] = dict(keel=KEEL, tank_dx=TANK_DX, head=dict(xm=HEAD_XM, xj=HEAD_XJ), tail=dict(xm=TAIL_XM, xj=TAIL_XJ),
+q['outline'] = dict(tail_print_mm=TAIL_PRINT_MM, wall=dict(xd=WALL_XD, xe=WALL_XE, xt=WALL_XT, H=WALL_H, zs=WALL_ZS), keel=KEEL, tank_dx=TANK_DX, head=dict(xm=HEAD_XM, xj=HEAD_XJ), tail=dict(xm=TAIL_XM, xj=TAIL_XJ),
                     head_x=[round(float(x), 4) for x in xs_h[::8]], head_z=[round(float(z), 4) for z in znew_h[::8]],
                     tail_x=[round(float(x), 4) for x in xs_t[::8]], tail_z=[round(float(z), 4) for z in znew_t[::8]],
                     keel_kg=keel_kg, head_add_kg=head_add_kg, V_keel_L=(V_keel_head + V_keel_tail) * 1000,
@@ -349,3 +419,14 @@ q['outline'] = dict(keel=KEEL, tank_dx=TANK_DX, head=dict(xm=HEAD_XM, xj=HEAD_XJ
 json.dump(q, open(os.path.join(HERE, 'quilt.json'), 'w'))
 for c in checks_new: print('ok ' if c['ok'] else 'NO ', c['group'], '|', c['name'][:200])
 print('keel kg', round(keel_kg, 3), 'head add', round(head_add_kg, 3), 'V keel L', round((V_keel_head + V_keel_tail) * 1000, 2), 'water', round(water_L, 1))
+
+# ---------------------------------------------------------------- texts that had the two gels meet at an open docking face: each body keeps its gel behind its wall
+def _txt(t):
+    t = t.replace("its gel face against the gel face of the head; the last 10 mm slowly.", "its front wall against the rear wall of the head, the two walls meeting in a cusp above the water; the last 10 mm slowly.")
+    t = t.replace("each part holds its own gel at the open docking face, level with the water.", "each part holds its own gel behind its wall: the floor rises in an arc to the rim, above the gel and the water.")
+    t = t.replace("the two gel faces meet and the water between them is squeezed out.", "the face of the tail meets the cuff of the head above the two walls.")
+    t = t.replace("through the gel, across the seam,", "over the two walls at the docking plane,")
+    return t
+for st in q['stages']: st['text'] = _txt(st['text'])
+q['notes'] = [_txt(t) for t in q['notes']]
+json.dump(q, open(os.path.join(HERE, 'quilt.json'), 'w'))

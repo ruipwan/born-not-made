@@ -255,8 +255,8 @@ html.bnm-embed .bottom .area, html.bnm-embed .info { overflow: visible; }
   <p>The Python pipeline of the simple version (<code>bnm_design/quilt/sim/design.py</code>, round 11) builds the tail, plans every move of the arm and writes <code>quilt.json</code>; here it runs with the enlarged lower shell and with the next head as its print. A second script (<code>bnm_design/quilt/derive.py</code>) solves the quilt: the cells are placed on the true head surface by dart throwing with a size field and a turning direction field, each cell gets webs and two bulging skins, and the section above the gel is checked as a two hinged arch on the lobe (loads times 2, the ballooning limit of the largest bulge divided by 1.5, wrinkling of the skin on the compression side). The same script tries the birth through the mouth against the true mouth rim and the reach of the DexArm (official joint ranges). The browser replays and interpolates.</p>
   <p>Colliders: the inner skin of the head (the inner face of the simple head, the cells bulge out from it), the saddles, the kit magazine and its spare kits, the parts of the store, the seat, the eight arm links, the module head and stem, the magnet, the parked modules, the kit, the folded next head as it is printed, and the newborn in every frame of the birth (its outer and inner skin against the inner skin and the quilt of the head, the lip, the rolled mouth edge, the tank floor, the arm, the holder and its crank). Every frame is tested for every pair; the Checks panel lists the deepest overlap of each pair.</p>
   <h4>What is printed where</h4>
-  <p>The H2S prints only the tail, in two prints, unchanged from the simple version, and the molds of the first head. The heads are silicone: the first one cast in a two part mold (or printed in a gel bath outside the tank beforehand), every later one printed folded flat by the arm in the gel of its parent.</p>
-  <table><tr><th>Part</th><th>Where</th><th>Size</th><th>Material</th></tr><tr><td>Tail, front</td><td>H2S, <a href="../simple/print/bnm_simple_tail_front.stl">bnm_simple_tail_front.stl</a></td><td>336 x 314 x 251 mm on the plate</td><td>clear PETG, 1.02 kg, about 23 h</td></tr><tr><td>Tail, rear</td><td>H2S, <a href="../simple/print/bnm_simple_tail_rear.stl">bnm_simple_tail_rear.stl</a></td><td>318 x 222 x 226 mm on the plate</td><td>clear PETG, 0.48 kg, about 11 h</td></tr><tr><td>First head (generation 0)</td><td>cast outside the tank, before the first cycle</td><td>the head form with the enlarged lobe, 1.17 L of silicone</td><td>Dragon Skin 30</td></tr><tr><td>Every later head</td><td>printed by the arm, folded flat, in the gel of its parent</td><td>123 x 194 x 79 mm folded, 18 layers</td><td>Dragon Skin 30 in Carbopol</td></tr></table>
+  <p>The tail is printed in one piece, its shell, keel and front wall together; the H2S prints the molds of the first head. The heads are silicone: the first one cast in a two part mold (or printed in a gel bath outside the tank beforehand), every later one printed folded flat by the arm in the gel of its parent.</p>
+  <table><tr><th>Part</th><th>Where</th><th>Size</th><th>Material</th></tr><tr id="tailRow"><td>Tail, one piece</td><td>a printer larger than the H2S</td><td></td><td>clear PETG</td></tr><tr><td>First head (generation 0)</td><td>cast outside the tank, before the first cycle</td><td>the head form with the enlarged lobe, 1.17 L of silicone</td><td>Dragon Skin 30</td></tr><tr><td>Every later head</td><td>printed by the arm, folded flat, in the gel of its parent</td><td>123 x 194 x 79 mm folded, 18 layers</td><td>Dragon Skin 30 in Carbopol</td></tr></table>
   <h4>The tank</h4>
   <p id="tankp"></p>
   <h4>Staging</h4>
@@ -667,9 +667,9 @@ function placeTiles(S) {          // round 5: which tile set rides on the magnet
   BB.seat1.visible = k === 2 && !birth;          // round 7: the first set stays on the gel floor during the second trip (it vanished before the print)
   BB.nbT.forEach((c, i) => { c.visible = birth; if (!birth) return; const F = J.read.tilef[i], nk = J.nbk.frames.length, k0 = Math.min(nk - 1, Math.floor(S.nbi)), k1 = Math.min(nk - 1, k0 + 1), f = S.nbi - k0, r = [];
     for (let j = 0; j < 9; j++) r.push(F[9 * k0 + j] * (1 - f) + F[9 * k1 + j] * f); c.matrix.copy(tileMat(r));
-    if (NB.F && (NB.u > 1e-4 || NB.dz > 0)) { const Fc = NB.F; c.matrix.copy(sillTile(c.matrix, NB.u, (p) => [p.clone().sub(Fc.c0).dot(Fc.ex) + SILL.xd, p.clone().sub(Fc.kp).dot(Fc.ez) - 0.0025], NB.dir, Fc.ey)); c.matrix.premultiply(Tm([0, 0, NB.dz])); }          // round 23: the tile sets ride the bolster and float with the newborn
+    if (NB.F) { const Fc = NB.F; c.matrix.copy(sillTile(c.matrix, 1, (p) => [p.clone().sub(Fc.c0).dot(Fc.ex) + SILL.xd, p.clone().sub(Fc.kp).dot(Fc.ez) - 0.0025], NB.dir, Fc.ey)); c.matrix.premultiply(Tm([0, 0, NB.dz])); }          // round 23: the tile sets ride the bolster and float with the newborn
     c.matrixWorldNeedsUpdate = true; });
-  const uh = S.sill ? S.sill.uh : 0; BB.parT.forEach((c, i) => { c.matrix.copy(sillTile(tileMat(J.read.tilep[i]), uh, (p) => [p.x, p.z], new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 1, 0))); c.matrixWorldNeedsUpdate = true; });
+  const uh = 1; BB.parT.forEach((c, i) => { c.matrix.copy(sillTile(tileMat(J.read.tilep[i]), uh, (p) => [p.x, p.z], new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 1, 0))); c.matrixWorldNeedsUpdate = true; });
 }
 function applyDip(d) {
   if (!PARTS.dipG || Math.abs(d - (PARTS.dipD || 0)) < 2e-5) return; PARTS.dipD = d; const xs = J.read.x_s, xl = J.mouth.lip[0];
@@ -683,7 +683,9 @@ function applyDip(d) {
    rises by a rounded roll near the rim (the filled bolster). calc/sill23.py has the same formula and the same Archimedes draft. */
 const SILL = { xd: 0.032, xe: 0.110, zs: 0.110, roll: 0.007 };
 const sss = (u) => { u = clamp(u, 0, 1); return u * u * (3 - 2 * u); };
-function sillL(x) { return SILL.zs * sss((SILL.xe - x) / (SILL.xe - SILL.xd)); }
+function sillL(x) { const u = clamp((SILL.xe - x) / (SILL.xe - SILL.xd), 0, 1); return SILL.H * (1 - Math.sqrt(1 - u * u)); }          // the rear wall of every head (outline round 3)
+function wallT(x) { const u = clamp((x - SILL.xt) / (SILL.xd - SILL.xt), 0, 1); return SILL.H * (1 - Math.sqrt(1 - u * u)); }          // the front wall of the tail
+function wallSync() { const w = J.outline && J.outline.wall; if (w) Object.assign(SILL, { xd: w.xd, xe: w.xe, xt: w.xt, H: w.H, zs: w.zs }); }
 function sillW(zo) { return clamp(1 - zo / SILL.zs, 0, 1); }
 function sillRoll(x) { const t = (x - SILL.xd - 0.012) / 0.016; return x < SILL.xe ? SILL.roll * Math.exp(-t * t) : 0; }
 function sillSlope(x) { const h = 0.0005; return (sillL(x + h) - sillL(x - h)) / (2 * h); }
@@ -899,8 +901,9 @@ function setNewborn(nbi) {
 // round 23: the cut outs of the head and the tail follow the bodies (they stayed where the parent body stands at the start); under a raised sill there is water again
 function sillWaterMasks(S, uh) {
   if (!WMASK.uMB) return; if (!WMASK.b0) WMASK.b0 = WMASK.uMB.value.slice(); const b = WMASK.uMB.value, F = WMASK.uMF.value;
-  const xc = uh * SILL.zs > J.WL ? SILL.xe - (SILL.xe - SILL.xd) * sillInv(J.WL / (uh * SILL.zs)) : -9;
+  const v = clamp(1 - J.WL / SILL.H, 0, 1), xc = SILL.xe - (SILL.xe - SILL.xd) * Math.sqrt(1 - v * v), xct = SILL.xt + (SILL.xd - SILL.xt) * Math.sqrt(1 - v * v);
   for (let k = 0; k < b.length; k++) b[k] = F.z + k * F.w < xc ? -1 : WMASK.b0[k];
+  { if (!WMASK.t0) WMASK.t0 = WMASK.uTB.value.slice(); const bt = WMASK.uTB.value, Ft = WMASK.uTF.value; for (let k = 0; k < bt.length; k++) bt[k] = Ft.z + k * Ft.w > xct ? -1 : WMASK.t0[k]; }
   F.x = S.hdx || 0; F.y = S.hdy || 0; WMASK.uTF.value.x = R3.tail.position.x; WMASK.uTF.value.y = R3.tail.position.y;
 }
 function sillInv(v) { let lo = 0, hi = 1; for (let k = 0; k < 30; k++) { const m = 0.5 * (lo + hi); if (sss(m) < v) lo = m; else hi = m; } return 0.5 * (lo + hi); }
@@ -921,12 +924,11 @@ function buildBody() {
   for (const [k, grp] of [["tail", R3.tail]]) {
     const m = meshOf(H[k].v, H[k].t, shellMat(0.07, 0.6, clip)); m.renderOrder = 7; m.layers.enable(1); grp.add(m); PARTS[k] = m;
   }
-  if (H.floor) { const pts = []; for (let i = 0; i < H.floor.length; i += 3) pts.push(new THREE.Vector2(H.floor[i], H.floor[i + 1])); const g = new THREE.ShapeGeometry(new THREE.Shape(pts)); g.translate(0, 0, H.floor[2]); const m = new THREE.Mesh(g, shellMat(0.07, 0.6, clip)); m.renderOrder = 7; R3.tail.add(m); PARTS.tailFloor = m; }          // outline round: the floor plate of the tail stays at z = 0; the keel shell is below it
+  if (H.floor_mesh) { const m = meshOf(H.floor_mesh.v, H.floor_mesh.t, shellMat(0.07, 0.6, clip)); m.renderOrder = 7; R3.tail.add(m); PARTS.tailFloor = m; } else if (H.floor) { const pts = []; for (let i = 0; i < H.floor.length; i += 3) pts.push(new THREE.Vector2(H.floor[i], H.floor[i + 1])); const g = new THREE.ShapeGeometry(new THREE.Shape(pts)); g.translate(0, 0, H.floor[2]); const m = new THREE.Mesh(g, shellMat(0.07, 0.6, clip)); m.renderOrder = 7; R3.tail.add(m); PARTS.tailFloor = m; }          // outline round: the floor plate of the tail stays at z = 0; the keel shell is below it
   const rimM = clayMat(0xe6e4dd, { sub: 0.5 });
   PARTS.rim = loopTube(H.rim, 0.0015, rimM, R3.chamber); if (H.cut) loopTube(H.cut, 0.0012, rimM, R3.chamber);
   const dk = H.dock.slice(), dk2 = H.dock.slice(), XD = J.read.dock_x; for (let i = 0; i < dk.length; i += 3) { dk[i] = XD + 0.002; dk2[i] = XD - 0.002; }
   loopTube(dk, 0.002, rimM, R3.chamber); loopTube(dk2, 0.002, rimM, R3.tail);
-  if (H.joint) loopTube(H.joint, 0.0014, rimM, R3.tail);          // the bonded joint of the two tail prints
   PARTS.tmag = [];
   for (const mg of J.magnets) { const a = new THREE.Mesh(new THREE.CylinderGeometry(0.0095, 0.0095, 0.0032, 20).rotateZ(Math.PI / 2), clayMat(0x9aa0a8, { rough: 0.3 }));          // round 7: each tail magnet on a tab hinged at its upper edge (the tilt release)
     const piv = new THREE.Group(); piv.position.set(mg.c[0] - 0.002, mg.c[1], mg.c[2] + 0.0095); a.position.set(-0.0016, 0, -0.0095); piv.add(a); R3.tail.add(piv); PARTS.tmag.push(piv);
@@ -961,8 +963,8 @@ function buildBody() {
     for (const [grp, dx] of [[R3.chamber, 0.0004], [R3.tail, -0.0004]]) { const m = new THREE.Mesh(fg, clayMat(0xd5e3ec, { opacity: 0.34, side: THREE.DoubleSide, sub: 0.2, clip: [GELCLIP, SECT] })); m.position.x = J.read.dock_x + dx; m.renderOrder = 4.1; grp.add(m); PARTS.gelFaces.push(m); } }
   // gel channels in the front of the tail: the neck of the kit store and one narrow well for each hanging tool, printed walls up to the rim, gel inside
   PARTS.chanGel = []; const wallM = clayMat(0xeef0ee, { opacity: 0.22, side: THREE.DoubleSide, sub: 0.4, clip }), gelM = clayMat(0xd5e3ec, { opacity: 0.32, sub: 0.2, clip }), R_ = J.read, XD_ = R_.bowl_x;
-  const trough = (cx, cy, len, wid, ang, zf) => { const w = new THREE.Mesh(new THREE.BoxGeometry(len + 0.004, wid + 0.004, R_.sill_z - zf + 0.002), wallM); w.position.set(cx, cy, (R_.sill_z + zf - 0.002) / 2); w.rotation.z = ang; w.renderOrder = 4.5; R3.chamber.add(w); edgeLines(w, 30, 0.35, 0xdfe3ea, clip);
-    const g = new THREE.Mesh(new THREE.BoxGeometry(len, wid, 1), gelM); g.position.set(cx, cy, zf); g.rotation.z = ang; g.renderOrder = 4.2; R3.chamber.add(g); PARTS.chanGel.push({ g, zf }); };
+  const trough = (cx, cy, len, wid, ang, zf) => { const w = new THREE.Mesh(new THREE.BoxGeometry(len + 0.004, wid + 0.004, R_.sill_z - zf + 0.002), wallM); w.position.set(cx, cy, (R_.sill_z + zf - 0.002) / 2); w.rotation.z = ang; w.renderOrder = 4.5; R3.tail.add(w);          /* a part of the tail (it travelled with the old head) */ edgeLines(w, 30, 0.35, 0xdfe3ea, clip);
+    const g = new THREE.Mesh(new THREE.BoxGeometry(len, wid, 1), gelM); g.position.set(cx, cy, zf); g.rotation.z = ang; g.renderOrder = 4.2; R3.tail.add(g); PARTS.chanGel.push({ g, zf }); };
   trough((R_.neck[0] + XD_) / 2, 0, XD_ - R_.neck[0], 2 * R_.neck[1], 0, 0.001);
   for (const c of J.chan) for (let i = 0; i < c.pts.length - 1; i++) { const a = c.pts[i], b = c.pts[i + 1]; let bx = b[0], by = b[1]; if (bx > XD_) { const t = (XD_ - a[0]) / (bx - a[0]); bx = XD_; by = a[1] + t * (by - a[1]); } const len = Math.hypot(bx - a[0], by - a[1]); if (len > 0.004) trough((a[0] + bx) / 2, (a[1] + by) / 2, len + 2 * c.w * 0.6, 2 * c.w, Math.atan2(by - a[1], bx - a[0]), c.zf); }
 }
@@ -977,14 +979,14 @@ function gelStrip(p, z, zt, ox, oy, cut, tailOn, headOn, su = 0) {
   const G_ = J.hull.gel, zs = G_.z, XD = J.read.dock_x, ih = G_.x.findIndex((x) => x >= XD);
   const lev = (zz) => { let k = 0; while (k < zs.length - 2 && zs[k + 1] < zz) k++; return [k, clamp((zz - zs[k]) / (zs[k + 1] - zs[k]), 0, 1)]; }, [k, f] = lev(z), [kt, ft] = lev(zt);
   for (let i = 0; i < G_.x.length; i++) { const t = G_.x[i] < XD; let w = (t ? lerp(G_.hw[kt][i], G_.hw[kt + 1][i], ft) : lerp(G_.hw[k][i], G_.hw[k + 1][i], f)) * 0.985;
-    if ((cut && (i === ih || i === ih - 1)) || (t && !tailOn) || (!t && !headOn) || (!t && su > 0 && su * sillL(G_.x[i]) > z - 0.001)) w = 0;          /* round 23: behind a raised sill there is no gel */ const x = G_.x[i] + (t ? ox : 0), y0 = t ? oy : 0, zz = t ? zt : z; p.setXYZ(2 * i, x, y0 + w, zz); p.setXYZ(2 * i + 1, x, y0 - w, zz); }
+    if ((cut && (i === ih || i === ih - 1)) || (t && !tailOn) || (!t && !headOn) || (!t && sillL(G_.x[i]) > z - 0.001) || (t && wallT(G_.x[i]) > zt - 0.001)) w = 0;          /* round 23: behind a raised sill there is no gel */ const x = G_.x[i] + (t ? ox : 0), y0 = t ? oy : 0, zz = t ? zt : z; p.setXYZ(2 * i, x, y0 + w, zz); p.setXYZ(2 * i + 1, x, y0 - w, zz); }
   p.needsUpdate = true;
 }
 function setGel(z, S) {
   const dock = S.dock || 0, ox = dock + (S.tdx || 0) - (S.hdx || 0), oy = (S.tdy || 0) - (S.hdy || 0), apart = Math.hypot(ox, oy) > 0.001, R = J.read;
   const nbDocked = R.nb_dock_tdx !== undefined && (S.tdx || 0) >= R.nb_dock_tdx - 0.001, zt = nbDocked ? (S.zt || z) : z;
-  const uh = S.sill ? S.sill.uh : 0; gelStrip(PARTS.gelTop.geometry.attributes.position, z, zt, ox, oy, apart, true, true, uh); sillClip(z, uh, S.hdx || 0);
-  if (PARTS.gelFaces) { PARTS.gelFaces[0].visible = apart && uh < 0.02; PARTS.gelFaces[1].visible = apart && !nbDocked; }
+  gelStrip(PARTS.gelTop.geometry.attributes.position, z, zt, ox, oy, apart, true, true); SILLCLIP.constant = 100;
+  if (PARTS.gelFaces) { PARTS.gelFaces[0].visible = false; PARTS.gelFaces[1].visible = false; }          // each gel stays behind its wall
   PARTS.gelTop.geometry.computeVertexNormals(); PARTS.gelTop.visible = z > 0.004; PARTS.gelBody.visible = z > 0.004; for (const c of PARTS.chanGel) { const h = z - c.zf; c.g.visible = h > 0.002; if (h > 0.002) { c.g.scale.z = h; c.g.position.z = c.zf + h / 2; } } GELCLIP.constant = z;
   // the gel of the newborn, filled in the relay (its own lobe; the tail part is drawn with the tail above)
   if (NBG.top) { const on = (S.gn || 0) > 1e-3 && S.nbi >= 0; NBG.grp.visible = on;
@@ -1322,21 +1324,21 @@ function renderReadouts(S) {
   if (S.vac) h += rr("Magnet lifts", f2(R.suction_N), "N", true) + rr("Kit weight, margin", `${f2(R.kit_N)} N, ${f1(R.suction_N / R.kit_N)} x`) ;
   if (false) h += rr("Force on the valve", f2(S.F), "N", true) + bar(S.F / R.payload_N, S.F > R.payload_N) + rr("Limit (payload 500 g)", f2(R.payload_N), "N");
   const relay = /^relay|^next$/.test(S.k), TK = R.tankn;
-  if (!relay) h += `</div><div class="rg"><h4>Head and gel</h4>${rr("Gel level", mm(S.gel), "mm")}${rr("Gel in the head and the tail", f2(S.gv), "L")}${rr("Lip above the gel, the water", `${mm(R.lip_z - S.gel)}, ${mm(R.lip_z - R.wlz)}`, "mm")}${rr("Rear sill", sillTxt(S.sill.uh, "flat, a tail docked"))}${rr("Kit", S.nbi >= 0 ? "in the newborn" : KITN[(S.nv > 0.5 && S.k !== "print") ? 3 : S.kit])}</div>`;
+  if (!relay) h += `</div><div class="rg"><h4>Head and gel</h4>${rr("Gel level", mm(S.gel), "mm")}${rr("Gel in the head and the tail", f2(S.gv), "L")}${rr("Lip above the gel, the water", `${mm(R.lip_z - S.gel)}, ${mm(R.lip_z - R.wlz)}`, "mm")}${rr("Rear wall", sillTxt(S.sill.uh, "flat, a tail docked"))}${rr("Kit", S.nbi >= 0 ? "in the newborn" : KITN[(S.nv > 0.5 && S.k !== "print") ? 3 : S.kit])}</div>`;
   else { const rel = S.k !== "relay_back", nbG = S.gn || 0;          // round 7: the relay shows its own numbers: the old head, the newborn as it fills, the tail
-    h += `</div><div class="rg"><h4>Old head${rel ? ", released" : ", still docked"}</h4>${rr("Gel level", mm(S.gel), "mm")}${rr("Gel", rel ? f2(R.gel_old_L) : f2(S.gv), "L", false)}${rr("Lip circuit", `gel at 9 kPa, ${f2(R.lipc_L)}`, "L")}${rr("Rear sill", sillTxt(S.sill.uh, "flat, the tail docked"))}</div>`;
-    h += `<div class="rg"><h4>Newborn</h4>${rr("Gel in the lobe", f2(nbG), "L of " + f2(R.gel_fill_L), S.k === "relay_gel")}${bar(nbG / R.gel_fill_L)}${rr("Gel level", nbG > 0.001 ? mm(S.zn) : "empty", nbG > 0.001 ? "mm" : "")}${rr("Lip circuit, gel at 9 kPa", f2(S.lc || 0), "L of " + f2(R.lipc_L), S.k === "relay_gel" && (S.lc || 0) > 0)}${rr("Gel the tail holds", rel ? f2(R.gel_tail_L) : "with the parent", rel ? "L" : "")}${rr("Rear sill", sillTxt(S.sill.un, "flat, the tail docked"))}${rr("Water", nbFloat(S), "", S.k === "relay_dock")}</div>`;
+    h += `</div><div class="rg"><h4>Old head${rel ? ", released" : ", still docked"}</h4>${rr("Gel level", mm(S.gel), "mm")}${rr("Gel", rel ? f2(R.gel_old_L) : f2(S.gv), "L", false)}${rr("Lip circuit", `gel at 9 kPa, ${f2(R.lipc_L)}`, "L")}${rr("Rear wall", sillTxt(S.sill.uh, "flat, the tail docked"))}</div>`;
+    h += `<div class="rg"><h4>Newborn</h4>${rr("Gel in the lobe", f2(nbG), "L of " + f2(R.gel_fill_L), S.k === "relay_gel")}${bar(nbG / R.gel_fill_L)}${rr("Gel level", nbG > 0.001 ? mm(S.zn) : "empty", nbG > 0.001 ? "mm" : "")}${rr("Lip circuit, gel at 9 kPa", f2(S.lc || 0), "L of " + f2(R.lipc_L), S.k === "relay_gel" && (S.lc || 0) > 0)}${rr("Gel the tail holds", rel ? f2(R.gel_tail_L) : "with the parent", rel ? "L" : "")}${rr("Rear wall", sillTxt(S.sill.un, "flat, the tail docked"))}${rr("Water", nbFloat(S), "", S.k === "relay_dock")}</div>`;
     h += `<div class="rg"><h4>Tail on its wheels</h4>${rr("Moved x, y", `${mm(S.tdx)}, ${mm(S.tdy)}`, "mm")}</div>`; }
   if (TK && (relay || S.k === "dock")) h += `<div class="rg"><h4>Tank, made to order</h4>${rr("Inner", TK.inner_mm.map((v) => f0(v)).join(" x "), "mm")}${rr("Water depth", f0(TK.depth_mm), "mm")}${rr("Water", `${f0(TK.water_L)} L, ${f0(TK.water_kg)}`, "kg")}${rr("Glass (estimate)", f0(TK.glass_kg), "kg")}${rr("Filled, with the parent body", f0(TK.filled_kg), "kg", true)}${rr("On the floor under it", f1(TK.floor_kPa), "kPa")}</div>`;
   if (S.k === "print") h += `<div class="rg"><h4>Print</h4>${rr("Progress", f0(S.pr * 100), "%", true)}${bar(S.pr)}${rr("Layer height z", f1(Math.min(S.pz, BB.box ? BB.box.max.z + J.read.axis_z : S.pz) * 1000), "mm")}${rr("Bead, silicone", `${f0(R.bead_m)} m, ${f2(R.sil_L)} L`)}</div>`;
   if (S.nv > 0.5 && S.k !== "print") h += `<div class="rg"><h4>Next head, folded</h4>${rr("Flat pack", J.pack.size_mm.map((v) => f0(v)).join(" x "), "mm", true)}${rr("Layers", J.pack.layers)}${rr("Silicone", f2(J.read.sil_L), "L")}</div>`;
-  if (S.nbi >= 0 && /^birth|^free$/.test(S.k)) h += `<div class="rg"><h4>Birth</h4>${rr("Keel pressure", f1(S.pbar), "kPa", true)}${rr("Inflation front x", S.front > 0 ? mm(S.front) : "none", S.front > 0 ? "mm" : "")}${rr("Rim x", mm(S.rimx), "mm", true)}${rr("Lower lip at x", mm(J.mouth.lip[0]), "mm")}${rr("Needle force", f2(S.Fn), "N")}${bar(S.Fn / J.read.payload_N)}${rr("Limit (payload 500 g)", f2(J.read.payload_N), "N")}${rr("Crank", S.crank > 0.99 ? "down" : S.crank > 0.01 ? "swinging" : "folded")}${rr("Rear sill", sillTxt(S.sill.un, "flat"))}${rr("Water", nbFloat(S))}</div>`;
+  if (S.nbi >= 0 && /^birth|^free$/.test(S.k)) h += `<div class="rg"><h4>Birth</h4>${rr("Keel pressure", f1(S.pbar), "kPa", true)}${rr("Inflation front x", S.front > 0 ? mm(S.front) : "none", S.front > 0 ? "mm" : "")}${rr("Rim x", mm(S.rimx), "mm", true)}${rr("Lower lip at x", mm(J.mouth.lip[0]), "mm")}${rr("Needle force", f2(S.Fn), "N")}${bar(S.Fn / J.read.payload_N)}${rr("Limit (payload 500 g)", f2(J.read.payload_N), "N")}${rr("Crank", S.crank > 0.99 ? "down" : S.crank > 0.01 ? "swinging" : "folded")}${rr("Rear wall", sillTxt(S.sill.un, "flat"))}${rr("Water", nbFloat(S))}</div>`;
   h += `<div class="rg"><h4>Penetration test, this frame</h4>${rr("Deepest overlap of any pair", f2(S.pen * 1000), "mm", S.pen > 0.001)}${rr("Worst over the whole timeline", f2(R.pen_max * 1000), "mm")}</div>`;
   $("#ro").innerHTML = h; $("#tlClock").textContent = hms(S.clock) + " of " + hms(TL.realTotal);
 }
 // round 23: readouts of the rear sill and the float
-function sillTxt(u, flat) { return u > 0.98 ? `up, ${f0(SILL.zs * 1000)} mm` : u > 0.02 ? "filling or venting" : flat; }
-function nbFloat(S) { const D = J.read.sill; if (S.sill.fl > 0.02 && !/^relay_dock|^relay_gel|^next/.test(S.k)) return "on the tank floor, keel cells flooded"; if (/^relay_dock|^relay_gel|^next/.test(S.k)) return D.onFloor ? "on the floor, docked" : "docked"; return S.k === "birth_d" ? "on the parent's lip" : "in the parent's head"; }
+function sillTxt(u, flat) { return `a fixed wall, ${f0(SILL.H * 1000)} mm`; }
+function nbFloat(S) { const D = J.read.sill; if (/^free|^relay_back|^relay_release|^relay_lane/.test(S.k)) return "on the tank floor"; if (S.sill.fl > 0.02 && !/^relay_dock|^relay_gel|^next/.test(S.k)) return "on the tank floor, keel cells flooded"; if (/^relay_dock|^relay_gel|^next/.test(S.k)) return D.onFloor ? "on the floor, docked" : "docked"; return S.k === "birth_d" ? "on the parent's lip" : "in the parent's head"; }
 function gelFrac(z) { return clamp(z / J.read.gel_z, 0, 1) ** 1.25; }
 function renderOverlay(S) {
   $("#ovStage").textContent = S.st.s.n + ". " + S.st.s.name; $("#ovStep").textContent = J.notes[S.note] || S.st.s.text; $("#ovClock").innerHTML = hms(S.clock) + " <span>process time</span>";
@@ -1391,9 +1393,11 @@ async function unpack(J) {          // round 3, part C: the skins as int16 at 0.
 async function loadAll() {
   const [j, a, g] = await Promise.all([getJSON("quilt.json"), getJSON("arm.json"), fetch("quilt_print.gcode").then((r) => r.ok ? r.text() : "").catch(() => "")]);
   if (!j || !a) { $("#ovStage").textContent = "The data files did not load"; throw new Error("data"); }
-  J = j; await unpack(J); syncTank(); J.read.wlz = J.WL; UW.uWL.value = J.WL; Object.assign(ARMD, a); GCL = g.split("\n").filter((l) => l.length);
+  J = j; await unpack(J); syncTank(); wallSync(); J.read.wlz = J.WL; UW.uWL.value = J.WL; Object.assign(ARMD, a); GCL = g.split("\n").filter((l) => l.length);
   sillDraft();          // round 23 (the texts of the moving sill are not used: one fixed shape)
   buildWater(); buildBody(); buildArm(); buildBaby(); buildNewbornGel(); buildGallery(); setShadows(); buildLabels(); buildCallouts(); renderDoc();
+  seatOnWalls();
+  { const r = $("#tailRow"), d = J.outline && J.outline.tail_print_mm; if (r && d) r.children[2].textContent = d.join(" x ") + " mm"; }
   log("quilt.json: " + J.fr.q0.length + " frames, " + J.checks.length + " checks", "a"); const bad = J.checks.filter((c) => !c.ok); for (const c of bad) log("fails: " + c.name, "w");
   log("penetration test: worst pair " + f2(J.read.pen_max * 1000) + " mm over " + J.fr.pen.length + " frames", J.read.pen_max > 0.001 ? "w" : "a");
 }
@@ -1412,6 +1416,23 @@ function shapeAudit() {
     if (NB.hi && NB.hi.visible) { nHi++; put("newborn", Math.max(...NB.hi.children.map((m, k) => dev(m.geometry.attributes.position.array, ref[k])), Math.abs(NB.hi.position.z - z0)), st.k); } }
   const t = (k) => `${f1(W[k][0] * 1000)} mm${W[k][1] ? " (worst in " + W[k][1] + ")" : ""}`;
   J.checks.push({ group: "Outline", name: `One rigid shape per body, measured in this page: every stage at 8 points, every drawn head mesh (outer skin, inner skin, cuff, rolled lip) in its own frame against the parent's head at stage 1, and its height: the parent's head and the old head ${t("parent")}; the newborn at rest (${nHi} samples) ${t("newborn")}; the tail shell ${t("tail")}`, ok: W.parent[0] < 1e-5 && W.tail[0] < 1e-5 && W.newborn[0] < 1e-5, value: "measured at load" });
+}
+// outline round 3: the parts built in the page (boxes of the racks, saddles and wells, the channel lines of the quilt) stand on the rising floor of the
+// walls: each vertex rises by the wall under it, fading with height as the skins do (the skins, the gel body, the cuff, the magnets and the floor plate
+// come raised from quilt.json). Tiles, kits and parked tools are placed per frame and ride the wall by sillTile.
+function seatOnWalls() {
+  const skip = new Set([BB.kitG, ...(BB.spares || []), ...(BB.tileSets || []), ...(BB.parT || []), PARTS.parkP, PARTS.parkN, ...(PARTS.tmag || [])].filter(Boolean));
+  const fade = (z) => clamp(1 - z / SILL.zs, 0, 1), v = new THREE.Vector3(); let n = 0;
+  for (const [grp, L] of [[R3.chamber, sillL], [R3.tail, wallT]]) {
+    grp.updateMatrixWorld(true);
+    const walk = (o) => { if (skip.has(o)) return; for (const c of o.children) walk(c);
+      if (!(o.isMesh || o.isLine) || !o.geometry || !o.geometry.attributes.position) return; const ty = o.geometry.type;
+      if (!(ty === "BoxGeometry" || (o.isLine && !o.isLineSegments))) return;
+      const g = o.geometry.clone(), pa = g.attributes.position, M = o.matrixWorld, Mi = M.clone().invert(); let moved = false;
+      for (let i = 0; i < pa.count; i++) { v.fromBufferAttribute(pa, i).applyMatrix4(M); const dz = L(v.x) * fade(v.z); if (dz > 1e-6) { v.z += dz; moved = true; } v.applyMatrix4(Mi); pa.setXYZ(i, v.x, v.y, v.z); }
+      if (moved) { g.computeVertexNormals(); o.geometry = g; n++; } };
+    walk(grp); }
+  log("seated on the walls: " + n + " parts", "a");
 }
 let lastNow = 0, lastRO = 0, DRAG = false;
 function frame() {
