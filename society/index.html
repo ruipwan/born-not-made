@@ -103,7 +103,7 @@ html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
     <div><h3>Dialogue</h3><div class="dlog" id="dlog" aria-live="off"></div>
       <p class="note">Every line said in the tank, with the speaker and the listener. No language model runs here: a line is composed from what the speaker has read, kept or been told.</p></div>
     <div><h3>Lineage</h3><div class="lin" id="lin"></div>
-      <p class="note">Each row is one generation of one tailed one: the outline seen from above and a little from the side, the traits that grew, the number alive, and the note every newborn of that generation was told. Click a row to follow a living body.</p></div>
+      <p class="note">Each row is one generation of one tailed one: the outline seen from above, drawn as in the Birth variation diagram, the traits that grew, the number alive, and the note every newborn of that generation was told. Click a row to follow a living body.</p></div>
     <div><h3>Population</h3><canvas class="spark" id="sp1"></canvas>
       <h3>Lines said, each 10 s</h3><canvas class="spark" id="sp2"></canvas>
       <h3>Mean traits of the living</h3><div class="bars" id="bars"></div></div>
@@ -113,8 +113,8 @@ html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
       <p class="note">The water. Sixteen small lamps hang over the tank. A patch of low lamps moves slowly across the grid, so a bright pool does not stay bright. A stream runs through the tank in a band that turns slowly; small motes on the surface show where the water moves. A body gains charge in light and shares the light with every body close by. Swimming, a strong stream and a large body all cost charge. In the dark a body without a lamp feels less far.</p>
       <p class="note">Reading and telling. A body swims to a place, reads the light, the stream and the crowd there, and keeps the reading as a memory. A body holds only a few memories; the oldest drops out. Two robots closer than the talk radius may talk, a few turns each. A turn says one thing: a reading, how the body fared and what the body lacks, a trace handed down, a question, a request. A listener keeps what was said, so word travels from body to body. A body low on charge asks where light is and swims to the place named. A tailed one sends a body to read a place the store has no fresh word of.</p>
       <p class="note">The store. A tailed one keeps what is told as lines, drawn as thin loops stacked in the head, and a ring on the water fills as the lines add up. A new line counts as one, a line that changes an old one counts as one, a line already held counts for little, and word passed on by a second speaker counts for less than a first reading. To generate, a tailed one needs the set number of lines, of at least three kinds, from at least two speakers. At the start no robot has anyone to ask, so a tailed one makes a first generation from three lines read at the tailed one's own place.</p>
-      <p class="note">The next generation. The tailed one weighs the store: word of strong streams pulls toward a narrower, faster body; word of darkness toward a lamp and a longer reach; word of crowds and of bodies that faded toward a body slower to drain; lost memories toward more room for traces. Every trait shares one budget, so no body is best at everything. Chance adds a little, set by Mutation. Shape follows function: a fast body is long and narrow, a lasting body is thick and large, a body that holds much has a tall full bulb, a body with a lamp is clear and glows.</p>
-      <p class="note">The form. Every body without a tail is a drop of quilted silicone: a round blunt bulb that narrows to a small open nozzle. The first generation of every tailed one is this plain drop. After that the narrow end can split into two to five points, each a tapered tip ending in a small open nozzle. A point can be long or short, turn aside or curl up; the points can open into a fan; a body can grow a point at the blunt end too. The form is handed down like a tree: each generation takes the form of the generation before, changed a little by chance and nudged by what the tailed one was told. Word of strong streams adds points, word of crowds and of fading takes points away and makes the rest short and thick, word of darkness curls the points up toward the lamps and spreads the points wider. So each line drifts a different way, and the tree is not even. Every form is about the same size. These links are fiction, a guess: more points might help a body steer.</p>
+      <p class="note">The next generation. The tailed one weighs the store: word of strong streams pulls toward a narrower, faster body; word of darkness toward a lamp and a longer reach; word of crowds and of bodies that faded toward a body slower to drain; lost memories toward more room for traces. Every trait shares one budget, so no body is best at everything. Chance adds a little, set by Mutation. Shape follows function: a fast body is long and narrow, a lasting body is round and large, a body that holds much has a full back, a body with a lamp is clear and glows.</p>
+      <p class="note">The form. Every body without a tail is a soft pillow of quilted silicone, after the Birth variation diagram: one smooth closed outline, filled with air. The back is round and blunt; the front ends in one to four short round points with smooth notches between them, and every point ends in a small open nozzle with a rolled rim. The forms are the diagram's: the plain drop, two points, three points, bent upward, a point at each end, one point turned, a fan of small points, one long and one short. Each first tailed one has a head of its own in this family and starts a line from that form. The form is handed down: each generation takes the form of the generation before with small changes of its own (the proportions, the depth of the notches, the length and the angle of the points, a slight bend), and now and then the line moves to a neighbouring form of the diagram. What the tailed one was told nudges the change. Word of strong streams makes the body longer and narrower and favours fewer points; word of crowds and of fading makes the body rounder and the points shorter; word of darkness lifts the front toward the lamps, makes the body flatter and wider, and favours more points; lost memories make the back fuller. So each line drifts a different way, and the tree is not even. These links are fiction, a guess: more points might help a body steer.</p>
       <p class="note">Birth. The tailed one prints the newborn folded flat in the gel, layer on layer, with the needle of the arm, the points laid in along the body. Then the arm pushes the folded pack to the mouth while the pump fills the newborn with air: the part past the lip swells like a balloon, the part still inside stays folded, the points fill last, and the newborn leaves at full size. A generation is one to three newborns of one design. At the birth the store is compacted. A few lines stay with the tailed one; the rest go with the newborn as traces, with one note on where light is and what to stay out of.</p>
       <p class="note">Feedback. A body that fits the water stays charged, lives longer and tells more, so the shape that works is heard most. A body that runs out of charge lets the air go, sinks and fades. A body near enough to see tells of the fading; if none saw, the tailed one of that line notes that the body did not come back.</p>
       <p class="note">The dialogue model follows the artist's <i>Raised by many</i> (Cognitive Agents, 2026), where each agent knows only what the agent read or was told, and a full memory is compacted at a birth. Here the lines are composed on this page from each speaker's state, without a language model.</p></div>
@@ -462,7 +462,13 @@ function bodyGeometry(s, tail) {
     let y = S.zc + S.b * rad * Math.sign(sn) * Math.pow(Math.abs(sn), e), z = S.a * rad * Math.sign(c) * Math.pow(Math.abs(c), e);
     y += s.crest * Math.pow(Math.max(0, sn), 10) * env * S.f;                                   // crest along the back
     if (S.tail) z *= 1 + s.fin * Math.pow(Math.abs(c), 10) * Math.sin(Math.PI * (1 - S.f) * 0.95) * (1 - Math.abs(sn));   // fins flare toward the tail end
-    pos.push(S.x, y, z); ang.push(th, k); } };
+    let dx = 0; if (s.hd && !S.tail) { const u = (S.x - x0) / s.Lh, wg = sstep(0.3, 0.72, u) * (1 - sstep(0.8, 0.99, u)), cc = Math.pow(Math.abs(c), 3) * wg;
+      // a founder's head: a soft lobe of its family at the front corners, the mouth and the docking face left as they are
+      if (s.hd === 1) { z += Math.sign(c) * 0.075 * cc; dx = 0.04 * cc; }
+      else if (s.hd === 2) { if (c > 0) { z += 0.09 * cc; dx = 0.045 * cc; } }
+      else if (s.hd === 3) { y += 0.045 * Math.pow(Math.max(0, sn), 3) * wg; if (c < 0) z -= 0.03 * cc; }
+      else if (s.hd === 4) { if (c < 0) { z -= 0.06 * cc; dx = 0.03 * cc; } } }
+    pos.push(S.x + dx, y, z); ang.push(th, k); } };
   for (let k = 0; k < st.length; k++) ring(k);
   const idx = [[], [], []], V = (k, j) => k * M + (j % M);
   for (let k = 0; k < st.length - 1; k++) { const grp = st[k + 1].tail ? 0 : 1; for (let j = 0; j < M; j++) idx[grp].push(V(k, j), V(k + 1, j), V(k + 1, j + 1), V(k, j), V(k + 1, j + 1), V(k, j + 1)); }
@@ -685,70 +691,103 @@ const reach = (r) => r.s.Lh / 2 + r.s.Ln;     // centre of the head to the lip, 
 const floatY = (a) => a.tailed ? WL - waterY(a.s) : WL + 0.15 * a.s.B * (a.k || 1);
 const headXY = (a, o) => { o[0] = a.x; o[1] = a.z; return o; };
 
-/* the shape of a body without a tail: a water drop, a round blunt bulb that narrows to a small open nozzle, after the Birth variation diagram.
-   The narrow end can split into one to five points, each a tapered tip ending in a nozzle, and a point can grow at the blunt end too.
-   The design is a genome handed down the line (DG below); the five traits set the size and the skin. Shape follows function, as a guess:
-   speed: longer, narrower; sense: wider; light: clear skin; memory: a taller, fuller bulb; endurance: thicker, larger */
-const PROTO = { fork: 0.5, web: 1, pts: [{ L: 1, yaw: 0, pit: 0, bu: 0, bs: 0, r: 1 }], back: 0, byaw: 0 };      // the first body: the plain drop
-const PTR = [1, 0.8, 0.68, 0.6, 0.54];      // the base of a point, by the number of points: more points, thinner points
-// the next design from the last: chance set by Mutation, nudged by the change in the traits and by what was told (Pr). Fiction: the links are guesses.
+/* the shape of a body without a tail, after the Birth variation diagram: a wide soft body, like a paramecium, drawn as one smooth closed outline
+   and filled with air like a pillow balloon. The outline is a round blunt back and a front that ends in one to four short round points (horns)
+   with smooth U shaped notches between them, each point ending in a small rolled nozzle. The forms are the diagram's: the prototype drop, two
+   points, three points, bent upward, a point at each end, one point turned, a fan of small points, one long and one short. A design is one of
+   these forms with small changes of its own (proportions, notch depth, point lengths and angles, a slight bend), handed down the line.
+   Units here are a body about 1 long; kidShape scales the form to metres. */
+const FORMS = {
+  proto:     { Rb: 0.29, cb: -0.21, cf: 0.27, Rf: 0.075, notch: 0, bend: 0, lift: 0, back: null, pts: [{ a: 0, L: 0.06, w: 0.06 }] },
+  two:       { Rb: 0.3, cb: -0.2, cf: 0.1, Rf: 0.26, notch: 1, bend: 0, lift: 0, back: null, pts: [{ a: -0.62, L: 0.12, w: 0.1 }, { a: 0.52, L: 0.15, w: 0.1 }] },
+  three:     { Rb: 0.3, cb: -0.2, cf: 0.1, Rf: 0.26, notch: 1, bend: 0, lift: 0, back: null, pts: [{ a: -0.78, L: 0.11, w: 0.085 }, { a: 0.02, L: 0.09, w: 0.08 }, { a: 0.72, L: 0.14, w: 0.085 }] },
+  bent:      { Rb: 0.29, cb: -0.2, cf: 0.12, Rf: 0.24, notch: 0, bend: -0.06, lift: 0.15, back: null, pts: [{ a: -1.0, L: 0.13, w: 0.09 }] },
+  twoEnds:   { Rb: 0.25, cb: -0.14, cf: 0.14, Rf: 0.21, notch: 0, bend: 0, lift: 0, back: { a: 0.25, L: 0.11, w: 0.08 }, pts: [{ a: 0.2, L: 0.12, w: 0.08 }] },
+  turned:    { Rb: 0.3, cb: -0.18, cf: 0.22, Rf: 0.11, notch: 0, bend: 0.12, lift: 0, back: null, pts: [{ a: 0.7, L: 0.07, w: 0.075 }] },
+  fan:       { Rb: 0.29, cb: -0.2, cf: 0.12, Rf: 0.26, notch: 0.75, bend: 0, lift: 0, back: null, pts: [{ a: -0.82, L: 0.05, w: 0.06 }, { a: -0.28, L: 0.055, w: 0.06 }, { a: 0.27, L: 0.05, w: 0.06 }, { a: 0.8, L: 0.06, w: 0.06 }] },
+  longShort: { Rb: 0.3, cb: -0.2, cf: 0.1, Rf: 0.26, notch: 0.95, bend: 0, lift: 0, back: null, pts: [{ a: -0.5, L: 0.19, w: 0.1 }, { a: 0.68, L: 0.06, w: 0.09 }] } };
+const PROTO = Object.assign({ f: "proto" }, FORMS.proto);
+// the forms a line can move to next, as on the diagram's tree; and which told traits pull toward a form (fiction, a guess)
+const FNEXT = { proto: ["two", "turned", "twoEnds"], two: ["three", "bent", "twoEnds", "longShort"], three: ["two", "fan"], bent: ["two", "turned"], twoEnds: ["proto", "two"],
+  turned: ["longShort", "fan", "proto", "bent"], fan: ["three", "longShort"], longShort: ["two", "turned", "fan"] };
+const FPULL = { proto: { speed: 1, endurance: 0.5 }, two: { sense: 0.6, speed: 0.3 }, three: { sense: 1 }, bent: { light: 1 }, twoEnds: { speed: 1 }, turned: { light: 0.5, endurance: 0.5 }, fan: { sense: 1, memory: 0.3 }, longShort: { sense: 0.4, speed: 0.4 } };
+// the founders: each tailed one starts its line from its own form, and its head has a soft outline of the same family
+const FOUNDER = ["proto", "two", "turned", "bent", "twoEnds"];
+const formOf = (name) => Object.assign({ f: name }, JSON.parse(JSON.stringify(FORMS[name])));
+// the next design from the last: chance set by Mutation, nudged by the change in the traits (D0 to D1) and by what was told (Pr). Fiction: the links are guesses.
 function mutateDesign(P0, D0, D1, Pr, mut, r) {
-  const d = JSON.parse(JSON.stringify(P0)), j = (a) => (r() - 0.5) * 2 * a * (0.6 + 3 * mut), up = (x) => Math.max(0, x);
-  const dSp = D1.speed - D0.speed, dSe = D1.sense - D0.sense, dLi = D1.light - D0.light, dEn = D1.endurance - D0.endurance, dMe = D1.memory - D0.memory; let n = d.pts.length;
-  // word of strong streams adds points (more points might help a body steer); word of crowds and fading takes points away
-  if (n < 5 && r() < 0.12 + 0.35 * (Pr.speed || 0) + 2.2 * up(dSp)) { const p = d.pts[Math.floor(r() * n)], side = r() < 0.5 ? -1 : 1, q = Object.assign({}, p);
-    if (n === 1 && Math.abs(p.yaw) < 0.2) { p.yaw = -0.3 - 0.2 * r(); q.yaw = 0.3 + 0.2 * r(); } else { q.yaw = p.yaw + side * (0.4 + 0.3 * r()); p.yaw -= side * 0.12; }
-    q.L = p.L * (0.75 + 0.4 * r()); q.bu = p.bu * r(); q.bs = j(0.3); d.pts.push(q); n++; }
-  else if (n > 1 && r() < 0.13 + 1.6 * up(-dSp) + 1.3 * up(dEn) + 0.3 * (Pr.endurance || 0)) { let k = 0; for (let i = 1; i < n; i++) if (d.pts[i].L < d.pts[k].L) k = i; d.pts.splice(k, 1); n--; }
-  // the spread: word of darkness and of what cannot be seen opens the points wider, to feel round more
-  if (n > 1) { const S = Math.min(0.95, 0.32 + 0.12 * n + 0.6 * D1.sense + 1.2 * up(dSe)), ys = d.pts.map((p) => p.yaw), c = ys.reduce((a, b) => a + b, 0) / n, w = Math.max(0.05, Math.max(...ys) - Math.min(...ys)) / 2, f = lerp(1, S / w, 0.4);
-    for (const p of d.pts) p.yaw = c * 0.85 + (p.yaw - c) * f + j(0.1); }
-  else d.pts[0].yaw += j(0.12);
-  const Lt = 1.0 + 0.45 * D1.speed - 0.35 * D1.endurance - 0.05 * (n - 1);
-  for (const p of d.pts) { p.L = clamp(lerp(p.L, Lt, 0.3) + j(0.12), 0.45, 1.6); p.r = clamp(p.r + j(0.08) + 0.5 * dEn - 0.3 * dSp, 0.7, 1.35);
-    // word of darkness curls the points up, toward the lamps
-    p.bu = clamp(p.bu + j(0.3) + 1.2 * dLi, -0.35, 1.3); p.bs = clamp(p.bs + j(0.3), -0.85, 0.85); p.pit = clamp(p.pit + j(0.08) + 0.3 * dLi, -0.12, 0.5); }
-  if (n >= 2 && r() < 0.16) { const a = Math.floor(r() * n), b = (a + 1 + Math.floor(r() * (n - 1))) % n; d.pts[a].L = Math.min(1.5, d.pts[a].L * 1.35); d.pts[b].L = Math.max(0.35, d.pts[b].L * 0.62); }      // one long, one short
-  if (n >= 4 && D1.sense > 0.35 && r() < 0.35) for (const p of d.pts) { p.L *= 0.72; p.bu *= 0.5; }      // a fan of small points
-  // a point at the blunt end: a guess that a body that must feel behind grows one
-  if (!d.back && r() < 0.05 + 1.0 * up(dSe) + 0.1 * (Pr.sense || 0)) { d.back = 0.55 + 0.5 * r(); d.byaw = j(0.5); } else if (d.back && r() < 0.1) d.back = 0; else if (d.back) d.back = clamp(d.back + j(0.15), 0.4, 1.2);
-  d.fork = clamp(d.fork + j(0.05) + 0.4 * dMe, 0.3, 0.68); d.web = clamp(d.web + j(0.15), 0.6, 1.5);
-  // points never sit on top of each other: keep them apart, inside a half turn
-  d.pts.sort((a, b) => a.yaw - b.yaw); for (let i = 1; i < d.pts.length; i++) if (d.pts[i].yaw - d.pts[i - 1].yaw < 0.42) d.pts[i].yaw = d.pts[i - 1].yaw + 0.42;
-  const m = (d.pts[0].yaw + d.pts[d.pts.length - 1].yaw) / 2, lim = 1.15; for (const p of d.pts) p.yaw = clamp(p.yaw - (Math.abs(m) > 0.5 ? m - Math.sign(m) * 0.5 : 0), -lim, lim);
+  let d = JSON.parse(JSON.stringify(P0)); const j = (a) => (r() - 0.5) * 2 * a * (0.6 + 3 * mut), up = (x) => Math.max(0, x), dT = {}; for (const k of TALK.TRAITS) dT[k] = D1[k] - D0[k];
+  // now and then the line moves to a neighbouring form of the diagram, pulled by what was told; the proportions carry over in part
+  let pull = 0; for (const k of TALK.TRAITS) pull += up(dT[k]); if (r() < 0.14 + 0.8 * pull + 0.3 * mut) {
+    const opts = FNEXT[d.f] || FNEXT.proto, wts = opts.map((f) => { let w = 0.35; for (const k in FPULL[f]) w += FPULL[f][k] * (4 * up(dT[k]) + (Pr[k] || 0)); return w; });
+    let x = r() * wts.reduce((a, b) => a + b, 0), i = 0; while (i < opts.length - 1 && (x -= wts[i]) > 0) i++;
+    const n = formOf(opts[i]); for (const k of ["Rb", "Rf", "cb", "cf"]) n[k] = lerp(d[k], n[k], 0.75); d = n; }
+  // small changes of the design's own: proportions, notch depth, point length and angle, a slight bend. Speed narrows, endurance widens and shortens
+  // the points, sense widens the front, light lifts the front toward the lamps, memory a fuller back
+  d.Rb = clamp(d.Rb + j(0.012) - 0.05 * dT.speed + 0.04 * dT.endurance + 0.04 * dT.memory, 0.22, 0.34);
+  d.Rf = clamp(d.Rf * (1 + j(0.06)) + 0.05 * dT.sense, d.pts.length > 1 ? 0.2 : 0.06, d.pts.length > 1 ? 0.3 : 0.26);
+  d.cf = clamp(d.cf + j(0.015), d.cb + 0.2, 0.3); d.notch = d.pts.length > 1 ? clamp(d.notch + j(0.08), 0.55, 1.2) : 0;
+  d.bend = clamp(d.bend + j(0.025), -0.18, 0.18); d.lift = clamp(d.lift + j(0.04) + 0.4 * dT.light, 0, 0.3);
+  const fan = d.f === "fan";
+  for (const p of d.pts) { p.a += j(0.05); p.L = clamp(p.L * (1 + j(0.1)) * (1 - 0.5 * up(dT.endurance)), 0.035, fan ? 0.07 : 0.2); p.w = clamp(p.w + j(0.006), 0.055, 0.11); }
+  if (d.back) { d.back.a += j(0.06); d.back.L = clamp(d.back.L * (1 + j(0.1)), 0.06, 0.14); }
+  // the points stay apart, inside the front
+  d.pts.sort((a, b) => a.a - b.a); for (let i = 1; i < d.pts.length; i++) if (d.pts[i].a - d.pts[i - 1].a < (fan ? 0.45 : 0.6)) d.pts[i].a = d.pts[i - 1].a + (fan ? 0.45 : 0.6);
+  for (const p of d.pts) p.a = clamp(p.a, -1.15, 1.15);
   return d; }
-// the parts of a design in metres: round cones joined smoothly. Built once per design and kept on the shape.
-function dropParts(s) { const dg = s.dg, Lu = s.Lu, rb = s.A, rt = s.rt, D = Lu - rb, n = dg.pts.length, xF = dg.fork * D, rF = rb + (rt - rb) * dg.fork, parts = [], tips = [];
-  parts.push({ a: [0, 0, 0], b: [xF, 0, 0], r1: rb, r2: rF, pt: 0 });
-  for (const p of dg.pts) { const li = p.L * (D - xF), r0 = rF * PTR[n - 1] * p.r * (n > 1 ? 1.12 : 1); let yaw = p.yaw, pit = p.pit, a = n > 1 ? [xF - 0.45 * rF, 0, 0] : [xF, 0, 0];
-    for (let k = 0; k < 3; k++) { const l = li / 3, b = [a[0] + l * Math.cos(yaw) * Math.cos(pit), a[1] + l * Math.sin(pit), a[2] + l * Math.sin(yaw) * Math.cos(pit)];
-      parts.push({ a, b, r1: lerp(r0, rt, k / 3), r2: lerp(r0, rt, (k + 1) / 3), pt: 1 }); a = b; yaw += p.bs / 3; pit = clamp(pit + p.bu / 3, -1.2, 1.3); }
-    tips.push({ T: a, d: [Math.cos(yaw - p.bs / 3) * Math.cos(pit), Math.sin(pit), Math.sin(yaw - p.bs / 3) * Math.cos(pit)] }); }
-  if (dg.back) { const lb = rb + dg.back * 0.3 * Lu, b = [-lb * Math.cos(dg.byaw), 0.1 * rb, -lb * Math.sin(dg.byaw)]; parts.push({ a: [-0.2 * rb, 0, 0], b, r1: 0.42 * rb, r2: rt, pt: 1 }); const l = Math.hypot(b[0] + 0.2 * rb, b[1], b[2]); tips.push({ T: b, d: [(b[0] + 0.2 * rb) / l, b[1] / l, b[2] / l] }); }
-  for (const t of tips) { const l = Math.hypot(t.d[0], t.d[1], t.d[2]); t.d = t.d.map((v) => v / l); }
-  for (const c of parts) { c.c = [(c.a[0] + c.b[0]) / 2, (c.a[1] + c.b[1]) / 2, (c.a[2] + c.b[2]) / 2]; c.cr = Math.hypot(c.b[0] - c.a[0], c.b[1] - c.a[1], c.b[2] - c.a[2]) / 2 + Math.max(c.r1, c.r2); rcPrep(c); }
-  return { parts, tips, k: (n > 1 ? 0.4 : 0.55) * rF * dg.web, rt }; }
-// iq's round cone, and a smooth minimum: the points grow out of the drop with a soft web between them
-function rcPrep(c) { const a = c.a, b = c.b; c.bx = b[0] - a[0]; c.by = b[1] - a[1]; c.bz = b[2] - a[2]; c.l2 = c.bx * c.bx + c.by * c.by + c.bz * c.bz; c.rr = c.r1 - c.r2; c.a2 = c.l2 - c.rr * c.rr; c.il2 = 1 / c.l2; return c; }
+// the outline as a 2D distance (negative inside), in the units of the form: the body is a round cone from the back to the front,
+// each point a short round cone joined with a wide smooth blend, and a round notch cut between neighbouring points
+const smax = (a, b, k) => -smin(-a, -b, k), RTIP = 0.04;
+function formField(dg) {
+  const body = rcPrep({ a: [dg.cb, 0, 0], b: [dg.cf, 0, 0], r1: dg.Rb, r2: dg.Rf }), parts = [], tips = [], notches = [];
+  const P = (o, R, p) => { const dx = Math.cos(p.a), dz = Math.sin(p.a), a = [o[0] + dx * R * 0.35, 0, dz * R * 0.35], t = [o[0] + dx * (R + p.L), 0, dz * (R + p.L)];
+    parts.push(rcPrep({ a, b: t, r1: p.w, r2: RTIP })); tips.push({ T: [t[0] + dx * RTIP, t[2] + dz * RTIP], d: [dx, dz] }); return t; };
+  const fr = dg.pts.map((p) => P([dg.cf, 0], dg.Rf, p));
+  if (dg.back) P([dg.cb, 0], dg.Rb, { a: Math.PI + dg.back.a, L: dg.back.L, w: dg.back.w });
+  for (let i = 0; i + 1 < fr.length; i++) { const p = dg.pts[i], q = dg.pts[i + 1], c = Math.hypot(fr[i][0] - fr[i + 1][0], fr[i][2] - fr[i + 1][2]), am = (p.a + q.a) / 2, rn = 0.34 * c * dg.notch, R = dg.Rf + Math.min(p.L, q.L) + 0.3 * rn;
+    notches.push([dg.cf + Math.cos(am) * R, Math.sin(am) * R, rn]); }
+  const xb = dg.cb - dg.Rb, K = 0.1;
+  const f = (x, z) => { const zq = z - dg.bend * (x - xb) * (x - xb); let d = sdRC(x, 0, zq, body);
+    for (const c of parts) d = smin(d, sdRC(x, 0, zq, c), K);
+    for (const n of notches) d = smax(d, n[2] - Math.hypot(x - n[0], zq - n[1]), 0.05);
+    return d; };
+  const tipsW = tips.map((t) => { const x = t.T[0], z = t.T[1] + dg.bend * (x - xb) * (x - xb), s = 2 * dg.bend * (x - xb), d = [t.d[0], t.d[1] + s * t.d[0]], l = Math.hypot(...d); return { T: [x, z], d: [d[0] / l, d[1] / l] }; });
+  // the part of the body that belongs to the points, for the birth: the points fill last
+  const pw = (x, z) => { const zq = z - dg.bend * (x - xb) * (x - xb); let dp = 1e9; for (const c of parts) dp = Math.min(dp, sdRC(x, 0, zq, c)); return sstep(-0.02, 0.07, sdRC(x, 0, zq, body) - dp); };
+  return { f, tips: tipsW, pw }; }
+// iq's round cone, and a smooth minimum
+function rcPrep(c) { const a = c.a, b = c.b; c.bx = b[0] - a[0]; c.by = b[1] - a[1]; c.bz = b[2] - a[2]; c.l2 = c.bx * c.bx + c.by * c.by + c.bz * c.bz; c.rr = c.r1 - c.r2; c.a2 = c.l2 - c.rr * c.rr; c.il2 = c.l2 > 1e-12 ? 1 / c.l2 : 0; return c; }
 function sdRC(px, py, pz, c) { const a = c.a, bx = c.bx, by = c.by, bz = c.bz, l2 = c.l2, rr = c.rr, a2 = c.a2, il2 = c.il2;
+  if (!il2) return Math.hypot(px - a[0], py - a[1], pz - a[2]) - Math.max(c.r1, c.r2);
   const qx = px - a[0], qy = py - a[1], qz = pz - a[2], y = qx * bx + qy * by + qz * bz, z = y - l2, wx = qx * l2 - bx * y, wy = qy * l2 - by * y, wz = qz * l2 - bz * y, x2 = wx * wx + wy * wy + wz * wz, y2 = y * y * l2, z2 = z * z * l2, k = Math.sign(rr) * rr * rr * x2;
   if (Math.sign(z) * a2 * z2 > k) return Math.sqrt(x2 + z2) * il2 - c.r2; if (Math.sign(y) * a2 * y2 < k) return Math.sqrt(x2 + y2) * il2 - c.r1; return (Math.sqrt(x2 * a2 * il2) + y * rr) * il2 - c.r1; }
 const smin = (a, b, k) => { const h = Math.max(k - Math.abs(a - b), 0) / k; return Math.min(a, b) - h * h * k * 0.25; };
-function dropF(DP, x, y, z) { let d = 1e9; for (const c of DP.parts) { const ex = x - c.c[0], ey = y - c.c[1], ez = z - c.c[2], lb = Math.sqrt(ex * ex + ey * ey + ez * ez) - c.cr; if (lb > d + DP.k) continue; d = smin(d, sdRC(x, y, z, c), DP.k); } return d; }
 function kidShape(D, K, dg) {
-  const k = clamp(0.72 + 0.24 * D.endurance + 0.08 * D.memory - 0.1 * D.speed, 0.66, 1.02);
-  const A = (0.082 - 0.016 * D.speed + 0.02 * D.memory + 0.016 * D.endurance) * k, B = (0.078 + 0.036 * D.memory + 0.016 * D.endurance - 0.016 * D.speed) * k, Lu = (0.3 + 0.12 * D.speed) * k;
-  const s = { k: 1, size: k, A, B, Lu, rt: Math.max(0.0065, 0.024 * Lu), dg: dg || PROTO, n: 2, As: A, q: 2, Lt: 0, tp: 3, drop: 0, ribN: 0, ribD: 0, crest: 0, fin: 0, lobeN: 3, lobeD: 0, tone: 0.76 + 0.24 * K[3],
+  dg = dg || PROTO; const k = clamp(0.72 + 0.24 * D.endurance + 0.08 * D.memory - 0.1 * D.speed, 0.66, 1.02);
+  // the outline on a grid, in the form's units, kept for the skin and for the lineage drawing
+  const FF = formField(dg), hn = 0.007; let x0 = 9, x1 = -9, z0 = 9, z1 = -9;
+  const gx0 = dg.cb - dg.Rb - 0.26, gx1 = 0.8, gz = 0.62, nx = Math.ceil((gx1 - gx0) / hn) + 1, nz = Math.ceil(2 * gz / hn) + 1, Gd = new Float32Array(nx * nz);
+  for (let jz = 0; jz < nz; jz++) for (let ix = 0; ix < nx; ix++) { const x = gx0 + ix * hn, z = -gz + jz * hn, v = Gd[jz * nx + ix] = FF.f(x, z); if (v < 0) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); z0 = Math.min(z0, z); z1 = Math.max(z1, z); } }
+  // in metres: a fast body is longer, a lasting or remembering body larger; light makes the body flatter
+  const Lu = (0.3 + 0.1 * D.speed) * k, S = Lu / (x1 - x0 + hn), H = (0.033 + 0.01 * D.memory + 0.01 * D.endurance - 0.012 * D.light) * k, ox = -0.525 * Lu - S * (x0 - hn / 2);
+  const s = { k: 1, size: k, A: S * Math.max(z1, -z0), B: H * 1.5, Lu, H, S, ox, dg, rt: S * RTIP, n: 2, As: 0, q: 2, Lt: 0, tp: 3, drop: 0, ribN: 0, ribD: 0, crest: 0, fin: 0, lobeN: 3, lobeD: 0, tone: 0.76 + 0.24 * K[3],
     tex: [Math.min(5, Math.floor(K[4] * 6)), 0.005 + 0.012 * K[5], 0.00025, 0.3 + 0.9 * K[0]],
     sil: [clamp(0.72 - 0.6 * D.light, 0.2, 0.72), 0.25 + 0.45 * (1 - D.light), clamp(0.9 - 1.3 * D.memory + 0.3 * (K[1] - 0.5), -0.45, 1.2), clamp(-0.5 + 0.35 * K[5] + 0.2 * D.speed, -0.6, 0.2)], nb: 0.4, nd: 0.3 };
-  // the drop is as tall as B: the parts are built round, then the height is stretched by sy
-  s.sy = B / A; const DP = dropParts(s); let x0 = 9, x1 = -9, zw = 0;
-  for (const c of DP.parts) for (const e of [[c.a, c.r1], [c.b, c.r2]]) { x0 = Math.min(x0, e[0][0] - e[1]); x1 = Math.max(x1, e[0][0] + e[1]); zw = Math.max(zw, Math.abs(e[0][2]) + e[1]); }
+  s.O = { G: Gd, nx, nz, gx0, gz, hn, x0, x1, z0, z1 }; s.FF = FF;
   // placed as the old bodies were placed: the back at -Lh/2 - R, the front at Lh/2 + Ln, so the swimming, the growth and the water keep working
-  const L = x1 - x0; s.R = 0.15 * L; s.Ln = 0.1 * L; s.Lh = 0.75 * L; s.x0 = -0.525 * L - x0; s.Zw = zw; s.DP = DP; return s; }
-// a smooth single skin from the parts: surface nets on a grid, each vertex pulled onto the surface, the normals from the field. h is the grid step (the level of detail).
-function dropMesh(s, h) { const DP = s.DP, sy = s.sy, ox = s.x0, f = (x, y, z) => dropF(DP, x - ox, y / sy, z);
-  let b0 = [9, 9, 9], b1 = [-9, -9, -9]; for (const c of DP.parts) for (const e of [[c.a, c.r1], [c.b, c.r2]]) for (let i = 0; i < 3; i++) { const v = e[0][i] * (i === 1 ? sy : 1) + (i === 0 ? ox : 0), r = e[1] * (i === 1 ? sy : 1) + DP.k * 0.3; b0[i] = Math.min(b0[i], v - r); b1[i] = Math.max(b1[i], v + r); }
+  s.R = 0.15 * Lu; s.Ln = 0.1 * Lu; s.Lh = 0.75 * Lu; s.Zw = s.A; s.x0 = ox; return s; }
+// the outline distance in metres at a point of the body, from the grid
+function d2At(s, x, z) { const O = s.O, u = ((x - s.ox) / s.S - O.gx0) / O.hn, v = (z / s.S + O.gz) / O.hn; if (u < 0 || v < 0 || u >= O.nx - 1 || v >= O.nz - 1) return 0.05;
+  const i = Math.floor(u), j = Math.floor(v), fu = u - i, fv = v - j, G = O.G, n = O.nx, a = G[j * n + i], b = G[j * n + i + 1], c = G[(j + 1) * n + i], d = G[(j + 1) * n + i + 1];
+  return s.S * ((a * (1 - fu) + b * fu) * (1 - fv) + (c * (1 - fu) + d * fu) * fv); }
+// the front lifts a little in a body bent upward
+const liftAt = (s, x) => s.dg.lift * s.H * 1.2 * sstep(-0.1 * s.Lu, 0.45 * s.Lu, x);
+// filled with air like a pillow balloon: the height grows from the outline with a round edge, a gentle dome in the middle, the underside a little flatter
+function pillowF(s, x, y, z) { const d = d2At(s, x, z), w = 0.9 * s.H, e = Math.max(0, 1 + d / w), dy = y - liftAt(s, x), Hy = s.H * (0.84 + 0.16 * sstep(0, 3 * w, -d)) * (dy > 0 ? 1 : 0.8);
+  return (Math.sqrt(e * e + (dy / Hy) * (dy / Hy)) - 1) * Math.min(w, Hy); }
+// a smooth single skin: surface nets on a grid, each vertex pulled onto the surface, the normals from the field. h is the grid step (the level of detail).
+function dropMesh(s, h) { const f = (x, y, z) => pillowF(s, x, y, z), O = s.O;
+  let b0 = [s.ox + s.S * O.x0 - 2 * h, -s.H - 2 * h, s.S * O.z0 - 2 * h], b1 = [s.ox + s.S * O.x1 + 2 * h, s.H * 1.05 + liftAt(s, 9) + 2 * h, s.S * O.z1 + 2 * h];
   b0 = b0.map((v) => v - 2 * h); const nx = Math.ceil((b1[0] - b0[0]) / h) + 3, ny = Math.ceil((b1[1] - b0[1]) / h) + 3, nz = Math.ceil((b1[2] - b0[2]) / h) + 3, V = new Float32Array(nx * ny * nz), I = (i, j, k) => i + nx * (j + ny * k);
   for (let k = 0; k < nz; k++) for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) V[I(i, j, k)] = f(b0[0] + i * h, b0[1] + j * h, b0[2] + k * h);
   const cid = new Int32Array(nx * ny * nz).fill(-1), pos = [], nrm = [], E = [[0, 1], [2, 3], [4, 5], [6, 7], [0, 2], [1, 3], [4, 6], [5, 7], [0, 4], [1, 5], [2, 6], [3, 7]], g = [0, 0, 0], e = h * 0.3;
@@ -767,25 +806,25 @@ function dropMesh(s, h) { const DP = s.DP, sy = s.sy, ox = s.x0, f = (x, y, z) =
     if (j < ny - 1 && v0 !== (V[I(i, j + 1, k)] < 0)) quad(cid[I(i - 1, j, k - 1)], cid[I(i - 1, j, k)], cid[I(i, j, k)], cid[I(i, j, k - 1)], !v0);
     if (k < nz - 1 && v0 !== (V[I(i, j, k + 1)] < 0)) quad(cid[I(i - 1, j - 1, k)], cid[I(i, j - 1, k)], cid[I(i, j, k)], cid[I(i - 1, j, k)], !v0); }
   return { pos, nrm, tri }; }
-/* one geometry per design and level of detail: the skin (shell), the dark nozzle faces and a rolled ring at every tip (mouth), the folded pack as a morph,
+/* one geometry per design and level of detail: the skin (shell), the dark nozzle face and a small rolled ring at the one nozzle (mouth), the folded pack as a morph,
    and aPw, how much of a point a vertex is (the points unfold last) */
 function kidGeometry(s, far) {
-  const h = far ? Math.max(0.011, 1.5 * s.rt) : Math.min(0.0058, 0.85 * s.rt), M = dropMesh(s, h), DP = s.DP, sy = s.sy, ox = s.x0, nv = M.pos.length / 3, tone = s.tone;
-  const tips = DP.tips.map((t) => { const d = [t.d[0], t.d[1] * sy, t.d[2]], l = Math.hypot(...d); return { T: [t.T[0] + ox, t.T[1] * sy, t.T[2]], d: d.map((v) => v / l) }; });
-  const dark = new Uint8Array(nv), pw = new Float32Array(nv), col = new Float32Array(nv * 3).fill(tone), rt = s.rt;
+  const h = far ? 0.011 : Math.min(0.005, 0.6 * s.rt), M = dropMesh(s, h), nv = M.pos.length / 3, tone = s.tone, rt = s.rt, w = 0.9 * s.H;
+  // the nozzle at the end of every point: a small dark face and a small rolled rim, as tall as the point is there
+  const tips = s.FF.tips.map((t) => { const x = s.ox + s.S * t.T[0], z = s.S * t.T[1], e = Math.max(0, 1 - rt / w); return { T: [x, liftAt(s, x) + 0.08 * s.H, z], d: [t.d[0], 0, t.d[1]], hy: Math.max(rt, 0.9 * s.H * Math.sqrt(1 - e * e)) }; });
+  const dark = new Uint8Array(nv), pw = new Float32Array(nv), col = new Float32Array(nv * 3).fill(tone);
   for (let i = 0; i < nv; i++) { const x = M.pos[3 * i], y = M.pos[3 * i + 1], z = M.pos[3 * i + 2];
-    for (const t of tips) { const dx = x - t.T[0], dy = y - t.T[1], dz = z - t.T[2]; if (dx * dx + dy * dy + dz * dz < (1.35 * rt) ** 2 && M.nrm[3 * i] * t.d[0] + M.nrm[3 * i + 1] * t.d[1] + M.nrm[3 * i + 2] * t.d[2] > 0.5) { dark[i] = 1; col.set([0.5 * tone, 0.5 * tone, 0.52 * tone], 3 * i); } }
-    let dt = 1e9, dp = 1e9; const X = x - ox, Y = y / sy; for (const c of DP.parts) { const v = sdRC(X, Y, z, c); if (c.pt) dp = Math.min(dp, v); else dt = Math.min(dt, v); }
-    pw[i] = sstep(-0.004, 0.03, dt - dp); }
+    for (const t of tips) { const dx = x - t.T[0], dz = z - t.T[2], dy = (y - t.T[1]) * rt / t.hy; if (dx * dx + dy * dy + dz * dz < (1.3 * rt) ** 2 && M.nrm[3 * i] * t.d[0] + M.nrm[3 * i + 2] * t.d[2] > 0.55) { dark[i] = 1; col.set([0.55 * tone, 0.55 * tone, 0.57 * tone], 3 * i); } }
+    pw[i] = s.FF.pw((x - s.ox) / s.S, z / s.S); }
   const sh = [], mo = []; for (let t = 0; t < M.tri.length; t += 3) { const a = M.tri[t], b = M.tri[t + 1], c = M.tri[t + 2]; (dark[a] + dark[b] + dark[c] >= 2 ? mo : sh).push(a, b, c); }
-  // the rolled ring of every nozzle
+  // the small rolled ring of the nozzle
   const P = M.pos.slice(), N = M.nrm.slice(), C = Array.from(col), W = Array.from(pw), q = new THREE.Quaternion(), zA = new THREE.Vector3(0, 0, 1), v = new THREE.Vector3();
-  for (const t of tips) { const tg = new THREE.TorusGeometry(rt * 0.9, rt * (far ? 0.4 : 0.3), far ? 4 : 6, far ? 8 : 14); q.setFromUnitVectors(zA, v.set(...t.d)); tg.applyQuaternion(q); tg.translate(t.T[0] + t.d[0] * rt * 0.15, t.T[1] + t.d[1] * rt * 0.15, t.T[2] + t.d[2] * rt * 0.15);
-    const base = P.length / 3, tp = tg.attributes.position.array, tn = tg.attributes.normal.array; for (let i = 0; i < tp.length; i++) { P.push(tp[i]); N.push(tn[i]); } for (let i = 0; i < tp.length / 3; i++) { C.push(0.84, 0.83, 0.81); W.push(1); }
+  for (const t of tips) { const tg = new THREE.TorusGeometry(rt * 0.82, rt * (far ? 0.2 : 0.14), far ? 4 : 6, far ? 8 : 14); tg.scale(1, Math.min(3, 0.82 * t.hy / rt), 1); q.setFromUnitVectors(zA, v.set(...t.d)); tg.applyQuaternion(q); tg.translate(t.T[0] - t.d[0] * rt * 0.25, t.T[1], t.T[2] - t.d[2] * rt * 0.25);
+    const base = P.length / 3, tp = tg.attributes.position.array, tn = tg.attributes.normal.array; for (let i = 0; i < tp.length; i++) { P.push(tp[i]); N.push(tn[i]); } for (let i = 0; i < tp.length / 3; i++) { C.push(0.8 * tone, 0.8 * tone, 0.79 * tone); W.push(1); }
     for (const i of tg.index.array) mo.push(i + base); tg.dispose(); }
   const n = P.length / 3, g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(P, 3)); g.setAttribute("normal", new THREE.Float32BufferAttribute(N, 3)); g.setAttribute("color", new THREE.Float32BufferAttribute(C, 3)); g.setAttribute("aPw", new THREE.Float32BufferAttribute(W, 1));
   printAttrs(g, s, n); g.setIndex(sh.concat(mo)); g.addGroup(0, 0, 0); g.addGroup(0, sh.length, 1); g.addGroup(sh.length, mo.length, 2);
-  // folded: the printed newborn before air goes in, about 0.4 of the length, with fine folds; the points are laid in along the body
+  // folded: the printed newborn before air goes in, about 0.4 of the length, with fine folds; the points are tucked in and fill last
   let xmin = 9, xmax = -9; for (let i = 0; i < n; i++) { xmin = Math.min(xmin, P[3 * i]); xmax = Math.max(xmax, P[3 * i]); }
   const wr = new Float32Array(n * 3); for (let i = 0; i < n; i++) { const x = P[3 * i], y = P[3 * i + 1], z = P[3 * i + 2], th = Math.atan2(y, z), env = sstep(xmin, xmin + 0.08, x) * (i < nv ? 1 : 0), w = (0.022 * Math.sin(th * 5 + x * 22) + 0.014 * Math.sin(x * 38 - th * 3) + 0.01 * Math.sin(th * 11 + x * 9)) * env;
     wr[3 * i] = x * 0.4; wr[3 * i + 1] = y * (1 + w) * FOLDY * (1 - 0.4 * W[i]); wr[3 * i + 2] = z * (1 + w) * FOLDZ * (1 - 0.45 * W[i]); }
@@ -811,6 +850,7 @@ function newTailed(i, n) {
   const q = { id: nextId++, tailed: true, tail: true, qtail: false, g, s: shapeOf(g), hx, hz, x: hx, z: hz, h: Math.atan2(-hz, -hx) + (rnd() - 0.5) * 0.6, gen: 0, E: 0.75, cap: 1, state: "listen", st: 0, brood: 0, cool: 5 + 5 * i, talks: 0, told: new Map(), mem: [], memCap: 99,
     store: TALK.Store(), D: {}, K: Array.from({ length: 6 }, rnd), arm: { q: DREST.slice(), want: DREST, tool: "mag", psi: 0 }, readT: 1 + rnd() * 3, darkT: 0, bob: rnd() * 6.283, born: 0, sent: new Map(), pair: new Map(), flashT: -9, baby: null, G: null };
   for (const k of TALK.TRAITS) q.D[k] = 0.22 + 0.2 * rnd();
+  q.form = FOUNDER[i % FOUNDER.length]; q.s.hd = i % FOUNDER.length;      // each founder its own form, and a head of that family
   q.line = q.id; q.mesh = bodyMesh(q); q.mesh.userData.agent = q; q.len = q.mesh.geometry.userData.len; armDims(q);
   q.grp = new THREE.Group(); q.grp.matrixAutoUpdate = false; q.grp.add(q.mesh);
   q.gelM = new THREE.Mesh(gelGeo(q.s), GELMAT); q.gelM.renderOrder = 4.5; q.grp.add(q.gelM);
@@ -943,7 +983,7 @@ function stepTailed(q, dt) {
 function decide(q) {
   const S = q.store, Pr = TALK.pressures(S, simT), D0 = q.D, D1 = TALK.compose(D0, Pr, P.mut, rnd), first = q.gen === 0;
   q.K = q.K.map((v) => clamp(v + (rnd() - 0.5) * 2 * (0.05 + P.mut), 0, 1)); q.gen++;
-  q.dg = first ? PROTO : mutateDesign(q.dg || PROTO, D0, D1, Pr, P.mut, rnd);      // the form: the plain drop first, then the last design of the line, changed
+  q.dg = first ? formOf(q.form) : mutateDesign(q.dg || formOf(q.form), D0, D1, Pr, P.mut, rnd);      // the form: the founder's own form first, then the last design of the line, changed
   const nt = TALK.note(S, simT), desc = first ? TALK.bodyText(D1) : TALK.describe(D0, D1), kinds = [...S.topics];
   const G = { line: q.id, gen: q.gen, D: D1, D0, K: q.K.slice(), s: kidShape(D1, q.K, q.dg), note: nt.text, noteFacts: nt.facts, traces: TALK.deal(S, 4, q.id + ":" + q.gen).map((l) => ({ txt: TALK.traceText(l), t: l.t, p: l.p })), desc, t: simT, ids: [], alive: 0, born: 0, lines: S.lines.length, kinds, speakers: S.speakers.size, geo: null, refs: 0, P: Pr };
   LIN.get(q.id).push(G); q.G = G; q.D = D1; linDirty = true;
@@ -1186,16 +1226,9 @@ function spark(id, data) { const c = $(id), D = Math.min(2, devicePixelRatio || 
   g.fillStyle = "#9b9a94"; g.font = "10px JetBrains Mono, monospace"; g.fillText(String(data[data.length - 1]), 2, 10); }
 function bars() { const live = F.filter((b) => !b.fade), m = {}; for (const k of TALK.TRAITS) { m[k] = 0; for (const b of live) m[k] += b.D[k] / (live.length || 1); }
   $("#bars").innerHTML = TALK.TRAITS.map((k) => `<span>${k}</span><i><u style="width:${(m[k] * 100).toFixed(0)}%"></u></i><output>${live.length ? m[k].toFixed(2) : ""}</output>`).join(""); }
-// the outline of a body, as in the Birth variation diagram: the thin contour of the drop with the points, seen from above and a little from the side
-// (so a point that curls up shows), an inner line for the double wall, and a short stroke across every nozzle
-const OTILT = 0.55;
-function outline(s) { const DP = s.DP, c = Math.cos(OTILT), sn = Math.sin(OTILT), pr = (p) => [p[0] + s.x0, p[2] * c - p[1] * s.sy * sn];
-  const P2 = DP.parts.map((q) => ({ a: pr(q.a), b: pr(q.b), r1: q.r1, r2: q.r2 }));
-  const R2 = P2.map((q) => rcPrep({ a: [q.a[0], q.a[1], 0], b: [q.b[0], q.b[1], 0], r1: q.r1, r2: q.r2 })), f = (x, y) => { let d = 1e9; for (const q of R2) d = smin(d, sdRC(x, y, 0, q), DP.k); return d; };
-  let x0 = 9, x1 = -9, y0 = 9, y1 = -9; for (const q of P2) for (const [p, r] of [[q.a, q.r1], [q.b, q.r2]]) { x0 = Math.min(x0, p[0] - r); x1 = Math.max(x1, p[0] + r); y0 = Math.min(y0, p[1] - r); y1 = Math.max(y1, p[1] + r); }
-  const h = 0.004, nx = Math.ceil((x1 - x0) / h) + 5, ny = Math.ceil((y1 - y0) / h) + 5, bx = x0 - 2 * h, by = y0 - 2 * h, V = new Float32Array(nx * ny);
-  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) V[j * nx + i] = f(bx + i * h, by + j * h);
-  const sc = Math.min(58 / (x1 - x0), 30 / (y1 - y0)), cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, X = (x) => (31 + (x - cx) * sc).toFixed(1), Y = (y) => (17 + (y - cy) * sc).toFixed(1);
+// the outline of a body seen from above, drawn as in the Birth variation diagram: a thin double contour (the two skins) and a small rim across every nozzle
+function outline(s) { const O = s.O, V = O.G, nx = O.nx, ny = O.nz, h = O.hn, bx = O.gx0, by = -O.gz;
+  const sc = Math.min(70 / (O.x1 - O.x0 + 0.08), 36 / (O.z1 - O.z0 + 0.08)), cx = (O.x0 + O.x1) / 2, cy = (O.z0 + O.z1) / 2, X = (x) => (40 + (x - cx) * sc).toFixed(1), Y = (y) => (22 + (y - cy) * sc).toFixed(1);
   // marching squares at a level, the segments chained into closed loops
   const contour = (lv) => { const ep = new Map(), nb = new Map(), link = (a, b) => { (nb.get(a) || nb.set(a, []).get(a)).push(b); (nb.get(b) || nb.set(b, []).get(b)).push(a); };
     const E = (i, j, vert) => { const id = 2 * (j * nx + i) + vert; if (!ep.has(id)) { const a = V[j * nx + i] - lv, b = (vert ? V[(j + 1) * nx + i] : V[j * nx + i + 1]) - lv, t = a / (a - b); ep.set(id, vert ? [bx + i * h, by + (j + t) * h] : [bx + (i + t) * h, by + j * h]); } return id; };
@@ -1206,9 +1239,8 @@ function outline(s) { const DP = s.DP, c = Math.cos(OTILT), sn = Math.sin(OTILT)
     for (const st of nb.keys()) { if (seen.has(st)) continue; let cur = st, prev = -1, pts = []; while (cur !== undefined && !seen.has(cur)) { seen.add(cur); pts.push(ep.get(cur)); const n = nb.get(cur), nx_ = n[0] !== prev ? n[0] : n[1]; prev = cur; cur = nx_; }
       if (pts.length > 3) d += "M" + pts.filter((_, k) => k % 2 === 0).map((p) => X(p[0]) + " " + Y(p[1])).join(" L") + " Z "; }
     return d; };
-  let tk = ""; for (const t of DP.tips) { const T = pr(t.T), ex = t.d[0], ey = t.d[2] * c - t.d[1] * s.sy * sn, l = Math.hypot(ex, ey) || 1, ux = ex / l, uy = ey / l, r = s.rt * 1.5;
-    tk += `M${X(T[0] - uy * r)} ${Y(T[1] + ux * r)} L${X(T[0] + uy * r)} ${Y(T[1] - ux * r)} `; }
-  return `<svg viewBox="0 0 62 34" aria-hidden="true"><path class="q" d="${contour(-0.009)}"/><path d="${contour(0)}${tk}"/></svg>`; }
+  let tk = ""; for (const t of s.FF.tips) { const ux = t.d[0], uy = t.d[1], r = RTIP * 1.25; for (const o of [0, 0.025]) { const px = t.T[0] - ux * o, py = t.T[1] - uy * o; tk += `M${X(px - uy * r)} ${Y(py + ux * r)} L${X(px + uy * r)} ${Y(py - ux * r)} `; } }
+  return `<svg viewBox="0 0 80 44" aria-hidden="true"><path class="q" d="${contour(-0.017)}"/><path d="${contour(0)}${tk}"/></svg>`; }
 function grew(G) { const d = TALK.TRAITS.map((k) => [k, G.D[k] - G.D0[k]]).sort((a, b) => b[1] - a[1]), up = d.filter((x) => x[1] > 0.04).slice(0, 2).map((x) => x[0] + " up"), dn = d[d.length - 1][1] < -0.06 ? [d[d.length - 1][0] + " down"] : []; return up.concat(dn).join(", ") || "as the last"; }
 function lineage() { let h = "";
   for (const q of Q) { const L = LIN.get(q.id), S = q.store, need = aloneQ(q) ? Math.min(P.need, 3) : P.need;
@@ -1247,7 +1279,7 @@ initThree(); tankCam(); R3.ctl.addEventListener("start", () => { R3.moved = true
 const embedSync = () => { const e = document.documentElement.classList.contains("bnm-embed"); R3.ctl.enableZoom = !e; }; embedSync(); new MutationObserver(embedSync).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
 reset(); requestAnimationFrame(loop);
 // for tests: the state, and a way to run the model ahead without drawing
-window.__soc = { get Q() { return Q; }, get F() { return F; }, get convos() { return convos; }, get LIN() { return LIN; }, get simT() { return simT; }, get DIR() { return DIR; }, get seed() { return SEED; }, R3, CINE, setCam, setSpd, frame,
+window.__soc = { dbg: { kidShape, outline, formOf, FORMS, mutateDesign, kidGeometry }, get Q() { return Q; }, get F() { return F; }, get convos() { return convos; }, get LIN() { return LIN; }, get simT() { return simT; }, get DIR() { return DIR; }, get seed() { return SEED; }, R3, CINE, setCam, setSpd, frame,
   advance(sec, dt = 0.05) { for (let t = 0; t < sec; t += dt) step(dt); },
   shot(e) { camMode = "film"; e.side = e.side || 1; e.b0 = births; e.dur = e.dur || 12; e.key = e.q || e.C.a; e.tgt = shotTarget(e); DIR.shot = e; DIR.t = 0; DIR.cut = true; },
   stats() { const live = F.filter((b) => !b.fade); return { t: Math.round(simT), tailed: Q.length, bodies: live.length, births, faded, said, talks, gens: Q.map((q) => q.gen), meanAge: live.length ? Math.round(live.reduce((s, b) => s + b.age, 0) / live.length) : 0 }; } };
