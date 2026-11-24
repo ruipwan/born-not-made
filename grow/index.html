@@ -2,144 +2,313 @@
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#000"><title>Grow · Born, Not Made</title>
-<meta name="description" content="After “birth”, three ways to fill the folds of the newborn: baking soda and acid, a mini air pump, and water electrolysis. A simple illustration, not a physics simulation.">
+<meta name="description" content="After “birth”, three ways to fill the folds of the newborn, compared on one real clock: baking soda and acid, a mini air pump, and water electrolysis, with the parts, the numbers and the risks.">
 <style>
 *{box-sizing:border-box}html{color-scheme:dark}
 body{margin:0;background:#000;color:rgba(236,235,230,.9);font:14px/1.55 Arial,Helvetica,sans-serif}
-main{max-width:1600px;margin:auto;padding:26px clamp(12px,2.2vw,36px) 18px}
+main{max-width:1600px;margin:auto;padding:26px clamp(12px,2.2vw,36px) 22px}
 h1{margin:0;font:400 clamp(26px,3vw,38px)/1.15 Georgia,serif;color:rgba(236,235,230,.95)}
-.sub{margin:6px 0 0;color:rgba(236,235,230,.62);font:15px/1.5 Arial,sans-serif}
-.bar{display:flex;gap:18px;align-items:center;margin:16px 0 14px;font:12px ui-monospace,Menlo,monospace;color:rgba(236,235,230,.55)}
+.sub{margin:6px 0 0;color:rgba(236,235,230,.62);font:15px/1.5 Arial,sans-serif;max-width:980px}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.clockbox{text-align:right}
+#clock{font:300 clamp(34px,4.2vw,54px)/1 ui-monospace,Menlo,monospace;color:rgba(236,235,230,.95);letter-spacing:.02em}
+.clockbox small{display:block;margin-top:6px;font:11px ui-monospace,Menlo,monospace;letter-spacing:.12em;text-transform:uppercase;color:rgba(236,235,230,.5)}
+.bar{display:flex;gap:12px;align-items:center;margin:16px 0 14px;font:12px ui-monospace,Menlo,monospace;color:rgba(236,235,230,.55);flex-wrap:wrap}
 button{color:rgba(236,235,230,.8);font:12px ui-monospace,Menlo,monospace;background:none;border:1px solid rgba(236,235,230,.28);border-radius:4px;padding:5px 12px;cursor:pointer}
 button:hover{color:#fff;border-color:rgba(236,235,230,.6)}
 button:focus-visible{outline:2px solid #fff;outline-offset:3px}
 .tag{border:1px solid rgba(236,235,230,.28);border-radius:3px;padding:2px 8px;letter-spacing:.08em;text-transform:uppercase;font-size:10.5px}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(12px,1.6vw,26px)}
-@media (max-width:820px){.grid{grid-template-columns:1fr}}
-figure{margin:0}
+canvas{display:block;width:100%;background:#000}
+.panel{border:1px solid rgba(236,235,230,.12);border-radius:6px}
 .k{margin:0 0 6px;font:11px ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(236,235,230,.55)}
-h2{margin:0 0 8px;font:400 19px/1.25 Georgia,serif;color:rgba(236,235,230,.95)}
-canvas{display:block;width:100%;aspect-ratio:400/258;background:#000;border:1px solid rgba(236,235,230,.12);border-radius:6px}
-figcaption p{margin:9px 0 0;color:rgba(236,235,230,.66);font-size:13.5px;line-height:1.55}
-figcaption p.t{color:rgba(236,235,230,.5)}
-figcaption b{font-weight:400;color:rgba(236,235,230,.85)}
-.note{margin:20px 0 0;color:rgba(236,235,230,.45);font:12px/1.6 Arial,sans-serif;max-width:1100px}
+h2{margin:0 0 10px;font:400 20px/1.25 Georgia,serif;color:rgba(236,235,230,.95)}
+h3{margin:16px 0 6px;font:11px ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(236,235,230,.55);font-weight:400}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(12px,1.6vw,26px);margin-top:22px}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+ul{margin:0;padding:0 0 0 16px;color:rgba(236,235,230,.7);font-size:13px;line-height:1.55}
+li{margin:0 0 4px}li::marker{color:rgba(236,235,230,.35)}
+.risk{margin:12px 0 0;padding:9px 12px;border-left:2px solid #c48b5c;color:rgba(236,235,230,.75);font-size:13px;line-height:1.55;background:rgba(196,139,92,.06)}
+.risk b{font-weight:400;color:#e0b48c}
+.mono{font-family:ui-monospace,Menlo,monospace;font-size:12px}
+.tl{margin-top:22px}
+.note{margin:18px 0 0;color:rgba(236,235,230,.45);font:12px/1.65 Arial,sans-serif;max-width:1250px}
+.note a{color:rgba(236,235,230,.7)}
 </style></head><body><main>
-<h1>Grow</h1>
-<p class="sub">After “birth”, three ways to fill the folds.</p>
-<div class="bar"><button type="button" id="play">Pause</button><button type="button" id="speed">Speed 1×</button><span id="clock">0.0 s</span><span class="tag">simple illustration</span></div>
-<div class="grid">
-<figure><p class="k">1 · Chemical</p><h2>Baking soda and acid</h2>
-<canvas id="c0" role="img" aria-label="The pleated newborn floats in water. Its small pump drips water onto an effervescent tablet in a chamber of the kit; carbon dioxide bubbles fill the body and the folds open."></canvas>
-<figcaption><p>The pump meters a few drops of water onto a baking soda and citric acid tablet in a small chamber of the kit. The tablet fizzes and its CO₂ fills the body.</p>
-<p class="t"><b>Tradeoff.</b> No moving parts in the reaction, but one shot per tablet, and the fizz is fast at first, then fades.</p></figcaption></figure>
-<figure><p class="k">2 · Mechanical</p><h2>Mini air pump</h2>
-<canvas id="c1" role="img" aria-label="The pleated newborn floats in water. A tiny pump in the kit draws air through a snorkel above the surface and pushes it into the body; the folds open."></canvas>
-<figcaption><p>A tiny air pump in the kit draws air through a thin snorkel that reaches above the surface, and pushes it into the body.</p>
-<p class="t"><b>Tradeoff.</b> Refillable and steady, but it needs an air inlet kept above water, and a motor that can wear out.</p></figcaption></figure>
-<figure><p class="k">3 · Electrical</p><h2>Water electrolysis</h2>
-<canvas id="c2" role="img" aria-label="The pleated newborn floats in water. Two electrodes in a small water cell, powered by the cell, release hydrogen and oxygen bubbles that fill the body; the folds open."></canvas>
-<figcaption><p>Two electrodes in a small water cell, powered by the battery cell, split water into hydrogen and oxygen. The gas fills the body.</p>
-<p class="t"><b>Tradeoff.</b> No moving parts, but slow, it drains the cell, and it makes hydrogen, which is flammable mixed with oxygen.</p></figcaption></figure>
+<div class="top">
+<div><h1>Grow</h1>
+<p class="sub">After “birth”, three ways to fill the folds. One target, three kits, one real clock: the newborn needs 4.76 L more gas to open from 365 to 426 mm.</p></div>
+<div class="clockbox"><div id="clock">0:00:01</div><small>real elapsed time since “birth”</small></div>
 </div>
-<p class="note">A simple illustration, not a physics simulation. Side views at one scale. Time is compressed: all three share one 14 second loop. The newborn leaves the parent half filled and folded, and the readout gives length relative to its length at “birth”.</p>
+<div class="bar"><button type="button" id="play">Pause</button><button type="button" id="speed">Speed 1×</button><span id="scale">clock runs on a log scale, 1 s to 10 h, about 34 s per loop</span><span class="tag">simple illustration, calculated numbers</span></div>
+
+<canvas id="sum" class="panel" style="aspect-ratio:1600/250" role="img" aria-label="The target. The newborn leaves at 7.14 litres, 365 by 210 millimetres, 673 pascals, and grows to 11.90 litres, 426 by 246 millimetres, 1582 pascals. The gas to make is 4.76 litres, 0.200 mol at 20 degrees and 102.6 kilopascals. The skin stretch goes from 1.07 to 1.25, under the limit 1.38."></canvas>
+
+<div class="grid">
+<section><p class="k">1 · Chemical</p><h2>Baking soda and acid</h2>
+<canvas id="c0" class="panel" style="aspect-ratio:480/885" role="img" aria-label="Baking soda and acid: the kit pumps tank water through a metering orifice onto a tablet in a dry pocket; carbon dioxide vents into the body. About 59 minutes."></canvas>
+<h3>What it needs to make it</h3>
+<ul><li>A tablet of 29.7 g: sodium bicarbonate 16.8 g and citric acid 12.8 g, in a dry pocket of 42 × 42 × 16 mm.</li>
+<li>89 mL of tank water, metered at 1.5 mL/min by the AITIAO 3 to 5 V micro submersible pump through an orifice, so about 59 min.</li>
+<li>Makes 8.8 g of CO₂, which is 4.76 L. The 17.2 g of sodium citrate leaves in solution with the jet.</li>
+<li class="mono">3 NaHCO₃ + C₆H₈O₇ → Na₃C₆H₅O₇ + 3 H₂O + 3 CO₂</li></ul>
+<p class="risk"><b>Risk.</b> CO₂ dissolves in water and passes through silicone much faster than air, so the body slowly shrinks unless it is fed again with a new tablet.</p>
+</section>
+<section><p class="k">2 · Mechanical</p><h2>Mini air pump</h2>
+<canvas id="c1" class="panel" style="aspect-ratio:480/885" role="img" aria-label="Mini air pump: an Adafruit ZR370 pump draws air through a snorkel and float with a check valve and pushes it into the body, 10 seconds on and 5 off. About 3 minutes."></canvas>
+<h3>What it needs to make it</h3>
+<ul><li>Adafruit ZR370-02PM air pump: 4.5 V, 2.5 L/min free flow, about 500 mA, rated for 10 s on and 5 s off.</li>
+<li>At about 1.6 kPa back pressure, take about 2.3 L/min: 124 s of pumping, 3.1 min on the clock.</li>
+<li>About 17 mAh of the 500 mAh LiPo for the pump, through a boost converter from 3.7 to 4.5 V.</li>
+<li>A snorkel to a float above the water, with a check valve so water and gas cannot run back.</li></ul>
+<p class="risk"><b>Risk.</b> The inlet must stay above water. If the float tips under, the pump draws water, and the motor is the part most likely to wear out.</p>
+</section>
+<section><p class="k">3 · Electrical</p><h2>Water electrolysis</h2>
+<canvas id="c2" class="panel" style="aspect-ratio:480/885" role="img" aria-label="Water electrolysis: two electrodes in a small water cell split water into hydrogen and oxygen at 1 ampere. The kit battery alone makes 7 percent of the gas, then is empty; with about 8 ampere hours more it takes about 7.2 hours."></canvas>
+<h3>What it needs to make it</h3>
+<ul><li>A cell with two electrodes in water with sodium bicarbonate as electrolyte. Not salt: salt water makes chlorine.</li>
+<li>Faraday’s law: 0.200 mol of gas needs 0.267 mol of electrons, 25.8 kC, which is 7.16 Ah. It splits 2.4 g of water into 3.17 L H₂ and 1.59 L O₂.</li>
+<li>At 1 A that is 7.2 h. The 500 mAh kit LiPo alone makes 0.33 L, 7% of the target, in 30 min, then it is empty.</li>
+<li>About 8 Ah more: for example three 18650 cells, or power from outside the body.</li></ul>
+<p class="risk"><b>Risk.</b> Hydrogen and oxygen mixed 2 to 1 is a flammable, explosive mixture. Inside the body it must be kept away from any spark, and the body holds 4.76 L of it.</p>
+</section>
+</div>
+
+<div class="tl"><p class="k">Shared clock, log scale · click to jump</p>
+<canvas id="tl" class="panel" style="aspect-ratio:1600/230;cursor:pointer" role="img" aria-label="Timeline on a log scale from 1 second to 10 hours. The air pump finishes at about 3 minutes, baking soda at about 59 minutes. Electrolysis stops at 7 percent after 30 minutes on the kit battery, or finishes at about 7.2 hours with 8 ampere hours more."></canvas></div>
+
+<p class="note">A simple illustration with calculated numbers, not a physics simulation. Body sizes, volumes and pressures come from the simplified simulator’s own grow data (simulator/simple/simple.json, key “grow”): it leaves at 60% of the grown gas volume. Length, diameter and pressure between the two ends are interpolated along the simulator’s stretch table. Gas volumes at 20 °C and 102.6 kPa, 23.75 L/mol. The kit cutaways are schematic, not to scale. Battery use counts only the gas maker, not the chip. The soda pump’s charge assumes the micro pump moves about 1.2 L/min at 0.2 A while it pulses.
+<br>Sources: <a href="https://www.adafruit.com/product/4699">Adafruit, Air Pump and Vacuum DC Motor, 4.5 V, 2.5 LPM, ZR370-02PM (product 4699)</a> · CMU 16-376 pump guide, current measured 350 to 500 mA at 5.1 V · <a href="https://www.adafruit.com/product/1578">Adafruit, Lithium Ion Polymer Battery 3.7 V 500 mAh (product 1578)</a> · Microbots CodeCell C6 Drive · AITIAO 3 to 5 V micro submersible water pump · Faraday constant 96485 C/mol (CODATA) · reaction 3 NaHCO₃ + C₆H₈O₇ → Na₃C₆H₅O₇ + 3 H₂O + 3 CO₂ · <a href="../simulator/simple/">the simplified simulator</a>.</p>
 </main>
 <script>
-const W=400,H=258,LOOP=14,T0=1,T1=11;
-const ink=a=>'rgba(236,235,230,'+a+')',MONO='11px ui-monospace,Menlo,monospace';
-const NB_F='rgba(160,104,66,.5)',NB_S='#c48b5c',SURF=92,FLOOR=240;
-const L0=118,L1=236,H0=74,H1=116,CX=204;
-const cvs=[0,1,2].map(i=>document.getElementById('c'+i)),ctx=cvs.map(c=>c.getContext('2d'));
-const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
-const CURVE=[u=>1-Math.pow(1-u,2.2),u=>u*u*(3-2*u)*.35+u*.65,u=>Math.pow(u,1.6)];
-const NAME=['CO₂','air','H₂ + O₂'];
-function prog(k,t){return CURVE[k](clamp((t-T0)/(T1-T0)))}
-function rate(k,t){const e=.02;return (prog(k,t+e)-prog(k,t-e))/(2*e)*(T1-T0)}
-function hash(i){const s=Math.sin(i*127.1+311.7)*43758.5453;return s-Math.floor(s)}
-function body(p){const L=L0+(L1-L0)*p,Hh=H0+(H1-H0)*p;return {L,Hh,cx:CX,cy:SURF+Hh*.28,fold:1-p}}
-/* egg with a rounder rear (left) and narrower front (right); fixed number of pleats that open as fold goes to 0 */
+/* ---------- numbers ---------- */
+const G={Vexit:7.1407,Vfull:11.9011,Vgas:4.7604,mol:.20044,Lx:365.2,Lf:425.5,Dx:209.5,Df:246.3,px:672.9,pf:1581.9,stx:1.073,stf:1.25,stl:1.38,
+  gf:[.6,.63038,.66145,.69315,.72545,.75832,.79171,.82556,.85984,.89447,.92942,.96462,1]};
+const FAR=96485,VM=23.75;                                 // C/mol, L/mol at 20 C, 102.6 kPa
+const PUMP={Q:2.3/60,on:10,off:5,A:.5};PUMP.need=G.Vgas/PUMP.Q;PUMP.done=Math.floor(PUMP.need/10)*15+PUMP.need%10;
+const SODA={done:3560.9,dose:89.02,tab:29.67,co2:8.82,cit:17.24,mAh:89.02*(60/1200)*.2/3.6};
+const EL={I:1,Q:G.mol*4/3*FAR};EL.done=EL.Q/EL.I;EL.kitC=1800;EL.kitL=EL.kitC/FAR*.75*VM;
+const TMAX=36000;
+function lamOf(gf){const a=G.gf;if(gf<=a[0])return 0;for(let i=1;i<a.length;i++)if(gf<=a[i])return (i-1+(gf-a[i-1])/(a[i]-a[i-1]))/12;return 1}
+function state(k,t){let gas=0,s={};
+  if(k===0){const f=Math.min(1,t/SODA.done);gas=G.Vgas*f;s={f,done:SODA.done,water:Math.min(SODA.dose,1.5*t/60),tab:SODA.tab*(1-f),co2:SODA.co2*f,cit:SODA.cit*f,mAh:SODA.mAh*f,run:f<1};}
+  if(k===1){const cyc=Math.floor(t/15),ph=t%15;const onT=Math.min(PUMP.need,cyc*10+Math.min(ph,10));gas=PUMP.Q*onT;
+    s={done:PUMP.done,onT,on:onT<PUMP.need&&ph<10,cyc:Math.min(cyc+1,Math.ceil(PUMP.need/10)),mAh:PUMP.A*onT/3.6,run:onT<PUMP.need};}
+  if(k===2){const Q=Math.min(EL.Q,t*EL.I);gas=Q/FAR*.75*VM;const kq=Math.min(t,EL.kitC);
+    s={done:EL.done,Q,kitGas:kq/FAR*.75*VM,kitmAh:kq/3.6,packmAh:Math.max(0,Q-EL.kitC)/3.6,water:Q/FAR/2*18.015,h2:gas*2/3,o2:gas/3,run:Q<EL.Q,kitEmpty:t>=EL.kitC};
+    s.mAh=Q/3.6;}
+  const V=G.Vexit+Math.min(gas,G.Vgas),gf=V/G.Vfull,lam=lamOf(gf);
+  return Object.assign(s,{gas:Math.min(gas,G.Vgas),V,gf,lam,L:G.Lx+(G.Lf-G.Lx)*lam,D:G.Dx+(G.Df-G.Dx)*lam,p:G.px+(G.pf-G.px)*lam});}
+/* ---------- drawing helpers ---------- */
+const ink=a=>'rgba(236,235,230,'+a+')',MONO='ui-monospace,Menlo,monospace',SANS='Arial,Helvetica,sans-serif',SERIF='Georgia,serif';
+const NB_F='rgba(160,104,66,.5)',NB_S='#c48b5c',ACC='#c48b5c',WATER='#0c1620';
+let g;
+function txt(s,x,y,o={}){g.font=(o.w||'')+' '+(o.s||11)+'px '+(o.f||MONO);g.fillStyle=o.c||ink(o.a??.65);g.textAlign=o.al||'left';g.textBaseline=o.bl||'alphabetic';g.fillText(s,x,y);return g.measureText(s).width}
+function line(x1,y1,x2,y2,c,w=1,dash){g.strokeStyle=c;g.lineWidth=w;if(dash)g.setLineDash(dash);g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke();if(dash)g.setLineDash([])}
+function rr(x,y,w,h,r,fill,stroke,lw=1){g.beginPath();g.roundRect(x,y,w,h,r);if(fill){g.fillStyle=fill;g.fill()}if(stroke){g.strokeStyle=stroke;g.lineWidth=lw;g.stroke()}}
+function circ(x,y,r,fill,stroke,lw=1){g.beginPath();g.arc(x,y,r,0,7);if(fill){g.fillStyle=fill;g.fill()}if(stroke){g.strokeStyle=stroke;g.lineWidth=lw;g.stroke()}}
+function arrow(x1,y1,x2,y2,c,w=1.1){line(x1,y1,x2,y2,c,w);const an=Math.atan2(y2-y1,x2-x1);g.beginPath();g.moveTo(x2-6*Math.cos(an-.5),y2-6*Math.sin(an-.5));g.lineTo(x2,y2);g.lineTo(x2-6*Math.cos(an+.5),y2-6*Math.sin(an+.5));g.stroke()}
+function lab(ax,ay,lx,ly,s,al='left'){line(ax,ay,lx,ly,ink(.3),.8);circ(ax,ay,1.6,ink(.6));txt(s,lx+(al==='left'?3:-3),ly+3.5,{s:10,al,a:.7})}
+function bar(x,y,w,h,f,col,mark){rr(x,y,w,h,1,ink(.06),ink(.22),.8);if(f>0)rr(x+1,y+1,Math.max(0,(w-2)*Math.min(1,f)),h-2,1,col);if(mark!=null)line(x+w*mark,y-3,x+w*mark,y+h+3,ink(.7),1)}
+/* egg, rear at x0, round rear, narrower front, NP pleats opening as fold goes to 0 */
 const NP=9;
-function eggPts(b){const pts=[];for(let i=0;i<=260;i++){const t=i/260*Math.PI*2,c=Math.cos(t);let x=b.L/2*c,y=b.Hh/2*Math.sin(t)*(1-.12*c);
-  const mid=Math.max(0,1-Math.pow(Math.abs(c)/.84,6)),tri=Math.abs((((x/b.L+.5)*NP)%1+1)%1-.5)*2;y-=Math.sign(y)*b.fold*mid*b.Hh*.065*tri;pts.push([b.cx+x,b.cy+y])}return pts}
-function topY(b,x){const c=clamp((x-b.cx)/(b.L/2),-.999,.999);return b.cy-b.Hh/2*Math.sqrt(1-c*c)*(1-.12*c)+b.fold*b.Hh*.065+3}
-function poly(g,P){g.beginPath();P.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath()}
-function text(g,s,x,y,a=.6,align='left',f=MONO){g.font=f;g.fillStyle=ink(a);g.textAlign=align;g.fillText(s,x,y)}
-function lead(g,ax,ay,lx,ly,s,align='left'){g.strokeStyle=ink(.3);g.lineWidth=.8;g.beginPath();g.moveTo(ax,ay);g.lineTo(lx,ly);g.stroke();text(g,s,lx+(align==='left'?3:-3),ly+(ly>ay?10:-3),.6,align)}
-function bubble(g,x,y,r,a){g.strokeStyle=ink(a);g.lineWidth=.9;g.beginPath();g.arc(x,y,r,0,7);g.stroke()}
-function rr(g,x,y,w,h,r,fill,stroke){g.beginPath();g.roundRect(x,y,w,h,r);if(fill){g.fillStyle=fill;g.fill()}if(stroke){g.strokeStyle=stroke;g.lineWidth=.9;g.stroke()}}
-function arrow(g,x1,y1,x2,y2,a){g.strokeStyle=ink(a);g.lineWidth=1.1;g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);const an=Math.atan2(y2-y1,x2-x1);
-  g.moveTo(x2-6*Math.cos(an-.5),y2-6*Math.sin(an-.5));g.lineTo(x2,y2);g.lineTo(x2-6*Math.cos(an+.5),y2-6*Math.sin(an+.5));g.stroke()}
-/* rising gas bubbles, deterministic in time: bubble i is born at i*dt and kept if the source rate at that moment beats its hash */
-function stream(g,k,t,b,src,opt){const dt=opt.dt,life=opt.life;const i0=Math.floor((t-life)/dt),i1=Math.floor(t/dt);
-  for(let i=Math.max(0,i0);i<=i1;i++){const tb=i*dt;if(tb<T0||tb>T1+.3)continue;if(rate(k,tb)*opt.gain<hash(i))continue;
-    const age=t-tb;if(age<0||age>life)continue;const s=src(i);const x=s[0]+Math.sin(age*5+i)*2*clamp(age);
-    const y=s[1]-age*opt.v;const ty=topY(b,x);if(y<ty)continue;const r=opt.r*(.7+.6*hash(i+9))*(1+.4*clamp(age/life));
-    bubble(g,x,y,r,.75*clamp((y-ty)/14)*clamp(age*6))}}
-function scene(k,t){const g=ctx[k],c=cvs[k],dpr=window.devicePixelRatio||1,s=c.width/W;
-  g.setTransform(s,0,0,s,0,0);g.fillStyle='#000';g.fillRect(0,0,W,H);
-  const p=prog(k,t),b=body(p),run=t>T0&&t<T1+.2;
-  // water
-  g.fillStyle='#0c1620';g.fillRect(12,SURF,W-24,FLOOR-SURF);
-  g.strokeStyle='rgba(130,170,200,.35)';g.lineWidth=1;g.setLineDash([4,5]);g.beginPath();g.moveTo(12,SURF);g.lineTo(W-12,SURF);g.stroke();g.setLineDash([]);
-  g.strokeStyle=ink(.25);g.beginPath();g.moveTo(12,FLOOR);g.lineTo(W-12,FLOOR);g.stroke();
-  // ghost of the full size
-  const bf=body(1);g.setLineDash([3,4]);g.strokeStyle=ink(.14);g.lineWidth=.8;poly(g,eggPts(bf));g.stroke();g.setLineDash([]);
-  // body
-  const P=eggPts(b);g.fillStyle=NB_F;poly(g,P);g.fill();g.strokeStyle=NB_S;g.lineWidth=1.5;g.stroke();
-  // kit, fixed size, at the rear wall
-  const kx=b.cx-b.L/2+16,ky=b.cy-4;
-  g.save();poly(g,P);g.clip();
-  if(b.fold>0){g.strokeStyle='rgba(230,190,150,'+(.5*b.fold)+')';g.lineWidth=.9;
-    for(let j=1;j<NP;j++){const x=b.cx-b.L/2+j*b.L/NP;g.beginPath();g.moveTo(x,b.cy-b.Hh);g.quadraticCurveTo(x+3,b.cy,x,b.cy+b.Hh);g.stroke()}}
-  rr(g,kx,ky+4,10,8,1.5,'#cfc8ba');                 // cell
-  rr(g,kx+12,ky+6,9,6,1,'#4a4a4a',ink(.35));        // chip
-  if(k===0){ // pump, droplets, chamber with tablet, CO2
-    g.fillStyle='#6a6a6a';g.beginPath();g.arc(kx+5,ky-3,4,0,7);g.fill();
-    rr(g,kx+24,ky-8,16,20,2,'rgba(236,235,230,.05)',ink(.55));
-    const tw=12*(1-.85*p);rr(g,kx+32-tw/2,ky+8,tw,3,1.5,'#e8e4da');
-    if(run){for(let d=0;d<3;d++){const ph=((t*2.2+d/3)%1);const x=kx+9+ph*18,y=ky-6-Math.sin(ph*Math.PI)*7;g.fillStyle='rgba(150,190,220,.85)';g.beginPath();g.arc(x,y,1.3,0,7);g.fill()}}
-    stream(g,0,t,b,i=>[kx+28+hash(i+3)*8,ky+6],{dt:.045,life:2.6,v:34,r:1.8,gain:.9});
-  }
-  if(k===1){ // pump with rotor; outlet bubbles
-    g.fillStyle='#5a5a5a';g.beginPath();g.arc(kx+30,ky+2,7,0,7);g.fill();
-    const a=run?t*9:0;g.strokeStyle=ink(.7);g.lineWidth=1;for(let j=0;j<3;j++){g.beginPath();g.moveTo(kx+30,ky+2);g.lineTo(kx+30+5*Math.cos(a+j*2.09),ky+2+5*Math.sin(a+j*2.09));g.stroke()}
-    stream(g,1,t,b,i=>[kx+38+hash(i+5)*3,ky],{dt:.06,life:2.4,v:38,r:1.9,gain:1});
-  }
-  if(k===2){ // water cell with two electrodes
-    rr(g,kx+24,ky-10,22,22,2,'rgba(120,160,200,.18)',ink(.55));
-    g.strokeStyle='#bdb6a8';g.lineWidth=1.6;g.beginPath();g.moveTo(kx+30,ky-13);g.lineTo(kx+30,ky+9);g.moveTo(kx+40,ky-13);g.lineTo(kx+40,ky+9);g.stroke();
-    g.strokeStyle=ink(.35);g.lineWidth=.7;g.beginPath();g.moveTo(kx+5,ky+4);g.lineTo(kx+5,ky-14);g.lineTo(kx+30,ky-14);g.moveTo(kx+8,ky+4);g.lineTo(kx+8,ky-17);g.lineTo(kx+40,ky-17);g.stroke();
-    stream(g,2,t,b,i=>[kx+30+(hash(i+1)-.5)*2,ky+4],{dt:.05,life:3,v:28,r:1.2,gain:.8});        // H2, twice the volume
-    stream(g,2,t+.37,b,i=>[kx+40+(hash(i+2)-.5)*2,ky+4],{dt:.1,life:3,v:28,r:1.2,gain:.8});      // O2
-  }
-  g.restore();
-  // outside the body: snorkel for the pump
-  if(k===1){const sx=kx+22,top=SURF-26;g.strokeStyle='rgba(200,200,200,.7)';g.lineWidth=1.6;g.beginPath();g.moveTo(kx+26,ky+2);g.lineTo(sx,ky+2);g.lineTo(sx,top);g.arc(sx+5,top,5,Math.PI,0);g.lineTo(sx+10,top+4);g.stroke();
-    if(run){for(let j=0;j<3;j++){const ph=((t*1.1+j/3)%1),y=top+2+ph*(ky-top-4);g.strokeStyle=ink(.7);g.lineWidth=1;g.beginPath();g.moveTo(sx-3,y-3);g.lineTo(sx,y);g.lineTo(sx+3,y-3);g.stroke()}
-      arrow(g,sx+10,top+18,sx+10,top+6,.5)}
-    lead(g,sx+9,top-3,sx+18,top-9,'air inlet');
-    lead(g,kx+30,ky+9,kx+20,FLOOR-24,'pump');}
-  if(k===0){lead(g,kx+32,ky+11,kx+22,FLOOR-24,'tablet, chamber');lead(g,kx+5,ky+1,kx-8,FLOOR-9,'pump, water drops')}
-  if(k===2){lead(g,kx+30,ky+10,kx+14,FLOOR-24,'electrodes, H₂ and O₂');lead(g,kx+5,ky+12,kx-8,FLOOR-9,'cell, the power')}
-  // readout
-  text(g,'fill '+String(Math.round(50+50*p)).padStart(3,' ')+'%',22,26,.8);
-  text(g,'length '+(1+p).toFixed(2)+'×',22,42,.8);
-  g.strokeStyle=ink(.2);g.lineWidth=1;g.strokeRect(22.5,52.5,100,3);g.fillStyle=ink(.75);g.fillRect(23,53,99*(.5+.5*p),2);
-  const st=t<T0?'folded, half filled':t<T1?(p<.5?'filling, folds opening':'folds opening'):'open, full';
-  text(g,st,W-22,26,.55,'right');text(g,'gas: '+NAME[k],W-22,42,.55,'right');
-  if(t<T1)arrow(g,b.cx+b.L/2+8,b.cy,b.cx+b.L/2+22,b.cy,.35*(t>T0?1:0));
-  // fade at the loop seam
-  const fa=Math.max(clamp((t-(LOOP-.7))/.7),clamp(1-t/.35));if(fa>0){g.fillStyle='rgba(0,0,0,'+fa+')';g.fillRect(0,0,W,H)}
+function eggPts(x0,cy,L,D,fold){const pts=[],cx=x0+L/2;for(let i=0;i<=260;i++){const t=i/260*Math.PI*2,c=Math.cos(t);let x=L/2*c,y=D/2*Math.sin(t)*(1-.1*c);
+  const mid=Math.max(0,1-Math.pow(Math.abs(c)/.84,6)),tri=Math.abs((((x/L+.5)*NP)%1+1)%1-.5)*2;y-=Math.sign(y)*fold*mid*D*.06*tri;pts.push([cx+x,cy+y])}return pts}
+function poly(P){g.beginPath();P.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath()}
+function egg(x0,cy,L,D,fold,ghost){const P=eggPts(x0,cy,L,D,fold);
+  if(ghost){g.setLineDash([3,4]);g.strokeStyle=ink(.3);g.lineWidth=.9;poly(P);g.stroke();g.setLineDash([]);return P}
+  g.fillStyle=NB_F;poly(P);g.fill();g.strokeStyle=NB_S;g.lineWidth=1.5;g.stroke();
+  if(fold>0){g.save();poly(P);g.clip();g.strokeStyle='rgba(230,190,150,'+(.5*fold)+')';g.lineWidth=.9;
+    for(let j=1;j<NP;j++){const x=x0+j*L/NP;g.beginPath();g.moveTo(x,cy-D);g.quadraticCurveTo(x+3,cy,x,cy+D);g.stroke()}g.restore()}
+  return P}
+function fmt(t){t=Math.max(0,Math.round(t));const h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=t%60;return h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
+function dur(t){if(t<90)return Math.round(t)+' s';if(t<3600)return (t/60).toFixed(t<600?1:0)+' min';return (t/3600).toFixed(1)+' h'}
+function fit(c,W,H){const dpr=devicePixelRatio||1,w=Math.round(c.clientWidth*dpr);if(w&&c.width!==w){c.width=w;c.height=Math.round(w*H/W)}const k=c.width/W;g=c.getContext('2d');g.setTransform(k,0,0,k,0,0);g.fillStyle='#000';g.fillRect(0,0,W,H)}
+function hash(i){const s=Math.sin(i*127.1+311.7)*43758.5453;return s-Math.floor(s)}
+
+/* ---------- top summary ---------- */
+function drawSum(){const c=document.getElementById('sum');fit(c,1600,250);
+  txt('THE TARGET, FROM THE SIMULATOR',30,34,{s:11,a:.5});
+  const s=.42,x0=40,cy=140;
+  egg(x0,cy,G.Lf*s,G.Df*s,0,true);egg(x0,cy,G.Lx*s,G.Dx*s,1);
+  txt('at “birth”',x0+6,cy+G.Dx*s/2+30,{s:12,f:SANS,a:.8});txt('7.14 L, 365 × 210 mm, 673 Pa',x0+6,cy+G.Dx*s/2+46,{s:11,a:.6});
+  txt('grown, dashed',x0+G.Lf*s-6,cy-G.Df*s/2-10,{s:12,f:SANS,a:.8,al:'right'});
+  const ax=270;arrow(ax,cy,ax+90,cy,ink(.6),1.3);
+  txt('+4.76 L',ax+105,cy-6,{s:34,f:SERIF,a:.95});txt('of gas to make',ax+107,cy+16,{s:12,f:SANS,a:.65});
+  txt('0.200 mol at 20 °C, 102.6 kPa',ax+107,cy+34,{s:11,a:.55});
+  const bx=640,bw=300;txt('GAS VOLUME',bx,70,{s:10,a:.5});
+  rr(bx,80,bw,16,2,ink(.05),ink(.25));rr(bx+1,81,(bw-2)*G.Vexit/G.Vfull,14,1,NB_F);rr(bx+1+(bw-2)*G.Vexit/G.Vfull,81,(bw-2)*G.Vgas/G.Vfull,14,1,'rgba(236,235,230,.12)');
+  g.setLineDash([3,3]);g.strokeStyle=ink(.6);g.strokeRect(bx+1+(bw-2)*G.Vexit/G.Vfull,81,(bw-2)*G.Vgas/G.Vfull,14);g.setLineDash([]);
+  txt('7.14 L, 60%',bx,114,{s:11,a:.7});txt('+4.76 L',bx+bw*.8,114,{s:11,a:.85,al:'center'});txt('11.90 L',bx+bw,72,{s:11,a:.7,al:'right'});
+  txt('LENGTH × DIAMETER',bx,152,{s:10,a:.5});txt('365 × 210 mm  →  426 × 246 mm',bx,172,{s:14,a:.85});
+  txt('the folds open, the skin stretches',bx,190,{s:11,f:SANS,a:.55});
+  const px=1010,pw=250;txt('PRESSURE OVER THE WATER',px,70,{s:10,a:.5});
+  bar(px,80,pw,10,G.px/1800,'rgba(160,104,66,.8)');const pm=x=>px+pw*x/1800;
+  line(pm(G.pf),74,pm(G.pf),98,ACC,1.4);txt('673 Pa',pm(G.px),114,{s:11,a:.7,al:'center'});txt('1582 Pa, stop',pm(G.pf),114,{s:11,c:'#e0b48c',al:'center'});
+  txt('SKIN STRETCH, OF PRINTED SIZE',px,152,{s:10,a:.5});const sm=x=>px+pw*(x-1)/.45;
+  line(px,166,px+pw,166,ink(.25),1);for(const v of [1,1.1,1.2,1.3,1.4]){line(sm(v),162,sm(v),170,ink(.3));txt(v.toFixed(1),sm(v),186,{s:9,a:.4,al:'center'})}
+  g.fillStyle=NB_F;g.fillRect(sm(G.stx),162,sm(G.stf)-sm(G.stx),8);line(sm(G.stl),156,sm(G.stl),176,'#d0664a',1.4);
+  txt('1.07 → 1.25',sm(1.16),206,{s:11,a:.8,al:'center'});txt('limit 1.38',sm(G.stl)+5,206,{s:10,c:'#d0664a'});
+  const rx=1330;txt('THE SAME RULE FOR ALL THREE',rx,70,{s:10,a:.5});
+  const L=['Trigger: the needle lets go,','the chip feels the pressure drop.','Run: make gas.','Stop: the pressure sensor reads','about 1.58 kPa, the chip stops.'];
+  L.forEach((s,i)=>txt(s,rx,92+i*19,{s:12.5,f:SANS,a:i===2?.85:.7}));
 }
-function size(){const dpr=window.devicePixelRatio||1;for(const c of cvs){const w=Math.round(c.clientWidth*dpr);if(w&&c.width!==w){c.width=w;c.height=Math.round(w*H/W)}}}
-let t=0,playing=true,speed=1,last=performance.now();const sp=[1,2,.5];let si=0;
-const q=new URLSearchParams(location.search);if(q.has('t')){t=+q.get('t');playing=false}
-function frame(now){const dt=Math.min(.1,(now-last)/1000);last=now;if(playing)t=(t+dt*speed)%LOOP;size();for(let k=0;k<3;k++)scene(k,t);
-  document.getElementById('clock').textContent=t.toFixed(1).padStart(4,' ')+' s / '+LOOP+' s';requestAnimationFrame(frame)}
-document.getElementById('play').onclick=e=>{playing=!playing;e.target.textContent=playing?'Pause':'Play'};
+/* ---------- column scene ---------- */
+const CW=480,CH=885,SURF=168,S=.8,REAR=42;
+function drawCol(k,t,at){const c=document.getElementById('c'+k);fit(c,CW,CH);const st=state(k,t);
+  const fin=[SODA.done,PUMP.done,EL.done][k];
+  txt('FULL AT',20,30,{s:10,a:.5});txt(fmt(fin),20,60,{s:28,f:MONO,a:.95});
+  txt(k===2?'with 8 Ah more; kit battery alone stops at 7%':'on the shared clock',20,78,{s:10.5,f:SANS,a:.55});
+  let status=t<2.5?'TRIGGER':!st.run?'FULL, STOPPED':k===1&&!st.on?'PUMP OFF, COOLING':'RUNNING';
+  if(k===2&&st.kitEmpty&&st.run)status='ON THE EXTRA PACK';
+  const sw=txt(status,CW-20,34,{s:10.5,al:'right',a:.9});g.strokeStyle=st.run?ACC:ink(.4);g.lineWidth=1;g.strokeRect(CW-26-sw,20,sw+12,20);
+  txt(Math.round(st.gf*100)+'%',CW-20,72,{s:26,f:MONO,a:.95,al:'right'});txt('of grown volume',CW-20,86,{s:10,a:.5,al:'right'});
+  const T0=100,T1=336;g.fillStyle=WATER;g.fillRect(14,SURF,CW-28,T1-SURF);
+  line(14,SURF,CW-14,SURF,'rgba(130,170,200,.4)',1,[4,5]);line(14,T1,CW-14,T1,ink(.25),1);
+  const Lp=st.L*S,Dp=st.D*S,cyy=SURF+G.Df*S*.22;
+  egg(REAR,cyy,G.Lf*S,G.Df*S,0,true);
+  const P=egg(REAR,cyy,Lp,Dp,1-st.lam);
+  const kx=REAR+22,ky=cyy+6;rr(kx,ky,46,20,3,'rgba(207,200,186,.85)');txt('kit',kx+23,ky+13.5,{s:9,al:'center',c:'#222'});
+  if(st.run&&t>.5){g.save();poly(P);g.clip();const n=k===1?(st.on?14:0):k===0?9:6;
+    for(let i=0;i<n;i++){const ph=((at*(k===2?.35:.6)+hash(i))%1),bx=kx+30+hash(i+7)*(k===1?10:14)+Math.sin(at*3+i)*2,by=ky-ph*(Dp*.6);circ(bx,by,k===2?1.2:1.8+hash(i)*1.2,null,ink(.75*(1-ph)),.9)}g.restore()}
+  if(k===1){const fx=kx+20;line(fx,ky,fx,SURF-6,'rgba(200,200,200,.7)',1.4);g.beginPath();g.ellipse(fx,SURF-5,12,4,0,0,7);g.fillStyle='rgba(200,200,200,.35)';g.fill();g.strokeStyle=ink(.6);g.stroke();
+    lab(fx+10,SURF-7,fx+60,SURF-26-36,'float, inlet above water');}
+  const fx=REAR+Lp;line(REAR,T1-18,fx,T1-18,ink(.55),1);line(REAR,T1-23,REAR,T1-13,ink(.55));line(fx,T1-23,fx,T1-13,ink(.55));
+  txt(Math.round(st.L)+' mm',(REAR+fx)/2,T1-24,{s:11,al:'center',a:.85});
+  line(fx+14,cyy-Dp/2,fx+14,cyy+Dp/2,ink(.55));line(fx+9,cyy-Dp/2,fx+19,cyy-Dp/2,ink(.55));line(fx+9,cyy+Dp/2,fx+19,cyy+Dp/2,ink(.55));
+  txt('⌀ '+Math.round(st.D),fx+22,cyy+4,{s:11,a:.85});
+  txt('grown outline, dashed',CW-20,T0+8,{s:9.5,a:.45,al:'right'});
+  const ry=T1+14;line(REAR,ry,REAR+450*S,ry,ink(.4),1);
+  for(let m=0;m<=450;m+=10){const x=REAR+m*S,big=m%50===0;line(x,ry,x,ry+(big?7:3.5),ink(big?.5:.25),.8);if(m%100===0)txt(String(m),x,ry+18,{s:9,a:.5,al:'center'})}
+  txt('mm',REAR+450*S+6,ry+8,{s:9,a:.5});
+  for(const m of [G.Lx,G.Lf])line(REAR+m*S,ry-5,REAR+m*S,ry,ACC,1.2);
+  txt('365',REAR+G.Lx*S,ry-8,{s:9,c:'#e0b48c',al:'center'});txt('426',REAR+G.Lf*S,ry-8,{s:9,c:'#e0b48c',al:'center'});
+  kitCut(k,st,t,at,20,392);
+  readouts(k,st,t,20,612);
+  strip(k,st,t,20,812);
+}
+function sectionHead(s,x,y,w){txt(s,x,y,{s:10,a:.5});line(x+g.measureText(s).width+8,y-3.5,x+w,y-3.5,ink(.15),1)}
+function pipe(pts,c=ink(.45),w=1.6){g.strokeStyle=c;g.lineWidth=w;g.lineJoin='round';g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.stroke()}
+function flow(pts,on,at,col='rgba(150,190,220,.95)',sp=.8,n=4){if(!on)return;let L=0;const seg=[];for(let i=1;i<pts.length;i++){const d=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);seg.push(d);L+=d}
+  for(let j=0;j<n;j++){let s=((at*sp+j/n)%1)*L;for(let i=0;i<seg.length;i++){if(s<=seg[i]){const f=s/seg[i];circ(pts[i][0]+(pts[i+1][0]-pts[i][0])*f,pts[i][1]+(pts[i+1][1]-pts[i][1])*f,1.8,col);break}s-=seg[i]}}}
+function common(x,y,st){
+  rr(x+14,y+58,92,34,3,'#2a2a2a',ink(.4));for(let i=0;i<6;i++){line(x+22+i*13,y+56,x+22+i*13,y+58,ink(.4));line(x+22+i*13,y+92,x+22+i*13,y+94,ink(.4))}
+  txt('CodeCell C6',x+60,y+73,{s:9.5,a:.85,al:'center'});txt('Drive, the chip',x+60,y+85,{s:9,a:.55,al:'center'});
+  rr(x+14,y+104,92,30,3,'rgba(207,200,186,.12)',ink(.5));rr(x+106,y+113,4,12,1,ink(.5));
+  const used=Math.min(1,(st.kitmAh??st.mAh)/500);rr(x+17,y+107,86*(1-used),24,2,'rgba(207,200,186,.35)');
+  txt('LiPo 3.7 V 500 mAh',x+60,y+123,{s:8.5,a:.85,al:'center'});
+  circ(x+28,y+36,7,'#333',ACC,1.2);txt('P',x+28,y+39.5,{s:8.5,al:'center',c:'#e0b48c'});
+  line(x+28,y+43,x+28,y+56,ink(.3),.8);
+  txt('pressure sensor, proposed',x+40,y+32,{s:9.5,c:'#e0b48c'});txt('stops the fill at 1.58 kPa',x+40,y+44,{s:9.5,c:'#e0b48c'});
+}
+function kitCut(k,st,t,at,x,y){sectionHead('KIT CUTAWAY, SCHEMATIC, NOT TO SCALE',x,y,440);
+  y+=10;rr(x,y+12,440,180,10,'rgba(236,235,230,.025)',ink(.3),1);
+  const on=st.run&&t>.5;
+  if(k===0){common(x,y,st);
+    const pin=[[x-6,y+168],[x+150,y+168]];pipe(pin);flow(pin,on,at,undefined,.4,3);
+    rr(x+150,y+150,52,34,4,'#3c3c3c',ink(.5));txt('water',x+176,y+164,{s:9,al:'center',a:.85});txt('pump',x+176,y+176,{s:9,al:'center',a:.85});
+    const p2=[[x+202,y+167],[x+238,y+167],[x+238,y+80],[x+300,y+80],[x+300,y+92]];pipe(p2);flow(p2,on,at,undefined,.35,4);
+    g.fillStyle=ink(.7);g.beginPath();g.moveTo(x+232,y+130);g.lineTo(x+244,y+130);g.lineTo(x+240,y+124);g.lineTo(x+236,y+124);g.closePath();g.fill();
+    lab(x+232,y+127,x+226,y+140,'orifice, 1.5 mL/min','right');
+    rr(x+246,y+92,110,62,4,'rgba(236,235,230,.04)',ink(.6));
+    const tw=96*Math.cbrt(Math.max(.001,1-st.f)),th=26*Math.cbrt(Math.max(.001,1-st.f));
+    if(st.f<1)rr(x+301-tw/2,y+150-th,tw,th,3,'#e8e4da');
+    if(on){for(let i=0;i<6;i++){const ph=(at*.9+hash(i))%1;circ(x+260+hash(i+3)*82,y+148-th-ph*28,1.5+ph,null,ink(.8*(1-ph)),.9)}
+      const dph=(at*1.2)%1;circ(x+300,y+96+dph*20,1.6,'rgba(150,190,220,.9)')}
+    txt('dry tablet pocket',x+246,y+168,{s:9,a:.6});txt('42 × 42 × 16 mm',x+246,y+180,{s:9,a:.6});
+    const v=[[x+340,y+92],[x+340,y+12],[x+340,y-6]];pipe(v,ink(.45));if(on)arrow(x+340,y+30,x+340,y+4,ink(.8));
+    txt('vent, CO₂ to the body',x+334,y+66,{s:9.5,a:.75,al:'right'});
+    const d=[[x+356,y+140],[x+446,y+140]];pipe(d,ink(.35));txt('spent solution',x+436,y+124,{s:8.5,a:.6,al:'right'});txt('out with the jet',x+436,y+156,{s:8.5,a:.6,al:'right'});txt('17.2 g citrate',x+436,y+168,{s:8.5,a:.45,al:'right'});
+    txt('tank water in',x+2,y+186,{s:9,a:.55});
+  }
+  if(k===1){common(x,y,st);
+    rr(x+130,y+108,56,26,3,'#333',ink(.45));txt('boost',x+158,y+119,{s:9,al:'center',a:.85});txt('3.7 → 4.5 V',x+158,y+130,{s:8.5,al:'center',a:.6});
+    line(x+106,y+120,x+130,y+120,ink(.4),1);line(x+186,y+120,x+222,y+120,ink(.4),1);line(x+222,y+120,x+222,y+136,ink(.4),1);
+    rr(x+214,y+136,110,46,6,'#3a3a3a',st.on?ACC:ink(.5),1.2);circ(x+246,y+159,13,'#2a2a2a',ink(.5));
+    const a=st.on?at*14:0;for(let j=0;j<3;j++)line(x+246,y+159,x+246+10*Math.cos(a+j*2.09),y+159+10*Math.sin(a+j*2.09),ink(.8),1.2);
+    txt('ZR370-02PM',x+290,y+156,{s:9,al:'center',a:.85});txt(st.on?'ON':st.run?'OFF, 5 s':'OFF',x+290,y+170,{s:9.5,al:'center',c:st.on?'#e0b48c':ink(.55)});
+    const sn=[[x+238,y-8],[x+238,y+136]];pipe(sn,'rgba(200,200,200,.6)',2);flow(sn,st.on,at,ink(.85),.9,4);
+    g.fillStyle=ink(.8);g.beginPath();g.moveTo(x+232,y+52);g.lineTo(x+244,y+52);g.lineTo(x+238,y+62);g.closePath();g.fill();line(x+232,y+63,x+244,y+63,ink(.8),1.4);
+    txt('check valve',x+250,y+60,{s:9.5,a:.75});txt('snorkel from the float',x+250,y+20,{s:9.5,a:.75});
+    const out=[[x+324,y+159],[x+420,y+159],[x+420,y-6]];pipe(out);flow(out,st.on,at,ink(.85),.9,4);
+    txt('air to the body',x+414,y+96,{s:9.5,a:.75,al:'right'});txt('10 s on, 5 s off',x+414,y+110,{s:9,a:.55,al:'right'});
+  }
+  if(k===2){common(x,y,st);
+    for(let i=0;i<3;i++){rr(x+14+i*31,y+146,27,40,3,'rgba(207,200,186,.08)',ink(.4));const u=Math.min(1,st.packmAh/8000);rr(x+17+i*31,y+149+34*u,21,34*(1-u),2,'rgba(207,200,186,.3)')}
+    txt('extra pack',x+112,y+170,{s:9,a:.7});txt('3 × 18650, 8 Ah',x+112,y+182,{s:9,a:.55});
+    rr(x+232,y+60,140,108,5,'rgba(120,160,200,.16)',ink(.55));
+    g.fillStyle='rgba(120,160,200,.12)';g.fillRect(x+233,y+76,138,91);line(x+233,y+76,x+371,y+76,'rgba(130,170,200,.5)',1,[3,3]);
+    for(const [ex,s] of [[x+272,'−'],[x+332,'+']]){rr(ex-3,y+66,6,90,1,'#bdb6a8');txt(s,ex,y+176,{s:12,al:'center',a:.85})}
+    txt('H₂',x+272,y+188,{s:10,al:'center',a:.85});txt('O₂',x+332,y+188,{s:10,al:'center',a:.85});
+    if(on){for(let i=0;i<10;i++){const ph=(at*.5+hash(i))%1;circ(x+276+hash(i+2)*8,y+150-ph*74,1.3,null,ink(.8*(1-ph)),.9)}
+      for(let i=0;i<5;i++){const ph=(at*.5+hash(i+20))%1;circ(x+336+hash(i+4)*8,y+150-ph*74,1.3,null,ink(.8*(1-ph)),.9)}}
+    line(x+106,y+75,x+190,y+75,ink(.35),.8);line(x+190,y+75,x+190,y+56,ink(.35),.8);line(x+190,y+56,x+272,y+56,ink(.35),.8);line(x+272,y+56,x+272,y+66,ink(.35),.8);
+    line(x+106,y+82,x+200,y+82,ink(.35),.8);line(x+200,y+82,x+200,y+48,ink(.35),.8);line(x+200,y+48,x+332,y+48,ink(.35),.8);line(x+332,y+48,x+332,y+66,ink(.35),.8);
+    txt('1 A',x+250,y+44,{s:9.5,c:'#e0b48c',al:'center'});
+    txt('electrolyte: water',x+226,y+112,{s:9,a:.6,al:'right'});txt('+ sodium bicarbonate',x+226,y+124,{s:9,a:.6,al:'right'});
+    const o=[[x+302,y+60],[x+302,y-6]];pipe(o,ink(.45));if(on)arrow(x+302,y+40,x+302,y+4,ink(.8));
+    txt('H₂ + O₂ to the body',x+308,y+30,{s:9.5,a:.75});
+    pipe([[x+400,y+186],[x+400,y+130],[x+372,y+130]],ink(.35));txt('tank',x+404,y+150,{s:9,a:.55});txt('water in',x+404,y+162,{s:9,a:.55});
+  }
+}
+function row(label,val,x,y,a=.85){txt(label,x,y,{s:10.5,a:.55});txt(val,x+440,y,{s:11,a,al:'right'})}
+function readouts(k,st,t,x,y){sectionHead('LIVE READOUT',x,y,440);y+=18;
+  row('gas made',st.gas.toFixed(2)+' of 4.76 L',x,y);bar(x,y+6,440,8,st.gas/G.Vgas,'rgba(236,235,230,.7)',k===2?EL.kitL/G.Vgas:null);
+  if(k===2){txt('kit battery empty: 0.33 L, 7%',x+440*EL.kitL/G.Vgas+5,y+26,{s:9,c:st.kitEmpty?'#d0664a':ink(.45)})}
+  y+=k===2?40:30;
+  row('fill, of grown volume',Math.round(st.gf*100)+'%   '+st.V.toFixed(2)+' L',x,y);y+=16;
+  row('length × diameter',Math.round(st.L)+' × '+Math.round(st.D)+' mm',x,y);y+=16;
+  row('pressure over the water',Math.round(st.p)+' Pa',x,y);bar(x,y+6,440,6,st.p/1800,'rgba(160,104,66,.8)',G.pf/1800);y+=26;
+  if(k===2){row('battery used','kit '+Math.round(st.kitmAh)+' of 500, pack '+Math.round(st.packmAh)+' of 8000 mAh',x,y);
+    bar(x,y+6,440*500/8500,6,st.kitmAh/500,'rgba(207,200,186,.6)');bar(x+440*500/8500+3,y+6,440*8000/8500-3,6,st.packmAh/8000,'rgba(207,200,186,.35)');}
+  else{row('battery used',(st.mAh<1?st.mAh.toFixed(2):st.mAh.toFixed(1))+' of 500 mAh',x,y);bar(x,y+6,440,6,st.mAh/500,'rgba(207,200,186,.6)');}
+  y+=26;
+  if(k===0){row('tablet left',st.tab.toFixed(1)+' of 29.7 g',x,y);y+=16;row('water dosed',st.water.toFixed(1)+' of 89 mL',x,y);y+=16;row('CO₂ made, citrate formed',st.co2.toFixed(2)+' g, '+st.cit.toFixed(1)+' g',x,y)}
+  if(k===1){row('pump',(st.on?'ON':'OFF')+', cycle '+st.cyc+' of 13',x,y,st.on?1:.6);y+=16;row('pumping time',Math.round(st.onT)+' of 124 s',x,y);y+=16;row('air drawn through the snorkel',st.gas.toFixed(2)+' L',x,y)}
+  if(k===2){row('charge',(st.Q/3600).toFixed(2)+' of 7.16 Ah',x,y);y+=16;row('water split',st.water.toFixed(2)+' of 2.40 g',x,y);y+=16;row('H₂ and O₂',st.h2.toFixed(2)+' L and '+st.o2.toFixed(2)+' L',x,y)}
+}
+function strip(k,st,t,x,y){sectionHead('TRIGGER, RUN, STOP',x,y,440);y+=10;
+  const run=['pump doses tank water|onto the tablet,|1.5 mL/min','pump runs 10 s on,|5 s off, air from|the snorkel','1 A through the cell,|H₂ and O₂ bubble up,|kit battery, then pack'][k];
+  const B=[['1 Trigger','needle lets go,|pressure drops,|chip starts'],['2 Run',run],['3 Stop','sensor reads|about 1.58 kPa,|chip stops']];
+  const ph=t<2.5?0:st.run?1:2,w=142;
+  B.forEach(([h,b],i)=>{const bx=x+i*(w+7),on=i===ph;rr(bx,y,w,62,4,on?'rgba(196,139,92,.12)':null,on?ACC:ink(.2),1);
+    txt(h,bx+8,y+15,{s:10,c:on?'#e0b48c':ink(.6)});b.split('|').forEach((s,j)=>txt(s,bx+8,y+31+j*12,{s:10,f:SANS,a:on?.9:.5}));
+    if(i<2)arrow(bx+w+1,y+31,bx+w+6,y+31,ink(.4))});
+}
+/* ---------- timeline ---------- */
+const TLW=1600,TLH=230,TX0=200,TX1=1540;
+const lx=t=>TX0+(TX1-TX0)*Math.log(Math.max(1,t))/Math.log(TMAX);
+function drawTL(t){const c=document.getElementById('tl');fit(c,TLW,TLH);
+  const ticks=[[1,'1 s'],[10,'10 s'],[60,'1 min'],[600,'10 min'],[3600,'1 h'],[36000,'10 h']];
+  for(const [v,s] of ticks){line(lx(v),26,lx(v),196,ink(.12),1);txt(s,lx(v),214,{s:10.5,a:.55,al:'center'})}
+  for(const v of [2,3,5,20,30,120,300,1200,1800,7200,18000])line(lx(v),192,lx(v),196,ink(.25),1);
+  const lanes=[[1,'2  Mini air pump',PUMP.done],[0,'1  Baking soda',SODA.done],[2,'3  Electrolysis',EL.done]];
+  lanes.forEach(([k,name,done],i)=>{const y=52+i*50;txt(name,24,y+5,{s:13,f:SERIF,a:.9});
+    line(TX0,y,TX1,y,ink(.15),1);
+    const end=Math.min(t,done);
+    if(k===2){const ke=Math.min(end,EL.kitC);line(TX0,y,lx(ke),y,ink(.85),4);
+      if(end>EL.kitC){g.setLineDash([6,4]);line(lx(EL.kitC),y,lx(end),y,'rgba(196,139,92,.9)',3);g.setLineDash([])}
+      g.setLineDash([2,4]);line(lx(EL.kitC),y,lx(done),y,'rgba(196,139,92,.35)',1);g.setLineDash([]);
+      circ(lx(EL.kitC),y,5,'#000','#d0664a',1.5);txt('kit battery empty, 7%, 30 min',lx(EL.kitC),y+20,{s:10,c:'#d0664a',al:'center'});
+    }else{line(TX0,y,lx(end),y,ink(.85),4);if(k===1){for(let c0=10;c0<done;c0+=15){const a=lx(c0),b=lx(Math.min(c0+5,done));if(c0<end)line(a,y,Math.min(b,lx(end)),y,'#000',2.5)}}}
+    g.save();g.translate(lx(done),y);g.rotate(Math.PI/4);g.fillStyle=t>=done?'#e0b48c':'#000';g.strokeStyle='#e0b48c';g.lineWidth=1.4;g.fillRect(-5,-5,10,10);g.strokeRect(-5,-5,10,10);g.restore();
+    txt('full at '+dur(done)+(k===2?', with 8 Ah more':''),lx(done),y-12,{s:10.5,c:'#e0b48c',al:'center'});
+    const st=state(k,t);txt(Math.round(st.gf*100)+'%',TX1+14,y+4,{s:11,a:.75});
+  });
+  line(lx(t),20,lx(t),200,ink(.9),1.2);txt(fmt(t),lx(t),16,{s:11,al:'center',a:.95});
+}
+/* ---------- loop ---------- */
+const RUN=30,HOLD=4,LOOP=RUN+HOLD;
+let u=0,playing=true,speed=1,last=performance.now(),at=0;const sp=[1,2,.5];let si=0;
+const tOf=u=>Math.pow(TMAX,Math.min(1,u/RUN));
+const q=new URLSearchParams(location.search);if(q.has('t')){const tt=Math.max(1,Math.min(TMAX,+q.get('t')));u=Math.log(tt)/Math.log(TMAX)*RUN;playing=false}
+function frame(now){const dt=Math.min(.1,(now-last)/1000);last=now;if(playing){u=(u+dt*speed)%LOOP;at+=dt}else at+=dt*.3;
+  const t=tOf(u);document.getElementById('clock').textContent=fmt(t);
+  drawSum();for(let k=0;k<3;k++)drawCol(k,t,at);drawTL(t);requestAnimationFrame(frame)}
+const pb=document.getElementById('play');pb.onclick=()=>{playing=!playing;pb.textContent=playing?'Pause':'Play'};if(!playing)pb.textContent='Play';
 document.getElementById('speed').onclick=e=>{si=(si+1)%sp.length;speed=sp[si];e.target.textContent='Speed '+speed+'×'};
-if(!playing)document.getElementById('play').textContent='Play';
-window.setT=v=>{t=v;playing=false;document.getElementById('play').textContent='Play'};
-addEventListener('resize',size);requestAnimationFrame(frame);
+document.getElementById('tl').addEventListener('click',e=>{const r=e.currentTarget.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*TLW;
+  const f=Math.max(0,Math.min(1,(x-TX0)/(TX1-TX0)));u=f*RUN;});
+window.setT=v=>{const tt=Math.max(1,Math.min(TMAX,v));u=Math.log(tt)/Math.log(TMAX)*RUN;playing=false;pb.textContent='Play'};
+requestAnimationFrame(frame);
 </script>
 </body></html>
