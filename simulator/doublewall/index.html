@@ -305,7 +305,8 @@ function log(msg, cls = "") {
 
 const UW = { uTime: { value: 0 }, uWL: { value: -0.13 } };
 /* the gallery: one square glass tank on a dark plinth, one spotlight straight above. CU holds what every shader needs to know about the light, the tank and the inner lights. */
-const TANK = { x0: -1.128, x1: 0.982, y0: -0.400, y1: 0.400, zf: -0.003, zt: 0.582, th: 0.015, zr: -0.95, lamp: [0.32, 0, 2.6] };   /* round 7: the tank made to order, inner size from quilt.json (was the 0.57 m UNS 150U) */
+const TANK = { x0: -1.078, x1: 1.032, y0: -0.400, y1: 0.400, zf: -0.053, zt: 0.532, th: 0.015, zr: -0.95, lamp: [-0.023, 0, 2.6] };   /* outline round: replaced from quilt.json (tank) at load: the bodies 50 mm nearer the rear glass, the floor 50 mm lower under the keels, the lamp over the middle of the tank */
+function syncTank() { const t = J.tank; if (!t || t.zf === undefined) return; Object.assign(TANK, { x0: t.x0, x1: t.x1, zf: t.zf, zt: t.zt, lamp: t.lamp.slice() }); CU.uLP.value.set(...TANK.lamp); CU.uTank.value.set(TANK.x0, TANK.y0, TANK.x1, TANK.y1); CU.uTankZ.value = TANK.zf; if (R3 && R3.spot) { R3.spot.position.set(...TANK.lamp); R3.spot.target.position.set(TANK.lamp[0], TANK.lamp[1], -1); R3.spot.target.updateMatrixWorld(); } }   /* round 7: the tank made to order, inner size from quilt.json (was the 0.57 m UNS 150U) */
 const LAMP_ANG = 0.56;
 /* the tank as drawn is made to order: no stock aquarium found is wide enough. Clear acrylic 1190 kg/m3; the volume is the water up to the waterline, the weight is that water plus the four walls. */
 const TANKF = () => { const T = TANK, W = T.x1 - T.x0, D = T.y1 - T.y0, dep = J.WL - T.zf, V = W * D * dep, walls = (2 * (W + 2 * T.th) + 2 * D) * T.th * (T.zt - T.zf) * 1190; return { W, D, dep, L: V * 1000, kg: V * 1000 + walls }; };
@@ -901,6 +902,7 @@ function buildBody() {
   for (const [k, grp] of [["tail", R3.tail]]) {
     const m = meshOf(H[k].v, H[k].t, shellMat(0.07, 0.6, clip)); m.renderOrder = 7; m.layers.enable(1); grp.add(m); PARTS[k] = m;
   }
+  if (H.floor) { const pts = []; for (let i = 0; i < H.floor.length; i += 3) pts.push(new THREE.Vector2(H.floor[i], H.floor[i + 1])); const g = new THREE.ShapeGeometry(new THREE.Shape(pts)); g.translate(0, 0, H.floor[2]); const m = new THREE.Mesh(g, shellMat(0.07, 0.6, clip)); m.renderOrder = 7; R3.tail.add(m); PARTS.tailFloor = m; }          // outline round: the floor plate of the tail stays at z = 0; the keel shell is below it
   const rimM = clayMat(0xe6e4dd, { sub: 0.5 });
   PARTS.rim = loopTube(H.rim, 0.0015, rimM, R3.chamber); if (H.cut) loopTube(H.cut, 0.0012, rimM, R3.chamber);
   const dk = H.dock.slice(), dk2 = H.dock.slice(), XD = J.read.dock_x; for (let i = 0; i < dk.length; i += 3) { dk[i] = XD + 0.002; dk2[i] = XD - 0.002; }
@@ -1234,7 +1236,7 @@ function updateLabels() {
 let AUTO = true, CAM = "overview", camGoal = null, CAMMOVE = false, CAMSNAP = false;
 const nbPos = () => R3.baby.visible ? new THREE.Vector3(BB.L / 2, 0, 0).applyMatrix4(R3.baby.matrix) : new THREE.Vector3(0.18, 0, 0.06);
 const CAMS = {
-  wide: () => ({ p: [0.24, -3.9, 1.05], t: [0.22, 0, 0.08] }),
+  wide: () => { const cx = (TANK.x0 + TANK.x1) / 2; return { p: [cx, -3.9, 1.0], t: [cx, 0, 0.04] }; },          // outline round: on the axis of the lamp and the tank
   overview: () => ({ p: [-0.02, -1.7, 0.3], t: [-0.02, 0, 0.15] }),
   section: () => ({ p: [-0.03, -1.55, 0.2], t: [-0.03, 0, 0.16] }),
   rack: () => ({ p: [-0.14, -0.62, 0.72], t: [-0.07, 0, 0.09] }),
@@ -1372,7 +1374,7 @@ async function unpack(J) {          // round 3, part C: the skins as int16 at 0.
 async function loadAll() {
   const [j, a, g] = await Promise.all([getJSON("quilt.json"), getJSON("arm.json"), fetch("quilt_print.gcode").then((r) => r.ok ? r.text() : "").catch(() => "")]);
   if (!j || !a) { $("#ovStage").textContent = "The data files did not load"; throw new Error("data"); }
-  J = j; await unpack(J); J.read.wlz = J.WL; UW.uWL.value = J.WL; Object.assign(ARMD, a); GCL = g.split("\n").filter((l) => l.length);
+  J = j; await unpack(J); syncTank(); J.read.wlz = J.WL; UW.uWL.value = J.WL; Object.assign(ARMD, a); GCL = g.split("\n").filter((l) => l.length);
   sillDraft(); sillTexts();          // round 23
   buildWater(); buildBody(); buildArm(); buildBaby(); buildNewbornGel(); buildGallery(); setShadows(); buildLabels(); buildCallouts(); renderDoc();
   log("quilt.json: " + J.fr.q0.length + " frames, " + J.checks.length + " checks", "a"); const bad = J.checks.filter((c) => !c.ok); for (const c of bad) log("fails: " + c.name, "w");
