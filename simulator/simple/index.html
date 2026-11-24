@@ -753,12 +753,12 @@ function babyGeo(lam, bend, ub) {
   const capl = (l) => { const [a, b] = stl(l); return P.cap_f + a * (P.cap_d - P.cap_f) + b * (P.cap_F - P.cap_d); };
   const u = [capl(lam[0])], th = [0]; for (let k = 0; k < n; k++) { u.push(u[k] + hseg(k)); th.push(th[k] + tw(k)); }
   const V = [], T = [];
-  const radii = (k, l) => { const [a, b] = stl(l), s_ = 1 + b * (P.STRETCH - 1); let ri = P.Ri[k] + a * (P.Rd[k] - P.Ri[k]); if (P.Ri[k] < P.Rd[k] - 1e-9) ri = Math.min(ri, P.Rd[k] * (1 - P.KC * (1 - b))); return [(P.Ro[k] + a * (P.Rd[k] - P.Ro[k])) * s_, ri * s_]; };
+  const radii = (k, l) => { const [a, b] = stl(l), s_ = 1 + b * (P.STRETCH - 1); let ri = P.Ri[k] + a * (P.Rd[k] - P.Ri[k]); if (P.Ri[k] < P.Rd[k] - 1e-9) ri = Math.min(ri, P.Rd[k] * (1 - P.KC * (1 - b) ** 2)); return [(P.Ro[k] + a * (P.Rd[k] - P.Ro[k])) * s_, ri * s_]; };
   const ring = (uk, thk, ro, ri, saddle) => { for (let i = 0; i < M; i++) { const ang = thk + 2 * Math.PI * i / M; let r = i % 2 === 0 ? ro : ri; if (saddle && Math.cos(ang + Math.PI / 2) > Math.cos(Math.PI / 4)) r = ro; V.push([uk, r * Math.cos(ang), r * Math.sin(ang)]); } };
   let nr = 0;
   for (let k = 0; k <= n; k++) {
     ring(u[k], th[k], ...radii(k, rl[k]), k === P.BAND || k === P.BAND + 1); nr++;
-    if (k < n && k !== P.BAND) { const [a, b] = stl(lam[k]), f = Math.min(P.MID + a * (1 - P.MID), 1 - P.KF * (1 - b)) * (1 + (P.BULGE[k] - 1) * a), r0 = radii(k, lam[k]), r1 = radii(k + 1, lam[k]), Z = P.ZF;
+    if (k < n && k !== P.BAND) { const [a, b] = stl(lam[k]), f = Math.min(P.MID + a * (1 - P.MID), 1 - P.KF * (1 - b) ** 2) * (1 + (P.BULGE[k] - 1) * a), r0 = radii(k, lam[k]), r1 = radii(k + 1, lam[k]), Z = P.ZF;
       for (let j = 1; j < 2 * Z; j++) { const w = j / (2 * Z); let rm = [(1 - w) * r0[0] + w * r1[0], (1 - w) * r0[1] + w * r1[1]]; if (j % 2 === 1) rm = rm.map((x) => x * f); ring((1 - w) * u[k] + w * u[k + 1], (1 - w) * th[k] + w * th[k + 1], rm[0], rm[1], false); nr++; } }
   }
   // round 12: rounded caps that follow the outline, round at the pole and tangent to the body (same as the Python script)
@@ -769,6 +769,18 @@ function babyGeo(lam, bend, ub) {
   for (let k = 0; k < nr - 1; k++) for (let i = 0; i < M; i++) { const b0 = k * M + i, b1 = k * M + (i + 1) % M, t0 = (k + 1) * M + i, t1 = (k + 1) * M + (i + 1) % M; T.push([b0, b1, t0], [b1, t1, t0]); }
   const tb = V.length; V.push([0, 0, 0]); for (let i = 0; i < M; i++) T.push([tb, (i + 1) % M, i]);
   const nt = V.length, last = (nr - 1) * M; V.push([L, 0, 0]); for (let i = 0; i < M; i++) T.push([last + i, last + (i + 1) % M, nt]);
+  // round 14, page only and inward only: where open stories meet folded ones (in the mouth, during the release) the ring radius may grow by at most ENV_G per unit of length,
+  // so the step reads as a soft shoulder of a half filled body, not as a dome on a stem; the checks use the fuller body, so no overlap is hidden by this
+  { const ENV_G = 1.1, rr = [], uu = []; for (let k = 0; k < nr; k++) { let m = 0; for (let i = 0; i < M; i++) { const v = V[k * M + i]; m = Math.max(m, Math.hypot(v[1], v[2])); } rr.push(m); uu.push(V[k * M][0]); }
+    const env = rr.slice(); for (let k = 1; k < nr; k++) env[k] = Math.min(env[k], env[k - 1] + ENV_G * Math.abs(uu[k] - uu[k - 1])); for (let k = nr - 2; k >= 0; k--) env[k] = Math.min(env[k], env[k + 1] + ENV_G * Math.abs(uu[k + 1] - uu[k]));
+    for (let pass = 0; pass < 3; pass++) { const e0 = env.slice(); for (let k = 1; k < nr - 1; k++) env[k] = Math.min(rr[k], 0.25 * e0[k - 1] + 0.5 * e0[k] + 0.25 * e0[k + 1]); }          // round off the kinks of the envelope
+    for (let k = 0; k < nr; k++) if (env[k] < rr[k] - 1e-6) { const f = env[k] / rr[k]; for (let i = 0; i < M; i++) { const v = V[k * M + i]; v[1] *= f; v[2] *= f; } } }
+  // round 14: the fish cues, after the unfolding (same function as geo.shape_xf): narrower sideways toward the tail end, a higher forehead, a flatter belly in front
+  { const S = P.SHAPE, w = clamp(lam.reduce((x, y) => x + y, 0) / lam.length / P.LAM_D, 0, 1), sst = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+    // page only, inward only (the checks keep the fuller body): a slight sag of the upper half while the body is partly filled
+    const bm = clamp((lam.reduce((x, y) => x + y, 0) / lam.length - P.LAM_D) / (1 - P.LAM_D), 0, 1), sag = 0.06 * w * (1 - bm);
+    if (w > 0) for (const v of V) { const un = 1 - clamp(v[0] / L, 0, 1), sy = 1 - (1 - S.sy1) * sst((un - S.sy0) / (1 - S.sy0)), up = 1 + S.fh * (1 - sst((un - S.fh0) / (S.fh1 - S.fh0))), dn = 1 - S.fb * (1 - sst((un - S.fb0) / (S.fb1 - S.fb0)));
+      v[1] *= 1 - w * (1 - sy); v[2] *= v[2] > 0 ? (1 + w * (up - 1)) * (1 - sag) : 1 + w * (dn - 1); } }
   const rb = radii(P.BAND, rl[P.BAND])[0], r0 = radii(0, rl[0])[0], cap = capl(lam[0]), uv = J.body.valve.s * cap, rv = r0 * dome(P.m_t, J.body.valve.s);          // the valve sits flush on the rounded tail end
   if (bend) { const N = 96, w = 0.03, u0 = -1e-6, u1 = L + 1e-6, us = [], ph = [], cx = [u0], cz = [0]; for (let i = 0; i < N; i++) { const uu = u0 + (u1 - u0) * i / (N - 1), t = clamp((uu - (ub - w)) / (2 * w), 0, 1); us.push(uu); ph.push(bend * t * t * (3 - 2 * t)); }
     for (let i = 1; i < N; i++) { const d = us[i] - us[i - 1]; cx.push(cx[i - 1] + 0.5 * (Math.cos(ph[i]) + Math.cos(ph[i - 1])) * d); cz.push(cz[i - 1] - 0.5 * (Math.sin(ph[i]) + Math.sin(ph[i - 1])) * d); }
@@ -781,9 +793,11 @@ function babyGeo(lam, bend, ub) {
 function babyMeshUpdate(lam, bend, ub) {
   const key = lam.map((l) => l.toFixed(3)).join(",") + "|" + bend.toFixed(3) + "|" + ub.toFixed(3); if (key === BB.key) return; BB.key = key;
   const { V, T, u, L, rb, r0, cap, uv, rv } = babyGeo(lam, bend, ub); BB.u = u; BB.L = L; BB.rb = rb; BB.rmax = Math.max(...V.map((v) => Math.hypot(v[1], v[2])));
-  const pos = new Float32Array(T.length * 9); let k = 0; for (const t of T) for (const vi of t) { pos[k++] = V[vi][0]; pos[k++] = V[vi][1]; pos[k++] = V[vi][2]; }
-  const g = BB.mesh.geometry; g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.computeVertexNormals(); g.computeBoundingSphere();
-  const eg = new THREE.EdgesGeometry(g, 25); BB.edges.geometry.dispose(); BB.edges.geometry = eg;
+  // round 14: one shared vertex per ring point, so the normals are averaged across the creases: the pleats read as soft folds, not facets
+  const pos = new Float32Array(V.length * 3); V.forEach((v, i) => { pos[3 * i] = v[0]; pos[3 * i + 1] = v[1]; pos[3 * i + 2] = v[2]; });
+  const g = BB.mesh.geometry; g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setIndex(T.flat()); g.computeVertexNormals(); g.computeBoundingSphere();
+  const lm = lam.reduce((x, y) => x + y, 0) / lam.length, ef = 1 - clamp((lm - 0.35) / (J.body.params.LAM_D - 0.35), 0, 1);          // the crease lines fade as the body fills
+  const eg = new THREE.EdgesGeometry(g, 25 + 30 * (1 - ef)); BB.edges.geometry.dispose(); BB.edges.geometry = eg; BB.edges.material.opacity = 0.42 * (0.15 + 0.85 * ef);
   BB.valve.position.set(uv, 0, rv - 0.001); BB.vent.position.set(BB.nose[0], 0, BB.nose[1]); BB.vent.rotation.y = BB.nose[2];
 }
 function buildBaby() {
