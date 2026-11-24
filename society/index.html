@@ -9,15 +9,18 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 12.5px/1.45 "Inter", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
 .app { display: grid; grid-template-columns: minmax(0, 1fr) 320px; height: 100vh; min-height: 560px; }
-.view { position: relative; overflow: hidden; background: #000; }
+.left { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.view { position: relative; overflow: hidden; background: #000; flex: 1 1 auto; min-height: 420px; }
+.below { flex: none; padding: 14px 16px 16px; background: #000; border-top: 1px solid #18181a; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 8px 28px; }
+@media (max-width: 860px) { .below { grid-template-columns: minmax(0, 1fr); } }
 #c { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
 #c:active { cursor: grabbing; }
-.cap { position: absolute; left: 16px; top: 12px; pointer-events: none; max-width: min(560px, calc(100% - 32px)); text-shadow: 0 0 6px #000; }
+.cap { min-width: 0; }
 .cap h1 { margin: 0; font: 400 26px/1.1 var(--serif); letter-spacing: -.01em; }
 .cap p { margin: 6px 0 0; color: #b9b8b2; font-size: 12px; }
 .hud { margin-top: 8px; font: 11px var(--mono); color: var(--muted); }
 .hud b { color: var(--ink); font-weight: 500; }
-.ev { position: absolute; left: 16px; bottom: 12px; pointer-events: none; font: 11px/1.6 var(--mono); color: #8d8c86; text-shadow: 0 0 5px #000; max-width: calc(100% - 330px); }
+.ev { align-self: end; font: 11px/1.6 var(--mono); color: #8d8c86; min-width: 0; }
 .ev div:last-child { color: var(--ink); }
 #labs { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
 /* a spoken line: small type between the two speakers, with who speaks to whom above */
@@ -62,7 +65,7 @@ a { color: var(--ink); }
 .bars i { display: block; height: 3px; background: #1d1d20; position: relative; } .bars i u { position: absolute; left: 0; top: 0; bottom: 0; background: #dedcd6; }
 .bars output { font: 10.5px var(--mono); text-align: right; }
 .mem { margin: 4px 0 0; padding: 0; list-style: none; font: 10.5px/1.5 var(--mono); color: #b4b3ad; } .mem li em { font-style: normal; color: var(--dim); }
-@media (max-width: 860px) { .app { grid-template-columns: minmax(0, 1fr); height: auto; } .view { height: 68vh; } aside { border-left: 0; border-top: 1px solid var(--line); } .ev { max-width: calc(100% - 32px); bottom: 70px; } }
+@media (max-width: 860px) { .app { grid-template-columns: minmax(0, 1fr); height: auto; } .view { height: 68vh; } aside { border-left: 0; border-top: 1px solid var(--line); } }
 /* embedded in the home page: no scroll inside the page's scroll; the controls sit below the tank in columns and the page scrolls as a whole */
 html.bnm-embed .app { grid-template-columns: minmax(0, 1fr); height: auto; min-height: 0; }
 html.bnm-embed .view { height: 720px; }
@@ -73,14 +76,18 @@ html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
 <link rel="icon" href="data:,">
 </head><body>
 <div class="app">
+  <div class="left">
   <div class="view">
     <canvas id="c" aria-label="A few tailed robots and the generations born from the tailed ones, talking in one tank under small spot lights"></canvas>
     <div id="labs"></div>
-    <div class="cap"><h1>Society</h1><p id="capt">A fixed number of tailed ones stay in the tank. Each tailed one holds an arm and gel. Every other body is born from a tailed one and has no tail. The bodies swim out, read the light, the stream and the crowd, and come back to tell. A tailed one keeps what is told as lines in the head. With enough lines, of enough kinds, the tailed one prints the next generation folded in the gel, then pushes the newborn out through the mouth while a pump fills the newborn with air. What was told shapes the next generation.</p>
-      <div class="hud" id="hud"></div></div>
     <div class="views" id="views"><button data-cam="film" class="on">Film</button><button data-cam="tank">Whole tank</button><button data-cam="follow">Follow</button><button data-cam="above">Above</button></div>
-    <div class="ev" id="ev"></div>
     <div class="spd" id="spd"><span class="spl">Speed</span><input type="range" id="spdR" min="0" max="7" step="1" value="2" aria-label="Simulation speed"><b id="spdV">1×</b></div>
+  </div>
+  <div class="below">
+<div class="cap"><h1>Society</h1><p id="capt">A fixed number of tailed ones stay in the tank. Each tailed one holds an arm and gel. Every other body is born from a tailed one and has no tail. The bodies swim out, read the light, the stream and the crowd, and come back to tell. A tailed one keeps what is told as lines in the head. With enough lines, of enough kinds, the tailed one prints the next generation folded in the gel, then pushes the newborn out through the mouth while a pump fills the newborn with air. What was told shapes the next generation.</p>
+      <div class="hud" id="hud"></div></div>
+    <div class="ev" id="ev"></div>
+  </div>
   </div>
   <aside>
     <div><h3>Run</h3>
