@@ -280,6 +280,9 @@ const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 const lerp = (a, b, t) => a + (b - a) * t;
 const mj = (u) => { u = clamp(u, 0, 1); return u * u * u * (10 - 15 * u + 6 * u * u); };
 const D2R = Math.PI / 180;
+/* a zero normal (a collapsed triangle, a fold lying flat, the tip of a cone) made NaN in the lighting; the depth of field and the bloom spread each NaN pixel into a black disk with a bright halo. Guard the two normalizations where it starts. */
+THREE.ShaderChunk.normal_fragment_begin = THREE.ShaderChunk.normal_fragment_begin.replace("vec3 normal = normalize( vNormal );", "vec3 normal = dot( vNormal, vNormal ) > 1e-12 ? normalize( vNormal ) : vec3( 0.0, 0.0, 1.0 );");
+THREE.ShaderChunk.bumpmap_pars_fragment = THREE.ShaderChunk.bumpmap_pars_fragment.replace("return normalize( abs( fDet ) * surf_norm - vGrad );", "vec3 bn = abs( fDet ) * surf_norm - vGrad; return dot( bn, bn ) > 1e-20 ? normalize( bn ) : surf_norm;");
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const hms = (s) => { s = Math.max(0, s); const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = Math.floor(s % 60); return h + ":" + String(m).padStart(2, "0") + ":" + String(x).padStart(2, "0"); };
 const f0 = (x) => (+x).toFixed(0), f1 = (x) => (+x).toFixed(1), f2 = (x) => (+x).toFixed(2), f3 = (x) => (+x).toFixed(3);
@@ -525,14 +528,15 @@ void main() {
 }`, Object.assign({ tDepth: { value: null }, uPI: { value: new THREE.Matrix4() }, uCW: { value: new THREE.Matrix4() }, uCam: { value: new THREE.Vector3() }, uN: { value: 22 }, uAir: { value: 0.03 }, uWat: { value: 0.012 }, uRoomZ: { value: TANK.zr } }, UW, CU));
   C.dof = fsMat(`uniform sampler2D tColor; uniform sampler2D tDepth; uniform vec2 uPx; uniform float uFocus; uniform float uAp; uniform float uMaxR; uniform float uNear; uniform float uFar; varying vec2 vUv;
 float dist(vec2 uv) { float d = texture2D(tDepth, uv).x; return (uNear * uFar) / (uFar - d * (uFar - uNear)); }
+vec3 fin3(vec3 c) { return (c.r < 1e5 && c.g < 1e5 && c.b < 1e5 && c.r > -1e5 && c.g > -1e5 && c.b > -1e5) ? c : vec3(0.0); }
 float coc(float z) { return clamp(uAp * abs(z - uFocus) / (z * uFocus), 0.0, 1.0) * uMaxR; }
-void main() { float zc = dist(vUv), cc = coc(zc); vec3 acc = texture2D(tColor, vUv).rgb; float tot = 1.0;
+void main() { float zc = dist(vUv), cc = coc(zc); vec3 acc = fin3(texture2D(tColor, vUv).rgb); float tot = 1.0;
   float a0 = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715)))) * 6.2831;
   for (int i = 1; i <= 44; i++) { float fi = float(i); float r = sqrt(fi / 44.0) * uMaxR; float an = fi * 2.39996 + a0; vec2 uv = vUv + vec2(cos(an), sin(an)) * r * uPx;
     float zs = dist(uv); float cs = coc(zs); if (zs > zc) cs = min(cs, cc * 2.0);
-    float m = smoothstep(r - 0.5, r + 0.5, cs); acc += mix(acc / tot, texture2D(tColor, uv).rgb, m); tot += 1.0; }
+    float m = smoothstep(r - 0.5, r + 0.5, cs); acc += mix(acc / tot, fin3(texture2D(tColor, uv).rgb), m); tot += 1.0; }
   gl_FragColor = vec4(acc / tot, 1.0); }`, { tColor: { value: null }, tDepth: { value: null }, uPx: { value: new THREE.Vector2() }, uFocus: { value: 2 }, uAp: { value: 0.22 }, uMaxR: { value: 4 }, uNear: { value: 0.01 }, uFar: { value: 60 } });
-  C.pre = fsMat("uniform sampler2D tColor; uniform sampler2D tHaze; uniform float uExp; varying vec2 vUv; void main() { vec3 c = min((texture2D(tColor, vUv).rgb + texture2D(tHaze, vUv).rgb) * uExp, vec3(24.0)); float br = max(c.r, max(c.g, c.b)); float w = clamp(br - 0.85, 0.0, 0.7); w = w * w / 1.4; gl_FragColor = vec4(c * max(w, br - 1.2) / max(br, 1e-4), 1.0); }", { tColor: { value: null }, tHaze: { value: null }, uExp: { value: 1 } });
+  C.pre = fsMat("uniform sampler2D tColor; uniform sampler2D tHaze; uniform float uExp; varying vec2 vUv; bool bad3(vec3 c) { return !(c.r < 1e5 && c.g < 1e5 && c.b < 1e5 && c.r > -1e5 && c.g > -1e5 && c.b > -1e5); }\nvoid main() { vec3 c = (texture2D(tColor, vUv).rgb + texture2D(tHaze, vUv).rgb) * uExp; c = bad3(c) ? vec3(0.0) : min(c, vec3(24.0)); float br = max(c.r, max(c.g, c.b)); float w = clamp(br - 0.85, 0.0, 0.7); w = w * w / 1.4; gl_FragColor = vec4(c * max(w, br - 1.2) / max(br, 1e-4), 1.0); }", { tColor: { value: null }, tHaze: { value: null }, uExp: { value: 1 } });
   C.down = fsMat("uniform sampler2D t; uniform vec2 hp; varying vec2 vUv; void main() { vec3 s = texture2D(t, vUv).rgb * 4.0 + texture2D(t, vUv - hp).rgb + texture2D(t, vUv + hp).rgb + texture2D(t, vUv + vec2(hp.x, -hp.y)).rgb + texture2D(t, vUv - vec2(hp.x, -hp.y)).rgb; gl_FragColor = vec4(s / 8.0, 1.0); }", { t: { value: null }, hp: { value: new THREE.Vector2() } });
   C.up = fsMat("uniform sampler2D t; uniform vec2 hp; uniform float k; varying vec2 vUv; void main() { vec3 s = texture2D(t, vUv + vec2(-hp.x * 2.0, 0.0)).rgb + texture2D(t, vUv + vec2(-hp.x, hp.y)).rgb * 2.0 + texture2D(t, vUv + vec2(0.0, hp.y * 2.0)).rgb + texture2D(t, vUv + hp).rgb * 2.0 + texture2D(t, vUv + vec2(hp.x * 2.0, 0.0)).rgb + texture2D(t, vUv + vec2(hp.x, -hp.y)).rgb * 2.0 + texture2D(t, vUv + vec2(0.0, -hp.y * 2.0)).rgb + texture2D(t, vUv - hp).rgb * 2.0; gl_FragColor = vec4(s / 12.0 * k, 1.0); }", { t: { value: null }, hp: { value: new THREE.Vector2() }, k: { value: 1 } }, { blending: THREE.AdditiveBlending, transparent: true });
   C.fin = fsMat(`uniform sampler2D tColor; uniform sampler2D tHaze; uniform sampler2D tBloom; uniform float uExp; uniform float uBloom; uniform float uVig; uniform float uGrainK; uniform float uT; uniform vec2 uRes; varying vec2 vUv;
@@ -544,6 +548,7 @@ void main() { vec2 cu = vUv - 0.5; float r2 = dot(cu * vec2(1.0, uRes.y / uRes.x
   vec3 c = vec3(texture2D(tColor, vUv - ca).r, texture2D(tColor, vUv).g, texture2D(tColor, vUv + ca).b);
   vec2 ht = 1.0 / uRes; vec3 hz = (texture2D(tHaze, vUv + ht).rgb + texture2D(tHaze, vUv - ht).rgb + texture2D(tHaze, vUv + vec2(ht.x, -ht.y)).rgb + texture2D(tHaze, vUv + vec2(-ht.x, ht.y)).rgb) * 0.25;
   c = (c + hz) * uExp + texture2D(tBloom, vUv).rgb * uBloom;
+  if (!(c.r < 1e5 && c.g < 1e5 && c.b < 1e5 && c.r > -1e5 && c.g > -1e5 && c.b > -1e5)) c = vec3(0.0);
   c *= 1.0 - uVig * smoothstep(0.08, 0.62, r2);
   c = aces(c);
   c = mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, c));
