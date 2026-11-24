@@ -151,7 +151,9 @@ button:focus-visible, input:focus-visible, a:focus-visible, .track:focus-visible
   .top .file { font-size: 15px; }
   .top .logo { display: none; }
   .top { padding: 0 8px; }
-  .top { gap: 8px; }
+  .top { gap: 8px; overflow-x: auto; scrollbar-width: none; }
+  .top::-webkit-scrollbar { display: none; }
+  .top .sp { flex: 0 0 0; }
   .seg { padding: 3px 2px; font-size: 9px; }
   .ahead { padding: 0 6px; gap: 5px; }
   .cams .btn { padding: 3px 7px; font-size: 11px; }
@@ -235,7 +237,7 @@ html.bnm-embed .bottom .area, html.bnm-embed .info { overflow: visible; }
 
 <section class="doc" id="how">
   <h2>A simplified parent body, after the sketch</h2>
-  <p>Three prints that read as one spindle, tallest and widest at the docking seam. The tail is two prints joined for good behind the arm by a bonded, sealed sleeve: the front print carries the Rotrics DexArm on a fixed base and everything for the tools behind the docking plane, with a magazine of three kits; the rear print is a long, slender taper to a small point that holds the store for three births (silicone, cells, gel for the top ups). The head is a bare shell: its roof falls in one arc to the upper lip, its open front end is the mouth, and its lower lip is long and nearly level. The gel is held by the shell alone: it starts at a ridge of the tail shell in front of the arm base, runs across the seam, and ends where the lower lip rises through its surface. The tools hang with their stems in the gel and travel in the gel. The tank is full and the gel is in from the first frame: before docking each part holds its own gel at its open docking face, level with the water, since gel and water weigh nearly the same. The tail docks from behind, in the water, sliding along the floor, gel face to gel face; the seam closes on a cord. There is no filling stage; the arm only tops up the little gel each newborn takes along. The parent body rests on the tank floor, apart or docked; only the newborn floats. This page calculates every dimension. Where a wish does not hold, the page says so and shows the smallest change that works.</p>
+  <p>Three prints that read as one spindle, tallest and widest at the docking seam. The tail is two prints joined for good behind the arm by a bonded, sealed sleeve: the front print carries the Rotrics DexArm on a fixed base and everything for the tools behind the docking plane, with a magazine of three kits; the rear print is a long, slender taper to a small point that holds the store for three births (silicone, cells, gel for the top ups). The tail is drawn frosted and the head clear, a design choice: the print in the head stays in view, while the machinery in the tail reads only as soft shapes, and the frost passes into the clear head in one gradient across the seam. The head is a bare shell: its roof falls in one arc to the upper lip, its open front end is the mouth, and its lower lip is long and nearly level. The gel is held by the shell alone: it starts at a ridge of the tail shell in front of the arm base, runs across the seam, and ends where the lower lip rises through its surface. The tools hang with their stems in the gel and travel in the gel. The tank is full and the gel is in from the first frame: before docking each part holds its own gel at its open docking face, level with the water, since gel and water weigh nearly the same. The tail docks from behind, in the water, sliding along the floor, gel face to gel face; the seam closes on a cord. There is no filling stage; the arm only tops up the little gel each newborn takes along. The parent body rests on the tank floor, apart or docked; only the newborn floats. This page calculates every dimension. Where a wish does not hold, the page says so and shows the smallest change that works.</p>
   <h4>Point by point</h4>
   <table id="verdict"></table>
   <h4>How each dimension is set</h4>
@@ -635,7 +637,7 @@ function boxMesh(b, mat, parent) { const m = new THREE.Mesh(new THREE.BoxGeometr
 function buildBody() {
   const H = J.hull, clip = [SECT];
   for (const [k, grp] of [["tail", R3.tail], ["chamber", R3.chamber]]) {
-    const m = meshOf(H[k].v, H[k].t, shellMat(0.07, 0.6, clip)); m.renderOrder = 7; m.layers.enable(1); grp.add(m); PARTS[k] = m;
+    const m = meshOf(H[k].v, H[k].t, frostMat(0.07, 0.6, clip)); m.renderOrder = 7; m.layers.enable(1); grp.add(m); PARTS[k] = m;
   }
   const rimM = clayMat(0xe6e4dd, { sub: 0.5 });
   PARTS.rim = loopTube(H.rim, 0.0015, rimM, R3.chamber); if (H.cut) loopTube(H.cut, 0.0012, rimM, R3.chamber);
@@ -650,7 +652,7 @@ function buildBody() {
   for (const b of J.boxes) { const m = boxMesh(b, /steel/.test(b.name) ? steelM : white, (b.grp === "seat" || b.grp === "bowl") ? R3.chamber : R3.tail); edgeLines(m, 30, 0.3, 0xdfe3ea, clip); }
   // the two pockets: swellings of the side walls of the tail, with the parts of the tail inside
   // drawn like the shell: clear printed wall that swells inward; the parts inside are light, a little translucent, at real size
-  for (const p of J.pods) { const m = meshOf(p.v, p.t, shellMat(0.16, 0.75, clip)); m.renderOrder = 6.5; R3.tail.add(m); const mi = meshOf(p.v, p.t, clayMat(0xf2f3f0, { opacity: 0.1, side: THREE.DoubleSide, sub: 0.3, clip, rough: 0.4 })); mi.renderOrder = 6.2; R3.tail.add(mi); }
+  for (const p of J.pods) { const m = meshOf(p.v, p.t, frostMat(0.16, 0.75, clip)); m.renderOrder = 6.5; R3.tail.add(m); const mi = meshOf(p.v, p.t, clayMat(0xf2f3f0, { opacity: 0.1, side: THREE.DoubleSide, sub: 0.3, clip, rough: 0.4 })); mi.renderOrder = 6.2; R3.tail.add(mi); }
   const softM = (hex, op = 0.78) => clayMat(hex, { opacity: op, depthWrite: true, sub: 0.3, sss: 0.4, clip, rough: 0.45 });
   const rbox = (sx, sy, sz, r) => { const sh = new THREE.Shape(), w = sx / 2 - r, h = sz / 2 - r; sh.absarc(w, h, r, 0, Math.PI / 2); sh.absarc(-w, h, r, Math.PI / 2, Math.PI); sh.absarc(-w, -h, r, Math.PI, 1.5 * Math.PI); sh.absarc(w, -h, r, 1.5 * Math.PI, 2 * Math.PI);
     return new THREE.ExtrudeGeometry(sh, { depth: sy - 2 * r * 0.5, bevelEnabled: true, bevelThickness: r * 0.5, bevelSize: r * 0.5, bevelSegments: 3, curveSegments: 8 }).translate(0, 0, -(sy - r) / 2).rotateX(Math.PI / 2); };
@@ -899,6 +901,21 @@ function updateLabels() {
   const far = R3.camera.position.distanceTo(R3.controls.target) > 2.4;
   for (const L of LABELS) { const p = STATE && !far ? L.fn() : null; if (!p) { L.d.style.display = "none"; continue; } ws.set(...p).project(R3.camera); const px = (ws.x + 1) / 2 * w, py = (1 - ws.y) / 2 * h; const on = ws.z < 1 && Math.abs(ws.x) < 0.96 && Math.abs(ws.y) < 0.96 && !(px < ox1 + 40 && py < oy1); L.d.style.display = on ? "" : "none"; if (on) L.d.style.transform = `translate(${px.toFixed(0)}px, ${py.toFixed(0)}px) translate(-50%, -130%)`; }
 }
+/* round 12: one shell look along the body axis: the tail frosted (matte, milky, the machinery only as soft shapes), the head clear; one smoothstep of the axial coordinate, the same on both parts, so the docking seam shows no break */
+const FROST = { uFr: { value: 1 }, goal: 1 }, FROST_VIEW = { section: 0.8, rack: 0.4, tailcam: 0.4, kit: 0.4, magazine: 0.4 };
+function frostMat(a0, a1, clip) {
+  const m = shellMat(a0, a1, clip), base = m.onBeforeCompile;
+  m.onBeforeCompile = (sh) => { base(sh); sh.uniforms.uFr = FROST.uFr; sh.uniforms.uXD = { value: J.read.dock_x };
+    let fs = sh.fragmentShader;
+    fs = fs.replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\n float fz = uFr * (1.0 - smoothstep(uXD - 0.11, uXD + 0.05, vOPw.x)); roughnessFactor = mix(roughnessFactor, 0.82, fz);");
+    fs = fs.replace("gl_FragColor = vec4(milkS + totalSpecular + rimS + glowS, aS); }", `float aF = clamp(0.7 + 0.1 * fr, 0.0, 0.92); vec3 milkF = totalDiffuse * 0.8 * (0.9 + 0.1 * shS) + vec3(0.58, 0.6, 0.62) * 0.008;
+      vec3 glowF = innerGlow(vWPw) * 0.22;
+      gl_FragColor = vec4(mix(milkS + totalSpecular + rimS + glowS, milkF + totalSpecular * 0.18 + rimS * 0.3 + glowF, fz), mix(aS, aF, fz)); }`);
+    if (!/float fz/.test(fs) || !/milkF/.test(fs)) console.warn("frost shader hooks missing");
+    sh.fragmentShader = "uniform float uFr; uniform float uXD;\n" + fs; };
+  m.customProgramCacheKey = () => "frost" + a0 + a1; return m;
+}
+function stepFrost(dt) { const g = FROST_VIEW[CAM] ?? 1; FROST.uFr.value = CAMSNAP ? g : FROST.uFr.value + (g - FROST.uFr.value) * Math.min(1, dt * 3); }
 /* ---------------------------------------------------------------- cameras: from the port side, tail on the left */
 let AUTO = true, CAM = "overview", camGoal = null, CAMMOVE = false, CAMSNAP = false;
 const nbPos = () => R3.baby.visible ? new THREE.Vector3(BB.L / 2, 0, 0).applyMatrix4(R3.baby.matrix) : new THREE.Vector3(0.18, 0, 0.06);
@@ -931,6 +948,7 @@ function damp(cur, goal, vel, tau, dt) {      // critically damped: the camera e
 }
 
 function stepCam(dt, S) {
+  stepFrost(dt);
   if (!camGoal) return; const c = R3.camera, tg = R3.controls.target, V = CAMV; if (!(AUTO || CAMMOVE || CAMSNAP)) return;
   camGoal = CAMS[CAM](); const k = R3.host.clientWidth < 520 ? 1.5 : 1; V.gt.set(...camGoal.t); V.gp.set(camGoal.t[0] + (camGoal.p[0] - camGoal.t[0]) * k, camGoal.t[1] + (camGoal.p[1] - camGoal.t[1]) * k, camGoal.t[2] + (camGoal.p[2] - camGoal.t[2]) * k);
   if (AUTO && CAM !== "wide") { const u = S.st.f - 0.5; V.d.subVectors(V.gt, V.gp); const len = V.d.length(); V.gp.addScaledVector(V.d, 0.08 * u); V.gp.x += 0.04 * len * u; V.gp.z += 0.03 * len * u; }
@@ -1049,7 +1067,7 @@ function wireUI() {
   tr.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") TL.T = Math.min(TL.total - 0.01, TL.T + 1); else if (e.key === "ArrowLeft") TL.T = Math.max(0, TL.T - 1); else return; e.preventDefault(); });
   document.querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { TAB = b.dataset.tab; document.querySelectorAll("[data-tab]").forEach((x) => x.setAttribute("aria-selected", String(x === b))); renderProps(); }));
 }
-window.BNM = { go(k, f = 0.5) { const s = TL.stages.find((x) => x.k === k); if (s) { TL.T = s.d0 + s.disp * f; TL.playing = false; $("#play").textContent = "Play"; } }, stages: () => TL.stages.map((s) => s.k), state: () => STATE, setAuto, setCam, setInner, settle: () => { CAMSNAP = true; }, quality: () => CINE.q };
+window.BNM = { go(k, f = 0.5) { const s = TL.stages.find((x) => x.k === k); if (s) { TL.T = s.d0 + s.disp * f; TL.playing = false; $("#play").textContent = "Play"; } }, stages: () => TL.stages.map((s) => s.k), state: () => STATE, setAuto, setCam, setInner, settle: () => { CAMSNAP = true; }, look(p, t) { setAuto(false); CAMS._look = () => ({ p, t }); setCam("_look", true); }, quality: () => CINE.q };
 (async function main() {
   try { initThree(); await loadAll(); wireUI(); buildStages(); renderTrack(); STATE = evalState(0); applyState(STATE, 0); setCam("wide", true); renderProps(); requestAnimationFrame(frame); }
   catch (e) { console.error(e); $("#ovStage").textContent = "The simulator did not start"; $("#ovStep").textContent = String(e.message || e); }
