@@ -529,11 +529,12 @@ void main() {
   C.dof = fsMat(`uniform sampler2D tColor; uniform sampler2D tDepth; uniform vec2 uPx; uniform float uFocus; uniform float uAp; uniform float uMaxR; uniform float uNear; uniform float uFar; varying vec2 vUv;
 float dist(vec2 uv) { float d = texture2D(tDepth, uv).x; return (uNear * uFar) / (uFar - d * (uFar - uNear)); }
 float coc(float z) { return clamp(uAp * abs(z - uFocus) / (z * uFocus), 0.0, 1.0) * uMaxR; }
-void main() { float zc = dist(vUv), cc = coc(zc); vec3 acc = texture2D(tColor, vUv).rgb; float tot = 1.0;
+vec4 texC(sampler2D s, vec2 u) { return min(texture2D(s, u), vec4(64.0)); }
+void main() { float zc = dist(vUv), cc = coc(zc); vec3 acc = texC(tColor, vUv).rgb; float tot = 1.0;
   float a0 = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715)))) * 6.2831;
   for (int i = 1; i <= 44; i++) { float fi = float(i); float r = sqrt(fi / 44.0) * uMaxR; float an = fi * 2.39996 + a0; vec2 uv = vUv + vec2(cos(an), sin(an)) * r * uPx;
     float zs = dist(uv); float cs = coc(zs); if (zs > zc) cs = min(cs, cc * 2.0);
-    float m = smoothstep(r - 0.5, r + 0.5, cs); acc += mix(acc / tot, texture2D(tColor, uv).rgb, m); tot += 1.0; }
+    float m = smoothstep(r - 0.5, r + 0.5, cs); acc += mix(acc / tot, texC(tColor, uv).rgb, m); tot += 1.0; }
   gl_FragColor = vec4(acc / tot, 1.0); }`, { tColor: { value: null }, tDepth: { value: null }, uPx: { value: new THREE.Vector2() }, uFocus: { value: 2 }, uAp: { value: 0.22 }, uMaxR: { value: 4 }, uNear: { value: 0.01 }, uFar: { value: 60 } });
   C.pre = fsMat("uniform sampler2D tColor; uniform sampler2D tHaze; uniform sampler2D tMask; uniform float uExp; varying vec2 vUv; void main() { vec3 c = min((texture2D(tColor, vUv).rgb + texture2D(tHaze, vUv).rgb * texture2D(tMask, vUv).a) * uExp, vec3(24.0)); float br = max(c.r, max(c.g, c.b)); float w = clamp(br - 0.85, 0.0, 0.7); w = w * w / 1.4; gl_FragColor = vec4(c * max(w, br - 1.2) / max(br, 1e-4), 1.0); }", { tColor: { value: null }, tHaze: { value: null }, tMask: { value: null }, uExp: { value: 1 } });
   C.down = fsMat("uniform sampler2D t; uniform vec2 hp; varying vec2 vUv; void main() { vec3 s = texture2D(t, vUv).rgb * 4.0 + texture2D(t, vUv - hp).rgb + texture2D(t, vUv + hp).rgb + texture2D(t, vUv + vec2(hp.x, -hp.y)).rgb + texture2D(t, vUv - vec2(hp.x, -hp.y)).rgb; gl_FragColor = vec4(s / 8.0, 1.0); }", { t: { value: null }, hp: { value: new THREE.Vector2() } });
@@ -542,9 +543,10 @@ void main() { float zc = dist(vUv), cc = coc(zc); vec3 acc = texture2D(tColor, v
 vec3 fit(vec3 v) { vec3 a = v * (v + 0.0245786) - 0.000090537; vec3 b = v * (0.983729 * v + 0.4329510) + 0.238081; return a / b; }
 vec3 aces(vec3 c) { c *= 1.0 / 0.6; c = mat3(0.59719, 0.07600, 0.02840, 0.35458, 0.90834, 0.13383, 0.04823, 0.01566, 0.83777) * c; c = fit(c); c = mat3(1.60475, -0.10208, -0.00327, -0.53108, 1.10813, -0.07276, -0.07367, -0.00605, 1.07602) * c; return clamp(c, 0.0, 1.0); }
 float h21(vec2 p) { vec3 q = fract(vec3(p.xyx) * 0.1031); q += dot(q, q.yzx + 33.33); return fract((q.x + q.y) * q.z); }
+vec4 texC(sampler2D s, vec2 u) { return min(texture2D(s, u), vec4(64.0)); }
 void main() { vec2 cu = vUv - 0.5; float r2 = dot(cu * vec2(1.0, uRes.y / uRes.x * 1.25), cu * vec2(1.0, uRes.y / uRes.x * 1.25));
   vec2 ca = cu * r2 * 0.012;                                             // a trace of lens color fringe toward the corners
-  vec3 c = vec3(texture2D(tColor, vUv - ca).r, texture2D(tColor, vUv).g, texture2D(tColor, vUv + ca).b);
+  vec3 c = vec3(texC(tColor, vUv - ca).r, texC(tColor, vUv).g, texC(tColor, vUv + ca).b);
   vec2 ht = 1.0 / uRes; vec3 hz = (texture2D(tHaze, vUv + ht).rgb + texture2D(tHaze, vUv - ht).rgb + texture2D(tHaze, vUv + vec2(ht.x, -ht.y)).rgb + texture2D(tHaze, vUv + vec2(-ht.x, ht.y)).rgb) * 0.25;
   c = (c + hz * texture2D(tMask, vUv).a) * uExp + texture2D(tBloom, vUv).rgb * uBloom;
   c *= 1.0 - uVig * smoothstep(0.08, 0.62, r2);
@@ -1186,8 +1188,11 @@ function filmShot(S) {          // the shot (index, camera p, target t) for the 
   const b = nbPos(), d = 0.45 + 1.3 * (BB.L || 0.37);          // swim: side tracking shot with the newborn, a little further out as the body grows
   return { i: 6, p: [b.x - 0.1 * d, -d, Math.max(0.1, b.z) + 0.22 * d], t: [b.x + 0.02, 0, Math.max(0.06, b.z)], track: true };
 }
+
 function filmCam(S, dt) {
-  const c = R3.camera, tg = R3.controls.target, sh = filmShot(S);
+  const c = R3.camera, tg = R3.controls.target;
+  if (_qs0("cam") !== "move") { const cx = (TANK.x0 + TANK.x1) / 2; c.position.set(cx + 0.02 - 0.08, -4.5 - 0.06, 1.2 + 0.02); tg.set(cx, 0, 0.1); if (FILM.shot !== 99) { FILM.shot = 99; CINE.focus = c.position.distanceTo(tg); } return; }          // the artist's choice: one fixed camera for the whole film, the wide front view of the end of the moving path (?cam=move keeps the path)
+  const sh = filmShot(S);
   if (sh.i !== FILM.shot) { const cut = !(sh.i === 7 && FILM.shot === 6); if (sh.i === 7) { FILM.P0 = c.position.toArray(); FILM.T0 = tg.toArray(); }
     FILM.shot = sh.i; if (cut) { c.position.set(...sh.p); tg.set(...sh.t); FILM.rv.p = new THREE.Vector3(); FILM.rv.t = new THREE.Vector3(); CINE.focus = c.position.distanceTo(tg); return; } }
   if (!FILM.rv.p) { FILM.rv.p = new THREE.Vector3(); FILM.rv.t = new THREE.Vector3(); }
