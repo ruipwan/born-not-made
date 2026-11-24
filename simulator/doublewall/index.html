@@ -151,7 +151,9 @@ button:focus-visible, input:focus-visible, a:focus-visible, .track:focus-visible
   .top .file { font-size: 15px; }
   .top .logo { display: none; }
   .top { padding: 0 8px; }
-  .top { gap: 8px; }
+  .top { gap: 8px; overflow-x: auto; scrollbar-width: none; }
+  .top::-webkit-scrollbar { display: none; }
+  .top .sp { flex: 0 0 0; }
   .seg { padding: 3px 2px; font-size: 9px; }
   .ahead { padding: 0 6px; gap: 5px; }
   .cams .btn { padding: 3px 7px; font-size: 11px; }
@@ -683,33 +685,82 @@ function buildQuilt() {
   cap(0); const mg = cap(na - 1);
   // round 3, point 0: the lip edge dips elastically under the keel of the newborn in phase d (S.dip); the base positions are kept
   PARTS.dipG = [og, ig, mg].map(g => [g, Float32Array.from(g.attributes.position.array)]);
-  const img = new Image(); img.onload = () => { const t = quiltTextures(img); outerM.map = t.map; outerM.needsUpdate = true; if (NB.mat) { NB.mat.map = t.map; NB.mat.needsUpdate = true; } }; img.onerror = () => log("quilt texture did not load", "w"); img.src = Q.tex;
+  // round 22: the newborn and the folded pack share the texture (and the newborn and the pack also take its bump map)
+  const img = new Image(); img.onload = () => { const t = quiltTextures(img); PARTS.qTex = t; outerM.map = t.map; outerM.needsUpdate = true; if (NB.mat) { NB.mat.map = t.map; NB.mat.bumpMap = t.bump; NB.mat.needsUpdate = true; } if (BB.quiltMats) for (const m of BB.quiltMats) { m.map = t.map; if (m.bumpScale) m.bumpMap = t.bump; m.needsUpdate = true; } }; img.onerror = () => log("quilt texture did not load", "w"); img.src = Q.tex;
   // the six circuits, through the cell centers, filled from the mouth end
   const cc = [0xc98b2b, 0xc98b2b, 0x5f8f4e, 0x5f8f4e, 0x4a7fb0, 0x4a7fb0]; PARTS.circ = [];
   for (const c of Q.circuits) { const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(c.p, 3)); const l = new THREE.Line(g, new THREE.LineBasicMaterial({ color: cc[c.c], transparent: true, opacity: 0.2, depthWrite: false, clippingPlanes: clip })); l.renderOrder = 7.1; R3.chamber.add(l); PARTS.circ.push(l); }
 }
-/* ---------------------------------------------------------------- the newborn: the same quilted head, a keyframed grid from the birth model (quilt.json, nbk) */
-const NB = { mesh: null, keys: null, n: 0 };
+/* ---------------------------------------------------------------- the newborn: the same quilted head, a keyframed grid from the birth model (quilt.json, nbk)
+   round 22: drawn as a real double wall like the parent. The keys are the newborn's OUTER skin (part_q.py: nb_world(..., which='outer')), so the outer skin is the keyed
+   surface and the inner skin lies at the local wall thickness t inward along the vertex normal. t comes from the parent's own grid: |outer - inner| of J.quilt averaged over
+   the 4 x 4 block of the full grid that each newborn vertex stands for (K.si, K.sj), never below the flat thickness TFLAT. How far a station has filled is read from the keys
+   themselves: the area enclosed by the outer skin's loop of that row against the same row of the parent (a flat or folded strip encloses almost nothing, an open row all of it).
+   The ribs: the parent's relief is geometry on its full grid (outer bulges per channel); the newborn grid (1 in 4 each way) is too coarse to carry it, so its outer skin gets a
+   bump map made from the puff channel of the same quilt texture. */
+const NB = { mesh: null, keys: null, n: 0 }, TFLAT = 0.0026;          // two skins lying together: 2 x 1.2 mm plus a hair
 function buildNewborn() {
   const K = J.nbk, na = K.na, nv = K.nv, n1 = nv + 1; if (K.keysI) NB.keys = K.keysI; else { const b = atob(K.data), u8 = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u8[i] = b.charCodeAt(i); NB.keys = new Int16Array(u8.buffer); } NB.n = na * nv; NB.sc = K.scale;
-  const pos = new Float32Array(na * n1 * 3), uv = new Float32Array(na * n1 * 2), idx = [];
+  const Q = J.quilt, QA = Q.na, QV = Q.nv, O = Q.outerF || b64f32(Q.outer), I = Q.innerF || b64f32(Q.inner), clip = [SECT];
+  // the full wall thickness at each newborn vertex, and which way is inward (from the parent: the newborn grid has the same form and the same winding)
+  const TF = new Float32Array(na * nv), at = (A, i, j, c) => A[(i * QV + ((j % QV) + QV) % QV) * 3 + c];
+  for (let i = 0; i < na; i++) for (let j = 0; j < nv; j++) { let sum = 0, cnt = 0; const ic = Math.min(QA - 1, i * K.si), jc = j * K.sj;
+    for (let di = -2; di <= 1; di++) { const ii = ic + di; if (ii < 0 || ii >= QA) continue; for (let dj = -2; dj <= 1; dj++) { const jj = jc + dj; sum += Math.hypot(at(O, ii, jj, 0) - at(I, ii, jj, 0), at(O, ii, jj, 1) - at(I, ii, jj, 1), at(O, ii, jj, 2) - at(I, ii, jj, 2)); cnt++; } }
+    TF[i * nv + j] = Math.max(TFLAT, sum / cnt); }
+  let sgn = 0; const ARef = new Float32Array(na), v3 = (i, j) => [at(O, i, j, 0), at(O, i, j, 1), at(O, i, j, 2)];
+  for (let i = 0; i < na; i++) { const ic = Math.min(QA - 1, i * K.si), ip = Math.min(QA - 1, ic + K.si), im = Math.max(0, ic - K.si); let ax = 0, ay = 0, az = 0;
+    for (let j = 0; j < nv; j++) { const jc = j * K.sj, p = v3(ic, jc), q = v3(ic, jc + K.sj), a1 = v3(ip, jc), a0 = v3(im, jc), b1 = v3(ic, jc + K.sj), b0 = v3(ic, jc - K.sj);
+      ax += p[1] * q[2] - p[2] * q[1]; ay += p[2] * q[0] - p[0] * q[2]; az += p[0] * q[1] - p[1] * q[0];
+      const di = [a1[0] - a0[0], a1[1] - a0[1], a1[2] - a0[2]], dj = [b1[0] - b0[0], b1[1] - b0[1], b1[2] - b0[2]], n = [di[1] * dj[2] - di[2] * dj[1], di[2] * dj[0] - di[0] * dj[2], di[0] * dj[1] - di[1] * dj[0]];
+      sgn += n[0] * (at(I, ic, jc, 0) - p[0]) + n[1] * (at(I, ic, jc, 1) - p[1]) + n[2] * (at(I, ic, jc, 2) - p[2]); }
+    ARef[i] = 0.5 * Math.hypot(ax, ay, az); }
+  NB.TF = TF; NB.ARef = ARef; NB.inw = sgn < 0 ? -1 : 1; NB.open = new Float32Array(na);
+  // the two skins: one index and one uv for both; the normals are computed once per frame on the keyed skin and shared (the inner skin is parallel to it)
+  const uv = new Float32Array(na * n1 * 2), idx = [];
   for (let i = 0; i < na; i++) for (let j = 0; j <= nv; j++) { const d = i * n1 + j; uv[2 * d] = i * K.si / (K.na_full - 1); uv[2 * d + 1] = 1 - (j * K.sj) / K.nv_full; }
   for (let i = 0; i < na - 1; i++) for (let j = 0; j < nv; j++) { const a = i * n1 + j, b2 = a + 1, c = a + n1, e = c + 1; idx.push(a, c, b2, b2, c, e); }
-  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.BufferAttribute(uv, 2)); g.setIndex(idx);
-  const mat = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(0xffffff), roughness: 0.55, clearcoat: 0.1, clearcoatRoughness: 0.5, transparent: true, opacity: 0.62, depthWrite: false, side: THREE.DoubleSide, clippingPlanes: [SECT], emissive: new THREE.Color(0x15181b) });
-  NB.mat = mat; NB.mesh = new THREE.Mesh(g, mat); NB.mesh.renderOrder = 9.5; NB.mesh.frustumCulled = false; R3.scene.add(NB.mesh); NB.na = na; NB.nv = nv; NB.last = -2;
+  const uvA = new THREE.BufferAttribute(uv, 2), nrm = new THREE.BufferAttribute(new Float32Array(na * n1 * 3), 3), ix = new THREE.Uint16BufferAttribute(idx, 1);
+  const skinGeo = () => { const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(na * n1 * 3), 3)); g.setAttribute("normal", nrm); g.setAttribute("uv", uvA); g.setIndex(ix); return g; };
+  // the same materials as the parent's two skins (buildQuilt); the quilt texture is shared when it loads, the outer skin also takes its bump map
+  const outerM = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(0xffffff), roughness: 0.62, metalness: 0, clearcoat: 0.04, clearcoatRoughness: 0.7, transparent: true, opacity: 0.5, depthWrite: false, side: THREE.FrontSide, clippingPlanes: clip, emissive: new THREE.Color(0x15181b), bumpScale: 0.003 });
+  const innerM = new THREE.MeshStandardMaterial({ color: new THREE.Color(0xdfe6ea).convertSRGBToLinear(), roughness: 0.5, transparent: true, opacity: 0.28, depthWrite: false, side: THREE.DoubleSide, clippingPlanes: clip });
+  const capM = clayMat(0xe9edee, { opacity: 0.75, side: THREE.DoubleSide, sub: 0.3, clip });
+  NB.mat = outerM; NB.innerM = innerM; NB.capM = capM; if (PARTS.qTex) { outerM.map = PARTS.qTex.map; outerM.bumpMap = PARTS.qTex.bump; }
+  NB.mesh = new THREE.Mesh(skinGeo(), outerM); NB.mesh.renderOrder = 9.5; NB.inner = new THREE.Mesh(skinGeo(), innerM); NB.inner.renderOrder = 9.3;
+  // the cuff at the rim (row 0) and the rolled edge of the mouth (last row): strips joining the two skins, as on the parent
+  NB.caps = [0, na - 1].map((i) => { const g = new THREE.BufferGeometry(), cx = []; g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(n1 * 6), 3)); for (let j = 1; j <= nv; j++) cx.push(2 * j - 2, 2 * j - 1, 2 * j, 2 * j - 1, 2 * j + 1, 2 * j); g.setIndex(cx);
+    const m = new THREE.Mesh(g, capM); m.renderOrder = 9.55; m.userData.row = i; return m; });
+  for (const m of [NB.mesh, NB.inner, ...NB.caps]) { m.frustumCulled = false; R3.scene.add(m); }
+  NB.na = na; NB.nv = nv; NB.last = -2;
   // the keel: two tubes along the floor centerline, drawn as a line on the grid row of the keel
   const kg = new THREE.BufferGeometry(); kg.setAttribute("position", new THREE.BufferAttribute(new Float32Array(na * 3), 3)); NB.keel = new THREE.Line(kg, new THREE.LineBasicMaterial({ color: 0x7fb2d9, transparent: true, opacity: 0.9, depthWrite: false })); NB.keel.renderOrder = 9.8; NB.keel.frustumCulled = false; R3.scene.add(NB.keel);
 }
 function setNewborn(nbi) {
-  if (!NB.mesh) return; const vis = nbi >= 0; NB.mesh.visible = vis; NB.keel.visible = vis; if (!vis) return;
+  if (!NB.mesh) return; const vis = nbi >= 0; for (const m of [NB.mesh, NB.inner, NB.keel, ...NB.caps]) m.visible = vis; if (!vis) return;
   if (Math.abs(nbi - NB.last) < 1e-4) return; NB.last = nbi;
   const K = J.nbk, nk = K.frames.length, k0 = Math.min(nk - 1, Math.floor(nbi)), k1 = Math.min(nk - 1, k0 + 1), f = nbi - k0, n = NB.n, sc = NB.sc, na = NB.na, nv = NB.nv, n1 = nv + 1;
-  const P = NB.mesh.geometry.attributes.position, A = P.array, KA = NB.keys, kp = NB.keel.geometry.attributes.position.array, jk = Math.floor(nv / 2);
-  for (let i = 0; i < na; i++) for (let j = 0; j <= nv; j++) { const s = (i * nv + (j % nv)) * 3, d = (i * n1 + j) * 3;
-    for (let c = 0; c < 3; c++) A[d + c] = (KA[k0 * n * 3 + s + c] * (1 - f) + KA[k1 * n * 3 + s + c] * f) * sc; }
-  for (let i = 0; i < na; i++) { const s = (i * nv + jk) * 3; for (let c = 0; c < 3; c++) kp[3 * i + c] = (KA[k0 * n * 3 + s + c] * (1 - f) + KA[k1 * n * 3 + s + c] * f) * sc + (c === 2 ? 0.001 : 0); }
-  P.needsUpdate = true; NB.mesh.geometry.computeVertexNormals(); NB.mesh.geometry.computeBoundingSphere(); NB.keel.geometry.attributes.position.needsUpdate = true;
+  const A = NB.mesh.geometry.attributes.position.array, B = NB.inner.geometry.attributes.position.array, NA = NB.mesh.geometry.attributes.normal.array, KA = NB.keys, kp = NB.keel.geometry.attributes.position.array, jk = Math.floor(nv / 2);
+  const o0 = k0 * n * 3, o1 = k1 * n * 3, g = 1 - f;
+  for (let i = 0; i < na; i++) { for (let j = 0; j < nv; j++) { const s = (i * nv + j) * 3, d = (i * n1 + j) * 3; A[d] = (KA[o0 + s] * g + KA[o1 + s] * f) * sc; A[d + 1] = (KA[o0 + s + 1] * g + KA[o1 + s + 1] * f) * sc; A[d + 2] = (KA[o0 + s + 2] * g + KA[o1 + s + 2] * f) * sc; }
+    const d0 = i * n1 * 3, dn = (i * n1 + nv) * 3; A[dn] = A[d0]; A[dn + 1] = A[d0 + 1]; A[dn + 2] = A[d0 + 2]; }
+  // normals by central differences on the grid, j wrapping (the seam j = 0 / j = nv gets one normal), one sided at the two end rows; the open fraction of each row from its enclosed area
+  const P = (i, j, c) => A[(i * n1 + j) * 3 + c];
+  for (let i = 0; i < na; i++) { const ip = Math.min(na - 1, i + 1), im = Math.max(0, i - 1); let ax = 0, ay = 0, az = 0, cx = 0, cy = 0, cz = 0;
+    for (let j = 0; j < nv; j++) { cx += P(i, j, 0); cy += P(i, j, 1); cz += P(i, j, 2); } cx /= nv; cy /= nv; cz /= nv;
+    for (let j = 0; j < nv; j++) { const jp = (j + 1) % nv, jm = (j + nv - 1) % nv;
+      const dix = P(ip, j, 0) - P(im, j, 0), diy = P(ip, j, 1) - P(im, j, 1), diz = P(ip, j, 2) - P(im, j, 2), djx = P(i, jp, 0) - P(i, jm, 0), djy = P(i, jp, 1) - P(i, jm, 1), djz = P(i, jp, 2) - P(i, jm, 2);
+      let nx = diy * djz - diz * djy, ny = diz * djx - dix * djz, nz = dix * djy - diy * djx; const l = Math.hypot(nx, ny, nz) || 1; nx /= l; ny /= l; nz /= l;
+      const d = (i * n1 + j) * 3; NA[d] = nx; NA[d + 1] = ny; NA[d + 2] = nz; if (j === 0) { const e = (i * n1 + nv) * 3; NA[e] = nx; NA[e + 1] = ny; NA[e + 2] = nz; }
+      const px = P(i, j, 0) - cx, py = P(i, j, 1) - cy, pz = P(i, j, 2) - cz, qx = P(i, jp, 0) - cx, qy = P(i, jp, 1) - cy, qz = P(i, jp, 2) - cz; ax += py * qz - pz * qy; ay += pz * qx - px * qz; az += px * qy - py * qx; }
+    const r = 0.5 * Math.hypot(ax, ay, az) / NB.ARef[i], u = clamp((r - 0.12) / 0.6, 0, 1); NB.open[i] = u * u * (3 - 2 * u); }
+  // the inner skin: inward by the local thickness, from the flat value (unfilled) to the parent's (filled)
+  const TF = NB.TF, sg = NB.inw;
+  for (let i = 0; i < na; i++) { const o = NB.open[i]; for (let j = 0; j <= nv; j++) { const d = (i * n1 + j) * 3, t = sg * (TFLAT + (TF[i * nv + (j % nv)] - TFLAT) * o); B[d] = A[d] + NA[d] * t; B[d + 1] = A[d + 1] + NA[d + 1] * t; B[d + 2] = A[d + 2] + NA[d + 2] * t; } }
+  for (const m of NB.caps) { const i = m.userData.row, C = m.geometry.attributes.position.array; for (let j = 0; j <= nv; j++) { const d = (i * n1 + j) * 3; C[6 * j] = A[d]; C[6 * j + 1] = A[d + 1]; C[6 * j + 2] = A[d + 2]; C[6 * j + 3] = B[d]; C[6 * j + 4] = B[d + 1]; C[6 * j + 5] = B[d + 2]; }
+    m.geometry.attributes.position.needsUpdate = true; m.geometry.computeVertexNormals(); }
+  for (let i = 0; i < na; i++) { const s = (i * nv + jk) * 3; for (let c = 0; c < 3; c++) kp[3 * i + c] = (KA[o0 + s + c] * g + KA[o1 + s + c] * f) * sc + (c === 2 ? 0.001 : 0); }
+  NB.mesh.geometry.attributes.position.needsUpdate = true; NB.inner.geometry.attributes.position.needsUpdate = true; NB.mesh.geometry.attributes.normal.needsUpdate = true;
+  NB.mesh.geometry.computeBoundingSphere(); NB.keel.geometry.attributes.position.needsUpdate = true;
 }
 function buildBody() {
   const H = J.hull, clip = [SECT];
@@ -854,12 +905,28 @@ function buildBaby() {
     mat.customProgramCacheKey = () => "babyskin" + side; return mat; };
 
   const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(P.v, 3)); g.setIndex(P.t); g.computeVertexNormals(); g.computeBoundingBox();
-  BB.back = new THREE.Mesh(g, skin(THREE.BackSide, false)); BB.back.renderOrder = 9.4; R3.baby.add(BB.back);
-  BB.mesh = new THREE.Mesh(g, skin(THREE.FrontSide, true)); BB.mesh.renderOrder = 9.6; R3.baby.add(BB.mesh);
   const bb = g.boundingBox; BB.L = bb.max.x - bb.min.x; BB.rb = (bb.max.z - bb.min.z) / 2; BB.rmax = (bb.max.y - bb.min.y) / 2; BB.box = bb;
-  // the 18 layers of the flat pack, as fine lines on the sides
-  const lp = [], n = P.layers; for (let k = 1; k < n; k++) { const z = bb.min.z + (bb.max.z - bb.min.z) * k / n; for (const y of [bb.min.y + 0.0004, bb.max.y - 0.0004]) lp.push(bb.min.x + 0.004, y, z, bb.max.x - 0.004, y, z); for (const x of [bb.min.x + 0.0004, bb.max.x - 0.0004]) lp.push(x, bb.min.y + 0.004, z, x, bb.max.y - 0.004, z); }
-  const lg = new THREE.BufferGeometry(); lg.setAttribute("position", new THREE.Float32BufferAttribute(lp, 3)); BB.edges = new THREE.LineSegments(lg, litLine(new THREE.LineBasicMaterial({ color: 0xcfd6dc, transparent: true, opacity: 0.5, depthWrite: false, clippingPlanes: clip }), 0.8, 0.1)); BB.edges.renderOrder = 9.7; R3.baby.add(BB.edges);
+  // round 22: the pack drawn as folded quilt, not a block: the parent's two skin materials (translucent, the quilt texture and its bump), the texture laid along the strip and
+  // over the fold edges at the real channel pitch (54 channels around the texture, 18 mm each, so it spans 0.97 m across; 0.40 m along, the length of the head)
+  { const pv = g.attributes.position.array, nv_ = g.attributes.normal.array, uvp = new Float32Array(pv.length / 3 * 2), LU = 0.40, LV = 54 * 0.018;
+    for (let k = 0; k < pv.length / 3; k++) { const x = pv[3 * k], y = pv[3 * k + 1], z = pv[3 * k + 2], over = z < bb.min.z + 0.004 ? 0 : Math.max(0, bb.max.z - z);
+      uvp[2 * k] = (x - bb.min.x) / LU; uvp[2 * k + 1] = 0.5 + (y + Math.sign(y) * over) / LV; }
+    g.setAttribute("uv", new THREE.BufferAttribute(uvp, 2)); }
+  const packOuter = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(0xffffff), roughness: 0.62, metalness: 0, clearcoat: 0.04, clearcoatRoughness: 0.7, transparent: true, opacity: 0.62, depthWrite: false, side: THREE.BackSide, clippingPlanes: clip, emissive: new THREE.Color(0x15181b), bumpScale: 0.003 });          // the pack mesh is wound inward: its outside faces are the back faces
+  const packInner = new THREE.MeshStandardMaterial({ color: new THREE.Color(0xdfe6ea).convertSRGBToLinear(), roughness: 0.5, transparent: true, opacity: 0.3, depthWrite: false, side: THREE.FrontSide, clippingPlanes: clip });
+  BB.quiltMats = [packOuter]; if (PARTS.qTex) { packOuter.map = PARTS.qTex.map; packOuter.bumpMap = PARTS.qTex.bump; }
+  BB.back = new THREE.Mesh(g, packInner); BB.back.renderOrder = 9.4; R3.baby.add(BB.back);
+  BB.mesh = new THREE.Mesh(g, packOuter); BB.mesh.renderOrder = 9.6; R3.baby.add(BB.mesh);
+  // the 18 layers of the flat pack: each a double skin, seen through the translucent pack as thin sheets, with its two skins as lines on the sides (strong at the layer
+  // faces, faint at the seam between the two skins of a layer)
+  const n = P.layers, H = bb.max.z - bb.min.z, inset = 0.003, rr = Math.min(0.012, (bb.max.y - bb.min.y) / 4);
+  { const sh = new THREE.Shape(), x0 = bb.min.x + inset, x1 = bb.max.x - inset, y0 = bb.min.y + inset, y1 = bb.max.y - inset;
+    sh.moveTo(x0 + rr, y0); sh.lineTo(x1 - rr, y0); sh.quadraticCurveTo(x1, y0, x1, y0 + rr); sh.lineTo(x1, y1 - rr); sh.quadraticCurveTo(x1, y1, x1 - rr, y1); sh.lineTo(x0 + rr, y1); sh.quadraticCurveTo(x0, y1, x0, y1 - rr); sh.lineTo(x0, y0 + rr); sh.quadraticCurveTo(x0, y0, x0 + rr, y0);
+    const sg = new THREE.ShapeGeometry(sh, 4), sm = new THREE.MeshStandardMaterial({ color: new THREE.Color(0xe4eaee).convertSRGBToLinear(), roughness: 0.5, transparent: true, opacity: 0.07, depthWrite: false, side: THREE.DoubleSide, clippingPlanes: clip });
+    BB.slabs = new THREE.Group(); for (let k = 1; k < n; k++) { const m = new THREE.Mesh(sg, sm); m.position.z = bb.min.z + H * k / n; m.renderOrder = 9.45; BB.slabs.add(m); } R3.baby.add(BB.slabs); }
+  const lp = [], lq = []; for (let k = 1; k < 2 * n; k++) { const z = bb.min.z + H * k / (2 * n), arr = k % 2 ? lq : lp; for (const y of [bb.min.y + 0.0004, bb.max.y - 0.0004]) arr.push(bb.min.x + 0.006, y, z, bb.max.x - 0.006, y, z); for (const x of [bb.min.x + 0.0004, bb.max.x - 0.0004]) arr.push(x, bb.min.y + 0.006, z, x, bb.max.y - 0.006, z); }
+  const lg = new THREE.BufferGeometry(); lg.setAttribute("position", new THREE.Float32BufferAttribute(lp, 3)); BB.edges = new THREE.LineSegments(lg, litLine(new THREE.LineBasicMaterial({ color: 0xcfd6dc, transparent: true, opacity: 0.62, depthWrite: false, clippingPlanes: clip }), 0.8, 0.1)); BB.edges.renderOrder = 9.7; R3.baby.add(BB.edges);
+  const lg2 = new THREE.BufferGeometry(); lg2.setAttribute("position", new THREE.Float32BufferAttribute(lq, 3)); BB.edges2 = new THREE.LineSegments(lg2, litLine(new THREE.LineBasicMaterial({ color: 0xcfd6dc, transparent: true, opacity: 0.24, depthWrite: false, clippingPlanes: clip }), 0.8, 0.1)); BB.edges2.renderOrder = 9.7; R3.baby.add(BB.edges2);
   BB.outline = new THREE.LineSegments(new THREE.EdgesGeometry(g, 25), new THREE.LineBasicMaterial({ color: 0xcfd6dc, transparent: true, opacity: 0.5, depthWrite: false, clippingPlanes: clip })); BB.outline.renderOrder = 9.7; BB.outline.visible = false; R3.baby.add(BB.outline);          // round 7: the Kit view shows the pack as a faint outline
   const kg = new THREE.Group(); kg.matrixAutoUpdate = false; R3.scene.add(kg); BB.kitG = kg; const K = J.kit, kp = (id) => K.parts.find((q) => q.id === id), at = (r) => new THREE.Vector3(-r[0], -r[1], r[2] - K.z);
   const gk = kg, part = (geo, hex, pos, o = {}) => { const m = new THREE.Mesh(geo, clayMat(hex, Object.assign({ sub: 0.3, sss: 0.25, sssi: 0.5, grain: 0.04 }, o))); m.position.copy(pos); gk.add(m); return m; };
@@ -1008,9 +1075,9 @@ function updateCallouts() {
 /* round 7: what the Kit and Newborn views fade so the parts read: the folded pack to an outline, the head skin and the gel top lighter, the newborn skin lighter */
 function viewFade() {
   const kv = CAM === "kit", nv = CAM === "newborn";
-  if (BB.mesh) { const showPack = !kv; BB.mesh.visible = showPack; BB.back.visible = showPack; if (BB.outline) BB.outline.visible = kv; if (BB.edges) BB.edges.material.opacity = kv ? 0.18 : 0.5; }
+  if (BB.mesh) { const showPack = !kv; BB.mesh.visible = showPack; BB.back.visible = showPack; if (BB.slabs) BB.slabs.visible = showPack; if (BB.edges2) BB.edges2.visible = showPack; if (BB.outline) BB.outline.visible = kv; if (BB.edges) BB.edges.material.opacity = kv ? 0.18 : 0.62; }
   if (PARTS.chamber) { PARTS.chamber.material.opacity = kv ? 0.16 : 0.5; PARTS.qInner.material.opacity = kv ? 0.1 : 0.28; PARTS.gelTop.material.opacity = kv ? 0.14 : 0.42; }
-  if (NB.mat) NB.mat.opacity = nv ? 0.4 : 0.62;
+  if (NB.mat) { const f = nv || kv; NB.mat.opacity = f ? 0.3 : 0.5; NB.innerM.opacity = f ? 0.13 : 0.28; NB.capM.opacity = f ? 0.45 : 0.75; }          // round 22: both skins and the cuffs lighter, still two layers
   if (BB.partMats) for (const m of BB.partMats) m.depthTest = !(kv || nv);          // in these two views the parts are drawn through the skins (an x ray of the interlayer)
 }
 function updateLabels() {
