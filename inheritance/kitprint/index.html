@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The kit, then one layer: print and place in one process · Born, Not Made</title>
+<meta name="description" content="How the newborn's parts come together into one kit, and how one 4 axis arm prints a layer in the gel, changes its tool, picks the kit, presses it into the wet layer and prints over it.">
+<meta name="theme-color" content="#000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout after simulator/simple: a viewport with the caption on the picture, readouts on the right, a stage timeline across the bottom.
+   The page flows: nothing is fixed, sticky, or scrolls on its own. With ?embed=1 only the viewport and the timeline show, sized to the frame. */
+:root { --bg: #000; --line: #2a2a2c; --ink: #ecebe6; --muted: #9b9a94; --dim: #67665f; --gel: #9cc8ec; --warn: #e3b36a;
+  --serif: "Cormorant Garamond", Georgia, serif; --sans: "Inter", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { background: #000; color: var(--ink); margin: 0; }
+body { font: 12.5px/1.45 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+.app { display: grid; gap: 2px; padding: 2px; grid-template-columns: minmax(0, 1fr) 360px; grid-template-rows: 40px auto auto;
+  grid-template-areas: "top top" "view side" "time time"; align-items: start; }
+.top { grid-area: top; display: flex; align-items: center; gap: 14px; padding: 0 12px; height: 40px; border-bottom: 1px solid #1c1c1e; }
+.top .file { font: 500 20px/1 var(--serif); white-space: nowrap; }
+.top .sub { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.top .sp { flex: 1; }
+.home { font: 500 12px var(--sans); color: var(--muted); text-decoration: none; white-space: nowrap; }
+.home:hover { color: #fff; }
+.view { grid-area: view; display: flex; flex-direction: column; min-width: 0; }
+.ahead { height: 30px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 8px; color: var(--muted); font-size: 11.5px; white-space: nowrap; overflow: hidden; }
+.ahead b { color: var(--ink); font-weight: 500; }
+.ahead .sp { flex: 1; }
+#vp { position: relative; height: clamp(440px, calc(100vh - 170px), 900px); background: #000; overflow: hidden; }
+#vp > canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.ov { position: absolute; left: 12px; top: 10px; right: 12px; pointer-events: none; line-height: 1.35; max-width: 640px;
+  background: linear-gradient(90deg, rgb(0 0 0 / 70%), rgb(0 0 0 / 40%) 70%, rgb(0 0 0 / 0%)); padding: 6px 10px 7px; }
+.ov .stg { font: 500 26px/1.1 var(--serif); }
+.ov .stepl { color: #cfcdc6; font-size: 13px; margin-top: 3px; max-width: 580px; }
+.ov .clk { font: 500 12px var(--mono); color: var(--gel); margin-top: 6px; }
+.ov .clk span { color: var(--muted); font-weight: 400; }
+.lab { position: absolute; left: 0; top: 0; pointer-events: none; color: rgb(255 255 255 / 78%); font: 500 9.5px/1 var(--mono); letter-spacing: .09em; text-transform: uppercase;
+  text-shadow: 0 0 5px #000, 0 0 2px #000; padding: 0 0 12px; white-space: nowrap; transform: translate(-50%, -100%); }
+.lab::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 1px; height: 9px; background: rgb(255 255 255 / 45%); }
+.scale { position: absolute; right: 14px; bottom: 12px; pointer-events: none; font: 10px var(--mono); color: var(--muted); text-align: center; }
+.scale i { display: block; height: 1px; background: var(--muted); margin-bottom: 3px; }
+.btn { font: 500 11.5px var(--sans); color: var(--muted); background: none; border: 0; padding: 3px 7px; cursor: pointer; white-space: nowrap; }
+.btn:hover { color: #fff; }
+.btn.on, .btn[aria-pressed="true"] { color: #fff; font-weight: 700; }
+button:focus-visible, .track:focus-visible, a:focus-visible { outline: 1px solid #fff; outline-offset: 2px; }
+.side { grid-area: side; padding: 30px 10px 10px; }
+.rg h4 { margin: 10px 0 4px; font: 500 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+.rr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding: 2px 0; border-bottom: 1px solid #1c1c1e; }
+.rr span:first-child { color: var(--muted); }
+.rr span:last-child { font: 500 12px var(--mono); text-align: right; white-space: nowrap; }
+.rr.hot span:last-child { color: var(--gel); }
+.rr.st { grid-template-columns: 1fr; gap: 0; } .rr.st span:last-child { text-align: left; white-space: normal; color: #cfcdc6; font-weight: 400; }
+.bar { height: 3px; background: #151517; margin: 3px 0 5px; }
+.bar i { display: block; height: 100%; background: var(--gel); }
+.time { grid-area: time; display: flex; align-items: stretch; gap: 8px; padding: 6px 8px; height: 62px; }
+.ctl { display: flex; gap: 2px; align-items: center; }
+.track { flex: 1; position: relative; display: flex; gap: 2px; min-width: 0; cursor: pointer; touch-action: none; user-select: none; }
+.seg { position: relative; background: #111; border: 1px solid #222; overflow: hidden; display: flex; align-items: flex-end; padding: 3px 5px; color: var(--muted); font-size: 11px; min-width: 0; }
+.seg span { position: relative; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; pointer-events: none; }
+.seg .fill { position: absolute; inset: 0 auto 0 0; width: 0; background: #1d2731; pointer-events: none; }
+.seg.on { color: #fff; border-color: #555; }
+.head { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--gel); pointer-events: none; }
+.doc { padding: 30px 16px 56px; max-width: 980px; margin: 0 auto; color: #cfcdc6; font-size: 14.5px; line-height: 1.62; }
+.doc h2 { font: 500 30px/1.1 var(--serif); margin: 0 0 10px; color: var(--ink); }
+.doc h4 { font: 500 19px/1.2 var(--serif); margin: 24px 0 6px; color: var(--ink); }
+.doc ul { margin: 0 0 10px; padding-left: 18px; } .doc li { margin: 0 0 4px; }
+.doc a { color: #cfcdc6; }
+.doc .est { color: var(--warn); font: 500 10px var(--mono); letter-spacing: .06em; margin-left: 6px; }
+@media (max-width: 980px) {
+  .app { grid-template-columns: minmax(0, 1fr); grid-template-areas: "top" "view" "time" "side"; }
+  .top .sub { display: none; } .side { padding-top: 6px; }
+  .time { height: auto; flex-wrap: wrap; } .track { flex-basis: 100%; height: 34px; }
+  .ov .stg { font-size: 21px; }
+}
+/* embedded: viewport and timeline only, exactly the size of the frame */
+html.embed, html.embed body { height: 100%; overflow: hidden; }
+html.embed .app { height: 100%; padding: 0; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; grid-template-areas: "view" "time"; align-items: stretch; }
+html.embed .top, html.embed .side, html.embed .doc, html.embed .opt, html.embed .speed { display: none; }
+html.embed .view { min-height: 0; }
+html.embed #vp { height: auto; flex: 1; min-height: 0; }
+html.embed .time { height: 46px; padding: 4px 6px; }
+html.embed .ov .stg { font-size: clamp(16px, 2.2vw, 24px); }
+html.embed .ov .stepl { font-size: clamp(11px, 1.3vw, 13px); }
+@media (max-width: 760px) { html.embed .ahead .cams .btn { padding: 3px 4px; font-size: 10.5px; } html.embed .seg span { display: none; } }
+</style>
+<script>if (new URLSearchParams(location.search).get("embed") === "1") document.documentElement.classList.add("embed");</script>
+</head><body>
+<div class="app">
+  <header class="top">
+    <span class="file">The kit, then one layer</span>
+    <span class="sub">Born, Not Made · print and place in one process, with one 4 axis arm and its tools, in millimeters</span>
+    <span class="sp"></span>
+    <a class="home" href="../">Inheritance</a>
+    <a class="home" href="../../">Home</a>
+  </header>
+  <section class="view" aria-label="3D viewport">
+    <div class="ahead"><b>3D</b><span class="opt">the kit, the gel bed, the arm and its tool rack</span><span class="sp"></span>
+      <div class="cams" role="group" aria-label="Camera">
+        <button class="btn" data-cam="kit">Kit</button><button class="btn" data-cam="wide">Wide</button><button class="btn" data-cam="bed">Bed</button><button class="btn" data-cam="rack">Rack</button>
+      </div>
+      <button class="btn on" id="autoCam" aria-pressed="true" title="The camera follows the stage">Auto</button>
+      <button class="btn" id="labT" aria-pressed="true">Text</button>
+    </div>
+    <div id="vp">
+      <div class="ov"><div class="stg" id="ovStage">Loading</div><div class="stepl" id="ovStep"></div><div class="clk" id="ovClock"></div></div>
+      <div id="labs"></div>
+    </div>
+  </section>
+  <aside class="side" aria-label="Readouts"><div id="ro"></div></aside>
+  <section class="time" aria-label="Timeline">
+    <div class="ctl">
+      <button class="btn" id="play" aria-pressed="true">Pause</button>
+      <span class="speed"><button class="btn on" data-speed="1">1×</button><button class="btn" data-speed="2">2×</button></span>
+    </div>
+    <div class="track" id="track" tabindex="0" role="slider" aria-label="Timeline, drag to scrub" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+  </section>
+</div>
+
+<section class="doc" id="how">
+  <h2>Print and place, in one process</h2>
+  <p>The newborn is not printed first and fitted with electronics later. The parts are joined into one kit before the print starts: a Raspberry Pi 5, the sensors, a motor driver, two water pumps, a micro air pump, a cell and a regulator, wired on one plate and cast in silicone. Then one arm does everything inside the head. It prints a layer of the newborn's wall in the gel, changes its tool, picks the kit up, presses it into the wet layer, changes back, and prints over it. When the print is done, the parts are already inside, and the newborn can move.</p>
+  <p>The gel is what makes this simple. A print in a gel bath needs no supports, so nothing has to be cut away, and the soft body slides out whole. Because nothing has to be held from below, a small desktop arm is enough. The arm is a Rotrics DexArm, which takes interchangeable heads on one mount: a printing head, an air pick with suction cups, and a soft gripper, with a rotary module as the fourth axis.</p>
+  <h4>Numbers</h4>
+  <ul>
+    <li>Kit pod 156 x 88 x 27 mm, as on the <a href="../wall/">wall page</a>; the folded print is 143 x 194 mm in plan.</li>
+    <li>Raspberry Pi 5, 85 x 56 mm; regulator 22.9 x 22.9 x 9.7 mm; two pumps of 42.6 x 23.9 x 22.7 mm; one 18650 cell.</li>
+    <li>Bead about 1.5 mm, one layer shown here; the real print stacks many.</li>
+    <li>DexArm: payload 500 g at most, repeatability 0.05 mm; the pneumatic rotary module carries 350 g, suction cups of 5, 10 and 15 mm, soft gripper range 30 mm.</li>
+  </ul>
+  <h4>Assumptions</h4>
+  <ul>
+    <li>The size of the micro air pump (30 x 12 x 12 mm) and of the sensor boards is assumed.</li>
+    <li>One layer stands for the whole wall; the layer height and path are drawn, not sliced from the real model.</li>
+    <li>The pod weighs about 0.5 kg in air, over the 350 g of the air pick; in the gel it weighs far less. Untested.</li>
+  </ul>
+  <h4>Sources</h4>
+  <ul>
+    <li><a href="https://rotricsarm.gitbook.io/get-start/rotary-module">Rotrics, Rotary Module guide</a>: the universal adapter switches between the soft gripper and the suction cup module.</li>
+    <li><a href="https://www.robotshop.com/products/rotrics-dexarm-pneumatic-kit">DexArm pneumatic kit listing</a>: suction cups of 5, 10 and 15 mm, soft gripper range 30 mm, payload 350 g.</li>
+    <li><a href="https://doi.org/10.1126/sciadv.1500655">Bhattacharjee et al., Writing in the granular gel medium, Sci. Adv. 2015</a>; <a href="https://doi.org/10.1002/adma.201703817">Valentine et al., Hybrid 3D printing of soft electronics, Adv. Mater. 2017</a>.</li>
+  </ul>
+</section>
+
+<script src="../../assets/vendor/three-r147/three.min.js"></script>
+<script src="../../assets/vendor/three-r147/OrbitControls.js"></script>
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const sm = (u) => { u = clamp(u); return u * u * (3 - 2 * u); };
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const V = (x, y, z) => new THREE.Vector3(x, y, z);
+const EMBED = document.documentElement.classList.contains("embed");
+const QP = new URLSearchParams(location.search);
+
+/* ============================================================ the scene, in mm. z up. The gel bed is centered at the origin; the arm stands behind it at -x. */
+const BED = { w: 150, d: 205, gel: 22 };          // the gel bed inside the head, a little larger than the folded print
+const PRINT = { w: 143, d: 194, bead: 1.5, pitch: 3.2 };
+const Z1 = 1.5;                                     // first layer, bead center
+const POD = { w: 88, d: 156, h: 27 };               // pod, long side along y here
+const ZC = Z1 + 0.75 + POD.h + 0.75;                // cover layer over the pod
+const ARMBASE = V(-205, 0, 0);
+const L1 = 150, L2 = 165, H0 = 118, R0 = 18;        // DexArm links (drawn), shoulder height and offset
+const RACK = { x: -150, y: -175, z: 40 };           // tool rack, three heads
+const SHELF = V(-140, 190, 40);                     // the kit waits on a shelf in the tail, dry
+
+/* ---------- parts of the kit, on a plate of 88 x 156: x across, y along */
+const PARTS = [
+  { k: "pi",   n: "Raspberry Pi 5",  w: 56, d: 85, h: 16, at: [-12, 32],  col: 0x6f8f6a },
+  { k: "cell", n: "18650 cell",      w: 18, d: 65, h: 18, at: [-31, -43], col: 0x5a6f8a, cyl: true },
+  { k: "reg",  n: "5 V regulator",   w: 22.9, d: 22.9, h: 9.7, at: [-8, -25], col: 0x8a7a5a },
+  { k: "drv",  n: "motor driver",    w: 18, d: 20, h: 4, at: [-10, -55], col: 0x7a5a6a },
+  { k: "pumpA",n: "water pump",      w: 23.9, d: 42.6, h: 22.7, at: [29, -12], col: 0x888888 },
+  { k: "pumpB",n: "water pump",      w: 23.9, d: 42.6, h: 22.7, at: [29, 40], col: 0x888888 },
+  { k: "air",  n: "micro air pump",  w: 12, d: 30, h: 12, at: [10, -55], col: 0x9a9a9a, cyl: true },
+  { k: "sen",  n: "sensors",         w: 18, d: 25, h: 3, at: [29, -55], col: 0x5a7a8a },
+];
+
+/* ---------- stages: k, name, caption, seconds on screen */
+const STAGES = [
+  ["parts",  "The parts",            "Everything the newborn needs to move and think: a Raspberry Pi 5, sensors, a motor driver, two water pumps, a micro air pump, a cell and a regulator.", 5],
+  ["plate",  "One plate",            "The parts are wired on one aluminum plate. No wire will run through the print.", 5],
+  ["pod",    "One pod",              "The plate is cast in silicone: one sealed pod, the kit. It waits dry in the tail.", 4],
+  ["print1", "Print the first layer","The arm, with its printing head, draws the lower skin of the newborn in the gel. The gel holds the soft bead where it is laid, so no support is needed.", 9],
+  ["tool1",  "Change the tool",      "The arm leaves the printing head in the rack and takes the air pick. Same mount, another head.", 5],
+  ["place",  "Pick and place",       "It lifts the kit from the shelf, turns it with the fourth axis, and presses it into the wet layer.", 8],
+  ["tool2",  "Change back",          "The air pick goes back to the rack; the printing head comes back on.", 5],
+  ["print2", "Print over it",        "The next layers close over the kit, wet on wet. The parts are now inside the wall.", 9],
+  ["done",   "One body",             "After the print the soft body slides out of the gel whole, with nothing to cut away, its parts already in place. It can move.", 6],
+];
+let T0 = 0; const ST = STAGES.map(([k, name, cap, d]) => { const s = { k, name, cap, d, t0: T0 }; T0 += d; return s; });
+const TOTAL = T0;
+
+/* ============================================================ paths */
+function zigzag(w, d, pitch, z, margin = 0) {   // one continuous path: an outline, then lines across
+  const pts = [], hw = w / 2, hd = d / 2, r = 18;
+  for (let i = 0; i <= 64; i++) {                 // rounded rectangle outline
+    const t = Math.PI * 1.25 + i / 64 * Math.PI * 2, c = Math.cos(t), s = Math.sin(t);
+    const x = Math.sign(c) * Math.min(hw, (hw - r) + r * Math.abs(c) * 1.0) * (Math.abs(c) > 0.001 ? 1 : 0);
+    pts.push(V(hw * Math.sign(c) * Math.pow(Math.abs(c), 0.25), hd * Math.sign(s) * Math.pow(Math.abs(s), 0.25), z));
+  }
+  const n = Math.floor((d - 2 * margin - 6) / pitch);
+  for (let j = 0; j <= n; j++) {
+    const y = -hd + margin + 3 + j * pitch, f = Math.pow(Math.abs(y / hd), 4), xx = (hw - 3) * Math.pow(Math.max(0, 1 - f), 0.25);
+    if (j % 2 === 0) { pts.push(V(-xx, y, z)); pts.push(V(xx, y, z)); } else { pts.push(V(xx, y, z)); pts.push(V(-xx, y, z)); }
+  }
+  return pts;
+}
+function dense(pts, step = 2) { const out = [pts[0]]; for (let i = 1; i < pts.length; i++) { const a = pts[i - 1], b = pts[i], n = Math.max(1, Math.ceil(a.distanceTo(b) / step)); for (let k = 1; k <= n; k++) out.push(a.clone().lerp(b, k / n)); } return out; }
+const PATH1 = dense(zigzag(PRINT.w, PRINT.d, PRINT.pitch, Z1));
+const PATH2 = dense(zigzag(POD.w + 18, POD.d + 18, PRINT.pitch, ZC));
+function cumLen(p) { const c = [0]; for (let i = 1; i < p.length; i++) c.push(c[i - 1] + p[i].distanceTo(p[i - 1])); return c; }
+const C1 = cumLen(PATH1), C2 = cumLen(PATH2);
+function at(path, cum, f) { const L = cum[cum.length - 1] * f; let lo = 0, hi = cum.length - 1; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (cum[m] <= L) lo = m; else hi = m; } const a = path[lo], b = path[hi], s = (L - cum[lo]) / Math.max(1e-6, cum[hi] - cum[lo]); return [a.clone().lerp(b, clamp(s)), lo]; }
+
+/* ============================================================ three */
+let R, SCN, CAM, CTRL; const OBJ = {};
+function mat(c, o = {}) { return new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: .55, metalness: .1 }, o)); }
+function boxM(w, d, h, m) { const g = new THREE.BoxGeometry(w, d, h); g.translate(0, 0, h / 2); return new THREE.Mesh(g, m); }
+function cylM(r, h, m, axis = "z") { const g = new THREE.CylinderGeometry(r, r, h, 24); if (axis === "z") { g.rotateX(Math.PI / 2); g.translate(0, 0, h / 2); } else if (axis === "y") { } return new THREE.Mesh(g, m); }
+function tube(path, r, m) { const curve = new THREE.CatmullRomCurve3(path, false, "centripetal", 0); const g = new THREE.TubeGeometry(curve, path.length * 2, r, 6, false); const mesh = new THREE.Mesh(g, m); mesh.userData.n = g.index.count; return mesh; }
+
+function initThree() {
+  const vp = $("#vp");
+  R = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); R.setPixelRatio(Math.min(2, devicePixelRatio)); R.setClearColor(0x000000);
+  vp.insertBefore(R.domElement, vp.firstChild);
+  SCN = new THREE.Scene(); SCN.fog = new THREE.Fog(0x000000, 900, 1800);
+  CAM = new THREE.PerspectiveCamera(32, 1, 1, 5000); CAM.up.set(0, 0, 1);
+  CTRL = new THREE.OrbitControls(CAM, R.domElement); CTRL.enableDamping = true;
+  SCN.add(new THREE.HemisphereLight(0xdfe7ee, 0x111111, .75));
+  const key = new THREE.DirectionalLight(0xffffff, .9); key.position.set(-200, -300, 500); SCN.add(key);
+  const rim = new THREE.DirectionalLight(0x9cc8ec, .35); rim.position.set(300, 300, 200); SCN.add(rim);
+  resize(); addEventListener("resize", resize);
+}
+function resize() { const vp = $("#vp"), w = vp.clientWidth, h = vp.clientHeight; if (!w || !h) return; R.setSize(w, h, false); CAM.aspect = w / h; CAM.updateProjectionMatrix(); }
+
+function build() {
+  // floor and gel bed
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(1400, 1000), mat(0x0b0b0c, { roughness: 1 })); floor.position.set(-60, 0, -0.2); SCN.add(floor);
+  const tray = boxM(BED.w + 8, BED.d + 8, BED.gel + 6, mat(0xd9e4ee, { transparent: true, opacity: .08, depthWrite: false })); tray.position.z = -2; SCN.add(tray);
+  const gel = boxM(BED.w, BED.d, BED.gel, mat(0x9cc8ec, { transparent: true, opacity: .16, depthWrite: false })); SCN.add(gel); OBJ.gel = gel;
+  const edge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(BED.w + 8, BED.d + 8, BED.gel + 6)), new THREE.LineBasicMaterial({ color: 0x5a6f80 })); edge.position.z = (BED.gel + 6) / 2 - 2; SCN.add(edge);
+  // printed layers
+  const sil = mat(0xf2f2ee, { transparent: true, opacity: .9, roughness: .35 });
+  OBJ.l1 = tube(PATH1, PRINT.bead / 2, sil); SCN.add(OBJ.l1);
+  OBJ.l2 = tube(PATH2, PRINT.bead / 2, sil); SCN.add(OBJ.l2);
+  // the kit: plate, parts, pod shell
+  const kit = new THREE.Group(); OBJ.kit = kit; SCN.add(kit);
+  const plate = boxM(POD.w - 6, POD.d - 6, 2, mat(0xb8bcc0, { metalness: .6, roughness: .35 })); kit.add(plate); OBJ.plate = plate;
+  OBJ.parts = PARTS.map((p) => {
+    const m = mat(p.col); let o;
+    if (p.cyl) { const g = new THREE.CylinderGeometry(p.w / 2, p.w / 2, p.d, 24); o = new THREE.Mesh(g, m); o.userData.zc = p.h / 2; }
+    else { o = boxM(p.w, p.d, p.h, m); o.userData.zc = 0; }
+    o.userData.p = p; kit.add(o); return o;
+  });
+  // wires: thin lines from the Pi to every part
+  const wm = new THREE.LineBasicMaterial({ color: 0xe3b36a, transparent: true, opacity: 0 });
+  const wg = new THREE.BufferGeometry(), arr = [];
+  PARTS.forEach((p) => { if (p.k === "pi") return; arr.push(-12, 32, 18, p.at[0], p.at[1], 6); });
+  wg.setAttribute("position", new THREE.Float32BufferAttribute(arr, 3)); OBJ.wires = new THREE.LineSegments(wg, wm); kit.add(OBJ.wires);
+  const shell = boxM(POD.w, POD.d, POD.h, mat(0xe8eef2, { transparent: true, opacity: 0, roughness: .25, depthWrite: false })); kit.add(shell); OBJ.shell = shell;
+  const shellE = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(POD.w, POD.d, POD.h)), new THREE.LineBasicMaterial({ color: 0xdfe7ee, transparent: true, opacity: 0 })); shellE.position.z = POD.h / 2; kit.add(shellE); OBJ.shellE = shellE;
+  // shelf in the tail and the tool rack
+  const shelf = boxM(175, 110, 4, mat(0x2a2c30)); shelf.position.set(SHELF.x, SHELF.y, SHELF.z - 4); SCN.add(shelf);
+  const sl = boxM(6, 6, SHELF.z - 4, mat(0x2a2c30)); sl.position.set(SHELF.x, SHELF.y, 0); SCN.add(sl);
+  const rack = boxM(150, 34, 6, mat(0x2a2c30)); rack.position.set(RACK.x, RACK.y, RACK.z - 6); SCN.add(rack);
+  const rl = boxM(8, 8, RACK.z - 6, mat(0x2a2c30)); rl.position.set(RACK.x, RACK.y, 0); SCN.add(rl);
+  // tools: printing head, air pick, soft gripper
+  OBJ.tools = { needle: makeTool("needle"), pick: makeTool("pick"), grip: makeTool("grip") };
+  OBJ.slot = { needle: V(RACK.x - 45, RACK.y, RACK.z), pick: V(RACK.x, RACK.y, RACK.z), grip: V(RACK.x + 45, RACK.y, RACK.z) };
+  Object.values(OBJ.tools).forEach((t) => SCN.add(t));
+  // the arm
+  makeArm();
+}
+function makeTool(k) {
+  const g = new THREE.Group(), body = mat(0xcfd3d6, { metalness: .3 }), dark = mat(0x3a3d42);
+  const cap = boxM(30, 30, 10, dark); cap.position.z = -10; g.add(cap);           // the quick mount, at the top
+  if (k === "needle") { const s = cylM(11, 48, mat(0xe8eef2, { transparent: true, opacity: .7 })); s.position.z = -58; g.add(s); const n = cylM(.8, 22, body); n.position.z = -80; g.add(n); g.userData.len = 80; }
+  if (k === "pick") { const s = cylM(6, 32, body); s.position.z = -42; g.add(s); const c = new THREE.Mesh(new THREE.CylinderGeometry(7.5, 3, 7, 20), mat(0x2b2b2b)); c.rotation.x = Math.PI / 2; c.position.z = -45.5; g.add(c); g.userData.len = 49; }
+  if (k === "grip") { const s = cylM(8, 20, body); s.position.z = -30; g.add(s); [-1, 1].forEach((d) => { const f = boxM(5, 12, 26, mat(0xe3b36a)); f.position.set(d * 9, 0, -56); g.add(f); }); g.userData.len = 56; }
+  return g;
+}
+function makeArm() {
+  const A = new THREE.Group(); A.position.copy(ARMBASE); SCN.add(A); OBJ.arm = A;
+  const dark = mat(0x1c1e22, { roughness: .6 }), shell = mat(0xdcdcdc, { roughness: .45 }), grey = mat(0x8a8d92);
+  const foot = cylM(70, 14, dark); A.add(foot);
+  const yaw = new THREE.Group(); yaw.position.z = 14; A.add(yaw); OBJ.yaw = yaw;
+  const tower = boxM(96, 104, 92, shell); tower.position.set(-24, 0, 0); yaw.add(tower);
+  const motor = cylM(34, 18, dark, "y"); const mg = new THREE.CylinderGeometry(34, 34, 118, 30); const mm = new THREE.Mesh(mg, dark); mm.position.set(0, 0, H0 - 14); yaw.add(mm);
+  const sh = new THREE.Group(); sh.position.set(R0, 0, H0 - 14); yaw.add(sh); OBJ.sh = sh;           // shoulder
+  const up = boxM(28, 30, L1, shell); up.position.set(0, 0, 0); sh.add(up); OBJ.up = up;
+  const rod = boxM(5, 5, L1, grey); rod.position.set(-18, 20, 0); sh.add(rod); OBJ.rod = rod;
+  const el = new THREE.Group(); el.position.set(0, 0, L1); sh.add(el); OBJ.el = el;                 // elbow
+  const fo = boxM(24, 26, L2, shell); fo.rotation.y = 0; el.add(fo); OBJ.fo = fo;
+  const wr = new THREE.Group(); wr.position.set(0, 0, L2); el.add(wr); OBJ.wr = wr;                 // wrist
+  const flange = new THREE.Group(); SCN.add(flange); OBJ.flange = flange;
+  const fb = boxM(34, 34, 16, dark); fb.position.set(14, 0, -16); flange.add(fb);
+  const rot = cylM(14, 14, mat(0x3a3d42)); rot.position.set(26, 0, -30); flange.add(rot); OBJ.rotm = rot;
+}
+// place the arm so that the tool tip is at P (world), the tool hanging straight down from the flange
+const TOOL_OFF = V(26, 0, -30);                     // flange mount below and ahead of the wrist
+function setArm(P, toolLen, spin = 0) {
+  const W = V(P.x - TOOL_OFF.x, P.y, P.z + toolLen - TOOL_OFF.z);   // wrist point if the arm pointed along +x; corrected below
+  const dx = P.x - ARMBASE.x, dy = P.y - ARMBASE.y, yaw = Math.atan2(dy, dx);
+  const rr = Math.hypot(dx, dy) - TOOL_OFF.x - R0, zz = P.z + toolLen - TOOL_OFF.z - (14 + H0 - 14);
+  const d = clamp(Math.hypot(rr, zz), 20, L1 + L2 - 1);
+  const a = Math.atan2(zz, rr), c = (L1 * L1 + d * d - L2 * L2) / (2 * L1 * d), o = Math.acos(clamp(c, -1, 1));
+  const th1 = a + o;                                                  // upper arm angle from horizontal, elbow up
+  const ex = L1 * Math.cos(th1), ez = L1 * Math.sin(th1);
+  const th2 = Math.atan2(zz - ez, rr - ex);
+  OBJ.yaw.rotation.z = yaw;
+  OBJ.sh.rotation.y = -(th1 - Math.PI / 2) * 1;                       // boxes extend along +z, so rotate from vertical
+  OBJ.sh.rotation.y = Math.PI / 2 - th1;
+  OBJ.el.rotation.y = th1 - th2;
+  // flange: world position of the wrist, kept level, turned with the base and the rotary axis
+  const wrist = new THREE.Vector3(); OBJ.wr.getWorldPosition(wrist);
+  OBJ.flange.position.copy(wrist); OBJ.flange.rotation.set(0, 0, yaw);
+  OBJ.rotm.rotation.z = spin;
+  return { yaw, spin };
+}
+function toolAt(tool, P, yaw, spin) { const t = OBJ.tools[tool]; const off = TOOL_OFF.clone().applyAxisAngle(V(0, 0, 1), yaw); const base = OBJ.flange.position.clone().add(off); t.position.copy(base); t.rotation.set(0, 0, yaw + spin); }
+
+/* ============================================================ state at time T */
+const KITPOS = (p) => V(p.at[0], p.at[1], 2);
+function kitLayout(f) { // f 0: parts spread in a row in the air, 1: on the plate
+  OBJ.parts.forEach((o, i) => { const p = o.userData.p;
+    const spread = V(-70 + i * 0, 0, 0); const sx = (i - 3.5) * 46, sp = V(sx * 0 + 0, 0, 0);
+    const from = V((i % 4 - 1.5) * 80, (i < 4 ? -75 : 75), 60 + (i % 2) * 30), to = KITPOS(p);
+    const q = from.clone().lerp(to, sm(f)); o.position.set(q.x, q.y, q.z + (p.cyl ? p.w / 2 : 0)); if (p.cyl) { o.rotation.set(0, 0, 0); } });
+}
+const PODHOME = V(0, 0, Z1 + .75);
+function lerpV(a, b, f) { return a.clone().lerp(b, sm(f)); }
+let STATE = {};
+function evalState(T) {
+  let si = ST.findIndex((s) => T < s.t0 + s.d); if (si < 0) si = ST.length - 1; const s = ST[si], f = clamp((T - s.t0) / s.d);
+  const k = s.k, S = { si, f, k };
+  const idx = (n) => ST.findIndex((x) => x.k === n);
+  const done = (n) => si > idx(n), now = (n) => k === n;
+  // kit
+  S.layout = si < idx("plate") ? 0 : now("plate") ? f : 1;
+  S.wires = si < idx("plate") ? 0 : now("plate") ? clamp((f - .6) / .4) : now("pod") ? 1 - f : 0;
+  S.shell = si < idx("pod") ? 0 : now("pod") ? sm(f) : 1;
+  // kit position: in the air over the bed for the first stages, on the shelf, carried, then in the layer
+  const shelfP = SHELF.clone(); const air = V(230, -150, 90);
+  if (si <= idx("pod")) S.kitP = now("pod") ? lerpV(air, shelfP, clamp((f - .5) / .5)) : air;
+  else if (si < idx("place")) S.kitP = shelfP;
+  else if (now("place")) { const g = [shelfP, V(SHELF.x, SHELF.y, 120), V(0, 0, 90), PODHOME]; const u = f * 3, j = Math.min(2, Math.floor(u)); S.kitP = lerpV(g[j], g[j + 1], u - j); }
+  else S.kitP = PODHOME;
+  S.kitSpin = si < idx("pod") ? 0 : now("pod") ? -Math.PI / 2 * sm(clamp((f - .5) / .5)) : si < idx("place") ? -Math.PI / 2 : now("place") ? -Math.PI / 2 * (1 - sm(clamp((f - .33) / .4))) : 0;
+  // printing
+  S.l1 = si < idx("print1") ? 0 : now("print1") ? clamp((f - .08) / .9) : 1;
+  S.l2 = si < idx("print2") ? 0 : now("print2") ? clamp((f - .08) / .9) : 1;
+  // tool on the arm and tool tip target
+  const park = V(-120, 0, 140), above = (p, h = 40) => V(p.x, p.y, p.z + h);
+  let tool = "needle", tip = park.clone(), spin = 0;
+  const slot = (n) => OBJ.slot[n].clone().add(V(0, 0, OBJ.tools[n].userData.len));
+  if (si < idx("print1")) { tool = "needle"; tip = park; }
+  else if (now("print1")) { tool = "needle"; const [p] = at(PATH1, C1, S.l1); tip = f < .08 ? lerpV(park, above(PATH1[0], 0), f / .08) : p.clone().add(V(0, 0, 0)); }
+  else if (now("tool1") || now("tool2")) { // to the rack, leave one head, take the other
+    const from = now("tool1") ? "needle" : "pick", to = now("tool1") ? "pick" : "needle";
+    const start = now("tool1") ? PATH1[PATH1.length - 1] : PODHOME.clone().add(V(0, 0, POD.h));
+    const end = now("tool1") ? above(SHELF, POD.h + 40) : above(PATH2[0], 10);
+    const dock = (n) => OBJ.slot[n].clone(), mount = (n) => OBJ.slot[n].clone().add(V(0, 0, OBJ.tools[n].userData.len));
+    if (f < .3) { tool = from; tip = lerpV(start, above(dock(from), 30), f / .3); }
+    else if (f < .42) { tool = from; tip = lerpV(above(dock(from), 30), dock(from), (f - .3) / .12); }
+    else if (f < .5) { tool = "none"; tip = lerpV(mount(from), above(mount(from), 30), (f - .42) / .08); }
+    else if (f < .6) { tool = "none"; tip = lerpV(above(mount(from), 30), above(mount(to), 30), (f - .5) / .1); }
+    else if (f < .7) { tool = "none"; tip = lerpV(above(mount(to), 30), mount(to), (f - .6) / .1); }
+    else { tool = to; tip = lerpV(dock(to), end, (f - .7) / .3); }
+  }
+  else if (now("place")) { tool = "pick"; tip = S.kitP.clone().add(V(0, 0, POD.h)); spin = S.kitSpin; }
+  else if (now("print2")) { tool = "needle"; const [p] = at(PATH2, C2, S.l2); tip = f < .08 ? above(PATH2[0], 10 * (1 - f / .08)) : p; }
+  else { tool = "needle"; tip = lerpV(PATH2[PATH2.length - 1], park, f); }
+  S.tool = tool; S.tip = tip; S.spin = spin; S.s = s;
+  return S;
+}
+function applyState(S) {
+  kitLayout(S.layout);
+  OBJ.wires.material.opacity = .9 * S.wires;
+  OBJ.shell.material.opacity = .42 * S.shell; OBJ.shellE.material.opacity = .7 * S.shell;
+  OBJ.plate.visible = S.layout > 0.02 || S.shell > 0;
+  OBJ.kit.position.copy(S.kitP); OBJ.kit.rotation.set(0, 0, S.kitSpin);
+  OBJ.l1.geometry.setDrawRange(0, Math.floor(OBJ.l1.userData.n * S.l1 / 3) * 3);
+  OBJ.l2.geometry.setDrawRange(0, Math.floor(OBJ.l2.userData.n * S.l2 / 3) * 3);
+  const len = S.tool === "none" ? 0 : OBJ.tools[S.tool].userData.len;
+  const a = setArm(S.tip, len, S.spin);
+  Object.keys(OBJ.tools).forEach((n) => { const t = OBJ.tools[n]; if (n === S.tool) toolAt(n, S.tip, a.yaw, a.spin); else { t.position.copy(OBJ.slot[n]).add(V(0, 0, t.userData.len)); t.rotation.set(0, 0, 0); } });
+  $("#ovStage").textContent = (S.si + 1) + ". " + S.s.name; $("#ovStep").textContent = S.s.cap;
+  $("#ovClock").innerHTML = "tool <span>" + ({ needle: "printing head", pick: "air pick", grip: "soft gripper", none: "changing" }[S.tool]) + "</span>";
+}
+
+/* ============================================================ camera */
+const CAMS = {
+  kit: () => ({ p: V(470, -470, 290), t: V(230, -150, 130) }),
+  wide: () => ({ p: V(260, -560, 420), t: V(-80, 0, 40) }),
+  bed: () => ({ p: V(170, -300, 260), t: V(0, 0, 10) }),
+  rack: () => ({ p: V(80, -480, 300), t: V(-130, -100, 40) }),
+};
+let CAMNAME = "kit", CAMGOAL = null, AUTO = true, SNAP = true;
+function setCam(n, snap = false) { if (!CAMS[n]) return; CAMNAME = n; CAMGOAL = CAMS[n](); if (snap) SNAP = true; document.querySelectorAll("[data-cam]").forEach((b) => b.classList.toggle("on", b.dataset.cam === n)); }
+function setAuto(on) { AUTO = on; $("#autoCam").classList.toggle("on", on); }
+function autoCam(S) { const w = { parts: "kit", plate: "kit", pod: "kit", print1: "bed", tool1: "wide", place: "wide", tool2: "wide", print2: "bed", done: "bed" }[S.k]; if (w !== CAMNAME) setCam(w); }
+function camStep(dt) { if (!CAMGOAL) return; const k = SNAP ? 1 : 1 - Math.exp(-dt * 2.0); CAM.position.lerp(CAMGOAL.p, k); CTRL.target.lerp(CAMGOAL.t, k); SNAP = false; if (CAM.position.distanceTo(CAMGOAL.p) < .1) CAMGOAL = null; }
+
+/* ============================================================ labels */
+let TEXT = !EMBED || QP.get("text") === "1";
+const LAB = [];
+function initLabels() { const box = $("#labs"); PARTS.forEach((p) => { const d = document.createElement("div"); d.className = "lab"; d.textContent = p.n; box.appendChild(d); LAB.push({ d, f: () => OBJ.parts[PARTS.indexOf(p)] }); });
+  [["gel bed", () => OBJ.gel, V(0, -BED.d / 2, BED.gel)], ["tool rack", null, V(RACK.x, RACK.y, RACK.z + 70)], ["kit, dry, in the tail", null, V(SHELF.x, SHELF.y, SHELF.z + 50)]].forEach(([t, , pos]) => { const d = document.createElement("div"); d.className = "lab"; d.textContent = t; box.appendChild(d); LAB.push({ d, pos }); }); }
+function placeLabels(S) { const vp = $("#vp"), w = vp.clientWidth, h = vp.clientHeight;
+  LAB.forEach((l, i) => { let show = TEXT, P;
+    if (l.f) { show = show && S.si <= 1; const o = l.f(); P = new THREE.Vector3(); o.getWorldPosition(P); P.z += 14; }
+    else { P = l.pos.clone(); show = show && (i === PARTS.length ? S.si >= 3 && S.si <= 3 : S.si >= 4 && S.si <= 6); }
+    if (!show) { l.d.style.display = "none"; return; }
+    const q = P.project(CAM); if (q.z > 1) { l.d.style.display = "none"; return; }
+    l.d.style.display = "block"; l.d.style.left = ((q.x + 1) / 2 * w) + "px"; l.d.style.top = ((1 - q.y) / 2 * h) + "px"; }); }
+
+/* ============================================================ readouts, timeline, loop */
+function renderRO(S) { const rows = [["stage", (S.si + 1) + " of " + ST.length], ["tool", { needle: "printing head", pick: "air pick", grip: "soft gripper", none: "changing" }[S.tool]], ["first layer", Math.round(S.l1 * 100) + " %"], ["kit", S.si < 5 ? "dry, in the tail" : S.si === 5 ? "carried" : "in the wall"], ["layer over it", Math.round(S.l2 * 100) + " %"]];
+  $("#ro").innerHTML = '<div class="rg"><h4>Now</h4>' + rows.map(([a, b]) => `<div class="rr"><span>${esc(a)}</span><span>${esc(b)}</span></div>`).join("") + '</div><div class="rg"><h4>The arm</h4><div class="rr st"><span></span><span>Rotrics DexArm, four axes with the rotary module. One mount takes the printing head, the air pick with suction cups of 5, 10 or 15 mm, or the soft gripper.</span></div></div>'; }
+const TL = { T: 0, playing: true, speed: 1 };
+function renderTrack() { $("#track").innerHTML = ST.map((s, i) => `<div class="seg" data-i="${i}" style="flex:${s.d}"><div class="fill"></div><span>${i + 1} ${esc(s.name)}</span></div>`).join("") + '<div class="head" id="head"></div>'; }
+function updateTrack(S) { const segs = $("#track").querySelectorAll(".seg"); segs.forEach((el, i) => { el.classList.toggle("on", i === S.si); el.querySelector(".fill").style.width = i < S.si ? "100%" : i === S.si ? (S.f * 100) + "%" : "0"; }); const seg = segs[S.si], tr = $("#track").getBoundingClientRect(), r = seg.getBoundingClientRect(); $("#head").style.left = (r.left - tr.left + S.f * r.width - 1) + "px"; }
+function scrubTo(cx) { const segs = $("#track").querySelectorAll(".seg"); for (let i = 0; i < segs.length; i++) { const r = segs[i].getBoundingClientRect(); if (cx <= r.right || i === segs.length - 1) { TL.T = ST[i].t0 + clamp((cx - r.left) / r.width, 0, .999) * ST[i].d; break; } } }
+function setPlay(on) { TL.playing = on; $("#play").textContent = on ? "Pause" : "Play"; }
+function wireUI() {
+  $("#play").addEventListener("click", () => setPlay(!TL.playing));
+  document.querySelectorAll("[data-speed]").forEach((b) => b.addEventListener("click", () => { TL.speed = +b.dataset.speed; document.querySelectorAll("[data-speed]").forEach((x) => x.classList.toggle("on", x === b)); }));
+  document.querySelectorAll("[data-cam]").forEach((b) => b.addEventListener("click", () => { setAuto(false); setCam(b.dataset.cam); }));
+  $("#autoCam").addEventListener("click", () => setAuto(!AUTO));
+  $("#labT").addEventListener("click", () => { TEXT = !TEXT; $("#labT").classList.toggle("on", TEXT); });
+  $("#labT").classList.toggle("on", TEXT);
+  let drag = false; const tr = $("#track");
+  tr.addEventListener("pointerdown", (e) => { drag = true; tr.setPointerCapture(e.pointerId); scrubTo(e.clientX); });
+  tr.addEventListener("pointermove", (e) => { if (drag) scrubTo(e.clientX); });
+  tr.addEventListener("pointerup", () => { drag = false; });
+  CTRL.addEventListener("start", () => setAuto(false));
+}
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  if (TL.playing) { TL.T += dt * TL.speed; if (TL.T >= TOTAL) TL.T = 0; }
+  STATE = evalState(TL.T); applyState(STATE);
+  if (AUTO) autoCam(STATE); camStep(dt); CTRL.update();
+  R.render(SCN, CAM); placeLabels(STATE); updateTrack(STATE); renderRO(STATE);
+  requestAnimationFrame(frame);
+}
+initThree(); build(); initLabels(); renderTrack(); wireUI(); setCam("kit", true);
+if (QP.get("t")) TL.T = +QP.get("t");
+window.KP = { go(i, f = .5) { TL.T = ST[i].t0 + ST[i].d * f; setPlay(false); }, setT(t) { TL.T = t; setPlay(false); }, total: TOTAL, stages: () => ST.map((s) => s.k), setCam: (n) => { setAuto(false); setCam(n, true); }, settle() { SNAP = true; }, text(v) { TEXT = v; } };
+requestAnimationFrame(frame);
+</script>
+</body></html>
