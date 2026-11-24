@@ -916,7 +916,7 @@ function frostMat(a0, a1, clip) {
   const m = shellMat(a0, a1, clip), base = m.onBeforeCompile;
   m.onBeforeCompile = (sh) => { base(sh); sh.uniforms.uFr = FROST.uFr; sh.uniforms.uXD = { value: J.read.dock_x };
     let fs = sh.fragmentShader;
-    fs = fs.replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\n float fz = uFr * (1.0 - smoothstep(uXD - 0.15, uXD + 0.05, vOPw.x)); roughnessFactor = mix(roughnessFactor, 0.82, fz);");
+    fs = fs.replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\n float fz = uFr * (1.0 - smoothstep(uXD + " + FROST_X[0].toFixed(3) + ", uXD + " + FROST_X[1].toFixed(3) + ", vOPw.x)); roughnessFactor = mix(roughnessFactor, 0.82, fz);");
     fs = fs.replace("gl_FragColor = vec4(milkS + totalSpecular + rimS + glowS, aS); }", `float aF = clamp(0.88 + 0.06 * fr, 0.0, 0.96); vec3 milkF = totalDiffuse * 1.15 * (0.92 + 0.08 * shS) + vec3(0.58, 0.6, 0.62) * (0.016 + 0.05 * spotK(vWPw) * uLI);
       vec3 glowF = innerGlow(vWPw) * 0.22;
       gl_FragColor = vec4(mix(milkS + totalSpecular + rimS + glowS, milkF + totalSpecular * 0.18 + rimS * 0.3 + glowF, fz), mix(aS, aF, fz)); }`);
@@ -926,13 +926,18 @@ function frostMat(a0, a1, clip) {
   m.customProgramCacheKey = () => "frost" + a0 + a1; return m;
 }
 /* the machinery inside the tail is dimmed toward the milky shell tone by the same axial function (axial coordinate in the tail frame), so through the frost it reads only as soft shapes */
+/* round 14: the dimming no longer depends on which surface lies between the camera and the part (through the clear head or the mouth nothing frosted lies in front): the parts themselves lose contrast toward one milky tone, and their edge lines fade, by the same axial factor, so the tail reads frosted from every side */
+const FROST_X = [-0.06, 0.07];          // the gradient, relative to the docking plane: fully frosted 60 mm behind it, clear 70 mm ahead of it (the print starts 76 mm ahead)
 function dimInTail() {
-  const seen = new Set();
-  R3.tail.traverse((o) => { const m = o.material; if (!o.isMesh || !m || seen.has(m) || !m.isMeshStandardMaterial || m.isMeshPhysicalMaterial || !m.onBeforeCompile) return; seen.add(m);
+  const seen = new Set(), F = `float fzI = uFr * (1.0 - smoothstep(uXD + ${FROST_X[0].toFixed(3)}, uXD + ${FROST_X[1].toFixed(3)}, vWPw.x - uTX));`;
+  R3.tail.traverse((o) => { const m = o.material; if (!m || seen.has(m) || !m.onBeforeCompile || m.isMeshPhysicalMaterial) return;
+    const line = o.isLineSegments && m.isLineBasicMaterial; if (!line && !(o.isMesh && m.isMeshStandardMaterial)) return; seen.add(m);
     const base = m.onBeforeCompile, key = m.customProgramCacheKey ? m.customProgramCacheKey.bind(m) : () => "";
     m.onBeforeCompile = (sh, r) => { base(sh, r); if (!/varying vec3 vWPw/.test(sh.fragmentShader)) return; sh.uniforms.uFr = FROST.uFr; sh.uniforms.uTX = FROST.uTX; sh.uniforms.uXD = { value: J.read.dock_x };
-      sh.fragmentShader = "uniform float uFr; uniform float uTX; uniform float uXD;\n" + sh.fragmentShader.replace(/}\s*$/, " { float fzI = uFr * (1.0 - smoothstep(uXD - 0.15, uXD + 0.05, vWPw.x - uTX)); gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.05, 0.053, 0.058) + gl_FragColor.rgb * 0.25, 0.6 * fzI); }\n}"); };
-    m.customProgramCacheKey = () => "dimT" + key(); m.needsUpdate = true; });
+      const body = line ? ` { ${F} gl_FragColor.a *= 1.0 - 0.88 * fzI; }\n}`
+        : ` { ${F} float lI = dot(gl_FragColor.rgb, vec3(0.3, 0.59, 0.11)); vec3 milkI = vec3(0.92, 0.95, 1.0) * (0.15 + 0.1 * min(lI, 0.5)) * (0.75 + 0.25 * spotK(vWPw) * uLI); gl_FragColor.rgb = mix(gl_FragColor.rgb, milkI, 0.97 * fzI); gl_FragColor.a *= 1.0 - 0.35 * fzI; }\n}`;
+      sh.fragmentShader = "uniform float uFr; uniform float uTX; uniform float uXD;\n" + sh.fragmentShader.replace(/}\s*$/, body); };
+    m.customProgramCacheKey = () => (line ? "dimL" : "dimT") + key(); m.needsUpdate = true; });
 }
 function stepFrost(dt) { FROST.uTX.value = R3.tail.position.x; const g = FROST_VIEW[CAM] ?? 1; FROST.uFr.value = CAMSNAP ? g : FROST.uFr.value + (g - FROST.uFr.value) * Math.min(1, dt * 3); }
 /* ---------------------------------------------------------------- cameras: from the port side, tail on the left */
