@@ -2,7 +2,7 @@
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#000"><title>Inheritance · Born, Not Made</title>
-<meta name="description" content="One still diagram of a newborn robot after “birth”. The newborn inherits part of a model as 21 compressed memories and starts at half size. Three identical frames at one scale with a ruler show the growth. Then the newborn grows: memories of the newborn’s own come in, and the body takes in more air between the two skins of the double wall until the newborn reaches full size.">
+<meta name="description" content="One still diagram of a newborn robot after “birth”. A grown robot gives “birth”; the newborn inherits part of the model as 21 compressed memories and starts at half size. Four identical frames at one scale with a ruler show the growth. Then the newborn grows: memories of the newborn’s own come in, and the body takes in more air between the two skins of the double wall until the newborn reaches full size.">
 <style>
 *{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:#000;color:#eee;font:14px/1.5 Inter,Arial,sans-serif}
 main{max-width:1600px;margin:auto;padding:0 0 6px}
@@ -38,12 +38,10 @@ button:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:3
 <section><div class="hd"><p>4 · The tail</p><h2>The tail copies itself</h2></div>
 <canvas id="d-tail" width="1600" height="700" style="aspect-ratio:1600/700" role="img" aria-label="A tail prints the next tail and hands over the arm."></canvas></section>
 </main><script src="diagrams.js?v=pod1"></script><script>
-/* One still diagram. Side view of the simplified bodies (profiles from simulator/simple/simple.json, meters).
-   The same newborn at three moments after "birth": half size with only what it inherited, then growing,
-   then grown. Three identical frames at one scale: the frames and the ruler stay, only the body grows. */
+/* One still diagram. The same kind of body at four moments, all at one scale, each in an identical frame:
+   "birth" from a grown body, then the newborn at half size, growing, grown. Rear round, front tapering to the mouth. */
 const cv=document.getElementById('d-lineage'), g=cv.getContext('2d');
-const W=1600,H=900,DOCK=.032,HK=1.3,TK=.62;
-const LIP=[0.36,0.15], MTOP=[0.295,0.325];
+const W=1600,H=900;
 const clamp=x=>Math.min(1,Math.max(0,x));
 const ink=a=>'rgba(236,235,230,'+clamp(a)+')';
 function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -51,40 +49,40 @@ const COL=[[232,163,61],[63,193,171],[156,136,242],[239,111,134]];
 const col=(o,a)=>'rgba('+COL[o].join(',')+','+clamp(a)+')';
 const mono='ui-monospace, "JetBrains Mono", Menlo, monospace';
 
-/* Bodies. A pose: X0 = screen x of the back face, Yb = screen y of the floor, k = px per meter. */
-const KID={l:1.05,h:.95,crown:.032,pitch:.011};
-const FLOOR=640, FULL=846; // px per meter, the same in every frame: the grown body is 390 px long
-const CW=(W-128-96)/3, CT=196, CX=i=>64+i*(CW+48); // three identical frames
-const hx=(r,p,x)=>p.X0+(x-DOCK)*HK*r.l*p.k;
-const hz=(r,p,x,z)=>p.Yb-(z*r.h+r.crown*Math.sin(Math.PI*clamp((x-DOCK)/.3))*(z>.2?1:0))*p.k;
-function headPath(r,p){
-  const P=new Path2D(), m=(x,z)=>[hx(r,p,x),hz(r,p,x,z)];
-  // after the sketch: a soft dome that leans forward, a tilted oval mouth, one long curve from the floor up into the lip
-  P.moveTo(...m(DOCK,.06));P.lineTo(...m(DOCK,.29));
-  P.bezierCurveTo(...m(DOCK,.345),...m(.06,.36),...m(.12,.36));
-  P.bezierCurveTo(...m(.19,.36),...m(.25,.345),...m(MTOP[0],MTOP[1]));
-  P.bezierCurveTo(...m(.335,.30),...m(.37,.22),...m(LIP[0],LIP[1]));
-  P.bezierCurveTo(...m(.345,.075),...m(.27,0),...m(.16,0));
-  P.lineTo(...m(.09,0));P.bezierCurveTo(...m(.05,0),...m(DOCK,.015),...m(DOCK,.06));
-  P.closePath();return P;
+/* Body: side view in meters, x from the round rear (0) to the mouth (0.72), z up from the floor. */
+const BL=.72, FULL=398;            // px per meter, the same in every frame
+const FLOOR=610, CT=300;           // floor line, top of the frames
+const GAP=28, F1=(W-80-3*GAP)/4.45, F0=F1*1.45;
+const FX=[40,40+F0+GAP,40+F0+GAP+F1+GAP,40+F0+GAP+2*(F1+GAP)], FW=[F0,F1,F1,F1];
+const MTOP=[.655,.215], LIP=[.735,.085];
+function bodyPath(p,v={}){
+  const c=v.crown||0, P=new Path2D(), m=(x,z)=>[p.X0+x*p.k*(v.l||1), p.Yb-(z+c*Math.sin(Math.PI*clamp(x/BL))*(z>.25?1:0))*p.k*(v.h||1)];
+  P.moveTo(...m(0,.15));
+  P.bezierCurveTo(...m(0,.3),...m(.08,.36),...m(.22,.36));
+  P.bezierCurveTo(...m(.4,.36),...m(.56,.31),...m(MTOP[0],MTOP[1]));
+  P.bezierCurveTo(...m(.71,.165),...m(.745,.12),...m(LIP[0],LIP[1]));
+  P.bezierCurveTo(...m(.69,.035),...m(.56,0),...m(.4,0));
+  P.lineTo(...m(.17,0));
+  P.bezierCurveTo(...m(.05,0),...m(0,.06),...m(0,.15));
+  P.closePath();return {P,m};
 }
 // gap: the air between the two skins of the double wall, in px
-function drawHead(r,p,gap){
-  const P=headPath(r,p);
+function drawBody(p,v,gap,a=1){
+  const {P,m}=bodyPath(p,v);
+  g.save();g.globalAlpha*=a;
   g.fillStyle=ink(.045);g.fill(P);
   g.save();g.clip(P);
-  const step=r.pitch*p.k*r.h;
-  g.strokeStyle=ink(.07);g.lineWidth=.8;g.beginPath();
-  for(let y=p.Yb-step;y>p.Yb-.42*p.k;y-=step){g.moveTo(p.X0-5,y);g.lineTo(hx(r,p,.4)+5,y)}
+  const step=.011*p.k;g.strokeStyle=ink(.07);g.lineWidth=.8;g.beginPath();
+  for(let y=p.Yb-step;y>p.Yb-.42*p.k;y-=step){g.moveTo(p.X0-5,y);g.lineTo(p.X0+.8*p.k,y)}
   g.stroke();
   if(gap){g.lineJoin='round';g.lineWidth=2*gap+1.2;g.strokeStyle=ink(.42);g.stroke(P);g.lineWidth=2*gap-1.2;g.strokeStyle='#000';g.stroke(P);g.strokeStyle=ink(.08);g.stroke(P)}
   g.restore();
   g.strokeStyle=ink(.78);g.lineWidth=1.5;g.stroke(P);
-  const [ax,ay]=[hx(r,p,MTOP[0]),hz(r,p,MTOP[0],MTOP[1])],[bx,by]=[hx(r,p,LIP[0]),hz(r,p,LIP[0],LIP[1])];
-  g.strokeStyle=ink(.6);g.lineWidth=1.1;g.beginPath();g.ellipse((ax+bx)/2-3*p.k/700,(ay+by)/2,Math.hypot(bx-ax,by-ay)/2*.98,.03*p.k,Math.atan2(by-ay,bx-ax),0,7);g.stroke();
+  const [ax,ay]=m(...MTOP),[bx,by]=m(...LIP);
+  g.strokeStyle=ink(.6);g.lineWidth=1.1;g.beginPath();g.ellipse((ax+bx)/2-.006*p.k,(ay+by)/2,Math.hypot(bx-ax,by-ay)/2*.98,.024*p.k,Math.atan2(by-ay,bx-ax),0,7);g.stroke();
+  g.restore();return m;
 }
-// a ring split by when its moments were learned
-function ring(X,Y,r,c,a){let s=-Math.PI/2;g.lineWidth=1.6;c.forEach((v,o)=>{if(v<.02)return;const e=s+v*2*Math.PI;g.strokeStyle=col(o,a);g.beginPath();g.arc(X,Y,r,s,e);g.stroke();s=e})}
+function ring(X,Y,r,c,a){let s=-Math.PI/2;g.lineWidth=1.5;c.forEach((v,o)=>{if(v<.02)return;const e=s+v*2*Math.PI;g.strokeStyle=col(o,a);g.beginPath();g.arc(X,Y,r,s,e);g.stroke();s=e})}
 function dot(X,Y,r,f){g.fillStyle=f;g.beginPath();g.arc(X,Y,r,0,7);g.fill()}
 function text(s,x,y,size,a,font='Arial',align='left',track=0){
   g.save();g.textAlign=align;g.fillStyle=ink(a);g.font=size+'px '+font;
@@ -93,41 +91,46 @@ function text(s,x,y,size,a,font='Arial',align='left',track=0){
 function tw(s,size,font,track=0){g.save();g.font=size+'px '+font;if(track&&'letterSpacing' in g)g.letterSpacing=track+'px';const w=g.measureText(s).width;g.restore();return w}
 function arrow(x1,y,x2,a=.4){g.strokeStyle=ink(a);g.lineWidth=1.2;g.beginPath();g.moveTo(x1,y);g.lineTo(x2,y);g.moveTo(x2-8,y-4.5);g.lineTo(x2,y);g.lineTo(x2-8,y+4.5);g.stroke()}
 
-// where a moment can sit inside the head, clear of the skins
-function spot(R){const x=.05+R()*.245, lo=x<.19?.02:.02+.16*Math.pow((x-.19)/.11,1.3), hi=.335-.06*Math.pow((x-.05)/.25,2);return [x,lo+R()*(hi-lo)]}
+/* Where a moment can sit: inside the inner skin of the full size body. */
+const REF={X0:0,Yb:1000,k:1000};
+const INNER=bodyPath({X0:.04*1000,Yb:1000-.035*1000,k:1000*.89}).P;
+const inside=(x,z)=>g.isPointInPath(INNER,x*1000,1000-z*1000);
+function spot(R){for(;;){const x=R()*BL,z=R()*.36;if(inside(x,z))return [x,z]}}
 
-/* The stages: the same newborn, only the scale changes. */
+/* The stages. The newborn is a little different from the body it came from: longer, flatter, a higher crown. */
+const KID={l:1,h:.96,crown:.02}, OLD={};
 const STAGES=[
- {name:'Born',  s:.50,gap:3},
+ {name:'“Birth”',s:1,gap:10},
+ {name:'Born',s:.5,gap:3},
  {name:'Growing',s:.75,gap:6},
- {name:'Grown', s:1,  gap:10}
-].map((st,i)=>Object.assign(st,{p:{X0:CX(i)+34,Yb:FLOOR,k:FULL*st.s},full:{X0:CX(i)+34,Yb:FLOOR,k:FULL}}));
-const OWN=[0,40,240]; // own moments held at each stage
-const px=(st,q)=>[hx(KID,st.p,q.x),hz(KID,st.p,q.x,q.z)];
+ {name:'Grown',s:1,gap:10}
+].map((st,i)=>Object.assign(st,{i,p:{X0:FX[i]+18,Yb:FLOOR,k:FULL*st.s},full:{X0:FX[i]+18,Yb:FLOOR,k:FULL}}));
+const OWN=[0,0,40,240];
+const map=(p,v,q)=>[p.X0+q.x*p.k*(v.l||1),p.Yb-q.z*p.k*(v.h||1)];
 
-/* Inherited: 21 rings, each many moments pressed into one. They sit together at the back and the floor
-   of the head and keep their places as the body grows. The front and the top are left empty. */
+/* Inherited: 21 rings, each many moments pressed into one, kept together at the rear and floor. */
 const RINGS=[];
-{ const R=rng(7), born=STAGES[0];
-  for(let n=0;RINGS.length<21&&n<20000;n++){
-    const q={x:.055+R()*.16,z:.035+R()*.23,r:4+R()*2.2};
-    if(q.x>.17&&q.z>.17)continue; // keep the upper front open
-    const [X,Y]=px(born,q);
-    if(RINGS.some(o=>{const [x,y]=px(born,o);return Math.hypot(X-x,Y-y)<q.r+o.r+5}))continue;
+{ const R=rng(7);
+  for(let n=0;RINGS.length<21&&n<200000;n++){
+    const [x,z]=spot(R);if(x>.5||z>.28)continue;
+    const q={x,z,r:4+R()*1.8};const P=STAGES[1].p;
+    const [X,Y]=map(P,KID,q);
+    if(RINGS.some(o=>{const [a,b]=map(P,KID,o);return Math.hypot(X-a,Y-b)<(q.r+o.r)*.62+2}))continue;
     const c=[R()*.6,.3+R(),.2+R()*.8,R()*.5],t=c.reduce((a,b)=>a+b,0);q.c=c.map(v=>v/t);q.o=q.c.indexOf(Math.max(...q.c));
     RINGS.push(q);
   } }
-/* Own: moments the newborn lives through, white. The first 40 are already there while it grows. */
+/* Own: moments lived after "birth", white. */
 const MINE=[];
 { const R=rng(41);
-  for(let n=0;MINE.length<OWN[2]&&n<60000;n++){
-    const [x,z]=spot(R), q={x,z}, st=STAGES[MINE.length<OWN[1]?1:2], [X,Y]=px(st,q);
-    if(RINGS.some(o=>{const [a,b]=px(st,o);return Math.hypot(X-a,Y-b)<o.r+5}))continue;
-    const [X2,Y2]=px(STAGES[2],q);
-    if(MINE.some(o=>{const [a,b]=px(STAGES[2],o);return Math.hypot(X2-a,Y2-b)<7.5}))continue;
-    if(MINE.length<OWN[1]&&MINE.some(o=>{const [a,b]=px(st,o);return Math.hypot(X-a,Y-b)<9}))continue;
+  for(let n=0;MINE.length<OWN[3]&&n<80000;n++){
+    const [x,z]=spot(R),q={x,z},st=STAGES[MINE.length<OWN[2]?2:3],[X,Y]=map(st.p,KID,q);
+    if(RINGS.some(o=>{const [a,b]=map(st.p,KID,o);return Math.hypot(X-a,Y-b)<o.r+4}))continue;
+    const [X3,Y3]=map(STAGES[3].p,KID,q);
+    if(MINE.some(o=>{const [a,b]=map(STAGES[3].p,KID,o);return Math.hypot(X3-a,Y3-b)<6.5}))continue;
     MINE.push(q);
   } }
+/* The grown body it is born from: full of moments, colored by when they were learned. */
+const OLDPTS=[];{const R=rng(3);for(let j=0;j<300;j++){const [x,z]=spot(R);OLDPTS.push({x,z,o:Math.min(3,Math.floor(R()*R()*4.6))})}}
 const MIX=[0,0,0,0];RINGS.forEach(q=>q.c.forEach((v,o)=>MIX[o]+=v/RINGS.length));
 
 function draw(){
@@ -136,62 +139,80 @@ function draw(){
   g.fillStyle='rgba(255,255,255,.018)';g.fillRect(0,FLOOR,W,H-FLOOR);
   g.strokeStyle=ink(.22);g.lineWidth=1;g.beginPath();g.moveTo(0,FLOOR+.5);g.lineTo(W,FLOOR+.5);g.stroke();
 
-  text('It inherits, then grows.',64,84,46,.97,'Georgia');
-  text('A newborn inherits part of a model and starts at half size. The rest, memory and body, is grown.',66,124,19,.68);
+  text('It inherits, then grows.',40,84,46,.97,'Georgia');
+  text('A newborn inherits part of a model and starts at half size. The rest, memory and body, is grown.',42,124,19,.68);
+  text('Four identical frames, one scale.',42,152,14,.45,mono);
 
-  // three identical frames, one scale: a ruler on every floor and the grown outline as a ghost
-  STAGES.forEach((st,i)=>{
-    const x0=CX(i);
-    g.strokeStyle=ink(.14);g.lineWidth=1;g.strokeRect(x0+.5,CT+.5,CW-1,FLOOR-CT);
-    const ox=st.p.X0;g.strokeStyle=ink(.35);g.beginPath();
-    for(let mm=0;mm<=400;mm+=50){const X=ox+mm/1000*FULL;g.moveTo(X,FLOOR);g.lineTo(X,FLOOR+(mm%100?4:8))}
+  // frames, rulers, and the grown outline as a ghost where the body is still small
+  STAGES.forEach(st=>{
+    const x0=FX[st.i],w=FW[st.i],ox=st.p.X0;
+    g.strokeStyle=ink(.14);g.lineWidth=1;g.strokeRect(x0+.5,CT+.5,w-1,FLOOR-CT);
+    g.strokeStyle=ink(.35);g.beginPath();
+    for(let cm=0;cm<=70;cm+=5){const X=ox+cm/100*FULL;g.moveTo(X,FLOOR);g.lineTo(X,FLOOR+(cm%10?4:8))}
     g.stroke();
-    for(let cm=0;cm<=40;cm+=10)text(String(cm),ox+cm/100*FULL,FLOOR+20,10,.45,mono,'center');
-    text('cm',ox+.44*FULL,FLOOR+20,10,.45,mono,'left');
-    if(st.s<1){g.save();g.setLineDash([4,5]);g.strokeStyle=ink(.22);g.lineWidth=1;g.stroke(headPath(KID,st.full));g.restore()}
+    for(let cm=0;cm<=70;cm+=20)text(String(cm),ox+cm/100*FULL,FLOOR+20,10,.45,mono,'center');
+    text('cm',ox+.72*FULL+4,FLOOR+20,10,.45,mono,'left');
+    if(st.s<1){g.save();g.setLineDash([4,5]);g.strokeStyle=ink(.22);g.lineWidth=1;g.stroke(bodyPath(st.full,KID).P);g.restore()}
   });
-  text('GROWN SIZE',hx(KID,STAGES[0].full,.12),hz(KID,STAGES[0].full,.12,.36)-12,10.5,.5,mono,'center',1.2);
-  arrow(CX(1)-40,FLOOR-140,CX(1)-8);arrow(CX(2)-40,FLOOR-140,CX(2)-8);
+  for(let i=1;i<4;i++)arrow(FX[i]-GAP+4,FLOOR-80,FX[i]-4,.35);
 
-  STAGES.forEach((st,i)=>{
-    const p=st.p;drawHead(KID,p,st.gap);
-    for(let j=0;j<OWN[i];j++){const [X,Y]=px(st,MINE[j]);dot(X,Y,1.9,ink(.78))}
-    for(const q of RINGS){const [X,Y]=px(st,q);ring(X,Y,q.r,q.c,.95);dot(X,Y,1.9,col(q.o,1))}
-    // under the body: name, inherited against own, size and memory
-    const cx=CX(i)+CW/2, BW=240, by=FLOOR+80, tot=RINGS.length+OWN[i], wi=BW*RINGS.length/tot;
-    text(st.name,cx,FLOOR+64,26,.95,'Georgia','center');
-    let x=cx-BW/2;MIX.forEach((v,o)=>{const w=wi*v;g.fillStyle=col(o,.95);g.fillRect(x,by,w,12);x+=w});
+  // 0: "birth". A grown body, full of moments, pushes the newborn out of the mouth, inflating on the way
+  { const st=STAGES[0],p=st.p;
+    drawBody(p,OLD,st.gap);
+    for(const q of OLDPTS){const [X,Y]=map(p,OLD,q);dot(X,Y,1.4,col(q.o,.85))}
+    // the arm in the rear, at rest
+    const m=(x,z)=>[p.X0+x*p.k,p.Yb-z*p.k];
+    g.strokeStyle=ink(.35);g.lineWidth=1.6;g.beginPath();g.moveTo(...m(.12,.03));g.lineTo(...m(.12,.17));g.lineTo(...m(.27,.27));g.lineTo(...m(.36,.13));g.stroke();
+    const n={X0:p.X0+.56*FULL,Yb:FLOOR-.07*FULL,k:FULL*.5};
+    g.save();g.fillStyle='#000';g.fill(bodyPath(n,KID).P);g.restore();
+    const mm=drawBody(n,KID,3);
+    for(const q of RINGS){const [X,Y]=map(n,KID,q);ring(X,Y,q.r*.55+.45*0,q.c,.95);dot(X,Y,1.4,col(q.o,1))}
+    text('DISTILLED AT “BIRTH”',n.X0+.2*n.k,CT+30,11,.7,mono,'center',1.3);
+    g.strokeStyle=ink(.4);g.lineWidth=1;g.beginPath();g.moveTo(n.X0+.2*n.k,CT+38);g.lineTo(n.X0+.2*n.k,n.Yb-.37*n.k);g.stroke();
+  }
+  // 1 to 3: the newborn, the same rings in the same places, own moments around them
+  for(let i=1;i<4;i++){const st=STAGES[i],p=st.p;
+    drawBody(p,KID,st.gap);
+    for(let j=0;j<OWN[i];j++){const [X,Y]=map(p,KID,MINE[j]);dot(X,Y,1.8,ink(.8))}
+    for(const q of RINGS){const [X,Y]=map(p,KID,q),r=q.r*(.55+.45*st.s);ring(X,Y,r,q.c,.95);dot(X,Y,1.6,col(q.o,1))}
+  }
+  // under each frame: name, a bar of where the memory came from, size and memory
+  STAGES.forEach(st=>{
+    const i=st.i,cx=FX[i]+FW[i]/2,BW=200,by=FLOOR+78;
+    text(st.name,cx,FLOOR+62,26,.95,'Georgia','center');
+    if(i===0){let x=cx-BW/2;[.4,.25,.2,.15].forEach((v,o)=>{g.fillStyle=col(o,.95);g.fillRect(x,by,BW*v,12);x+=BW*v});
+      text('grown body · '+OLDPTS.length+' moments',cx,by+34,13,.82,mono,'center');return}
+    const tot=RINGS.length+OWN[i],wi=BW*RINGS.length/tot;let x=cx-BW/2;
+    MIX.forEach((v,o)=>{const w=wi*v;g.fillStyle=col(o,.95);g.fillRect(x,by,w,12);x+=w});
     if(OWN[i]){g.fillStyle=ink(.9);g.fillRect(x+1.5,by,BW-wi-1.5,12)}
-    text('body '+Math.round(st.s*100)+'%  ·  memory '+RINGS.length+' inherited'+(OWN[i]?' + '+OWN[i]+' own':''),cx,by+34,13,.82,mono,'center');
+    text('body '+Math.round(st.s*100)+'% · '+RINGS.length+' inherited'+(OWN[i]?' + '+OWN[i]+' own':''),cx,by+34,13,.82,mono,'center');
   });
-
   // Born: the empty front and top is the room left to grow
-  { const p=STAGES[0].p, X=hx(KID,p,.245), Y=hz(KID,p,.245,.25);
-    text('ROOM TO GROW',X,392,11,.7,mono,'center',1.3);
-    g.strokeStyle=ink(.4);g.lineWidth=1;g.beginPath();g.moveTo(X,400);g.lineTo(X,Y-6);g.stroke();
-    g.beginPath();g.arc(X,Y,4,0,7);g.stroke(); }
+  { const p=STAGES[1].p,X=p.X0+.52*p.k,Y=p.Yb-.2*p.k;
+    text('ROOM TO GROW',X+30,CT+70,11,.7,mono,'center',1.3);
+    g.strokeStyle=ink(.4);g.lineWidth=1;g.beginPath();g.moveTo(X+30,CT+78);g.lineTo(X,Y-5);g.stroke();g.beginPath();g.arc(X,Y,4,0,7);g.stroke();
+    text('GROWN SIZE',STAGES[1].full.X0+.5*FULL,STAGES[1].full.Yb-.37*FULL-8,10.5,.5,mono,'center',1.2); }
   // Growing: moments of its own come in from outside
-  { const st=STAGES[1],p=st.p;
-    text('LIVE DATA',hx(KID,p,.19),CT+24,11,.7,mono,'center',1.3);
-    [[.1,.62],[.15,.3],[.2,.85],[.25,.5],[.28,.15]].forEach(([x,f])=>{
-      const X=hx(KID,p,x),top=CT+36,Y=hz(KID,p,x,.36)+10, y=top+(Y-top)*f;
+  { const p=STAGES[2].p;
+    text('LIVE DATA',p.X0+.36*p.k,CT+26,11,.7,mono,'center',1.3);
+    [[.2,.6],[.3,.3],[.4,.85],[.5,.5],[.58,.2]].forEach(([x,f])=>{
+      const X=p.X0+x*p.k,top=CT+36,Y=p.Yb-.37*p.k,y=top+(Y-top)*f;
       g.strokeStyle=ink(.18);g.lineWidth=1;g.beginPath();g.moveTo(X,top);g.lineTo(X,Y);g.stroke();
-      g.strokeStyle=ink(.6);g.beginPath();g.moveTo(X,Math.max(top,y-26));g.lineTo(X,y);g.stroke();
-      dot(X,y,2.3,ink(.95));
+      g.strokeStyle=ink(.6);g.beginPath();g.moveTo(X,Math.max(top,y-22));g.lineTo(X,y);g.stroke();dot(X,y,2.2,ink(.95));
     }); }
   // Grown: the body grew by taking in air between its two skins
-  { const p=STAGES[2].p, X=hx(KID,p,.13), Y=hz(KID,p,.13,.36)+5;
-    text('The body grows: more air between the two skins.',CX(2)+CW-14,CT+26,13,.72,'Arial','right');
-    g.strokeStyle=ink(.4);g.lineWidth=1;g.beginPath();g.moveTo(X,CT+36);g.lineTo(X,Y-3);g.stroke();
-    g.beginPath();g.arc(X,Y,3,0,7);g.stroke(); }
+  { const p=STAGES[3].p,X=p.X0+.3*p.k,Y=p.Yb-.355*p.k;
+    text('More air between the two skins.',FX[3]+FW[3]-12,CT+24,12.5,.72,'Arial','right');
+    g.strokeStyle=ink(.4);g.lineWidth=1;g.beginPath();g.moveTo(X,CT+32);g.lineTo(X,Y);g.stroke();g.beginPath();g.arc(X,Y,3,0,7);g.stroke(); }
 
   // legend
-  { let lx=64;const y=846;
+  { let lx=40;const y=860;
     ring(lx+6,y-4,5.5,[.25,.4,.25,.1],1);dot(lx+6,y-4,1.9,col(1,1));
-    const a='MANY MOMENTS PRESSED INTO ONE, INHERITED';text(a,lx+20,y,11,.62,mono,'left',1);lx+=20+tw(a,11,mono,1)+40;
-    dot(lx+4,y-4,2.2,ink(.9));const b='A MOMENT LIVED';text(b,lx+14,y,11,.62,mono,'left',1);lx+=14+tw(b,11,mono,1)+40;
-    g.fillStyle=ink(.045);g.fillRect(lx,y-11,14,14);g.strokeStyle=ink(.5);g.lineWidth=1;g.strokeRect(lx+.5,y-10.5,13,13);
-    text('EMPTY, ROOM TO GROW',lx+22,y,11,.62,mono,'left',1); }
+    const a='MANY MOMENTS PRESSED INTO ONE, INHERITED';text(a,lx+20,y,11,.62,mono,'left',1);lx+=20+tw(a,11,mono,1)+36;
+    dot(lx+4,y-4,2.2,ink(.9));const b='A MOMENT LIVED';text(b,lx+14,y,11,.62,mono,'left',1);lx+=14+tw(b,11,mono,1)+36;
+    [0,1,2,3].forEach(o=>dot(lx+4+o*9,y-4,2.2,col(o,.9)));const c='MOMENTS OF THE BODY IT CAME FROM, BY WHEN LEARNED';text(c,lx+44,y,11,.62,mono,'left',1);lx+=44+tw(c,11,mono,1)+36;
+    g.save();g.setLineDash([3,4]);g.strokeStyle=ink(.5);g.strokeRect(lx+.5,y-10.5,13,13);g.restore();
+    text('GROWN SIZE',lx+22,y,11,.62,mono,'left',1); }
 }
 function size(){const r=Math.min(2,devicePixelRatio||1),w=Math.round(cv.clientWidth*r);if(w&&cv.width!==w){cv.width=w;cv.height=Math.round(w*9/16)}}
 function show(){size();draw()}
