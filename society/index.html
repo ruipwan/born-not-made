@@ -86,7 +86,7 @@ html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
   <div class="below">
 <div class="cap"><h1>Society</h1><p id="capt">A fixed number of tailed ones stay in the tank. Each tailed one holds an arm and gel. Every other body is born from a tailed one and has no tail. The bodies swim out, read the light, the stream and the crowd, and come back to tell. A tailed one keeps what is told as lines in the head. With enough lines, of enough kinds, the tailed one prints the next generation folded in the gel, then pushes the newborn out through the mouth while a pump fills the newborn with air. What was told shapes the next generation.</p>
       <div class="hud" id="hud"></div>
-<div class="spd" id="spd"><span class="spl">Speed</span><input type="range" id="spdR" min="0" max="7" step="1" value="2" aria-label="Simulation speed"><b id="spdV">1×</b></div></div>
+<div class="spd" id="spd"><span class="spl">Speed</span><input type="range" id="spdR" min="0" max="8" step="1" value="2" aria-label="Simulation speed"><b id="spdV">1×</b></div></div>
     <div class="ev" id="ev"></div>
   </div>
   </div>
@@ -1270,9 +1270,10 @@ document.querySelectorAll("[data-cam]").forEach((b) => (b.onclick = () => setCam
 $("#run").onclick = () => { running = !running; $("#run").textContent = running ? "Pause" : "Run"; $("#run").classList.toggle("on", running); };
 $("#reset").onclick = reset;
 $("#talkBtn").onclick = () => { showTalk = !showTalk; $("#talkBtn").classList.toggle("on", showTalk); $("#talkBtn").textContent = showTalk ? "Talk shown" : "Talk hidden"; };
-const SPEEDS = [0.25, 0.5, 1, 2, 3, 5, 8, 12];
+const SPEEDS = [0.25, 0.5, 1, 2, 3, 5, 6, 8, 12];
 const setSpd = (v) => { speed = v; $("#spdV").textContent = v + "×"; $("#spdR").value = SPEEDS.indexOf(v) >= 0 ? SPEEDS.indexOf(v) : 2; };
 $("#spdR").oninput = () => setSpd(SPEEDS[+$("#spdR").value]);
+{ const q = +new URLSearchParams(location.search).get("speed"); if (SPEEDS.includes(q)) setSpd(q); }
 let downAt = null; cv.addEventListener("pointerdown", (e) => (downAt = [e.clientX, e.clientY]));
 cv.addEventListener("pointerup", (e) => { if (!downAt || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 5) return; const b = cv.getBoundingClientRect(); const rc = new THREE.Raycaster(); rc.setFromCamera({ x: (e.clientX - b.left) / b.width * 2 - 1, y: -(e.clientY - b.top) / b.height * 2 + 1 }, R3.cam); const hit = rc.intersectObjects(pickable, false)[0]; selected = hit ? hit.object.userData.agent : null; inspect(); });
 initThree(); tankCam(); R3.ctl.addEventListener("start", () => { R3.moved = true; if (camMode === "film") { camMode = "free"; document.querySelectorAll("[data-cam]").forEach((x) => x.classList.remove("on")); } });
