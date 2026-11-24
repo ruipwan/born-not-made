@@ -20,8 +20,8 @@ button:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:3
 <section><div class="hd"><p>Lineage</p><h2>It inherits, then grows</h2></div>
 <canvas id="d-lineage" width="1600" height="900" style="aspect-ratio:16/9" role="img" aria-label="The same newborn robot at three moments after “birth”. Born: half size, holding only 21 inherited rings, with much empty room; a dashed outline shows the grown size. Growing: three quarters size, the same rings plus 40 moments of its own coming in as live data. Grown: full size, the same 21 rings among 240 moments of its own; the body grew by taking more air between its two skins."></canvas>
 </section>
-<section><div class="hd"><p>Fiction</p><h2>Ten thousand births</h2></div>
-<canvas id="d-evolve" width="1600" height="900" style="aspect-ratio:16/9" role="img" aria-label="Fiction. One queen body stays in place and keeps giving birth. Every newborn comes from the queen, distilled from what it has learned by then. Five grown bodies in a row, from birth 1 to birth 10,000: each is fuller with air, holds more inherited memory from later in the queen's life, and lifts its mouth higher, until the last one stands upright."></canvas>
+<section><div class="hd"><p>Fiction</p><h2>Birth variation</h2></div>
+<canvas id="d-evolve" width="1600" height="900" style="aspect-ratio:16/9" role="img" aria-label="Fiction. A tree of births from one first body. The branches split unevenly. Every body is about the same size, but each is printed folded and expanded with air into a different form: one point, two points, three points, a head bent upward, a point at each end, one long and one short, a fan of small points. Each branch meets different knowledge, so each body inherits a different mix of memory."></canvas>
 </section>
 <section><div class="hd"><p>1 · Why “birth”</p><h2>Copy, update, “birth”</h2></div>
 <canvas id="d-why" width="1600" height="780" style="aspect-ratio:1600/780" role="img" aria-label="Copy, update and birth compared."></canvas></section>
@@ -223,106 +223,137 @@ show();
 new ResizeObserver(show).observe(cv);
 if(document.fonts)document.fonts.ready.then(()=>{cv.width=0;show()});
 
-/* Fiction: one queen, many births. Every newborn is distilled from the queen at that moment, so later ones differ:
-   fuller with air, more memory from later in the queen's life, the mouth lifted higher, until a body stands. */
+/* Fiction: birth variation. One first body, a tree of births that branches unevenly. Sizes stay about the same;
+   what changes is the form the folded print takes when it fills with air, and the knowledge each branch met. */
 (()=>{
 const cv=document.getElementById('d-evolve');if(!cv)return;const g=cv.getContext('2d');
-const W=1600,H=900,FLOOR=700;
+const W=1600,H=900;
 const clamp=x=>Math.min(1,Math.max(0,x)),ink=a=>'rgba(236,235,230,'+clamp(a)+')';
 function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 const EP=[[232,163,61],[63,193,171],[156,136,242],[239,111,134],[120,176,244]];
 const ep=(o,a)=>'rgba('+EP[o].join(',')+','+clamp(a)+')';
 const mono='ui-monospace, "JetBrains Mono", Menlo, monospace';
 function text(s,x,y,size,a,font='Arial',align='left',track=0){g.save();g.textAlign=align;g.fillStyle=ink(a);g.font=size+'px '+font;if(track&&'letterSpacing' in g)g.letterSpacing=track+'px';g.fillText(s,x,y);g.restore()}
-/* outline in meters: round rear at x 0, mouth at x .735 */
-const SEG=[[[0,.15]],[[0,.3],[.08,.36],[.22,.36]],[[.4,.36],[.56,.31],[.655,.215]],[[.71,.165],[.745,.12],[.735,.085]],[[.69,.035],[.56,0],[.4,0]],[[.17,0]],[[.05,0],[0,.06],[0,.15]]];
-const LOCAL=[];{let c=SEG[0][0];LOCAL.push(c);for(const s of SEG.slice(1)){if(s.length===1){for(let t=1;t<=8;t++)LOCAL.push([c[0]+(s[0][0]-c[0])*t/8,c[1]+(s[0][1]-c[1])*t/8]);c=s[0];continue}
-  for(let t=1;t<=24;t++){const u=t/24,v=1-u;LOCAL.push([0,1].map(k=>v*v*v*c[k]+3*v*v*u*s[0][k]+3*v*u*u*s[1][k]+u*u*u*s[2][k]))}c=s[2]}}
-function pip(P,x,y){let r=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const [a,b]=P[i],[c,d]=P[j];if((b>y)!==(d>y)&&x<(c-a)*(y-b)/(d-b)+a)r=!r}return r}
-const INNER=LOCAL.map(([x,z])=>[.37+(x-.37)*.86,.18+(z-.18)*.82]);
-/* a figure: v.l, v.h inflation, v.crown, v.rot (deg, lifts the mouth), placed with its foot centered at cx on the floor */
-function figure(v,k,cx){
-  const th=v.rot*Math.PI/180,C=Math.cos(th),S=Math.sin(th);
-  const loc=(x,z)=>{const X=x*v.l,Z=(z-.18)*v.h+.18+(z>.25?v.crown*Math.sin(Math.PI*clamp(x/.735)):0);return [X*C-Z*S,X*S+Z*C]};
-  const pts=LOCAL.map(([x,z])=>loc(x,z));
-  const minz=Math.min(...pts.map(q=>q[1])),xs=pts.map(q=>q[0]),mid=(Math.min(...xs)+Math.max(...xs))/2;
-  const tr=(x,z)=>{const [a,b]=loc(x,z);return [cx+(a-mid)*k,FLOOR-(b-minz)*k]};
-  const P=new Path2D();LOCAL.forEach(([x,z],i)=>{const [X,Y]=tr(x,z);i?P.lineTo(X,Y):P.moveTo(X,Y)});P.closePath();
-  const top=Math.min(...LOCAL.map(([x,z])=>tr(x,z)[1]));
-  return {P,tr,top,left:cx+(Math.min(...xs)-mid)*k,right:cx+(Math.max(...xs)-mid)*k};
-}
-function drawFig(f,gap){
-  g.fillStyle='#000';g.fill(f.P);g.fillStyle=ink(.05);g.fill(f.P);
-  g.save();g.clip(f.P);
-  g.strokeStyle=ink(.07);g.lineWidth=.8;g.beginPath();
-  for(let z=.011;z<.7;z+=.011){const [a,b]=f.tr(-.3,z),[c,d]=f.tr(1,z);g.moveTo(a,b);g.lineTo(c,d)}g.stroke();
-  g.lineJoin='round';g.lineWidth=2*gap+1.2;g.strokeStyle=ink(.42);g.stroke(f.P);g.lineWidth=2*gap-1.2;g.strokeStyle='#000';g.stroke(f.P);g.strokeStyle=ink(.08);g.stroke(f.P);
-  g.restore();
-  g.strokeStyle=ink(.8);g.lineWidth=1.5;g.stroke(f.P);
-  const [ax,ay]=f.tr(.655,.215),[bx,by]=f.tr(.735,.085),L=Math.hypot(bx-ax,by-ay);
-  g.strokeStyle=ink(.6);g.lineWidth=1.1;g.beginPath();g.ellipse((ax+bx)/2,(ay+by)/2,L/2*.98,L*.17,Math.atan2(by-ay,bx-ax),0,7);g.stroke();
-}
-function ring(X,Y,r,c,a){let s=-Math.PI/2;g.lineWidth=1.4;c.forEach((v,o)=>{if(v<.02)return;const e=s+v*2*Math.PI;g.strokeStyle=ep(o,a);g.beginPath();g.arc(X,Y,r,s,e);g.stroke();s=e})}
 function dot(X,Y,r,f){g.fillStyle=f;g.beginPath();g.arc(X,Y,r,0,7);g.fill()}
-function spots(R,n,minD,k){const out=[];for(let t=0;out.length<n&&t<40000;t++){const x=R()*.75,z=R()*.37;if(!pip(INNER,x,z))continue;if(out.some(q=>Math.hypot((q[0]-x)*k,(q[1]-z)*k)<minD))continue;out.push([x,z])}return out}
+function ring(X,Y,r,c,a){let s=-Math.PI/2;g.lineWidth=1.4;c.forEach((v,o)=>{if(v<.02)return;const e=s+v*2*Math.PI;g.strokeStyle=ep(o,a);g.beginPath();g.arc(X,Y,r,s,e);g.stroke();s=e})}
 
-const K=330;
-const GEN=[
- {n:'1',say:'lies flat',v:{l:1,h:1,crown:0,rot:0},s:.92,gap:4,rings:6,own:70},
- {n:'10',say:'fuller',v:{l:1.02,h:1.12,crown:.01,rot:7},s:1,gap:6,rings:10,own:95},
- {n:'100',say:'lifts the mouth',v:{l:1.05,h:1.24,crown:.02,rot:22},s:1.08,gap:8,rings:14,own:120},
- {n:'1,000',say:'half upright',v:{l:1.08,h:1.34,crown:.03,rot:44},s:1.17,gap:10,rings:18,own:145},
- {n:'10,000',say:'stands',v:{l:1.1,h:1.45,crown:.04,rot:74},s:1.26,gap:13,rings:22,own:170}
+/* shapes as distance fields: a round rear plus tapering heads, blended smoothly */
+function cone(px,py,ax,ay,bx,by,r1,r2){
+  const dx=bx-ax,dy=by-ay,h=Math.hypot(dx,dy),ux=dx/h,uy=dy/h;
+  let x=Math.abs((px-ax)*uy-(py-ay)*ux),y=(px-ax)*ux+(py-ay)*uy;
+  const b=(r1-r2)/h,a=Math.sqrt(1-b*b),k=-b*x+a*y;
+  if(k<0)return Math.hypot(x,y)-r1; if(k>a*h)return Math.hypot(x,y-h)-r2; return a*x+b*y-r1;
+}
+const smin=(a,b,k)=>{const h=clamp(.5+.5*(b-a)/k);return b+(a-b)*h-k*h*(1-h)};
+const REAR=[[-40,0,58],[-40,0,28,0,58,46]];
+// each head: start x,y, end x,y, r1, r2 (chain two for a bend)
+const FORMS={
+ one:  {heads:[[10,0,128,14,54,7]]},
+ two:  {heads:[[10,-8,112,-52,40,7],[10,12,126,30,42,7]]},
+ three:{heads:[[5,-14,98,-70,32,6],[15,0,134,-2,34,6],[5,18,96,64,32,6]]},
+ bent: {heads:[[10,0,84,-12,52,28],[84,-12,112,-70,28,7]]},
+ ends: {rear:[[-25,0,50],[-25,0,30,0,50,46]],heads:[[10,0,124,10,48,7],[-50,0,-146,-26,42,7]]},
+ long: {heads:[[10,-8,150,-22,46,7],[0,24,62,62,28,6]]},
+ fan:  {heads:[[20,-22,92,-62,26,6],[25,-8,118,-28,26,6],[25,8,120,14,26,6],[20,22,98,54,26,6]]}
+};
+function field(F){
+  const rear=F.rear||REAR;
+  return (x,y)=>{let d=Math.hypot(x-rear[0][0],y-rear[0][1])-rear[0][2];
+    const c=rear[1];d=smin(d,cone(x,y,c[0],c[1],c[2],c[3],c[4],c[5]),10);
+    for(const h of F.heads)d=smin(d,cone(x,y,...h),26);return d};
+}
+/* draw a body: outer skin, inner skin, print layers, mouths at the tips; returns a function to place points inside */
+function body(F,cx,cy,sc,rot,gap=7){
+  const f=field(F),C=Math.cos(rot),S=Math.sin(rot);
+  const loc=(X,Y)=>{const x=(X-cx)/sc,y=(Y-cy)/sc;return [x*C+y*S,-x*S+y*C]};
+  const fd=(X,Y)=>{const [x,y]=loc(X,Y);return f(x,y)*sc};
+  const R=200*sc,st=2,nx=Math.ceil(2*R/st),x0=cx-R,y0=cy-R,V=[];
+  for(let j=0;j<=nx;j++){const row=new Float32Array(nx+1);for(let i=0;i<=nx;i++)row[i]=fd(x0+i*st,y0+j*st);V.push(row)}
+  // fill
+  g.fillStyle='rgba(236,235,230,.05)';
+  for(let j=0;j<nx;j++)for(let i=0;i<nx;i++)if(V[j][i]<0)g.fillRect(x0+i*st,y0+j*st,st,st);
+  // print layers inside the inner skin, along the body's own axis
+  g.strokeStyle=ink(.08);g.lineWidth=.8;g.beginPath();
+  for(let L=-110;L<=110;L+=5.5){let on=false;for(let t=-190;t<=190;t+=1.5){const x=t,y=L,X=cx+(x*C-y*S)*sc,Y=cy+(x*S+y*C)*sc,inside=f(x,y)<-gap/sc;
+    if(inside&&!on){g.moveTo(X,Y);on=true}else if(inside)g.lineTo(X,Y);else on=false}}
+  g.stroke();
+  const iso=(lv,col,w)=>{g.strokeStyle=col;g.lineWidth=w;g.beginPath();
+    for(let j=0;j<nx;j++)for(let i=0;i<nx;i++){const a=V[j][i]-lv,b=V[j][i+1]-lv,c=V[j+1][i+1]-lv,d=V[j+1][i]-lv,X=x0+i*st,Y=y0+j*st,P=[];
+      if((a<0)!==(b<0))P.push([X+st*a/(a-b),Y]);if((b<0)!==(c<0))P.push([X+st,Y+st*b/(b-c)]);
+      if((c<0)!==(d<0))P.push([X+st*(1-c/(c-d)),Y+st]);if((d<0)!==(a<0))P.push([X,Y+st*(1-d/(d-a))]);
+      if(P.length>=2){g.moveTo(...P[0]);g.lineTo(...P[1])}if(P.length===4){g.moveTo(...P[2]);g.lineTo(...P[3])}}
+    g.stroke()};
+  iso(0,ink(.82),1.5);iso(-gap,ink(.42),1);
+  // a mouth at every tip
+  for(const h of F.heads){if(h[5]>8)continue;const x=h[2],y=h[3],X=cx+(x*C-y*S)*sc,Y=cy+(x*S+y*C)*sc,an=Math.atan2(h[3]-h[1],h[2]-h[0])+rot;
+    g.strokeStyle=ink(.6);g.lineWidth=1.1;g.beginPath();g.ellipse(X-Math.cos(an)*6*sc,Y-Math.sin(an)*6*sc,2.6*sc,7*sc,an,0,7);g.stroke()}
+  return {fd,cx,cy,R};
+}
+function inside(B,n,seed,minD,margin){const R=rng(seed),out=[];for(let t=0;out.length<n&&t<30000;t++){const X=B.cx+(R()*2-1)*B.R,Y=B.cy+(R()*2-1)*B.R;
+  if(B.fd(X,Y)>-margin)continue;if(out.some(q=>Math.hypot(q[0]-X,q[1]-Y)<minD))continue;out.push([X,Y])}return out}
+
+/* the tree: nodes add new knowledge; leaves are bodies */
+const ROOT={x:210,y:470};
+const N={a:{x:470,y:340,from:ROOT,add:1},b:{x:500,y:610,from:ROOT,add:3},aa:{x:880,y:345,from:'a',add:2},bb:{x:860,y:690,from:'b',add:4}};
+const LEAF=[
+ {k:'two',  x:745,y:215,from:'a', rot:-.12,say:'two points',add:null},
+ {k:'three',x:1140,y:215,from:'aa',rot:.08,say:'three points'},
+ {k:'bent', x:1440,y:330,from:'aa',rot:-.05,say:'bent upward'},
+ {k:'ends', x:1105,y:470,from:'a', rot:.18,say:'a point at each end'},
+ {k:'long', x:1130,y:712,from:'bb',rot:-.2,say:'one long, one short'},
+ {k:'fan',  x:1440,y:620,from:'bb',rot:.1,say:'a fan of small points'},
+ {k:'one',  x:760,y:545,from:'b', rot:.35,say:'one point, turned'}
 ];
-const CX=[560,790,1010,1215,1430];
-GEN.forEach((G,i)=>{const R=rng(11+i*7),k=K*G.s;
-  G.ringPts=spots(R,G.rings,24/k*1,1).slice(0,G.rings).map(([x,z])=>{const c=[];for(let o=0;o<=i;o++)c.push(.3+R()*(o===i?1.6:1));const t=c.reduce((a,b)=>a+b,0);return {x,z,c:c.map(q=>q/t),r:3.6+R()*1.6}});
-  G.ownPts=spots(R,G.own,0,1);
-});
-const QUEEN=spots(rng(5),360,0,1).map(([x,z],j)=>({x,z,o:Math.min(4,Math.floor(rng(900+j)()*5))}));
+const P=k=>typeof k==='string'?N[k]:k;
+function mixOf(k){const m=[1,0,0,0,0];let n=P(k);const seen=[];while(n&&n!==ROOT){seen.push(n.add);n=P(n.from)}seen.reverse().forEach((o,i)=>m[o]+=.9+i*.5);const t=m.reduce((a,b)=>a+b,0);return m.map(v=>v/t)}
+function curve(a,b,col,w){g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(a.x,a.y);const mx=(a.x+b.x)/2;g.bezierCurveTo(mx,a.y,mx,b.y,b.x,b.y);g.stroke()}
+function along(a,b,t){const mx=(a.x+b.x)/2,u=1-t;return [u*u*u*a.x+3*u*u*t*mx+3*u*t*t*mx+t*t*t*b.x,u*u*u*a.y+3*u*u*t*a.y+3*u*t*t*b.y+t*t*t*b.y]}
 
 function draw(){
   g.setTransform(cv.width/W,0,0,cv.height/H,0,0);
   g.fillStyle='#000';g.fillRect(0,0,W,H);
-  g.fillStyle='rgba(255,255,255,.018)';g.fillRect(0,FLOOR,W,H-FLOOR);
-  g.strokeStyle=ink(.22);g.lineWidth=1;g.beginPath();g.moveTo(0,FLOOR+.5);g.lineTo(W,FLOOR+.5);g.stroke();
-  text('Ten thousand births.',40,84,46,.97,'Georgia');
-  text('Fiction. One queen stays in place and keeps giving “birth”. Each newborn is distilled from what the queen knows at that moment,',42,124,19,.68);
-  text('so no two are the same. Over many births the bodies hold more air and more memory, and slowly rise off the floor.',42,150,19,.68);
+  text('Birth variation.',40,84,46,.97,'Georgia');
+  text('Each newborn is printed folded, then fills with air. The same printer can unfold it into many forms, at about the same size.',42,124,19,.68);
+  text('Each branch also meets different knowledge, so each newborn inherits a different memory. The tree does not need to be even.',42,150,19,.68);
+  g.save();g.translate(0,18);drawTree();g.restore();drawRest();
+}
+function drawTree(){
+  // edges: the color is the knowledge met on that stretch
+  const edges=[];Object.values(N).forEach(n=>edges.push([n.from===ROOT?{x:ROOT.x+95,y:ROOT.y}:P(n.from),n,n.add]));LEAF.forEach(l=>edges.push([P(l.from),{x:l.x-70,y:l.y},null]));
+  edges.forEach(([a,b,o])=>{curve(a,b,ink(.22),1.2);const R=rng(Math.round(a.x+b.y));
+    if(o!==null)for(let t=.2;t<.95;t+=.09){const [X,Y]=along(a,b,t+R()*.03);dot(X,Y,2.2,ep(o,.9))}});
+  Object.values(N).forEach(n=>{dot(n.x,n.y,4,'#000');g.strokeStyle=ink(.7);g.lineWidth=1.2;g.beginPath();g.arc(n.x,n.y,4,0,7);g.stroke()});
 
-  // the queen: the first body, stays, its arm folded in the rear
-  const qk=K*1.02,q=figure({l:1,h:1,crown:0,rot:0},qk,205);
-  drawFig(q,8);
-  for(const d of QUEEN){const [X,Y]=q.tr(d.x,d.z);dot(X,Y,1.3,ep(d.o,.85))}
-  g.strokeStyle=ink(.32);g.lineWidth=1.6;g.beginPath();[[.12,.03],[.12,.17],[.27,.27],[.36,.13]].forEach(([x,z],i)=>{const [X,Y]=q.tr(x,z);i?g.lineTo(X,Y):g.moveTo(X,Y)});g.stroke();
-  text('QUEEN',205,q.top-44,12,.78,mono,'center',1.6);
-  text('stays, keeps giving “birth”',205,q.top-24,13,.55,'Arial','center');
+  // the first body at the root
+  const Bq=body(FORMS.one,ROOT.x-20,ROOT.y,.8,0,7);
+  inside(Bq,120,3,6,10).forEach(([X,Y],j)=>dot(X,Y,1.4,ep(0,.85)));
+  text('THE FIRST BODY',ROOT.x-10,ROOT.y-82,11.5,.78,mono,'center',1.5);
+  text('the prototype',ROOT.x-10,ROOT.y+96,13,.55,'Arial','center');
 
-  // the march, drawn right to left so each mouth sits in front of the next body
-  [...GEN].reverse().forEach((G)=>{const i=GEN.indexOf(G);const k=K*G.s,f=figure(G.v,k,CX[i]);G.f=f;drawFig(f,G.gap);
-    for(const [x,z] of G.ownPts){const [X,Y]=f.tr(x,z);dot(X,Y,1.6,ink(.78))}
-    for(const r of G.ringPts){const [X,Y]=f.tr(r.x,r.z);ring(X,Y,r.r,r.c,.95);dot(X,Y,1.4,ep(r.c.indexOf(Math.max(...r.c)),1))}
+  // the newborns, grown, all at one scale
+  LEAF.forEach((l,i)=>{
+    g.fillStyle='#000';g.beginPath();g.arc(l.x,l.y,0,0,7);g.fill();
+    const B=body(FORMS[l.k],l.x+10,l.y,.74,l.rot,6);
+    const mix=mixOf(l.from),Rr=rng(77+i*13);
+    inside(B,40,200+i,5,8).forEach(([X,Y])=>dot(X,Y,1.5,ink(.75)));
+    inside(B,11,500+i,17,12).forEach(([X,Y])=>{const c=mix.map(v=>v*(.6+Rr()*.8)),t=c.reduce((a,b)=>a+b,0);ring(X,Y,4.2+Rr()*1.4,c.map(v=>v/t),.95);dot(X,Y,1.4,ep(mix.indexOf(Math.max(...mix)),1))});
+    text(l.say,l.x+10,l.y+98,13,.62,mono,'center');
   });
+}
+function drawRest(){
 
-  // every newborn comes from the queen, not from the one before
-  const by=FLOOR+26;g.strokeStyle=ink(.4);g.lineWidth=1.1;g.beginPath();
-  g.moveTo(205,FLOOR);g.lineTo(205,by);g.lineTo(CX[4],by);CX.forEach(x=>{g.moveTo(x,by);g.lineTo(x,FLOOR+6)});g.stroke();
-  CX.forEach(x=>dot(x,by,2.6,ink(.8)));dot(205,by,3.2,ink(.9));
-  text('ALL FROM THE QUEEN',(205+CX[0])/2,by-8,10.5,.55,mono,'center',1.2);
-  GEN.forEach((G,i)=>{text('Birth '+G.n,CX[i],FLOOR+64,24,.95,'Georgia','center');text(G.say,CX[i],FLOOR+88,13,.6,mono,'center')});
-  text('The first body',205,FLOOR+64,24,.95,'Georgia','center');text('the prototype',205,FLOOR+88,13,.6,mono,'center');
-
-  // what changes along the row
-  const ay=290;g.strokeStyle=ink(.35);g.lineWidth=1.2;g.beginPath();g.moveTo(CX[0]-90,ay);g.lineTo(CX[4]+100,ay);g.moveTo(CX[4]+92,ay-4.5);g.lineTo(CX[4]+100,ay);g.lineTo(CX[4]+92,ay+4.5);g.stroke();
-  text('MORE AIR BETWEEN THE SKINS  ·  MORE MEMORY, FROM LATER IN THE QUEEN’S LIFE  ·  THE MOUTH RISES',(CX[0]+CX[4])/2,ay-12,11,.62,mono,'center',1.2);
+  // folded, then filled with air
+  { const x=70,y=790;g.strokeStyle=ink(.6);g.lineWidth=1.2;g.beginPath();g.moveTo(x,y);
+    for(let i=0;i<=14;i++)g.lineTo(x+i*7,y+(i%2?-9:9));g.lineTo(x+98,y+22);for(let i=14;i>=0;i--)g.lineTo(x+i*7,y+22+(i%2?-7:7));g.closePath();g.stroke();
+    g.strokeStyle=ink(.4);g.beginPath();g.moveTo(x+118,y+10);g.lineTo(x+170,y+10);g.moveTo(x+162,y+5.5);g.lineTo(x+170,y+10);g.lineTo(x+162,y+14.5);g.stroke();
+    text('PRINTED FOLDED,',x+182,y+6,11,.62,mono,'left',1.2);text('THEN FILLED WITH AIR',x+182,y+22,11,.62,mono,'left',1.2); }
 
   // legend
-  { let lx=40;const y=868;const tw=(s)=>{g.save();g.font='11px '+mono;if('letterSpacing' in g)g.letterSpacing='1px';const w=g.measureText(s).width;g.restore();return w};
-    EP.forEach((c,o)=>dot(lx+4+o*9,y-4,2.4,ep(o,.95)));let s='WHEN THE QUEEN LEARNED IT, EARLY TO LATE';text(s,lx+52,y,11,.62,mono,'left',1);lx+=52+tw(s)+36;
-    ring(lx+6,y-4,5.5,[.3,.3,.2,.1,.1],1);s='INHERITED AT “BIRTH”';text(s,lx+20,y,11,.62,mono,'left',1);lx+=20+tw(s)+36;
-    dot(lx+4,y-4,2.2,ink(.9));s='LIVED AFTER';text(s,lx+14,y,11,.62,mono,'left',1);lx+=14+tw(s)+36;
-    text('FICTION. ONLY THE FIRST BODY IS BUILT.',W-40,y,11,.5,mono,'right',1);
-  }
+  { let lx=40;const y=868;const tw=s=>{g.save();g.font='11px '+mono;if('letterSpacing' in g)g.letterSpacing='1px';const w=g.measureText(s).width;g.restore();return w};
+    EP.forEach((c,o)=>dot(lx+4+o*9,y-4,2.4,ep(o,.95)));let s='KNOWLEDGE MET ALONG A BRANCH';text(s,lx+52,y,11,.62,mono,'left',1);lx+=52+tw(s)+36;
+    ring(lx+6,y-4,5.5,[.4,.3,.2,.1,0],1);s='INHERITED AT “BIRTH”';text(s,lx+20,y,11,.62,mono,'left',1);lx+=20+tw(s)+36;
+    dot(lx+4,y-4,2.2,ink(.9));s='LIVED AFTER';text(s,lx+14,y,11,.62,mono,'left',1);
+    text('FICTION. THE FORMS ARE GUESSES; MORE POINTS MIGHT HELP A BODY STEER.',W-40,y,11,.5,mono,'right',1); }
 }
 function size(){const r=Math.min(2,devicePixelRatio||1),w=Math.round(cv.clientWidth*r);if(w&&cv.width!==w){cv.width=w;cv.height=Math.round(w*9/16)}}
 function show(){size();draw()}
