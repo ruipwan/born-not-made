@@ -27,12 +27,18 @@ t('Pump, chip and 500 mAh battery are in the kit inside the body.',820,234,26,.5
 // three columns
 function lab(s,x1,y1,x2,y2){line(x1,y1,x2,y2,.45,1.2);t(s,x2+8,y2+7,21,.7)}
 const C=[
- {n:'1',name:'Mini air pump',time:'3 min',x:60,
-  need:['ZR370 air pump, 2.5 L/min, 0.5 A','10 s on, 5 s off; 17 mAh','snorkel to a float above water'],
-  risk:'The inlet must stay above water.',
-  draw:(x,y)=>{water(x,y+30,640,200);egg(x+300,y+130,330,180,.5);line(x+215,y+125,x+215,y-25,.85,2.2);g.strokeStyle=w(.85);g.lineWidth=2;g.beginPath();g.ellipse(x+215,y-32,26,9,0,0,7);g.stroke();
-   g.strokeRect(x+185,y+130,60,38);g.beginPath();g.arc(x+215,y+149,12,0,7);g.stroke();bubbles([[x+255,y+118,6],[x+278,y+96,7],[x+300,y+78,5]]);
-   lab('float, air in',x+241,y-32,x+330,y-32);lab('air pump',x+245,y+160,x+500,y+235)}},
+ {n:'1',name:'One pump',time:'1 to 2 min',x:60,choice:true,
+  need:['diaphragm pump: water 0.4 L/min, air 4 L/min','6 V, self priming, can run dry','two 3 way valves: water to the jet, air to the body'],
+  risk:'Needs a 6 V boost; its current and weight are still to check.',
+  draw:(x,y)=>{water(x,y+30,640,200);egg(x+330,y+130,330,180,.5);
+   line(x+215,y+125,x+215,y-25,.85,2.2);g.strokeStyle=w(.85);g.lineWidth=2;g.beginPath();g.ellipse(x+215,y-32,26,9,0,0,7);g.stroke();
+   g.strokeRect(x+240,y+132,56,38);g.beginPath();g.arc(x+268,y+151,11,0,7);g.stroke();             // pump
+   const v=(cx,cy)=>{g.beginPath();g.moveTo(cx-9,cy-9);g.lineTo(cx+9,cy+9);g.moveTo(cx-9,cy+9);g.lineTo(cx+9,cy-9);g.stroke();g.strokeRect(cx-11,cy-11,22,22)};
+   v(x+215,y+151);line(x+226,y+151,x+240,y+151,.85,2);line(x+204,y+151,x+150,y+190,.6,1.6);          // inlet valve: air from the float, water from the tank
+   v(x+320,y+151);line(x+296,y+151,x+309,y+151,.85,2);line(x+331,y+151,x+520,y+151,.6,1.6);line(x+320,y+140,x+320,y+108,.85,2); // outlet valve: jet or body
+   bubbles([[x+320,y+96,6],[x+338,y+80,5]]);t('jet',x+528,y+158,20,.7);
+   lab('valve: air or water in',x+204,y+140,x+40,y-60);lab('one pump',x+268,y+170,x+420,y+235);lab('valve: to the body or the jet',x+331,y+140,x+390,y-60);
+}},
  {n:'2',name:'Baking soda',time:'59 min',x:840,
   need:['29.7 g tablet: 16.8 g baking soda','+ 12.8 g citric acid, kept dry','89 mL of tank water at 1.5 mL/min'],
   risk:'CO₂ leaks out through silicone, so it slowly shrinks.',
@@ -49,6 +55,7 @@ const C=[
 ];
 const Y0=360;
 C.forEach(c=>{
+  if(c.choice){g.strokeStyle=w(.9);g.lineWidth=2.4;g.strokeRect(c.x-24,Y0-22,768,670);g.fillStyle='#000';g.fillRect(c.x-6,Y0-40,365,36);t('MY CHOICE · water and air',c.x+4,Y0-14,22,1,'left',M,true)}
   line(c.x,Y0,c.x+720,Y0,.35,1.2);
   t(c.n,c.x,Y0+50,26,.55,'left',M);t(c.name,c.x+40,Y0+50,34,.95,'left',F,true);
   t('full in',c.x+720,Y0+30,20,.5,'right',M);t(c.time,c.x+720,Y0+76,56,1,'right',F,true);
@@ -61,6 +68,6 @@ const ax0=280,ax1=2300,ay=1080,lg=s=>ax0+(Math.log10(s)-0)/(Math.log10(36000))*(
 line(ax0,ay,ax1,ay,.5,1.6);
 [[1,'1 s'],[10,'10 s'],[60,'1 min'],[600,'10 min'],[3600,'1 h'],[36000,'10 h']].forEach(([s,l])=>{line(lg(s),ay-8,lg(s),ay+8,.5,1.4);t(l,lg(s),ay+38,20,.5,'center',M)});
 t('TIME TO FULL',60,ay+6,20,.5,'left',M);
-[[184,'1  pump'],[3561,'2  soda'],[25786,'3  electrolysis']].forEach(([s,l])=>{const x=lg(s);g.fillStyle='#fff';g.beginPath();g.moveTo(x,ay-12);g.lineTo(x+10,ay);g.lineTo(x,ay+12);g.lineTo(x-10,ay);g.closePath();g.fill();t(l,x,ay-24,22,.9,'center',M)});
+[[72,'1  one pump'],[3561,'2  soda'],[25786,'3  electrolysis']].forEach(([s,l])=>{const x=lg(s);g.fillStyle='#fff';g.beginPath();g.moveTo(x,ay-12);g.lineTo(x+10,ay);g.lineTo(x,ay+12);g.lineTo(x-10,ay);g.closePath();g.fill();t(l,x,ay-24,22,.9,'center',M)});
 {const x=lg(1800);g.strokeStyle=w(.6);g.lineWidth=1.6;g.beginPath();g.arc(x,ay,8,0,7);g.stroke();t('kit battery empty',x,ay+38,18,.45,'center',M)}
 </script></body></html>
