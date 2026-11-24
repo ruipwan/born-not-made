@@ -1,119 +1,120 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The cycle in 5 steps · simplified version</title>
+<title>The cycle · simplified version</title>
 <style>html,body{margin:0;background:#000}canvas{display:block;width:100%;height:auto}</style></head><body>
-<canvas id="c" width="2400" height="1105" role="img" aria-label="The cycle in five steps, side views from the simplified simulator: dock, print, birth, grow, and optionally the tail moving to the newborn."></canvas>
+<canvas id="c" width="2400" height="1105" role="img" aria-label="The cycle, side views from the simplified simulator: dock, print, birth, born small and folded, and, optionally, growing outside the body as the folds open."></canvas>
 <script>
-/* Side views at one scale, traced from the side section of the simplified simulator (simulator/simple, secSvg),
-   in its own units (1 unit is about 1.7 mm). Floor at y 222, water at y 168, docking plane at x 190.7. */
-const G={"gel":[[153.8,162.5],[153.8,222.0],[155.6,222.0],[157.3,222.0],[159.2,222.0],[161.0,222.0],[162.8,222.0],[164.6,222.0],[166.4,222.0],[168.2,222.0],[170.0,222.0],[171.8,222.0],[173.6,222.0],[175.4,222.0],[177.2,222.0],[179.0,222.0],[180.8,222.0],[182.6,222.0],[184.4,222.0],[186.3,222.0],[188.0,222.0],[189.8,222.0],[191.7,222.0],[193.5,222.0],[195.2,222.0],[197.1,222.0],[198.9,222.0],[200.7,222.0],[202.5,222.0],[204.3,222.0],[206.1,222.0],[207.9,222.0],[209.7,222.0],[211.5,222.0],[213.3,222.0],[215.1,222.0],[217.0,222.0],[218.7,222.0],[220.5,222.0],[222.4,222.0],[224.2,222.0],[225.9,222.0],[227.8,222.0],[229.6,222.0],[231.4,222.0],[233.2,222.0],[235.0,222.0],[236.8,222.0],[238.6,222.0],[240.4,222.0],[242.2,222.0],[244.0,222.0],[245.8,222.0],[247.6,222.0],[249.5,222.0],[251.2,222.0],[253.0,222.0],[254.9,222.0],[256.7,222.0],[258.4,222.0],[260.3,222.0],[262.1,222.0],[263.9,222.0],[265.7,222.0],[267.5,222.0],[269.3,222.0],[271.1,222.0],[272.9,222.0],[274.7,222.0],[276.5,222.0],[278.3,222.0],[280.1,222.0],[281.9,222.0],[283.7,222.0],[285.5,222.0],[287.4,222.0],[289.1,222.0],[290.9,222.0],[292.8,222.0],[294.6,222.0],[296.3,222.0],[298.2,222.0],[300.0,222.0],[301.8,222.0],[303.6,222.0],[305.4,222.0],[307.2,222.0],[309.0,222.0],[310.8,222.0],[312.6,222.0],[314.4,222.0],[316.2,222.0],[318.0,221.7],[319.8,221.7],[321.6,221.7],[323.4,221.7],[325.3,221.7],[327.0,221.7],[328.8,221.7],[330.7,221.6],[332.5,221.0],[334.2,219.9],[336.1,218.3],[337.9,216.2],[339.7,214.3],[341.5,213.0],[343.3,212.3],[345.1,211.7],[346.9,211.0],[348.7,210.2],[350.5,209.4],[352.3,208.5],[354.1,207.5],[355.9,206.5],[357.7,205.3],[359.5,204.2],[361.3,202.9],[363.2,201.6],[364.9,200.2],[366.7,198.7],[368.6,197.2],[370.4,195.6],[372.1,194.0],[374.0,192.3],[375.8,190.5],[377.6,188.6],[379.4,186.7],[381.2,184.8],[383.0,182.7],[384.8,180.6],[386.6,178.4],[388.4,176.2],[390.2,173.9],[392.0,171.5],[393.8,169.1],[395.6,166.6],[397.4,164.0],[397.4,162.5]],"low":[[-6.9,147.6],[-5.1,165.8],[-3.2,175.1],[-1.5,182.4],[0.3,188.7],[2.2,194.2],[4.0,199.1],[5.7,203.4],[7.6,207.2],[9.4,210.5],[11.2,213.4],[13.0,215.9],[14.8,217.9],[16.6,219.6],[18.4,220.8],[20.2,221.6],[22.0,221.9],[23.8,222.0],[25.6,222.0],[27.4,222.0],[29.2,222.0],[31.0,222.0],[32.8,222.0],[34.7,222.0],[36.4,222.0],[38.2,222.0],[40.1,222.0],[41.9,222.0],[43.6,222.0],[45.5,222.0],[47.3,222.0],[49.1,222.0],[50.9,222.0],[52.7,222.0],[54.5,222.0],[56.3,222.0],[58.1,222.0],[59.9,222.0],[61.7,222.0],[63.5,222.0],[65.3,222.0],[67.1,222.0],[68.9,222.0],[70.7,222.0],[72.6,222.0],[74.3,222.0],[76.1,222.0],[78.0,222.0],[79.8,222.0],[81.5,222.0],[83.4,222.0],[85.2,222.0],[87.0,222.0],[88.8,222.0],[90.6,222.0],[92.4,222.0],[94.2,222.0],[96.0,222.0],[97.8,222.0],[99.6,222.0],[101.4,222.0],[103.2,222.0],[105.0,222.0],[106.8,222.0],[108.6,222.0],[110.5,222.0],[112.2,222.0],[114.0,222.0],[115.9,222.0],[117.7,222.0],[119.4,222.0],[121.3,222.0],[123.1,222.0],[124.9,222.0],[126.7,222.0],[128.5,222.0],[130.3,222.0],[132.1,222.0],[133.9,222.0],[135.7,222.0],[137.5,222.0],[139.3,222.0],[141.1,222.0],[142.9,222.0],[144.7,222.0],[146.5,222.0],[148.4,222.0],[150.1,209.3],[151.9,160.4],[153.8,222.0],[155.6,222.0],[157.3,222.0],[159.2,222.0],[161.0,222.0],[162.8,222.0],[164.6,222.0],[166.4,222.0],[168.2,222.0],[170.0,222.0],[171.8,222.0],[173.6,222.0],[175.4,222.0],[177.2,222.0],[179.0,222.0],[180.8,222.0],[182.6,222.0],[184.4,222.0],[186.3,222.0],[188.0,222.0],[189.8,222.0],[191.7,222.0],[193.5,222.0],[195.2,222.0],[197.1,222.0],[198.9,222.0],[200.7,222.0],[202.5,222.0],[204.3,222.0],[206.1,222.0],[207.9,222.0],[209.7,222.0],[211.5,222.0],[213.3,222.0],[215.1,222.0],[217.0,222.0],[218.7,222.0],[220.5,222.0],[222.4,222.0],[224.2,222.0],[225.9,222.0],[227.8,222.0],[229.6,222.0],[231.4,222.0],[233.2,222.0],[235.0,222.0],[236.8,222.0],[238.6,222.0],[240.4,222.0],[242.2,222.0],[244.0,222.0],[245.8,222.0],[247.6,222.0],[249.5,222.0],[251.2,222.0],[253.0,222.0],[254.9,222.0],[256.7,222.0],[258.4,222.0],[260.3,222.0],[262.1,222.0],[263.9,222.0],[265.7,222.0],[267.5,222.0],[269.3,222.0],[271.1,222.0],[272.9,222.0],[274.7,222.0],[276.5,222.0],[278.3,222.0],[280.1,222.0],[281.9,222.0],[283.7,222.0],[285.5,222.0],[287.4,222.0],[289.1,222.0],[290.9,222.0],[292.8,222.0],[294.6,222.0],[296.3,222.0],[298.2,222.0],[300.0,222.0],[301.8,222.0],[303.6,222.0],[305.4,222.0],[307.2,222.0],[309.0,222.0],[310.8,222.0],[312.6,222.0],[314.4,222.0],[316.2,222.0],[318.0,221.7],[319.8,221.7],[321.6,221.7],[323.4,221.7],[325.3,221.7],[327.0,221.7],[328.8,221.7],[330.7,221.6],[332.5,221.0],[334.2,219.9],[336.1,218.3],[337.9,216.2],[339.7,214.3],[341.5,213.0],[343.3,212.3],[345.1,211.7],[346.9,211.0],[348.7,210.2],[350.5,209.4],[352.3,208.5],[354.1,207.5],[355.9,206.5],[357.7,205.3],[359.5,204.2],[361.3,202.9],[363.2,201.6],[364.9,200.2],[366.7,198.7],[368.6,197.2],[370.4,195.6],[372.1,194.0],[374.0,192.3],[375.8,190.5],[377.6,188.6],[379.4,186.7],[381.2,184.8],[383.0,182.7],[384.8,180.6],[386.6,178.4],[388.4,176.2],[390.2,173.9],[392.0,171.5],[393.8,169.1],[395.6,166.6],[397.4,164.0],[399.2,161.4],[401.1,158.8],[402.8,156.0],[404.6,153.2],[406.5,150.4],[408.3,147.4],[410.0,145.0],[411.9,143.3],[413.7,141.6],[415.5,139.6],[417.3,137.5],[419.1,135.7],[420.9,133.5],[422.7,130.2],[424.5,126.9]],"up":[[-6.9,147.6],[-5.1,133.6],[-3.2,126.4],[-1.5,120.5],[0.3,115.4],[2.2,110.8],[4.0,106.6],[5.7,102.6],[7.6,99.0],[9.4,95.5],[11.2,92.2],[13.0,89.0],[14.8,85.9],[16.6,83.0],[18.4,80.2],[20.2,77.5],[22.0,74.9],[23.8,72.4],[25.6,70.0],[27.4,67.7],[29.2,65.4],[31.0,63.3],[32.8,61.1],[34.7,59.1],[36.4,57.1],[38.2,55.2],[40.1,53.4],[41.9,51.7],[43.6,49.9],[45.5,48.3],[47.3,46.7],[49.1,45.2],[50.9,43.7],[52.7,42.4],[54.5,41.0],[56.3,39.8],[58.1,38.5],[59.9,37.3],[61.7,36.2],[63.5,35.2],[65.3,34.2],[67.1,33.2],[68.9,32.4],[70.7,31.5],[72.6,30.8],[74.3,30.1],[76.1,29.3],[78.0,28.7],[79.8,28.2],[81.5,27.7],[83.4,27.3],[85.2,26.8],[87.0,26.5],[88.8,26.2],[90.6,26.0],[92.4,25.8],[94.2,25.7],[96.0,25.6],[97.8,25.6],[99.6,25.6],[101.4,25.6],[103.2,25.6],[105.0,25.6],[106.8,25.6],[108.6,25.6],[110.5,25.6],[112.2,25.6],[114.0,25.6],[115.9,25.6],[117.7,25.6],[119.4,25.6],[121.3,25.6],[123.1,25.6],[124.9,25.6],[126.7,25.6],[128.5,25.6],[130.3,25.6],[132.1,25.6],[133.9,25.6],[135.7,25.6],[137.5,25.6],[139.3,25.6],[141.1,25.6],[142.9,25.6],[144.7,25.6],[146.5,25.6],[148.4,25.6],[150.1,25.6],[151.9,25.6],[153.8,25.6],[155.6,25.6],[157.3,25.6],[159.2,25.6],[161.0,25.6],[162.8,25.6],[164.6,25.6],[166.4,25.6],[168.2,25.6],[170.0,25.6],[171.8,25.6],[173.6,25.6],[175.4,25.6],[177.2,25.6],[179.0,25.6],[180.8,25.6],[182.6,25.6],[184.4,25.6],[186.3,25.6],[188.0,25.6],[189.8,25.6],[191.7,25.6],[193.5,25.6],[195.2,25.6],[197.1,25.6],[198.9,25.6],[200.7,25.6],[202.5,25.6],[204.3,25.6],[206.1,25.6],[207.9,25.6],[209.7,25.6],[211.5,25.6],[213.3,25.6],[215.1,25.6],[217.0,25.6],[218.7,25.6],[220.5,25.7],[222.4,25.7],[224.2,25.7],[225.9,25.7],[227.8,25.7],[229.6,25.7],[231.4,25.7],[233.2,25.7],[235.0,25.7],[236.8,25.8],[238.6,25.8],[240.4,25.8],[242.2,25.8],[244.0,25.8],[245.8,25.8],[247.6,25.8],[249.5,25.8],[251.2,25.8],[253.0,25.8],[254.9,25.8],[256.7,25.9],[258.4,25.9],[260.3,25.9],[262.1,25.9],[263.9,25.9],[265.7,25.9],[267.5,25.9],[269.3,26.0],[271.1,26.0],[272.9,26.0],[274.7,26.1],[276.5,26.1],[278.3,26.1],[280.1,26.1],[281.9,26.1],[283.7,26.1],[285.5,26.2],[287.4,26.2],[289.1,26.2],[290.9,26.2],[292.8,26.3],[294.6,26.3],[296.3,26.3],[298.2,26.4],[300.0,26.4],[301.8,26.4],[303.6,26.4],[305.4,26.5],[307.2,26.5],[309.0,26.5],[310.8,26.6],[312.6,26.6],[314.4,26.7],[316.2,26.7],[318.0,26.7],[319.8,26.8],[321.6,26.8],[323.4,26.8],[325.3,26.9],[327.0,26.9],[328.8,27.0],[330.7,27.0],[332.5,27.0],[334.2,27.1],[336.1,27.1],[337.9,27.2],[339.7,27.2],[341.5,27.3],[343.3,27.3],[345.1,27.4],[346.9,27.4],[348.7,27.4],[350.5,27.5],[352.3,27.6],[354.1,27.6],[355.9,27.7],[357.7,27.7],[359.5,27.8],[361.3,27.9],[363.2,27.9],[364.9,28.0],[366.7,28.0],[368.6,28.0],[370.4,28.1],[372.1,28.2],[374.0,28.3],[375.8,28.3],[377.6,28.4],[379.4,28.4],[381.2,28.5],[383.0,28.6],[384.8,28.6],[386.6,28.7],[388.4,28.7],[390.2,28.9],[392.0,28.9],[393.8,29.0],[395.6,29.0],[397.4,29.1],[399.2,29.2],[401.1,29.3],[402.8,29.3],[404.6,29.5],[406.5,29.5],[408.3,29.6],[410.0,29.7],[411.9,29.8],[413.7,29.8],[415.5,29.9],[417.3,30.0],[419.1,30.1],[420.9,30.2],[422.7,30.3],[424.5,30.4]]};
+/* Side views at one scale, after the simplified simulator (simulator/simple), in its own units (1 unit is about 1.7 mm).
+   Floor at y 222, water at y 168, docking plane at x 190.7. Outline redrawn round, as sketched: two rounded bodies. */
 const cv=document.getElementById('c'),g=cv.getContext('2d'),W=2400,H=1105,S=1.25;
 const ink=a=>'rgba(236,235,230,'+a+')',font='Arial, Helvetica, sans-serif';
-const DOCK=190.7,FLOOR=222,WATER=168,MOUTH=[[382.2,28.5],[424.5,126.9]];
+const DOCK=190.7,FLOOR=222,WATER=168,GEL=162.5,MTOP=[382,28.5],LIP=[424.5,129];
+function bez(segs){const out=[];let c=segs[0];out.push(c);for(const s of segs.slice(1)){for(let i=1;i<=30;i++){const t=i/30,u=1-t;out.push([0,1].map(k=>u*u*u*c[k]+3*u*u*t*s[0][k]+3*u*t*t*s[1][k]+t*t*t*s[2][k]))}c=s[2]}return out}
+// tail: top from the docking plane back, round rear, floor, then up into the notch at the docking plane
+const TAIL=bez([[DOCK,25.6],[[150,25.6],[95,25.6],[60,32]],[[18,42],[-15,90],[-15,135]],[[-15,175],[0,210],[40,221]],[[80,222],[130,222],[156,221]],[[176,220],[DOCK-4,200],[DOCK-2,182]]]);
+const HEAD=bez([[DOCK+2,182],[[DOCK+4,205],[195,219],[214,221]],[[250,222],[300,222],[330,221]],[[372,219],[410,180],[LIP[0],LIP[1]]]]);
+const HEADTOP=[[DOCK,25.6],MTOP];
 function T(o,x,y){return [o.x+x*S,o.y+(y-FLOOR)*S]}
-function poly(o,pts,close){g.beginPath();pts.forEach(([x,y],i)=>{const [X,Y]=T(o,x,y);i?g.lineTo(X,Y):g.moveTo(X,Y)});if(close)g.closePath()}
+function path(o,pts,close){g.beginPath();pts.forEach(([x,y],i)=>{const [X,Y]=T(o,x,y);i?g.lineTo(X,Y):g.moveTo(X,Y)});if(close)g.closePath()}
 function text(s,x,y,size=15,a=.6,align='left',bold=false){g.font=(bold?'bold ':'')+size+'px '+font;g.fillStyle=ink(a);g.textAlign=align;g.fillText(s,x,y)}
 function lines(arr,x,y,size,a,lh){arr.forEach((s,i)=>text(s,x,y+i*lh,size,a))}
-function label(s,o,ax,ay,lx,ly,align='left'){const [A,B]=T(o,ax,ay),[X,Y]=T(o,lx,ly);g.strokeStyle=ink(.35);g.lineWidth=1;g.beginPath();g.moveTo(A,B);g.lineTo(X,Y+4);g.stroke();text(s,X+(align==='right'?-0:0),Y,14,.62,align)}
+function label(s,o,ax,ay,lx,ly){const [A,B]=T(o,ax,ay),[X,Y]=T(o,lx,ly);g.strokeStyle=ink(.35);g.lineWidth=1;g.beginPath();g.moveTo(A,B);g.lineTo(X,Y+4);g.stroke();text(s,X,Y,14,.62)}
 function water(o,x0,x1){const [a,b]=T(o,x0,WATER),[c,d]=T(o,x1,FLOOR);g.fillStyle='#0c1620';g.fillRect(a,b,c-a,d-b+16);
   g.strokeStyle='rgba(130,170,200,.35)';g.setLineDash([4,5]);g.beginPath();g.moveTo(a,b);g.lineTo(c,b);g.stroke();g.setLineDash([]);
   g.strokeStyle=ink(.25);g.beginPath();g.moveTo(a,d+16);g.lineTo(c,d+16);g.stroke()}
-const upHead=G.up.filter(p=>p[0]>=DOCK&&p[0]<=MOUTH[0][0]),lowHead=G.low.filter(p=>p[0]>=DOCK);
-const upTail=G.up.filter(p=>p[0]<=DOCK),lowTail=G.low.filter(p=>p[0]<=DOCK);
-function gel(o,dx=0){g.fillStyle='rgba(222,170,90,.16)';poly(o,[[DOCK+dx,162.5],[DOCK+dx,FLOOR],...G.gel.map(([x,y])=>[x+dx,y]).filter(p=>p[0]>DOCK+dx)],true);g.fill();
-  g.strokeStyle='rgba(222,170,90,.55)';g.lineWidth=1.2;g.beginPath();const [a,b]=T(o,DOCK+dx,162.5),[c]=T(o,397.4+dx,162.5);g.moveTo(a,b);g.lineTo(c,b);g.stroke()}
-function head(o,dx=0){
-  g.fillStyle='rgba(236,235,230,.035)';poly(o,[[DOCK+dx,25.6],...upHead.map(([x,y])=>[x+dx,y]),[MOUTH[1][0]+dx,MOUTH[1][1]],...lowHead.slice().reverse().map(([x,y])=>[x+dx,y]),[DOCK+dx,FLOOR]],true);g.fill();
-  g.strokeStyle=ink(.85);g.lineWidth=2;poly(o,upHead.map(([x,y])=>[x+dx,y]));g.stroke();poly(o,lowHead.map(([x,y])=>[x+dx,y]));g.stroke();
-  g.lineWidth=1.6;g.beginPath();g.moveTo(...T(o,DOCK+dx,26));g.lineTo(...T(o,DOCK+dx,FLOOR));g.stroke();
-  g.setLineDash([5,5]);g.strokeStyle=ink(.4);g.lineWidth=1.2;g.beginPath();g.moveTo(...T(o,MOUTH[0][0]+dx,MOUTH[0][1]));g.lineTo(...T(o,MOUTH[1][0]+dx,MOUTH[1][1]));g.stroke();g.setLineDash([]);
+const headShape=[...HEADTOP,...[...HEAD].reverse()];          // top, mouth top, then lip back to the notch
+function head(o){
+  g.fillStyle='rgba(236,235,230,.035)';path(o,[[DOCK,25.6],MTOP,...[...HEAD].reverse(),[DOCK,182]],true);g.fill();
+  // gel: inside the head, below the gel line
+  g.save();path(o,[[DOCK,25.6],MTOP,...[...HEAD].reverse(),[DOCK,182]],true);g.clip();
+  const [a,b]=T(o,DOCK-5,GEL),[c,d]=T(o,LIP[0]+5,FLOOR+5);g.fillStyle='rgba(222,170,90,.17)';g.fillRect(a,b,c-a,d-b);
+  g.strokeStyle='rgba(222,170,90,.6)';g.lineWidth=1.2;g.beginPath();g.moveTo(a,b);g.lineTo(c,b);g.stroke();g.restore();
+  g.strokeStyle=ink(.85);g.lineWidth=2;path(o,HEADTOP);g.stroke();path(o,HEAD);g.stroke();
+  g.lineWidth=1.6;g.beginPath();g.moveTo(...T(o,DOCK,25.6));g.lineTo(...T(o,DOCK,182));g.stroke();
+  g.setLineDash([5,5]);g.strokeStyle=ink(.4);g.lineWidth=1.2;g.beginPath();g.moveTo(...T(o,...MTOP));g.lineTo(...T(o,...LIP));g.stroke();g.setLineDash([]);
 }
-function rr(o,x,y,w,h,r,fill){const [X,Y]=T(o,x,y);g.beginPath();g.roundRect(X,Y,w*S,h*S,r);g.fillStyle=fill;g.fill()}
-function tail(o,dx=0){
-  g.fillStyle='rgba(236,235,230,.035)';poly(o,[...upTail,[DOCK,25.6],[DOCK,FLOOR],...lowTail.slice().reverse()].map(([x,y])=>[x+dx,y]),true);g.fill();
-  g.strokeStyle=ink(.85);g.lineWidth=2;poly(o,upTail.map(([x,y])=>[x+dx,y]));g.stroke();poly(o,lowTail.map(([x,y])=>[x+dx,y]));g.stroke();
-  g.lineWidth=1.6;g.beginPath();g.moveTo(...T(o,DOCK+dx,26));g.lineTo(...T(o,DOCK+dx,FLOOR));g.stroke();
-  // inside: store, two pumps, brain and cell, kit magazine
-  rr(o,20+dx,56,52,15,6,'#3a3a3a');rr(o,8+dx,92,26,14,4,'#4a4a4a');rr(o,8+dx,112,26,14,4,'#4a4a4a');
-  rr(o,16+dx,140,40,22,3,'#545454');
-  for(let i=0;i<3;i++)rr(o,46+dx+i*16,204,13,10,2,'#8f887c');
+function box(o,x,y,w,h,r,fill){const [X,Y]=T(o,x,y);g.beginPath();g.roundRect(X,Y,w*S,h*S,r);g.fillStyle=fill;g.fill()}
+function tail(o){
+  g.fillStyle='rgba(236,235,230,.035)';path(o,TAIL,true);g.fill();
+  g.strokeStyle=ink(.85);g.lineWidth=2;path(o,TAIL);g.stroke();
+  g.lineWidth=1.6;g.beginPath();g.moveTo(...T(o,DOCK,25.6));g.lineTo(...T(o,DOCK,182));g.stroke();
+  box(o,12,102,26,14,4,'#4a4a4a');                 // pump
+  box(o,14,132,40,22,3,'#545454');                 // brain and cell
+  for(let i=0;i<3;i++)box(o,40+i*15,205,12,10,2,'#8f887c');  // kit magazine
 }
-function arm(o,pose,dx=0){
-  const P=pose.map(([x,y])=>T(o,x+dx,y));
-  rr(o,86+dx,207,46,13,3,'#5c5c5c');rr(o,101+dx,174,16,34,3,'#4e4e4e');
-  g.strokeStyle='#6e6e6e';g.lineCap='round';g.lineWidth=7;g.beginPath();g.moveTo(...P[0]);g.lineTo(...P[1]);g.lineTo(...P[2]);g.stroke();
-  g.lineWidth=2;g.strokeStyle='#9a9a9a';g.beginPath();g.moveTo(...P[2]);g.lineTo(...P[3]);g.stroke();
-  P.slice(0,3).forEach(p=>{g.fillStyle='#8a8a8a';g.beginPath();g.arc(...p,4.5,0,7);g.fill()});g.lineCap='butt';
+/* Rotrics DexArm, side view: base, turret, upper arm, forearm with its parallel link, a flange that stays level, the tool hanging down */
+const SH=[118,164],L1=88,L2=96;
+function ik(w){const dx=w[0]-SH[0],dy=w[1]-SH[1],d=Math.min(Math.hypot(dx,dy),L1+L2-1),a=Math.atan2(dy,dx),b=Math.acos((L1*L1+d*d-L2*L2)/(2*L1*d));return [SH[0]+L1*Math.cos(a-b),SH[1]+L1*Math.sin(a-b)]}
+function link(o,a,b,w,col){g.strokeStyle=col;g.lineWidth=w*S;g.lineCap='round';g.beginPath();g.moveTo(...T(o,...a));g.lineTo(...T(o,...b));g.stroke();g.lineCap='butt'}
+function dexarm(o,wr,tool=30,tube=null){
+  const el=ik(wr);
+  box(o,SH[0]-32,206,64,15,4,'#5a5a5a');                    // base
+  box(o,SH[0]-20,170,40,37,6,'#4c4c4c');                    // turret
+  const par=[[SH[0]-9,SH[1]-6],[el[0]-9,el[1]-6]];
+  link(o,[SH[0]-14,SH[1]+2],[el[0]-12,el[1]+6],3,'#5e5e5e');   // rear rod of the parallelogram
+  link(o,SH,el,11,'#6f6f6f');                                // upper arm
+  link(o,[el[0]+2,el[1]-7],[wr[0]-6,wr[1]-7],3,'#5e5e5e');    // forearm parallel link
+  link(o,el,wr,9,'#7a7a7a');                                 // forearm
+  box(o,wr[0]-7,wr[1]-8,16,18,3,'#8a8a8a');                  // level flange
+  g.strokeStyle='#b0b0b0';g.lineWidth=2;g.beginPath();g.moveTo(...T(o,wr[0]+1,wr[1]+10));g.lineTo(...T(o,wr[0]+1,wr[1]+10+tool));g.stroke();
+  for(const p of [SH,el]){g.fillStyle='#9a9a9a';g.beginPath();g.arc(...T(o,...p),4,0,7);g.fill()}
+  if(tube){g.strokeStyle='rgba(200,200,200,.55)';g.lineWidth=1.4;g.beginPath();g.moveTo(...T(o,wr[0]+1,wr[1]+10+tool));g.bezierCurveTo(...T(o,wr[0]+30,wr[1]+tool+30),...T(o,tube[0]-30,tube[1]+10),...T(o,...tube));g.stroke()}
 }
-const FOLD=[[110,174],[96,96],[150,108],[150,128]];
+const FOLDED=[164,112];
 const NB_F='rgba(160,104,66,.5)',NB_S='#c48b5c';
 function folded(o){const pts=[[238,220]];for(let i=0;i<=12;i++)pts.push([238+i*7.4,i%2?206:211]);pts.push([327,220]);
-  g.fillStyle=NB_F;poly(o,pts,true);g.fill();g.strokeStyle=NB_S;g.lineWidth=1.5;g.stroke();rr(o,268,212,18,7,2,'#cfc8ba')}
-/* the inflated newborn: an egg, rounder rear, a little narrower front; rearCut opens its rear for the tail */
-function egg(o,cx,cy,L,Hh,rot,f=1,cut=0){
-  const pts=[];for(let i=0;i<=120;i++){const t=i/120*Math.PI*2,c=Math.cos(t);let x=L/2*c,y=Hh/2*Math.sin(t)*(1-.12*c);
-    if(cut&&x<-L/2+cut)x=-L/2+cut;pts.push([x,y])}
+  g.fillStyle=NB_F;path(o,pts,true);g.fill();g.strokeStyle=NB_S;g.lineWidth=1.5;g.stroke();box(o,268,212,18,7,2,'#cfc8ba')}
+/* the newborn: an egg with a rounder rear; its sides are pleated, and the pleats open as it grows (fold 1 = fully pleated, 0 = smooth) */
+function egg(o,cx,cy,L,Hh,rot,fold,kit=true){
+  const n=Math.round(L/14),pts=[];
+  for(let i=0;i<=240;i++){const t=i/240*Math.PI*2,c=Math.cos(t);let x=L/2*c,y=Hh/2*Math.sin(t)*(1-.12*c);
+    const mid=Math.max(0,1-Math.pow(Math.abs(c)/.82,6));const tri=Math.abs(((x/L*n)%1+1)%1-.5)*2;const d=fold*mid*Math.min(9,Hh*.08)*tri;
+    y-=Math.sign(y)*d;pts.push([x,y])}
   const tr=([x,y])=>[cx+x*Math.cos(rot)-y*Math.sin(rot),cy+x*Math.sin(rot)+y*Math.cos(rot)];
-  const P=pts.map(tr);g.fillStyle=NB_F;poly(o,P,true);g.fill();g.strokeStyle=NB_S;g.lineWidth=2;
-  if(cut){const open=pts.map((p,i)=>Math.abs(p[0]-(-L/2+cut))<.01);g.beginPath();let on=false;P.forEach((p,i)=>{const [X,Y]=T(o,...p);if(open[i]){on=false;return}on?g.lineTo(X,Y):g.moveTo(X,Y);on=true});g.stroke();
-    g.setLineDash([4,4]);g.strokeStyle=ink(.55);g.lineWidth=1.2;const a=P.filter((p,i)=>open[i]);g.beginPath();g.moveTo(...T(o,...a[0]));g.lineTo(...T(o,...a[a.length-1]));g.stroke();g.setLineDash([])}
-  else g.stroke();
-  // pleats, fading as it fills
-  g.save();poly(o,P,true);g.clip();g.strokeStyle='rgba(230,190,150,'+(.35*(1-f)+.06)+')';g.lineWidth=1;
-  for(let k=-5;k<=5;k++){const x=k*L/12;g.beginPath();g.moveTo(...T(o,...tr([x,-Hh])));g.lineTo(...T(o,...tr([x+(1-f)*6,Hh])));g.stroke()}g.restore();
+  const P=pts.map(tr);g.fillStyle=NB_F;path(o,P,true);g.fill();g.strokeStyle=NB_S;g.lineWidth=2;g.stroke();
+  if(fold>0){g.save();path(o,P,true);g.clip();g.strokeStyle='rgba(230,190,150,'+(.45*fold)+')';g.lineWidth=1;
+    for(let k=1;k<n;k++){const x=-L/2+k*L/n;if(Math.abs(x)>L*.42)continue;g.beginPath();g.moveTo(...T(o,...tr([x,-Hh])));g.quadraticCurveTo(...T(o,...tr([x+3,0])),...T(o,...tr([x,Hh])));g.stroke()}g.restore()}
+  if(kit){const [kx,ky]=tr([-L*.12,Hh*.28]);box(o,kx-12,ky-4,24,9,2,'#cfc8ba')}
   return tr;
 }
 function arrowPx(x1,y1,x2,y2,a=.5){g.strokeStyle=ink(a);g.lineWidth=1.4;g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);const an=Math.atan2(y2-y1,x2-x1);
   g.moveTo(x2-9*Math.cos(an-.45),y2-9*Math.sin(an-.45));g.lineTo(x2,y2);g.lineTo(x2-9*Math.cos(an+.45),y2-9*Math.sin(an+.45));g.stroke()}
-function caption(n,title,body,x,y,opt){g.font='bold 30px '+font;g.fillStyle=ink(.95);g.textAlign='left';g.fillText(n,x,y+4);
+function caption(n,title,body,x,y,tag){g.font='bold 30px '+font;g.fillStyle=ink(.95);g.textAlign='left';g.fillText(n,x,y+4);
   text(title,x+36,y,21,.95,'left',true);
-  if(opt){const w=g.measureText(title).width;g.font='12px '+font;const tw=g.measureText('OPTIONAL').width+16;const bx=x+36+w+14;g.strokeStyle=ink(.55);g.lineWidth=1;g.strokeRect(bx+.5,y-16.5,tw,22);text('OPTIONAL',bx+8,y-1,12,.75)}
+  if(tag){g.font='bold 21px '+font;const w=g.measureText(title).width;g.font='12px '+font;const tw=g.measureText(tag).width+16;const bx=x+36+w+14;g.strokeStyle=ink(.55);g.lineWidth=1;g.strokeRect(bx+.5,y-16.5,tw,22);text(tag,bx+8,y-1,12,.75)}
   lines(body,x+36,y+30,16,.62,22)}
 
 function draw(){
   g.setTransform(cv.width/W,0,0,cv.height/H,0,0);g.fillStyle='#000';g.fillRect(0,0,W,H);
-  lines(['Side views at one scale, after the simplified simulator. The robot is two bodies. The tail holds the arm, the kit magazine, the store, the pumps and the brain.',
-         'The head is a bare shell that holds the gel, with a mouth turned up. The tail prints a newborn in the gel and gives “birth” to it. Step 5 is optional.'],40,44,17,.62,26);
-
+  lines(['Side views at one scale, after the simplified simulator. The robot is two bodies. The tail holds a DexArm, the kit magazine, a pump and the brain.',
+         'The head is a bare shell that holds the gel, with a mouth turned up. The tail prints a newborn in the gel and gives “birth” to it.'],40,44,17,.62,26);
   // 1 Dock
-  { const o={x:40+20+6.9*S,y:400};water(o,-10,470);gel(o);head(o);tail(o);arm(o,FOLD);
-    arrowPx(o.x-36,o.y-120,o.x-6,o.y-120,.6);
-    label('tail: arm, store, pumps, brain',o,40,60,-4,4);label('head, the gel chamber',o,300,30,250,4);
-    label('docking plane, gel face to gel face',o,DOCK,150,230,250,'left');label('mouth, open',o,403,78,430,46);
-    label('kit magazine, 3 kits',o,62,206,-4,262);label('gel',o,360,190,450,262);
-    caption('1','Dock',['The tail swims in and docks from behind, gel face to gel face,','in the water. Three magnets hold the seam. The gel stays in the head.'],40,470); }
+  { const o={x:40+40,y:400};water(o,-30,460);head(o);tail(o);dexarm(o,FOLDED,22);
+    arrowPx(o.x-60,o.y-120,o.x-26,o.y-120,.6);
+    label('tail: arm, pump, brain',o,30,110,-20,4);label('head, the gel chamber',o,300,30,250,4);
+    label('mouth, open',o,403,78,428,46);label('DexArm, folded',o,140,140,-20,262);
+    label('docking plane, gel face to gel face',o,DOCK,120,215,262);label('gel',o,360,190,440,262);
+    caption('1','Dock',['The tail swims in and docks from behind, gel face to gel face,','in the water. The gel stays in the head.'],40,470); }
   // 2 Print
-  { const o={x:840+20+6.9*S,y:400};water(o,-10,470);gel(o);head(o);tail(o);folded(o);arm(o,[[110,174],[170,70],[285,108],[285,204]]);
-    label('print needle',o,285,150,330,4);label('kit, set first from the magazine',o,270,216,120,262);label('newborn, folded flat in the gel',o,322,210,350,262);
-    caption('2','Print',['The arm sets a kit on the floor, changes to the print needle and','prints the newborn folded around it, layer by layer, in clear silicone.'],840,470); }
+  { const o={x:840+40,y:400};water(o,-30,460);head(o);tail(o);folded(o);dexarm(o,[284,120],78);
+    label('print needle',o,285,170,330,4);label('kit, set first from the magazine',o,270,216,120,262);label('newborn, folded flat in the gel',o,322,210,340,262);
+    caption('2','Print',['The arm sets a kit on the floor, then prints the newborn folded','around it, layer by layer, in clear silicone.'],840,470); }
   // 3 Birth
-  { const o={x:1640+20+6.9*S,y:400};water(o,-10,540);gel(o);head(o);tail(o);
-    egg(o,452,112,112,66,-.55,.55);arm(o,[[110,174],[190,60],[330,96],[404,134]]);
-    label('air through the needle',o,380,118,236,4);label('fills as it leaves the mouth',o,470,84,400,-14);
-    label('over the lower lip',o,422,128,430,262);
-    caption('3','“Birth”',['The needle presses the tail end down; the nose rises over the lower','lip. The newborn fills with air as it is pushed out, like a balloon.'],1640,470); }
-  // 4 Grow
-  { const o={x:40+20+6.9*S,y:820};water(o,-10,870);gel(o);head(o);tail(o);arm(o,FOLD);
-    const cx=690,cy=128;const tr=egg(o,cx,cy,280,190,0,.95,22);
-    // the dashed size at release, and its kit
-    g.save();g.setLineDash([4,5]);g.strokeStyle=ink(.3);g.lineWidth=1;const r=[];for(let i=0;i<=80;i++){const t=i/80*Math.PI*2,c=Math.cos(t);r.push([cx+84*c,cy+20+57*Math.sin(t)*(1-.12*c)])}poly(o,r,true);g.stroke();g.restore();
-    rr(o,cx-40,cy+62,40,16,3,'#cfc8ba');
-    for(const [bx,by,br] of [[cx+10,cy+40,4],[cx+30,cy+20,3],[cx+18,cy+0,5],[cx+44,cy-14,3.5],[cx-8,cy+16,3]]){const [X,Y]=T(o,bx,by);g.strokeStyle=ink(.55);g.lineWidth=1;g.beginPath();g.arc(X,Y,br*S,0,7);g.stroke()}
-    { const [X,Y]=T(o,cx-150,cy+50);for(let i=0;i<3;i++)arrowPx(X-10-i*18,Y,X-30-i*18,Y,.35) }
-    label('at release',o,cx+60,cy+50,cx+110,262);label('grown',o,cx+120,cy-60,cx+150,10);
-    label('its kit: pump, chip, cell, soda tablet',o,cx-20,cy+70,cx-240,262);label('carbon dioxide',o,cx+18,cy,cx+40,10);
-    label('opening at the rear, closed for now',o,cx-118,cy-40,cx-260,10);
-    caption('4','Grow',['Released, the newborn floats and swims on the small pump in its kit. The pump meters water onto a soda tablet;','carbon dioxide fills the body until the pleats flatten. The model on its chip keeps learning.'],40,890); }
-  // 5 Optional: the tail moves to the newborn
-  { const ox=1220;const o1={x:ox+20-DOCK*S,y:820};water(o1,DOCK-6,440);gel(o1);head(o1);
-    label('the head it came with, left behind',o1,300,30,DOCK,10);
-    arrowPx(o1.x+446*S,620,o1.x+510*S,620,.55);
-    const o2={x:ox+430+6.9*S,y:820};water(o2,-10,DOCK+300);
-    egg(o2,DOCK+140-22,123,280,198,0,1,22);
-    {const [a,b]=T(o2,DOCK,196),[c,d]=T(o2,DOCK+280,FLOOR+2);g.save();g.beginPath();const P=[];for(let i=0;i<=120;i++){const t=i/120*Math.PI*2,cc=Math.cos(t);let x=140*cc;if(x<-118)x=-118;P.push([DOCK+118+x,123+99*Math.sin(t)*(1-.12*cc)])}poly(o2,P,true);g.clip();g.fillStyle='rgba(222,170,90,.22)';g.fillRect(a,b,c-a,d-b);g.strokeStyle='rgba(222,170,90,.6)';g.beginPath();g.moveTo(a,b);g.lineTo(c,b);g.stroke();g.restore()}
-    tail(o2);arm(o2,[[110,174],[178,70],[268,120],[268,184]]);
-    label('the tail, free',o2,60,200,-4,262);label('docks into the opening at the newborn’s rear',o2,DOCK+4,70,DOCK+60,10);
-    label('gel, topped up from the store',o2,300,205,300,262);
-    caption('5','The tail moves on',['The tail lets go of the head it came with, swims to the grown newborn and docks into','the opening at its rear. With the gel topped up, the newborn can give “birth” too.'],1220,890,true); }
+  { const o={x:1640+40,y:400};water(o,-30,560);head(o);tail(o);
+    egg(o,462,108,104,62,-.5,1);dexarm(o,[282,96],34,[416,132]);
+    label('air through the needle',o,330,150,236,4);label('half filled, still folded',o,490,80,410,-14);label('over the lower lip',o,424,130,430,262);
+    caption('3','“Birth”',['Air comes through the needle; the newborn rises over the lower lip','and leaves through the mouth, half filled, still folded.'],1640,470); }
+  // 4 Born
+  { const o={x:40+40,y:820};water(o,-30,760);head(o);tail(o);dexarm(o,FOLDED,22);
+    egg(o,600,112,112,68,0,1);
+    { const [X,Y]=T(o,530,130);for(let i=0;i<3;i++)arrowPx(X-6-i*16,Y,X-22-i*16,Y,.35) }
+    label('folds still closed',o,610,80,640,10);label('its kit: pump, chip, cell',o,588,131,560,262);
+    caption('4','Born',['Small and folded, it swims on the small pump in its kit.','The model on its chip starts to learn.'],40,890); }
+  // 5 Grow, optional: the goal
+  { const ox=1080;const o={x:ox,y:820};water(o,0,1060);
+    const st=[[90,112,68,1,'born'],[300,150,94,.5,'the folds open'],[575,214,140,0,'grown']];
+    st.forEach(([x,L,Hh,f,s],i)=>{egg(o,x+L/2,FLOOR-Hh/2-6,L,Hh,0,f);text(s,o.x+(x+L/2)*S,o.y+40,14,.62,'center');
+      if(i<2){const a=o.x+(x+L+14)*S,b=o.x+(st[i+1][0]-14)*S;arrowPx(a,o.y-60,b,o.y-60,.5)}});
+    caption('5','Grow',['Outside the body, the pump meters water onto a soda tablet. Carbon dioxide fills the body,','the folds open one by one, and it grows bigger, close to the size of the head.'],1080,890,'OPTIONAL · THE GOAL'); }
 }
 function show(){const r=Math.min(2,devicePixelRatio||1),w=Math.round(cv.clientWidth*r);if(w&&cv.width!==w&&!/png/.test(location.search)){cv.width=w;cv.height=Math.round(w*H/W)}draw()}
 show();new ResizeObserver(show).observe(cv);
