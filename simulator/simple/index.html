@@ -194,7 +194,7 @@ html.bnm-embed .bottom .area, html.bnm-embed .info { overflow: visible; }
       </div>
       <button class="btn on" id="autoCam" aria-pressed="true" title="Camera follows the process">Auto</button>
     </div>
-    <div id="vp">
+    <div id="vp" class="notext">
       <div class="ov"><div class="stg" id="ovStage">Loading</div><div class="stepl" id="ovStep"></div><div class="clk" id="ovClock"></div></div>
       <div class="notes" id="notes"></div>
     </div>
@@ -234,7 +234,7 @@ html.bnm-embed .bottom .area, html.bnm-embed .info { overflow: visible; }
       <div class="ctl">
         <button class="btn" id="play" aria-pressed="true">Pause</button>
         <button class="btn on" data-speed="1">1×</button><button class="btn" data-speed="2">2×</button><button class="btn" data-speed="4">4×</button>
-        <span class="tgl"><button class="btn on" id="txtTgl" aria-pressed="true" title="Show or hide all text in the viewport">Text</button><button class="btn on" id="audTgl" aria-pressed="true" title="Show or hide the audience">Audience</button></span>
+        <span class="tgl"><button class="btn" id="txtTgl" aria-pressed="false" title="Show or hide all text in the viewport">Text</button><button class="btn on" id="audTgl" aria-pressed="true" title="Show or hide the audience">Audience</button></span>
       </div>
       <div class="track" id="track" tabindex="0" role="slider" aria-label="Timeline, drag to scrub" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
     </div>
@@ -771,7 +771,7 @@ function babyGeo(lam, bend, ub) {
   const capl = (l) => { const [a, b] = stl(l); return P.cap_f + a * (P.cap_d - P.cap_f) + b * (P.cap_F - P.cap_d); };
   const u = [capl(lam[0])], th = [0]; for (let k = 0; k < n; k++) { u.push(u[k] + hseg(k)); th.push(th[k] + tw(k)); }
   const V = [], T = [];
-  const crz = (a, b, k0) => Math.min(k0 * (1 - b) ** (2 - a) * (1 + CRZ_G * a * (1 - b)), CRZ_MAX);          // round 17, page only and inward only: the pleats of the partly filled newborn read deeper (the exit at 60 percent gas is clearly wrinkled) and flatten to nothing at full; the checks keep the fuller body
+  const crz = (a, b0, k0) => { const b = clamp(b0 * (1 - P.LAM_D) / ((P.LAM_MAX || 1) - P.LAM_D), 0, 1); return Math.min(k0 * (1 - b) ** (2 - a) * (1 + CRZ_G * a * (1 - b)), CRZ_MAX); };          // round 18: the pleats fade over the whole growth up to the grown (stretched) size, so mid swim still shows them          // round 17, page only and inward only: the pleats of the partly filled newborn read deeper (the exit at 60 percent gas is clearly wrinkled) and flatten to nothing at full; the checks keep the fuller body
   const radii = (k, l) => { const [a, b] = stl(l), s_ = 1 + b * (P.STRETCH - 1); let ri = P.Ri[k] + a * (P.Rd[k] - P.Ri[k]); if (P.Ri[k] < P.Rd[k] - 1e-9) ri = Math.min(ri, P.Rd[k] * (1 - crz(a, b, P.KC))); return [(P.Ro[k] + a * (P.Rd[k] - P.Ro[k])) * s_, ri * s_]; };
   const ring = (uk, thk, ro, ri, saddle) => { for (let i = 0; i < M; i++) { const ang = thk + 2 * Math.PI * i / M; let r = i % 2 === 0 ? ro : ri; if (saddle && Math.cos(ang + Math.PI / 2) > Math.cos(Math.PI / 4)) r = ro; V.push([uk, r * Math.cos(ang), r * Math.sin(ang)]); } };
   let nr = 0;
@@ -809,14 +809,26 @@ function babyGeo(lam, bend, ub) {
   } else BB.nose = [L, 0, 0];
   return { V, T, u, L, rb, r0, cap, uv, rv };
 }
+// round 18, page only: the pleats read as soft rounded folds, not zigzag facets: the ring grid is resampled with Catmull-Rom splines around each ring (periodic) and along the axis
+function smoothGrid(V, M, SC, SA) {
+  const nr = (V.length - 2) / M, cr = (p0, p1, p2, p3, t) => { const t2 = t * t, t3 = t2 * t; return 0.5 * (2 * p1 + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3); };
+  const M2 = M * SC, R1 = [];
+  for (let k = 0; k < nr; k++) { const ring = []; for (let i = 0; i < M; i++) { const g = (j) => V[k * M + ((j % M) + M) % M]; for (let s = 0; s < SC; s++) { const t = s / SC, a = g(i - 1), b = g(i), c = g(i + 1), d = g(i + 2); ring.push([0, 1, 2].map((q) => cr(a[q], b[q], c[q], d[q], t))); } } R1.push(ring); }
+  const R2 = []; for (let k = 0; k < nr - 1; k++) for (let s = 0; s < SA; s++) { const t = s / SA, a = R1[Math.max(k - 1, 0)], b = R1[k], c = R1[k + 1], d = R1[Math.min(k + 2, nr - 1)]; R2.push(b.map((_, i) => [0, 1, 2].map((q) => cr(a[i][q], b[i][q], c[i][q], d[i][q], t)))); }
+  R2.push(R1[nr - 1]); const n2 = R2.length, W = [], T = []; for (const r of R2) for (const v of r) W.push(v);
+  for (let k = 0; k < n2 - 1; k++) for (let i = 0; i < M2; i++) { const b0 = k * M2 + i, b1 = k * M2 + (i + 1) % M2, t0 = (k + 1) * M2 + i, t1 = (k + 1) * M2 + (i + 1) % M2; T.push([b0, b1, t0], [b1, t1, t0]); }
+  const tb = W.length; W.push(V[V.length - 2]); for (let i = 0; i < M2; i++) T.push([tb, (i + 1) % M2, i]);
+  const nt = W.length, last = (n2 - 1) * M2; W.push(V[V.length - 1]); for (let i = 0; i < M2; i++) T.push([last + i, last + (i + 1) % M2, nt]);
+  return { V: W, T };
+}
 function babyMeshUpdate(lam, bend, ub) {
   const key = lam.map((l) => l.toFixed(3)).join(",") + "|" + bend.toFixed(3) + "|" + ub.toFixed(3); if (key === BB.key) return; BB.key = key;
-  const { V, T, u, L, rb, r0, cap, uv, rv } = babyGeo(lam, bend, ub); BB.u = u; BB.L = L; BB.rb = rb; BB.rmax = Math.max(...V.map((v) => Math.hypot(v[1], v[2])));
+  let { V, T, u, L, rb, r0, cap, uv, rv } = babyGeo(lam, bend, ub); const lm0 = lam.reduce((x, y) => x + y, 0) / lam.length; if (lm0 > 0.5 * J.body.params.LAM_D) ({ V, T } = smoothGrid(V, 2 * J.body.params.NP, 3, 3)); BB.u = u; BB.L = L; BB.rb = rb; BB.rmax = Math.max(...V.map((v) => Math.hypot(v[1], v[2])));
   // round 14: one shared vertex per ring point, so the normals are averaged across the creases: the pleats read as soft folds, not facets
   const pos = new Float32Array(V.length * 3); V.forEach((v, i) => { pos[3 * i] = v[0]; pos[3 * i + 1] = v[1]; pos[3 * i + 2] = v[2]; });
-  const g = BB.mesh.geometry; g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setIndex(T.flat()); g.computeVertexNormals(); g.computeBoundingSphere();
+  const g = BB.mesh.geometry; g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setIndex(T.flat()); if (g.getAttribute("normal") && g.getAttribute("normal").count !== V.length) g.deleteAttribute("normal"); g.computeVertexNormals();          /* round 18: the vertex count changes with the smoothing */ g.computeBoundingSphere();
   const lm = lam.reduce((x, y) => x + y, 0) / lam.length, bS = stl(lm)[1], ef = Math.max(1 - clamp((lm - 0.35) / (J.body.params.LAM_D - 0.35), 0, 1), lm > J.body.params.LAM_D ? clamp((1 - bS) / 0.75, 0, 1) : 0);          // the crease lines fade as the body fills (round 17: they stay on while the pleats are still open, after the exit, and go only when the body is full)
-  const eg = new THREE.EdgesGeometry(g, 25 + 30 * (1 - ef)); BB.edges.geometry.dispose(); BB.edges.geometry = eg; BB.edges.material.opacity = 0.42 * (0.15 + 0.85 * ef);
+  const eg = new THREE.EdgesGeometry(g, 25 + 30 * (1 - ef)); BB.edges.geometry.dispose(); BB.edges.geometry = eg; BB.edges.material.opacity = 0.42 * (0.15 + 0.85 * ef); BB.edges.visible = lm0 <= 0.5 * J.body.params.LAM_D;          // round 18: no crease line overlay once the body is unfolding (the rounded shaded grooves carry the pleats)
   BB.valve.position.set(uv, 0, rv - 0.001); BB.vent.position.set(BB.nose[0], 0, BB.nose[1]); BB.vent.rotation.y = BB.nose[2];
 }
 function buildBaby() {
@@ -909,7 +921,7 @@ function applyState(S, now) {
     PRINTCLIP.constant = S.k === "print" ? S.pz + 0.0008 : 100; }
   const K = J.kit;
   if (nb && S.k !== "print") { const ub0 = BB.u[J.body.params.BAND], ub1 = BB.u[J.body.params.BAND + 1], uc = 0.5 * (ub0 + ub1) + J.read.kit_df * (ub1 - ub0) / 0.07, kz = -BB.rb + 0.0065 + K.size[2] / 2; BB.kitG.matrix.copy(R3.baby.matrix).multiply(Tm([uc, 0, kz])); if (BB.sadFit) BB.sadFit(BB.rb);
-    BB.jets.forEach((j, i) => { j.position.set(uc + BB.jetEnd[i][0] - 0.004, BB.jetEnd[i][1], kz + BB.jetEnd[i][2]); setJet(j, S.jets, now); }); }
+    BB.jets.forEach((j, i) => { j.position.set(uc + BB.jetEnd[i][0] - 0.004, BB.jetEnd[i][1], kz + BB.jetEnd[i][2]); setJet(j, S.jets > 0.005 ? Math.min(1, 0.35 + S.jets) : S.jets, now); }); }          // round 18: the slow jet at a low duty stays visible (drawn only; the readout shows the duty)
   else { BB.kitG.matrix.copy(Tm([S.kx + (S.kit === 0 ? S.dock : 0), S.ky, S.kz + 0.003])).multiply(M4().makeRotationZ(S.kyaw)); if (BB.jets) BB.jets.forEach((j) => { j.visible = false; }); }
   BB.kitG.matrixWorldNeedsUpdate = true;
   // the two spare kits in the magazine, in the tail (the starboard kit slides to the pick pocket in the reload)
@@ -1093,14 +1105,14 @@ function frame() {
   R3.controls.update(); stepInner(S, now, dt); stepAudience(); cineRender(now, dt); updateLabels();
   if (now - lastRO > 0.12) { lastRO = now; renderReadouts(S); renderOverlay(S); renderCode(S); updateTrack(S.st); if (TAB === "birth") drawChart(); if (TAB === "growth" && S.gf > 0) renderProps(); }
 }
-// round 16: Text and Audience toggles (also ?text=0, ?audience=0 in the address)
-let SHOWTXT = true, SHOWAUD = true; const _qs = new URLSearchParams(location.search);
+// round 16: Text and Audience toggles (?text=1 shows the text on load, round 18: off by default; ?audience=0)
+let SHOWTXT = false, SHOWAUD = true; const _qs = new URLSearchParams(location.search);
 function setText(v) { SHOWTXT = v; $("#vp").classList.toggle("notext", !v); const b = $("#txtTgl"); b.classList.toggle("on", v); b.setAttribute("aria-pressed", String(v)); }
 function setAudience(v) { SHOWAUD = v; const b = $("#audTgl"); b.classList.toggle("on", v); b.setAttribute("aria-pressed", String(v)); }
 function stepAudience() { if (!GAL.front) return; const c = R3.camera.position, wide = c.distanceTo(R3.controls.target) > 2.6; for (const f of GAL.figures) f.visible = SHOWAUD && wide; const on = SHOWAUD && wide && c.y < TANK.y0 - 2.7; for (const f of GAL.front) f.visible = on; }          // the audience shows only in the wide views
 function wireUI() {
   $("#txtTgl").addEventListener("click", () => setText(!SHOWTXT)); $("#audTgl").addEventListener("click", () => setAudience(!SHOWAUD));
-  setText(_qs.get("text") !== "0"); setAudience(_qs.get("audience") !== "0");
+  setText(_qs.get("text") === "1"); setAudience(_qs.get("audience") !== "0");          // round 18: text off by default, ?text=1 shows it on load
   document.querySelectorAll("[data-cam]").forEach((b) => b.addEventListener("click", () => { setAuto(false); setCam(b.dataset.cam); CAMMOVE = true; }));
   document.querySelectorAll("[data-inner]").forEach((b) => b.addEventListener("click", () => setInner(b.dataset.inner === "on")));
   let inner0 = false; try { inner0 = localStorage.getItem("bnm.sim.innerLight") === "on"; } catch (e) { /* storage may be blocked */ }
