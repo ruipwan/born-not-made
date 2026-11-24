@@ -172,6 +172,11 @@ html.bnm-embed .bottom .area, html.bnm-embed .info { overflow: visible; }
 
 #vp.notext .ov, #vp.notext .notes, #vp.notext .lab { display: none !important; }
 .ctl .tgl { display: inline-flex; gap: 2px; margin-left: 8px; padding-left: 8px; border-left: 1px solid #333; }
+
+/* round 20: film mode, only the picture: the canvas renders 1920 x 1080 and is scaled to fit the window */
+body.film { overflow: hidden !important; background: #000 !important; cursor: none; }
+body.film * { visibility: hidden !important; }
+body.film #vp > canvas { visibility: visible !important; position: fixed !important; left: 0; top: 0; width: 100vw !important; height: 100vh !important; object-fit: contain; z-index: 2147483647; background: #000; cursor: none; }
 </style>
 <link rel="stylesheet" href="../../assets/css/monochrome.css">
 </head><body>
@@ -633,8 +638,9 @@ function initThree() {
   cineInit(); new ResizeObserver(resize).observe(host); resize();
 }
 function resize() {
-  const { renderer, camera, host } = R3; const w = host.clientWidth, h = host.clientHeight; if (!w || !h) return;
-  renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w < 520 ? 40 : 30; camera.updateProjectionMatrix();
+  const { renderer, camera, host } = R3; const w = host.clientWidth, h = host.clientHeight;
+  if (FILM.on) { renderer.setPixelRatio(1); renderer.setSize(1920, 1080, false); camera.aspect = 16 / 9; camera.fov = 30; camera.updateProjectionMatrix(); }          // round 20: film mode renders true 1080p, the canvas is scaled by CSS (object-fit contain)
+  else { if (!w || !h) return; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w < 520 ? 40 : 30; camera.updateProjectionMatrix(); }
   if (CINE.Q) { const s = renderer.getDrawingBufferSize(new THREE.Vector2()); if (s.x !== CINE.w || s.y !== CINE.h) cineTargets(s.x, s.y); }
 }
 /* ---------------------------------------------------------------- the parent body: two clear shells, thin rims, rack, shelf, seat, tail equipment */
@@ -1099,10 +1105,10 @@ let lastNow = 0, lastRO = 0, DRAG = false;
 function frame() {
   requestAnimationFrame(frame);
   const now = performance.now() / 1000, dt = Math.min(0.1, now - lastNow); lastNow = now;
-  if (TL.playing && !DRAG) { TL.T += dt * TL.speed; if (TL.T >= TL.total) TL.T = 0; }
+  if (FILM.on) filmTick(); else if (TL.playing && !DRAG) { TL.T += dt * TL.speed; if (TL.T >= TL.total) TL.T = 0; }
   const S = evalState(TL.T);
   if (S.st.i !== TL.lastStage) { TL.lastStage = S.st.i; log("stage " + S.st.s.n + ": " + S.st.s.name, "a"); }
-  applyState(S, now); if (AUTO) autoCam(S); stepCam(dt, S);
+  applyState(S, now); if (FILM.on) filmCam(S, dt); else { if (AUTO) autoCam(S); stepCam(dt, S); }
   R3.controls.update(); stepInner(S, now, dt); stepAudience(); cineRender(now, dt); updateLabels();
   if (now - lastRO > 0.12) { lastRO = now; renderReadouts(S); renderOverlay(S); renderCode(S); updateTrack(S.st); if (TAB === "birth") drawChart(); if (TAB === "growth" && S.gf > 0) renderProps(); }
 }
@@ -1128,9 +1134,73 @@ function wireUI() {
   tr.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") TL.T = Math.min(TL.total - 0.01, TL.T + 1); else if (e.key === "ArrowLeft") TL.T = Math.max(0, TL.T - 1); else return; e.preventDefault(); });
   document.querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { TAB = b.dataset.tab; document.querySelectorAll("[data-tab]").forEach((x) => x.setAttribute("aria-selected", String(x === b))); renderProps(); }));
 }
-window.BNM = { go(k, f = 0.5) { const s = TL.stages.find((x) => x.k === k); if (s) { TL.T = s.d0 + s.disp * f; TL.playing = false; $("#play").textContent = "Play"; } }, stages: () => TL.stages.map((s) => s.k), state: () => STATE, setAuto, setCam, setInner, setText, setAudience, settle: () => { CAMSNAP = true; }, look(p, t) { setAuto(false); CAMS._look = () => ({ p, t }); setCam("_look", true); }, quality: () => CINE.q };
+
+/* ---------------------------------------------------------------- round 20: film mode (?film=1, ?speed=N, ?rec=1, ?audience=0): only the picture, 1920 x 1080, one pass through the cycle on a film camera path, optional recording in the browser */
+const FILM = { on: _qs0("film") === "1", rec: false, speed: 3, w: -1, t0: 0, dur: 1, pull0: 0, shot: -1, P0: null, T0: null, rv: { p: null, t: null }, mr: null, chunks: [] };
+FILM.rec = FILM.on && _qs0("rec") === "1";
+function _qs0(k) { try { return new URLSearchParams(location.search).get(k); } catch (e) { return null; } }
+const FILM_WAIT = 1.5, FILM_PULL = 3.0, FILM_HOLD = 3.5, FILM_TAIL = 1.0;          // seconds of screen time: first frame, pull back to the wide view, wide hold, recording after the hold
+const FST = { state: "idle", progress: 0, blobUrl: null, fileName: null, mime: null, bytes: 0 };
+function filmSetup() {
+  document.body.classList.add("film"); setText(false); TL.playing = false; TL.T = 0;
+  const g = TL.stages.find((s) => s.k === "grow"); FILM.pull0 = FILM_WAIT + (g ? g.d0 : TL.total) / FILM.speed;
+  FILM.dur = Math.max(FILM_WAIT + TL.total / FILM.speed, FILM.pull0 + FILM_PULL + FILM_HOLD);
+}
+function filmStart() {
+  if (!FILM.on) return; FILM.w = 0; FILM.t0 = performance.now() / 1000; FILM.shot = -1; TL.T = 0; FST.progress = 0;
+  if (FST.blobUrl) { try { URL.revokeObjectURL(FST.blobUrl); } catch (e) { /* ignore */ } FST.blobUrl = null; FST.bytes = 0; }
+  if (FILM.mr && FILM.mr.state !== "inactive") { FILM.mr.onstop = null; FILM.mr.stop(); }
+  FST.state = "playing";
+  if (FILM.rec && window.MediaRecorder && R3.renderer.domElement.captureStream) {
+    const types = ["video/mp4;codecs=avc1.640028", "video/webm;codecs=vp9", "video/webm"], mime = types.find((t) => { try { return MediaRecorder.isTypeSupported(t); } catch (e) { return false; } }) || "";
+    const stream = R3.renderer.domElement.captureStream(30); FILM.chunks = [];
+    const mr = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 16000000 } : { videoBitsPerSecond: 16000000 });
+    mr.ondataavailable = (e) => { if (e.data && e.data.size) FILM.chunks.push(e.data); };
+    mr.onstop = () => { const type = (mr.mimeType || mime || "video/webm").split(";")[0], blob = new Blob(FILM.chunks, { type }); FST.mime = mr.mimeType || mime || type; FST.bytes = blob.size; FST.fileName = "born_not_made_simple_1080p." + (type === "video/mp4" ? "mp4" : "webm"); FST.blobUrl = URL.createObjectURL(blob); FST.state = "done";
+      const a = document.createElement("a"); a.href = FST.blobUrl; a.download = FST.fileName; a.style.display = "none"; document.body.appendChild(a); a.click(); setTimeout(() => a.remove(), 1000); };
+    mr.start(1000); FILM.mr = mr; FST.mime = mr.mimeType || mime; FST.state = "recording";
+  }
+}
+function filmTick() {
+  if (FILM.w < 0) { TL.T = 0; return; }
+  FILM.w = FILM.freeze != null ? FILM.freeze : performance.now() / 1000 - FILM.t0; TL.T = clamp((FILM.w - FILM_WAIT) * FILM.speed, 0, TL.total - 1e-4); FST.progress = clamp(FILM.w / FILM.dur, 0, 1);
+  if (FILM.w >= FILM.dur && FST.state === "playing") FST.state = "done";
+  if (FILM.w >= FILM.dur + FILM_TAIL && FILM.mr && FILM.mr.state === "recording") FILM.mr.stop();
+}
+const ease = (u) => { u = clamp(u, 0, 1); return u * u * (3 - 2 * u); };
+const lerp3 = (a, b, u) => [lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u)];
+function filmShot(S) {          // the shot (index, camera p, target t) for the film time; cuts only where the index changes, at stage boundaries
+  const T = FILM.w < FILM_WAIT ? 0 : (FILM.w - FILM_WAIT) * FILM.speed, st = (k) => TL.stages.find((s) => s.k === k), cx = (TANK.x0 + TANK.x1) / 2;
+  const span = (k0, k1) => { const a = st(k0), b = st(k1); return clamp((T - a.d0) / (b.d0 + b.disp - a.d0), 0, 1); };
+  const k = S.k, W = { p: [cx + 0.02, -4.5, 1.2], t: [cx, 0, 0.1] };
+  if (FILM.w >= FILM.pull0) {          // grown: a slow pull back from the tracking shot to the wide view with the audience, then a hold with a slight drift
+    const u = ease((FILM.w - FILM.pull0) / FILM_PULL), h = clamp((FILM.w - FILM.pull0 - FILM_PULL) / FILM_HOLD, 0, 1), P = FILM.P0 || W.p, Tg = FILM.T0 || W.t;
+    return { i: 7, p: lerp3(P, [W.p[0] - 0.08 * h, W.p[1] - 0.06 * h, W.p[2] + 0.02 * h], u), t: lerp3(Tg, W.t, u), keep: true };
+  }
+  if (k === "dock" || k === "gel") { const u = ease(span("dock", "gel")); return { i: 0, p: lerp3(W.p, [cx - 0.12, -3.25, 0.82], u), t: lerp3(W.t, [cx - 0.1, 0, 0.14], u) }; }          // the wide lamp and audience view, slow push in
+  if (k === "kit" || k === "change") { const u = ease(span("kit", "change")); return { i: 1, p: lerp3([-0.38, -0.7, 0.5], [-0.02, -0.74, 0.44], u), t: lerp3([-0.12, 0, 0.1], [-0.05, 0, 0.1], u) }; }          // the tail: kit and tool change, slow drift along
+  if (k === "print") { const u = ease(span("print", "print")), az = lerp(-2.15, -1.15, u), r = 0.52, c = [0.17, 0, 0.08]; return { i: 2, p: [c[0] + r * Math.cos(az), c[1] + r * Math.sin(az), lerp(0.12, 0.19, u)], t: c }; }          // low three quarter through the clear head, slow orbit round the needle
+  if (k === "cure" || k === "drain") { const u = ease(span("cure", "drain")); return { i: 3, p: lerp3([0.95, -1.2, 0.5], [0.62, -1.3, 0.36], u), t: lerp3([0.06, 0, 0.12], [0.12, 0, 0.12], u) }; }          // the whole body, slow drift
+  if (k === "push" || k === "fill") { const u = ease(span("push", "fill")); return { i: 4, p: lerp3([0.8, -0.8, 0.32], [0.66, -0.66, 0.24], u), t: lerp3([0.28, 0, 0.15], [0.33, 0, 0.14], u) }; }          // close at the mouth
+  if (k === "lower" || k === "float") { const u = ease(span("lower", "float")); return { i: 5, p: lerp3([1.02, -0.64, 0.16], [0.92, -0.72, 0.14], u), t: lerp3([0.42, 0, 0.12], [0.5, 0, 0.11], u) }; }          // front quarter, low near the waterline, for the release over the lip
+  const b = nbPos(), d = 0.45 + 1.3 * (BB.L || 0.37);          // swim: side tracking shot with the newborn, a little further out as the body grows
+  return { i: 6, p: [b.x - 0.1 * d, -d, Math.max(0.1, b.z) + 0.22 * d], t: [b.x + 0.02, 0, Math.max(0.06, b.z)], track: true };
+}
+function filmCam(S, dt) {
+  const c = R3.camera, tg = R3.controls.target, sh = filmShot(S);
+  if (sh.i !== FILM.shot) { const cut = !(sh.i === 7 && FILM.shot === 6); if (sh.i === 7) { FILM.P0 = c.position.toArray(); FILM.T0 = tg.toArray(); }
+    FILM.shot = sh.i; if (cut) { c.position.set(...sh.p); tg.set(...sh.t); FILM.rv.p = new THREE.Vector3(); FILM.rv.t = new THREE.Vector3(); CINE.focus = c.position.distanceTo(tg); return; } }
+  if (!FILM.rv.p) { FILM.rv.p = new THREE.Vector3(); FILM.rv.t = new THREE.Vector3(); }
+  if (sh.track) { damp(c.position, CAMV.gp.set(...sh.p), FILM.rv.p, 0.5, dt); damp(tg, CAMV.gt.set(...sh.t), FILM.rv.t, 0.5, dt); }          // smooths the bob of the newborn
+  else { c.position.set(...sh.p); tg.set(...sh.t); }
+}
+window.BNM = { go(k, f = 0.5) { const s = TL.stages.find((x) => x.k === k); if (s) { TL.T = s.d0 + s.disp * f; TL.playing = false; $("#play").textContent = "Play"; } }, stages: () => TL.stages.map((s) => s.k), state: () => STATE, setAuto, setCam, setInner, setText, setAudience, settle: () => { CAMSNAP = true; }, look(p, t) { setAuto(false); CAMS._look = () => ({ p, t }); setCam("_look", true); }, quality: () => CINE.q, film: FST, filmStart, filmSeek(w, hold = false) { if (FILM.w >= 0) { FILM.t0 = performance.now() / 1000 - w; FILM.freeze = hold ? w : null; FILM.shot = -1; } }, filmLength: () => FILM.dur };
 (async function main() {
-  try { initThree(); await loadAll(); wireUI(); buildStages(); renderTrack(); STATE = evalState(0); applyState(STATE, 0); setCam("wide", true); renderProps(); requestAnimationFrame(frame); }
+  try { if (FILM.on) { const sp = parseFloat(_qs0("speed")); FILM.speed = sp > 0 ? sp : 3; if (!_qs0("q")) { CINE.q = 2; CINE.lock = true; } }          // round 20: film mode keeps the full picture quality (no fallback)
+    initThree(); await loadAll(); wireUI(); buildStages(); renderTrack(); STATE = evalState(0); applyState(STATE, 0); setCam("wide", true); renderProps();
+    if (FILM.on) { filmSetup(); let n = 0; const warm = () => { if (++n < 45) requestAnimationFrame(warm); else filmStart(); }; requestAnimationFrame(warm); }          // the first frames compile the shaders
+    else { const sp = parseFloat(_qs0("speed")); if (sp > 0) { TL.speed = sp; document.querySelectorAll("[data-speed]").forEach((x) => x.classList.toggle("on", +x.dataset.speed === sp)); } }
+    requestAnimationFrame(frame); }
   catch (e) { console.error(e); $("#ovStage").textContent = "The simulator did not start"; $("#ovStep").textContent = String(e.message || e); }
 })();
 
