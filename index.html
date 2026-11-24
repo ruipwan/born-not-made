@@ -1463,6 +1463,10 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
   <div class="tabhead"><h2>Inheritance</h2><a class="btn" href="inheritance/?v=fold1">Open diagram</a></div>
   <div class="fullframe" style="height:min(88vh,1080px);background:#000"><iframe data-src="inheritance/?v=fold1" title="Inheritance: print and distillation across generations"></iframe></div>
 </section>
+<section class="tab" id="grow">
+  <div class="tabhead"><h2>Grow</h2><a class="btn" href="grow/?v=g1">Open page</a></div>
+  <div class="fullframe" style="height:min(88vh,860px);background:#000"><iframe data-src="grow/?v=g1" title="Grow: three ways to fill the folds after birth"></iframe></div>
+</section>
 <section class="tab" id="simulator">
   <div class="tabhead"><div><p class="kicker">Simulator</p><h2>The printing process</h2><p>Stage 3, a console modeled on Blender. The robot is one egg: the tail docks to the gel chamber by magnets, gel goes in, and the DexArm comes out of the tail, places the electronics kit and prints the folded Kresling newborn around the kit from real G-code. The arm then pushes and inflates the newborn out of the stern opening. The newborn floats and swims away on two jets. Every number comes from a physics script.</p></div><a class="btn" href="simulator/" target="_blank" rel="noopener">Open full screen</a></div>
   <div class="fullframe"><iframe data-src="simulator/" title="Printing simulator" allow="microphone"></iframe></div>
@@ -1530,7 +1534,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 <script>
 const GROUPS = [
   { g: "work", label: "The Prototype", tabs: [["work", "The Prototype"]] },
-  { g: "sim", label: "Simulator", tabs: [["simulator", "Printing console", "signal, G-code, print, birth"], ["inheritance", "Inheritance", "print, distill, learn"], ["physics", "Physics", "birth and printing, simulated"], ["eating", "Eating parts", "robots eat electronic parts and reproduce tails"], ["society", "Society", "tailed ones talk and bear generations"]] },
+  { g: "sim", label: "Simulator", tabs: [["simulator", "Printing console", "signal, G-code, print, birth"], ["inheritance", "Inheritance", "print, distill, learn"], ["grow", "Grow", "three ways to fill the folds"], ["physics", "Physics", "birth and printing, simulated"], ["eating", "Eating parts", "robots eat electronic parts and reproduce tails"], ["society", "Society", "tailed ones talk and bear generations"]] },
   { g: "think", label: "Think", tabs: [["ideas", "Ideas", "questions the work raises"], ["culture", "Culture", "stories, screens and art"], ["machines", "Machines", "what birth has meant for machines"], ["nature", "Nature", "how other species give birth"], ["academia", "Academia Research", "labs, works and PhD paths"]] },
   { g: "make", label: "Make", tabs: [["prototypes", "Prototypes", "versions one to three"], ["build", "Build", "every part, with sources"], ["process", "Process", "how the work changed"]] },
   { g: "talk", label: "Talk", tabs: [["conversations", "Conversations", "one to one"], ["voices", "Voices", "open to everyone"]] },
