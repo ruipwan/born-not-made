@@ -24,6 +24,19 @@ t('Trigger: the needle lets go, the chip feels the pressure drop and starts.',82
 t('Stop: a pressure sensor reads 1.58 kPa, the chip stops.',820,192,26,.85);
 t('Pump, chip and 500 mAh battery are in the kit inside the body.',820,234,26,.55);
 
+
+// the chosen pump, line drawing: a micro diaphragm pump (motor, pump head, two ports)
+{ const x=1860,y=95; g.strokeStyle=w(.9);g.lineWidth=2.2;
+  g.beginPath();g.roundRect(x,y+30,190,92,[0,40,40,0]);g.stroke();              // motor can
+  for(let i=1;i<5;i++)line(x+i*30,y+34,x+i*30,y+118,.18,1);
+  g.strokeRect(x-110,y+18,110,116);                                               // pump head
+  g.strokeRect(x-96,y+30,82,92);line(x-96,y+76,x-14,y+76,.4,1.2);                  // valve plate
+  g.strokeRect(x-98,y-14,18,32);g.strokeRect(x-30,y-14,18,32);                    // two ports
+  line(x-89,y-14,x-89,y-36,.9,2);line(x-21,y-14,x-21,y-36,.9,2);
+  t('in',x-89,y-44,18,.7,'center',M);t('out',x-21,y-44,18,.7,'center',M);
+  line(x+190,y+60,x+240,y+60,.7,1.6);line(x+190,y+90,x+240,y+90,.7,1.6);t('6 V',x+248,y+82,18,.7,'left',M);
+  t('THE PUMP · micro diaphragm, water and air',x-110,y+172,18,.75,'left',M); }
+
 // three columns
 function lab(s,x1,y1,x2,y2){line(x1,y1,x2,y2,.45,1.2);t(s,x2+8,y2+7,21,.7)}
 const C=[
