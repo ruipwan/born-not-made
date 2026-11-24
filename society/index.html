@@ -28,6 +28,7 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); 
 .sp.on { opacity: 1; }
 .sp i { display: block; font: 500 8.5px/1.5 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: rgb(255 255 255 / 55%); font-style: normal; }
 .wide .sp s { display: none; }
+.sp .gist { display: none; } .wide .sp .full { display: none; } .wide .sp .gist { display: inline; } .wide .sp { font-size: 10px; max-width: 170px; padding-bottom: 6px; } .wide .sp i { font-size: 7.5px; }
 .sp s { display: block; text-decoration: none; color: rgb(255 255 255 / 42%); font-size: 10px; }
 .sp::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 1px; height: 7px; background: rgb(255 255 255 / 34%); }
 .tg { position: absolute; left: 0; top: 0; pointer-events: none; transform: translate(-50%, -100%); font: 500 8.5px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: rgb(255 255 255 / 58%); text-shadow: 0 0 4px #000; white-space: nowrap; padding-bottom: 7px; }
@@ -41,7 +42,7 @@ button:hover { color: #fff; } button.on { color: #fff; font-weight: 700; }
 .ctl { display: grid; grid-template-columns: 128px minmax(0, 1fr) 34px; align-items: center; gap: 8px; font-size: 12px; margin: 3px 0; }
 .ctl output { font: 11px var(--mono); color: var(--muted); text-align: right; }
 input[type=range] { width: 100%; accent-color: #fff; }
-.spd { position: absolute; right: 18px; bottom: 18px; z-index: 6; display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: rgba(12,12,12,0.78); border: 1px solid rgba(255,255,255,0.18); border-radius: 6px; font: 12px/1 var(--mono); color: #ddd; letter-spacing: 0.08em; text-transform: uppercase; }
+.spd { display: inline-flex; margin-top: 12px; align-items: center; gap: 12px; padding: 10px 14px; background: rgba(12,12,12,0.78); border: 1px solid rgba(255,255,255,0.18); border-radius: 6px; font: 12px/1 var(--mono); color: #ddd; letter-spacing: 0.08em; text-transform: uppercase; }
 .spd input { width: 180px; accent-color: #eee; }
 .spd b { min-width: 3.2em; text-align: right; font-weight: 600; color: #fff; }
 canvas.spark { width: 100%; height: 40px; display: block; margin-bottom: 8px; }
@@ -81,11 +82,11 @@ html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
     <canvas id="c" aria-label="A few tailed robots and the generations born from the tailed ones, talking in one tank under small spot lights"></canvas>
     <div id="labs"></div>
     <div class="views" id="views"><button data-cam="film" class="on">Film</button><button data-cam="tank">Whole tank</button><button data-cam="follow">Follow</button><button data-cam="above">Above</button></div>
-    <div class="spd" id="spd"><span class="spl">Speed</span><input type="range" id="spdR" min="0" max="7" step="1" value="2" aria-label="Simulation speed"><b id="spdV">1×</b></div>
   </div>
   <div class="below">
 <div class="cap"><h1>Society</h1><p id="capt">A fixed number of tailed ones stay in the tank. Each tailed one holds an arm and gel. Every other body is born from a tailed one and has no tail. The bodies swim out, read the light, the stream and the crowd, and come back to tell. A tailed one keeps what is told as lines in the head. With enough lines, of enough kinds, the tailed one prints the next generation folded in the gel, then pushes the newborn out through the mouth while a pump fills the newborn with air. What was told shapes the next generation.</p>
-      <div class="hud" id="hud"></div></div>
+      <div class="hud" id="hud"></div>
+<div class="spd" id="spd"><span class="spl">Speed</span><input type="range" id="spdR" min="0" max="7" step="1" value="2" aria-label="Simulation speed"><b id="spdV">1×</b></div></div>
     <div class="ev" id="ev"></div>
   </div>
   </div>
@@ -108,7 +109,7 @@ html.bnm-embed aside > * { break-inside: avoid; margin-bottom: 16px; }
       <h3>Mean traits of the living</h3><div class="bars" id="bars"></div></div>
     <div><h3>Selected</h3><div id="insp" class="note">Click a robot in the tank.</div></div>
     <div><h3>Rules</h3>
-      <p class="note">The cast. The tailed ones are fixed in number and do not move far. A tailed one is two rounded parts: a clear quilted head of silicone with gel on the floor, and a tail holding a Rotrics DexArm at true size. Only a tailed one can make a body. Every body without a tail was born in this tank from one of the tailed ones, and no body without a tail makes another.</p>
+      <p class="note">The cast. The tailed ones are fixed in number and do not move far. A tailed one is two rounded parts: a clear quilted head of silicone with gel on the floor, and a tail holding a Rotrics DexArm at true size. Only a tailed one can make a body. Every body without a tail was born in this tank from one of the tailed ones, and no body without a tail makes another. A body is born small, about half its adult length, and grows over two to three minutes to roughly twice that, never longer than 0.85 of a tailed one. About one body in five keeps away: it roams the far side of the tank and comes back to tell only when it has a lot to say.</p>
       <p class="note">The water. Sixteen small lamps hang over the tank. A patch of low lamps moves slowly across the grid, so a bright pool does not stay bright. A stream runs through the tank in a band that turns slowly; small motes on the surface show where the water moves. A body gains charge in light and shares the light with every body close by. Swimming, a strong stream and a large body all cost charge. In the dark a body without a lamp feels less far.</p>
       <p class="note">Reading and telling. A body swims to a place, reads the light, the stream and the crowd there, and keeps the reading as a memory. A body holds only a few memories; the oldest drops out. Two robots closer than the talk radius may talk, a few turns each. A turn says one thing: a reading, how the body fared and what the body lacks, a trace handed down, a question, a request. A listener keeps what was said, so word travels from body to body. A body low on charge asks where light is and swims to the place named. A tailed one sends a body to read a place the store has no fresh word of.</p>
       <p class="note">The store. A tailed one keeps what is told as lines, drawn as thin loops stacked in the head, and a ring on the water fills as the lines add up. A new line counts as one, a line that changes an old one counts as one, a line already held counts for little, and word passed on by a second speaker counts for less than a first reading. To generate, a tailed one needs the set number of lines, of at least three kinds, from at least two speakers. At the start no robot has anyone to ask, so a tailed one makes a first generation from three lines read at the tailed one's own place.</p>
@@ -726,6 +727,8 @@ function newFree(q, G, ki, x, z, h) {
   const D = G.D, b = { id: nextId++, tailed: false, line: q.id, gen: G.gen, G, D, s: G.s, k: ki, x, z, h, vx: Math.cos(h) * 0.09, vz: Math.sin(h) * 0.09, cap: 0.6 + 0.6 * D.endurance, vmax: (0.05 + 0.13 * D.speed) * (1 - 0.3 * D.endurance), senseR: 0.5 + 1.6 * D.sense, memCap: 3 + Math.round(7 * D.memory),
     mem: [], told: new Map(), born: simT, age: 0, life: 320 + 160 * rnd(), mode: "explore", goalP: undefined, gx: x, gz: z, goalT: 0, carried: 0, carriedD: 0, searched: 0, lostDark: 0, darkT: 0, forgot: 0, readT: 4, seeT: 0, seen: null, reportT: simT, cool: new Map(), talk: null, wait: 0, fade: 0, crowd: 0, L: 0, fs: 0,
     loss: { dark: 0, flow: 0, crowd: 0 }, bob: rnd() * 6.283, wander: h, wanderT: 0, note: G.note, said: 0, told0: 0 };
+  // born small, then grows: the adult size is about 1.75 times the size at birth, never longer than 0.85 of the tailed one
+  b.loner = rnd() < 0.2; b.kb = ki; b.ka = Math.min(ki * 1.75, 0.85 * q.len / (G.s.Lh + G.s.Ln + G.s.R)); b.grow = 150 + 60 * rnd();
   b.E = 0.7 * b.cap; b.len = (G.s.Lh + G.s.Ln + G.s.R) * ki; b.rad = Math.max(b.len * 0.36, G.s.A * ki);
   // what the newborn carries: traces of the store, then the facts of the note, which the newborn acts on
   for (const tr of G.traces) TALK.remember(b, TALK.fact({ k: "trace", g: G.gen, txt: tr.txt, t: tr.t, p: tr.p, src: q.id, hops: 1 }));
@@ -755,12 +758,14 @@ function read(b, full) { const p = placeOf(b.x, b.z), have = (k) => b.mem.find((
 function chooseGoal(b) { let best = 4, bs = -1e9;
   for (let p = 0; p < 9; p++) { const own = b.mem.find((m) => m.k === "light" && m.p === p), fl = b.mem.find((m) => m.k === "flow" && m.p === p), xy = placeXY(p);
     let sc = (own ? Math.min(200, simT - own.t) : 200) + 70 * rnd() - 14 * Math.hypot(xy[0] - b.x, xy[1] - b.z);
+    if (b.loner) { let dq = 9; for (const q of Q) dq = Math.min(dq, Math.hypot(xy[0] - q.x, xy[1] - q.z)); sc += 130 * dq + 14 * Math.hypot(xy[0] - b.x, xy[1] - b.z); }
     if (fl && fl.v > 0.6 && b.D.speed < 0.45) sc -= 150; if (own && own.v < 0.2 && b.D.light < 0.3) sc -= 70; if (sc > bs) { bs = sc; best = p; } }
+  if (b.loner) { let bd = -1; for (let p = 0; p < 9; p++) { const xy = placeXY(p); let dq = 9; for (const q of Q) dq = Math.min(dq, Math.hypot(xy[0] - q.x, xy[1] - q.z)); dq += 0.6 * rnd(); if (dq > bd) { bd = dq; best = p; } } }
   setGoal(b, best, null); }
 function setGoal(b, p, why) { const xy = placeXY(p); b.goalP = p; b.goalWhy = why; b.gx = clamp(xy[0] + (rnd() - 0.5) * 1.1, -TX + 0.35, TX - 0.35); b.gz = clamp(xy[1] + (rnd() - 0.5) * 1.0, -TZ + 0.35, TZ - 0.35); b.goalT = 0; }
 const untoldN = (b, q) => { const t = b.told.get(q.id); let n = 0; for (const m of b.mem) if (m.src !== q.id && !(t && t.has(m.o))) n++; return n; };
 function decideNext(b) { const q = byId.get(b.line), n = q ? untoldN(b, q) : 0;
-  if (q && n >= 1 && (n >= 2 || simT - b.reportT > 60)) { b.mode = "report"; b.wait = 0; return; }
+  if (q && n >= 1 && (b.loner ? n >= 5 || simT - b.reportT > 160 : n >= 2 || simT - b.reportT > 60)) { b.mode = "report"; b.wait = 0; return; }
   b.mode = "explore"; if (b.goalWhy === "sent" && b.goalT === 0) return; chooseGoal(b); }
 function startFade(b, why) { b.fade = 0.0001; b.why = why; faded++; b.G.alive--; linDirty = true; const p = placeOf(b.x, b.z); if (b.talk) endConvo(b.talk);
   dline(null, null, `#${b.id} of #${b.line}'s line, generation ${b.gen}, fades ${TALK.AT[p]} after ${fmt(b.age)}. ${TALK.FADE_WHY[why]}`, "fade"); log(`#${b.id} fades ${TALK.AT[p]}`); ripple(b.x, b.z, 0.5);
@@ -769,6 +774,7 @@ function startFade(b, why) { b.fade = 0.0001; b.why = why; faded++; b.G.alive--;
   const q = byId.get(b.line); if (!seen && q) { TALK.take(q.store, TALK.fact({ k: "fade", who: b.id, why, p, t: simT, src: q.id }), null, simT); q.flashT = simT; dline(q, null, `#${b.id} did not come back.`, "act"); } }
 function stepFree(b, dt) {
   b.age = simT - b.born; const D = b.D;
+  if (b.ka && b.k < b.ka) { const u = Math.min(1, b.age / b.grow), g = u * u * (3 - 2 * u); b.k = b.kb + (b.ka - b.kb) * g; b.len = (b.s.Lh + b.s.Ln + b.s.R) * b.k; b.rad = Math.max(b.len * 0.36, b.s.A * b.k); }
   if (b.fade > 0) { b.fade += dt / 8; const f = flowAt(b.x, b.z, _fl); b.x += _fl[0] * dt; b.z += _fl[1] * dt; if (b.fade >= 1) removeFree(b); return; }
   const L = b.L = lightAt(b.x, b.z), fs = b.fs = flowAt(b.x, b.z, _fl), fx = _fl[0], fz = _fl[1], c = b.crowd, sp = Math.hypot(b.vx, b.vz);
   // charge: light feeds, shared with the bodies close by; size, swimming, the stream and what the body carries all cost
@@ -852,7 +858,7 @@ function decide(q) {
 }
 // a printed body clipped at the layer being laid. The pack is milky while folded, wall on wall, and clears as the air stretches it
 function startPrint(q) {
-  const G = q.G, s = G.s, ki = 0.95 + 0.1 * rnd(), geo = kidGeometry(s), plane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0), mk = (m) => clipMat(m, plane);
+  const G = q.G, s = G.s, ki = 0.55 + 0.06 * rnd(), geo = kidGeometry(s), plane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0), mk = (m) => clipMat(m, plane);
   const a = geo.attributes.position.array, W = geo.morphAttributes.position[0].array; for (let i = 0; i < a.length; i++) { a[i] *= ki; W[i] *= ki; }
   const baby = new THREE.Mesh(geo, [mk(MAT.shell), mk(MAT.shell), mk(MAT.mouth)]); baby.frustumCulled = false; baby.renderOrder = 4; baby.castShadow = false;
   const U_ = geo.userData, len = U_.len * ki; let lo = 9, hi = -9; for (let i = 1; i < W.length; i += 3) { lo = Math.min(lo, W[i]); hi = Math.max(hi, W[i]); }
@@ -901,7 +907,8 @@ function dline(from, to, text, cls) { const el = $("#dlog"), stick = el.scrollTo
   if (window.__lines) window.__lines.push({ t: simT, from: from ? from.id : 0, to: to ? to.id : 0, text }); }
 function bubble(key, a, b, text, hold) { let s = SPEECH.get(key); if (!s) { const el = document.createElement("div"); el.className = "sp"; $("#labs").appendChild(el); s = { el, text: "" }; SPEECH.set(key, s); }
   s.off = 0; s.prev = s.a === a || key[0] === "q" ? "" : s.text; s.a = a; s.b = b; s.text = text; s.until = simT + hold; s.real = performance.now() + 2500;
-  s.el.innerHTML = `<i>#${a.id}${b ? " to #" + b.id : ""}</i>` + (s.prev ? `<s>${esc(s.prev)}</s>` : "") + esc(text); }
+  s.el.innerHTML = `<i>#${a.id}${b ? " to #" + b.id : ""}</i>` + (s.prev ? `<s>${esc(s.prev)}</s>` : "") + `<span class="full">${esc(text)}</span><span class="gist">${esc(gist(text))}</span>`; }
+function gist(t) { const ss = t.split(/(?<=[.?!])\s+/).filter((x) => x && !/^#\d+[,.]|generation \d+ of|^(Kept|Known|Changed)\b/.test(x)), u = (ss[0] || t).replace(/[.]$/, ""), w = u.split(/\s+/); return w.length <= 7 ? u : w.slice(0, 6).join(" ").replace(/[,;:]$/, "") + " …"; }
 function startConvo(a, b) { const C = TALK.Convo(a, b, simT); C.id = ++talks; C.nextT = simT + 0.5; C.lastT = simT; convos.push(C);
   for (const x of [a, b]) { if (x.tailed) x.talks++; else x.talk = C; } return C; }
 function endConvo(C) { if (C.closed) return; C.closed = true; convos.splice(convos.indexOf(C), 1); const s = SPEECH.get("c" + C.id); if (s) s.until = Math.min(s.until, simT + 1.2);
@@ -1023,10 +1030,10 @@ function speechDraw() { if (performance.now() - CAPB.t > 1000) { const c = $(".c
   const W = cv.clientWidth, H = cv.clientHeight, now = performance.now(), list = [];
   for (const [key, s] of SPEECH) { const gone = (simT > s.until && now > s.real) || !byId.has(s.a.id); if (gone && now > (s.off || (s.off = now + 500))) { s.el.remove(); SPEECH.delete(key); continue; }
     const a = s.a, b = s.b && byId.has(s.b.id) ? s.b : null, x = b ? (a.x + b.x) / 2 : a.x, z = b ? (a.z + b.z) / 2 : a.z, y = Math.max(floatY(a) + (a.tailed ? a.s.B : a.s.B * a.k), b ? floatY(b) + (b.tailed ? b.s.B : b.s.B * b.k) : 0) + 0.07;
-    tmpV.set(x, y, z).project(R3.cam); s.sx = (tmpV.x + 1) / 2 * W; s.sy = (1 - tmpV.y) / 2 * H; s.on = !gone && showTalk && tmpV.z < 1 && Math.abs(tmpV.x) < 0.94 && tmpV.y < 0.9 && tmpV.y > -0.95 && !(s.sx < CAPB.r + 130 && s.sy < CAPB.b + 70); s.d = R3.cam.position.distanceTo(_d.set(x, y, z));
+    tmpV.set(x, y, z).project(R3.cam); s.sx = (tmpV.x + 1) / 2 * W; s.sy = (1 - tmpV.y) / 2 * H; s.on = !gone && showTalk && tmpV.z < 1 && Math.abs(tmpV.x) < 0.94 && tmpV.y < 0.9 && tmpV.y > -0.95; s.d = R3.cam.position.distanceTo(_d.set(x, y, z));
     s.pri = (DIR.shot && DIR.shot.C && key === "c" + DIR.shot.C.id ? -100 : 0) + (DIR.shot && DIR.shot.q && key === "q" + DIR.shot.q.id ? -90 : 0) + (selected && (a === selected || b === selected) ? -80 : 0) + s.d; list.push(s); }
-  list.sort((p, q) => p.pri - q.pri); const close = R3.cam.position.distanceTo(R3.ctl.target) < 4, shown = [], max = close ? 2 : 3; $("#labs").classList.toggle("wide", !close);
-  for (const s of list) { let ok = s.on && shown.length < max; if (ok) for (const o of shown) if (Math.abs(o.sx - s.sx) < 270 && Math.abs(o.sy - s.sy) < 90) { ok = false; break; }
+  list.sort((p, q) => p.pri - q.pri); const close = R3.cam.position.distanceTo(R3.ctl.target) < 4, shown = [], max = close ? 3 : 16; $("#labs").classList.toggle("wide", !close);
+  for (const s of list) { let ok = s.on && shown.length < max; if (ok) for (const o of shown) if (Math.abs(o.sx - s.sx) < (close ? 270 : 175) && Math.abs(o.sy - s.sy) < (close ? 90 : 46)) { ok = false; break; }
     if (ok) { shown.push(s); s.el.style.transform = `translate(-50%, -100%) translate(${s.sx.toFixed(1)}px, ${Math.max(70, s.sy).toFixed(1)}px)`; } s.el.classList.toggle("on", ok); }
 }
 
