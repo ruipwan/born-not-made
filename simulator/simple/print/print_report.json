@@ -1,223 +1,57 @@
 {
- "tail_front": {
-  "file": "bnm_simple_tail_front.stl",
+ "tail": {
+  "file": "bnm_simple_tail.stl",
   "watertight": true,
   "winding": true,
   "bodies": 1,
-  "volume_cm3": 800.3,
-  "mass_kg": 1.02,
-  "hours": 23.2,
+  "volume_cm3": 941.5,
+  "mass_kg": 1.2,
+  "hours": 27.2,
   "box": [
    336.0,
    314.0,
-   251.0
+   335.4
   ],
   "margin": [
    4.0,
    6.0,
-   89.0
+   4.6
   ],
-  "faces": 53636,
+  "faces": 87014,
   "orientations": {
    "on the docking face": {
     "box": [
      336.0,
      314.0,
-     251.0
+     335.4
     ],
     "fits": true,
     "margin": [
      4.0,
      6.0,
-     89.0
+     4.6
     ],
-    "overhang_cm2": 656.0,
+    "overhang_cm2": 1044.0,
     "bed_cm2": 0.0
    },
    "on the floor": {
     "box": [
-     251.0,
+     335.4,
      314.0,
      336.0
     ],
     "fits": true,
     "margin": [
-     89.0,
+     4.6,
      6.0,
      4.0
     ],
-    "overhang_cm2": 753.0,
-    "bed_cm2": 427.0
+    "overhang_cm2": 765.0,
+    "bed_cm2": 462.0
    },
    "on the side": {
     "box": [
-     251.0,
-     336.0,
-     314.0
-    ],
-    "fits": true,
-    "margin": [
-     4.0,
-     69.0,
-     26.0
-    ],
-    "overhang_cm2": 1429.0,
-    "bed_cm2": 24.0
-   },
-   "on the tip": {
-    "box": [
-     336.0,
-     314.0,
-     251.0
-    ],
-    "fits": true,
-    "margin": [
-     4.0,
-     6.0,
-     89.0
-    ],
-    "overhang_cm2": 627.0,
-    "bed_cm2": 25.0
-   }
-  },
-  "choice": "on the docking face"
- },
- "tail_rear": {
-  "file": "bnm_simple_tail_rear.stl",
-  "watertight": true,
-  "winding": true,
-  "bodies": 1,
-  "volume_cm3": 375.2,
-  "mass_kg": 0.48,
-  "hours": 10.9,
-  "box": [
-   318.1,
-   222.3,
-   226.4
-  ],
-  "margin": [
-   21.9,
-   97.7,
-   113.6
-  ],
-  "faces": 42494,
-  "orientations": {
-   "on the docking face": {
-    "box": [
-     318.1,
-     222.3,
-     226.4
-    ],
-    "fits": true,
-    "margin": [
-     21.9,
-     97.7,
-     113.6
-    ],
-    "overhang_cm2": 66.0,
-    "bed_cm2": 21.0
-   },
-   "on the floor": {
-    "box": [
-     226.4,
-     222.3,
-     318.1
-    ],
-    "fits": true,
-    "margin": [
-     113.6,
-     97.7,
-     21.9
-    ],
-    "overhang_cm2": 253.0,
-    "bed_cm2": 128.0
-   },
-   "on the side": {
-    "box": [
-     226.4,
-     318.1,
-     222.3
-    ],
-    "fits": true,
-    "margin": [
-     113.6,
-     1.9,
-     117.7
-    ],
-    "overhang_cm2": 988.0,
-    "bed_cm2": 0.0
-   },
-   "on the tip": {
-    "box": [
-     318.1,
-     222.3,
-     226.4
-    ],
-    "fits": true,
-    "margin": [
-     21.9,
-     97.7,
-     113.6
-    ],
-    "overhang_cm2": 73.0,
-    "bed_cm2": 1.0
-   }
-  },
-  "choice": "on the docking face"
- },
- "head": {
-  "file": "bnm_simple_head.stl",
-  "watertight": true,
-  "winding": true,
-  "bodies": 1,
-  "volume_cm3": 745.5,
-  "mass_kg": 0.95,
-  "hours": 21.6,
-  "box": [
-   336.0,
-   314.0,
-   335.1
-  ],
-  "margin": [
-   4.0,
-   6.0,
-   4.9
-  ],
-  "faces": 56748,
-  "orientations": {
-   "on the docking face": {
-    "box": [
-     336.0,
-     314.0,
-     335.1
-    ],
-    "fits": true,
-    "margin": [
-     4.0,
-     6.0,
-     4.9
-    ],
-    "overhang_cm2": 231.0,
-    "bed_cm2": 41.0
-   },
-   "on the floor": {
-    "box": [
-     335.1,
-     314.0,
-     336.0
-    ],
-    "fits": true,
-    "margin": [
-     4.9,
-     6.0,
-     4.0
-    ],
-    "overhang_cm2": 1131.0,
-    "bed_cm2": 201.0
-   },
-   "on the side": {
-    "box": [
-     335.1,
+     335.4,
      336.0,
      314.0
     ],
@@ -227,22 +61,105 @@
      -16.0,
      26.0
     ],
-    "overhang_cm2": 1518.0,
-    "bed_cm2": 40.0
+    "overhang_cm2": 1694.0,
+    "bed_cm2": 23.0
    },
    "on the tip": {
     "box": [
      336.0,
      314.0,
-     335.1
+     335.4
     ],
     "fits": true,
     "margin": [
      4.0,
      6.0,
-     4.9
+     4.6
     ],
-    "overhang_cm2": 272.0,
+    "overhang_cm2": 1030.0,
+    "bed_cm2": 5.0
+   }
+  },
+  "choice": "on the docking face"
+ },
+ "head": {
+  "file": "bnm_simple_head.stl",
+  "watertight": true,
+  "winding": true,
+  "bodies": 1,
+  "volume_cm3": 892.0,
+  "mass_kg": 1.13,
+  "hours": 25.8,
+  "box": [
+   336.0,
+   314.0,
+   390.0
+  ],
+  "margin": [
+   4.0,
+   6.0,
+   -50.0
+  ],
+  "faces": 53530,
+  "orientations": {
+   "on the docking face": {
+    "box": [
+     336.0,
+     314.0,
+     390.0
+    ],
+    "fits": false,
+    "margin": [
+     4.0,
+     -16.0,
+     -50.0
+    ],
+    "overhang_cm2": 263.0,
+    "bed_cm2": 41.0
+   },
+   "on the floor": {
+    "box": [
+     390.0,
+     314.0,
+     336.0
+    ],
+    "fits": false,
+    "margin": [
+     -50.0,
+     -70.0,
+     4.0
+    ],
+    "overhang_cm2": 1028.0,
+    "bed_cm2": 228.0
+   },
+   "on the side": {
+    "box": [
+     390.0,
+     336.0,
+     314.0
+    ],
+    "fits": false,
+    "margin": [
+     -50.0,
+     -70.0,
+     26.0
+    ],
+    "overhang_cm2": 2016.0,
+    "bed_cm2": 38.0
+   },
+   "on the tip": {
+    "box": [
+     336.0,
+     314.0,
+     390.0
+    ],
+    "fits": false,
+    "margin": [
+     4.0,
+     -16.0,
+     -50.0
+    ],
+    "overhang_cm2": 295.0,
     "bed_cm2": 0.0
    }
   },

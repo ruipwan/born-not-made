@@ -1,3 +1,5 @@
+> Round 15 (24 Nov 2026): the form changed. The tail is shorter and prints in one piece, `bnm_simple_tail.stl`, 336 x 314 x 335 mm on its docking face (no joint, no sleeve). The head now has the length of the double wall head: `bnm_simple_head.stl`, 336 x 314 x 390 mm on its docking face, longer than the 340 mm bed of the H2S, so it needs a larger printer or a split (not worked out). The settings below (clear PETG, wall, docking face) still apply; the part sizes, times and the two tail prints described below are from round 14.
+
 # Print plan for the Bambu Lab H2S: simplified Born, Not Made, round 11
 
 Three prints, each in one piece: the head, the front of the tail and the rear of the tail. The two tail prints are joined for good (bonded and sealed) behind the arm. All files are in millimeters, watertight, already oriented as they lie on the plate (centered, lowest point at z = 0).
