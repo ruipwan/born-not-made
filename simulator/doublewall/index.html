@@ -244,7 +244,7 @@ html.bnm-embed .bottom .area, html.bnm-embed .info { overflow: visible; }
 
 <section class="doc" id="how">
   <h2>Every head a quilted double membrane</h2>
-  <p>One head form for every generation: the head of the simple version (the spindle head, the roof falling in one arc to the mouth, the oval mouth leaning back, the long lower lip, the gel held by its own lower part, the docking face; in side view the lower outline is one smooth line: the floor of the lobe flat on the tank floor, a fillet, the front wall, a second fillet and the lip rising 3 degrees to the rolled mouth edge), made as an inflated double membrane of silicone, quilted like a down jacket: two skins joined by short webs into small irregular cells, smallest at the docking rim and the mouth, largest on the roof, one depth along the lower line, their direction turning along the body. The interior is open. The first head is made that way beforehand, outside the tank; every newborn is such a head. Only the tail (arm, tools, store) stays a hard print.</p>
+  <p>One head form for every generation: the head of the simple version (the spindle head, the roof falling in one arc to the mouth, the oval mouth leaning back, the long lower lip, the gel held by its own lower part, the docking face; in side view the lower outline is one smooth convex arc: from the cuff at the docking rim down to a keel under the flat bowl floor and up into the lower lip, which rises gently to the rolled mouth edge; the tail has the same arc under its floor plate, closed up to its docking face), made as an inflated double membrane of silicone, quilted like a down jacket: two skins joined by short webs into small irregular cells, smallest at the docking rim and the mouth, largest on the roof, one depth along the lower line, their direction turning along the body. The interior is open. The first head is made that way beforehand, outside the tank; every newborn is such a head. Only the tail (arm, tools, store) stays a hard print.</p>
   <p>The lower part of the head was enlarged so that the next head fits there folded flat: the gel lobe is 224 mm wide instead of 96, the rest of the form is unchanged. The arm prints the next head folded flat, 18 layers, around its kit, in the gel of the head. The birth (round 2) is keel first and mouth end first: a band of two tubes along the floor centerline of the newborn is filled first; it straightens the folds and carries the push. The soft strip passes the mouth cupped, its edges riding up the lower contour of the mouth. The holder pushes the rim while air is fed into the cells from the mouth end, so each section opens across only outside the lip; a folding crank on the holder carries the rim the last part, 20 mm past the lip; the rim fills last. The newborn slides off the lip and lies in front of the mouth, a quilted head of the same form. The relay and the next cycle are not run in this round.</p>
   <h4>Point by point</h4>
   <table id="verdict"></table>
@@ -266,7 +266,7 @@ html.bnm-embed .bottom .area, html.bnm-embed .info { overflow: visible; }
   <h4>Sources</h4>
   <ul id="sources"></ul>
   <h4>Files</h4>
-  <p><a href="quilt.json">quilt.json</a> · <a href="quilt_print.gcode">quilt_print.gcode</a> · <a href="arm.json">arm.json</a> · <a href="quilt_tex.png">quilt_tex.png</a> · <a href="../simple/">the simple version</a></p>
+  <p><a href="quilt.json">quilt.json</a> · <a href="reshape.py">reshape.py</a> (the outline round: keels, tank and newborn keyframes) · <a href="quilt_print.gcode">quilt_print.gcode</a> · <a href="arm.json">arm.json</a> · <a href="quilt_tex.png">quilt_tex.png</a> · <a href="../simple/">the simple version</a></p>
   <h4>AI disclosure</h4>
   <p>The page, the script and the model were written with Claude.</p>
 </section>
@@ -775,7 +775,7 @@ function buildQuilt() {
   const outer = new THREE.Mesh(og, outerM); outer.renderOrder = 7.2; R3.chamber.add(outer); const inner = new THREE.Mesh(ig, innerM); inner.renderOrder = 7.0; R3.chamber.add(inner); PARTS.chamber = outer; PARTS.qInner = inner;
   // the cuff at the docking rim and the rolled edge of the mouth: the two skins joined
   const cap = (i) => { const pos = [], ix = []; for (let j = 0; j <= nv; j++) { const s = (i * nv + (j % nv)) * 3; pos.push(O[s], O[s + 1], O[s + 2], I[s], I[s + 1], I[s + 2]); if (j) ix.push(2 * j - 2, 2 * j - 1, 2 * j, 2 * j - 1, 2 * j + 1, 2 * j); }
-    const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(ix); g.computeVertexNormals(); const m = new THREE.Mesh(g, clayMat(0xe9edee, { opacity: 0.75, side: THREE.DoubleSide, sub: 0.3, clip })); m.renderOrder = 7.3; R3.chamber.add(m); return g; };
+    const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(ix); g.computeVertexNormals(); const m = new THREE.Mesh(g, clayMat(0xe9edee, { opacity: 0.75, side: THREE.DoubleSide, sub: 0.3, clip })); m.renderOrder = 7.3; R3.chamber.add(m); (PARTS.qCapM = PARTS.qCapM || []).push(m); return g; };
   const cg = cap(0), mg = cap(na - 1);
   // round 3, point 0: the lip edge dips elastically under the keel of the newborn in phase d (S.dip); the base positions are kept
   PARTS.dipG = [og, ig, mg].map(g => [g, Float32Array.from(g.attributes.position.array)]);
@@ -785,6 +785,7 @@ function buildQuilt() {
   const cc = [0xc98b2b, 0xc98b2b, 0x5f8f4e, 0x5f8f4e, 0x4a7fb0, 0x4a7fb0]; PARTS.circ = [];
   for (const c of Q.circuits) { const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(c.p, 3)); const l = new THREE.Line(g, new THREE.LineBasicMaterial({ color: cc[c.c], transparent: true, opacity: 0.2, depthWrite: false, clippingPlanes: clip })); l.renderOrder = 7.1; R3.chamber.add(l); PARTS.circ.push(l); }
   buildSill(og, ig, cg, O, I, nv);          // round 23
+  PARTS.qG = { og, ig, cg, mg, outer, inner };
 }
 /* ---------------------------------------------------------------- the newborn: the same quilted head, a keyframed grid from the birth model (quilt.json, nbk)
    round 22: drawn as a real double wall like the parent. The keys are the newborn's OUTER skin (part_q.py: nb_world(..., which='outer')), so the outer skin is the keyed
@@ -801,7 +802,9 @@ function buildNewborn() {
   const TF = new Float32Array(na * nv), at = (A, i, j, c) => A[(i * QV + ((j % QV) + QV) % QV) * 3 + c];
   for (let i = 0; i < na; i++) for (let j = 0; j < nv; j++) { let sum = 0, cnt = 0; const ic = Math.min(QA - 1, i * K.si), jc = j * K.sj;
     for (let di = -2; di <= 1; di++) { const ii = ic + di; if (ii < 0 || ii >= QA) continue; for (let dj = -2; dj <= 1; dj++) { const jj = jc + dj; sum += Math.hypot(at(O, ii, jj, 0) - at(I, ii, jj, 0), at(O, ii, jj, 1) - at(I, ii, jj, 1), at(O, ii, jj, 2) - at(I, ii, jj, 2)); cnt++; } }
-    TF[i * nv + j] = Math.max(TFLAT, sum / cnt); }
+    TF[i * nv + j] = Math.max(TFLAT, Math.min(0.0149, sum / cnt)); }          // outline round: at most the wall of round 7; the keel cells under the floor open only at rest (below)
+  NB.DO = new Float32Array(na * nv * 3); NB.DI = new Float32Array(na * nv * 3);
+  for (let i = 0; i < na; i++) for (let j = 0; j < nv; j++) for (let c = 0; c < 3; c++) { const ic = Math.min(QA - 1, i * K.si), jc = j * K.sj, d = (i * nv + j) * 3 + c; NB.DO[d] = at(O, ic, jc, c); NB.DI[d] = at(I, ic, jc, c); }
   let sgn = 0; const ARef = new Float32Array(na), v3 = (i, j) => [at(O, i, j, 0), at(O, i, j, 1), at(O, i, j, 2)];
   for (let i = 0; i < na; i++) { const ic = Math.min(QA - 1, i * K.si), ip = Math.min(QA - 1, ic + K.si), im = Math.max(0, ic - K.si); let ax = 0, ay = 0, az = 0;
     for (let j = 0; j < nv; j++) { const jc = j * K.sj, p = v3(ic, jc), q = v3(ic, jc + K.sj), a1 = v3(ip, jc), a0 = v3(im, jc), b1 = v3(ic, jc + K.sj), b0 = v3(ic, jc - K.sj);
@@ -826,6 +829,13 @@ function buildNewborn() {
   NB.caps = [0, na - 1].map((i) => { const g = new THREE.BufferGeometry(), cx = []; g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(n1 * 6), 3)); for (let j = 1; j <= nv; j++) cx.push(2 * j - 2, 2 * j - 1, 2 * j, 2 * j - 1, 2 * j + 1, 2 * j); g.setIndex(cx);
     const m = new THREE.Mesh(g, capM); m.renderOrder = 9.55; m.userData.row = i; return m; });
   for (const m of [NB.mesh, NB.inner, ...NB.caps]) { m.frustumCulled = false; R3.scene.add(m); }
+  // outline round: once every row lies at rest the newborn is the parent's head itself (same grid, same skins, same keel and roof), drawn from a copy of its geometry,
+  // moved to the newborn's place; the bolster of the rear sill lifts it by the parent's own formula. The coarse keyed grid draws only the birth.
+  { const G = PARTS.qG, it = PARTS.sill ? PARTS.sill.items : []; NB.hi = new THREE.Group(); NB.hi.visible = false; NB.hiG = [];
+    const add = (g, mat, ro, item) => { const c = g.clone(); c.attributes.position = g.userData.base ? new THREE.BufferAttribute(Float32Array.from(g.userData.base), 3) : c.attributes.position.clone(); const m = new THREE.Mesh(c, mat); m.renderOrder = ro + 2.3; m.frustumCulled = false; NB.hi.add(m); NB.hiG.push({ g: c, item }); };
+    const dip = new Map((PARTS.dipG || []).map(([g, b]) => [g, b]));
+    for (const [g, mat, ro, k] of [[G.og, G.outer.material, 7.2, 0], [G.ig, G.inner.material, 7.0, 1], [G.cg, PARTS.qCapM[0].material, 7.3, 2], [G.mg, PARTS.qCapM[1].material, 7.3, -1]]) { if (dip.has(g)) g.userData.base = dip.get(g); add(g, mat, ro, k >= 0 ? it[k] : null); }
+    NB.hiU = -1; R3.scene.add(NB.hi); }
   NB.na = na; NB.nv = nv; NB.last = -2;
   // round 23: the bolster of the newborn, from its rest keys (the last frame: level, in front of the mouth, its rim at x = nb_dock_tdx + rim of the parent)
   { const nk = K.frames.length, o = (nk - 1) * na * nv * 3, ox = J.read.nb_dock_tdx, oz = J.read.nb_T[2], R = (v, c) => NB.keys[o + v * 3 + c] * K.scale;
@@ -851,6 +861,10 @@ function setNewborn(nbi) {
   for (let i = 0; i < na; i++) { for (let j = 0; j < nv; j++) { const s = (i * nv + j) * 3, d = (i * n1 + j) * 3; A[d] = (KA[o0 + s] * g + KA[o1 + s] * f) * sc; A[d + 1] = (KA[o0 + s + 1] * g + KA[o1 + s + 1] * f) * sc; A[d + 2] = (KA[o0 + s + 2] * g + KA[o1 + s + 2] * f) * sc; }
     const d0 = i * n1 * 3, dn = (i * n1 + nv) * 3; A[dn] = A[d0]; A[dn + 1] = A[d0 + 1]; A[dn + 2] = A[d0 + 2]; }
   const P = (i, j, c) => A[(i * n1 + j) * 3 + c];
+  // outline round: how near each row lies to its rest pose (the designed head at the newborn's place); 1 at rest
+  { const ox = J.read.nb_dock_tdx, oz = J.read.nb_T[2], DO = NB.DO; NB.wr = NB.wr || new Float32Array(na); let wmin = 1;
+    for (let i = 0; i < na; i++) { let dm = 0; for (let j = 0; j < nv; j++) { const d = (i * n1 + j) * 3, e = (i * nv + j) * 3; dm = Math.max(dm, Math.hypot(A[d] - DO[e] - ox, A[d + 1] - DO[e + 1], A[d + 2] - DO[e + 2] - oz)); }
+      const w = 1 - sss((dm - 0.002) / 0.018); NB.wr[i] = w; wmin = Math.min(wmin, w); } NB.atRest = wmin > 0.999; }
   // round 23: the bolster lifts the rear floor along the newborn's own up (its rest frame turned into its present pose), then the newborn floats: its lowest point not below the draft
   const Fc = nbFrame((i, j, c) => P(i, j % nv, c)), Fr = NB.Fr, dir = Fc.ex.clone().multiplyScalar(Fr.ex.z).add(Fc.ey.clone().multiplyScalar(Fr.ey.z)).add(Fc.ez.clone().multiplyScalar(Fr.ez.z)).normalize();
   NB.F = Fc; NB.dir = dir;
@@ -870,12 +884,17 @@ function setNewborn(nbi) {
   // the inner skin: inward by the local thickness, from the flat value (unfilled) to the parent's (filled)
   const TF = NB.TF, sg = NB.inw;
   for (let i = 0; i < na; i++) { const o = NB.open[i]; for (let j = 0; j <= nv; j++) { const d = (i * n1 + j) * 3, t = sg * (TFLAT + (TF[i * nv + (j % nv)] - TFLAT) * o + NB.u * NB.RV[i * nv + (j % nv)]); B[d] = A[d] + NA[d] * t; B[d + 1] = A[d + 1] + NA[d + 1] * t; B[d + 2] = A[d + 2] + NA[d + 2] * t; } }
+  { const DO = NB.DO, DI = NB.DI; for (let i = 0; i < na; i++) { const w = NB.wr[i]; if (w < 1e-3) continue; for (let j = 0; j <= nv; j++) { const d = (i * n1 + j) * 3, e = (i * nv + (j % nv)) * 3, t = sg * NB.u * NB.RV[i * nv + (j % nv)];
+    for (let c = 0; c < 3; c++) B[d + c] = lerp(B[d + c], A[d + c] + DI[e + c] - DO[e + c] + NA[d + c] * t, w); } } }
   for (const m of NB.caps) { const i = m.userData.row, C = m.geometry.attributes.position.array; for (let j = 0; j <= nv; j++) { const d = (i * n1 + j) * 3; C[6 * j] = A[d]; C[6 * j + 1] = A[d + 1]; C[6 * j + 2] = A[d + 2]; C[6 * j + 3] = B[d]; C[6 * j + 4] = B[d + 1]; C[6 * j + 5] = B[d + 2]; }
     m.geometry.attributes.position.needsUpdate = true; m.geometry.computeVertexNormals(); }
   for (let i = 0; i < na; i++) { const s = (i * n1 + jk) * 3; for (let c = 0; c < 3; c++) kp[3 * i + c] = A[s + c] + (c === 2 ? 0.001 : 0); }
   nbMask(A, n1);
   NB.mesh.geometry.attributes.position.needsUpdate = true; NB.inner.geometry.attributes.position.needsUpdate = true; NB.mesh.geometry.attributes.normal.needsUpdate = true;
   NB.mesh.geometry.computeBoundingSphere(); NB.keel.geometry.attributes.position.needsUpdate = true;
+  const hi = NB.atRest && NB.hi; NB.mat.visible = !hi; NB.innerM.visible = !hi; NB.capM.visible = !hi; if (NB.hi) NB.hi.visible = !!hi;
+  if (hi) { NB.hi.position.set(J.read.nb_dock_tdx, 0, J.read.nb_T[2] + NB.dz);
+    if (Math.abs(NB.u - NB.hiU) > 1e-4) { NB.hiU = NB.u; for (const h of NB.hiG) { if (!h.item) continue; const p = h.g.attributes.position.array, it = h.item; for (let k = 0; k < it.ix.length; k++) p[it.ix[k]] = it.b[k] + NB.u * it.dz[k]; h.g.attributes.position.needsUpdate = true; if (h.g.index && it.ix.length) h.g.computeVertexNormals(); } } }
 }
 // round 23: the cut outs of the head and the tail follow the bodies (they stayed where the parent body stands at the start); under a raised sill there is water again
 function sillWaterMasks(S, uh) {
