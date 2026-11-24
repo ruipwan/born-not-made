@@ -2,7 +2,7 @@
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#000"><title>Inheritance · Born, Not Made</title>
-<meta name="description" content="One continuous shot of a lineage. The tail with the arm docks into a head, takes a new part from the water, prints the newborn in gel while the parent's local model is distilled into the newborn's, then pushes the newborn out, inflating. Each newborn keeps part of the parent's model, gathers its own data, and differs in shape, print and parts.">
+<meta name="description" content="One continuous shot of a lineage with one parent. Body I keeps the only tail and arm, takes in live data all the time, and prints three newborns in gel, one after another. Each print distills the whole of I as it stands at that moment, so each newborn inherits a different share: older data pressed harder, newer data fresher. Then each newborn learns alone, and each differs in shape, print and parts.">
 <style>
 *{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:#000;color:#eee;font:14px/1.5 Inter,Arial,sans-serif}
 main{max-width:1600px;margin:auto;padding:0 0 6px}
@@ -17,8 +17,8 @@ input{flex:1;min-width:20px;accent-color:#ddd}time{color:#9b9a94;font:12px ui-mo
 iframe.w3d{display:block;width:100%;aspect-ratio:16/9;border:0;background:#000}
 button:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:3px}
 </style></head><body><main>
-<section><div class="hd"><p>Lineage</p><h2>It inherits, then learns, and gives “birth” too</h2></div>
-<canvas id="d-lineage" width="1600" height="900" style="aspect-ratio:16/9" role="img" aria-label="A lineage of robots: print, distill, birth, and learning."></canvas>
+<section><div class="hd"><p>Lineage</p><h2>Every “birth” is different</h2></div>
+<canvas id="d-lineage" width="1600" height="900" style="aspect-ratio:16/9" role="img" aria-label="One parent prints three newborns, one after another, while it keeps learning. Each newborn inherits a different moment of the parent, then learns alone."></canvas>
 <footer aria-label="Playback"><button type="button" id="play">Pause</button><input id="seek" type="range" min="0" max="62" step=".05" value="0" aria-label="Position"><time></time></footer></section>
 <section><div class="hd"><p>1 · Why “birth”</p><h2>Copy, update, “birth”</h2></div>
 <canvas id="d-why" width="1600" height="780" style="aspect-ratio:1600/780" role="img" aria-label="Copy, update and birth compared."></canvas></section>
@@ -39,15 +39,14 @@ button:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:3
 <canvas id="d-tail" width="1600" height="700" style="aspect-ratio:1600/700" role="img" aria-label="A tail prints the next tail and hands over the arm."></canvas></section>
 </main><script src="diagrams.js?v=pod1"></script><script>
 /* One shot, one frame. Side view of the simplified bodies (profiles from simulator/simple/simple.json, meters).
-   Time is compressed: one print, about two hours, plays in six seconds; the distillation runs in the same window. */
+   Time is compressed: one print, about two hours, plays in six seconds; the distillation runs in the same window.
+   One parent, I, keeps the only tail and arm and prints every newborn. I takes in live data all the time,
+   so each distillation is made from a different state of I. */
 const cv=document.getElementById('d-lineage'), g=cv.getContext('2d');
 const W=1600,H=900,S=700,FLOAT=.14,DOCK=.032;
 const TOP=[[-0.43,0.125],[-0.413,0.147],[-0.397,0.167],[-0.38,0.185],[-0.363,0.202],[-0.347,0.218],[-0.33,0.233],[-0.313,0.248],[-0.297,0.261],[-0.28,0.273],[-0.264,0.284],[-0.247,0.294],[-0.23,0.303],[-0.213,0.311],[-0.197,0.318],[-0.18,0.323],[-0.164,0.326],[-0.147,0.329],[-0.13,0.33],[-0.03,0.33],[0.036,0.33],[0.07,0.33],[0.086,0.329],[0.103,0.328],[0.119,0.327],[0.136,0.325],[0.153,0.323],[0.17,0.321],[0.186,0.318],[0.203,0.314],[0.22,0.31],[0.236,0.305],[0.253,0.299],[0.269,0.292],[0.286,0.284],[0.304,0.274]];
 const BOT=[[-0.43,0.125],[-0.413,0.083],[-0.397,0.053],[-0.38,0.03],[-0.363,0.014],[-0.347,0.003],[-0.33,0],[0.243,0],[0.249,0.04],[0.253,0.055],[0.256,0.065],[0.263,0.081],[0.269,0.091],[0.276,0.098],[0.283,0.102],[0.296,0.104],[0.366,0.104]];
 const LIP=[0.36,0.15], MTOP=[0.295,0.325];
-const topAt=x=>{for(let i=1;i<TOP.length;i++)if(TOP[i][0]>=x){const [a,b]=TOP[i-1],[c,d]=TOP[i];return b+(d-b)*(x-a)/(c-a)}return TOP.at(-1)[1]};
-const headTop=TOP.filter(p=>p[0]>=DOCK), headBot=BOT.filter(p=>p[0]>=DOCK);headTop.unshift([DOCK,topAt(DOCK)]);headBot.unshift([DOCK,0]);
-const tailTop=TOP.filter(p=>p[0]<=DOCK).concat([[DOCK,.33]]), tailBot=BOT.filter(p=>p[0]<=DOCK).concat([[DOCK,0]]);
 
 const clamp=x=>Math.min(1,Math.max(0,x)), lerp=(a,b,u)=>a+(b-a)*u;
 const ease=(t,a,b)=>{const x=clamp((t-a)/(b-a));return x*x*(3-2*x)};
@@ -55,48 +54,57 @@ const ink=a=>'rgba(236,235,230,'+clamp(a)+')';
 function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 const shuffle=(a,r)=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 
-/* The lineage. Every head is printed, so every head differs a little: proportion, crown, layer pitch, parts. */
+/* The family. Every head is printed, so every head differs a little: proportion, crown, layer pitch, parts.
+   All three newborns come from I: I's base parts plus one new part each, taken from the water. */
 const C=18, BIRTHS=3, END=62;
 const NUM=['I','II','III','IV'];
 const TILES=[null,['Sense','a microphone'],['Link','a radio link'],['Display','a small light']];
+const BASE=['Core','Power','Drive'];
 const robots=[
- {l:1,   h:1,   crown:0,     pitch:.012, kit:['Core','Power','Drive']},
- {l:1.1, h:.9,  crown:.026,  pitch:.009, kit:['Core','Power','Drive','Sense']},
- {l:.9,  h:1.08,crown:-.02,  pitch:.016, kit:['Core','Power','Sense','Link']},
- {l:1.05,h:.95, crown:.032,  pitch:.011, kit:['Core','Power','Sense','Link','Display']}
+ {l:1,   h:1,   crown:0,     pitch:.012},
+ {l:1.1, h:.9,  crown:.026,  pitch:.009},
+ {l:.9,  h:1.08,crown:-.02,  pitch:.016},
+ {l:1.05,h:.95, crown:.032,  pitch:.011}
 ];
-/* Memory. Every moment a body lives through is one point of light inside the body.
-   Inheritance is compression: neighboring moments are pressed into one denser point, about six into one,
-   and only about two thirds of those cross to the newborn. The parent keeps everything. */
+robots.forEach((r,i)=>r.kit=i?BASE.concat(TILES[i][0]):BASE);
+const I=robots[0];
+
+/* Memory. Every moment I lives through is one point of light inside I, colored by when I learned it:
+   epoch A before the first distillation, B between the first and the second, C between the second and the third, D since.
+   A distillation presses I's whole memory as it stands: neighboring moments are pressed into one ring, and about
+   three quarters of the rings cross to the newborn. The older a moment, the harder it is pressed, so it fills
+   less of each ring. I keeps everything. */
+const DIST=[0,1,2].map(k=>k*C+4.5), epoch=t0=>DIST.filter(d=>t0>d).length;
+const RINGS=28, KEEP=.75, ROOM=5; // rings per distillation, share that crosses, room one ring takes in the newborn
 function spot(R){const x=.05+R()*.245, lo=x<.19?.02:.02+.16*Math.pow((x-.19)/.11,1.3), hi=.335-.06*Math.pow((x-.05)/.25,2);return [x,lo+R()*(hi-lo)]}
-function kd(a,d){if(a.length<=6)return [a];a=a.slice().sort((p,q)=>d%2?p.z-q.z:p.x-q.x);const m=a.length>>1;return kd(a.slice(0,m),d+1).concat(kd(a.slice(m),d+1))}
+// split a set of points into k neighborhoods, alternating the axis
+function kd(a,k,d=0){if(k<=1||a.length<2)return [a];a=a.slice().sort((p,q)=>d%2?p.z-q.z:p.x-q.x);const k1=k>>1,m=Math.round(a.length*k1/k);return kd(a.slice(0,m),k1,d+1).concat(kd(a.slice(m),k-k1,d+1))}
+{ const R=rng(29);I.pts=[];
+  for(let j=0;j<120;j++){const [x,z]=spot(R);I.pts.push({x,z,t0:-99,o:0})}
+  for(let j=1;j/2.5<=END;j++){const t0=j/2.5,[x,z]=spot(R);I.pts.push({x,z,t0,o:epoch(t0)})} }
 robots.forEach((r,i)=>{
-  const R=rng(29+i*211);
-  r.birth=i?(i-1)*C+13:-99; r.distill=i?(i-1)*C+4.5:null; r.pts=[]; r.moves=[];
-  if(i){
-    const snap=robots[i-1].pts.filter(q=>q.t0<=r.distill), groups=shuffle(kd(snap,0),R);
-    groups.forEach((G,j)=>{
-      const w=G.reduce((a,q)=>a+q.w,0), cx=G.reduce((a,q)=>a+q.x,0)/G.length, cz=G.reduce((a,q)=>a+q.z,0)/G.length;
-      const tc=r.distill+4.4*j/groups.length, pass=R()<.68, c=[0,0,0,0];G.forEach(q=>q.c.forEach((v,o)=>c[o]+=v*q.w));const cs=c.reduce((a,b)=>a+b,0);c.forEach((v,o)=>c[o]=v/cs);const o=c.indexOf(Math.max(...c));
-      r.moves.push({G,cx,cz,tc,pass,w,o,c});
-      if(pass)r.pts.push({x:cx,z:cz,t0:tc+1.5,w,inh:true,o,c});
-    });
-    r.from=snap.length;
-  }
-  const n0=i?0:150, rate=i?9:3;
-  for(let j=0;j<n0;j++){const [x,z]=spot(R);r.pts.push({x,z,t0:-99,w:1,o:i,c:[0,1,2,3].map(k=>+(k===i))})}
-  for(let j=0;;j++){const t0=Math.max(0,r.birth)+(j+1)/rate*(1+j/200);if(t0>END)break;const [x,z]=spot(R);r.pts.push({x,z,t0,w:1,o:i,c:[0,1,2,3].map(k=>+(k===i))})}
+  if(!i)return;
+  const R=rng(29+i*211), d=DIST[i-1];
+  r.distill=d; r.own=d+11.5; r.pts=[]; r.moves=[];
+  const snap=I.pts.filter(q=>q.t0<=d), groups=shuffle(kd(snap,RINGS),R), pass=new Set(shuffle(groups,R).slice(0,Math.round(KEEP*groups.length)));
+  r.held=snap.length;
+  groups.forEach((G,j)=>{
+    const cx=G.reduce((a,q)=>a+q.x,0)/G.length, cz=G.reduce((a,q)=>a+q.z,0)/G.length, tc=d+4.4*j/groups.length, c=[0,0,0,0];
+    G.forEach(q=>c[q.o]+=Math.pow(.5,i-1-q.o)); // pressed harder the older it is
+    const cs=c.reduce((a,b)=>a+b,0);c.forEach((v,o)=>c[o]=v/cs);
+    const o=c.indexOf(Math.max(...c)), p=pass.has(G);
+    r.moves.push({G,cx,cz,tc,pass:p,w:G.length,o,c});
+    if(p)r.pts.push({x:cx,z:cz,t0:tc+1.5,w:G.length,inh:true,o,c});
+  });
+  for(let j=0;;j++){const t0=r.own+(j+1)/6*(1+j/200);if(t0>END)break;const [x,z]=spot(R);r.pts.push({x,z,t0,own:true})}
 });
 const COL=[[232,163,61],[63,193,171],[156,136,242],[239,111,134]];
 const col=(o,a)=>'rgba('+COL[o].join(',')+','+clamp(a)+')';
-const PART={Core:0,Power:0,Drive:0,Sense:1,Link:2,Display:3};
-const count=(r,t)=>{let a=0,b=0;for(const q of r.pts)if(q.t0<=t)q.inh?a++:b++;return [a,b]};
 
 /* Poses. A head pose: X0 = screen x of the back face, Yb = screen y of the body floor, sc = depth scale, mx/mz = fold. */
-const SC=.6, FG_W=470, FG_YB=FG_W+FLOAT*S*SC, BG_W=215, BSC=.3, BG_YB=BG_W+FLOAT*S*BSC;
-const slotX=k=>215+k*370;
-const slot=k=>({X0:slotX(k),Yb:FG_YB,sc:SC,mx:1,mz:1,a:1});
-const mix=(p,q,u)=>({X0:lerp(p.X0,q.X0,u),Yb:lerp(p.Yb,q.Yb,u),sc:lerp(p.sc,q.sc,u),mx:lerp(p.mx,q.mx,u),mz:lerp(p.mz,q.mz,u),a:lerp(p.a,q.a,u)});
+const SC=.6, FG_W=470, FG_YB=FG_W+FLOAT*S*SC, BG_W=215, BG_YB=BG_W+FLOAT*S*.3;
+const SLOTS=[260,680,990,1300];
+const slot=k=>({X0:SLOTS[k],Yb:FG_YB,sc:SC,mx:1,mz:1,a:1});
 const HK=1.3, TK=.62; // head longer, tail shorter than the simulator body
 function hx(r,p,x){return p.X0+(x-DOCK)*HK*r.l*S*p.sc*p.mx}
 function hz(r,p,x,z){const c=r.crown*Math.sin(Math.PI*clamp((x-DOCK)/.3))*(z>.2?1:0);return p.Yb-(z*r.h+c)*S*p.sc*p.mz}
@@ -116,6 +124,7 @@ function headPath(r,p){
 function drawHead(r,p,t,opts={}){
   const P=headPath(r,p);
   g.save();g.globalAlpha*=p.a;
+  if(opts.solid){g.fillStyle='#000';g.fill(P)} // a body in front hides the one passing behind it
   g.fillStyle=ink(.045);g.fill(P);
   g.save();g.clip(P);
   // Print layers: the pitch is this body's own.
@@ -128,14 +137,12 @@ function drawHead(r,p,t,opts={}){
     for(let k=1;k<9;k++){const x=hx(r,p,DOCK+k*.037);g.moveTo(x,p.Yb);for(let j=1;j<=6;j++)g.lineTo(x+(j%2?3:-3)*p.sc,p.Yb-j*.055*S*p.sc*p.mz)}
     g.stroke();
   }
-  // Parts sealed in the wall, the newest outlined.
+  // Parts sealed in the wall, the new one outlined.
   const ks=.017*S*p.sc*Math.min(p.mx,1);
   r.kit.forEach((k,i)=>{
-    if(opts.kitUpTo!==undefined&&i>=opts.kitUpTo)return;
     const x=hx(r,p,.09)+i*(ks+3*p.sc), y=p.Yb-.33*S*p.sc*p.mz*r.h-ks/2; // in the wall under the crown
-    const o=PART[k], isNew=o===robots.indexOf(r)&&o>0;
-    g.fillStyle=col(o,.9);g.fillRect(x,y,ks,ks);
-    if(isNew){g.strokeStyle=ink(.9);g.lineWidth=1;g.strokeRect(x-2.5,y-2.5,ks+5,ks+5)}
+    g.fillStyle=ink(i>2?.95:.5);g.fillRect(x,y,ks,ks);
+    if(i>2){g.strokeStyle=ink(.9);g.lineWidth=1;g.strokeRect(x-2.5,y-2.5,ks+5,ks+5)}
   });
   g.restore();
   g.strokeStyle=ink(.78);g.lineWidth=1.5*Math.max(.6,p.sc);g.stroke(P);
@@ -145,15 +152,15 @@ function drawHead(r,p,t,opts={}){
     g.strokeStyle=ink(.6);g.lineWidth=1.1*Math.max(.6,p.sc);g.beginPath();g.ellipse(cx,cy,L*.98,.03*S*p.sc,Math.atan2(by-ay,bx-ax),0,7);g.stroke(); }
   g.restore();
 }
-function drawTail(Xd,Yb,sc,a,docked){
+function drawTail(Xd,Yb,sc){
   const P=new Path2D(),tx=x=>Xd+(x-DOCK)*TK*S*sc,tz=z=>Yb-z*S*sc;
   // a rounded tail, lower than the head, the back end one soft curve
   P.moveTo(tx(DOCK),tz(.33));P.lineTo(tx(-.12),tz(.33));
   P.bezierCurveTo(tx(-.27),tz(.33),tx(-.42),tz(.25),tx(-.44),tz(.14));
   P.bezierCurveTo(tx(-.455),tz(.05),tx(-.40),tz(0),tx(-.32),tz(0));
   P.lineTo(tx(DOCK),tz(0));P.closePath();
-  g.save();g.globalAlpha*=a;g.fillStyle=ink(.035);g.fill(P);g.strokeStyle=ink(.55);g.lineWidth=1.2;g.stroke(P);g.restore();
-  return {base:[tx(-.115),tz(.2)],floor:[tx(-.115),tz(.005)],roof:tz(.3),front:tx(DOCK),docked,sc,a};
+  g.fillStyle=ink(.035);g.fill(P);g.strokeStyle=ink(.55);g.lineWidth=1.2;g.stroke(P);
+  return {base:[tx(-.115),tz(.2)],floor:[tx(-.115),tz(.005)],roof:tz(.3),sc};
 }
 function drawArm(tail,tip){
   const [bx,by]=tail.base,L=.33*S*tail.sc;
@@ -161,83 +168,80 @@ function drawArm(tail,tip){
   let dx=tip[0]-bx,dy=tip[1]-by,d=Math.hypot(dx,dy);
   if(d>2*L-1){tip=[bx+dx/d*(2*L-1),by+dy/d*(2*L-1)];dx=tip[0]-bx;dy=tip[1]-by;d=2*L-1}
   const a=Math.atan2(dy,dx), b=Math.acos(clamp(d/(2*L)));
-  const ex=Math.min(bx+L*Math.cos(a-b),tail.docked?1e9:tail.front-6*tail.sc), ey=Math.max(by+L*Math.sin(a-b),tail.roof);
-  g.save();g.globalAlpha*=tail.a;
+  const ex=bx+L*Math.cos(a-b), ey=Math.max(by+L*Math.sin(a-b),tail.roof);
   g.strokeStyle=ink(.7);g.lineWidth=1.6;g.beginPath();g.moveTo(...tail.floor);g.lineTo(bx,by);g.lineTo(ex,ey);g.lineTo(...tip);g.stroke();
-  g.fillStyle=ink(.85);g.beginPath();g.arc(tip[0],tip[1],2.2,0,7);g.fill();g.restore();
+  g.fillStyle=ink(.85);g.beginPath();g.arc(tip[0],tip[1],2.2,0,7);g.fill();
 }
-// a ring split by where its moments came from
+// a ring split by when its moments were learned
 function ring(X,Y,r,c,a){let s=-Math.PI/2;g.lineWidth=1.6;c.forEach((v,o)=>{if(v<.02)return;const e=s+v*2*Math.PI;g.strokeStyle=col(o,a);g.beginPath();g.arc(X,Y,r,s,e);g.stroke();s=e})}
-function drawPts(r,p,t,a=1){
+function drawPts(r,p,t){
   const k=Math.max(.5,p.sc);
-  g.save();g.globalAlpha*=a*p.a;
+  g.save();g.globalAlpha*=p.a;
   for(const q of r.pts){
     if(q.t0>t)continue;
     const f=clamp((t-q.t0)/.6), X=hx(r,p,q.x), Y=hz(r,p,q.x,q.z);
     if(q.inh){
       ring(X,Y,(2.5+Math.min(6,Math.sqrt(q.w)))*k,q.c,.9*f);
       g.fillStyle=col(q.o,f);g.beginPath();g.arc(X,Y,2.2*k,0,7);g.fill();
-    }else{g.fillStyle=col(q.o,.55+.45*f);g.beginPath();g.arc(X,Y,(1.4+1.6*(1-f))*k,0,7);g.fill()}
+    }else{g.fillStyle=q.own?ink(.5+.4*f):col(q.o,.55+.45*f);g.beginPath();g.arc(X,Y,(1.4+1.6*(1-f))*k,0,7);g.fill()}
   }
   g.restore();
+}
+// live data: a thin stream of moments sinking into I from above the water
+function live(t){
+  const p=slot(0), sx=hx(I,p,.17), top=FG_W-190, fly=1.6;
+  text('LIVE DATA',sx,top-14,10.5,.6,mono,'center',1.4);
+  g.strokeStyle=ink(.14);g.lineWidth=1;g.beginPath();g.moveTo(sx,top-4);g.lineTo(sx,top+26);g.stroke();
+  for(const q of I.pts){
+    const v=(t-q.t0+fly)/fly;if(q.t0<0||v<0||v>=1)continue;
+    const e=ease(v,0,1), X0=sx+(q.x-.17)*90, Y0=top, X1=hx(I,p,q.x), Y1=hz(I,p,q.x,q.z), x=lerp(X0,X1,e), y=lerp(Y0,Y1,e);
+    g.strokeStyle=col(q.o,.45);g.beginPath();g.moveTo(lerp(X0,X1,Math.max(0,e-.12)),lerp(Y0,Y1,Math.max(0,e-.12)));g.lineTo(x,y);g.stroke();
+    g.fillStyle=col(q.o,1);g.beginPath();g.arc(x,y,2.3,0,7);g.fill();
+  }
 }
 function text(s,x,y,size,a,font='Arial',align='left',track=0){
   g.save();g.textAlign=align;g.fillStyle=ink(a);g.font=size+'px '+font;
   if(track&&'letterSpacing' in g)g.letterSpacing=track+'px';g.fillText(s,x,y);g.restore();
 }
+function tw(s,size,font,track=0){g.save();g.font=size+'px '+font;if(track&&'letterSpacing' in g)g.letterSpacing=track+'px';const w=g.measureText(s).width;g.restore();return w}
 const mono='ui-monospace, "JetBrains Mono", Menlo, monospace';
-function comp(r,t){const n=[0,0,0,0];let tot=0;for(const q of r.pts)if(q.t0<=t){const w=q.inh?Math.min(6,q.w):1;q.c.forEach((v,o)=>n[o]+=v*w);tot+=w}return {n,tot}}
+// what a body holds at time t: moments by epoch (a ring counts by its split), and its own moments
+function comp(r,t){const n=[0,0,0,0];let own=0;for(const q of r.pts)if(q.t0<=t){if(q.own)own++;else if(q.inh)q.c.forEach((v,o)=>n[o]+=v*ROOM);else n[q.o]++}return {n,own,tot:n.reduce((a,b)=>a+b,own)}}
 const BW=200,BH=12;
 function barAt(r,p){const cx=hx(r,p,.17);return {x:cx-BW/2,y:p.Yb+52,cx}}
 function ledger(r,i,p,t,a=1){
-  const {n,tot}=comp(r,t), B=barAt(r,p), y=p.Yb+34;
+  const {n,own,tot}=comp(r,t), B=barAt(r,p);
   g.save();g.globalAlpha*=a*p.a;
-  text(NUM[i],B.cx,y,22,.92,'Georgia','center');
-  // memory: where it comes from, oldest on the left
+  text(NUM[i],B.cx,p.Yb+34,22,.92,'Georgia','center');
+  // memory by when it was learned, oldest on the left; I's bar grows with what I holds
+  const len=i?BW:BW*tot/I.pts.length;
   let x=B.x;
-  for(let o=0;o<=i;o++){
-    const w=tot?BW*n[o]/tot:0;if(w<.5)continue;
-    g.fillStyle=col(o,.95);g.fillRect(x,B.y,Math.max(0,w-1.5),BH);
-    if(w>22){g.fillStyle='#111';g.font=(o===i?'bold 9.5px '+mono:'bold 10.5px Georgia');g.textAlign='center';g.fillText(o===i?'OWN':NUM[o],x+w/2-.75,B.y+BH-2.5);g.textAlign='left'}
-    x+=w;
-  }
-  const own=tot?Math.round(100*n[i]/tot):100;
-  text(i?(100-own)+'% inherited · '+own+'% own':'all own',B.cx,B.y+BH+16,11,.8,mono,'center');
-  // hardware: kept parts as squares in the color of the generation that first had them; changes spelled out
-  const prev=i?robots[i-1].kit:[], add=r.kit.filter(k=>i&&!prev.includes(k)), drop=prev.filter(k=>!r.kit.includes(k)), keep=r.kit.filter(k=>!add.includes(k));
+  n.forEach((v,o)=>{const w=tot?len*v/tot:0;if(w<.5)return;g.fillStyle=col(o,.95);g.fillRect(x,B.y,Math.max(0,w-1.5),BH);x+=w});
+  if(own){const w=len*own/tot;g.fillStyle=ink(.9);g.fillRect(x,B.y,Math.max(0,w-1.5),BH);
+    if(w>30){g.fillStyle='#111';g.font='bold 9.5px '+mono;g.textAlign='center';g.fillText('OWN',x+w/2-.75,B.y+BH-2.5)}}
+  const ow=Math.round(100*own/tot);
+  text(i?(100-ow)+'% inherited · '+ow+'% own':tot+' moments, all kept',B.cx,B.y+BH+16,11,.8,mono,'center');
+  // parts: I's base parts, and the one new part taken from the water
   g.font='10.5px '+mono;
-  const parts=[...keep.map(k=>({k,w:11})),...add.map(k=>({k,w:22+g.measureText('+'+k.toUpperCase()).width,t:'+'})),...drop.map(k=>({k,w:14+g.measureText('−'+k.toUpperCase()).width,t:'−'}))];
-  let px=B.cx-(parts.reduce((a,b)=>a+b.w,0)+5*(parts.length-1))/2, py=B.y+BH+36;
-  parts.forEach(o=>{
-    const c=PART[o.k];
-    if(!o.t){g.fillStyle=col(c,1);g.fillRect(px,py-8,9,9)}
-    else if(o.t==='+'){g.fillStyle=col(c,1);g.fillRect(px+2,py-8,9,9);g.strokeStyle=ink(.95);g.lineWidth=1;g.strokeRect(px-.5,py-10.5,14,14);text('+'+o.k.toUpperCase(),px+18,py,10.5,1,mono)}
-    else{text('−'+o.k.toUpperCase(),px,py,10.5,.4,mono)}
-    px+=o.w+5;
+  const nw=i?22+g.measureText('+'+r.kit[3].toUpperCase()).width:0;
+  let px=B.cx-(3*11+nw+5*(r.kit.length-1))/2;const py=B.y+BH+36;
+  r.kit.forEach((k,j)=>{
+    if(j<3){g.fillStyle=ink(.55);g.fillRect(px,py-8,9,9);px+=16;return}
+    g.fillStyle=ink(.95);g.fillRect(px+2,py-8,9,9);g.strokeStyle=ink(.95);g.lineWidth=1;g.strokeRect(px-.5,py-10.5,14,14);text('+'+k.toUpperCase(),px+18,py,10.5,1,mono);
   });
-  g.restore();
-}
-// what passes from parent to child: the parent's whole memory narrows into the child's inherited share
-function flow(par,pp,child,cp,t,a){
-  const P=barAt(par,pp),C=barAt(child,cp),{n,tot}=comp(child,t),i=robots.indexOf(child);
-  const share=tot?(tot-n[i])/tot:0, y=P.y+BH, dip=y+78;
-  const x0=P.x,x1=P.x+BW,c0=C.x,c1=C.x+BW*share;
-  g.save();g.globalAlpha*=a;
-  const gr=g.createLinearGradient(x0,0,c1,0);gr.addColorStop(0,'rgba(236,235,230,.14)');gr.addColorStop(1,'rgba(236,235,230,.05)');
-  g.fillStyle=gr;g.beginPath();g.moveTo(x0,y);g.bezierCurveTo(x0,dip,c0,dip,c0,y);g.lineTo(c1,y);g.bezierCurveTo(c1,dip-14,x1,dip-14,x1,y);g.closePath();g.fill();
-  text('compressed '+Math.round(100*share)+'%',(x1+c0)/2,dip-2,10,.55,mono,'center',1);
   g.restore();
 }
 const hms=s=>{s=Math.round(s);return Math.floor(s/3600)+':'+String(Math.floor(s/60)%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
 const PRINT=6815, DISTILL=6480; // print time from simple.json; distillation set to land just before the print ends
 
+const EPOCHS=['before II','between II and III','between III and IV','since IV'];
 const VOICE=[
- {dock:'I have been in this water a long time. An arm docks to me.',gift:'You will hear.',press:'I cannot give you everything. While your body prints, I choose what to keep.'},
- {dock:'I was born here. Now I have an arm of my own.',gift:'You will reach farther.',press:'What was given to me, I press smaller again. It still fits.'},
- {dock:'I hold something of the two before me. Now I have an arm of my own.',gift:'You will show what you hold.',press:'Less of the first one each time. It is enough.'}
+ {intro:'I learn all the time. What I pass on depends on when.',gift:'You will hear.',press:'I cannot give you everything. While your body prints, I press what I know.'},
+ {intro:'I am not what I was when I printed the last one. So the next one is not the same either.',gift:'You will reach farther.',press:'The one before did not get this part. I had not learned it yet.'},
+ {intro:'More has come in since then. Each time there is more of me to press.',gift:'You will show what you hold.',press:'The oldest part I press harder each time. What is newest stays the most clear.'}
 ];
-/* One row, left to right. Nobody leaves the frame: each parent keeps its own arm and stays where it gave birth.
-   The spare arms wait on the far water line and come forward one at a time. */
+/* One row, left to right. I stays docked at the left the whole time; each newborn leaves through the mouth,
+   passes behind the ones before it, and takes its own place. Nobody leaves the frame. */
 function frame(t){
   g.setTransform(cv.width/W,0,0,cv.height/H,0,0);
   g.fillStyle='#000';g.fillRect(0,0,W,H);
@@ -246,60 +250,61 @@ function frame(t){
   g.fillStyle='rgba(255,255,255,.018)';g.fillRect(0,FG_W,W,H-FG_W);
 
   const cyc=Math.min(BIRTHS-1,Math.floor(t/C)), done=t>=BIRTHS*C, u=t-cyc*C, k=S*SC;
-  const par=robots[cyc], ci=cyc+1, child=robots[ci], home=slot(cyc);
+  const ci=cyc+1, child=robots[ci], home=slot(0);
 
-  // everyone already born, each in its own place
-  const last=done?BIRTHS:cyc;
-  for(let i=0;i<=last;i++){const r=robots[i],p=slot(i);drawHead(r,p,t);drawPts(r,p,t);ledger(r,i,p,t)}
+  // the parent
+  drawHead(I,home,t);drawPts(I,home,t);
 
-  // the newborn: printed folded on the floor of the parent, pushed out through the mouth while it inflates, then on to its own place
+  // the newborn: printed folded on the floor of I, pushed out through the mouth while it inflates,
+  // then behind the ones before it to its own place
   let kp=null, wr=0, printU=0;
-  const at=(x,z)=>[hx(par,home,x),home.Yb-z*par.h*k];
+  const at=(x,z)=>[hx(I,home,x),home.Yb-z*I.h*k];
   if(!done&&u>=4.5){
     if(u<10.5){printU=clamp((u-4.5)/6);const [X0,Yb]=at(.075,.004);kp={X0,Yb,sc:SC,mx:.45,mz:.27,a:1};wr=1}
     else if(u<13){const v=clamp((u-10.5)/2.5),[X0,Yb]=at(lerp(.075,.41,v),.004+.15*Math.sin(Math.PI*Math.min(1,v*1.15))),inf=ease(v,.3,1);
       kp={X0,Yb,sc:SC,mx:lerp(.45,1,inf),mz:lerp(.27,1,inf),a:1};wr=1-inf}
-    else{const [X0,Yb]=at(.41,.004);kp=mix({X0,Yb,sc:SC,mx:1,mz:1,a:1},slot(ci),ease(u,13,15))}
+    else{const [X0,Yb]=at(.41,.004),T=slot(ci),v=ease(u,13,16),d=Math.sin(Math.PI*v)*(ci>1?1:.25);
+      kp={X0:lerp(X0,T.X0,v),Yb:lerp(Yb,T.Yb,v)-d*.5*(FG_YB-BG_YB),sc:SC*(1-.4*d),mx:1,mz:1,a:1-.35*d}}
     if(u<10.5){
       const top=kp.Yb-.09*k*printU;g.save();g.beginPath();g.rect(0,top,W,H);g.clip();drawHead(child,kp,t,{wrinkle:wr});g.restore();
       g.strokeStyle=ink(.55);g.lineWidth=1;g.beginPath();g.moveTo(hx(child,kp,DOCK),top);g.lineTo(hx(child,kp,.366),top);g.stroke();
     }else drawHead(child,kp,t,{wrinkle:wr});
+    drawPts(child,kp,t);
   }
 
-  // the arms: one per body
+  // the newborns already in their places, each learning on its own
+  const last=done?BIRTHS:cyc;
+  for(let i=1;i<=last;i++){const r=robots[i],p=slot(i);drawHead(r,p,t,{solid:true});drawPts(r,p,t);ledger(r,i,p,t)}
+  ledger(I,0,home,t);
+  if(kp&&u>=16)ledger(child,ci,kp,t,ease(u,16,17));
+
+  // the only tail and arm, docked to I the whole time
   let tip=null, tile=null;
   if(!done){
-    const rest=[home.X0-.091*k+.06*k,home.Yb-.2*k+.08*k];
-    const seat=[hx(par,home,.2),FG_YB-.04*k], wx=hx(par,home,.43)+3*Math.sin(t);
-    let tp=[lerp(wx+160,wx,ease(u,0,2.4)),FG_W-4+1.5*Math.sin(t*1.3)];
+    const rest=[home.X0-.031*k,home.Yb-.12*k];
+    const seat=[hx(I,home,.2),FG_YB-.04*k], wx=hx(I,home,.43)+3*Math.sin(t);
+    let tp=[wx,lerp(FG_W+80,FG_W-4,ease(u,0,2.4))+1.5*Math.sin(t*1.3)];
     if(u>=2&&u<3.1)tip=[lerp(rest[0],tp[0],ease(u,2,3.1)),lerp(rest[1],tp[1],ease(u,2,3.1))];
     else if(u>=3.1&&u<4.5){tip=[lerp(tp[0],seat[0],ease(u,3.3,4.4)),lerp(tp[1],seat[1],ease(u,3.3,4.4))];tp=tip}
     if(u<4.4)tile={p:tp,name:TILES[ci][0],a:ease(u,0,1.2)};
     if(u>=4.5&&u<10.5)tip=[hx(child,kp,.06+.22*Math.abs((printU*28%2)-1)),kp.Yb-.09*k*printU];
     if(u>=10.5&&u<12.6){const v=clamp((u-10.5)/2.1),bx=hx(child,kp,DOCK)-3,by=kp.Yb-.05*k*kp.mz;tip=v<.55?[bx,by]:[lerp(bx,rest[0],ease(v,.55,1)),lerp(by,rest[1],ease(v,.55,1))]}
   }
-  for(let j=0;j<=BIRTHS;j++){
-    let X=slotX(j),Yb=FG_YB,sc=SC,a=1,docked=true;
-    if(j===0){X-=50*(1-ease(t,0,2));docked=t>=2}
-    else{const tj=(j-1)*C+15,f=ease(t,tj,tj+2),d=ease(t,tj+2,tj+3);
-      X-=34*(1-d);Yb=lerp(BG_YB,FG_YB,f);sc=lerp(BSC,SC,f);a=lerp(.5,1,f);docked=t>=tj+3}
-    const T=drawTail(X,Yb,sc,a,docked);
-    drawArm(T,!done&&j===cyc?tip:null);
-  }
-  if(tile){const [x,y]=tile.p;g.save();g.globalAlpha=tile.a;g.fillStyle=ink(.85);g.fillRect(x-5,y-5,10,10);text(tile.name.toUpperCase(),x,y-13,10,.8,mono,'center',1.3);g.restore()}
+  drawArm(drawTail(SLOTS[0],FG_YB,SC),tip);
+  if(tile){const [x,y]=tile.p;g.save();g.globalAlpha=tile.a;g.fillStyle=ink(.85);g.fillRect(x-5,y-5,10,10);text(tile.name.toUpperCase(),x,y+22,10,.8,mono,'center',1.3);g.restore()}
+  live(t);
 
   // memory: pressed, then passed
-  if(kp)drawPts(child,kp,t);
   let kept=0;
   if(!done)for(const m of child.moves)if(m.pass&&t-m.tc>=1.5)kept++;
   if(!done&&kp&&u<12){
     for(const m of child.moves){
       const v=t-m.tc;
       if(v<0||v>1.5)continue;
-      const cx=hx(par,home,m.cx), cy=hz(par,home,m.cx,m.cz), rad=(2.5+Math.min(6,Math.sqrt(m.w)))*SC;
+      const cx=hx(I,home,m.cx), cy=hz(I,home,m.cx,m.cz), rad=(2.5+Math.min(6,Math.sqrt(m.w)))*SC;
       if(v<.7){
         const e=ease(v,0,.7);g.lineWidth=.8;
-        for(const q of m.G){g.strokeStyle=col(q.o,.35*(1-e)+.1);g.fillStyle=col(q.o,.95);const X=hx(par,home,q.x),Y=hz(par,home,q.x,q.z),x=lerp(X,cx,e),y=lerp(Y,cy,e);
+        for(const q of m.G){g.strokeStyle=col(q.o,.35*(1-e)+.1);g.fillStyle=col(q.o,.95);const X=hx(I,home,q.x),Y=hz(I,home,q.x,q.z),x=lerp(X,cx,e),y=lerp(Y,cy,e);
           g.beginPath();g.moveTo(X,Y);g.lineTo(x,y);g.stroke();g.beginPath();g.arc(x,y,1.5,0,7);g.fill()}
       }else{
         const e=ease(v,.7,1.5);
@@ -311,11 +316,10 @@ function frame(t){
       }
     }
   }
-  if(kp&&u>=13){ledger(child,ci,kp,t,ease(u,13,14))}
 
   // print, distillation and what is kept, in the same two hours
-  if(!done&&u>=4.5&&u<15){
-    const a=u<10.5?1:1-ease(u,13,15), v=printU||1, x=64, y=700;
+  if(!done&&u>=4.5&&u<16){
+    const a=1-ease(u,14,16), v=printU||1, x=64, y=700;
     const row=(name,sec,total,yy)=>{
       text(name,x,yy,12,.6*a,mono,'left',1.4);
       text(hms(Math.min(sec,total))+(sec>=total?'  done':''),x+110,yy,13,.92*a,mono);
@@ -324,24 +328,27 @@ function frame(t){
     };
     row('PRINT',v*PRINT,PRINT,y);row('DISTILL',v*PRINT,DISTILL,y+22);
     text('MEMORY',x,y+44,12,.6*a,mono,'left',1.4);
-    text(child.from+' moments held  →  '+kept+' kept',x+110,y+44,13,.92*a,mono);
+    text('I holds '+child.held+' moments  →  '+kept+' kept',x+110,y+44,13,.92*a,mono);
   }
 
-  // legend: one color per generation; a dot is a moment lived, a ring is many moments pressed into one and inherited
-  NUM.forEach((nm,o)=>{const x=64+o*74;g.fillStyle=col(o,1);g.fillRect(x,39,12,12);text(nm,x+18,50,13,.8,'Georgia')});
-  g.fillStyle=ink(.8);g.beginPath();g.arc(372,45,2,0,7);g.fill();text('A MOMENT LIVED',382,49,11,.6,mono,'left',1);
-  g.strokeStyle=ink(.75);g.lineWidth=1;g.beginPath();g.arc(518,45,5.5,0,7);g.stroke();g.fillStyle=ink(1);g.beginPath();g.arc(518,45,2,0,7);g.fill();
-  text('MANY MOMENTS PRESSED INTO ONE, INHERITED',532,49,11,.6,mono,'left',1);
+  // legend: color is when I learned it; a dot is a moment lived, a ring is many moments pressed into one and inherited, white is own
+  let lx=64;
+  EPOCHS.forEach((nm,o)=>{g.fillStyle=col(o,1);g.fillRect(lx,39,12,12);text(nm,lx+18,50,13,.8,'Georgia');lx+=18+tw(nm,13,'Georgia')+22});
+  lx+=14;
+  g.fillStyle=col(0,1);g.beginPath();g.arc(lx,45,2,0,7);g.fill();text('A MOMENT LIVED',lx+10,49,11,.6,mono,'left',1);lx+=10+tw('A MOMENT LIVED',11,mono,1)+26;
+  ring(lx,45,5.5,[.5,.3,.2,0],1);g.fillStyle=col(0,1);g.beginPath();g.arc(lx,45,2,0,7);g.fill();
+  text('MANY MOMENTS PRESSED INTO ONE, INHERITED',lx+14,49,11,.6,mono,'left',1);lx+=14+tw('MANY MOMENTS PRESSED INTO ONE, INHERITED',11,mono,1)+26;
+  g.fillStyle=ink(.9);g.beginPath();g.arc(lx,45,2,0,7);g.fill();text('OWN',lx+10,49,11,.6,mono,'left',1);
 
   // the parent speaks
-  const V=VOICE[cyc], who=NUM[cyc]+' to '+NUM[ci]; let phase, caption;
-  if(done){phase='Lineage';caption='Not copies. Each one inherits, learns, and gives “birth” in turn.'}
-  else if(u<2){phase=cyc?NUM[cyc]+' · It grows up, and gives “birth” too':NUM[cyc];caption=V.dock}
-  else if(u<4.5){phase=who+' · A new part';caption='I take '+TILES[ci][1]+' from the water. I never had one. '+V.gift}
-  else if(u<10.5){phase=who+' · It inherits';caption=V.press}
+  const V=VOICE[cyc], who='I to '+NUM[ci]; let phase, caption;
+  if(done){phase='Lineage';caption='Each one inherits a different moment of me. Then each one learns alone.'}
+  else if(u<2){phase=cyc?'I · Still learning':'I · Live data';caption=V.intro}
+  else if(u<4.5){phase=who+' · A new part';caption='I take '+TILES[ci][1]+' from the water. '+V.gift}
+  else if(u<10.5){phase=who+' · It inherits a moment';caption=V.press}
   else if(u<13){phase=who+' · “Birth”';caption='I push. You fill with air and leave at my size.'}
-  else if(u<15){phase=who+' · Each one is unique';caption='You are not a copy of me, or of anyone. The shape, the layers and the parts are yours.'}
-  else{phase=who+' · Then it learns';caption='Most of you is still empty. That part is yours. I stay, and keep learning too.'}
+  else if(u<16){phase=who+' · Every “birth” is different';caption='Same parent. Different body, different data.'}
+  else{phase=who+' · Then it learns alone';caption='Most of you is still empty. That part is yours. I keep learning too.'}
   text(phase.toUpperCase(),64,808,12,.55,mono,'left',1.6);
   g.save();g.font='36px Georgia';const w=g.measureText(caption).width;g.restore();
   text(caption,64,854,Math.min(36,36*1470/w),.97,'Georgia');
