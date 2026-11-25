@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Born, Not Made · The exhibition</title>
+<meta name="description" content="Born, Not Made as an exhibition: a dark room, three walls of projection, four installations from simple to complex, and the people who walk through and argue about what to call birth.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="icon" href="data:,">
+<style>
+:root { --bg: #000; --line: #262628; --ink: #ecebe6; --muted: #9b9a94; --dim: #67665f; --mono: "JetBrains Mono", ui-monospace, monospace; --serif: "Cormorant Garamond", Georgia, serif; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font: 13px/1.55 "Inter", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+a { color: var(--ink); }
+header.top { display: flex; align-items: baseline; gap: 14px; padding: 12px 16px; flex-wrap: wrap; }
+header.top h1 { margin: 0; font: 400 24px/1.1 var(--serif); }
+header.top p { margin: 0; color: var(--muted); font-size: 12px; flex: 1 1 260px; }
+header.top a { font-size: 12px; color: var(--muted); text-decoration: none; } header.top a:hover { color: #fff; }
+.view { position: relative; background: #000; height: min(78vh, 820px); min-height: 380px; overflow: hidden; }
+#c { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; padding: 8px 12px; border-top: 1px solid #18181a; border-bottom: 1px solid #18181a; }
+.bar .sep { width: 1px; height: 14px; background: #2a2a2d; margin: 0 6px; }
+.bar label { font: 500 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); margin-right: 2px; }
+button { font: 500 11.5px "Inter", sans-serif; color: var(--muted); background: none; border: 0; padding: 4px 7px; cursor: pointer; }
+button:hover { color: #fff; } button.on { color: #fff; font-weight: 700; }
+input[type=range] { accent-color: #fff; flex: 1 1 160px; min-width: 120px; }
+.bar output { font: 11px var(--mono); color: var(--muted); min-width: 74px; text-align: right; }
+main { max-width: 1120px; margin: 0 auto; padding: 8px 16px 80px; }
+main h2 { font: 400 28px/1.15 var(--serif); margin: 44px 0 10px; }
+main h3 { font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
+main p { color: #c9c8c2; max-width: 74ch; margin: 0 0 12px; }
+.lead { font: 300 19px/1.5 var(--serif); color: var(--ink); max-width: 62ch; }
+.grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 14px; }
+.card { border: 1px solid var(--line); padding: 14px; cursor: pointer; }
+.card:hover { border-color: #55554f; }
+.card b { display: block; font: 400 19px/1.2 var(--serif); margin: 4px 0 6px; }
+.card p { font-size: 12px; margin: 0 0 6px; color: #b4b3ad; }
+.card i { font-style: normal; font: 10.5px var(--mono); color: var(--dim); }
+table { border-collapse: collapse; width: 100%; margin-top: 10px; font-size: 12.5px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 10px 8px 0; border-top: 1px solid #1c1c1e; color: #c9c8c2; }
+th { font: 500 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border-top: 0; }
+td:first-child { color: var(--ink); white-space: nowrap; }
+ol.path { margin: 8px 0 0; padding: 0; list-style: none; counter-reset: s; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 22px; }
+ol.path li { counter-increment: s; border-top: 1px solid #1c1c1e; padding-top: 8px; color: #c9c8c2; font-size: 12.5px; }
+ol.path li::before { content: counter(s, decimal-leading-zero); display: block; font: 10.5px var(--mono); color: var(--dim); }
+ol.path li b { display: block; color: var(--ink); font-weight: 500; }
+.voices { columns: 2 300px; column-gap: 28px; margin-top: 10px; }
+.voices p { break-inside: avoid; font: 300 18px/1.4 var(--serif); color: var(--ink); margin: 0 0 10px; }
+.voices p span { display: block; font: 10.5px var(--mono); color: var(--dim); }
+.note { color: var(--muted); font-size: 12px; }
+@media (max-width: 820px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } ol.path { grid-template-columns: minmax(0, 1fr); } .view { height: 62vh; } }
+html.film, html.film body { height: 100%; overflow: hidden; }
+html.film header.top, html.film .bar, html.film main { display: none; }
+html.film .view { position: fixed; inset: 0; height: auto; min-height: 0; }
+html.film #c { object-fit: contain; cursor: none; }
+html.bnm-embed header.top { display: none; }
+</style></head>
+<body>
+<header class="top"><h1>The exhibition</h1><p>Born, Not Made as a room to walk through: three walls of projection, four installations from simple to complex, and the people who argue about what to call what they see.</p><a href="../">Home</a></header>
+<div class="view"><canvas id="c"></canvas></div>
+<div class="bar">
+  <button id="play" class="on">Pause</button>
+  <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Time in the tour">
+  <output id="clock">0:00 / 1:04</output>
+  <span class="sep"></span><label>View</label>
+  <span id="views"></span>
+  <span class="sep"></span><label>Projection</label><button data-r="walls" class="on">Three walls</button><button data-r="ring">Ring</button>
+  <span class="sep"></span><label>Show</label>
+  <button data-t="voices" class="on">Voices</button><button data-t="path">Path</button><button data-t="labels">Labels</button><button data-t="people" class="on">Visitors</button>
+</div>
+<main>
+  <h2>The idea</h2>
+  <p class="lead">AI is now so capable that one day a next generation may follow. As software the answer is easy: a copy. A body cannot be copied that way. A new body has to come from somewhere, and so far only living beings have ever made a new body from their own.</p>
+  <p>Robots will surely find rules of their own in the end. Until then, life is the one reference there is. So the work studies how many kinds of living beings give birth: what each new generation inherits, and what new thing appears that lets a species keep changing. What is learned goes into a way for a robot to do the same.</p>
+  <p>The robot is there to serve the idea. The final work takes the form of art: an exhibition with a series of installations, which can also become part of a performance. People witness the whole birth of an intelligent robot. Some are moved, or find the newborn cute. Others find the scene unsettling, or read a warning in it. Someone who walks in sure that nothing in a machine is alive may walk out less sure. The work is an open debate about what we are willing to call birth, and what we are willing to call life.</p>
+
+  <h2>The setup</h2>
+  <p>A dark room, about 14 m wide. Three walls carry one continuous projection, 4 m tall; the fourth side is open and people come in there. A full ring of projection around a round room is a second option, and the bar under the view switches between the two. Four glass tanks stand on black plinths in an arc, each under one lamp, from the smallest and simplest to the largest. Each tank holds one parent body and shows one way a new body can leave another. The tanks are the props; the room, the light and the people are the piece.</p>
+  <div class="grid" id="cards"></div>
+
+  <h2>The path</h2>
+  <ol class="path">
+    <li><b>Enter</b>The walls are already alive: bodies of many sizes drift, meet and bring out new ones, each stretch of wall in a different way.</li>
+    <li><b>Fill and release</b>The smallest tank. A folded body, made beforehand, takes air and is pushed out. Nothing is printed. Is this already a birth?</li>
+    <li><b>Print and release</b>A needle draws a new body in gel inside the parent body. Water pushes the new body out.</li>
+    <li><b>Print, fill, grow</b>The printed body leaves folded and wrinkled, swims straight ahead and grows as air opens the folds.</li>
+    <li><b>A body that can bear the next</b>The largest tank. The newborn carries parts, and a third body already begins inside the second.</li>
+    <li><b>The walls again</b>People stand in the middle and talk. The question on the wall is the one they are already asking each other.</li>
+  </ol>
+
+  <h2>From simple to complex</h2>
+  <p>Life has many ways to bring a new body out of another. The installations answer a few of them in order, starting with the least a machine can do. The wall shows the same ladder as moving drawings, one way of birth for each stretch of wall.</p>
+  <table>
+    <tr><th>In life</th><th>What happens</th><th>On the wall</th><th>In the room</th></tr>
+    <tr><td>Division</td><td>One body becomes two of the same size.</td><td>A circle stretches and parts.</td><td>Not built. The software answer: a copy.</td></tr>
+    <tr><td>Budding</td><td>A small body grows on the side of a large one and lets go.</td><td>A bud swells on the rim and drifts away.</td><td>Station 1. A ready made body is filled and released.</td></tr>
+    <tr><td>Laying</td><td>The new body leaves early and finishes outside.</td><td>Small dots are left behind and open later.</td><td>Station 2. Printed inside, pushed out, finished by the water.</td></tr>
+    <tr><td>Carrying</td><td>The new body forms inside and leaves when able to live alone.</td><td>A small circle crosses the rim of a large one from inside.</td><td>Station 3. Printed folded, filled, released, grows while swimming.</td></tr>
+    <tr><td>One for many</td><td>One body bears the young for a whole colony.</td><td>One large circle with a stream of small ones around.</td><td>Station 4, and the Society simulation.</td></tr>
+  </table>
+  <p class="note">Species, films and sources for births in nature are on the Nature tab of the site. The ladder here is a reading order for the room, not a claim about biology.</p>
+
+  <h2>What people say</h2>
+  <p>The voices in the room are part of the work. The lines below are imagined, written to test the piece before anyone has seen it. In the tour they appear above the visitors who say them.</p>
+  <div class="voices" id="vlist"></div>
+
+  <h2>The film</h2>
+  <p>The view above is a tour of one minute through the room, on a loop. Drag the time bar to any moment, or pick a view and orbit freely. <a href="?film=1">Open the tour as a clean film</a>, with nothing but the picture at 1920 by 1080. Add <code>&amp;rec=1</code> to record in the browser and download the file.</p>
+</main>
+<script src="../assets/vendor/three-r147/three.min.js"></script>
+<script src="../assets/vendor/three-r147/OrbitControls.js"></script>
+<script>
+"use strict";
+if (window.self !== window.top) document.documentElement.classList.add("bnm-embed");
+const Q = new URLSearchParams(location.search), FILM = Q.get("film") === "1", REC = FILM && Q.get("rec") === "1";
+if (FILM) document.documentElement.classList.add("film");
+const DUR = 64, cv = document.getElementById("c");
+const R = new THREE.WebGLRenderer({ canvas: cv, antialias: true, preserveDrawingBuffer: REC });
+R.setPixelRatio(FILM ? 1 : Math.min(devicePixelRatio, 2)); R.outputEncoding = THREE.sRGBEncoding; R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = 1.15;
+const S = new THREE.Scene(); S.background = new THREE.Color(0x000000); S.fog = new THREE.FogExp2(0x000000, 0.028);
+const cam = new THREE.PerspectiveCamera(38, 16 / 9, 0.1, 80); S.add(cam);
+const orbit = new THREE.OrbitControls(cam, cv); orbit.enableDamping = true; orbit.maxPolarAngle = Math.PI * 0.495; orbit.minDistance = 1.2; orbit.maxDistance = 30; orbit.enabled = false;
+const sm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); }, lerp = (a, b, t) => a + (b - a) * t, clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+/* ---------- the room ---------- */
+const RR = 8.6, WH = 4.2, GAP = 0.55;                       // ring radius, wall height, half opening in radians (entrance at -x)
+S.add(new THREE.AmbientLight(0xffffff, 0.05));
+const floor = new THREE.Mesh(new THREE.CircleGeometry(RR + 4, 96), new THREE.MeshStandardMaterial({ color: 0x0c0c0d, roughness: 0.62, metalness: 0.1 })); floor.rotation.x = -Math.PI / 2; S.add(floor);
+const PW = 2048, PH = 384, pc = document.createElement("canvas"); pc.width = PW; pc.height = PH; const px = pc.getContext("2d");
+const ptex = new THREE.CanvasTexture(pc); ptex.encoding = THREE.sRGBEncoding; ptex.wrapS = THREE.RepeatWrapping; ptex.repeat.x = -1; ptex.offset.x = 1; ptex.anisotropy = 4;
+const ringGeo = new THREE.CylinderGeometry(RR, RR, WH, 160, 1, true, Math.PI / 2 + GAP + Math.PI, Math.PI * 2 - 2 * GAP);
+const ring = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ map: ptex, side: THREE.BackSide, fog: false })); ring.position.y = WH / 2 + 0.35; S.add(ring);
+const ringBack = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.FrontSide })); ringBack.position.copy(ring.position); ringBack.scale.set(1.004, 1, 1.004); S.add(ringBack);
+/* three flat walls, open toward the entrance at -x: side wall at -z, back wall at +x, side wall at +z. One picture runs across all three. */
+const WX0 = -5, WX1 = 8.4, WZ = 7, Y0 = 0.35, Y1 = 0.35 + WH, LA = WX1 - WX0, LB = 2 * WZ, LT = 2 * LA + LB, ua = LA / LT, ub = (LA + LB) / LT;
+const wq = [[WX0, -WZ, 0], [WX1, -WZ, ua], [WX1, -WZ, ua], [WX1, WZ, ub], [WX1, WZ, ub], [WX0, WZ, 1]], wp = [], wu = [], wi = [];
+for (let k = 0; k < 3; k++) { const a = wq[2 * k], b = wq[2 * k + 1], o = k * 4; wp.push(a[0], Y0, a[1], b[0], Y0, b[1], b[0], Y1, b[1], a[0], Y1, a[1]); wu.push(1 - a[2], 0, 1 - b[2], 0, 1 - b[2], 1, 1 - a[2], 1); wi.push(o, o + 1, o + 2, o, o + 2, o + 3); }
+const wallGeo = new THREE.BufferGeometry(); wallGeo.setAttribute('position', new THREE.Float32BufferAttribute(wp, 3)); wallGeo.setAttribute('uv', new THREE.Float32BufferAttribute(wu, 2)); wallGeo.setIndex(wi);
+const walls = new THREE.Mesh(wallGeo, new THREE.MeshBasicMaterial({ map: ptex, side: THREE.FrontSide, fog: false })); S.add(walls);
+const wallFrame = new THREE.LineSegments(new THREE.EdgesGeometry(wallGeo), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.12 })); S.add(wallFrame);
+let ROOM = Q.get('room') === 'ring' ? 'ring' : 'walls';
+function setRoom(r) { ROOM = r; const w = r === 'walls'; walls.visible = wallFrame.visible = w; ring.visible = ringBack.visible = glow.visible = !w; document.querySelectorAll('[data-r]').forEach((b) => b.classList.toggle('on', b.dataset.r === r)); }
+/* the wall lights the floor a little: a soft pool under the ring */
+const glow = new THREE.Mesh(new THREE.RingGeometry(RR - 3.4, RR, 96, 1), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.035, blending: THREE.AdditiveBlending, depthWrite: false })); glow.rotation.x = -Math.PI / 2; glow.position.y = 0.004; S.add(glow);
+const wallLight = new THREE.HemisphereLight(0xffffff, 0x000000, 0.1); S.add(wallLight); setRoom(ROOM);
+
+/* ---------- the four stations ---------- */
+const ST = [
+  { key: "fill", n: "Fill and release", d: "A folded body, made beforehand, sits inside the parent body. Air fills the folds and the body is pushed out. No printing.", life: "after budding", s: 0.62, a: -2.42, print: 0, fill: 1, grow: 0, parts: 0 },
+  { key: "print", n: "Print and release", d: "A needle draws the new body in gel, layer by layer. Water pressure pushes the body out through the mouth.", life: "after laying", s: 0.8, a: -1.86, print: 1, fill: 0, grow: 0, parts: 0 },
+  { key: "grow", n: "Print, fill, grow", d: "Printed folded, filled just enough to pass the mouth, released wrinkled. An air pump opens the folds while the newborn swims.", life: "after carrying", s: 1.0, a: -1.26, print: 1, fill: 1, grow: 1, parts: 0 },
+  { key: "next", n: "A body that can bear the next", d: "The newborn is printed with parts in the wall and leaves able to print. A third body begins inside the second.", life: "after one for many", s: 1.3, a: -0.62, print: 1, fill: 1, grow: 1, parts: 1 },
+];
+const SR = 4.3, PLH = 0.92;
+const glassM = new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: 0.07, roughness: 0.05, metalness: 0, side: THREE.DoubleSide, depthWrite: false });
+const edgeM = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 });
+const waterM = new THREE.MeshStandardMaterial({ color: 0x9aa0a6, transparent: true, opacity: 0.16, roughness: 0.2, depthWrite: false });
+const shellM = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.2, roughness: 0.25, side: THREE.DoubleSide, depthWrite: false, emissive: 0xffffff, emissiveIntensity: 0.05 });
+const partM = new THREE.MeshStandardMaterial({ color: 0xb9b9b9, roughness: 0.6 });
+function capsule(len, rad) {                                  // parent body: closed round tail at -x, open oblique mouth at +x
+  const pts = []; for (let i = 0; i <= 14; i++) { const t = i / 14 * Math.PI / 2; pts.push(new THREE.Vector2(Math.sin(t) * rad, -Math.cos(t) * rad * 1.1)); }
+  pts.push(new THREE.Vector2(rad, len * 0.55), new THREE.Vector2(rad * 0.92, len * 0.86), new THREE.Vector2(rad * 0.8, len));
+  const g = new THREE.LatheGeometry(pts, 40); g.rotateZ(-Math.PI / 2); return g;
+}
+for (const st of ST) {
+  const g = new THREE.Group(), s = st.s; st.g = g;
+  st.pos = new THREE.Vector3(Math.cos(st.a) * SR, 0, -Math.sin(st.a) * SR * -1); st.pos.set(Math.cos(st.a) * SR, 0, Math.sin(st.a) * SR);
+  g.position.copy(st.pos); g.rotation.y = -st.a - Math.PI / 2; S.add(g);         // long axis along the tangent, front toward the center
+  const L = 1.9 * s, W = 0.62 * s, H = 0.6 * s; st.L = L; st.W = W; st.H = H;
+  const pl = new THREE.Mesh(new THREE.BoxGeometry(L + 0.06, PLH, W + 0.06), new THREE.MeshStandardMaterial({ color: 0x070707, roughness: 0.5 })); pl.position.y = PLH / 2; g.add(pl);
+  const box = new THREE.BoxGeometry(L, H, W), tank = new THREE.Mesh(box, glassM); tank.position.y = PLH + H / 2; g.add(tank);
+  const ed = new THREE.LineSegments(new THREE.EdgesGeometry(box), edgeM); ed.position.copy(tank.position); g.add(ed);
+  const wat = new THREE.Mesh(new THREE.BoxGeometry(L - 0.01, H * 0.5, W - 0.01), waterM); wat.position.y = PLH + H * 0.25; g.add(wat);
+  const wl = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(L - 0.01, W - 0.01)), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.25 })); wl.rotation.x = Math.PI / 2; wl.position.y = PLH + H * 0.5; g.add(wl);
+  const br = 0.19 * s, bl = 0.5 * s; st.br = br; st.bl = bl; st.x0 = -L / 2 + br * 1.1 + 0.1 * s;
+  const body = new THREE.Mesh(capsule(bl, br), shellM); body.position.set(st.x0, PLH + br + 0.012, 0); g.add(body); st.cy = PLH + br + 0.012;
+  if (st.print) {                                             // a small arm in the tail with a needle
+    const base = new THREE.Mesh(new THREE.BoxGeometry(br * 0.5, br * 0.5, br * 0.5), partM); base.position.set(st.x0 - br * 0.1, st.cy - br * 0.45, 0); g.add(base);
+    st.arm = new THREE.Mesh(new THREE.CylinderGeometry(br * 0.05, br * 0.05, 1, 6), partM); g.add(st.arm);
+    st.needle = new THREE.Mesh(new THREE.CylinderGeometry(br * 0.018, br * 0.018, br * 0.5, 5), new THREE.MeshBasicMaterial({ color: 0xffffff })); g.add(st.needle);
+  } else { const pump = new THREE.Mesh(new THREE.BoxGeometry(br * 0.5, br * 0.36, br * 0.4), partM); pump.position.set(st.x0 - br * 0.15, st.cy - br * 0.5, 0); g.add(pump); }
+  /* the newborn: an egg like body whose folds open with the fill */
+  const ng = new THREE.SphereGeometry(1, 44, 22); ng.rotateZ(Math.PI / 2); st.nb0 = ng.attributes.position.array.slice();
+  st.nb = new THREE.Mesh(ng, new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.62, roughness: 0.35, emissive: 0xffffff, emissiveIntensity: 0.1, depthWrite: false })); st.nb.renderOrder = 2; g.add(st.nb);
+  st.kit = new THREE.Mesh(new THREE.BoxGeometry(0.03 * s, 0.022 * s, 0.03 * s), partM); st.kit.visible = !!st.parts; g.add(st.kit);
+  st.inner = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 10), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 })); st.inner.visible = false; st.inner.renderOrder = 3; g.add(st.inner);
+  /* one lamp for each tank, with a faint cone */
+  const sp = new THREE.SpotLight(0xffffff, 2.2, 9, 0.42, 0.6, 1.2); sp.position.set(0, 4.4, 0); sp.target.position.set(0, PLH, 0); g.add(sp, sp.target);
+  const cone = new THREE.Mesh(new THREE.ConeGeometry(1.5 * (0.7 + s * 0.3), 3.5, 40, 1, true), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.014, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false, fog: false })); cone.position.y = 4.4 - 1.75; g.add(cone);
+  st.phase = ST.indexOf(st) * 0.19;
+}
+const CYC = 26;
+function newbornShape(st, fill) {                             // wrinkles fade and the body swells with the fill (0.25 folded .. 1 grown)
+  const p = st.nb.geometry.attributes.position, a = p.array, b = st.nb0, w = (1 - fill) * 0.22;
+  for (let i = 0; i < a.length; i += 3) {
+    const x = b[i], y = b[i + 1], z = b[i + 2], th = Math.atan2(z, y), k = 1 - w * (0.5 + 0.5 * Math.sin(th * 9 + x * 7)) * (1 - x * x * 0.6) - w * 0.25 * Math.sin(x * 16);
+    const taper = x > 0 ? 1 : 1 - 0.35 * x * x;                                   // rounder front, finer rear
+    a[i] = x; a[i + 1] = y * k * taper; a[i + 2] = z * k * taper * (x < -0.4 ? 1 - 0.5 * (-x - 0.4) : 1);
+  }
+  p.needsUpdate = true; st.nb.geometry.computeVertexNormals();
+}
+function stepStation(st, T) {
+  const u = ((T / CYC + st.phase) % 1 + 1) % 1, br = st.br, s = st.s;
+  const made = st.print ? sm(0.02, 0.36, u) : 1;                                  // printed from the floor up, or there from the start
+  const exitFill = st.fill ? 0.5 : 0.92, startFill = st.print ? (st.fill ? 0.3 : 0.92) : 0.25;
+  let fill = lerp(startFill, exitFill, sm(0.36, 0.5, u));
+  const out = sm(0.5, 0.66, u), swim = sm(0.64, 0.92, u), fade = 1 - sm(0.94, 0.995, u);
+  fill = lerp(fill, 1, st.grow ? swim : sm(0.6, 0.7, u));
+  const size = br * 0.5 * (st.grow ? lerp(0.86, 1.55, swim) : lerp(0.86, 1.0, sm(0.5, 0.7, u)));
+  const xin = st.x0 + st.bl * 0.52, xmouth = st.x0 + st.bl + size * 1.3, xend = st.L / 2 - size * 1.7 - 0.05 * s;
+  const x = lerp(lerp(xin, xmouth, out), xend, swim), y = lerp(st.cy - br * 0.38, PLH + st.H * 0.5 - size * 0.25, sm(0.56, 0.7, u)) + Math.sin(T * 1.7 + st.phase * 9) * 0.004 * swim;
+  newbornShape(st, fill);
+  st.nb.position.set(x, y, 0); st.nb.scale.set(size * 1.55, size * Math.max(0.04, made), size); if (st.print && made < 1) st.nb.position.y -= size * (1 - made);
+  st.nb.material.opacity = 0.62 * fade * (u < 0.012 ? u / 0.012 : 1); st.nb.visible = fade > 0.01;
+  if (st.arm) {
+    const tipx = made < 1 ? xin + Math.sin(T * 5.1) * size * 1.2 : st.x0 + st.bl * 0.2, tipy = made < 1 ? st.cy - br * 0.38 - size + 2 * size * made + br * 0.25 : st.cy + br * 0.3, bx = st.x0 - br * 0.1, by = st.cy - br * 0.2;
+    st.needle.position.set(tipx, tipy, 0); st.needle.visible = made < 1 && u > 0.02;
+    const dx = tipx - bx, dy = tipy + br * 0.25 - by, len = Math.hypot(dx, dy); st.arm.scale.y = len; st.arm.position.set(bx + dx / 2, by + dy / 2, 0); st.arm.rotation.z = Math.atan2(dy, dx) - Math.PI / 2;
+  }
+  st.kit.position.set(x - size * 0.2, y - size * 0.55, 0); st.kit.visible = !!st.parts && made > 0.5 && fade > 0.05;
+  const third = st.parts ? sm(0.8, 0.93, u) : 0; st.inner.visible = third > 0.01 && fade > 0.05; st.inner.position.set(x + size * 0.2, y, 0); st.inner.scale.setScalar(size * 0.3 * third); st.inner.material.opacity = 0.5 * fade;
+  st.u = u;
+}
+
+/* ---------- the wall: bodies of many sizes bring out new ones, a different way on each stretch ---------- */
+const ZN = 5, ZW = PW / ZN, zones = [];
+for (let z = 0; z < ZN; z++) { const ag = [], n = z === 4 ? 1 : 9 - z, r0 = [15, 19, 25, 34, 58][z]; for (let i = 0; i < n; i++) ag.push({ x: ZW * (0.15 + 0.7 * rnd()), y: PH * (0.2 + 0.6 * rnd()), r: r0 * (0.75 + 0.5 * rnd()), vx: (rnd() - 0.5) * 8, vy: (rnd() - 0.5) * 6, t: rnd() * 9, p: 0, age: 9 }); zones.push({ ag, eggs: [] }); }
+zones[4].ag[0].x = ZW / 2; zones[4].ag[0].y = PH / 2; zones[4].ag[0].vx = zones[4].ag[0].vy = 0;
+function stepWall(dt, T) {
+  px.fillStyle = "rgba(0,0,0,0.34)"; px.fillRect(0, 0, PW, PH); px.lineWidth = 2.2; px.lineCap = "round";
+  for (let z = 0; z < ZN; z++) {
+    const Z = zones[z], ox = z * ZW, A = Z.ag, cap = [20, 18, 15, 12, 34][z];
+    for (const a of A) {
+      a.age += dt; a.t += dt; a.x += a.vx * dt; a.y += a.vy * dt; a.vx += (rnd() - 0.5) * 6 * dt; a.vy += (rnd() - 0.5) * 5 * dt; a.vx *= 0.995; a.vy *= 0.995;
+      if (a.x < a.r + 8) a.vx += 14 * dt; if (a.x > ZW - a.r - 8) a.vx -= 14 * dt; if (a.y < a.r + 16) a.vy += 12 * dt; if (a.y > PH - a.r - 16) a.vy -= 12 * dt;
+      if (z === 4 && a.q) { const q = A[0], dx = a.x - q.x, dy = a.y - q.y, d = Math.hypot(dx, dy) || 1; a.vx += (-dy / d * 9 + dx / d * (70 + a.orb - d) * 0.25 - a.vx) * dt; a.vy += (dx / d * 9 + dy / d * (70 + a.orb - d) * 0.25 - a.vy) * dt; }
+      const period = [15, 13, 9, 14, 2.6][z] * (a.k || (a.k = 0.7 + 0.6 * rnd())); const parent = z !== 4 || !a.q;
+      if (parent && a.age > 6 && a.t > period && !a.p) { a.p = 0.0001; a.ang = rnd() * 6.283; }
+      if (a.p) { a.p += dt / [4, 4, 1.2, 4.5, 1.4][z];
+        if (a.p >= 1) { a.p = 0; a.t = 0; const c = Math.cos(a.ang), s = Math.sin(a.ang);
+          if (z === 0) { a.r *= 0.82; A.push({ x: a.x + c * a.r * 1.6, y: a.y + s * a.r * 1.6, r: a.r, vx: c * 7, vy: s * 7, t: 0, p: 0, age: 0 }); }
+          else if (z === 1) A.push({ x: a.x + c * a.r * 1.5, y: a.y + s * a.r * 1.5, r: a.r * 0.5, vx: c * 9, vy: s * 9, t: 0, p: 0, age: 0, g: a.r * (0.8 + 0.3 * rnd()) });
+          else if (z === 2) Z.eggs.push({ x: a.x, y: a.y + a.r, r: a.r, t: 0 });
+          else if (z === 3) A.push({ x: a.x + c * a.r * 1.4, y: a.y + s * a.r * 1.4, r: a.r * 0.42, vx: c * 8, vy: s * 8, t: 0, p: 0, age: 0, g: a.r * (0.8 + 0.3 * rnd()) });
+          else A.push({ x: a.x + c * a.r, y: a.y + s * a.r, r: 7 + rnd() * 7, vx: c * 26, vy: s * 26, t: 0, p: 0, age: 0, q: 1, orb: rnd() * 70 }); } }
+      if (a.g && a.r < a.g) a.r += dt * 0.5;
+    }
+    for (const e of Z.eggs) { e.t += dt; e.y += 5 * dt * Math.max(0, 1 - e.t / 3); }
+    for (let i = Z.eggs.length - 1; i >= 0; i--) if (Z.eggs[i].t > 7) { const e = Z.eggs.splice(i, 1)[0]; A.push({ x: e.x, y: e.y, r: e.r * 0.35, vx: 0, vy: -4, t: 0, p: 0, age: 0, g: e.r * (0.8 + 0.3 * rnd()) }); }
+    while (A.length > cap) { let o = z === 4 ? 1 : 0; for (let i = o; i < A.length; i++) if (A[i].age > A[o].age) o = i; A.splice(o, 1); }
+    /* draw */
+    px.strokeStyle = "rgba(255,255,255,0.1)"; px.beginPath();
+    for (let i = 0; i < A.length; i++) for (let j = i + 1; j < A.length; j++) { const d = Math.hypot(A[i].x - A[j].x, A[i].y - A[j].y); if (d < 150 && (z !== 4 || i === 0)) { px.moveTo(ox + A[i].x, A[i].y); px.lineTo(ox + A[j].x, A[j].y); } }
+    px.stroke();
+    for (const a of A) { const al = Math.min(1, a.age / 2 + 0.25), X = ox + a.x; px.strokeStyle = `rgba(255,255,255,${0.85 * al})`; px.fillStyle = `rgba(255,255,255,${0.06 * al})`;
+      const c = Math.cos(a.ang || 0), s = Math.sin(a.ang || 0), p = a.p;
+      if (z === 0 && p) { const d = a.r * 0.8 * p, rr = a.r * (1 - 0.18 * p); px.beginPath(); px.arc(X - c * d, a.y - s * d, rr, 0, 6.283); px.fill(); px.stroke(); px.beginPath(); px.arc(X + c * d, a.y + s * d, rr, 0, 6.283); px.fill(); px.stroke(); continue; }
+      px.beginPath(); px.arc(X, a.y, a.r, 0, 6.283); px.fill(); px.stroke();
+      if (p && z === 1) { px.beginPath(); px.arc(X + c * a.r * (1 + 0.5 * p), a.y + s * a.r * (1 + 0.5 * p), a.r * 0.5 * p, 0, 6.283); px.stroke(); }
+      if (p && z === 2) { px.fillStyle = "rgba(255,255,255,0.8)"; px.beginPath(); px.arc(X, a.y + a.r * p, 2.5, 0, 6.283); px.fill(); }
+      if (z === 3) { const k = p || 0; if (a.t > 4 || p) { px.beginPath(); px.arc(X + c * a.r * 1.4 * k, a.y + s * a.r * 1.4 * k, a.r * 0.42 * Math.min(1, p ? 1 : (a.t - 4) / 5), 0, 6.283); px.stroke(); } }
+      if (z === 4 && !a.q) { px.beginPath(); px.arc(X, a.y, a.r * 0.55, 0, 6.283); px.stroke(); }
+    }
+    px.fillStyle = "rgba(255,255,255,0.8)"; for (const e of Z.eggs) { px.beginPath(); px.arc(ox + e.x, e.y, 2.5 + e.t * 0.25, 0, 6.283); px.fill(); }
+  }
+  /* the question travels slowly around the ring near the end of the tour */
+  const qa = sm(50, 54, T) * (1 - sm(62.5, 64, T)); if (qa > 0.01) { px.fillStyle = `rgba(0,0,0,${0.5 * qa})`; px.fillRect(0, PH * 0.36, PW, PH * 0.28); px.fillStyle = `rgba(255,255,255,${qa})`; px.font = "300 40px 'Cormorant Garamond', Georgia, serif"; px.textAlign = "center"; px.textBaseline = "middle"; for (let i = 0; i < 3; i++) px.fillText("What are we willing to call birth?", PW * (0.164 + 0.336 * i), PH / 2); }
+  ptex.needsUpdate = true;
+}
+
+/* ---------- the visitors and the path ---------- */
+const inner = (a, r) => new THREE.Vector3(Math.cos(a) * r, 0, Math.sin(a) * r);
+const pathPts = [new THREE.Vector3(-RR - 2.6, 0, 0.2), new THREE.Vector3(-RR + 1.2, 0, 0), new THREE.Vector3(-5.2, 0, -0.9), inner(ST[0].a, SR - 1.55), inner(ST[1].a, SR - 1.6), inner(ST[2].a, SR - 1.65), inner(ST[3].a, SR - 1.8), new THREE.Vector3(4.9, 0, 0.9), new THREE.Vector3(3.2, 0, 3.6), new THREE.Vector3(0, 0, 4.4), new THREE.Vector3(-2.4, 0, 2.6), new THREE.Vector3(-1.2, 0, 0.4), new THREE.Vector3(-4.6, 0, 0.9), new THREE.Vector3(-RR + 1.2, 0, 0.7), new THREE.Vector3(-RR - 2.6, 0, 0.9)];
+const path = new THREE.CatmullRomCurve3(pathPts, false, "catmullrom", 0.5), PLEN = path.getLength();
+const pathLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(path.getSpacedPoints(300).map((p) => p.setY(0.012))), new THREE.LineDashedMaterial({ color: 0xffffff, transparent: true, opacity: 0.55, dashSize: 0.16, gapSize: 0.12 })); pathLine.computeLineDistances(); pathLine.visible = false; S.add(pathLine);
+const figM = new THREE.MeshBasicMaterial({ color: 0x000000 }), figG = new THREE.Group(); S.add(figG);
+function figure(h) { const g = new THREE.Group(), pts = []; [[0.0, 0], [0.16, 0.02], [0.17, 0.5], [0.2, 0.74], [0.21, 0.8], [0.1, 0.84], [0.07, 0.87]].forEach((p) => pts.push(new THREE.Vector2(p[0] * h / 1.7, p[1] * h)));
+  const b = new THREE.Mesh(new THREE.LatheGeometry(pts, 14), figM); b.scale.z = 0.62; const hd = new THREE.Mesh(new THREE.SphereGeometry(0.105 * h / 1.7, 14, 10), figM); hd.position.y = h * 0.935; hd.scale.y = 1.15; g.add(b, hd); g.userData.h = h; return g; }
+const walkers = []; for (let i = 0; i < 9; i++) { const f = figure(1.55 + rnd() * 0.3); figG.add(f); walkers.push({ f, off: i / 9 + rnd() * 0.04, side: (rnd() - 0.5) * 0.7, sp: 0.9 + rnd() * 0.25 }); }
+/* people who stand and talk: two at each station, three in the middle */
+const standers = []; function stand(x, z, lookx, lookz, h) { const f = figure(h); f.position.set(x, 0, z); f.rotation.y = Math.atan2(lookx - x, lookz - z); figG.add(f); standers.push(f); return f; }
+ST.forEach((st, i) => { const c = inner(st.a, SR - 1.25 - st.s * 0.25), tn = new THREE.Vector3(-Math.sin(st.a), 0, Math.cos(st.a)); stand(c.x + tn.x * 0.42, c.z + tn.z * 0.42, st.pos.x, st.pos.z, 1.62 + 0.06 * i); stand(c.x - tn.x * 0.45, c.z - tn.z * 0.45, st.pos.x, st.pos.z, 1.76 - 0.04 * i); });
+stand(-0.5, 2.3, 0.4, 2.9, 1.7); stand(0.5, 2.9, -0.5, 2.3, 1.6); stand(0.1, 3.4, 0.1, 2.5, 1.8);
+/* dwell at the stations: time maps to distance with plateaus */
+function walkU(t) { const stops = [0.235, 0.325, 0.41, 0.5, 0.72]; let v = t; for (const s of stops) v -= 0.022 * Math.tanh((t - s) * 34); return clamp(v, 0, 1); }
+function stepWalkers(T) { for (const w of walkers) { const t = ((T / 120 * w.sp + w.off) % 1 + 1) % 1, u = clamp(walkU(t), 0.001, 0.999), p = path.getPointAt(u), tg = path.getTangentAt(u); w.f.position.set(p.x - tg.z * w.side, 0, p.z + tg.x * w.side); w.f.rotation.y = Math.atan2(tg.x, tg.z); w.f.position.y = Math.abs(Math.sin(T * 3.1 * w.sp + w.off * 40)) * 0.012; } }
+
+/* ---------- the voices: lines above the people who say them ---------- */
+const V = [
+  [9.0, 0, "Is this the Mother Robot?"], [12.2, 1, "Should we call it a mother? Is it really female?"],
+  [16.0, 1, "Nothing was made here. It only blew up a bag."], [19.0, 0, "Then why did I hold my breath?"],
+  [23.5, 2, "It drew that inside its own body."], [26.5, 3, "So is the small one a baby?"],
+  [31.0, 4, "It came out wrinkled. Look, it is growing."], [34.2, 5, "Does a baby have to look like its mother?"],
+  [38.6, 6, "The small one already carries the next."], [41.6, 7, "This is where I stop finding it cute."],
+  [45.4, 8, "It is a machine. Nothing in there is alive."], [48.2, 9, "You said that when we walked in."], [51.2, 10, "I am less sure now."],
+];
+function textSprite(txt) { const c = document.createElement("canvas"), x = c.getContext("2d"), f = "300 46px 'Cormorant Garamond', Georgia, serif"; x.font = f; const w = Math.ceil(x.measureText(txt).width) + 40; c.width = w; c.height = 84; x.font = f; x.textAlign = "center"; x.textBaseline = "middle"; x.shadowColor = "#000"; x.shadowBlur = 12; x.fillStyle = "#fff"; x.fillText(txt, w / 2, 38); x.fillText(txt, w / 2, 38); x.shadowBlur = 0; x.fillStyle = "rgba(255,255,255,.5)"; x.fillRect(w / 2 - 0.75, 66, 1.5, 18);
+  const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, opacity: 0, depthTest: false, fog: false })); s.userData.asp = w / 84; s.renderOrder = 10; s.center.set(0.5, 0); return s; }
+const voiceG = new THREE.Group(); S.add(voiceG);
+function buildVoices() { voiceG.clear(); for (const v of V) { const s = textSprite("“" + v[2] + "”"); v[3] = s; const f = standers[v[1]]; s.position.set(f.position.x, f.userData.h + 0.12, f.position.z); voiceG.add(s); } }
+const labelG = new THREE.Group(); labelG.visible = false; S.add(labelG);
+function buildLabels() { labelG.clear(); ST.forEach((st, i) => { const s = textSprite((i + 1) + "  " + st.n); s.material.opacity = 0.9; s.position.set(st.pos.x, PLH + st.H + 0.5, st.pos.z); s.userData.fix = 0.2; labelG.add(s); }); }
+function stepVoices(T) { for (const v of V) { const s = v[3]; if (!s) continue; const a = sm(v[0], v[0] + 0.5, T) * (1 - sm(v[0] + 3.4, v[0] + 4.1, T)); s.material.opacity = a; s.visible = a > 0.01; const d = cam.position.distanceTo(s.position), h = clamp(d * 0.06, 0.17, 0.8); s.scale.set(h * s.userData.asp, h, 1); }
+  for (const s of labelG.children) { const d = cam.position.distanceTo(s.position), h = clamp(d * 0.03, 0.1, 0.5); s.scale.set(h * s.userData.asp, h, 1); } }
+document.getElementById("vlist").innerHTML = V.map((v) => `<p>“${v[2]}”<span>${v[1] < 8 ? "at station " + (Math.floor(v[1] / 2) + 1) : "in the middle of the room"}</span></p>`).join("");
+document.getElementById("cards").innerHTML = ST.map((s, i) => `<div class="card" data-v="s${i}"><i>Station ${i + 1} · ${s.life}</i><b>${s.n}</b><p>${s.d}</p><i>tank ${(s.L * 100).toFixed(0)} cm long</i></div>`).join("");
+
+/* ---------- the camera: one tour, and free views ---------- */
+const v3 = (x, y, z) => new THREE.Vector3(x, y, z), eye = (st, back, up, side) => { const c = inner(st.a, SR - back), tn = v3(-Math.sin(st.a), 0, Math.cos(st.a)); return v3(c.x + tn.x * side, up, c.z + tn.z * side); }, at = (st, up) => v3(st.pos.x, up, st.pos.z);
+const SHOTS = [                                               // [start, end, from, to, look from, look to]
+  [0, 8, v3(-6.6, 5.2, 4.2), v3(-5.6, 3.4, 3.4), v3(0.6, 1.0, -1.2), v3(0.8, 1.3, -1.6)],
+  [8, 15.5, v3(-7.4, 1.62, 0.3), v3(-4.3, 1.58, -0.6), at(ST[0], 1.35), at(ST[0], 1.25)],
+  [15.5, 22.5, eye(ST[0], 1.15, 1.36, -0.35), eye(ST[0], 1.0, 1.32, 0.3), at(ST[0], 1.22), at(ST[0], 1.2)],
+  [22.5, 30, eye(ST[1], 2.5, 1.56, -0.12), eye(ST[1], 2.1, 1.5, 0.1), at(ST[1], 1.25), at(ST[1], 1.25)],
+  [30, 37.5, eye(ST[2], 1.3, 1.4, -0.5), eye(ST[2], 1.15, 1.36, 0.45), at(ST[2], 1.3), at(ST[2], 1.3)],
+  [37.5, 44.5, eye(ST[3], 3.1, 1.62, -0.15), eye(ST[3], 2.6, 1.56, 0.12), at(ST[3], 1.38), at(ST[3], 1.38)],
+  [44.5, 53, v3(-1.6, 1.66, 5.6), v3(1.4, 1.7, 6.0), v3(0, 1.5, 2.6), v3(0.2, 1.75, 0)],
+  [53, 64, v3(0.4, 2.0, 5.4), v3(-0.6, 6.4, 7.6), v3(0, 1.7, 0), v3(0, 1.3, -1.2)],
+];
+const VIEWS = { tour: ["Tour"], room: ["Room", v3(-11.5, 5.8, 9), v3(0, 1, -0.6)], plan: ["Plan", v3(0, 21, 0.01), v3(0, 0, 0)], s0: ["1", eye(ST[0], 1.9, 1.5, 0.2), at(ST[0], 1.2)], s1: ["2", eye(ST[1], 2.2, 1.5, 0.2), at(ST[1], 1.25)], s2: ["3", eye(ST[2], 2.5, 1.55, 0.2), at(ST[2], 1.3)], s3: ["4", eye(ST[3], 3.0, 1.6, 0.2), at(ST[3], 1.38)], wall: ["Wall", v3(0, 1.65, 2.4), v3(0.2, 2.2, -8)] };
+let view = "tour", T = 0, playing = true;
+const vb = document.getElementById("views"); vb.innerHTML = Object.entries(VIEWS).map(([k, v]) => `<button data-v="${k}"${k === "tour" ? ' class="on"' : ""}>${v[0]}</button>`).join("");
+function setView(k) { view = k; orbit.enabled = k !== "tour"; vb.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.dataset.v === k)); if (k !== "tour") { cam.position.copy(VIEWS[k][1]); orbit.target.copy(VIEWS[k][2]); orbit.update(); if (k === "plan") { pathLine.visible = true; labelG.visible = true; syncToggles(); } } }
+document.addEventListener("click", (e) => { const b = e.target.closest("[data-v]"); if (b) { setView(b.dataset.v); if (b.classList.contains("card")) scrollTo({ top: 0, behavior: "smooth" }); } });
+const show = { voices: true, path: false, labels: false, people: true };
+function syncToggles() { show.path = pathLine.visible; show.labels = labelG.visible; document.querySelectorAll("[data-t]").forEach((b) => b.classList.toggle("on", show[b.dataset.t])); }
+document.querySelectorAll('[data-r]').forEach((b) => b.onclick = () => setRoom(b.dataset.r)); setRoom(ROOM);
+document.querySelectorAll("[data-t]").forEach((b) => b.onclick = () => { const k = b.dataset.t; show[k] = !show[k]; voiceG.visible = show.voices; pathLine.visible = show.path; labelG.visible = show.labels; figG.visible = show.people; if (!show.people) voiceG.visible = false; syncToggles(); });
+if (Q.get("voices") === "0") { show.voices = false; voiceG.visible = false; } if (Q.get("people") === "0") { show.people = false; figG.visible = false; voiceG.visible = false; }
+const tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3();
+function tourCam(T) { let sh = SHOTS[SHOTS.length - 1]; for (const s of SHOTS) if (T >= s[0] && T < s[1]) { sh = s; break; } const k = sm(0, 1, (T - sh[0]) / (sh[1] - sh[0])) * 0.9 + 0.1 * (T - sh[0]) / (sh[1] - sh[0]); cam.position.lerpVectors(sh[2], sh[3], k); tmpA.lerpVectors(sh[4], sh[5], k); cam.lookAt(tmpA); }
+/* a short fade to black at each cut and at both ends */
+const fadeM = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0, depthTest: false, fog: false }), fadeQ = new THREE.Mesh(new THREE.PlaneGeometry(4, 4), fadeM); fadeQ.position.z = -0.2; fadeQ.renderOrder = 99; cam.add(fadeQ);
+function cutFade(T) { let f = 1 - sm(0, 1.4, T) + sm(DUR - 1.3, DUR - 0.2, T); for (const s of SHOTS) if (s[0] > 0) f = Math.max(f, 1 - Math.min(1, Math.abs(T - s[0]) / 0.38)); return clamp(f, 0, 1); }
+
+/* ---------- time, size, recording ---------- */
+const playB = document.getElementById("play"), scrub = document.getElementById("scrub"), clock = document.getElementById("clock"), mmss = (t) => Math.floor(t / 60) + ":" + String(Math.floor(t % 60)).padStart(2, "0");
+playB.onclick = () => { playing = !playing; playB.textContent = playing ? "Pause" : "Play"; playB.classList.toggle("on", playing); };
+scrub.oninput = () => { T = scrub.value / 1000 * DUR; };
+function resize() { if (FILM) { R.setSize(1920, 1080, false); cam.aspect = 16 / 9; } else { const w = cv.clientWidth, h = cv.clientHeight; R.setSize(w, h, false); cam.aspect = w / h; cam.fov = w / h < 1 ? 56 : 38; } cam.updateProjectionMatrix(); }
+addEventListener("resize", resize); resize();
+const film = { state: "idle", progress: 0, bytes: 0, fileName: "", mime: "", blobUrl: "" }; window.BNM = { film, seek: (t) => { T = t; }, view: setView };
+let rec = null, world = 0, last = performance.now(), loops = 0;
+function startRec() { const types = ["video/mp4;codecs=avc1.640028", "video/webm;codecs=vp9", "video/webm"], mime = types.find((m) => MediaRecorder.isTypeSupported(m)) || ""; const chunks = []; rec = new MediaRecorder(cv.captureStream(30), { mimeType: mime, videoBitsPerSecond: 16e6 }); rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+  rec.onstop = () => { const blob = new Blob(chunks, { type: mime.split(";")[0] }); film.bytes = blob.size; film.mime = mime; film.fileName = "born_not_made_exhibition_1080p." + (mime.includes("mp4") ? "mp4" : "webm"); film.blobUrl = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = film.blobUrl; a.download = film.fileName; document.body.appendChild(a); a.click(); film.state = "done"; }; rec.start(1000); film.state = "recording"; }
+function frame(now) {
+  requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (playing) { T += dt; world += dt; if (T >= DUR) { if (FILM) { T = DUR - 0.001; if (film.state === "recording" && rec.state === "recording") rec.stop(); else if (film.state === "playing") film.state = "done"; playing = false; } else { T = 0; loops++; } } }
+  if (document.activeElement !== scrub) scrub.value = T / DUR * 1000; clock.textContent = mmss(T) + " / " + mmss(DUR); film.progress = T / DUR;
+  const W = world + 40; for (const st of ST) stepStation(st, W); stepWall(dt, view === "tour" ? T : -1); stepWalkers(W + 30);
+  if (view === "tour") { tourCam(T); fadeM.opacity = cutFade(T); } else { orbit.update(); fadeM.opacity = 0; }
+  stepVoices(view === "tour" ? T : (world % DUR));
+  R.render(S, cam);
+}
+/* prime the wall and the stations so the first frame is already alive */
+for (let i = 0; i < 500; i++) stepWall(0.05, -1);
+(document.fonts && document.fonts.load ? document.fonts.load("300 46px 'Cormorant Garamond'").catch(() => 0) : Promise.resolve()).then(() => { buildVoices(); buildLabels(); if (FILM) { film.state = "playing"; if (REC) startRec(); } requestAnimationFrame(frame); });
+</script>
+</body></html>
