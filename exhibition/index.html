@@ -86,6 +86,7 @@ html.bnm-embed header.top { display: none; }
   <p><b>One thing at a time.</b> The room is almost dark. Only one lamp is up, over the tank where a birth is happening. The visitors follow the light from the smallest tank to the largest, as one group, the way a procession moves from station to station.</p>
   <p><b>Nothing is taken away.</b> Each newborn stays afloat in the tank after the lamp moves on. By the last beat four of them share the room with the visitors.</p>
   <p><b>The walls carry the argument.</b> First one mark, copied until the front wall is full. Then, along all three walls, a row of the ways a new body comes out of another in living beings, nine of them, each a small moving drawing with a name, examples, and what the young inherit. When the tanks begin, the wall behind the lit tank shows the study that led to that robot birth, taken from this site. After each robot birth one more place is added at the end of the row of life, drawn with a broken frame and a question mark: the room does not decide whether the robot belongs there. At the end the walls show the Society simulation of this site: many of these bodies, living together.</p>
+  <p><b>Something is allowed to go wrong.</b> In life the new thing that lets a species change begins as an error in the copy. So the piece keeps two errors on purpose. Among the copies on the front wall one mark comes out wrong, and that one is the last to go out. At the end one body does not stay in the picture: the body leaves the wall, crosses the floor as a ring of light and goes out through the open side. A simulation that can only do what was planned has nothing new to pass on.</p>
   <p><b>The tanks hold the real design.</b> The parent body in each tank is the hull of the Simple version of the simulator, loaded from the same data, at four sizes. The newborn and the arm are still drawn simply here; the full print and birth are in the Printing simulator.</p>
   <p><b>The setup.</b> A dark room about 14 m wide and 10 m deep. A front wall and two side walls carry one continuous projection, 4.2 m tall; the fourth side is open and people come in there. Four glass tanks on black plinths stand in a row before the front wall, the smallest at the left. A full ring of projection in a round room is a possible variant of the same piece.</p>
   <div class="grid" id="cards"></div>
@@ -127,7 +128,7 @@ const BEATS = [
   [8, "2  A body", "The copies go out. In the dark, four bodies in four tanks. A body cannot be copied that way.", "Once it has a body, copying is no longer enough. The new body has to come from somewhere."],
   [15, "3  Life", "Along the three walls, one after another, the ways a new body comes out of another in living beings: division, budding, fragments, spores, spawning, laid eggs, live birth, the pouch, one body for a whole colony. The visitors turn with the wall.", "So far, only living beings have ever made a new body from their own."],
   [41, "4  The robot", "The row of life dims and stays. One lamp at a time, four tanks answer, from the least a machine can do to a body that bears the next. Behind each tank the wall shows the study that led there. Each robot birth then takes a place at the end of the row of life, with a question mark.", "“Is this the Mother Robot?” “Should we call it a mother? Is it really female?”"],
-  [81, "5  The turn", "Every lamp goes out. Only the four newborns glow. The walls show many of them, living together. Nobody speaks. Then one line, and the question.", "“I am less sure now.”"],
+  [81, "5  The turn", "Every lamp goes out. Only the four newborns glow. The walls show many of them, living together. Nobody speaks. One body slides down out of the picture, crosses the floor between the visitors and leaves the room. Then one line, and the question.", "“I am less sure now.”"],
 ];
 /* [from, to, words, 1 = the artist's line (no quotation marks), 0 = a visitor] */
 const SUBS = [
@@ -222,6 +223,7 @@ function stepStation(st, i, T) {
 }
 
 /* ---------- the walls: copies, then the births of life in a row, then the studies behind each robot birth, then the society ---------- */
+const ESC0 = TURN + 4.2;
 const EV = [0, 1, 2, 3].map((i) => { let lo = ACT[i][0], hi = ACT[i][1]; for (let k = 0; k < 24; k++) { const m = (lo + hi) / 2; if (uOf(i, m) < 0.6) lo = m; else hi = m; } return lo; });
 const NS = 13, SW = PW / NS, FH = 182;
 const KIND = [
@@ -264,7 +266,9 @@ function wallDraw(T) {
   px.fillStyle = "#000"; px.fillRect(0, 0, PW, PH); px.lineCap = "round"; const out = 1 - sm(DUR - 1.6, DUR - 0.2, T), turn = sm(TURN + 0.5, TURN + 4, T), F0 = LS * PPM, FW = LM * PPM;
   /* chapter 1: one mark, copied */
   const ca = sm(0.3, 1.2, T) * (1 - sm(8, 10.5, T)); if (ca > 0.01) { const n = Math.min(26 * 9, Math.floor(Math.pow(2, T * 1.7))), cw = 42, x0 = F0 + FW / 2 - 13 * cw, y0 = PH / 2 - 4.5 * 36; px.strokeStyle = `rgba(255,255,255,${0.85 * ca})`; px.lineWidth = 1.3;
-    for (let k = 0; k < n; k++) { const c = k % 26, r = Math.floor(k / 26), x = x0 + c * cw + 8, y = y0 + r * 36 + 6; px.strokeRect(x, y, 24, 22); px.beginPath(); px.moveTo(x + 5, y + 8); px.lineTo(x + 19, y + 8); px.moveTo(x + 5, y + 14); px.lineTo(x + 14, y + 14); px.stroke(); } }
+    for (let k = 0; k < n; k++) { const c = k % 26, r = Math.floor(k / 26), x = x0 + c * cw + 8, y = y0 + r * 36 + 6; if (k === 147) continue; px.strokeRect(x, y, 24, 22); px.beginPath(); px.moveTo(x + 5, y + 8); px.lineTo(x + 19, y + 8); px.moveTo(x + 5, y + 14); px.lineTo(x + 14, y + 14); px.stroke(); } }
+  /* one copy came out wrong. It is the last to go out */
+  const ma = sm(5.2, 5.8, T) * (1 - sm(11, 13.5, T)); if (ma > 0.01) { const cw = 42, x = F0 + FW / 2 - 13 * cw + (147 % 26) * cw + 8, y = PH / 2 - 4.5 * 36 + Math.floor(147 / 26) * 36 + 6; px.strokeStyle = `rgba(255,255,255,${ma})`; px.lineWidth = 1.6; px.beginPath(); px.moveTo(x, y + 2); px.lineTo(x + 26, y - 2); px.lineTo(x + 22, y + 24); px.lineTo(x + 3, y + 20); px.closePath(); px.moveTo(x + 5, y + 8); px.lineTo(x + 19, y + 6); px.moveTo(x + 6, y + 14); px.lineTo(x + 11, y + 15); px.stroke(); }
   /* chapter 3 on: the row of births. Nine from life, then four from the room, each with a question mark */
   const dim = 1 - 0.62 * sm(41.5, 45, T) + 0.5 * turn;
   for (let i = 0; i < NS; i++) { const a = sm(slotT(i), slotT(i) + 1.3, T) * (i < 9 ? dim : 1) * out; if (a < 0.01) continue; const cx = (i + 0.5) * SW, k = KIND[i];
@@ -275,8 +279,13 @@ function wallDraw(T) {
   /* chapter 5: the society, from the simulator, around the room */
   const sv = vids.society; if (turn > 0.01 && sv.readyState >= 2) { const y = FH + 10, h = PH - y, sh = 240, sy = 60; px.save(); px.filter = "grayscale(1) contrast(1.2) brightness(1.5)"; px.globalAlpha = turn * out; px.drawImage(sv, 0, sy, 1280, sh, F0, y, FW, h); px.globalAlpha = 0.7 * turn * out; px.drawImage(sv, 0, sy, 900, sh, 0, y, F0, h); px.drawImage(sv, 380, sy, 900, sh, F0 + FW, y, F0, h); px.restore(); }
   const qa = sm(QT, QT + 2.5, T) * out; if (qa > 0.01) { const cx = wallX(0), cy = FH + (PH - FH) / 2; const g = px.createRadialGradient(cx, cy, 30, cx, cy, 600); g.addColorStop(0, `rgba(0,0,0,${0.96 * qa})`); g.addColorStop(0.6, `rgba(0,0,0,${0.85 * qa})`); g.addColorStop(1, "rgba(0,0,0,0)"); px.fillStyle = g; px.fillRect(cx - 620, FH, 1240, PH - FH); px.fillStyle = `rgba(255,255,255,${qa})`; px.textAlign = "center"; px.textBaseline = "middle"; px.font = "300 60px 'Cormorant Garamond', Georgia, serif"; px.fillText("What are we willing to call birth?", cx, cy - 22); px.font = "300 32px 'Cormorant Garamond', Georgia, serif"; px.fillStyle = `rgba(255,255,255,${0.75 * qa * sm(QT + 2, QT + 4, T)})`; px.fillText("And what are we willing to call life?", cx, cy + 34); }
+  const ea = sm(ESC0, ESC0 + 0.6, T) * (1 - sm(ESC0 + 2.2, ESC0 + 2.6, T)); if (ea > 0.01) blob(wallX(1.6), lerp(FH + 70, PH + 16, sm(ESC0, ESC0 + 2.6, T)), 15, ea);
   ptex.needsUpdate = true; wallLight.intensity = (0.012 + 0.07 * ca + 0.09 * sm(LIFE0, 40, T) * dim + 0.2 * turn) * out;
 }
+
+/* out of the frame: the body that left the wall, as light on the floor */
+const escM = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }), esc = new THREE.Mesh(new THREE.RingGeometry(0.15, 0.185, 40), escM), escF = new THREE.Mesh(new THREE.CircleGeometry(0.15, 40), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false })); esc.rotation.x = escF.rotation.x = -Math.PI / 2; S.add(esc, escF); const escL = new THREE.PointLight(0xffffff, 0, 2.2, 2); S.add(escL);
+function stepEscape(T) { const t0 = ESC0 + 2.4, f = clamp((T - t0) / (DUR - 1 - t0), 0, 1), a = sm(t0, t0 + 0.5, T) * (1 - sm(DUR - 2, DUR - 0.6, T)), x = 1.6 + Math.sin(f * 7) * 0.5 - f * 1.2, z = lerp(WZB + 0.25, 5.6, f * f * 0.35 + f * 0.65); esc.position.set(x, 0.012, z); escF.position.set(x, 0.011, z); escM.opacity = 0.9 * a; escF.material.opacity = 0.12 * a; escL.position.set(x, 0.25, z); escL.intensity = 0.5 * a; }
 
 /* ---------- the visitors: one group that follows the light; two of them carry the story ---------- */
 const figM = new THREE.MeshBasicMaterial({ color: 0x000000 }), figG = new THREE.Group(); S.add(figG);
@@ -344,7 +353,7 @@ function frame(now) {
   requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000); last = now;
   if (playing) { T += dt; if (T >= DUR) { if (FILM) { T = DUR - 0.001; playing = false; if (film.state === "recording" && rec.state === "recording") rec.stop(); else if (film.state === "playing") film.state = "done"; } else T = 0; } }
   if (document.activeElement !== scrub) scrub.value = T / DUR * 1000; clock.textContent = mmss(T) + " / " + mmss(DUR); film.progress = T / DUR;
-  ST.forEach((st, i) => stepStation(st, i, T)); wallDraw(T); stepPeople(T);
+  ST.forEach((st, i) => stepStation(st, i, T)); wallDraw(T); stepPeople(T); stepEscape(T);
   if (view === "tour") { tourCam(T); fadeM.opacity = cutFade(T); } else { orbit.update(); fadeM.opacity = 0; }
   stepWords(T); R.render(S, cam);
 }
