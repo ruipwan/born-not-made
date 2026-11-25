@@ -61,12 +61,12 @@ html.film #c { object-fit: contain; cursor: none; }
 html.bnm-embed header.top { display: none; }
 </style></head>
 <body>
-<header class="top"><h1>The exhibition</h1><p>Born, Not Made as a performance in a dark room: one birth at a time, from simple to complex, three walls that remember each one, and two visitors whose view changes.</p><a href="../">Home</a></header>
+<header class="top"><h1>The exhibition</h1><p>Born, Not Made as a performance in a dark room: from the copy of software, through the births of living beings, to four births of a robot, and two visitors whose view changes.</p><a href="../">Home</a></header>
 <div class="view"><canvas id="c"></canvas></div>
 <div class="bar">
   <button id="play" class="on">Pause</button>
   <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Time in the film">
-  <output id="clock">0:00 / 1:12</output>
+  <output id="clock">0:00 / 1:36</output>
   <span class="sep"></span><label>View</label>
   <span id="views"></span>
   <span class="sep"></span><label>Show</label>
@@ -78,14 +78,15 @@ html.bnm-embed header.top { display: none; }
   <p>Robots will surely find rules of their own in the end. Until then, life is the one reference there is. So the work studies how many kinds of living beings give birth: what each new generation inherits, and what new thing appears that lets a species keep changing. What is learned goes into a way for a robot to do the same.</p>
   <p>The robot is there to serve the idea. The final work takes the form of art: an exhibition with a series of installations, which is also a performance. People witness the whole birth of an intelligent robot. Some are moved, or find the newborn cute. Others find the scene unsettling, or read a warning in it. Someone who walks in sure that nothing in a machine is alive may walk out less sure. The work is an open debate about what we are willing to call birth, and what we are willing to call life.</p>
 
-  <h2>The story, in six beats</h2>
-  <p>The piece is told through two visitors. One walks in sure that a machine is only a machine. The other is drawn in from the start. The room gives the two one birth at a time, each a little harder to dismiss than the last, and the walls keep every newborn. Select a beat to jump there.</p>
+  <h2>The story, in five chapters</h2>
+  <p>The piece follows the argument of the work, in the order of the idea above: software can be copied; a body cannot; life is the one reference; so the births of living beings are studied; and what is learned becomes a way for a robot to do the same. The first three chapters are carried by the artist's own lines. In the fourth the visitors start to talk, and two of them carry the rest: one is sure that a machine is only a machine, the other is drawn in. Select a chapter to jump there.</p>
   <ol class="beats" id="beats"></ol>
 
   <h2>How the room works</h2>
   <p><b>One thing at a time.</b> The room is almost dark. Only one lamp is up, over the tank where a birth is happening. The visitors follow the light from the smallest tank to the largest, as one group, the way a procession moves from station to station.</p>
   <p><b>Nothing is taken away.</b> Each newborn stays afloat in the tank after the lamp moves on. By the last beat four of them share the room with the visitors.</p>
-  <p><b>The walls and the tanks are one event at two scales.</b> A tank shows one birth, up close. The wall behind shows the same birth large: the breath of the pump as widening rings, the path of the needle as a stack of drawn layers. When the newborn leaves the parent body, the drawing lets go as well and becomes one more body on the wall. In the last act the bodies on the wall begin to bring out new ones without any tank, and spread from the front wall over the two side walls until the visitors stand inside a society.</p>
+  <p><b>The walls carry the argument.</b> First one mark, copied until the front wall is full. Then, along all three walls, a row of the ways a new body comes out of another in living beings, nine of them, each a small moving drawing with a name, examples, and what the young inherit. When the tanks begin, the wall behind the lit tank shows the study that led to that robot birth, taken from this site. After each robot birth one more place is added at the end of the row of life, drawn with a broken frame and a question mark: the room does not decide whether the robot belongs there. At the end the walls show the Society simulation of this site: many of these bodies, living together.</p>
+  <p><b>The tanks hold the real design.</b> The parent body in each tank is the hull of the Simple version of the simulator, loaded from the same data, at four sizes. The newborn and the arm are still drawn simply here; the full print and birth are in the Printing simulator.</p>
   <p><b>The setup.</b> A dark room about 14 m wide and 10 m deep. A front wall and two side walls carry one continuous projection, 4.2 m tall; the fourth side is open and people come in there. Four glass tanks on black plinths stand in a row before the front wall, the smallest at the left. A full ring of projection in a round room is a possible variant of the same piece.</p>
   <div class="grid" id="cards"></div>
 
@@ -102,7 +103,7 @@ html.bnm-embed header.top { display: none; }
   <p class="note">Species, films and sources for births in nature are on the Nature tab of the site. The ladder here is a reading order for the room, not a claim about biology.</p>
 
   <h2>The film</h2>
-  <p>The view above is the performance cut to 72 seconds, on a loop. Drag the time bar to any moment, or pick Room or Plan and orbit freely while the piece runs. <a href="?film=1">Open the clean film</a>: only the picture, at 1920 by 1080, played once. Add <code>&amp;rec=1</code> to record in the browser and download the file. The voices are imagined, written to test the piece before anyone has seen it.</p>
+  <p>The view above is the performance cut to 96 seconds, on a loop. Drag the time bar to any moment, or pick Room or Plan and orbit freely while the piece runs. <a href="?film=1">Open the clean film</a>: only the picture, at 1920 by 1080, played once. Add <code>&amp;rec=1</code> to record in the browser and download the file. The voices are imagined, written to test the piece before anyone has seen it.</p>
 </main>
 <script src="../assets/vendor/three-r147/three.min.js"></script>
 <script src="../assets/vendor/three-r147/OrbitControls.js"></script>
@@ -111,7 +112,7 @@ html.bnm-embed header.top { display: none; }
 if (window.self !== window.top) document.documentElement.classList.add("bnm-embed");
 const Q = new URLSearchParams(location.search), FILM = Q.get("film") === "1", REC = FILM && Q.get("rec") === "1";
 if (FILM) document.documentElement.classList.add("film");
-const DUR = 72, cv = document.getElementById("c");
+const DUR = 96, cv = document.getElementById("c");
 const R = new THREE.WebGLRenderer({ canvas: cv, antialias: true, preserveDrawingBuffer: REC });
 R.setPixelRatio(FILM ? 1 : Math.min(devicePixelRatio, 2)); R.outputEncoding = THREE.sRGBEncoding; R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = 1.15;
 const S = new THREE.Scene(); S.background = new THREE.Color(0x000000); S.fog = new THREE.FogExp2(0x000000, 0.03);
@@ -119,23 +120,27 @@ const cam = new THREE.PerspectiveCamera(38, 16 / 9, 0.1, 80); S.add(cam);
 const orbit = new THREE.OrbitControls(cam, cv); orbit.enableDamping = true; orbit.maxPolarAngle = Math.PI * 0.495; orbit.minDistance = 1.2; orbit.maxDistance = 30; orbit.enabled = false;
 const sm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); }, lerp = (a, b, t) => a + (b - a) * t, clamp = (x, a, b) => Math.min(b, Math.max(a, x)), v3 = (x, y, z) => new THREE.Vector3(x, y, z);
 
-/* ---------- the script: six beats ---------- */
-const ACT = [[7, 20], [20, 33], [33, 46], [46, 57]], TURN = 57, QT = 65;
+/* ---------- the script: the argument of the work, in five chapters ---------- */
+const DURN = 96, ACT = [[45, 54], [54, 63], [63, 72], [72, 81]], TURN = 81, QT = 89.5, LIFE0 = 15.5, LIFEDT = 2.75;
 const BEATS = [
-  [0, "Enter", "The room is dark. One small circle breathes on the front wall. A group walks in toward the only tank that can be seen.", "“It is a machine. Nothing in there is alive.”"],
-  [7, "1  A breath", "The lamp comes up on the smallest tank. A folded body, made beforehand, takes air and is pushed out. The wall widens in rings with each breath of the pump, and the circle on the wall lets go of a small one.", "“It only blew up a bag.” “Then why did I hold my breath?”"],
-  [20, "2  Drawn inside", "The light moves on. A needle draws a new body in gel inside the parent body; the wall draws the same layers, large. The body is pushed out, and the drawing on the wall lets go too.", "“Is this the Mother Robot?” “Should we call it a mother? Is it really female?”"],
-  [33, "3  Growing", "The third body leaves wrinkled, swims straight ahead and grows as the folds open. On the wall the bodies begin to find each other.", "“So the small one is a baby?”"],
-  [46, "4  The next", "The largest tank. The newborn leaves with parts in the wall and a third body already inside. The wall stops waiting for the tanks: the bodies bring out new ones and spread over all three walls.", "“The small one already carries the next.” “This is where I stop finding it cute.”"],
-  [57, "The turn", "Every lamp goes out. Only the four newborns glow. The visitors are shadows before a wall full of generations. Nobody speaks. Then one line, and the question.", "“I am less sure now.”"],
+  [0, "1  A copy", "The front wall fills with one mark, copied and copied again. For software a next generation is easy.", "As software, the answer is easy: it can simply be copied."],
+  [8, "2  A body", "The copies go out. In the dark, four bodies in four tanks. A body cannot be copied that way.", "Once it has a body, copying is no longer enough. The new body has to come from somewhere."],
+  [15, "3  Life", "Along the three walls, one after another, the ways a new body comes out of another in living beings: division, budding, fragments, spores, spawning, laid eggs, live birth, the pouch, one body for a whole colony. The visitors turn with the wall.", "So far, only living beings have ever made a new body from their own."],
+  [41, "4  The robot", "The row of life dims and stays. One lamp at a time, four tanks answer, from the least a machine can do to a body that bears the next. Behind each tank the wall shows the study that led there. Each robot birth then takes a place at the end of the row of life, with a question mark.", "“Is this the Mother Robot?” “Should we call it a mother? Is it really female?”"],
+  [81, "5  The turn", "Every lamp goes out. Only the four newborns glow. The walls show many of them, living together. Nobody speaks. Then one line, and the question.", "“I am less sure now.”"],
 ];
+/* [from, to, words, 1 = the artist's line (no quotation marks), 0 = a visitor] */
 const SUBS = [
-  [1.2, 4.4, "It is a machine. Nothing in there is alive."], [4.9, 7.2, "Then why are we whispering?"],
-  [9.6, 12.6, "Nothing was made here. It only blew up a bag."], [14.2, 17.4, "Then why did I hold my breath?"],
-  [21.4, 24.4, "It is drawing that inside its own body."], [25.6, 28.2, "Is this the Mother Robot?"], [29.0, 32.3, "Should we call it a mother? Is it really female?"],
-  [35.0, 38.0, "So the small one is a baby?"], [41.0, 44.6, "It came out wrinkled. Look, it is growing."],
-  [47.0, 50.0, "Does a baby have to look like its mother?"], [52.2, 55.0, "The small one already carries the next."], [55.4, 57.8, "This is where I stop finding it cute."],
-  [63.2, 66.6, "I am less sure now."],
+  [1.0, 7.2, "As software, the answer is easy: it can simply be copied.", 1],
+  [8.6, 14.6, "Once it has a body, copying is no longer enough. The new body has to come from somewhere.", 1],
+  [15.8, 21.6, "So far, only living beings have ever made a new body from their own.", 1],
+  [29.5, 36.5, "What does each new generation inherit, and what new thing appears?", 1],
+  [41.2, 44.8, "I use what I learn to design a way for a robot to do the same.", 1],
+  [46.2, 49.4, "It is a machine. Nothing in there is alive.", 0], [50.0, 53.5, "Then why did I hold my breath?", 0],
+  [55.2, 58.0, "Is this the Mother Robot?", 0], [58.8, 62.5, "Should we call it a mother? Is it really female?", 0],
+  [64.2, 67.0, "So the small one is a baby?", 0], [67.8, 71.5, "It came out wrinkled. Look, it is growing.", 0],
+  [73.2, 76.2, "Does a baby have to look like its mother?", 0], [77.0, 80.5, "The small one already carries the next.", 0],
+  [86.0, 89.4, "I am less sure now.", 0],
 ];
 
 /* ---------- the room: a front wall and two side walls, open toward +z ---------- */
@@ -168,10 +173,10 @@ ST.forEach((st, i) => {
   const pl = new THREE.Mesh(new THREE.BoxGeometry(L + 0.06, PLH, W + 0.06), new THREE.MeshStandardMaterial({ color: 0x070707, roughness: 0.5 })); pl.position.y = PLH / 2; g.add(pl);
   const box = new THREE.BoxGeometry(L, H, W), tank = new THREE.Mesh(box, glassM); tank.position.y = PLH + H / 2; g.add(tank);
   st.edge = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 }); const ed = new THREE.LineSegments(new THREE.EdgesGeometry(box), st.edge); ed.position.copy(tank.position); g.add(ed);
-  st.water = new THREE.MeshStandardMaterial({ color: 0x9aa0a6, transparent: true, opacity: 0.15, roughness: 0.2, depthWrite: false }); const wat = new THREE.Mesh(new THREE.BoxGeometry(L - 0.01, H * 0.5, W - 0.01), st.water); wat.position.y = PLH + H * 0.25; g.add(wat);
+  st.water = new THREE.MeshStandardMaterial({ color: 0x9aa0a6, transparent: true, opacity: 0.15, roughness: 0.2, depthWrite: false }); const wat = new THREE.Mesh(new THREE.BoxGeometry(L - 0.01, H * 0.2, W - 0.01), st.water); wat.position.y = PLH + H * 0.1; g.add(wat);
   const br = 0.19 * s, bl = 0.5 * s; st.br = br; st.bl = bl; st.x0 = -L / 2 + br * 1.1 + 0.1 * s; st.cy = PLH + br + 0.012;
   st.shell = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.2, roughness: 0.25, side: THREE.DoubleSide, depthWrite: false, emissive: 0xffffff, emissiveIntensity: 0.04 });
-  const body = new THREE.Mesh(capsule(bl, br), st.shell); body.position.set(st.x0, st.cy, 0); g.add(body);
+  st.body = new THREE.Mesh(capsule(bl, br), st.shell); st.body.position.set(st.x0, st.cy, 0); g.add(st.body);
   if (st.print) { const base = new THREE.Mesh(new THREE.BoxGeometry(br * 0.5, br * 0.5, br * 0.5), partM); base.position.set(st.x0 - br * 0.1, st.cy - br * 0.45, 0); g.add(base);
     st.arm = new THREE.Mesh(new THREE.CylinderGeometry(br * 0.05, br * 0.05, 1, 6), partM); g.add(st.arm);
     st.needle = new THREE.Mesh(new THREE.CylinderGeometry(br * 0.018, br * 0.018, br * 0.5, 5), new THREE.MeshBasicMaterial({ color: 0xffffff })); g.add(st.needle);
@@ -183,8 +188,12 @@ ST.forEach((st, i) => {
   st.sp = new THREE.SpotLight(0xffffff, 0, 9, 0.44, 0.65, 1.2); st.sp.position.set(0, 4.5, 0.6); st.sp.target.position.set(0, PLH, 0.3); g.add(st.sp, st.sp.target);
   st.cone = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false, fog: false }); const cone = new THREE.Mesh(new THREE.ConeGeometry(1.5 * (0.7 + s * 0.3), 3.6, 40, 1, true), st.cone); cone.position.set(0, 4.5 - 1.8, 0.45); g.add(cone);
   st.glow = new THREE.PointLight(0xffffff, 0, 2.6, 2); g.add(st.glow);
-  st.wx = wallX(st.x); st.wy = wallY(2.75);
+  st.wx = wallX(st.x);
 });
+/* the parent body is the real hull of the Simple version: the meshes of the simulator, loaded from its data */
+fetch("../simulator/simple/simple.json").then((r) => r.json()).then((d) => { const mk = (h) => { const v = h.v, n = v.length / 3, p = new Float32Array(v.length); for (let i = 0; i < n; i++) { p[3 * i] = v[3 * i]; p[3 * i + 1] = v[3 * i + 2]; p[3 * i + 2] = v[3 * i + 1]; } const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(p, 3)); g.setIndex(h.t); g.computeVertexNormals(); return g; }, gt = mk(d.hull.tail), gc = mk(d.hull.chamber);
+  for (const st of ST) { const k = st.s, hx = -st.L / 2 + 0.12 * st.s + 0.3 * k, grp = new THREE.Group(); grp.position.set(hx, PLH + 0.012, 0); grp.scale.setScalar(k); grp.add(new THREE.Mesh(gt, st.shell), new THREE.Mesh(gc, st.shell)); const rim = new THREE.LineSegments(new THREE.EdgesGeometry(gc, 50), st.edge); grp.add(rim); st.g.add(grp); st.body.visible = false;
+    st.br = 0.165 * k; st.x0 = hx - 0.3 * k + st.br; st.bl = 0.7212 * k - st.br; st.cy = PLH + 0.012 + 0.165 * k; } }).catch(() => 0);
 function newbornShape(st, fill) { const p = st.nb.geometry.attributes.position, a = p.array, b = st.nb0, w = (1 - fill) * 0.22;
   for (let i = 0; i < a.length; i += 3) { const x = b[i], y = b[i + 1], z = b[i + 2], th = Math.atan2(z, y), k = 1 - w * (0.5 + 0.5 * Math.sin(th * 9 + x * 7)) * (1 - x * x * 0.6) - w * 0.25 * Math.sin(x * 16), taper = x > 0 ? 1 : 1 - 0.35 * x * x; a[i] = x; a[i + 1] = y * k * taper; a[i + 2] = z * k * taper * (x < -0.4 ? 1 - 0.5 * (-x - 0.4) : 1); }
   p.needsUpdate = true; st.nb.geometry.computeVertexNormals(); }
@@ -198,7 +207,8 @@ function stepStation(st, i, T) {
   fill = lerp(fill, 1, st.grow ? swim : sm(0.6, 0.7, u));
   const size = br * 0.5 * (st.grow ? lerp(0.86, 1.55, swim) : lerp(0.86, 1.0, sm(0.5, 0.7, u)));
   const xin = st.x0 + st.bl * 0.52, xmouth = st.x0 + st.bl + size * 1.3, xend = st.L / 2 - size * 1.7 - 0.05 * s;
-  const x = lerp(lerp(xin, xmouth, out), xend, swim), y = lerp(st.cy - br * 0.38, PLH + st.H * 0.5 - size * 0.25, sm(0.56, 0.7, u)) + Math.sin(T * 1.7 + i * 2) * 0.004 * swim;
+  const yIn = st.cy - br * 0.42, yLip = st.cy - br * 0.08 + size * 0.5, yWat = PLH + st.H * 0.2 + size * 0.3;
+  const x = lerp(lerp(xin, xmouth, out), xend, swim), y = lerp(lerp(yIn, yLip, out), yWat, sm(0.66, 0.76, u)) + Math.sin(T * 1.7 + i * 2) * 0.004 * swim;
   newbornShape(st, fill); st.nb.position.set(x, y, 0); st.nb.scale.set(size * 1.55, size * Math.max(0.04, made), size); if (st.print && made < 1) st.nb.position.y -= size * (1 - made);
   st.nb.visible = made > 0.015; st.nb.material.emissiveIntensity = 0.1 + 1.3 * turn; st.nb.material.opacity = 0.62 + 0.3 * turn;
   if (st.arm) { const tipx = made < 1 ? xin + Math.sin(T * 5.1) * size * 1.2 : st.x0 + st.bl * 0.2, tipy = made < 1 ? st.cy - br * 0.38 - size + 2 * size * made + br * 0.25 : st.cy + br * 0.3, bx = st.x0 - br * 0.1, by = st.cy - br * 0.2;
@@ -206,79 +216,103 @@ function stepStation(st, i, T) {
   st.kit.position.set(x - size * 0.2, y - size * 0.55, 0); st.kit.visible = !!st.parts && made > 0.5;
   const third = st.parts ? sm(0.78, 0.92, u) : 0; st.inner.visible = third > 0.01; st.inner.position.set(x + size * 0.2, y, 0); st.inner.scale.setScalar(size * 0.3 * third);
   /* the light: faint before the act, full during, low after, out at the turn */
-  const a0 = ACT[i][0], a1 = ACT[i][1], lamp = (0.035 * (i === 0 ? 3 : 1) + 0.965 * sm(a0 - 0.6, a0 + 1.6, T) - 0.7 * sm(a1 - 0.4, a1 + 2.2, T)) * (1 - sm(TURN, TURN + 2.2, T)) * (0.25 + 0.75 * sm(0, 3, T)) + 0.5 * sm(DUR - 1.5, DUR, T) * 0;
+  const a0 = ACT[i][0], a1 = ACT[i][1], lamp = (0.11 * sm(8, 12, T) + 0.89 * sm(a0 - 0.6, a0 + 1.6, T) - 0.66 * sm(a1 - 0.4, a1 + 2.2, T)) * (1 - sm(TURN, TURN + 2.2, T));
   st.sp.intensity = 2.6 * lamp; st.cone.opacity = 0.016 * lamp; st.edge.opacity = 0.1 + 0.42 * lamp + 0.12 * turn; st.shell.opacity = 0.05 + 0.17 * lamp; st.water.opacity = 0.05 + 0.11 * lamp;
   st.glow.position.set(x, y, 0); st.glow.intensity = 0.9 * turn;
 }
 
-/* ---------- the walls: every birth in a tank becomes a body on the wall; in the last act the bodies bear the next and spread ---------- */
-let wseed = 11, wt = 0, bodies = []; const wr = () => (wseed = (wseed * 16807) % 2147483647) / 2147483647, WDT = 1 / 30;
-const EV = [tOfU(0, 0.6), tOfU(1, 0.6), tOfU(2, 0.6), tOfU(3, 0.6)], PROL = EV[3] + 0.8;
-function wallReset() { wseed = 11; wt = 0; bodies = [{ x: ST[0].wx, y: ST[0].wy, r: 26, g: 26, vx: 0, vy: 0, age: 99, k: 1, t: 0, first: 1 }]; }
-function spawn(x, y, r, g, vx, vy, extra) { bodies.push(Object.assign({ x, y, r, g, vx, vy, age: 0, k: 0.7 + 0.6 * wr(), t: 0 }, extra || {})); }
-function wallStep() { const t = wt, dt = WDT;
-  for (let i = 0; i < 4; i++) if (t <= EV[i] && t + dt > EV[i]) { const st = ST[i]; if (i === 0) spawn(st.wx + 40, st.wy + 6, 6, 14, 16, 3); else if (i === 1) spawn(st.wx + 30, st.wy, 30, 26, 12, -2); else if (i === 2) spawn(st.wx + 30, st.wy, 14, 40, 10, 0, { wr: 1 }); else spawn(st.wx + 40, st.wy, 46, 46, 9, 0, { inner: 1 }); }
-  const spread = sm(PROL, TURN + 3, t), xmin = lerp(LS * PPM + 30, 30, spread), xmax = lerp((LS + LM) * PPM - 30, PW - 30, spread), drift = t > 8 ? 1 : 0;
-  for (const b of bodies) { b.age += dt; b.t += dt; if (b.r < b.g) b.r += dt * (b.wr ? 4.2 : 3); if (b.wr) b.wr = Math.max(0, b.wr - dt / 6.5);
-    b.vx += (wr() - 0.5) * 10 * dt * drift; b.vy += (wr() - 0.5) * 8 * dt * drift; b.vx *= 0.992; b.vy *= 0.992;
-    if (b.x < xmin + b.r) b.vx += 22 * dt; if (b.x > xmax - b.r) b.vx -= 22 * dt; if (b.y < b.r + 22) b.vy += 18 * dt; if (b.y > PH - b.r - 22) b.vy -= 18 * dt; b.x += b.vx * dt * drift; b.y += b.vy * dt * drift; }
-  if (t > PROL && bodies.length < 230) for (let i = bodies.length - 1; i >= 0; i--) { const b = bodies[i]; if (b.age > 1.4 && b.t > 2.3 * b.k && b.r > 9) { b.t = 0; const a = wr() * 6.283, c = Math.cos(a), s = Math.sin(a) * 0.6; spawn(b.x + c * b.r, b.y + s * b.r, 4, Math.max(9, b.g * (0.62 + 0.3 * wr())), c * (30 + 40 * spread), s * 30, { inner: wr() < 0.3 ? 1 : 0 }); } }
-  wt += dt; }
-function wallDraw(T) {
-  px.fillStyle = "#000"; px.fillRect(0, 0, PW, PH); px.lineCap = "round";
-  const s0 = ST[0], breath = sm(ACT[0][0], ACT[0][0] + 1.5, T) * (1 - sm(EV[0] - 0.4, EV[0] + 1.2, T));                     // act 1: the pump breathes, the wall widens in rings
-  if (breath > 0.01) { px.lineWidth = 1.6; for (let i = 0; i < 4; i++) { const p = ((T * 0.42 + i / 4) % 1 + 1) % 1; px.strokeStyle = `rgba(255,255,255,${(1 - p) * 0.55 * breath})`; px.beginPath(); px.arc(bodies[0].x, bodies[0].y, 28 + p * 260, 0, 6.283); px.stroke(); } }
-  for (let i = 1; i < 4; i++) { const st = ST[i], u = uOf(i, T), made = sm(0.02, 0.36, u), a = sm(ACT[i][0], ACT[i][0] + 1, T) * (1 - sm(EV[i] - 0.3, EV[i] + 0.7, T));   // acts 2 to 4: the wall draws the layers the needle draws
-    if (a > 0.01) { const n = 22 + i * 4, RX = 46 + i * 16, RY = 26 + i * 9; px.lineWidth = 1.3; for (let k = 0; k < n; k++) { const f = k / (n - 1); if (f > made) break; const yy = st.wy + RY - 2 * RY * f, hw = RX * Math.sqrt(Math.max(0, 1 - Math.pow(2 * f - 1, 2))) * (1 + 0.07 * Math.sin(k * 2.4)); px.strokeStyle = `rgba(255,255,255,${0.75 * a})`; px.beginPath(); px.ellipse(st.wx, yy, hw + 1, 3.2, 0, 0, 6.283); px.stroke(); }
-      if (made < 1) { const f = made, yy = st.wy + RY - 2 * RY * f; px.fillStyle = `rgba(255,255,255,${a})`; px.beginPath(); px.arc(st.wx + Math.sin(T * 5.1) * RX * 0.8, yy, 3, 0, 6.283); px.fill(); } } }
-  const talk = sm(ACT[2][0] + 2, ACT[2][0] + 7, T); if (talk > 0.01) { px.lineWidth = 1; px.strokeStyle = `rgba(255,255,255,${0.13 * talk})`; px.beginPath(); for (let i = 0; i < bodies.length; i++) for (let j = i + 1; j < bodies.length; j++) { const A = bodies[i], B = bodies[j], dx = A.x - B.x; if (dx > 170 || dx < -170) continue; if (Math.hypot(dx, A.y - B.y) < 170) { px.moveTo(A.x, A.y); px.lineTo(B.x, B.y); } } px.stroke(); }
-  px.lineWidth = 2.2; const fadeIn = sm(0, 3, T);
-  for (const b of bodies) { const al = Math.min(1, b.age / 1.2 + 0.2) * fadeIn, r = b.first ? b.r * (1 + 0.07 * Math.sin(T * 1.5)) : b.r; px.strokeStyle = `rgba(255,255,255,${0.9 * al})`; px.fillStyle = `rgba(255,255,255,${0.07 * al})`; px.beginPath();
-    if (b.wr > 0.02) { for (let k = 0; k <= 48; k++) { const a = k / 48 * 6.283, rr = r * (1 + 0.16 * b.wr * Math.sin(a * 9)); k ? px.lineTo(b.x + Math.cos(a) * rr, b.y + Math.sin(a) * rr) : px.moveTo(b.x + Math.cos(a) * rr, b.y + Math.sin(a) * rr); } } else px.arc(b.x, b.y, r, 0, 6.283);
-    px.fill(); px.stroke(); if (b.inner && b.r > 10) { px.lineWidth = 1.4; px.beginPath(); px.arc(b.x + b.r * 0.2, b.y, b.r * 0.36, 0, 6.283); px.stroke(); px.lineWidth = 2.2; } }
-  const qa = sm(QT, QT + 2.5, T) * (1 - sm(DUR - 1.4, DUR - 0.2, T)); if (qa > 0.01) { const cx = wallX(0), cy = PH * 0.5; const g = px.createRadialGradient(cx, cy, 40, cx, cy, 620); g.addColorStop(0, `rgba(0,0,0,${0.97 * qa})`); g.addColorStop(0.55, `rgba(0,0,0,${0.9 * qa})`); g.addColorStop(1, "rgba(0,0,0,0)"); px.fillStyle = g; px.fillRect(cx - 640, 0, 1280, PH); px.fillStyle = `rgba(255,255,255,${qa})`; px.textAlign = "center"; px.textBaseline = "middle"; px.font = "300 62px 'Cormorant Garamond', Georgia, serif"; px.fillText("What are we willing to call birth?", cx, cy - 26); px.font = "300 34px 'Cormorant Garamond', Georgia, serif"; px.fillStyle = `rgba(255,255,255,${0.75 * qa * sm(QT + 2, QT + 4, T)})`; px.fillText("And what are we willing to call life?", cx, cy + 36); }
-  ptex.needsUpdate = true; wallLight.intensity = (0.015 + 0.3 * Math.min(1, bodies.length / 150)) * (1 - sm(DUR - 1.5, DUR, T));
+/* ---------- the walls: copies, then the births of life in a row, then the studies behind each robot birth, then the society ---------- */
+const EV = [0, 1, 2, 3].map((i) => { let lo = ACT[i][0], hi = ACT[i][1]; for (let k = 0; k < 24; k++) { const m = (lo + hi) / 2; if (uOf(i, m) < 0.6) lo = m; else hi = m; } return lo; });
+const NS = 13, SW = PW / NS, FH = 182;
+const KIND = [
+  ["Division", "bacteria, amoebae", "inherits everything · new: copying errors"],
+  ["Budding", "yeast, hydra", "inherits everything · new: copying errors"],
+  ["Fragments", "flatworms, some sea stars", "a piece regrows the whole"],
+  ["Spores", "fungi, mosses, ferns", "many small starts, carried far"],
+  ["Spawning", "corals, most fish, frogs", "half from each parent · new: a mix never seen"],
+  ["Laid eggs", "insects, reptiles, birds", "half from each, and a yolk to start on"],
+  ["Live birth", "most mammals, some sharks and snakes", "half from each, and a start inside a body"],
+  ["The pouch", "kangaroos; seahorse fathers", "born early, carried until ready"],
+  ["One for many", "ants, bees, termites", "one body bears the young of a colony"],
+  ["Fill and release ?", "robot, act 1", "inherits a ready made body · new: nothing yet"],
+  ["Print and release ?", "robot, act 2", "inherits a drawing · new: what the print adds"],
+  ["Print, fill, grow ?", "robot, act 3", "inherits a drawing and a model · new: what it learns"],
+  ["Bearing the next ?", "robot, act 4", "inherits drawing, parts, model · new: it can print"],
+];
+const slotT = (i) => i < 9 ? LIFE0 + i * LIFEDT : EV[i - 9] + 0.4;
+function slotWorld(f) { const sd = (f + 0.5) * SW / PPM; return sd < LS ? v3(-WX, 3.7, WZF - sd) : sd < LS + LM ? v3(-WX + sd - LS, 3.7, WZB) : v3(WX, 3.7, WZB + sd - LS - LM); }
+const vids = {}; for (const n of ["concept_budding", "concept_pod", "relation", "concept_swallow", "society"]) { const v = document.createElement("video"); v.src = "media/" + n + ".mp4"; v.muted = true; v.loop = true; v.playsInline = true; v.preload = "auto"; v.play().catch(() => 0); vids[n] = v; }
+addEventListener("pointerdown", () => { for (const k in vids) if (vids[k].paused) vids[k].play().catch(() => 0); });
+const ACTV = ["concept_budding", "concept_pod", "relation", "concept_swallow"];
+function blob(x, y, r, a) { if (r < 0.6) return; const g = px.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.1, x, y, r); g.addColorStop(0, `rgba(255,255,255,${0.36 * a})`); g.addColorStop(1, `rgba(255,255,255,${0.05 * a})`); px.fillStyle = g; px.beginPath(); px.arc(x, y, r, 0, 6.283); px.fill(); px.strokeStyle = `rgba(255,255,255,${0.9 * a})`; px.lineWidth = 1.4; px.stroke(); if (r > 6) { px.fillStyle = `rgba(255,255,255,${0.45 * a})`; px.beginPath(); px.arc(x + r * 0.2, y + r * 0.12, r * 0.17, 0, 6.283); px.fill(); } }
+function dot(x, y, r, a) { px.fillStyle = `rgba(255,255,255,${a})`; px.beginPath(); px.arc(x, y, r, 0, 6.283); px.fill(); }
+function vignette(i, cx, a, T) { const cy = 56, p = ((T * 0.2 + i * 0.37) % 1 + 1) % 1;
+  if (i === 0) { const d = sm(0.2, 0.8, p) * 23, r = 23 * (1 - 0.22 * sm(0.2, 0.8, p)); blob(cx - d, cy, r, a); blob(cx + d, cy, r, a); }
+  else if (i === 1) { blob(cx - 12, cy, 25, a); const r = 13 * sm(0.05, 0.6, p); blob(cx - 12 + 25 + r * 0.5 + sm(0.68, 1, p) * 30, cy - 7, r, a * (1 - sm(0.9, 1, p))); }
+  else if (i === 2) { for (let k = 0; k < 4; k++) blob(cx + (k - 1.5) * (21 + sm(0.25, 0.6, p) * 13), cy + Math.sin(k * 2) * 3, 11 + 4 * sm(0.65, 1, p), a); }
+  else if (i === 3) { blob(cx, cy + 26, 15, a); for (let k = 0; k < 16; k++) { const t = (p + k / 16) % 1; dot(cx + Math.sin(k * 2.4) * t * 52, cy + 10 - t * 62, 1.8, a * (1 - t)); } }
+  else if (i === 4) { blob(cx - 56, cy, 17, a); blob(cx + 56, cy, 17, a); for (let k = 0; k < 6; k++) { const t = (p + k / 6) % 1, y = cy + Math.sin(k * 1.7) * 20 * (1 - t); dot(cx - 38 + t * 38, y, 2, a * 0.9); dot(cx + 38 - t * 38, y + 3, 2, a * 0.9); } dot(cx, cy, 3 + 2 * Math.sin(T * 3), a); }
+  else if (i === 5) { blob(cx - 44, cy - 4, 21, a); px.strokeStyle = `rgba(255,255,255,${0.9 * a})`; px.lineWidth = 1.4; px.beginPath(); px.ellipse(cx + 28, cy + 14, 14, 18, 0, sm(0.45, 0.6, p) * 0.9 - 1.57, 4.71 - sm(0.45, 0.6, p) * 0.9); px.stroke(); blob(cx + 28, cy + 16 - sm(0.5, 1, p) * 34, 9 * sm(0.45, 0.8, p), a); }
+  else if (i === 6) { blob(cx - 14, cy, 31, a); blob(cx - 14 + sm(0.3, 0.9, p) * 58, cy + 4, 10, a); }
+  else if (i === 7) { blob(cx, cy - 4, 27, a); px.strokeStyle = `rgba(255,255,255,${0.9 * a})`; px.lineWidth = 1.4; px.beginPath(); px.arc(cx + 9, cy + 6, 13, 0.2, 2.9); px.stroke(); const t = sm(0, 0.55, p); blob(lerp(cx - 40, cx + 9, t), lerp(cy + 34, cy + 9, t), 4 + 5 * sm(0.6, 1, p), a); }
+  else if (i === 8) { blob(cx - 40, cy, 23, a); for (let k = 0; k < 7; k++) { const t = (p + k / 7) % 1; blob(cx - 14 + t * 96, cy + Math.sin(k * 2.2 + t * 5) * 9, 5, a * (1 - sm(0.8, 1, t))); } }
+  else { const j = i - 9, t = sm(0.25, 0.85, p); px.strokeStyle = `rgba(255,255,255,${0.9 * a})`; px.lineWidth = 1.4; px.beginPath(); px.moveTo(cx + 6, cy - 22); px.lineTo(cx - 36, cy - 22); px.arc(cx - 36, cy, 22, -1.57, 1.57, true); px.lineTo(cx + 12, cy + 22); px.stroke();
+    if (j > 0) { px.beginPath(); px.moveTo(cx - 40, cy + 12); px.lineTo(cx - 14, cy - 10); px.stroke(); for (let k = 0; k < 4; k++) { px.beginPath(); px.ellipse(cx + 2 + t * 44, cy + 9 - k * 5, 13, 3, 0, 0, 6.283); px.globalAlpha = 0.5; px.stroke(); px.globalAlpha = 1; } }
+    blob(cx + 2 + t * 44, cy + 2, (j >= 2 ? 9 + 6 * t : 11), a); if (j === 3) blob(cx + 6 + t * 44, cy + 2, 4, a); }
 }
-function wallTo(T) { if (T < wt - 0.001) wallReset(); let n = 0; while (wt < T && n++ < 4000) wallStep(); wallDraw(T); }
-wallReset();
+function wallDraw(T) {
+  px.fillStyle = "#000"; px.fillRect(0, 0, PW, PH); px.lineCap = "round"; const out = 1 - sm(DUR - 1.6, DUR - 0.2, T), turn = sm(TURN + 0.5, TURN + 4, T), F0 = LS * PPM, FW = LM * PPM;
+  /* chapter 1: one mark, copied */
+  const ca = sm(0.3, 1.2, T) * (1 - sm(8, 10.5, T)); if (ca > 0.01) { const n = Math.min(26 * 9, Math.floor(Math.pow(2, T * 1.7))), cw = 42, x0 = F0 + FW / 2 - 13 * cw, y0 = PH / 2 - 4.5 * 36; px.strokeStyle = `rgba(255,255,255,${0.85 * ca})`; px.lineWidth = 1.3;
+    for (let k = 0; k < n; k++) { const c = k % 26, r = Math.floor(k / 26), x = x0 + c * cw + 8, y = y0 + r * 36 + 6; px.strokeRect(x, y, 24, 22); px.beginPath(); px.moveTo(x + 5, y + 8); px.lineTo(x + 19, y + 8); px.moveTo(x + 5, y + 14); px.lineTo(x + 14, y + 14); px.stroke(); } }
+  /* chapter 3 on: the row of births. Nine from life, then four from the room, each with a question mark */
+  const dim = 1 - 0.62 * sm(41.5, 45, T) + 0.5 * turn;
+  for (let i = 0; i < NS; i++) { const a = sm(slotT(i), slotT(i) + 1.3, T) * (i < 9 ? dim : 1) * out; if (a < 0.01) continue; const cx = (i + 0.5) * SW, k = KIND[i];
+    px.save(); px.translate(cx, 0); px.scale(1.28, 1.28); vignette(i, 0, a, T); px.restore(); px.textAlign = "center"; px.textBaseline = "alphabetic"; px.fillStyle = `rgba(255,255,255,${a})`; px.font = "400 24px 'Cormorant Garamond', Georgia, serif"; px.fillText(k[0], cx, 143); px.fillStyle = `rgba(255,255,255,${0.62 * a})`; px.font = "400 12.5px Inter, sans-serif"; px.fillText(k[1], cx, 159); px.fillStyle = `rgba(255,255,255,${0.42 * a})`; px.font = "400 10.5px Inter, sans-serif"; px.fillText(k[2], cx, 174);
+    if (i >= 9) { px.setLineDash([4, 5]); px.strokeStyle = `rgba(255,255,255,${0.3 * a})`; px.lineWidth = 1; px.strokeRect(cx - SW / 2 + 8, 4, SW - 16, FH - 2); px.setLineDash([]); } }
+  /* chapter 4: behind the tank that is lit, the study that led to it, from the site */
+  for (let i = 0; i < 4; i++) { const a = sm(ACT[i][0] + 0.4, ACT[i][0] + 2, T) * (1 - sm(ACT[i][1] - 1, ACT[i][1] + 0.4, T)), v = vids[ACTV[i]]; if (a < 0.01 || v.readyState < 2) continue; const h = PH - FH - 22, w = h * 16 / 9, x = clamp(ST[i].wx - w / 2, F0 + 8, F0 + FW - w - 8), y = FH + 14; px.save(); px.filter = "grayscale(1) contrast(1.15)"; px.globalAlpha = 0.85 * a; px.drawImage(v, x, y, w, h); px.restore(); px.strokeStyle = `rgba(255,255,255,${0.25 * a})`; px.lineWidth = 1; px.strokeRect(x, y, w, h); }
+  /* chapter 5: the society, from the simulator, around the room */
+  const sv = vids.society; if (turn > 0.01 && sv.readyState >= 2) { const y = FH + 10, h = PH - y, sh = 240, sy = 60; px.save(); px.filter = "grayscale(1) contrast(1.2) brightness(1.5)"; px.globalAlpha = turn * out; px.drawImage(sv, 0, sy, 1280, sh, F0, y, FW, h); px.globalAlpha = 0.7 * turn * out; px.drawImage(sv, 0, sy, 900, sh, 0, y, F0, h); px.drawImage(sv, 380, sy, 900, sh, F0 + FW, y, F0, h); px.restore(); }
+  const qa = sm(QT, QT + 2.5, T) * out; if (qa > 0.01) { const cx = wallX(0), cy = FH + (PH - FH) / 2; const g = px.createRadialGradient(cx, cy, 30, cx, cy, 600); g.addColorStop(0, `rgba(0,0,0,${0.96 * qa})`); g.addColorStop(0.6, `rgba(0,0,0,${0.85 * qa})`); g.addColorStop(1, "rgba(0,0,0,0)"); px.fillStyle = g; px.fillRect(cx - 620, FH, 1240, PH - FH); px.fillStyle = `rgba(255,255,255,${qa})`; px.textAlign = "center"; px.textBaseline = "middle"; px.font = "300 60px 'Cormorant Garamond', Georgia, serif"; px.fillText("What are we willing to call birth?", cx, cy - 22); px.font = "300 32px 'Cormorant Garamond', Georgia, serif"; px.fillStyle = `rgba(255,255,255,${0.75 * qa * sm(QT + 2, QT + 4, T)})`; px.fillText("And what are we willing to call life?", cx, cy + 34); }
+  ptex.needsUpdate = true; wallLight.intensity = (0.012 + 0.07 * ca + 0.09 * sm(LIFE0, 40, T) * dim + 0.2 * turn) * out;
+}
 
 /* ---------- the visitors: one group that follows the light; two of them carry the story ---------- */
 const figM = new THREE.MeshBasicMaterial({ color: 0x000000 }), figG = new THREE.Group(); S.add(figG);
 function figure(h) { const g = new THREE.Group(), pts = []; [[0.0, 0], [0.16, 0.02], [0.17, 0.5], [0.2, 0.74], [0.21, 0.8], [0.1, 0.84], [0.07, 0.87]].forEach((p) => pts.push(new THREE.Vector2(p[0] * h / 1.7, p[1] * h))); const b = new THREE.Mesh(new THREE.LatheGeometry(pts, 14), figM); b.scale.z = 0.62; const hd = new THREE.Mesh(new THREE.SphereGeometry(0.105 * h / 1.7, 14, 10), figM); hd.position.y = h * 0.935; hd.scale.y = 1.15; g.add(b, hd); return g; }
 const SLOT = [[-0.42, 1.25], [0.42, 1.22], [-1.2, 1.3], [1.22, 1.34], [-0.85, 1.9], [0.9, 1.86], [-1.7, 1.95], [1.72, 2.0], [-1.15, 2.5], [1.3, 2.46]], HGT = [1.84, 1.6, 1.7, 1.75, 1.66, 1.8, 1.58, 1.72, 1.78, 1.63];
 const people = SLOT.map((s, i) => { const f = figure(HGT[i]); figG.add(f); return { f, s }; });
-const KEY = [-0.5, 6.4, 19.2, 21.6, 32.2, 34.6, 45.2, 47.6, TURN + 0.5, TURN + 5];                          // times at which the group stands: door, tank 1, leave, tank 2, ... , line before the wall
+const KEY = [-0.5, 6.6, ACT[1][0] - 0.8, ACT[1][0] + 1.6, ACT[2][0] - 0.8, ACT[2][0] + 1.6, ACT[3][0] - 0.8, ACT[3][0] + 1.6, TURN + 0.5, TURN + 5];                          // times at which the group stands: door, tank 1, leave, tank 2, ... , line before the wall
 function spot(i, k) { const s = SLOT[i]; if (k === 0) return [-3.2 + s[0] * 0.8, 8.2 + s[1] * 1.3]; if (k === 5) return [-3.4 + i * 0.76 + (i % 3) * 0.08, 0.2 + (i % 2) * 0.55 + (i % 3) * 0.12]; const st = ST[k - 1]; return [st.x + s[0] * (0.85 + 0.15 * st.s), TZ + s[1] + st.W / 2]; }
 function stepPeople(T) { const segs = [[0, 1, KEY[0], KEY[1]], [1, 2, KEY[2], KEY[3]], [2, 3, KEY[4], KEY[5]], [3, 4, KEY[6], KEY[7]], [4, 5, KEY[8], KEY[9]]];
   people.forEach((p, i) => { let a = spot(i, 0), b = a, f = 0, moving = 0; for (const s of segs) { const d = i * 0.07, t0 = s[2] + d, t1 = s[3] + d; if (T >= t0) { a = spot(i, s[0]); b = spot(i, s[1]); f = sm(t0, t1, T); moving = T < t1 ? 1 : 0; } }
     const x = lerp(a[0], b[0], f), z = lerp(a[1], b[1], f); p.f.position.set(x, moving ? Math.abs(Math.sin(T * 6 + i)) * 0.014 : 0, z);
     const look = moving ? Math.atan2(b[0] - a[0], b[1] - a[1]) : Math.atan2((T > TURN + 4 ? x : (ST[Math.min(3, Math.max(0, T < KEY[3] ? 0 : T < KEY[5] ? 1 : T < KEY[7] ? 2 : 3))].x)) - x, TZ - z - (T > TURN + 4 ? 4 : 0));
-    let dr = look - p.f.rotation.y; dr = Math.atan2(Math.sin(dr), Math.cos(dr)); p.f.rotation.y += dr * 0.12; }); }
+    let lk = look; if (!moving && T > LIFE0 && T < 43) { const w = slotWorld(clamp((T - LIFE0) / LIFEDT - 0.2, 0, 8.4)); lk = Math.atan2(w.x - x, w.z - z); }
+    let dr = lk - p.f.rotation.y; dr = Math.atan2(Math.sin(dr), Math.cos(dr)); p.f.rotation.y += dr * 0.12; }); }
 
 /* ---------- words: subtitles fixed to the picture, and small names over the tanks ---------- */
-function textTex(txt, size, weight) { const c = document.createElement("canvas"), x = c.getContext("2d"), f = `${weight || 300} ${size}px 'Cormorant Garamond', Georgia, serif`; x.font = f; const w = Math.ceil(x.measureText(txt).width) + 48; c.width = w; c.height = Math.round(size * 1.7); x.font = f; x.textAlign = "center"; x.textBaseline = "middle"; x.shadowColor = "#000"; x.shadowBlur = 14; x.fillStyle = "#fff"; for (let i = 0; i < 3; i++) x.fillText(txt, w / 2, c.height / 2); const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.userData = { asp: w / c.height }; return t; }
+function textTex(txt, size, weight) { const c = document.createElement("canvas"), x = c.getContext("2d"), f = `${weight || "300"} ${size}px 'Cormorant Garamond', Georgia, serif`; x.font = f; const w = Math.ceil(x.measureText(txt).width) + 48; c.width = w; c.height = Math.round(size * 1.7); x.font = f; x.textAlign = "center"; x.textBaseline = "middle"; x.shadowColor = "#000"; x.shadowBlur = 14; x.fillStyle = "#fff"; for (let i = 0; i < 3; i++) x.fillText(txt, w / 2, c.height / 2); const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.userData = { asp: w / c.height }; return t; }
 const subG = new THREE.Group(); cam.add(subG); const labelG = new THREE.Group(); labelG.visible = false; S.add(labelG);
 function buildWords() { subG.clear(); labelG.clear();
-  for (const s of SUBS) { const t = textTex("“" + s[2] + "”", 56), m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: t, transparent: true, opacity: 0, depthTest: false, fog: false })); m.renderOrder = 50; m.userData.asp = t.userData.asp; s[3] = m; subG.add(m); }
+  for (const s of SUBS) { const t = textTex(s[3] ? s[2] : "“" + s[2] + "”", 56, s[3] ? "italic 300" : "300"), m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: t, transparent: true, opacity: 0, depthTest: false, fog: false })); m.renderOrder = 50; m.userData.asp = t.userData.asp; s[4] = m; subG.add(m); }
   ST.forEach((st, i) => { const t = textTex((i + 1) + "  " + st.n, 44), sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, opacity: 0.9, depthTest: false, fog: false })); sp.userData.asp = t.userData.asp; sp.position.set(st.x, PLH + st.H + 0.34, TZ); sp.center.set(0.5, 0); labelG.add(sp); }); }
 function stepWords(T) { const d = 2, vh = 2 * d * Math.tan(cam.fov * Math.PI / 360), h = vh * 0.07, wmax = vh * cam.aspect * 0.9;
-  for (const s of SUBS) { const m = s[3]; if (!m) continue; const a = sm(s[0], s[0] + 0.45, T) * (1 - sm(s[1] - 0.5, s[1], T)); m.material.opacity = a; m.visible = a > 0.01; const w = Math.min(wmax, h * m.userData.asp); m.scale.set(w, w / m.userData.asp, 1); m.position.set(0, -vh * 0.39, -d); }
+  for (const s of SUBS) { const m = s[4]; if (!m) continue; const a = sm(s[0], s[0] + 0.45, T) * (1 - sm(s[1] - 0.5, s[1], T)); m.material.opacity = a; m.visible = a > 0.01; const w = Math.min(wmax, h * m.userData.asp); m.scale.set(w, w / m.userData.asp, 1); m.position.set(0, -vh * 0.39, -d); }
   for (const sp of labelG.children) { const dd = cam.position.distanceTo(sp.position), hh = clamp(dd * 0.028, 0.09, 0.4); sp.scale.set(hh * sp.userData.asp, hh, 1); } }
 
 /* ---------- the camera: it stays with the two at the front of the group ---------- */
 const X = ST.map((s) => s.x);
 const SHOTS = [
-  [0, 7, v3(-2.2, 1.72, 11.4), v3(-3.6, 1.62, 1.2), v3(-4.3, 1.5, TZ), v3(-4.3, 1.3, TZ)],
-  [7, 14.2, v3(X[0] + 0.02, 1.6, -0.75), v3(X[0], 1.52, -1.45), v3(X[0], 1.75, WZB), v3(X[0] + 0.1, 1.5, WZB)],
-  [14.2, 20, v3(X[0] - 0.75, 1.3, -2.78), v3(X[0] - 0.35, 1.28, -2.86), v3(X[0] + 0.05, 1.2, TZ), v3(X[0] + 0.3, 1.22, TZ)],
-  [20, 26.2, v3(X[1] - 0.5, 1.3, -2.72), v3(X[1] - 0.2, 1.27, -2.8), v3(X[1] - 0.25, 1.17, TZ), v3(X[1] - 0.15, 1.17, TZ)],
-  [26.2, 33, v3(X[1] + 0.05, 1.66, -0.5), v3(X[1], 1.58, -1.2), v3(X[1], 2.0, WZB), v3(X[1] + 0.2, 1.9, WZB)],
-  [33, 39.4, v3(X[2], 1.66, -0.3), v3(X[2], 1.58, -1.1), v3(X[2], 1.9, WZB), v3(X[2], 1.75, WZB)],
-  [39.4, 46, v3(X[2] - 0.2, 1.32, -2.66), v3(X[2] + 0.5, 1.32, -2.66), v3(X[2] + 0.1, 1.26, TZ), v3(X[2] + 0.55, 1.28, TZ)],
-  [46, 51.4, v3(X[3] - 0.7, 1.4, -2.5), v3(X[3] - 0.2, 1.38, -2.56), v3(X[3] - 0.5, 1.3, TZ), v3(X[3] + 0.2, 1.32, TZ)],
-  [51.4, 57, v3(X[3] - 0.1, 1.72, 0.1), v3(X[3] - 0.6, 1.8, 1.1), v3(X[3] - 0.4, 2.1, WZB), v3(X[3] - 1.6, 2.2, WZB)],
-  [57, 72, v3(0.3, 1.68, 2.6), v3(0, 3.0, 7.4), v3(0, 2.1, WZB), v3(0, 2.2, WZB)],
+  [0, 8, v3(0.4, 1.72, 11.2), v3(-1.6, 1.66, 2.6), v3(0, 2.3, WZB), v3(0, 2.4, WZB)],
+  [8, 15, v3(X[0] - 1.1, 1.36, -2.35), v3(X[0] - 0.5, 1.3, -2.62), v3(X[0] - 0.25, 1.12, TZ), v3(X[0] - 0.1, 1.12, TZ)],
+  [15, 41, v3(-1.2, 1.62, 0.9), v3(0.9, 1.62, 0.5), 0, 0, 1],
 ];
+ST.forEach((st, i) => { const a0 = ACT[i][0], a1 = ACT[i][1], x = st.x, s = st.s, yy = 1.08 + 0.17 * s;
+  SHOTS.push([a0, a0 + 5.2, v3(x - 0.5 * s - 0.25, yy + 0.16, -2.72 + 0.1 * s), v3(x - 0.05, yy + 0.13, -2.8 + 0.1 * s), v3(x - 0.15 * s, yy, TZ), v3(x + 0.3 * s, yy + 0.02, TZ)]);
+  SHOTS.push([a0 + 5.2, a1, v3(x + 0.04, 1.66, -0.35), v3(x, 1.6, -1.1), v3(x, 2.15, WZB), v3(x + 0.15, 2.0, WZB)]); });
+SHOTS.push([TURN, DUR, v3(0.3, 1.68, 2.6), v3(0, 3.1, 7.6), v3(0, 2.1, WZB), v3(0, 2.3, WZB)]);
 const VIEWS = { tour: ["Film"], room: ["Room", v3(-6.5, 5.2, 9.5), v3(0, 1.4, -3)], plan: ["Plan", v3(0, 21, -1.99), v3(0, 0, -2)] };
 let view = "tour", T = 0, playing = true;
 const vb = document.getElementById("views"); vb.innerHTML = Object.entries(VIEWS).map(([k, v]) => `<button data-v="${k}"${k === "tour" ? ' class="on"' : ""}>${v[0]}</button>`).join("");
@@ -288,7 +322,7 @@ const show = { subs: true, labels: false, people: true };
 document.querySelectorAll("[data-t]").forEach((b) => b.onclick = () => { const k = b.dataset.t; show[k] = !show[k]; b.classList.toggle("on", show[k]); subG.visible = show.subs; labelG.visible = show.labels; figG.visible = show.people; });
 if (Q.get("voices") === "0") { show.subs = false; subG.visible = false; } if (Q.get("people") === "0") { show.people = false; figG.visible = false; }
 const tmpA = new THREE.Vector3();
-function tourCam(T) { let sh = SHOTS[SHOTS.length - 1]; for (const s of SHOTS) if (T >= s[0] && T < s[1]) { sh = s; break; } const f = (T - sh[0]) / (sh[1] - sh[0]), k = sm(0, 1, f) * 0.85 + 0.15 * f; cam.position.lerpVectors(sh[2], sh[3], k); tmpA.lerpVectors(sh[4], sh[5], k); cam.lookAt(tmpA); }
+function tourCam(T) { let sh = SHOTS[SHOTS.length - 1]; for (const s of SHOTS) if (T >= s[0] && T < s[1]) { sh = s; break; } const f = (T - sh[0]) / (sh[1] - sh[0]), k = sm(0, 1, f) * 0.85 + 0.15 * f; cam.position.lerpVectors(sh[2], sh[3], k); if (sh[6]) { const a = slotWorld(clamp((T - LIFE0) / LIFEDT + 0.25, -0.2, 8.6)); tmpA.copy(a); tmpA.y = 3.25; } else tmpA.lerpVectors(sh[4], sh[5], k); cam.lookAt(tmpA); }
 const fadeM = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0, depthTest: false, fog: false }), fadeQ = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), fadeM); fadeQ.position.z = -0.3; fadeQ.renderOrder = 40; cam.add(fadeQ);
 function cutFade(T) { let f = 1 - sm(0, 2.2, T) + sm(DUR - 1.6, DUR - 0.2, T); for (const s of SHOTS) if (s[0] > 0) f = Math.max(f, 1 - Math.min(1, Math.abs(T - s[0]) / 0.3)); return clamp(f, 0, 1); }
 document.getElementById("beats").innerHTML = BEATS.map((b) => `<li data-go="${b[0]}"><time>${Math.floor(b[0] / 60)}:${String(b[0] % 60).padStart(2, "0")}</time><b>${b[1]}</b><p>${b[2]}<em>${b[3]}</em></p></li>`).join("");
@@ -310,7 +344,7 @@ function frame(now) {
   requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000); last = now;
   if (playing) { T += dt; if (T >= DUR) { if (FILM) { T = DUR - 0.001; playing = false; if (film.state === "recording" && rec.state === "recording") rec.stop(); else if (film.state === "playing") film.state = "done"; } else T = 0; } }
   if (document.activeElement !== scrub) scrub.value = T / DUR * 1000; clock.textContent = mmss(T) + " / " + mmss(DUR); film.progress = T / DUR;
-  ST.forEach((st, i) => stepStation(st, i, T)); wallTo(T); stepPeople(T);
+  ST.forEach((st, i) => stepStation(st, i, T)); wallDraw(T); stepPeople(T);
   if (view === "tour") { tourCam(T); fadeM.opacity = cutFade(T); } else { orbit.update(); fadeM.opacity = 0; }
   stepWords(T); R.render(S, cam);
 }
