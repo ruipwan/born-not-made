@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Born, Not Made · The exhibition</title>
-<meta name="description" content="Born, Not Made as an exhibition: a dark round room, a ring of projection, four installations from simple to complex, and the people who walk through and argue about what to call birth.">
+<meta name="description" content="Born, Not Made as an exhibition: a dark room, three walls of projection, four installations from simple to complex, and the people who walk through and argue about what to call birth.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="icon" href="data:,">
 <style>
@@ -53,7 +53,7 @@ html.film #c { object-fit: contain; cursor: none; }
 html.bnm-embed header.top { display: none; }
 </style></head>
 <body>
-<header class="top"><h1>The exhibition</h1><p>Born, Not Made as a room to walk through: a ring of projection, four installations from simple to complex, and the people who argue about what to call what they see.</p><a href="../">Home</a></header>
+<header class="top"><h1>The exhibition</h1><p>Born, Not Made as a room to walk through: three walls of projection, four installations from simple to complex, and the people who argue about what to call what they see.</p><a href="../">Home</a></header>
 <div class="view"><canvas id="c"></canvas></div>
 <div class="bar">
   <button id="play" class="on">Pause</button>
@@ -61,6 +61,7 @@ html.bnm-embed header.top { display: none; }
   <output id="clock">0:00 / 1:04</output>
   <span class="sep"></span><label>View</label>
   <span id="views"></span>
+  <span class="sep"></span><label>Projection</label><button data-r="walls" class="on">Three walls</button><button data-r="ring">Ring</button>
   <span class="sep"></span><label>Show</label>
   <button data-t="voices" class="on">Voices</button><button data-t="path">Path</button><button data-t="labels">Labels</button><button data-t="people" class="on">Visitors</button>
 </div>
@@ -71,21 +72,21 @@ html.bnm-embed header.top { display: none; }
   <p>The robot is there to serve the idea. The final work takes the form of art: an exhibition with a series of installations, which can also become part of a performance. People witness the whole birth of an intelligent robot. Some are moved, or find the newborn cute. Others find the scene unsettling, or read a warning in it. Someone who walks in sure that nothing in a machine is alive may walk out less sure. The work is an open debate about what we are willing to call birth, and what we are willing to call life.</p>
 
   <h2>The setup</h2>
-  <p>A dark round room, about 17 m across. The wall is one ring of projection, 4 m tall, open at one side where people come in. Four glass tanks stand on black plinths in an arc, each under one lamp, from the smallest and simplest to the largest. Each tank holds one parent body and shows one way a new body can leave another. The tanks are the props; the room, the light and the people are the piece.</p>
+  <p>A dark room, about 14 m wide. Three walls carry one continuous projection, 4 m tall; the fourth side is open and people come in there. A full ring of projection around a round room is a second option, and the bar under the view switches between the two. Four glass tanks stand on black plinths in an arc, each under one lamp, from the smallest and simplest to the largest. Each tank holds one parent body and shows one way a new body can leave another. The tanks are the props; the room, the light and the people are the piece.</p>
   <div class="grid" id="cards"></div>
 
   <h2>The path</h2>
   <ol class="path">
-    <li><b>Enter</b>The ring is already alive: on the wall, bodies of many sizes drift, meet and bring out new ones, each stretch of wall in a different way.</li>
+    <li><b>Enter</b>The walls are already alive: bodies of many sizes drift, meet and bring out new ones, each stretch of wall in a different way.</li>
     <li><b>Fill and release</b>The smallest tank. A folded body, made beforehand, takes air and is pushed out. Nothing is printed. Is this already a birth?</li>
     <li><b>Print and release</b>A needle draws a new body in gel inside the parent body. Water pushes the new body out.</li>
     <li><b>Print, fill, grow</b>The printed body leaves folded and wrinkled, swims straight ahead and grows as air opens the folds.</li>
     <li><b>A body that can bear the next</b>The largest tank. The newborn carries parts, and a third body already begins inside the second.</li>
-    <li><b>The ring again</b>People stand in the middle and talk. The question on the wall is the one they are already asking each other.</li>
+    <li><b>The walls again</b>People stand in the middle and talk. The question on the wall is the one they are already asking each other.</li>
   </ol>
 
   <h2>From simple to complex</h2>
-  <p>Life has many ways to bring a new body out of another. The installations answer a few of them in order, starting with the least a machine can do. The wall shows the same ladder as moving drawings, one way of birth for each stretch of the ring.</p>
+  <p>Life has many ways to bring a new body out of another. The installations answer a few of them in order, starting with the least a machine can do. The wall shows the same ladder as moving drawings, one way of birth for each stretch of wall.</p>
   <table>
     <tr><th>In life</th><th>What happens</th><th>On the wall</th><th>In the room</th></tr>
     <tr><td>Division</td><td>One body becomes two of the same size.</td><td>A circle stretches and parts.</td><td>Not built. The software answer: a copy.</td></tr>
@@ -128,9 +129,18 @@ const ptex = new THREE.CanvasTexture(pc); ptex.encoding = THREE.sRGBEncoding; pt
 const ringGeo = new THREE.CylinderGeometry(RR, RR, WH, 160, 1, true, Math.PI / 2 + GAP + Math.PI, Math.PI * 2 - 2 * GAP);
 const ring = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ map: ptex, side: THREE.BackSide, fog: false })); ring.position.y = WH / 2 + 0.35; S.add(ring);
 const ringBack = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.FrontSide })); ringBack.position.copy(ring.position); ringBack.scale.set(1.004, 1, 1.004); S.add(ringBack);
+/* three flat walls, open toward the entrance at -x: side wall at -z, back wall at +x, side wall at +z. One picture runs across all three. */
+const WX0 = -5, WX1 = 8.4, WZ = 7, Y0 = 0.35, Y1 = 0.35 + WH, LA = WX1 - WX0, LB = 2 * WZ, LT = 2 * LA + LB, ua = LA / LT, ub = (LA + LB) / LT;
+const wq = [[WX0, -WZ, 0], [WX1, -WZ, ua], [WX1, -WZ, ua], [WX1, WZ, ub], [WX1, WZ, ub], [WX0, WZ, 1]], wp = [], wu = [], wi = [];
+for (let k = 0; k < 3; k++) { const a = wq[2 * k], b = wq[2 * k + 1], o = k * 4; wp.push(a[0], Y0, a[1], b[0], Y0, b[1], b[0], Y1, b[1], a[0], Y1, a[1]); wu.push(1 - a[2], 0, 1 - b[2], 0, 1 - b[2], 1, 1 - a[2], 1); wi.push(o, o + 1, o + 2, o, o + 2, o + 3); }
+const wallGeo = new THREE.BufferGeometry(); wallGeo.setAttribute('position', new THREE.Float32BufferAttribute(wp, 3)); wallGeo.setAttribute('uv', new THREE.Float32BufferAttribute(wu, 2)); wallGeo.setIndex(wi);
+const walls = new THREE.Mesh(wallGeo, new THREE.MeshBasicMaterial({ map: ptex, side: THREE.FrontSide, fog: false })); S.add(walls);
+const wallFrame = new THREE.LineSegments(new THREE.EdgesGeometry(wallGeo), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.12 })); S.add(wallFrame);
+let ROOM = Q.get('room') === 'ring' ? 'ring' : 'walls';
+function setRoom(r) { ROOM = r; const w = r === 'walls'; walls.visible = wallFrame.visible = w; ring.visible = ringBack.visible = glow.visible = !w; document.querySelectorAll('[data-r]').forEach((b) => b.classList.toggle('on', b.dataset.r === r)); }
 /* the wall lights the floor a little: a soft pool under the ring */
 const glow = new THREE.Mesh(new THREE.RingGeometry(RR - 3.4, RR, 96, 1), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.035, blending: THREE.AdditiveBlending, depthWrite: false })); glow.rotation.x = -Math.PI / 2; glow.position.y = 0.004; S.add(glow);
-const wallLight = new THREE.HemisphereLight(0xffffff, 0x000000, 0.1); S.add(wallLight);
+const wallLight = new THREE.HemisphereLight(0xffffff, 0x000000, 0.1); S.add(wallLight); setRoom(ROOM);
 
 /* ---------- the four stations ---------- */
 const ST = [
@@ -252,7 +262,7 @@ function stepWall(dt, T) {
     px.fillStyle = "rgba(255,255,255,0.8)"; for (const e of Z.eggs) { px.beginPath(); px.arc(ox + e.x, e.y, 2.5 + e.t * 0.25, 0, 6.283); px.fill(); }
   }
   /* the question travels slowly around the ring near the end of the tour */
-  const qa = sm(50, 54, T) * (1 - sm(62.5, 64, T)); if (qa > 0.01) { px.fillStyle = `rgba(0,0,0,${0.5 * qa})`; px.fillRect(0, PH * 0.36, PW, PH * 0.28); px.fillStyle = `rgba(255,255,255,${qa})`; px.font = "300 50px 'Cormorant Garamond', Georgia, serif"; px.textAlign = "center"; px.textBaseline = "middle"; for (let i = 0; i < 2; i++) px.fillText("What are we willing to call birth?", PW * (0.27 + 0.46 * i), PH / 2); }
+  const qa = sm(50, 54, T) * (1 - sm(62.5, 64, T)); if (qa > 0.01) { px.fillStyle = `rgba(0,0,0,${0.5 * qa})`; px.fillRect(0, PH * 0.36, PW, PH * 0.28); px.fillStyle = `rgba(255,255,255,${qa})`; px.font = "300 40px 'Cormorant Garamond', Georgia, serif"; px.textAlign = "center"; px.textBaseline = "middle"; for (let i = 0; i < 3; i++) px.fillText("What are we willing to call birth?", PW * (0.164 + 0.336 * i), PH / 2); }
   ptex.needsUpdate = true;
 }
 
@@ -312,6 +322,7 @@ function setView(k) { view = k; orbit.enabled = k !== "tour"; vb.querySelectorAl
 document.addEventListener("click", (e) => { const b = e.target.closest("[data-v]"); if (b) { setView(b.dataset.v); if (b.classList.contains("card")) scrollTo({ top: 0, behavior: "smooth" }); } });
 const show = { voices: true, path: false, labels: false, people: true };
 function syncToggles() { show.path = pathLine.visible; show.labels = labelG.visible; document.querySelectorAll("[data-t]").forEach((b) => b.classList.toggle("on", show[b.dataset.t])); }
+document.querySelectorAll('[data-r]').forEach((b) => b.onclick = () => setRoom(b.dataset.r)); setRoom(ROOM);
 document.querySelectorAll("[data-t]").forEach((b) => b.onclick = () => { const k = b.dataset.t; show[k] = !show[k]; voiceG.visible = show.voices; pathLine.visible = show.path; labelG.visible = show.labels; figG.visible = show.people; if (!show.people) voiceG.visible = false; syncToggles(); });
 if (Q.get("voices") === "0") { show.voices = false; voiceG.visible = false; } if (Q.get("people") === "0") { show.people = false; figG.visible = false; voiceG.visible = false; }
 const tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3();
