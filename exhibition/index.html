@@ -54,6 +54,11 @@ ol.beats p { margin: 0; font-size: 12.5px; max-width: none; }
 ol.beats p em { display: block; font: 300 17px/1.4 var(--serif); color: var(--ink); font-style: normal; margin-top: 5px; }
 @media (max-width: 820px) { ol.beats li { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 820px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } ol.path { grid-template-columns: minmax(0, 1fr); } .view { height: 62vh; } }
+.lin { border: 1px solid var(--line); padding: 14px; margin-top: 12px; }
+.linc { display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center; margin-bottom: 10px; }
+.linc label { display: flex; align-items: center; gap: 8px; font: 500 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.linc input { width: 130px; flex: none; min-width: 0; } .linc output { font: 11px var(--mono); color: var(--ink); min-width: 62px; text-transform: none; letter-spacing: 0; }
+#lin { display: block; width: 100%; height: 360px; background: #000; }
 html.film, html.film body { height: 100%; overflow: hidden; }
 html.film header.top, html.film .bar, html.film main { display: none; }
 html.film .view { position: fixed; inset: 0; height: auto; min-height: 0; }
@@ -102,6 +107,21 @@ html.bnm-embed header.top { display: none; }
     <tr><td>One for many</td><td>One body bears the young for a whole colony.</td><td>Act 4 and the walls: bodies that bear the next, at scale.</td></tr>
   </table>
   <p class="note">Species, films and sources for births in nature are on the Nature tab of the site. The ladder here is a reading order for the room, not a claim about biology.</p>
+
+  <h2>A lineage you can run</h2>
+  <p>One rule from life, one from agents. From life: a body changes only at birth, and some changes are errors. From agents: within one life a mind adapts to the context it is in. Joined, the rule for this robot is: <b>adapt within a life, inherit at birth</b>. What the parent body learned from one audience is written into the body of the next newborn. Living beings mostly cannot do that; a robot can.</p>
+  <p>Here each show is one birth. Set the audience, then run the show. The parent body reads the room and bends the next body toward that audience: a full room asks for a larger body, people who stand close keep more folds, a tender room is trusted with more parts. On top of that every birth carries a small random error, and now and then a large one. The audience then selects without knowing: the next parent is the body people stayed with longest.</p>
+  <div class="lin">
+    <div class="linc">
+      <label>Crowd <input type="range" id="lc" min="0" max="100" value="45"><output id="lco"></output></label>
+      <label>Distance <input type="range" id="ld" min="0" max="100" value="50"><output id="ldo"></output></label>
+      <label>Mood <input type="range" id="lm" min="0" max="100" value="50"><output id="lmo"></output></label>
+      <span><button id="lnext" class="on">Run one show</button><button id="lmany">Run ten, audience drifting</button><button id="lreset">Start again</button></span>
+    </div>
+    <canvas id="lin"></canvas>
+    <p class="note" id="lsay"></p>
+    <p class="note">A solid ring: the body as inherited. An arrow: a change the parent body made for the audience. A jagged mark: an error. A broken outline: a body born from a large error. The bright line is the line of parents. This is a sketch of the rule with made up numbers, not a model of the robot or of evolution.</p>
+  </div>
 
   <h2>The film</h2>
   <p>The view above is the performance cut to 96 seconds, on a loop. Drag the time bar to any moment, or pick Room or Plan and orbit freely while the piece runs. <a href="?film=1">Open the clean film</a>: only the picture, at 1920 by 1080, played once. Add <code>&amp;rec=1</code> to record in the browser and download the file. The voices are imagined, written to test the piece before anyone has seen it.</p>
@@ -358,5 +378,36 @@ function frame(now) {
   stepWords(T); R.render(S, cam);
 }
 (document.fonts && document.fonts.load ? Promise.all([document.fonts.load("300 56px 'Cormorant Garamond'")]).catch(() => 0) : Promise.resolve()).then(() => { buildWords(); if (FILM) { film.state = "playing"; if (REC) startRec(); } requestAnimationFrame(frame); });
+</script>
+<script>
+"use strict";
+(() => {
+  const cv = document.getElementById("lin"); if (!cv) return; const x = cv.getContext("2d"), $ = (i) => document.getElementById(i), say = $("lsay");
+  let seed = 5, bodies, parent, show; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647, cl = (v, a, b) => Math.min(b, Math.max(a, v));
+  const words = { lc: ["a few people", "a full room"], ld: ["far back", "up close"], lm: ["wary", "tender"] };
+  function ctx() { return { crowd: $("lc").value / 100, close: $("ld").value / 100, tender: $("lm").value / 100 }; }
+  function labels() { for (const k of ["lc", "ld", "lm"]) { const v = $(k).value / 100; $(k + "o").textContent = v < 0.34 ? words[k][0] : v > 0.66 ? words[k][1] : "between"; } }
+  function reset() { seed = 5; show = 0; bodies = [{ id: 0, gen: 0, par: -1, size: 0.5, folds: 0.5, parts: 0.4, att: 20, ad: {}, er: {}, big: 0, row: 0 }]; parent = 0; say.textContent = "The first body. Set the audience and run a show."; draw(); }
+  function run(c) { const p = bodies[parent], b = { id: bodies.length, gen: ++show, par: parent, ad: {}, er: {}, big: 0 }, want = { size: 0.25 + 0.6 * c.crowd, folds: 0.2 + 0.65 * c.close, parts: 0.15 + 0.7 * c.tender };
+    for (const k of ["size", "folds", "parts"]) { const a = (want[k] - p[k]) * 0.45; let e = (rnd() - 0.5) * 0.12; if (rnd() < 0.13) { e = (rnd() < 0.5 ? -1 : 1) * (0.28 + rnd() * 0.2); b.big = 1; } b[k] = cl(p[k] + a + e, 0.08, 1); if (Math.abs(a) > 0.03) b.ad[k] = a; if (Math.abs(e) > 0.04) b.er[k] = e; }
+    const fit = 1 - (Math.abs(b.size - want.size) + Math.abs(b.folds - want.folds) + Math.abs(b.parts - want.parts)) / 3; b.att = Math.round(8 + 50 * fit * fit + (b.big ? (rnd() < 0.5 ? 26 : -6) : 0) + rnd() * 8);
+    const used = bodies.filter((o) => o.gen === b.gen - 1 || o.gen === b.gen).map((o) => o.row); b.row = cl(p.row + (b.big ? (rnd() < 0.5 ? -1 : 1) : 0), -2, 2); bodies.push(b);
+    const live = bodies.slice(-3); let best = live[0]; for (const o of live) if (o.att > best.att) best = o; parent = best.id;
+    const nm = { size: ["smaller", "larger"], folds: ["fewer folds", "more folds"], parts: ["fewer parts", "more parts"] }, li = (o) => Object.keys(o).map((k) => nm[k][o[k] > 0 ? 1 : 0]).join(", ") || "nothing";
+    say.textContent = `Show ${b.gen}. Adapted for the audience: ${li(b.ad)}. Errors: ${li(b.er)}${b.big ? " (one large)" : ""}. People stayed ${b.att} s. ` + (parent === b.id ? "This body bears the next." : `Body ${parent} still bears the next: people stayed longer there.`); draw(); }
+  function body(cx, cy, b, hot) { const r = 9 + 17 * b.size, n = 64; x.beginPath(); for (let i = 0; i <= n; i++) { const a = i / n * 6.283, rr = r * (1 + 0.13 * b.folds * Math.sin(a * 11)), px = cx + Math.cos(a) * rr * 1.35, py = cy + Math.sin(a) * rr; i ? x.lineTo(px, py) : x.moveTo(px, py); }
+    x.fillStyle = "rgba(255,255,255,.07)"; x.fill(); x.setLineDash(b.big ? [4, 4] : []); x.strokeStyle = hot ? "#fff" : "rgba(255,255,255,.55)"; x.lineWidth = hot ? 1.8 : 1.2; x.stroke(); x.setLineDash([]);
+    const np = Math.round(b.parts * 6); x.fillStyle = "rgba(255,255,255,.8)"; for (let i = 0; i < np; i++) x.fillRect(cx - np * 3 + i * 6, cy + r * 0.25, 3.5, 3.5);
+    let k = 0; x.lineWidth = 1.2; for (const t of ["size", "folds", "parts"]) { const ox = cx - 14 + k * 14, oy = cy - r - 12; if (b.ad[t]) { const u = b.ad[t] > 0 ? -1 : 1; x.strokeStyle = "rgba(255,255,255,.9)"; x.beginPath(); x.moveTo(ox, oy + 5 * u * -1); x.lineTo(ox, oy + 5 * u); x.moveTo(ox - 3, oy + 2 * u); x.lineTo(ox, oy + 5 * u); x.lineTo(ox + 3, oy + 2 * u); x.stroke(); } if (b.er[t]) { x.strokeStyle = "rgba(255,255,255,.9)"; x.beginPath(); x.moveTo(ox + 3, oy - 5); x.lineTo(ox + 7, oy - 2); x.lineTo(ox + 3, oy + 1); x.lineTo(ox + 7, oy + 4); x.stroke(); } k++; }
+    x.fillStyle = "rgba(255,255,255,.5)"; x.font = "10px 'JetBrains Mono', monospace"; x.textAlign = "center"; x.fillText(b.att + " s", cx, cy + r + 16); }
+  function draw() { const w = cv.clientWidth, h = cv.clientHeight, d = Math.min(devicePixelRatio || 1, 2); cv.width = w * d; cv.height = h * d; x.setTransform(d, 0, 0, d, 0, 0); x.clearRect(0, 0, w, h);
+    const vis = Math.max(6, Math.floor(w / 92)), g0 = Math.max(0, show - vis + 1), gx = (g) => 52 + (g - g0) * ((w - 104) / Math.max(1, vis - 1)), ry = (r) => h / 2 - 8 + r * 62, line = new Set(); for (let i = parent; i >= 0; i = bodies[i].par) line.add(i);
+    for (const b of bodies) { if (b.par < 0 || b.gen < g0) continue; const p = bodies[b.par]; if (p.gen < g0) continue; const on = line.has(b.id); x.strokeStyle = on ? "rgba(255,255,255,.85)" : "rgba(255,255,255,.2)"; x.lineWidth = on ? 1.6 : 1; x.beginPath(); x.moveTo(gx(p.gen) + 30, ry(p.row)); x.bezierCurveTo(gx(p.gen) + 60, ry(p.row), gx(b.gen) - 60, ry(b.row), gx(b.gen) - 36, ry(b.row)); x.stroke(); }
+    for (const b of bodies) if (b.gen >= g0) body(gx(b.gen), ry(b.row), b, line.has(b.id));
+    x.fillStyle = "rgba(255,255,255,.4)"; x.font = "10px 'JetBrains Mono', monospace"; x.textAlign = "center"; for (let g = g0; g <= show; g++) x.fillText(g ? "show " + g : "first", gx(g), h - 8); }
+  $("lnext").onclick = () => run(ctx());
+  $("lmany").onclick = () => { let n = 0; const t = setInterval(() => { for (const k of ["lc", "ld", "lm"]) $(k).value = cl(+$(k).value + (rnd() - 0.5) * 34, 0, 100); labels(); run(ctx()); if (++n >= 10) clearInterval(t); }, 260); };
+  $("lreset").onclick = reset; for (const k of ["lc", "ld", "lm"]) $(k).oninput = labels; addEventListener("resize", draw); labels(); reset();
+})();
 </script>
 </body></html>
