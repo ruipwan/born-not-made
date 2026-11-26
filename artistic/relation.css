@@ -1,0 +1,49 @@
+.relation-study {
+  --rs-ink: #efeee9;
+  --rs-muted: #b6b5b1;
+  --rs-line: #434343;
+  width: 100%;
+  color: var(--rs-ink);
+  font-family: var(--sans, Inter, system-ui, sans-serif);
+  color-scheme: dark;
+}
+.relation-study *, .relation-study *::before, .relation-study *::after { box-sizing: border-box; }
+.relation-study .rs-stage { position: relative; background: #101010; overflow: hidden; }
+.relation-study canvas { width: 100%; height: auto; display: block; aspect-ratio: 2.42; }
+.relation-study .rs-moments, .relation-study .rs-interactions, .relation-study .rs-choice { display: flex; align-items: center; }
+.relation-study button {
+  background: transparent;
+  color: var(--rs-muted);
+  font: inherit;
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+  min-height: 44px;
+  padding: 5px 0;
+  touch-action: manipulation;
+}
+.relation-study button:hover, .relation-study button:focus-visible, .relation-study button[aria-pressed="true"] { color: #fff; }
+.relation-study button:focus-visible { outline: 1px solid currentColor; outline-offset: 3px; }
+.relation-study button[aria-pressed="true"] .rs-name { border-bottom: 1px solid currentColor; }
+.relation-study .rs-name { padding-bottom: 2px; }
+.relation-study .rs-moments { justify-content: space-between; gap: 1rem; border-block: 1px solid var(--rs-line); }
+.relation-study .rs-steps { display: flex; gap: clamp(.55rem, 2vw, 1.7rem); flex-wrap: wrap; }
+.relation-study .rs-steps button, .relation-study .rs-play { font-size: .8rem; letter-spacing: .018em; }
+.relation-study .rs-play { flex: none; min-width: 5.2em; text-align: right; }
+.relation-study .rs-interactions { margin-top: 1.05rem; justify-content: space-between; flex-wrap: wrap; gap: .1rem 1rem; }
+.relation-study .rs-question { font-size: 1rem; margin: 0; }
+.relation-study .rs-choice { gap: 1.25rem; }
+.relation-study .rs-choice button { font-size: .91rem; }
+.relation-study .rs-caption { color: var(--rs-muted); margin: .6rem 0 0; max-width: 64ch; font-size: .94rem; line-height: 1.55; min-height: 3.1em; }
+.relation-study .rs-score { color: var(--rs-muted); font: 400 .66rem/1.4 var(--mono, ui-monospace, monospace); letter-spacing: .06em; text-transform: uppercase; margin: .6rem 0; }
+@media (max-width: 620px) {
+  .relation-study canvas { aspect-ratio: 1.47; }
+  .relation-study .rs-steps { gap: .78rem; }
+  .relation-study .rs-steps button, .relation-study .rs-play { font-size: .73rem; }
+  .relation-study .rs-interactions { display: block; }
+  .relation-study .rs-caption { margin-top: .25rem; }
+}
+@media (max-width: 370px) {
+  .relation-study .rs-steps { gap: .55rem; }
+  .relation-study .rs-moments { gap: .2rem; }
+}

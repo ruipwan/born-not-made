@@ -355,7 +355,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 <header class="top"><div class="bar">
   <a class="brand" href="#work">Speculative prototype: a robot giving “birth” to another</a>
   <nav class="tabs" aria-label="Sections">
-    <a href="#work" data-g="work">The Prototype</a><a href="#simulator" data-g="sim">Simulator</a><a href="#ideas" data-g="think">Think</a><a href="#prototypes" data-g="make">Make</a><a href="#conversations" data-g="talk" class="voices">Talk</a>
+    <a href="#work" data-g="work">The Prototype</a><a href="#artistic" data-g="artistic">Artistic Version</a><a href="#simulator" data-g="sim">Simulator</a><a href="#ideas" data-g="think">Think</a><a href="#prototypes" data-g="make">Make</a><a href="#conversations" data-g="talk" class="voices">Talk</a>
   </nav>
 </div><nav class="sub" id="subnav" aria-label="Pages in this section"></nav></header>
 <main>
@@ -1529,6 +1529,10 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
   <div class="fullframe"><iframe data-src="society/" title="Society simulation: tailed robots and the generations born from the tailed ones talk in one tank"></iframe></div>
 </section>
 
+<section class="tab" id="artistic" aria-label="Artistic Version">
+  <iframe id="artisticFrame" data-src="artistic/" title="After release — an exhibition film and two interactive studies" allowfullscreen style="display:block;width:100%;height:960px;border:0;background:#000"></iframe>
+</section>
+
 <!-- ============================== ACADEMIA RESEARCH ============================== -->
 <section class="tab" id="academia">
   <div class="tabhead"><div><p class="kicker">Research Atlas</p><h2>Academia Research</h2><p>A visual working index of research projects, artists, laboratories and doctoral pathways related to Born, Not Made and Baby Robot.</p></div>
@@ -1540,6 +1544,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 <script>
 const GROUPS = [
   { g: "work", label: "The Prototype", tabs: [["work", "The Prototype"], ["exhibition", "The Exhibition", "the room, the path, the voices"]] },
+  { g: "artistic", label: "Artistic Version", tabs: [["artistic", "Artistic Version"]] },
   { g: "sim", label: "Simulator", tabs: [["simulator", "Printing console", "signal, G-code, print, birth"], ["inheritance", "Inheritance", "print, distill, learn"], ["grow", "Grow", "three ways to fill the folds"], ["physics", "Physics", "birth and printing, simulated"], ["eating", "Eating parts", "robots eat electronic parts and reproduce tails"], ["society", "Society", "tailed ones talk and bear generations"]] },
   { g: "think", label: "Think", tabs: [["ideas", "Ideas", "questions the work raises"], ["culture", "Culture", "stories, screens and art"], ["machines", "Machines", "what birth has meant for machines"], ["nature", "Nature", "how other species give birth"], ["academia", "Academia Research", "labs, works and PhD paths"]] },
   { g: "make", label: "Make", tabs: [["prototypes", "Prototypes", "versions one to three"], ["build", "Build", "every part, with sources"], ["process", "Process", "how the work changed"]] },
@@ -1558,6 +1563,8 @@ function show() {
   const live = grp.tabs.filter((t) => document.getElementById(t[0]));
   document.getElementById("subnav").innerHTML = live.length > 1 ? live.map((t) => `<a href="#${t[0]}"${t[0] === id ? ' aria-current="page"' : ""}>${esc(t[1])}</a>`).join("") : "";
   const f = document.querySelector("#" + id + " iframe[data-src]"); if (f && !f.src) f.src = f.dataset.src;
+  const artisticFrame = document.getElementById("artisticFrame");
+  if (artisticFrame.getAttribute("src")) artisticFrame.contentWindow?.postMessage({ bnm: "artistic-visible", active: id === "artistic" }, location.origin);
   document.querySelectorAll("section.tab:not(.on) video").forEach((v) => v.pause());
   document.querySelectorAll("section.tab:not(.on) iframe[data-yt]").forEach((f) => f.removeAttribute("src"));
   document.querySelectorAll("#" + id + " iframe[data-yt]").forEach((f) => { if (!f.getAttribute("src")) f.src = f.dataset.yt; });
@@ -1631,6 +1638,12 @@ document.getElementById("conversations").addEventListener("click", event => {
 async function loadConversations() { if (CONV) return; try { CONV = await (await fetch("conversations/data/conversations.json", { cache: "no-cache" })).json(); renderConversations(); } catch (e) { document.getElementById("convList").innerHTML = '<p class="note">Conversations could not load.</p>'; } }
 addEventListener("message", (e) => {
   if (e.origin !== location.origin || !e.data) return;
+  if (e.data.bnm === "artistic-height") {
+    const frame = document.getElementById("artisticFrame");
+    if (e.source === frame.contentWindow && Number.isFinite(e.data.height) && e.data.height > 0) {
+      frame.style.height = Math.min(32000, e.data.height) + "px";
+    }
+  }
   if (e.data.bnm === "early-height") {
     const f = document.getElementById("earlyFrame");
     if (f && Number.isFinite(+e.data.h)) f.style.height = Math.max(500, +e.data.h) + "px";
