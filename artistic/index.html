@@ -6,10 +6,12 @@
   <meta name="theme-color" content="#000000">
   <title>After release · Born, Not Made · Ruipeng Wang</title>
   <meta name="description" content="An exhibition film and two interactive studies of a robotic birth. A folded silicone body leaves its parent, meets another body and passes on a gesture.">
+  <script>if (new URLSearchParams(location.search).get('view') === 'room') document.documentElement.classList.add('presentation');</script>
   <link rel="stylesheet" href="edition.css">
+  <link rel="stylesheet" href="room.css">
 </head>
 <body>
-  <a class="return" href="../#work" target="_top">← Born, Not Made</a>
+  <a class="return" href="../#artistic" target="_top">← Born, Not Made</a>
   <main>
     <header class="hero" id="film">
       <div class="hero-art" role="img" aria-label="A hand cradles a translucent, wired robot prototype."></div>
@@ -30,12 +32,30 @@
       </div>
     </header>
     <div class="index-strip">
-      <nav aria-label="In this edition"><a href="#material">Material study</a><a href="#relation">Relation study</a><a href="#notes">Field notes</a></nav>
+      <nav aria-label="In this edition"><a href="#rooms">Three exhibition directions</a><a href="#material">Material study</a><a href="#relation">Relation study</a><a href="#notes">Field notes</a></nav>
       <details class="film-info"><summary>Film notes</summary>
         <div><p>48 seconds, with a synthesized stereo score. The opening ten seconds use Ruipeng Wang’s photographs of the VISAP installation and a prototype held in the hand. The film then enters an earlier gallery simulation. At 0:32, a new macro animation imagines the silicone folds taking air. At 0:40, the view returns to the tank.</p><p>The internal printing and floating release are proposed sequences. The interactive cutaway below shows the later S8 boat-shaped hull.</p>
           <a href="encounter.mp4" download="Born-Not-Made_After-release.mp4">Download film (MP4)</a> · <a href="encounter.vtt">English captions</a></div>
       </details>
     </div>
+    <section class="chapter" id="rooms" aria-labelledby="rooms-title">
+      <div class="chapter-head">
+        <div><p class="eyebrow">Exhibition rehearsals</p><h2 id="rooms-title">Three ways to <i>visit</i></h2></div>
+        <p>Enter the same room three times. Follow the visitor at the copper strip, the stranger beside a newborn, or the person who must refill the machine before it can give birth again.</p>
+      </div>
+      <div id="room-stage"></div>
+      <a id="present" href="?view=room&amp;direction=witness" target="_blank" rel="noopener">Present this direction ↗</a>
+      <details class="text-note rehearsals-film"><summary>Watch the three directions together</summary>
+        <div>
+          <video controls playsinline preload="none" poster="rehearsals.jpg" aria-label="Three exhibition rehearsals, a comparison film">
+            <source src="rehearsals.mp4" type="video/mp4">
+            <track kind="captions" srclang="en" label="English" src="rehearsals.vtt">
+            <a href="rehearsals.mp4">Play the comparison film</a>
+          </video>
+          <a href="rehearsals.mp4" download="Born-Not-Made_Three-exhibition-rehearsals.mp4">Download the comparison film (MP4)</a>
+        </div>
+      </details>
+    </section>
     <section class="chapter" id="material" aria-labelledby="material-title">
       <div class="chapter-head">
         <div><p class="eyebrow">Material study</p><h2 id="material-title">The last point of <i>contact</i></h2></div>
@@ -46,7 +66,7 @@
         <div class="transport">
           <button class="plain-action" type="button" id="motion" aria-label="Play material study"><span aria-hidden="true">▶</span> Play</button>
           <input type="range" id="scrub" min="0" max="1000" step="1" value="75" aria-label="Scrub the print and release sequence">
-          <output for="scrub" id="time">00:02</output>
+          <output for="scrub" id="time" aria-live="off">00:02</output>
         </div>
         <div class="phase-list" role="group" aria-label="Jump to a material stage">
           <button type="button" data-phase="0" aria-pressed="true">Place the core</button>
@@ -54,7 +74,7 @@
           <button type="button" data-phase="2" aria-pressed="false">Admit air</button>
           <button type="button" data-phase="3" aria-pressed="false">Release</button>
         </div>
-        <figcaption id="phase-caption">The motor and electronics enter as one assembled core. They are already there when the parent begins to print.</figcaption>
+        <figcaption id="phase-caption" aria-live="polite" aria-atomic="true">The motor and electronics enter as one assembled core. They are already there when the parent begins to print.</figcaption>
       </figure>
       <details class="text-note"><summary>About this mechanism</summary>
         <div><p>The early tank prototype used water pressure to push a pre-made child through an elastic opening. This cutaway follows a later proposal. A robot arm deposits silicone around supplied electronics in gel. Switching the connector to air gives the folded shell volume. The pump, reservoirs, battery and people who replenish them are conditions of the birth.</p><p>The timing and material movement are choreographed. The project's printing console gives a separate view of the toolpath and joint motion.</p><a href="../#simulator" target="_top">Open the printing console ↗</a> <a href="https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html" target="_blank" rel="noopener">Read the original tank tests ↗</a></div>
@@ -63,7 +83,7 @@
     <section class="chapter" id="relation" aria-labelledby="relation-title">
       <div class="chapter-head">
         <div><p class="eyebrow">Relation study</p><h2 id="relation-title">A movement <i>between them</i></h2></div>
-        <p>One gesture comes from a parent. Another becomes possible when a stranger comes close. Watch which gesture reaches the next generation.</p>
+        <p>Here the stranger moves first. The child already has its parent’s double pulse. Bring the bodies close, then watch which gesture reaches the next generation.</p>
       </div>
       <div id="relation-score"></div>
     </section>
@@ -75,6 +95,8 @@
           <details open><summary>Who carries the child?</summary><div>
             <p>At Waikīkī Aquarium, a pair of weedy seadragons transferred eggs during a dance. The male carried them under his tail until they hatched. A carrier can enter the story after conception. In the cutaway, follow the arm for a few seconds beyond the end of printing. <a href="https://www.hawaii.edu/news/2022/11/15/weedy-seadragon-born-at-waikiki-aquarium/">University of Hawaiʻi ↗</a></p>
             <p>At one sperm whale birth filmed off Dominica, females from two maternal lines took turns lifting the newborn toward the surface. That observation suggests a different framing for a robot birth. Leave space in the shot for someone else to arrive. <a href="https://doi.org/10.1126/science.ady9280">Project CETI in Science ↗</a></p></div></details>
+          <details><summary>Where does a body open?</summary><div>
+            <p>The Surinam toad, <em>Pipa pipa</em>, carries developing young in the skin of her back. They emerge as formed froglets. Her many sites of emergence throw the boat’s single stern opening into relief. The opening a machine has is also a decision someone made about its body. <a href="https://annex.exploratorium.edu/frogs/mainstory/surinam.html">Exploratorium ↗</a></p></div></details>
           <details><summary>Where does a gesture come from?</summary><div>
             <p>Some Shark Bay bottlenose dolphins learn to shake fish from empty shells by associating with dolphins that already do it. A skill can travel sideways through a group. The relation study gives a child a brief encounter with a neighbor before its own offspring appears. <a href="https://news.uzh.ch/en/articles/2020/Dolphins-Shelling.html">University of Zurich ↗</a></p>
             <p>In Mbendjele BaYaka camps in the Republic of the Congo, researchers observed infants receiving attention from several recurring caregivers. It matters <em>who comes back</em>. A future installation could let a visitor recognize the same unrelated robot returning to a particular child. <a href="https://www.repository.cam.ac.uk/items/47b02144-360d-4074-b3a5-b1623dfc0bb3">Chaudhary, Salali and Swanepoel ↗</a></p></div></details>

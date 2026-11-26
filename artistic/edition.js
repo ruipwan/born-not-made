@@ -1,4 +1,5 @@
 const embedded = window !== window.parent;
+const presenting = document.documentElement.classList.contains('presentation');
 document.documentElement.classList.toggle('embedded', embedded);
 
 const film = document.querySelector('#film-player');
@@ -6,6 +7,11 @@ const hero = document.querySelector('#film');
 const screen = document.querySelector('#screen');
 const watch = document.querySelector('#watch');
 const closeFilm = document.querySelector('#close-film');
+const reelPanel = document.querySelector('.rehearsals-film');
+const reel = reelPanel.querySelector('video');
+reelPanel.addEventListener('toggle', () => { if (!reelPanel.open) reel.pause(); });
+reel.addEventListener('play', () => { film.pause(); stopStudy(); });
+film.addEventListener('play', () => { reel.pause(); stopStudy(); });
 watch.addEventListener('click', event => {
   event.preventDefault();
   stopStudy();
@@ -40,19 +46,22 @@ const phases = [
 let progress = phases[0].mark;
 let scene;
 let relation;
+let room;
 let previousPhase = -1;
 let active = true;
 let frame = 0;
 let lastTime = 0;
 let materialInView = false;
 let relationInView = false;
+let roomInView = false;
 const duration = 34;
 
 function updateStudy(next) {
   progress = Math.min(1, Math.max(0, next));
   scene?.setProgress(progress);
   scrub.value = String(Math.round(progress * 1000));
-  clock.textContent = '00:' + String(Math.floor(duration * progress)).padStart(2, '0');
+  const currentTime = '00:' + String(Math.floor(duration * progress)).padStart(2, '0');
+  if (clock.textContent !== currentTime) clock.textContent = currentTime;
   const index = phases.findLastIndex(phase => progress >= phase.start);
   if (index !== previousPhase) {
     previousPhase = index;
@@ -91,9 +100,10 @@ updateStudy(progress);
 
 function syncPlayback() {
   const visible = active && !document.hidden;
-  if (!visible) film.pause();
+  if (!visible) { film.pause(); reel.pause(); }
   if (!visible || !materialInView) stopStudy();
   relation?.setActive(visible && relationInView);
+  room?.setActive(visible && roomInView);
 }
 if (embedded) {
   window.addEventListener('message', event => {
@@ -109,19 +119,39 @@ if (embedded) {
   reportSize();
 }
 document.addEventListener('visibilitychange', syncPlayback);
-window.addEventListener('pagehide', () => { film.pause(); stopStudy(); relation?.setActive(false); });
+window.addEventListener('pagehide', () => { film.pause(); reel.pause(); stopStudy(); relation?.setActive(false); room?.setActive(false); });
 window.addEventListener('pageshow', syncPlayback);
 const observers = new IntersectionObserver(entries => {
   for (const entry of entries) {
     if (entry.target === canvas) materialInView = entry.isIntersecting;
-    else relationInView = entry.isIntersecting;
+    else if (entry.target === score) relationInView = entry.isIntersecting;
+    else roomInView = entry.isIntersecting;
   }
   syncPlayback();
 });
 observers.observe(canvas);
 const score = document.querySelector('#relation-score');
 observers.observe(score);
-import('./material.js').then(({ createMaterialScene }) => {
+const theatre = document.querySelector('#room-stage');
+observers.observe(theatre);
+import('./room.js').then(({ mountRoom }) => {
+  const requestedDirection = new URLSearchParams(location.search).get('direction');
+  room = mountRoom(theatre, { direction: requestedDirection });
+  const present = document.querySelector('#present');
+  function updatePresentationLink() {
+    const direction = room.getDirection();
+    present.href = '?view=room&direction=' + encodeURIComponent(direction);
+    if (presenting) {
+      history.replaceState(null, '', present.href);
+    }
+  }
+  updatePresentationLink();
+  theatre.addEventListener('click', updatePresentationLink);
+  syncPlayback();
+}).catch(() => {
+  theatre.textContent = 'The room could not load. The film above shows the proposed gallery from the far side of the tank.';
+});
+if (!presenting) import('./material.js').then(({ createMaterialScene }) => {
   scene = createMaterialScene(canvas);
   scene.setProgress(progress);
 }).catch(() => {
@@ -129,7 +159,7 @@ import('./material.js').then(({ createMaterialScene }) => {
   motion.disabled = true;
   scrub.disabled = true;
 });
-import('./relation.js').then(({ mountRelation }) => {
+if (!presenting) import('./relation.js').then(({ mountRelation }) => {
   relation = mountRelation(score);
   syncPlayback();
 }).catch(() => {

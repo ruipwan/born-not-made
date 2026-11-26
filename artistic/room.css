@@ -1,0 +1,21 @@
+.room-selection,.room-actions{display:flex;flex-wrap:wrap;align-items:baseline;gap:.35rem 1.5rem}
+.room-selection{border-top:1px solid var(--rule,#383838);padding:.5rem 0 .72rem}
+.rehearsal button{font:inherit;color:inherit;border:0;background:transparent;padding:.22rem 0;text-align:left;cursor:pointer}
+.room-selection button{font-size:clamp(.98rem,1.4vw,1.19rem);color:#a6a6a6}
+.room-selection button[aria-pressed=true],.room-actions button[aria-pressed=true]{color:#f1f1ee;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.33em}
+.room-stage{width:100%;aspect-ratio:2.04;overflow:hidden;background:#202020}
+.room-stage canvas{display:block;width:100%;height:100%}
+.room-console{display:grid;grid-template-columns:1fr 1fr;gap:clamp(18px,4vw,66px);border-bottom:1px solid var(--rule,#383838);padding:.95rem 0 1.15rem}
+.room-console p{margin:0;font-size:.91rem;line-height:1.52}
+.room-actions{padding-top:.48rem;gap:.25rem 1.25rem}
+.room-actions button{font-size:.89rem;color:#e5e5e3;text-decoration:underline;text-underline-offset:.29em;text-decoration-color:#747474}
+.room-actions button:hover,.room-selection button:hover{color:white;text-decoration-color:white}
+.room-result{color:#b9b9b6}
+.rehearsal .room-reset{margin-top:.42rem;color:#aaa;font-size:.78rem}
+.room-reset:hover{text-decoration:underline}
+@media(max-width:670px){
+  .room-stage{aspect-ratio:1.5}
+  .room-console{grid-template-columns:1fr;gap:.82rem}
+  .room-selection,.room-actions{gap:.22rem .96rem}
+  .room-selection button,.room-actions button,.rehearsal .room-reset{min-height:42px}
+}

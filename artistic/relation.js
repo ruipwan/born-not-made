@@ -302,8 +302,11 @@ export function mountRelation(container) {
       const step = Number(button.dataset.rsStep);
       time = playing ? chapterStarts[step] : chapterFrames[step];
     } else {
-      near = button.dataset.rsNear === '1';
-      if (time < chapterStarts[2]) time = chapterFrames[1];
+      const nextNear = button.dataset.rsNear === '1';
+      if (near !== nextNear || time < chapterStarts[1]) {
+        near = nextNear;
+        time = playing ? chapterStarts[1] : chapterFrames[1];
+      }
     }
     schedule();
   }

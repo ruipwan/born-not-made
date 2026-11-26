@@ -79,6 +79,17 @@ figure { margin: 0; }
 .text-note > summary { display: inline-block; padding: 4px 0; }
 .text-note > div, .film-info > div { max-width: 70ch; font-size: .91rem; }
 .text-note a { display: inline-block; margin-right: 20px; }
+.rehearsals-film { padding-top: 14px; }
+#present { float: right; margin-top: 14px; color: var(--secondary); font-size: .86rem; }
+.presentation main > :not(#rooms), .presentation footer, .presentation #present, .presentation .rehearsals-film { display: none; }
+.presentation #rooms { padding: 14px 0 36px; }
+.presentation #rooms .chapter-head > p { display: none; }
+.presentation #rooms .chapter-head { grid-template-columns: 1fr; }
+.presentation #rooms h2 { font-size: clamp(36px,4.3vw,62px); }
+.presentation #rooms .chapter-head .eyebrow { margin-bottom: 4px; }
+.presentation #rooms .room-stage { max-height: 58svh; }
+.rehearsals-film > div { max-width: none; margin-top: 12px; }
+.rehearsals-film video { display: block; width: 100%; aspect-ratio: 16/9; margin-bottom: 10px; background: #101010; }
 .field { padding-bottom: 64px; }
 .field-spread { display: grid; grid-template-columns: 5fr 7fr; gap: clamp(20px,4.5vw,72px); align-items: start; margin: 34px 0 0; }
 .field-photo img { display: block; width: 100%; height: auto; filter: grayscale(1); }
@@ -124,6 +135,8 @@ footer { border-top: 1px solid var(--rule); padding-block: 15px 42px; display: f
   .play-disc { width: 34px; height: 34px; }
   .index-strip nav { gap: 6px 17px; }
   .index-strip nav a,.film-info summary { font-size: .8rem; }
+  #present { float: none; display: inline-block; }
+  .presentation #present { display: none; }
   .transport { gap: 9px; }
   .plain-action { min-width: 4.7em; }
 }
