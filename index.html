@@ -355,7 +355,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 <header class="top"><div class="bar">
   <a class="brand" href="#work">Speculative prototype: a robot giving “birth” to another</a>
   <nav class="tabs" aria-label="Sections">
-    <a href="#work" data-g="work">The Prototype</a><a href="#artistic" data-g="artistic">Artistic Version</a><a href="#simulator" data-g="sim">Simulator</a><a href="#ideas" data-g="think">Think</a><a href="#prototypes" data-g="make">Make</a><a href="#conversations" data-g="talk" class="voices">Talk</a>
+    <a href="#work" data-g="work">The Prototype</a><a href="#artistic" data-g="artistic">Artistic Version</a><a href="#birth-in-water" data-g="birth-in-water">Birth in Water</a><a href="#simulator" data-g="sim">Simulator</a><a href="#ideas" data-g="think">Think</a><a href="#prototypes" data-g="make">Make</a><a href="#conversations" data-g="talk" class="voices">Talk</a>
   </nav>
 </div><nav class="sub" id="subnav" aria-label="Pages in this section"></nav></header>
 <main>
@@ -1529,6 +1529,7 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
   <div class="fullframe"><iframe data-src="society/" title="Society simulation: tailed robots and the generations born from the tailed ones talk in one tank"></iframe></div>
 </section>
 
+<section class="tab" id="birth-in-water" aria-label="Birth in Water"><iframe id="birthWaterFrame" data-src="birth-in-water/" title="Birth in Water — film script and research" style="display:block;width:100%;height:1150px;border:0;background:#090909"></iframe></section>
 <section class="tab" id="artistic" aria-label="Artistic Version">
   <iframe id="artisticFrame" data-src="artistic/" title="After release — an exhibition film and two interactive studies" allowfullscreen style="display:block;width:100%;height:960px;border:0;background:#000"></iframe>
 </section>
@@ -1544,12 +1545,20 @@ footer { border-top: 1px solid var(--line); padding: 26px max(16px, env(safe-are
 <script>
 const GROUPS = [
   { g: "work", label: "The Prototype", tabs: [["work", "The Prototype"], ["exhibition", "The Exhibition", "the room, the path, the voices"]] },
+  { g: "birth-in-water", label: "Birth in Water", tabs: [["birth-in-water", "Birth in Water"]] },
   { g: "artistic", label: "Artistic Version", tabs: [["artistic", "Artistic Version"]] },
   { g: "sim", label: "Simulator", tabs: [["simulator", "Printing console", "signal, G-code, print, birth"], ["inheritance", "Inheritance", "print, distill, learn"], ["grow", "Grow", "three ways to fill the folds"], ["physics", "Physics", "birth and printing, simulated"], ["eating", "Eating parts", "robots eat electronic parts and reproduce tails"], ["society", "Society", "tailed ones talk and bear generations"]] },
   { g: "think", label: "Think", tabs: [["ideas", "Ideas", "questions the work raises"], ["culture", "Culture", "stories, screens and art"], ["machines", "Machines", "what birth has meant for machines"], ["nature", "Nature", "how other species give birth"], ["academia", "Academia Research", "labs, works and PhD paths"]] },
   { g: "make", label: "Make", tabs: [["prototypes", "Prototypes", "versions one to three"], ["build", "Build", "every part, with sources"], ["process", "Process", "how the work changed"]] },
   { g: "talk", label: "Talk", tabs: [["conversations", "Conversations", "one to one"], ["voices", "Voices", "open to everyone"]] },
 ];
+window.addEventListener("message", event => {
+  const frame = document.getElementById("birthWaterFrame");
+  if (event.origin !== location.origin || event.source !== frame.contentWindow) return;
+  const data = event.data || {};
+  if (data.bnm === "birth-in-water-height" && Number.isFinite(data.height) && data.height > 100) frame.style.height = Math.ceil(data.height) + "px";
+  if (data.bnm === "birth-in-water-scroll" && Number.isFinite(data.y) && frame.closest(".tab.on")) window.scrollTo({top: window.scrollY + frame.getBoundingClientRect().top + data.y - 80});
+});
 const TABS = GROUPS.flatMap((x) => x.tabs.map((t) => t[0]));
 const ALIAS = { trunk: "work", branches: "ideas", questions: "ideas", early: "prototypes", log: "process", think: "ideas", make: "prototypes", talk: "conversations" };
 if (ALIAS[location.hash.slice(1)]) history.replaceState(null, "", "#" + ALIAS[location.hash.slice(1)]);
