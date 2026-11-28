@@ -1,0 +1,7 @@
+film_start_s,routing,low_band_db_relative_to_sum,upper_band_db_relative_to_sum
+46,left,0.0,0.181
+46,sum,0.0,0.0
+46,right,-0.0,-0.114
+54,left,-0.018,-3.981
+54,sum,0.0,0.0
+54,right,0.019,2.722

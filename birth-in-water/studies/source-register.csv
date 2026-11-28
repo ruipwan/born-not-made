@@ -1,0 +1,9 @@
+local_source_alias,kind,work,published_source,edit_interval,use,raster_or_audio,source_rate,rendition_bytes,rendition_sha256
+ecology.mp4,Artist recording of digital work,Water Beings,https://vimeo.com/1229413082,0–8 and 70.15–79.15 s,Picture,1280x720,30000/1001,24943572,488518c6bc20cc435a486c112a3bab4ea93b042398e8f2fe0decfe4aad82d766
+pump.mp4,Workshop camera,Hydraulic push test,https://vimeo.com/1147282116,8–18.4 s,Picture,1280x720,30/1,3082778,f54fee45f07e6229b9f5dffbc331510484c09ce956315a7398425bb0729bbb8a
+pump-audio.mp4,Workshop camera,Hydraulic push test,https://vimeo.com/1147282116,8–18.4 s,Synchronous sound,2 channels,48000 Hz,285898,ba48af95e806b644e0f7a5b4270cca60d94fa8b1f33d67b55b8dc95169578daa
+interface.mp4,Separate workshop camera test,Phone control,https://vimeo.com/1147361501,18.4–24 s,Picture,1920x1080,30000/1001,24190136,38452b6b264b2f80921d3bd8f86ce8fe497859087ff02cbfb18a60940e45ea7f
+overhead-4k.mp4,Overhead tank camera,First prototype,https://vimeo.com/1147548218,24–60 s,Picture in three framings,3840x2160,30000/1001,98590999,2abd00885cf08ea9ba18546d0708a8c015d9658f571979a2dcc9c5b34111a9db
+overhead-audio.mp4,Overhead tank camera,First prototype,https://vimeo.com/1147548218,24–60 s,Synchronous sound under composed score,2 channels,48000 Hz,933502,124a89500afacfcbaac9ddbe447014cfc9f232513648d43cee7cb1fa00267022
+second.mp4,Artist project overview,Second prototype,https://vimeo.com/1238506916,60–65.15 s,Picture,1920x1080,24000/1001,26805712,3ef04e557ce4ca9820e6c4428b480d0b1f0c1489c0daf5cd9ae4054aa5496e8d
+installation.webp,Repository artwork preview,VISAP catalogue,https://visap.net/2026/artwork-4.html,65.15–70.15 s,Held image; capture method unspecified,850x478,still,18402,ef31028eb060f4c8d59b09d6b21e344c43d525338b5b0808d6282e980cf574af

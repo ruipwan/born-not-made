@@ -31,3 +31,5 @@ The next shot uses a 118 mm model lens at f/11 from the same camera position. It
 [Flow solver](../production/solid_waves.py) · [Plot and probe sampling](../production/plot_wave_control.py) · [Camera and water mesh](../production/rim_wave.py)
 
 To reproduce the finest pair, run the solver once with each value of --case, hull and empty, using --nx 96 --ny 54 --nz 23. Supply the repository simulator/simple/print directory and an output NPZ filename. The optical renderer reads that file through BNM_WAVE_RESULT. BNM_GROOVE_CAMERA=1 selects the closer lens, BNM_CROSS_HEIGHT=0.82 the raised strip. The earlier dispersive rush remains reproducible with its original field.
+
+The moving comparison uses 96 consecutive 768 × 432 pictures for the fixed-hull field and 48 for its empty-water control. Render both at 24 fps with BNM_SCALE=80, BNM_SAMPLES=32 and the closer camera. After denoising, use [the film assembly](../production/hull_wave_movie.py). Its opening is the four-second fixed-shell passage. The second half compares matched views and crops over a two-second interval repeated twice. The first paired layout was checked while the remaining frames rendered.
