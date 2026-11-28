@@ -2,6 +2,8 @@
 
 The earlier Artistic Version developed Witness, A Stranger and The Night Shift. Keep their different questions alive in one trial. On entry a visitor encounters two bodies whose relation is uncertain. A witness cannot command a birth. On exit one can see who restores the conditions for another cycle. This sequence is a curatorial proposal, not an account of visitor reactions.
 
+The current two-screen rehearsal puts recorded tank footage on the north wall and a separate recording of the digital population on the east wall. The live seam-camera proposal below was an earlier option. It would require an installed camera, a separate signal route and a clear label. The present two-player test uses the two recordings.
+
 ## Walkthrough for a black-box mock-up
 
 Start at the door during reset. A newcomer sees the operator setting the folded body back into the chamber. Let this work be legible: inserting a prefabricated body is different from the proposed internal printing process. A person who arrives only for these ninety seconds should be able to tell what someone had to do for a birth to recur. Time the actual reset before determining exhibition frequency.
@@ -31,3 +33,11 @@ Wang’s archive paraphrases his interlocutors; it is not a transcript or a reco
 * **Can this offspring carry another?** Blaise Agüera y Arcas and Steve Mann raised the next-generation question in different terms. The recorded offspring was made in advance. The main cut returns to a seven-generation digital population while the physical child is still a first-generation demonstration. At reset, identify the body being reloaded. Seeing the scene twice can otherwise resemble seeing two generations. Vera Wu’s interest in a group that grows generation by generation remains a future installation question.
 
 [Artist’s conversation archive](../../conversations/data/conversations.json) · [Earlier artistic editions](../../artistic/)
+
+## A record that the film cannot supply
+
+In Mary Kelly’s *Post-Partum Document*, feeding charts and traces on nappy liners belong to the same installation. Later sections move into utterances, marks and diary entries. A chart made by a carer and a mark left by a child give access to different parts of their relation. In this gallery a staff record can say which physical hull went back into the carrier. Only the overhead camera can give the visitor the particular view of two pale contours moving apart. Keep the distinction visible. [Mary Kelly, work and materials for the six parts](https://www.marykellyartist.com/copy-of-post-partum-document-1973-79)
+
+[Print the return record and room handover on two separate A4 leaves](tank-return-and-handover.pdf). Offer the first sheet on the dry reading route. With the operator’s agreement, write the actual time, identifiable hull or “unknown,” and the change observed before the next release. A row can remain open. Start the display with a blank sheet; the existing camera records do not document the reload. A second demonstration with the same body can now have a history without being counted as a second generation. Put the staff sheet at the dry bench and keep the tank-status sign independent.
+
+For a four-hour opening with uninterrupted supervised wet operation, the proposal needs four hours of competent operator coverage plus four hours of floor coverage when the group needs directing. As an example, one fifteen-minute break for each person leaves thirty minutes of separate duties to cover if breaks are staggered. The wet operator’s relief must know that prototype; otherwise announce a film-only interval. Allow additional paid time to prepare, inspect and close the apparatus. These are staffing arithmetic for a trial opening, not venue hours, labour conditions or an artist-approved operating schedule.
