@@ -7,7 +7,7 @@
 </style></head><body>
 <header><a href="../">Birth in Water</a></header><main>
 <h1>A room already in motion</h1><p>A visitor can meet the child at the opening, encounter it after separation, or arrive while someone is putting it back. Each entrance makes a different part of the work visible.</p>
-<nav aria-label="Room rehearsal sections"><a href="#gallery-cut">Rehearse an arrival</a> · <a href="#turning-bay">Check the seated view</a> · <a href="#reset-status">Pause and reset</a> · <a href="#sound-check">Check playback</a> · <a href="gallery-rehearsal.pdf" download>Print the room plan</a></nav>
+<nav aria-label="Room rehearsal sections"><a href="#gallery-cut">Rehearse an arrival</a> · <a href="#seated-visit">Take the seated visit</a> · <a href="#reset-status">Pause and reset</a> · <a href="#sound-check">Check playback</a> · <a href="gallery-rehearsal.pdf" download>Print the room plan</a></nav>
 <section id="gallery-cut" aria-labelledby="timeline"><h2 id="timeline">Enter the film mid-loop</h2>
 <div class="panel"><div><video controls playsinline loop muted preload="metadata" poster="../media/film-poster.jpg"><source src="../media/gallery-cut.mp4" type="video/mp4"><track default kind="captions" srclang="en" label="English" src="../media/gallery-cut.en.vtt"><track kind="subtitles" label="English · essay text" srclang="en" src="../media/gallery-reading.en.vtt"></video><small>Exhibition edit · 79 s · starts muted. Use the player's volume control to audition the composed score.</small></div>
 <div><label for="scenario">Visitor rehearsal</label><select id="scenario">
@@ -17,6 +17,12 @@
 
 <p><a href="../index.html#bw-script">Read the timed film text</a> · <a href="../media/gallery-cut.mp4" download>Download exhibition edit</a> · <a href="../media/gallery-cut-open-captions.mp4" download>Download with permanent captions</a> · <a href="record.html">Shots and source credits</a></p>
 <details><summary>Set up offline gallery playback</summary><p><a href="../media/birth-in-water-gallery.zip" download>Download the complete offline gallery kit</a>. Extract the ZIP into one folder and open index.html. It includes the permanent-caption film, plan and elevations, status cards, actual-size caption test, illustrated film label, editable arrival rehearsal and mono speaker-placement cue.</p><p>Download the <a href="../media/gallery-projection-1080.mp4" download>1080p projection copy with permanent captions</a> to the display computer. Its nine shots use the original source files, including the higher-resolution phone test and overhead tank take. The film runs for 79.15 seconds and contains the same stereo mix as the web edition. Set the local player to repeat one file. During opening checks, mute the output, watch the operator’s hand on the phone, then let the final digital image wrap to the opening. The shot labels and sound captions are part of the picture. The live tank can remain paused throughout this test. Post its operating status at the tank.</p></details></section>
+<section id="seated-visit"><h2>Sixteen seconds in the seated bay</h2>
+<video controls playsinline muted preload="metadata" poster="room-views/seated-gallery.jpg" style="width:100%" aria-label="Seated gallery visit during a tank reset, with open captions"><source src="../media/seated-gallery-visit.mp4" type="video/mp4"></video>
+<button id="visit-full" type="button">Play the seated visit full screen</button> <span id="visit-status" role="status"></span>
+<p>The card beside the tank says “Live tank paused.” A visitor crosses in front of the opening. From the same seat, turn towards the film. The small body gets clear, curves back, then disappears at the cut to the second prototype. The staff member and physical tank stay in place. Both wall films keep running.</p>
+<p>This is a rendered rehearsal at a 1.12 m eye height. The north wall plays seconds 45–61 of the gallery film. The east wall plays seconds 7–23 of <i>Water Beings</i>. Unmute to hear the film at the modelled seat. The small outer captions carry the events in silence. Try this turn with visitors in the actual room before fixing the chair or the screen.</p>
+<p><a href="../media/seated-gallery-visit.mp4" download>Download the seated visit · 16 s</a> · <a href="room-views/seated-gallery-sequence.jpg">Inspect six moments</a> · <a href="notebook.html#visitor-test">Read the visitor and reset trials</a></p></section>
 <section id="after-separation"><h2>Stay after separation</h2>
 <p>Near the end of the first overhead recording, the smaller hull curves back across the far side of the tank. Its outline meets the carrier again. This 55-second playback trial holds the complete camera take between two passages from <i>Water Beings</i>. Try it on the film wall while the physical tank is paused.</p>
 <figure><a href="return-player.html"><img src="return-frames.jpg" loading="lazy" width="1280" height="814" style="height:auto" alt="Four frames show the smaller hull emerging, moving away and curving back toward the larger body."></a></figure>
@@ -102,6 +108,18 @@ silent:[42,'Keep the player muted. Stay for 16 seconds. The caption and the chan
 reset:[66,'Imagine the pump has stopped. The operator posts “Live tank paused” while the film continues independently. At two minutes the reset may still be in progress.']
 };
 document.querySelectorAll('video,audio').forEach(player=>player.addEventListener('play',()=>document.querySelectorAll('video,audio').forEach(other=>{if(other!==player)other.pause();})));
+const seated=document.querySelector('#seated-visit video');
+const fullVisit=document.querySelector('#visit-full');
+fullVisit.hidden=!(seated.requestFullscreen || seated.webkitEnterFullscreen);
+fullVisit.onclick=async()=>{
+ const info=document.querySelector('#visit-status');
+ try{
+  if(seated.requestFullscreen)await seated.requestFullscreen();
+  else seated.webkitEnterFullscreen();
+  if(seated.ended)seated.currentTime=0;
+  await seated.play();info.textContent='';
+ }catch{info.textContent='Use the video controls to continue in this window.';}
+};
 const routing=document.querySelector('#routing-audio');
 const cueSource=routing.querySelector('source').src;
 let cueFile, cueRequest=0;
