@@ -1,5 +1,6 @@
 """Plot a gallery hypothesis in metres. Run from any directory."""
 from pathlib import Path
+from math import hypot
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -28,12 +29,18 @@ a.annotate('',xy=(7.55,.6),xytext=(3.1,.6),arrowprops={'arrowstyle':'->','color'
 label(a,.2,.22,'Entry');label(a,6.96,.22,'Exit')
 a=axes[1];a.set_title('Section  /  across the viewing bay',loc='left')
 a.set_xlim(-.2,4);a.set_ylim(0,2.45);a.set_yticks([0,.5,1,1.5,2])
-box(a,2.2,0,.8,.68,'#dad6c9');box(a,2.2,.68,.8,.56,'#c5dddd')
-a.plot([2.2,3],[1.13,1.13],color=blue);label(a,2.35,.45,'Plinth')
+# Project the same plan ray onto a vertical section. The ray enters
+# through the front face at y=3.70, then reaches the release at y=3.96.
+distance=hypot(3.50-2.55,3.96-2.45)
+front=distance*(3.70-2.45)/(3.96-2.45)
+back=distance*(4.35-2.45)/(3.96-2.45)
+box(a,front,0,back-front,.68,'#dad6c9');box(a,front,.68,back-front,.56,'#c5dddd')
+a.plot([front,back],[1.13,1.13],color=blue);label(a,front+.08,.45,'Plinth')
 for z,c,y in [(1.12,blue,1.0),(1.62,warm,1.77)]:
- a.plot([.45,2.6],[z,1.02],color=c,lw=1.6);a.scatter(.45,z,color=c,s=18);label(a,.04,y,f'Eye {z:.2f} m')
-a.scatter(2.6,1.02,color=ink,s=16);label(a,2.42,1.4,'Release at 1.02 m')
-a.plot([.45,2.6],[.14,.14],color=ink);label(a,.56,.22,'2.15 m to release')
+ a.plot([0,distance],[z,1.02],color=c,lw=1.6);a.scatter(0,z,color=c,s=18);label(a,.02,y,f'Eye {z:.2f} m')
+a.scatter(distance,1.02,color=ink,s=16);label(a,front,1.4,'Release at 1.02 m')
+a.plot([0,distance],[.14,.14],color=ink);label(a,.12,.22,f'{distance:.2f} m to release')
+a.set_xlim(-.2,3.25)
 fig.suptitle('Birth in Water     /     spatial rehearsal',x=.075,ha='left',fontsize=17)
 fig.tight_layout(pad=2)
 fig.savefig(Path(__file__).resolve().parents[1]/'studies/room-proposal.svg',bbox_inches='tight')

@@ -41,6 +41,28 @@ def surface_frame(scene):
   coords.extend((x,y,z))
  mesh.vertices.foreach_set('co',coords);mesh.update()
 bpy.app.handlers.frame_change_pre.append(surface_frame)
+if os.environ.get('BNM_ANGLE')=='rim':
+ # A second fixed camera at the vessel rim. The rear glass and water surface
+ # provide stationary scale and show the reflected light continuing after a wave.
+ cam.location=(.63,-.88,.225);aim(cam,(.23,-.025,.068))
+ cam.data.lens=69;cam.data.dof.focus_distance=.95;cam.data.dof.aperture_fstop=8
+ s.world.color=(.028,.041,.044)
+ s.cycles.samples=64
+ s.frame_end=96
+ s.render.resolution_percentage=80
+ for light in bpy.data.lights:
+  light.specular_factor=.55
+ for obj in s.objects:
+  if obj.type=='LIGHT' and obj.location.x>.6:
+   obj.location=(.5,.7,.55);aim(obj,(.22,0,.085));obj.data.energy=14;obj.data.size=.55;obj.data.size_y=.026
+ for loc,dims in [((0,.38,.04),(1.7,.005,.50)),((.67,0,.04),(.004,.76,.50))]:
+  bpy.ops.mesh.primitive_cube_add(size=1,location=loc)
+  wall=bpy.context.object;wall.dimensions=dims
+  mat=bpy.data.materials.new('Tank wall');mat.use_nodes=True
+  pg=mat.node_tree.nodes.get('Principled BSDF')
+  pg.inputs['Base Color'].default_value=(.82,.94,.93,1);pg.inputs['Transmission Weight'].default_value=1
+  pg.inputs['IOR'].default_value=1.49;pg.inputs['Roughness'].default_value=.025
+  wall.data.materials.append(mat)
 if 'BNM_TEST_FRAME' in os.environ:
  s.frame_set(int(os.environ['BNM_TEST_FRAME']));s.render.filepath=str(out/'proof.png');bpy.ops.render.render(write_still=True)
 else:
