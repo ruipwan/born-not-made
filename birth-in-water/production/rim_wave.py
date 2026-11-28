@@ -9,6 +9,13 @@ state=runpy.run_path(str(base/'shell_plate.py'))
 s,cam,aim=state['s'],state['cam'],state['aim']
 cam.location=(.44,-.92,.34);aim(cam,(.235,-.025,.065))
 cam.data.lens=72;cam.data.dof.focus_distance=.94;cam.data.dof.aperture_fstop=8
+if os.getenv('BNM_GROOVE_CAMERA')=='1':
+ from mathutils import Vector
+ focus=Vector((.309,-.047,.098))
+ aim(cam,focus)
+ cam.data.lens=118
+ cam.data.dof.focus_distance=(cam.location-focus).length
+ cam.data.dof.aperture_fstop=11
 s.world.color=(.045,.055,.061)
 for o in s.objects:
  if o.type=='LIGHT' and o.location.x>.6:
@@ -32,7 +39,12 @@ s.render.resolution_x,s.render.resolution_y=960,540;s.render.resolution_percenta
 s.render.fps=24;s.frame_start=int(os.getenv('BNM_START','1'));s.frame_end=int(os.getenv('BNM_COUNT','120'))
 out=Path(os.getenv('BNM_FRAMES','/tmp/bnm-dispersive'));out.mkdir(exist_ok=True,parents=True)
 s.render.filepath=str(out/'rim-');s.render.image_settings.file_format='PNG'
-tank=WaveTank();gx,gy=np.meshgrid(tank.x,tank.y);ny,nx=gx.shape
+if os.getenv('BNM_WAVE_RESULT'):
+ from sampled_surface import SampledSurface
+ tank=SampledSurface(os.environ['BNM_WAVE_RESULT'])
+else:
+ tank=WaveTank()
+gx,gy=np.meshgrid(tank.x,tank.y);ny,nx=gx.shape
 coords=np.column_stack((gx.ravel(),gy.ravel(),np.full(nx*ny,.10))).astype('float32')
 faces=[(j*nx+i,j*nx+i+1,(j+1)*nx+i+1,(j+1)*nx+i) for j in range(ny-1) for i in range(nx-1)]
 rim=[*range(nx),*[j*nx+nx-1 for j in range(1,ny)],*range(ny*nx-2,(ny-1)*nx-1,-1),*[j*nx for j in range(ny-2,0,-1)]]
