@@ -28,3 +28,22 @@ A second geometry check projects the same room from the seated eye toward the pr
 ### How often would someone actually see the release?
 
 For a uniform arrival around a 56.2 s film loop, a visitor staying 20 s has about a 36% chance of seeing the first prototype's single separation instant. A 10 s visit has about an 18% chance. These are exact window/period ratios under the stated arrival model; real dwell times need observation. The 79.15 s exhibition edit lowers the corresponding 20 s probability to about 25%. Its bench sequence gives those visitors another event to encounter. Ask someone who saw only the pump test what relation they think it has to the tank. A second screen repeating the climax could improve coverage while reducing the value of the wait; test this as a curatorial choice.
+
+### Two possible playback positions
+
+The plan offers a testable acoustic choice. With identical direct sound at the seated listener, how much reaches the entrance? Coordinates below use metres in the same 8 × 6 room. The assumed entrance listener is at (0.45, 0.64, 1.50) and the seated ear is at (2.55, 2.45, 1.12).
+
+| Playback source | Distance to seated ear | Distance to entrance | Predicted direct level at entrance relative to seated ear |
+|---|---:|---:|---:|
+| At the film display, (1.40, 5.80, 1.485) | 3.56 m | 5.25 m | −3.4 dB |
+| Small speaker on a separate stand outside the bay, (2.35, 3.55, 1.05) | 1.12 m | 3.50 m | −9.9 dB |
+
+The comparison uses 20 log10(seated distance / entrance distance) for a free-field point source. It gives a reason to test the nearer position: about 6.5 dB more direct-sound separation for the same level at the seat. It does not predict the installed sound level. Reflections, low-frequency room modes, source directivity and other visitors are absent. Bring both positions up to the same measured level at the seat. At the entrance, compare intelligibility and recorded level against pump-only background. Check the standing group and the live operator as secondary listeners. Keep the stand, cable and its base clear of circulation and outside the taped turning circle. A quiet or caption-only presentation remains available. [Acoustics Lab, direct and reflected sound](https://acousticslab.org/RECA220/PMFiles/Module07.htm)
+
+### Camera rehearsal of the proposed room
+
+[Open the six switchable views](room.html#sightline-trials). The room uses the plan coordinates, two true-scale project STL meshes, a 9 mm modelled glass front pane, a nominal 1.13 m waterline and film frames on emissive display surfaces. The mouth of the 390 mm head faces the lateral bay. The 1.12 m and 1.62 m eye positions share the same plan mark. Neutral human-sized volumes stand in for visitors. Their posture and behavior have not been observed.
+
+In the first test, the bright digital image at the right crosses the outline of the tank. Through the seated view, a clear line to the mouth therefore still competes with another image. The fifth standing position blocks most of the carrier. The lighting variant changes both the liner and the cross-light. It brightens the lower tank, but leaves the north-wall image in the glass. In the last test the digital image moves to the east wall, centred at (7.88, 4.85, 1.46); both the material and the seat stay fixed. Compare the right-hand pane. A person now needs to turn farther to see the digital image. Mark both wall options on site before fixing the projector position.
+
+These are ray-traced design comparisons with approximate transmission lighting. They do not measure venue illuminance, contrast through actual glass, wheelchair access or crowd behavior. The printable north elevation describes the baseline candidate. The east-wall image is a separate test.

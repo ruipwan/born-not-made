@@ -7,17 +7,21 @@ sys.path.insert(0,str(base))
 from wave_tank import WaveTank
 state=runpy.run_path(str(base/'shell_plate.py'))
 s,cam,aim=state['s'],state['cam'],state['aim']
-cam.location=(.63,-.88,.227);aim(cam,(.23,-.025,.068))
-cam.data.lens=64;cam.data.dof.focus_distance=.94;cam.data.dof.aperture_fstop=8
+cam.location=(.44,-.92,.34);aim(cam,(.235,-.025,.065))
+cam.data.lens=72;cam.data.dof.focus_distance=.94;cam.data.dof.aperture_fstop=8
 s.world.color=(.045,.055,.061)
 for o in s.objects:
  if o.type=='LIGHT' and o.location.x>.6:
   o.location=(.50,.70,.56);aim(o,(.21,0,.08));o.data.energy=18;o.data.size=.55;o.data.size_y=.033
+# Keep the broad fill softbox out of the front glass's mirror image. The
+# narrow cross-light remains visible to glossy rays as a slope reference.
+for lamp in s.objects:
+ if lamp.type=='LIGHT' and lamp.location.x<0:lamp.visible_glossy=False
 s.cycles.samples=int(os.getenv('BNM_SAMPLES','64'))
 s.cycles.caustics_reflective=False;s.cycles.caustics_refractive=False
 s.cycles.sample_clamp_indirect=1.4;s.cycles.sample_clamp_direct=3.2
 s.render.use_persistent_data=True
-s.render.resolution_x,s.render.resolution_y=960,540;s.render.resolution_percentage=100
+s.render.resolution_x,s.render.resolution_y=960,540;s.render.resolution_percentage=int(os.getenv('BNM_SCALE','100'))
 s.render.fps=24;s.frame_start=1;s.frame_end=int(os.getenv('BNM_COUNT','120'))
 out=Path(os.getenv('BNM_FRAMES','/tmp/bnm-dispersive'));out.mkdir(exist_ok=True,parents=True)
 s.render.filepath=str(out/'rim-');s.render.image_settings.file_format='PNG'
@@ -43,7 +47,7 @@ for loc,dim in [((0,.383,.03),(1.35,.005,.41)),((0,-.383,.03),(1.35,.005,.41)),(
  bpy.ops.mesh.primitive_cube_add(size=1,location=loc);o=bpy.context.object;o.dimensions=dim;o.data.materials.append(wallmat)
 def move(scene):
  t=(scene.frame_current-1)/24
- coords[:base_idx,2]=.1+tank.displacement(t).ravel()
+ coords[:base_idx,2]=.1 if os.getenv('BNM_CALM')=='1' else .1+tank.displacement(t).ravel()
  mesh.vertices.foreach_set('co',coords.ravel());mesh.update()
 bpy.app.handlers.frame_change_pre.append(move)
 if 'BNM_TEST_FRAME' in os.environ:
