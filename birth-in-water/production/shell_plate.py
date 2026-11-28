@@ -1,5 +1,5 @@
 """From repository root: blender -b -P birth-in-water/production/shell_plate.py"""
-import bpy, math
+import bpy, math, os
 from pathlib import Path
 from mathutils import Vector, Matrix
 root = Path(__file__).resolve().parents[2]
@@ -21,7 +21,10 @@ for name,sign in [('head',1),('tail',-1)]:
  obj=bpy.context.object
  # Print Z is the length axis. Both parts were laid on their docking face.
  mat=Matrix(((0,0,sign,0),(0,-sign,0,0),(1,0,0,0),(0,0,0,1)))
- obj.matrix_world=mat @ Matrix.Diagonal(Vector((.001,.001,.001,1)))
+ # Tail alignment pins extend 4 mm closer to the print bed than the docking ring.
+ # Registration is to the ring plane; the first optical rushes used bed-plane registration.
+ offset=.004 if name=="tail" and os.getenv("BNM_PRINT_BED_ALIGNMENT")!="1" else 0
+ obj.matrix_world=Matrix.Translation((offset,0,0)) @ mat @ Matrix.Diagonal(Vector((.001,.001,.001,1)))
  obj.data.materials.append(resin)
  for poly in obj.data.polygons:poly.use_smooth=True
 bpy.ops.mesh.primitive_plane_add(size=200,location=(0,0,-.175))

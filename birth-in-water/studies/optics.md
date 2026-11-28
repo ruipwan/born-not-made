@@ -21,3 +21,9 @@ The plate and moving studies use Blender Cycles. Early builds lacked integrated 
 The [wide view](../media/water-surface-rush.mp4) contains 96 consecutive rendered frames. The [close lighting test](../media/rim-lighting-rush.mp4) contains 24 consecutive frames. The [bounded dispersive surface](../media/dispersive-rim-rush.mp4) contains 36 consecutive frames, 1.5 s at 24 fps. Only the last example uses the finite-depth mode calculation. Its native 720 × 405 picture is padded by one scan line for H.264. Compare the [six sampled images](dispersive-review.jpg) with the flat-surface control above. The difference reads at the lip; the documentary shot remains much stronger for seeing the motion of the two bodies.
 
 The [frame ledger](render-ledger.csv) records completion times, hashes and Blender render time for the 156 frames in the three rushes, plus the matched control and six gallery renders. The median frame times were 13.29 s for the wide test, 64.83 s for the close lighting test, and 25.64 s for the dispersive test. Jobs overlapped. Summing these times would overstate elapsed work.
+
+## Registration of the two printable halves
+
+A mesh-plane check identified a 4 mm difference between print-bed and mating-face registration. On the head the main docking face is at STL z = 0. On the tail the two projecting pin tips reach z = 0, while the docking face, with approximately 5,380 mm² of coplanar triangle area, is at z = 4 mm. The corrected scene translates the tail 4 mm toward the head after rotating the print axes into the body frame. The head and lip retain their original positions.
+
+The initial wide and rim rushes, the flat-surface comparison and the six room visualisations used print-bed registration. The offset is visible in a seam close-up. The revised plate uses mating-face registration. Reproduce the earlier optical tests with BNM_PRINT_BED_ALIGNMENT=1. No gallery clearance or prototype fit was measured from this rendering.
