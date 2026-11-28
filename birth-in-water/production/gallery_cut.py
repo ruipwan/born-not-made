@@ -26,16 +26,8 @@ with tempfile.TemporaryDirectory() as temp:
   run('-f','concat','-safe','0','-i',tmp/'list','-c','copy',tmp/'picture.mp4')
  # Use the authored resonances for the 36-second observational span. Keep the
  # bench sound synchronous and leave a quiet gap over the control-interface edit.
- import numpy as np
+ from gallery_sound import RATE, gallery_signals, pcm16
  from scipy.io.wavfile import write
- rate=48000
- total=sum(shot[2] for shot in shots)
- mix=np.zeros((round(total*rate),2),dtype=np.float32)
- for source,start,length,offset,gain,fade in [('pump-audio.mp4',1,10.4,8,.55,.16),('overhead-audio.mp4',1,36,24,1,.15),('score.wav',7,36,24,1,.8)]:
-  raw=subprocess.check_output(['ffmpeg','-loglevel','error','-ss',str(start),'-t',str(length),'-i',str(src/source),'-vn','-ar',str(rate),'-ac','2','-f','f32le','-'])
-  pcm=np.frombuffer(raw,dtype='<f4').reshape(-1,2).copy()
-  env=np.linspace(0,1,round(fade*rate))[:,None]
-  pcm[:len(env)]*=env;pcm[-len(env):]*=env[::-1]
-  sample=round(offset*rate);mix[sample:sample+len(pcm)]+=pcm*gain
- write(tmp/'mix.wav',rate,np.int16(mix.clip(-1,1)*32767))
+ camera, score = gallery_signals(src)
+ write(tmp/'mix.wav', RATE, pcm16(camera+score))
  run('-i',picture,'-i',tmp/'mix.wav','-map','0:v:0','-map','1:a:0','-c:v','copy','-c:a','aac','-b:a','96k','-movflags','+faststart',out)
