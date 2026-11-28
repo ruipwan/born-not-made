@@ -1,45 +1,20 @@
 # Birth in Water
 
-Born, Not Made · Ruipeng Wang
+*Born, Not Made* · Ruipeng Wang · 79-second exhibition edit
 
-Proposed film script · approximately 2 minutes 5 seconds. Timings are editorial. The release and response sequences are proposed tests.
+Proposed first-person essay text. The optional English subtitle track carries these words. The film plays with location sound and a composed score. It contains no recorded voiceover.
 
-## 00:00–00:25 · Contact
+| Film time | Picture | Essay text |
+|---|---|---|
+| 00:00.4–00:07.8 | A digital population moves across the circular field in *Water Beings*. | In Water Beings, the dead stay where they fall. The next generation grows around them. |
+| 00:08.5–00:15.9 | On a workbench, a ball slowly emerges from a pink housing. | On the bench I could make a ball come out. I could pick it up and do it again. |
+| 00:18.6–00:23.6 | A hand operates the phone during a separate control test. | Here you can see a hand. Remember it when the view changes. |
+| 00:25.6–00:31.7 | A larger body holds a smaller one in the first tank. | In my first design, the mother died giving birth. |
+| 00:32.0–00:38.1 | Keep the carrier in the overhead frame. | In the next design she lived. Watch her side of the opening. |
+| 00:38.25–00:51.7 | A closer crop of the same take holds on the opening. A gap appears. The view widens. | Leave the release without essay text. |
+| 00:51.7–00:59.7 | The child moves around the tank. The upper edge of the carrier holds its changed angle. | I kept watching the child. When I looked back, the mother had turned in the water too. |
+| 01:00.0–01:05.15 | A different prototype leaves a soft opening. | Leave this second release without essay text. |
+| 01:05.3–01:10.1 | The VISAP catalogue preview places the tank beneath the digital population. | To show this live again, someone has to put the child back. |
+| 01:10.6–01:18.9 | Return to *Water Beings*. | The film can begin again exactly here. What would a second birth carry from the first? |
 
-**Picture and sound**  
-Use the original Water Beings screen recording. Stay with one contact through the appearance of the next generation. Cut to the real tank at exactly the same scale.
-
-**Voice**  
-In Water Beings, two cells touched, and another appeared. Seven generations lived by that rule. When the water grew crowded, the cells died. What they left behind changed where the next ones could live. I wanted to give one of those beings a body. The first thing I had to decide was where it would go when the other one let go.
-
-## 00:25–00:48 · A young jelly lets go
-
-**Picture and sound**  
-Use credited natural-history footage if licensed, or film a jelly culture with permission. Hold one continuous view as a juvenile separates. Leave two beats of silence.
-
-**Voice**  
-Watch a young jellyfish come away from a polyp. For a moment you can still see where the two were joined. Then there is a sliver of water between them. I keep coming back to that little gap. On a screen I could create another individual in a single frame. Here, something has to take its weight.
-
-## 00:48–01:12 · Two kinds of water
-
-**Picture and sound**  
-Film the real silicone lip and the meniscus from the side. Rack focus from the wet exterior to the sealed compartment. Use a documented cutaway for any hidden mechanism.
-
-**Voice**  
-A seahorse carries its young in a pouch. Even underwater, the fluid inside that pouch has its own conditions. As birth approaches, it becomes closer in concentration to the surrounding sea. That helped me see what I needed to build. Some parts of this machine have to stay dry for its whole life. Its skin has to feel the water.
-
-## 01:12–01:38 · The last point of contact
-
-**Picture and sound**  
-Proposed prototype test. Frame the opening, the folded body and a stationary mark on the tank in one shot. Record the pump, the release and the silence after the pump stops.
-
-**Voice**  
-Inside the larger robot, the folded body is held in place. Imagine the opening giving way. The pump falls quiet. Water takes some of the load, and the small body tips to one side. I would leave that in the film. That first awkward tilt tells you something a drawing never could. The tank has had its say.
-
-## 01:38–02:05 · A reply
-
-**Picture and sound**  
-Proposed experiment. Keep the camera fixed through one external pulse, the passive displacement and one independently initiated correction. Retain the control take. End with the wake arriving at the larger body.
-
-**Voice**  
-Now send one small wave across the tank. At first the little body goes wherever the water takes it. Then, if its own controller senses the tilt, it might pulse once to right itself. Watch the larger body. A little later, the water it displaced reaches it. This is why I want the birth to happen here. The two can let go of each other and still be within reach.
+The earlier mother dying at birth and the later design in which she survives are intentions described in the artist's workshop journal. The film shows the operator's experiments and the separation of two fabricated bodies. The reset is an exhibition question. [Artist's journal](https://fab.cba.mit.edu/classes/863.25/people/RuipengWang/week16.html) · [Timed essay text](media/gallery-reading.en.vtt) · [Source record](studies/record.html)

@@ -7,14 +7,13 @@
 </style></head><body>
 <header><a href="../">Birth in Water</a></header><main>
 <h1>A room already in motion</h1><p>A visitor can meet the child at the opening, encounter it after separation, or arrive while someone is putting it back. Each entrance makes a different part of the work visible.</p>
-<section aria-labelledby="timeline"><h2 id="timeline">Enter the film mid-loop</h2>
-<div class="panel"><div><video controls playsinline loop muted preload="metadata" poster="../media/film-poster.jpg"><source src="../media/birth-in-water.mp4" type="video/mp4"><track default kind="captions" srclang="en" label="English" src="../media/birth-in-water.en.vtt"></video><small>Recorded prototypes and digital population · 56 s · starts muted. Use the player's volume control to audition the composed score.</small></div>
+<section id="gallery-cut" aria-labelledby="timeline"><h2 id="timeline">Enter the film mid-loop</h2>
+<div class="panel"><div><video controls playsinline loop muted preload="metadata" poster="../media/film-poster.jpg"><source src="../media/gallery-cut.mp4" type="video/mp4"><track default kind="captions" srclang="en" label="English" src="../media/gallery-cut.en.vtt"><track kind="subtitles" label="English · essay text" srclang="en" src="../media/gallery-reading.en.vtt"></video><small>Exhibition edit · 79 s · starts muted. Use the player's volume control to audition the composed score.</small></div>
 <div><label for="scenario">Visitor rehearsal</label><select id="scenario">
 <option value="approach">Arrive as the rim opens</option><option value="late">Arrive after separation</option><option value="seated">Seated beside a standing group</option><option value="silent">Watch without touch or sound</option><option value="reset">Enter during a pump reset</option></select>
-<p class="scenario" id="scenario-text" aria-live="polite">Enter at 31 seconds. At 31.9 seconds a second silhouette becomes measurable. Watch the larger body until the next cut.</p><button type="button" id="seek">Start this visit</button><p><small id="status" role="status"></small></p></div></div></section>
-<section id="gallery-cut"><h2>Seeing who starts the pump</h2>
+<p class="scenario" id="scenario-text" aria-live="polite">Enter at 48 seconds. At 48.9 seconds green water appears between the hulls. Stay for 12 seconds and follow the larger body.</p><button type="button" id="seek">Start this visit</button><p><small id="status" role="status"></small></p></div></div>
 <p>The exhibition edit gives the operator a place in the film. A ball emerges on a workbench. A hand moves across a phone. Later, the same question follows the visitor to the live tank: who else has to be here for this to happen?</p>
-<details><summary>Play the exhibition edit · 79 s</summary><video controls playsinline preload="none" poster="../media/film-poster.jpg"><source src="../media/gallery-cut.mp4" type="video/mp4"><track default kind="captions" label="English" srclang="en" src="../media/gallery-cut.en.vtt"><track kind="subtitles" label="English · essay text" srclang="en" src="../media/gallery-reading.en.vtt"></video></details>
+
 <p><a href="../index.html#bw-script">Read the timed film text</a> · <a href="../media/gallery-cut.mp4" download>Download exhibition edit</a> · <a href="../media/gallery-cut-open-captions.mp4" download>Download with permanent captions</a> · <a href="record.html">Shots and source credits</a></p></section>
 <section id="after-separation"><h2>Stay after separation</h2>
 <p>Near the end of the first overhead recording, the smaller hull curves back across the far side of the tank. Its outline meets the carrier again. This 55-second playback trial holds the complete camera take between two passages from <i>Water Beings</i>. Try it on the film wall while the physical tank is paused.</p>
@@ -51,11 +50,11 @@ const descriptions={
 };
 document.querySelector('#room-view').onchange=e=>{const key=e.target.value;const im=document.querySelector('#room-picture');im.src='room-views/'+key+'.jpg';im.alt=descriptions[key];document.querySelector('#room-caption').textContent=descriptions[key];};
 const cases={
-approach:[31,'Enter at 31 seconds. At 31.9 seconds a second silhouette becomes measurable. Watch the larger body until the next cut.'],
-late:[48.2,'Stay 25 seconds. You will see the population, cross the loop seam and meet the first tank before the next release. The live apparatus has a separate clock.'],
-seated:[24,'Imagine four visitors at the marked standing positions. Check the release in the film, then compare the two projected views below. The fifth position blocks the live tank.'],
-silent:[20,'Keep the player muted. Stay 16 seconds. The caption and the changing gap carry the transition. No gesture or sensor input is required.'],
-reset:[43,'Imagine the pump has stopped. The operator posts “Live tank paused” while the film continues independently. At two minutes the reset may still be in progress.']
+approach:[48,'Enter at 48 seconds. At 48.9 seconds green water appears between the hulls. Stay for 12 seconds and follow the larger body.'],
+late:[72.5,'Stay for 25 seconds. You will cross the loop seam, see the population and reach the workbench before the next tank release. The live apparatus has a separate clock.'],
+seated:[42,'Imagine four visitors at the marked standing positions. Check the release in the film, then compare the two projected views below. The fifth position blocks the live tank.'],
+silent:[42,'Keep the player muted. Stay for 16 seconds. The caption and the changing gap carry the transition. No gesture or sensor input is required.'],
+reset:[66,'Imagine the pump has stopped. The operator posts “Live tank paused” while the film continues independently. At two minutes the reset may still be in progress.']
 };
 document.querySelectorAll('video').forEach(player=>player.addEventListener('play',()=>document.querySelectorAll('video').forEach(other=>{if(other!==player)other.pause();})));
 const v=document.querySelector('video'),choice=document.querySelector('#scenario'),copy=document.querySelector('#scenario-text'),status=document.querySelector('#status');
