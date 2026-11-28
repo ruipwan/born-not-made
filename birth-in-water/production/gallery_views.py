@@ -85,4 +85,6 @@ s.world.color=(.045,.044,.043);s.cycles.samples=32;s.cycles.sample_clamp_indirec
 s.render.resolution_x,s.render.resolution_y=1120,630;s.render.resolution_percentage=100
 s.render.image_settings.file_format='JPEG';s.render.image_settings.quality=90
 out=Path(os.getenv('BNM_VIEW_OUT','/tmp/bnm-gallery-views'));out.mkdir(exist_ok=True,parents=True)
-s.render.filepath=str(out/(view+('-fill' if light_test else '')+('-side' if side_screen else '')+'.jpg'));bpy.ops.render.render(write_still=True)
+s.render.filepath=str(out/(view+('-fill' if light_test else '')+('-side' if side_screen else '')+'.jpg'))
+if __name__ == '__main__':
+ bpy.ops.render.render(write_still=True)
