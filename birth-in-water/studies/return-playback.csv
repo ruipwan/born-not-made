@@ -1,0 +1,157 @@
+utc,elapsed,loops,phase,muted,paused,full,failed,total,dropped,caption
+2026-11-28T04:44:21.567313+00:00,20.01,0,19.976214,True,False,display,0,604,0,First tank prototype · overhead camera
+2026-11-28T04:44:41.575271+00:00,40.02,0,39.984551,True,False,display,0,1204,0,First tank prototype · overhead camera
+2026-11-28T04:45:01.583237+00:00,60.02,1,4.47862,True,False,display,0,1800,0,Water Beings · recorded simulation
+2026-11-28T04:45:21.594515+00:00,80.04,1,24.488505,True,False,display,0,2401,0,First tank prototype · overhead camera
+2026-11-28T04:45:41.610803+00:00,100.05,1,44.506394,True,False,display,0,3000,0,First tank prototype · overhead camera
+2026-11-28T04:46:01.621735+00:00,120.06,2,8.878884,True,False,display,0,3593,0,First tank prototype · overhead camera
+2026-11-28T04:46:21.629201+00:00,140.07,2,28.886562,True,False,display,0,4192,0,First tank prototype · overhead camera
+2026-11-28T04:46:41.635161+00:00,160.08,2,48.892594,True,False,display,0,4793,1,Water Beings · recorded simulation
+2026-11-28T04:47:01.643165+00:00,180.08,3,13.323595,True,False,display,0,5388,2,First tank prototype · overhead camera
+2026-11-28T04:47:21.662475+00:00,200.1,3,33.341864,True,False,display,0,5987,5,First tank prototype · overhead camera
+2026-11-28T04:47:41.683575+00:00,220.12,3,53.304075,True,False,display,0,6586,6,Water Beings · recorded simulation
+2026-11-28T04:48:01.720611+00:00,240.16,4,17.795908,True,False,display,0,7183,6,First tank prototype · overhead camera
+2026-11-28T04:48:21.742777+00:00,260.18,4,37.825345,True,False,display,0,7783,6,First tank prototype · overhead camera
+2026-11-28T04:48:41.767587+00:00,280.21,5,2.302208,True,False,display,0,8379,7,Water Beings · recorded simulation
+2026-11-28T04:49:01.791024+00:00,300.23,5,22.325432,True,False,display,0,8979,8,First tank prototype · overhead camera
+2026-11-28T04:49:21.820512+00:00,320.26,5,42.330409,True,False,display,0,9578,8,First tank prototype · overhead camera
+2026-11-28T04:49:41.844670+00:00,340.29,6,6.771186,True,False,display,0,10173,8,Water Beings · recorded simulation
+2026-11-28T04:50:01.884571+00:00,360.33,6,26.801346,True,False,display,0,10774,8,First tank prototype · overhead camera
+2026-11-28T04:50:21.907149+00:00,380.35,6,46.833811,True,False,display,0,11375,8,Water Beings · recorded simulation
+2026-11-28T04:50:41.934623+00:00,400.38,7,11.270243,True,False,display,0,11970,9,First tank prototype · overhead camera
+2026-11-28T04:51:01.966569+00:00,420.41,7,31.302166,True,False,display,0,12570,9,First tank prototype · overhead camera
+2026-11-28T04:51:21.987781+00:00,440.43,7,51.283405,True,False,display,0,13169,14,Water Beings · recorded simulation
+2026-11-28T04:51:42.011202+00:00,460.45,8,15.693788,True,False,display,0,13763,14,First tank prototype · overhead camera
+2026-11-28T04:52:02.034308+00:00,480.48,8,35.716875,True,False,display,0,14364,15,First tank prototype · overhead camera
+2026-11-28T04:52:22.068896+00:00,500.51,9,0.205883,True,False,display,0,14960,15,Water Beings · recorded simulation
+2026-11-28T04:52:42.095215+00:00,520.54,9,20.244915,True,False,display,0,15561,15,First tank prototype · overhead camera
+2026-11-28T04:53:02.120188+00:00,540.56,9,40.249716,True,False,display,0,16160,15,First tank prototype · overhead camera
+2026-11-28T04:53:22.159350+00:00,560.6,10,4.715157,True,False,display,0,16756,16,Water Beings · recorded simulation
+2026-11-28T04:53:42.179437+00:00,580.62,10,24.750089,True,False,display,0,17357,17,First tank prototype · overhead camera
+2026-11-28T04:54:02.199326+00:00,600.64,10,44.750253,True,False,display,0,17957,20,First tank prototype · overhead camera
+2026-11-28T04:54:22.225686+00:00,620.67,11,9.220337,True,False,display,0,18552,20,First tank prototype · overhead camera
+2026-11-28T04:54:42.260675+00:00,640.7,11,29.215391,True,False,display,0,19152,20,First tank prototype · overhead camera
+2026-11-28T04:55:02.283442+00:00,660.72,11,49.218053,True,False,display,0,19750,24,Water Beings · recorded simulation
+2026-11-28T04:55:22.308324+00:00,680.75,12,13.682106,True,False,display,0,20347,24,First tank prototype · overhead camera
+2026-11-28T04:55:42.331678+00:00,700.77,12,33.670317,True,False,display,0,20946,25,First tank prototype · overhead camera
+2026-11-28T04:56:02.366447+00:00,720.81,12,53.70138,True,False,display,0,21547,26,Water Beings · recorded simulation
+2026-11-28T04:56:22.386981+00:00,740.83,13,18.153809,True,False,display,0,22142,26,First tank prototype · overhead camera
+2026-11-28T04:56:42.407147+00:00,760.85,13,38.173917,True,False,display,0,22742,26,First tank prototype · overhead camera
+2026-11-28T04:57:02.427487+00:00,780.87,14,2.670099,True,False,display,0,23339,26,Water Beings · recorded simulation
+2026-11-28T04:57:22.461247+00:00,800.9,14,22.681048,True,False,display,0,23939,26,First tank prototype · overhead camera
+2026-11-28T04:57:42.488103+00:00,820.93,14,42.70231,True,False,display,0,24538,26,First tank prototype · overhead camera
+2026-11-28T04:58:02.515292+00:00,840.96,15,7.189943,True,False,display,0,25136,26,Water Beings · recorded simulation
+2026-11-28T04:58:22.545094+00:00,860.99,15,27.217266,True,False,display,0,25736,26,First tank prototype · overhead camera
+2026-11-28T04:58:42.576857+00:00,881.02,15,47.245665,True,False,display,0,26336,26,Water Beings · recorded simulation
+2026-11-28T04:59:02.602847+00:00,901.04,16,11.678538,True,False,display,0,26931,27,First tank prototype · overhead camera
+2026-11-28T04:59:22.631991+00:00,921.07,16,31.708006,True,False,display,0,27531,29,First tank prototype · overhead camera
+2026-11-28T04:59:42.664494+00:00,941.11,16,51.720635,True,False,display,0,28131,31,Water Beings · recorded simulation
+2026-11-28T05:00:02.690229+00:00,961.13,17,15.9093,True,False,display,0,28719,33,First tank prototype · overhead camera
+2026-11-28T05:00:22.714672+00:00,981.16,17,35.314985,True,False,display,0,29300,33,First tank prototype · overhead camera
+2026-11-28T05:00:42.736383+00:00,1001.18,17,54.476191,True,False,display,0,29875,34,Water Beings · recorded simulation
+2026-11-28T05:01:02.770990+00:00,1021.21,18,18.930166,True,False,display,0,30470,34,First tank prototype · overhead camera
+2026-11-28T05:01:22.792078+00:00,1041.23,18,38.93864,True,False,display,0,31069,37,First tank prototype · overhead camera
+2026-11-28T05:01:42.820915+00:00,1061.26,19,3.44688,True,False,display,0,31667,42,Water Beings · recorded simulation
+2026-11-28T05:02:02.845350+00:00,1081.29,19,23.476047,True,False,display,0,32268,43,First tank prototype · overhead camera
+2026-11-28T05:02:22.872529+00:00,1101.31,19,43.461744,True,False,display,0,32867,46,First tank prototype · overhead camera
+2026-11-28T05:02:42.895468+00:00,1121.34,20,7.913868,True,False,display,0,33462,46,Water Beings · recorded simulation
+2026-11-28T05:03:02.920944+00:00,1141.36,20,27.934236,True,False,display,0,34062,46,First tank prototype · overhead camera
+2026-11-28T05:03:22.943256+00:00,1161.38,20,47.961805,True,False,display,0,34663,46,Water Beings · recorded simulation
+2026-11-28T05:03:42.976847+00:00,1181.42,21,12.450803,True,False,display,0,35259,46,First tank prototype · overhead camera
+2026-11-28T05:04:03.008528+00:00,1201.45,21,32.477462,True,False,display,0,35860,48,First tank prototype · overhead camera
+2026-11-28T05:04:23.033066+00:00,1221.47,21,52.511597,True,False,display,0,36460,48,Water Beings · recorded simulation
+2026-11-28T05:04:43.081146+00:00,1241.52,22,17.032199,True,False,display,0,37058,48,First tank prototype · overhead camera
+2026-11-28T05:05:03.106456+00:00,1261.55,22,37.048399,True,False,display,0,37658,48,First tank prototype · overhead camera
+2026-11-28T05:05:23.132527+00:00,1281.57,23,1.523934,True,False,display,0,38254,50,Water Beings · recorded simulation
+2026-11-28T05:05:43.166387+00:00,1301.61,23,21.541102,True,False,display,0,38854,50,First tank prototype · overhead camera
+2026-11-28T05:06:03.205399+00:00,1321.65,23,41.556022,True,False,display,0,39454,51,First tank prototype · overhead camera
+2026-11-28T05:06:23.229663+00:00,1341.67,24,6.056027,True,False,display,0,40051,51,Water Beings · recorded simulation
+2026-11-28T05:06:43.273287+00:00,1361.71,24,26.046847,True,False,display,0,40651,51,First tank prototype · overhead camera
+2026-11-28T05:07:03.305187+00:00,1381.75,24,46.088522,True,False,display,0,41251,51,First tank prototype · overhead camera
+2026-11-28T05:07:23.327063+00:00,1401.77,25,10.581814,True,False,display,0,41847,51,First tank prototype · overhead camera
+2026-11-28T05:07:43.360232+00:00,1421.8,25,30.600534,True,False,display,0,42447,51,First tank prototype · overhead camera
+2026-11-28T05:08:03.383470+00:00,1441.82,25,50.638313,True,False,display,0,43048,51,Water Beings · recorded simulation
+2026-11-28T05:08:23.408790+00:00,1461.85,26,15.105111,True,False,display,0,43644,51,First tank prototype · overhead camera
+2026-11-28T05:08:43.431589+00:00,1481.87,26,35.130932,True,False,display,0,44245,51,First tank prototype · overhead camera
+2026-11-28T05:09:03.466288+00:00,1501.91,26,55.166524,True,False,display,0,44844,51,Water Beings · recorded simulation
+2026-11-28T05:09:23.495054+00:00,1521.94,27,19.645596,True,False,display,0,45441,51,First tank prototype · overhead camera
+2026-11-28T05:09:43.514394+00:00,1541.96,27,39.665049,True,False,display,0,46041,51,First tank prototype · overhead camera
+2026-11-28T05:10:03.540634+00:00,1561.98,28,4.17127,True,False,display,0,46638,51,Water Beings · recorded simulation
+2026-11-28T05:10:23.572821+00:00,1582.01,28,24.187111,True,False,display,0,47238,51,First tank prototype · overhead camera
+2026-11-28T05:10:43.595883+00:00,1602.04,28,44.226077,True,False,display,0,47838,51,First tank prototype · overhead camera
+2026-11-28T05:11:03.615171+00:00,1622.06,29,8.738936,True,False,display,0,48436,51,First tank prototype · overhead camera
+2026-11-28T05:11:23.634812+00:00,1642.08,29,28.758577,True,False,display,0,49036,52,First tank prototype · overhead camera
+2026-11-28T05:11:43.669217+00:00,1662.11,29,48.78932,True,False,display,0,49637,52,Water Beings · recorded simulation
+2026-11-28T05:12:03.691302+00:00,1682.13,30,13.291217,True,False,display,0,50234,54,First tank prototype · overhead camera
+2026-11-28T05:12:23.711180+00:00,1702.15,30,33.311086,True,False,display,0,50834,54,First tank prototype · overhead camera
+2026-11-28T05:12:43.731319+00:00,1722.17,30,53.33107,True,False,display,0,51433,54,Water Beings · recorded simulation
+2026-11-28T05:13:03.760518+00:00,1742.2,31,17.834804,True,False,display,0,52030,54,First tank prototype · overhead camera
+2026-11-28T05:13:23.783977+00:00,1762.22,31,37.858216,True,False,display,0,52631,54,First tank prototype · overhead camera
+2026-11-28T05:13:43.804027+00:00,1782.24,32,2.326362,True,False,display,0,53227,54,Water Beings · recorded simulation
+2026-11-28T05:14:03.826325+00:00,1802.27,32,22.348692,True,False,display,0,53827,54,First tank prototype · overhead camera
+2026-11-28T05:14:23.860329+00:00,1822.3,32,42.38061,True,False,display,0,54427,55,First tank prototype · overhead camera
+2026-11-28T05:14:43.892527+00:00,1842.33,33,6.882395,True,False,display,0,55025,55,Water Beings · recorded simulation
+2026-11-28T05:15:03.914355+00:00,1862.36,33,26.906982,True,False,display,0,55624,55,First tank prototype · overhead camera
+2026-11-28T05:15:23.938390+00:00,1882.38,33,46.910925,True,False,display,0,56224,55,Water Beings · recorded simulation
+2026-11-28T05:15:43.966331+00:00,1902.41,34,11.404998,True,False,display,0,56821,55,First tank prototype · overhead camera
+2026-11-28T05:16:03.992561+00:00,1922.43,34,31.425922,True,False,display,0,57421,57,First tank prototype · overhead camera
+2026-11-28T05:16:24.017303+00:00,1942.46,34,51.43593,True,False,display,0,58021,60,Water Beings · recorded simulation
+2026-11-28T05:16:44.038515+00:00,1962.48,35,15.925092,True,False,display,0,58618,62,First tank prototype · overhead camera
+2026-11-28T05:17:04.066663+00:00,1982.51,35,35.946795,True,False,display,0,59218,62,First tank prototype · overhead camera
+2026-11-28T05:17:24.090566+00:00,2002.53,36,0.450205,True,False,display,0,59815,62,Water Beings · recorded simulation
+2026-11-28T05:17:44.114668+00:00,2022.56,36,20.474448,True,False,display,0,60415,63,First tank prototype · overhead camera
+2026-11-28T05:18:04.138349+00:00,2042.58,36,40.498097,True,False,display,0,61015,65,First tank prototype · overhead camera
+2026-11-28T05:18:24.165930+00:00,2062.61,37,5.000042,True,False,display,0,61612,65,Water Beings · recorded simulation
+2026-11-28T05:18:44.190226+00:00,2082.63,37,25.028299,True,False,display,0,62212,66,First tank prototype · overhead camera
+2026-11-28T05:19:04.220523+00:00,2102.66,37,45.054159,True,False,display,0,62813,66,First tank prototype · overhead camera
+2026-11-28T05:19:24.243229+00:00,2122.68,38,9.569335,True,False,display,0,63410,66,First tank prototype · overhead camera
+2026-11-28T05:19:44.269375+00:00,2142.71,38,29.589442,True,False,display,0,64010,66,First tank prototype · overhead camera
+2026-11-28T05:20:04.295590+00:00,2162.74,38,49.621739,True,False,display,0,64611,66,Water Beings · recorded simulation
+2026-11-28T05:20:24.328155+00:00,2182.77,39,14.047896,True,False,display,0,65205,66,First tank prototype · overhead camera
+2026-11-28T05:20:44.372587+00:00,2202.81,39,34.08656,True,False,display,0,65806,67,First tank prototype · overhead camera
+2026-11-28T05:21:04.395020+00:00,2222.84,39,54.097852,True,False,display,0,66405,67,Water Beings · recorded simulation
+2026-11-28T05:21:24.416743+00:00,2242.86,40,18.578459,True,False,display,0,67002,67,First tank prototype · overhead camera
+2026-11-28T05:21:44.443099+00:00,2262.88,40,38.604969,True,False,display,0,67602,67,First tank prototype · overhead camera
+2026-11-28T05:22:04.467443+00:00,2282.91,41,3.10352,True,False,display,0,68198,67,Water Beings · recorded simulation
+2026-11-28T05:22:24.490124+00:00,2302.93,41,23.126161,True,False,display,0,68799,69,First tank prototype · overhead camera
+2026-11-28T05:22:44.520800+00:00,2322.96,41,43.113435,True,False,display,0,69398,73,First tank prototype · overhead camera
+2026-11-28T05:23:04.564558+00:00,2343.01,42,7.606893,True,False,display,0,69996,73,Water Beings · recorded simulation
+2026-11-28T05:23:24.587196+00:00,2363.03,42,27.6504,True,False,display,0,70595,73,First tank prototype · overhead camera
+2026-11-28T05:23:44.616854+00:00,2383.06,42,47.671291,True,False,display,0,71196,73,Water Beings · recorded simulation
+2026-11-28T05:24:04.641939+00:00,2403.08,43,12.171893,True,False,display,0,71793,73,First tank prototype · overhead camera
+2026-11-28T05:24:24.666677+00:00,2423.11,43,32.196967,True,False,display,0,72393,73,First tank prototype · overhead camera
+2026-11-28T05:24:44.691101+00:00,2443.13,43,52.22068,True,False,display,0,72994,73,Water Beings · recorded simulation
+2026-11-28T05:25:04.717033+00:00,2463.16,44,16.735803,True,False,display,0,73590,73,First tank prototype · overhead camera
+2026-11-28T05:25:24.743457+00:00,2483.18,44,36.762334,True,False,display,0,74191,74,First tank prototype · overhead camera
+2026-11-28T05:25:44.761423+00:00,2503.2,45,1.241643,True,False,display,0,74788,75,Water Beings · recorded simulation
+2026-11-28T05:26:04.789127+00:00,2523.23,45,21.276105,True,False,display,0,75388,75,First tank prototype · overhead camera
+2026-11-28T05:26:24.818250+00:00,2543.26,45,41.309086,True,False,display,0,75988,75,First tank prototype · overhead camera
+2026-11-28T05:26:44.845170+00:00,2563.29,46,5.803601,True,False,display,0,76585,75,Water Beings · recorded simulation
+2026-11-28T05:27:04.869071+00:00,2583.31,46,25.784439,True,False,display,0,77184,75,First tank prototype · overhead camera
+2026-11-28T05:27:24.902134+00:00,2603.34,46,45.780292,True,False,display,0,77784,77,First tank prototype · overhead camera
+2026-11-28T05:27:44.924542+00:00,2623.37,47,10.247457,True,False,display,0,78379,77,First tank prototype · overhead camera
+2026-11-28T05:28:04.965544+00:00,2643.41,47,30.289338,True,False,display,0,78979,77,First tank prototype · overhead camera
+2026-11-28T05:28:24.995739+00:00,2663.44,47,50.319972,True,False,display,0,79580,77,Water Beings · recorded simulation
+2026-11-28T05:28:45.028591+00:00,2683.47,48,14.722522,True,False,display,0,80174,80,First tank prototype · overhead camera
+2026-11-28T05:29:05.066812+00:00,2703.51,48,34.766903,True,False,display,0,80775,80,First tank prototype · overhead camera
+2026-11-28T05:29:25.097691+00:00,2723.54,48,54.77963,True,False,display,0,81374,82,Water Beings · recorded simulation
+2026-11-28T05:29:45.119459+00:00,2743.56,49,19.19029,True,False,display,0,81969,86,First tank prototype · overhead camera
+2026-11-28T05:30:05.139507+00:00,2763.58,49,39.210067,True,False,display,0,82569,87,First tank prototype · overhead camera
+2026-11-28T05:30:25.165304+00:00,2783.61,50,3.680288,True,False,display,0,83166,88,Water Beings · recorded simulation
+2026-11-28T05:30:45.186395+00:00,2803.63,50,23.706004,True,False,display,0,83765,88,First tank prototype · overhead camera
+2026-11-28T05:31:05.207722+00:00,2823.65,50,43.72682,True,False,display,0,84366,88,First tank prototype · overhead camera
+2026-11-28T05:31:25.229451+00:00,2843.67,51,8.191776,True,False,display,0,84962,89,First tank prototype · overhead camera
+2026-11-28T05:31:45.266212+00:00,2863.71,51,28.226598,True,False,display,0,85562,91,First tank prototype · overhead camera
+2026-11-28T05:32:05.289036+00:00,2883.73,51,48.251886,True,False,display,0,86162,91,Water Beings · recorded simulation
+2026-11-28T05:32:25.315409+00:00,2903.76,52,12.725301,True,False,display,0,86759,91,First tank prototype · overhead camera
+2026-11-28T05:32:45.341288+00:00,2923.78,52,32.671227,True,False,display,0,87357,91,First tank prototype · overhead camera
+2026-11-28T05:33:05.373334+00:00,2943.81,52,52.664289,True,False,display,0,87955,91,Water Beings · recorded simulation
+2026-11-28T05:33:25.398868+00:00,2963.84,53,17.124926,True,False,display,0,88551,91,First tank prototype · overhead camera
+2026-11-28T05:33:45.419986+00:00,2983.86,53,37.146242,True,False,display,0,89151,94,First tank prototype · overhead camera
+2026-11-28T05:34:05.441212+00:00,3003.88,54,1.616174,True,False,display,0,89748,95,Water Beings · recorded simulation
+2026-11-28T05:34:25.463300+00:00,3023.9,54,21.638959,True,False,display,0,90347,95,First tank prototype · overhead camera
+2026-11-28T05:34:45.489598+00:00,3043.93,54,41.665145,True,False,display,0,90948,95,First tank prototype · overhead camera
+2026-11-28T05:35:05.511523+00:00,3063.95,55,6.146945,True,False,display,0,91544,95,Water Beings · recorded simulation
+2026-11-28T05:35:25.535334+00:00,3083.98,55,26.170158,True,False,display,0,92145,95,First tank prototype · overhead camera
+2026-11-28T05:35:45.566268+00:00,3104.01,55,46.201738,True,False,display,0,92745,95,First tank prototype · overhead camera
+2026-11-28T05:36:05.588300+00:00,3124.03,56,10.663112,True,False,display,0,93341,97,First tank prototype · overhead camera
