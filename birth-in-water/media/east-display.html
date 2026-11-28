@@ -1,0 +1,18 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Water Beings · East display rehearsal</title>
+<style>*{box-sizing:border-box}body{background:#121a18;color:#eceee5;font:1rem/1.55 system-ui,sans-serif;margin:0}main{max-width:1060px;padding:clamp(1rem,4vw,3rem);margin:auto}h1{font:normal clamp(2.4rem,5vw,4.5rem)/1 Georgia,serif;letter-spacing:-.04em;margin:0 0 .6rem}p{max-width:70ch}video{display:block;width:100%;aspect-ratio:16/9;background:#070a09;margin:1.2rem 0}button{font:inherit;padding:.55rem 1rem;background:#dce3d0;color:#162820;border:0;border-radius:2px;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #9fca9a;outline-offset:3px}a{color:#bbd6c1}small{color:#c7d0c7}video:fullscreen{width:100vw;height:100vh;object-fit:contain}</style></head>
+<body><main><h1>Water Beings</h1><p>Ruipeng Wang · 33-second recorded passage for an independent east-wall rehearsal</p>
+<video controls playsinline loop muted preload="auto" aria-label="Recorded digital population"><source src="water-beings-east.mp4" type="video/mp4"></video>
+<button id="start" type="button">Play east wall full screen</button> <span id="state" role="status"></span>
+<p>Put this page and <b>water-beings-east.mp4</b> in the same folder on the second player. The population runs at its original speed and has no sound. The picture returns to its first state at each loop. Leave this wall running if the film player restarts or the tank is paused.</p>
+<p><small>Source time 6.006–39.039 s, end exclusive. These are 990 consecutive pictures from the artist’s recording. The gallery study uses this passage for a light and timing rehearsal. The recording cannot respond to a visitor. <a href="https://ruipengwang.space/water-beings">Artist’s work</a>.</small></p></main>
+<script>
+const movie=document.querySelector('video'),message=document.querySelector('#state');
+document.querySelector('#start').onclick=async()=>{
+ try{
+  if(movie.requestFullscreen)await movie.requestFullscreen();
+  else if(movie.webkitEnterFullscreen)movie.webkitEnterFullscreen();
+  await movie.play();message.textContent='Playing on its own loop.';
+ }catch{message.textContent='Use the video controls to play in this window.'}
+};
+movie.addEventListener('error',()=>{message.textContent='Place water-beings-east.mp4 in the same folder as this page.'});
+</script></body></html>

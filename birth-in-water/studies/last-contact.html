@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>The last contact · Birth in Water</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#eeede4;color:#24312d;font:1rem/1.55 system-ui,sans-serif}main,header{max-width:980px;margin:auto;padding:1.3rem clamp(1rem,5vw,3.8rem)}header{border-bottom:1px solid #b4b7a7}a{color:#245951;text-underline-offset:.2em}h1,h2{font:normal clamp(2.4rem,7vw,4.7rem)/1 Georgia,serif;letter-spacing:-.04em;margin:.38em 0}h2{font-size:1.65rem;margin-top:1.4em}p{max-width:72ch}figure{margin:1.4rem 0;background:#162521;color:#f4f2e5}#picture{aspect-ratio:16/9;background-color:#10251f;background-size:300% 900%;background-repeat:no-repeat}#picture img{display:block;width:100%;height:auto}figcaption{padding:.72rem 1rem;font:normal .9rem/1.5 system-ui,sans-serif}#controls{border:0;margin:0;padding:0}#controls[hidden]{display:none}.row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}input{width:100%;min-height:42px;accent-color:#31574d}button{font:inherit;background:transparent;border:1px solid #637a70;border-radius:2px;color:#25463b;padding:.45rem .8rem;cursor:pointer}button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #32644d;outline-offset:2px}button:disabled{opacity:.45;cursor:default}output{font-variant-numeric:tabular-nums}.result{min-height:3em}footer{border-top:1px solid #b4b7a7;margin:2rem 0;padding:1rem 0}
+</style></head><body>
+<header><a href="record.html">Birth in Water · Camera and sources</a></header>
+<main><h1>The last contact</h1>
+<p>When can the camera see two bodies? Look along the lower edge of the opening. A dark line widens between the pale surfaces. Even when the outlines part, a faint diagonal trace remains below them.</p>
+<figure><div id="picture" role="img" aria-label="Fixed crop of the first tank recording. The large pale hull fills the left and the small hull moves out to its right."><img src="separation-still.jpg" width="720" height="405" alt=""></div><figcaption>First prototype · overhead workshop recording · <output id="time">25.893 s</output> in the source</figcaption></figure>
+<fieldset id="controls" hidden><legend>Step through 27 consecutive camera frames</legend>
+<input id="frame" aria-label="Camera frame" type="range" min="0" max="26" step="1" value="16">
+<div class="row"><button type="button" id="prev">Previous frame</button><button type="button" id="next">Next frame</button><button type="button" id="play">Play once at camera speed</button></div></fieldset>
+<p class="result" id="reading">At 25.893 s one image mask distinguishes two pale regions. Closing narrow breaks in the mask joins them for one more frame.</p>
+<h2>What does the score hear?</h2>
+<p>The score samples a 480-pixel-wide view ten times a second. Its second voice enters at source time 25.9 s. In this closer reading, six choices of image scale or threshold put the first split at 25.926 s. Omitting the step that closes small breaks gives 25.893 s. That difference is one camera frame.</p>
+<p>The algorithm measures the distance between two large, pale regions. A green interval between them can coexist with a faint line in the water. This angle alone cannot identify that trace, date the last point of physical contact or decide when an offspring became an individual. Watch the carrier after the gap opens. Its position keeps changing.</p>
+<details><summary>Camera and mask settings</summary><p>Ruipeng Wang’s 3840 × 2160 recording runs at 30000/1001 frames per second. This fixed 1440 × 810 crop begins at native coordinate (1660, 550), and displays at 720 × 405. All 27 source pictures are shown in order. The slider changes the camera time without interpolating pictures.</p>
+<p>The 960-pixel test selects a mean RGB value above 98 and a channel spread below 53. Four iterations of binary closing bridge small breaks. Only the two largest connected pale regions count, with a second region of at least 880 pixels. The reported gap is the shortest pixel-centre distance. The CSV also gives two brightness changes, two colour-spread changes, a half-width test and the result without closing.</p></details>
+<footer><a href="separation-samples.csv" download>Download the 189 measurements</a> · <a href="../production/separation_reading.py" download>Reproduce the crop and masks</a> · <a href="https://vimeo.com/1147548218">Artist’s source recording</a> · <a href="../#bw-film">Watch the film</a></footer></main>
+<script>
+const slider=document.getElementById('frame'), picture=document.getElementById('picture');
+const buttons=['prev','next','play'].map(id=>document.getElementById(id));
+let animation=0, rows=[];
+function stop(){cancelAnimationFrame(animation);animation=0;buttons[2].textContent='Play once at camera speed';}
+function show(i){
+ slider.value=i;const row=rows[i];const time=Number(row.time).toFixed(3)+' s';
+ document.getElementById('time').value=time;slider.setAttribute('aria-valuetext','Frame '+(i+1)+' of 27 at '+time);
+ picture.style.backgroundPosition=((i%3)*50)+'% '+(Math.floor(i/3)*12.5)+'%';
+ buttons[0].disabled=i===0;buttons[1].disabled=i===26;
+ const region=value=>value===''?'one connected region':'two regions, '+Number(value).toFixed(2)+' px apart';
+ document.getElementById('reading').textContent='At 960 px wide, with small breaks closed: '+region(row.closed)+'. Without closing: '+region(row.open)+'.';
+}
+async function init(){
+ const img=new Image();img.src='separation-frames.jpg';
+ const [response]=await Promise.all([fetch('separation-samples.csv'),img.decode()]);
+ if(!response.ok)throw Error('Measurements unavailable');
+ for(const line of (await response.text()).trimEnd().split(/\r?\n/).slice(1)){
+  const [i,time,width,brightness,spread,closing,gap]=line.split(',');
+  if(width==='960'&&brightness==='98'&&spread==='53'){
+   if(!rows[i])rows[i]={time};
+   rows[i][closing==='0'?'open':'closed']=gap;
+  }
+ }
+ if(rows.length!==27 || !rows.every(r=>r.open!==undefined&&r.closed!==undefined))throw Error('Incomplete measurements');
+ picture.style.backgroundImage='url("separation-frames.jpg")';picture.querySelector('img').hidden=true;picture.querySelector('img').style.display='none';
+ document.querySelector('#controls').hidden=false;show(16);
+ slider.addEventListener('input',()=>{stop();show(Number(slider.value))});
+ buttons[0].onclick=()=>{stop();show(Math.max(0,Number(slider.value)-1))};
+ buttons[1].onclick=()=>{stop();show(Math.min(26,Number(slider.value)+1))};
+ buttons[2].onclick=()=>{
+  if(animation){stop();return}
+  const start=performance.now();buttons[2].textContent='Pause';show(0);
+  const paint=now=>{const i=Math.max(0,Math.floor((now-start)*30/1001));show(Math.min(26,i));if(i<26)animation=requestAnimationFrame(paint);else stop()};
+  animation=requestAnimationFrame(paint);
+ };
+}
+init().catch(()=>{/* The individual still, timings and downloadable measurements remain readable. */});
+</script></body></html>
