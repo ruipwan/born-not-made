@@ -24,10 +24,10 @@ def wall_grid(w, h):
     return x[None,:], z[:,None]
 
 class Rays:
-    def __init__(self, source, points):
+    def __init__(self, source, points, target_y=wall_y):
         self.source = np.array(source)
         x,z = points
-        self.dx, self.dy, self.dz = x-source[0], wall_y-source[1], z-source[2]
+        self.dx, self.dy, self.dz = x-source[0], target_y-source[1], z-source[2]
 
     def blocked(self, x, y, scale=1.):
         sx,sy,sz = self.source

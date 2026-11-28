@@ -1,0 +1,10 @@
+segment,first_frame,last_frame,pairs,median_abs_difference_8bit,percentile_95_difference,pairs_above_half_level,peak_pair_difference
+Water Beings opening,0,239,239,2.323,5.365,239,7.239
+Hydraulic bench,240,551,311,0.22,1.335,51,3.452
+Phone trial,552,719,167,0.078,0.224,0,0.368
+First tank wide,720,1147,427,0.028,0.252,3,1.231
+First tank detail,1148,1481,333,0.062,3.608,34,8.208
+First tank wide return,1482,1798,316,0.259,1.454,57,2.506
+Second tank,1799,1953,154,3.62,15.021,123,20.179
+Held catalogue image,1954,2103,149,0.003,0.003,0,0.018
+Water Beings closing,2104,2373,269,2.613,5.555,268,8.136

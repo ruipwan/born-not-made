@@ -71,6 +71,8 @@ h1,h2,h3{font-family:Georgia,serif;font-weight:400;line-height:1.12;color:#17332
 <h3 id="gallery-cut--camera-sound-and-score-on-separate-faders">Camera sound and score on separate faders</h3>
 <p>The <a href="../media/gallery-audio-stems.zip">two lossless stereo stems</a> share the film start and last 3,799,200 samples per channel at 48 kHz. The workshop-camera stem contains the bench test and overhead recording. The image-derived score has its own fader. Keep the MP4 audio muted when using them together on the same transport. At film 46–55 s the stereo camera stem averages −75.44 dBFS RMS and the composed stem −27.17 dBFS RMS. Audition them at their recorded gains before increasing level. The louder sound one hears at release was composed for the image.</p>
 <p>The two decoded 16-bit files sum exactly to the pre-AAC master. Encoding that sum with the film’s 96 kb/s AAC recipe reproduces every byte of the published ADTS stream. Both source-specific fades are retained. This gives an installer a reversible way to listen to the camera recording and the movement-derived pitches independently. The analogue mix coming from speakers depends on speaker placement, amplifier gain and the room.</p>
+<h2 id="gallery-cut--motion-in-the-delivered-cut">Motion in the delivered cut</h2>
+<p>A <a href="gallery-motion.csv">frame-pair check</a> sampled all 2,374 pictures of the clean film. The centre 1152 × 576 pixels were reduced to a 288 × 144 grey image, and neighbouring pictures within each edit segment were compared. The median change in the quiet opening wide of the tank was 0.028 of 255 levels per pixel; the returning wide measured 0.259. The catalogue preview stayed held for five seconds, with a peak change of 0.018 in this calculation. The digital opening and closing each had a median change above two levels. These numbers reflect movement, lighting and compression together. A low whole-field difference can coexist with an operator’s hand moving in a small part of a shot.</p>
 <p class="source"><a href="gallery-cut.md" download="">Download the editable notes</a></p></article>
 <article id="field-notes"><h1 id="field-notes--where-does-the-body-end">Where does the body end?</h1>
 <p>First research and production pass. The prior script took the first independent correction as the criterion of birth. That measure privileges motor competence. A newborn can be entirely dependent. Remove that test from the narration as a definition of who counts. Keep passive controls in the studio to understand our own images.</p>
@@ -454,6 +456,47 @@ h1,h2,h3{font-family:Georgia,serif;font-weight:400;line-height:1.12;color:#17332
 <p><a href="room.html#seated-visit">Play the 16-second room film</a> or <a href="room-views/seated-gallery-sequence.jpg">inspect six moments</a>. The head turns from the near tank to the north-wall film without moving the eye from its 1.12 m mark. A fifth visitor crosses in front of the tank. The wall is already showing the first prototype. The seat recovers the film before the pale outlines separate. At 15 s the image cuts to the blue tank of the second prototype while the printed pause card stays beside the physical shell. The same sequence can be followed with the sound off.</p>
 <p>The camera turn starts at 1.6 s and ends at 3.55 s, covering roughly 51°. Visitors and staff are position proxies. A real wheelchair user may prefer a different angle or to move the whole chair. The animation does not establish reach, comfort, accessibility or visitor behaviour. Keep space around the bay for another person and test the turn without asking people to perform it on cue.</p>
 <p>The north wall uses seconds 45–61 from the 1080p captioned cut. The independent east screen uses seconds 7–23 of the artist’s published digital population. The on-screen tank footage retains its camera motion. The physical model is stationary, with the revised dry-side bench, a staff proxy and the A4 pause card. The soundtrack uses the actual film mix folded to mono through the acoustic model’s bay loudspeaker path. No gallery recording or pump noise was added. <a href="room-views/gallery-visit-frames.csv">192 rendered pictures and source times</a>. The earlier 10-second view uses the separate return study and the previous bench layout.</p>
+<h2 id="visitor-test--can-the-seated-eye-stay-still">Can the seated eye stay still?</h2>
+<p>In the <a href="room.html#fixed-seat">three-pass room film</a>, the eye stays at (2.55, 2.45, 1.12) m. Its yaw is fixed 3° east of north and its elevation is about 1.4°. The same 24 mm model lens observes the same 45–51 s of the gallery film, four standing visitors, the crossing fifth visitor and the operator. No head or chair turn is built into these passes. The wet model remains paused. The wall is emissive in the render; a projector in a changed position would also need its throw and shadow retested.</p>
+<div class="table" tabindex="0" aria-label="Scrollable data table"><table>
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>North film centre x</th>
+<th>Pause card centre height</th>
+<th>Angle from film centre to mouth</th>
+<th>Bright lower-caption samples behind paper at 49.5 s, seated eye 1.12 m</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1.40 m</td>
+<td>1.09 m</td>
+<td>51.12°</td>
+<td>0 / 6,746</td>
+</tr>
+<tr class="even">
+<td>2.80 m</td>
+<td>1.09 m</td>
+<td>27.91°</td>
+<td>746 / 6,746</td>
+</tr>
+<tr class="odd">
+<td>2.80 m</td>
+<td>0.90 m</td>
+<td>27.91°</td>
+<td>0 / 6,746</td>
+</tr>
+</tbody>
+</table>
+</div><p>The wall move changes where the near paper falls across the distant picture. In the middle pass the opaque card covers the end of “between” and all of “them.” The second line about the tone remains readable. At the same plan location, lowering the paper clears the sampled caption for eye heights 1.00, 1.12, 1.30 and 1.62 m. This ray count uses the actual 1920 × 1080 film picture and the modelled A4 paper rectangle. It examines a single caption and omits glass refraction and the card’s thin pole. A visitor may still lose the live mouth to a standing body. The angular difference is a geometric measure; comfortable gaze, chair orientation, card contrast and caption readability need visitors and full-size tape marks in a venue.</p>
+<p><a href="room-views/fixed-seat-letters.jpg">Actual caption crop with modelled paper</a> · <a href="room-views/fixed-seat-captions.jpg">Same instant in three room views</a> · <a href="fixed-seat-captions.csv">Direct ray counts</a> · <a href="room-views/fixed-seat-frames.csv">216 pictures, source times and hashes</a>.</p>
+<p>The paper itself has a cost. From the 1.12 m seated mark its centre moves from 1.22° to 8.86° below horizontal. At the 1.62 m standing eye the lower placement requires a 27.02° downward look. A separate direct-sight test used the actual dark pixels in the printed “Live tank paused” heading. The modelled people left all 10,844 sampled ink pixels visible at six positions in the crossing, from the four bay eye heights and the entrance. That is evidence about obstruction. It cannot establish that a visitor can read small print, is comfortable looking down, or will notice a sign placed lower in a dark room. <a href="fixed-seat-sign.csv">Status-heading samples and viewing angles</a></p>
 <p class="source"><a href="visitor-test.md" download="">Download the editable notes</a></p></article>
 <article id="projection-throw"><h1 id="projection-throw--a-reader-in-the-projection-beam">A reader in the projection beam</h1>
 <p>At film time 49.5 s, a visitor standing at (1.40, 4.18) m clears every sampled pixel of the lower caption from the seated eye. With the long throw, the same person intercepts the projector rays to 1,786 of its 2,718 bright pixels. Someone in the bay could see the wall perfectly well and still lose the words. Shifting the lens forward clears the caption in this arrangement. When the person steps another 0.72 m toward the wall both projectors lose much of it.</p>
@@ -769,6 +812,12 @@ h1,h2,h3{font-family:Georgia,serif;font-weight:400;line-height:1.12;color:#17332
 <p>The east-display copy is 11,477,612 bytes, 1280 × 720 H.264 at 30000/1001 fps, 990 frames, 33.033 s, with no audio stream. Each decoded frame matches its counterpart at source index 180–1169 in the artist’s recording. SHA-256 e68e198e249209d2e7438ebfc43db7e5047f05fbc276282dcda26405c265326e. The independent page opens without a network connection when downloaded beside the MP4.</p>
 <p>At 07:09 UTC both new A4 leaves were rendered and reviewed. The visitor copy has three empty returns, with room to record the observed body and changed condition. The independent staff copy identifies both recorded players and the wet operator’s handover. No actual reset time or visitor history has been entered. Chromium and Firefox also exercised the frame study at 390 and 1440 px, including keyboard frame stepping, playback, CSV download and its still-picture fallback.</p>
 <p>The embedded project tab previously retained a 12,148 CSS-pixel frame after an internal source link loaded a 1,604-pixel document. In the embedded edition, links that leave the chapter now open a separate browsing context. On a narrow screen the film and tab remained in place. The standalone page still navigates normally. Local playback tests also passed for the gallery kit, arrival planner, illustrated wall label, diagram downloads and both notebook widths.</p>
+<h2 id="qa-2026-11-28--independent-playback-and-keyboard-only-arrival">Independent playback and keyboard-only arrival</h2>
+<p>The two offline walls ran in separate browser processes for 15 minutes. Closing the north player for 75 s left the east loop running. Closing the east player for 30 s left the north film running. Both recovered individually. All playing samples were local, muted, fullscreen and free of media errors. No HTTP requests occurred. <a href="two-wall-playout.csv">Time-stamped wall log</a>.</p>
+<p>At a 390 px viewport in Firefox and Chromium, Enter opened the gallery from the embedded project tab. The keyboard selected the silent visit and started playback at 42 s. The muted film continued until its English caption described the new strip of water and the second tone at 48.9 s. No touch, microphone or pointer input was sent.</p>
+<h2 id="qa-2026-11-28--three-fixed-eye-passes">Three fixed-eye passes</h2>
+<p>The two original wall positions were rendered first. The shifted screen reduced the angular distance to the tank, but the modelled A4 card cut across “them” in the real caption. A third render lowered the card by 0.19 m. The 216 new Cycles pictures span 07:11:11–07:22:31 UTC. The reviewed 18 s MP4 contains three matched 6 s takes at 12 fps, 768 × 532 including a label strip. The camera stays fixed throughout. <a href="room-views/fixed-seat-frames.csv">Render ledger</a> · <a href="room-views/fixed-seat-captions.jpg">Matched stills</a> · <a href="room-views/fixed-seat-letters.jpg">Caption crop</a>. SHA-256 6e8274c3d11b25d3bc2161452c29e6553fe673dc74518d004da6dbe607288413.</p>
+<p>Chromium and Firefox both opened the fixed-seat section from its direct link at 390 and 1440 px, played and sought all three passes, paused it on changing players, and downloaded byte-identical copies of the film and A4 handover. The lower card clears the sampled words at the four tested eye heights. Its own heading remains in direct sight in the tested crowd positions. Full-scale reading and visitor comfort require a venue rehearsal.</p>
 <p class="source"><a href="qa-2026-11-28.md" download="">Download the editable notes</a></p></article>
 <article id="population-light"><h1 id="population-light--what-moves-behind-the-front-pane">What moves behind the front pane?</h1>
 <p>The most distracting light near the stationary shell comes through the glass. For this seated view the digital population sits behind the tank on the north wall. In the model, hiding the digital image from glossy reflection rays scarcely changes the bright group below the rail. Hiding it from transmitted rays removes much of that group. Above the rail one can still see the screen directly. Moving the screen can clear a visual overlap that a more matte surface on the cabinet would leave in place.</p>
@@ -784,6 +833,7 @@ h1,h2,h3{font-family:Georgia,serif;font-weight:400;line-height:1.12;color:#17332
 <p><a href="../media/east-display.html">Open the east display</a>. For an offline room, save the <a href="../media/east-display.html">player page</a> and <a href="../media/water-beings-east.mp4">MP4</a> in the same folder on the second machine. On the first machine use the separate 79.15-second captioned projection in the gallery kit. Start each machine independently. The east screen stays silent. Give it a physical label reading “Water Beings — recorded digital population, Ruipeng Wang.” The live tank can be paused while either or both recordings continue.</p>
 <p>The trial uses source pictures 180–1169 inclusive from the artist’s 71.54-second <em>Water Beings</em> recording. The cluster grows dense and thins within these 33.033 seconds. The final picture cuts back to the first when the player loops. This passage cannot establish every chromatic generation by sight. The artist describes seven contact-linked generations and how remains change the terrain. A living digital population would require its own running system and could accumulate a different history.</p>
 <p>Two full-frame encodes at different compression settings were larger than the bounded original segment. Eleven complete interframe groups could be copied from the artist’s H.264 rendition with no video re-encode. Decoding all 990 pictures and comparing their planar pixel hashes with those of the source gave 990 matches. The earlier 4-second light-path comparison uses a later, brighter part of the same source; it remains a separate optical stress test. The seated visit uses source seconds 7–23 inside this east-wall passage.</p>
+<p>A 15-minute two-player rehearsal ran from 07:06:07 to 07:21:07 UTC. Each wall used a different network-disabled browser process and local files. The east passage began 15 seconds after the film. When the north process was shut down for roughly 75 seconds, the east picture continued for 75.28 media seconds, wrapping twice. Later the east process was closed for roughly 30 seconds. The north picture continued for 30.31 media seconds across its own loop boundary. Both new processes started at the beginning of their respective recordings. The test exercised separate playback processes on one host, with no physical projectors, tank or venue sound. <a href="two-wall-playout.csv">122 wall observations</a></p>
 <p class="source"><a href="population-light.md" download="">Download the editable notes</a></p></article></main></div>
 <script>
 const chapters=Array.from(document.querySelectorAll('main article')),links=Array.from(document.querySelectorAll('nav a'));

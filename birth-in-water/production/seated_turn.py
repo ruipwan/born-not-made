@@ -24,7 +24,14 @@ room = runpy.run_path(str(Path(__file__).with_name('gallery_views.py')))
 scene, camera = room['s'], room['cam']
 eye = camera.location.copy()
 mouth = Vector((3.50, 3.96, 1.02))
-screen = Vector((1.4, 5.80, 1.485))
+film_x = float(os.getenv('BNM_FILM_WALL_X', '1.4'))
+for name in ('Recorded film', 'Recorded film surround'):
+    scene.objects[name].location.x += film_x - 1.4
+screen = Vector((film_x, 5.80, 1.485))
+# Fixed 3-degree heading east of north for the matched wall-position trial.
+fixed_direction = Vector((math.sin(math.radians(3)), math.cos(math.radians(3)), .025))
+fixed_rotation = fixed_direction.to_track_quat('-Z', 'Y')
+fixed_seat = os.getenv('BNM_FIXED_SEAT') == '1'
 initial = (mouth-eye).to_track_quat('-Z', 'Y')
 terminal = (screen-eye).to_track_quat('-Z', 'Y')
 
@@ -43,10 +50,12 @@ if gallery:
     # The tank is paused. The sourced films on both walls continue at their
     # own times; the dark figure at the revised bench is a staff-position proxy.
     room['visitor'](4.0,4.85)
-    room['cube']('Pause card stand',(2.89,3.84,.49),(.022,.022,.98),room['metal'])
+    status_height=float(os.getenv('BNM_STATUS_HEIGHT','1.09'))
+    post_height=status_height-.11
+    room['cube']('Pause card stand',(2.89,3.84,post_height/2),(.022,.022,post_height),room['metal'])
     room['cube']('Stand base',(2.89,3.84,.008),(.18,.16,.016),room['metal'])
     for label,location,rotation,dimensions,path in [
-        ('Tank paused',(2.89,3.82,1.09),(math.pi/2,0,0),(.297,.210),os.environ['BNM_STATUS_CARD']),
+        ('Tank paused',(2.89,3.82,status_height),(math.pi/2,0,0),(.297,.210),os.environ['BNM_STATUS_CARD']),
         ('Film wall label',(7.992,1.95,1.35),(math.pi/2,0,-math.pi/2),(.297,.420),os.environ['BNM_LABEL_TEXTURE'])]:
         bpy.ops.mesh.primitive_plane_add(size=1,location=location,rotation=rotation)
         card=bpy.context.object;card.name=label;card.scale=(*dimensions,1)
@@ -66,7 +75,7 @@ def move(frame_scene):
     for obj, origin in walker:
         obj.location.x = origin.x - 1.23*ease((seconds-.25)/(1.75 if gallery else 2.25))
     fraction = .5 if os.getenv('BNM_MIDPOINT') == '1' else (ease((seconds-1.6)/1.95) if gallery else ease((seconds-2.8)/2.4))
-    camera.rotation_quaternion = initial.slerp(terminal, fraction)
+    camera.rotation_quaternion = fixed_rotation if fixed_seat else initial.slerp(terminal, fraction)
 
 bpy.app.handlers.frame_change_pre.append(move)
 scene.frame_start = int(os.getenv('BNM_START','1'))

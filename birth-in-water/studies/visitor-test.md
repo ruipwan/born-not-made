@@ -133,3 +133,19 @@ Five matched room renders used the two reading locations, the door and bay views
 The camera turn starts at 1.6 s and ends at 3.55 s, covering roughly 51°. Visitors and staff are position proxies. A real wheelchair user may prefer a different angle or to move the whole chair. The animation does not establish reach, comfort, accessibility or visitor behaviour. Keep space around the bay for another person and test the turn without asking people to perform it on cue.
 
 The north wall uses seconds 45–61 from the 1080p captioned cut. The independent east screen uses seconds 7–23 of the artist’s published digital population. The on-screen tank footage retains its camera motion. The physical model is stationary, with the revised dry-side bench, a staff proxy and the A4 pause card. The soundtrack uses the actual film mix folded to mono through the acoustic model's bay loudspeaker path. No gallery recording or pump noise was added. [192 rendered pictures and source times](room-views/gallery-visit-frames.csv). The earlier 10-second view uses the separate return study and the previous bench layout.
+
+## Can the seated eye stay still?
+
+In the [three-pass room film](room.html#fixed-seat), the eye stays at (2.55, 2.45, 1.12) m. Its yaw is fixed 3° east of north and its elevation is about 1.4°. The same 24 mm model lens observes the same 45–51 s of the gallery film, four standing visitors, the crossing fifth visitor and the operator. No head or chair turn is built into these passes. The wet model remains paused. The wall is emissive in the render; a projector in a changed position would also need its throw and shadow retested.
+
+| North film centre x | Pause card centre height | Angle from film centre to mouth | Bright lower-caption samples behind paper at 49.5 s, seated eye 1.12 m |
+|---|---|---|---|
+| 1.40 m | 1.09 m | 51.12° | 0 / 6,746 |
+| 2.80 m | 1.09 m | 27.91° | 746 / 6,746 |
+| 2.80 m | 0.90 m | 27.91° | 0 / 6,746 |
+
+The wall move changes where the near paper falls across the distant picture. In the middle pass the opaque card covers the end of “between” and all of “them.” The second line about the tone remains readable. At the same plan location, lowering the paper clears the sampled caption for eye heights 1.00, 1.12, 1.30 and 1.62 m. This ray count uses the actual 1920 × 1080 film picture and the modelled A4 paper rectangle. It examines a single caption and omits glass refraction and the card’s thin pole. A visitor may still lose the live mouth to a standing body. The angular difference is a geometric measure; comfortable gaze, chair orientation, card contrast and caption readability need visitors and full-size tape marks in a venue.
+
+[Actual caption crop with modelled paper](room-views/fixed-seat-letters.jpg) · [Same instant in three room views](room-views/fixed-seat-captions.jpg) · [Direct ray counts](fixed-seat-captions.csv) · [216 pictures, source times and hashes](room-views/fixed-seat-frames.csv).
+
+The paper itself has a cost. From the 1.12 m seated mark its centre moves from 1.22° to 8.86° below horizontal. At the 1.62 m standing eye the lower placement requires a 27.02° downward look. A separate direct-sight test used the actual dark pixels in the printed “Live tank paused” heading. The modelled people left all 10,844 sampled ink pixels visible at six positions in the crossing, from the four bay eye heights and the entrance. That is evidence about obstruction. It cannot establish that a visitor can read small print, is comfortable looking down, or will notice a sign placed lower in a dark room. [Status-heading samples and viewing angles](fixed-seat-sign.csv)
