@@ -8,14 +8,14 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Source,DejaVu Sans,24,&H00FFFFFF,&H00FFFFFF,&H70080808,&H70080808,0,0,0,0,100,100,0,0,3,5,0,7,48,48,32,1
+Style: Source,DejaVu Sans,27,&H00FFFFFF,&H00FFFFFF,&H70080808,&H70080808,0,0,0,0,100,100,0,0,3,5,0,7,48,48,32,1
 Style: Caption,DejaVu Sans,30,&H00FFFFFF,&H00FFFFFF,&H60080808,&H60080808,0,0,0,0,100,100,0,0,3,6,0,2,65,65,32,1
 Style: Credit,DejaVu Sans,23,&H00FFFFFF,&H00FFFFFF,&H65080808,&H65080808,0,0,0,0,100,100,0,0,3,5,0,1,48,48,35,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 Dialogue: 0,0:00:00.00,0:00:08.00,Source,,0,0,0,,Water Beings  ·  Digital population
-Dialogue: 1,0:00:01.10,0:00:06.80,Caption,,0,0,0,,Contact starts another generation.
+Dialogue: 1,0:00:01.10,0:00:06.80,Caption,,0,0,0,,Seven generations reproduce through contact.\NTheir remnants change the space for those that follow.
 Dialogue: 0,0:00:08.00,0:00:18.40,Source,,0,0,0,,Hydraulic push test  ·  Workshop recording
 Dialogue: 1,0:00:08.75,0:00:13.40,Caption,,0,0,0,,Water fills a bladder inside the pink housing.
 Dialogue: 1,0:00:15.60,0:00:18.30,Caption,,0,0,0,,The ball rolls onto the table.
