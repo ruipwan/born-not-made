@@ -1,0 +1,32 @@
+[Script Info]
+Title: Birth in Water - gallery open captions
+ScriptType: v4.00+
+PlayResX: 1280
+PlayResY: 720
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Source,DejaVu Sans,24,&H00FFFFFF,&H00FFFFFF,&H70080808,&H70080808,0,0,0,0,100,100,0,0,3,5,0,7,48,48,32,1
+Style: Caption,DejaVu Sans,30,&H00FFFFFF,&H00FFFFFF,&H60080808,&H60080808,0,0,0,0,100,100,0,0,3,6,0,2,65,65,32,1
+Style: Credit,DejaVu Sans,23,&H00FFFFFF,&H00FFFFFF,&H65080808,&H65080808,0,0,0,0,100,100,0,0,3,5,0,1,48,48,35,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.00,0:00:08.00,Source,,0,0,0,,Water Beings  ·  Digital population
+Dialogue: 1,0:00:01.10,0:00:06.80,Caption,,0,0,0,,Contact starts another generation.
+Dialogue: 0,0:00:08.00,0:00:18.40,Source,,0,0,0,,Hydraulic push test  ·  Workshop recording
+Dialogue: 1,0:00:08.75,0:00:13.40,Caption,,0,0,0,,Water fills a bladder inside the pink housing.
+Dialogue: 1,0:00:15.60,0:00:18.30,Caption,,0,0,0,,The ball rolls onto the table.
+Dialogue: 0,0:00:18.40,0:00:24.00,Source,,0,0,0,,Phone control  ·  Separate workshop test
+Dialogue: 1,0:00:18.90,0:00:23.50,Caption,,0,0,0,,A hand adjusts the control. The workbench falls quiet.
+Dialogue: 0,0:00:24.00,0:01:00.00,Source,,0,0,0,,First tank prototype  ·  Overhead recording
+Dialogue: 1,0:00:24.70,0:00:29.00,Caption,,0,0,0,,[A low tone enters.]
+Dialogue: 1,0:00:38.25,0:00:42.40,Caption,,0,0,0,,A closer view of the same opening.
+Dialogue: 1,0:00:48.90,0:00:53.40,Caption,,0,0,0,,A strip of water opens between them.\N[A second tone rises.]
+Dialogue: 1,0:00:54.00,0:00:58.70,Caption,,0,0,0,,The larger body turns as the smaller one moves around it.
+Dialogue: 0,0:01:00.00,0:01:05.15,Source,,0,0,0,,Second prototype  ·  Separate tank recording
+Dialogue: 0,0:01:05.15,0:01:10.15,Source,,0,0,0,,IEEE VIS Arts Program  ·  Installation photograph
+Dialogue: 0,0:01:10.15,0:01:19.15,Source,,0,0,0,,Water Beings  ·  Digital population
+Dialogue: 1,0:01:13.10,0:01:19.15,Credit,,0,0,0,,Born, Not Made  ·  Ruipeng Wang\NWith Vera Yu Wu, Di Wu, Kexin Wang, Jimmy Haochen Xu and Leo Liu
