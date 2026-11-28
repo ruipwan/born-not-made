@@ -1,0 +1,5 @@
+source,asset,artist_url,raster_or_audio,frame_or_sample_rate,bytes,sha256
+shell,video,https://vimeo.com/1147282112,1920x1080,30/1,4475006,e6d1ccfb977436908c7d21a083bdbc7cdaf32696023945d221c3cbff470a701b
+shell,audio,https://vimeo.com/1147282112,stereo AAC,48000 Hz,134029,4f5549bd58c8734efd266246796b1826b77ac1b2f5f53bd7ed953a37d188ff48
+sponge,video,https://vimeo.com/1147282114,1080x1920,30000/1001,14464788,a77ad6b3ea46c07d632bf80068902b17279035a5ceeee824d6f4ce50b558731d
+sponge,audio,https://vimeo.com/1147282114,stereo AAC,48000 Hz,496866,0f81bef058d89e020c75b9bc72990f29cad38a66843a633948eec2cf71af7e54
