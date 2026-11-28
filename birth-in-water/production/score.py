@@ -1,5 +1,5 @@
 """Compose two resonances from the image-space gap. Output a stereo 48 kHz score.
-Usage: python score.py tank-trace.csv score.wav
+Usage: python score.py tank-trace.csv score.wav [carrier-edge.csv]
 """
 import sys
 import numpy as np
@@ -24,6 +24,14 @@ def breath(lo,hi):
 # Quiet friction on a sustained, slightly drifting upper partial. No rhythmic
 # heartbeat or synthetic motor; each pitch is an editorial choice.
 phase=2*np.pi*(96.1*t+.16*np.sin(.19*t))
+if len(sys.argv)>3:
+ edge=np.genfromtxt(sys.argv[3],delimiter=',',names=True)
+ # The apparent angle in the overhead image alters the carrier voice.
+ # Retain the full shift while its rim stays turned, even after the gap closes.
+ shift=edge['angle_deg'][0]-edge['angle_deg']
+ turn=np.interp(t,edge['source_s']+6,shift,left=0,right=shift[-1])
+ rise=smooth(np.clip(turn,0,12),2)
+ phase+=2*np.pi*np.cumsum(1.12*rise)/rate
 first=.042*np.sin(phase)+.013*np.sin(phase*2.004)+.012*breath(230,380)
 second=.043*np.sin(2*np.pi*np.cumsum(142+distance*24)/rate)+.014*breath(480,780)
 wet=np.clip((t-5.4)/2,0,1)*np.clip((44.5-t)/2.2,0,1)
