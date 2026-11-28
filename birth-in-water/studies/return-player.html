@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Birth in Water · exhibition playback rehearsal</title>
+<style>
+*{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:#0a100e;color:#edece5;font:1rem/1.45 system-ui,sans-serif}main{width:min(100%,1100px);margin:auto;padding:1rem}a{color:inherit;text-underline-offset:.2em}h1{font:normal clamp(1.7rem,4vw,2.9rem) Georgia,serif;margin:.7em 0 .25em}p{max-width:75ch}figure{background:#090c0b;color:#efeee7;margin:1rem 0 0;display:flex;flex-direction:column;justify-content:center}video{width:100%;object-fit:contain;min-height:0;display:block}figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;padding:.65em 1em;gap:.2em 1em}figure:fullscreen video{flex:1}figure:fullscreen figcaption{font-size:clamp(18px,2.5vh,32px)}button{font:inherit;padding:.5em .85em;border:1px solid #718780;border-radius:.2rem;background:#21352e;color:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #d8bc86;outline-offset:2px}.controls{display:flex;gap:.55em;flex-wrap:wrap;margin:.8em 0}button[hidden]{display:none}
+</style>
+</head>
+<body><main><a href="room.html#after-separation">Room rehearsal</a>
+<h1>Birth in Water</h1><p>Exhibition playback rehearsal · 55 seconds · Ruipeng Wang</p>
+<figure id="display"><video id="film" controls playsinline muted loop preload="metadata" poster="../media/return-poster.jpg"><source src="../media/return-study.mp4" type="video/mp4"><track kind="captions" label="English" srclang="en" src="../media/return-study.en.vtt"></video>
+<figcaption><span>Recorded film · Ruipeng Wang</span><span id="source">Water Beings · recorded simulation</span></figcaption></figure>
+<div class="controls"><button id="start">Play loop</button><button id="full" hidden>Full-screen display</button></div><p id="feedback" role="status"></p>
+<p>Start playback before visitors enter. The film loops silently by default. Its source label stays outside the picture in full-screen display. The tank operator posts the live apparatus status at the tank.</p>
+<p><a href="../media/return-study.mp4" download>Download MP4</a> · <a href="../media/return-study.en.vtt" download>English captions</a> · <a href="record.html">Footage and credits</a></p>
+</main><script>
+const film = document.querySelector('#film');
+const start = document.querySelector('#start');
+const display = document.querySelector('#display');
+const full = document.querySelector('#full');
+const feedback = document.querySelector('#feedback');
+function updateSource() {
+  const time = film.currentTime;
+  document.querySelector('#source').textContent =
+    time >= 8.008 && time < 46.413 ? 'First tank prototype · overhead camera' : 'Water Beings · recorded simulation';
+}
+for (const event of ['playing', 'timeupdate', 'seeked']) film.addEventListener(event, updateSource);
+film.addEventListener('play', () => { start.textContent = 'Pause loop'; });
+film.addEventListener('pause', () => { start.textContent = 'Play loop'; });
+start.addEventListener('click', async () => {
+  if (!film.paused) { film.pause(); return; }
+  try { await film.play(); feedback.textContent = ''; }
+  catch { feedback.textContent = 'Use the video controls or open the downloaded MP4.'; }
+});
+if (document.fullscreenEnabled && display.requestFullscreen) {
+  full.hidden = false;
+  full.addEventListener('click', async () => {
+    try { await display.requestFullscreen(); }
+    catch { feedback.textContent = 'Full-screen display is unavailable in this browser.'; }
+  });
+}
+</script></body></html>
