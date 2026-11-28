@@ -21,12 +21,12 @@ Dialogue: 1,0:00:08.75,0:00:13.40,Caption,,0,0,0,,Water fills a bladder inside t
 Dialogue: 1,0:00:15.60,0:00:18.30,Caption,,0,0,0,,The ball rolls onto the table.
 Dialogue: 0,0:00:18.40,0:00:24.00,Source,,0,0,0,,Phone control  ·  Separate workshop test
 Dialogue: 1,0:00:18.90,0:00:23.50,Caption,,0,0,0,,A hand adjusts the control. The workbench falls quiet.
-Dialogue: 0,0:00:24.00,0:01:00.00,Source,,0,0,0,,First tank prototype  ·  Overhead recording
+Dialogue: 0,0:00:24.00,0:00:59.96,Source,,0,0,0,,First tank prototype  ·  Overhead recording
 Dialogue: 1,0:00:24.70,0:00:29.00,Caption,,0,0,0,,[A low tone enters.]
 Dialogue: 1,0:00:38.25,0:00:42.40,Caption,,0,0,0,,A closer view of the same opening.
 Dialogue: 1,0:00:48.90,0:00:53.40,Caption,,0,0,0,,A strip of water opens between them.\N[A second tone rises.]
 Dialogue: 1,0:00:54.00,0:00:58.70,Caption,,0,0,0,,The smaller hull curves around the carrier.\N[The lower tone holds its changed pitch.]
-Dialogue: 0,0:01:00.00,0:01:05.15,Source,,0,0,0,,Second prototype  ·  Separate tank recording
-Dialogue: 0,0:01:05.15,0:01:10.15,Source,,0,0,0,,IEEE VIS Arts Program  ·  Artwork preview
-Dialogue: 0,0:01:10.15,0:01:19.15,Source,,0,0,0,,Water Beings  ·  Digital population
+Dialogue: 0,0:00:59.96,0:01:05.13,Source,,0,0,0,,Second prototype  ·  Separate tank recording
+Dialogue: 0,0:01:05.13,0:01:10.13,Source,,0,0,0,,IEEE VIS Arts Program  ·  Artwork preview
+Dialogue: 0,0:01:10.13,0:01:19.15,Source,,0,0,0,,Water Beings  ·  Digital population
 Dialogue: 1,0:01:13.10,0:01:19.15,Credit,,0,0,0,,Born, Not Made  ·  Ruipeng Wang\NWith Vera Yu Wu, Di Wu, Kexin Wang, Jimmy Haochen Xu and Leo Liu

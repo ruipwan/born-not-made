@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Birth in Water · gallery copy</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#111b1a;color:#efeee3;font:1rem/1.55 system-ui,sans-serif}main{max-width:1050px;margin:auto;padding:2.5rem clamp(1rem,5vw,4rem) 4rem}h1,h2{font:normal clamp(2.8rem,8vw,5.6rem)/1.06 Georgia,serif;letter-spacing:-.04em;margin:.35em 0}h2{font-size:2rem;margin-top:1.2em}video{display:block;background:black;width:100%;aspect-ratio:16/9;margin:1.3rem 0 .8rem}video:fullscreen{object-fit:contain}a{color:#bcddca;text-underline-offset:.2em}button{border:1px solid #8baca0;background:#d1e1d3;color:#17362c;border-radius:3px;padding:.65em 1.1em;font:600 1rem system-ui;cursor:pointer}.links{display:flex;align-items:center;flex-wrap:wrap;gap:.8rem 1.4rem}p{max-width:70ch}li+li{margin-top:.45em}small{display:block;color:#bdc9c0}audio{width:min(100%,32rem)}details{border-top:1px solid #455853;padding:1em 0;margin-top:1.6em}summary{cursor:pointer}img{max-width:100%;height:auto}figure{margin:1em 0}figcaption{max-width:70ch;color:#bdc9c0}
+</style></head><body><main>
+<h1>Birth in Water</h1><p>Ruipeng Wang · <i>Born, Not Made</i></p>
+<video id="film" controls playsinline loop muted preload="metadata" poster="film-poster.jpg" aria-label="79-second exhibition film with permanent English captions" src="gallery-projection-1080.mp4"></video>
+<div class="links"><button id="wall" type="button">Play full screen</button><a href="gallery-projection-1080.mp4">Open the MP4</a><small>79.15 s · 1080p · loops · starts muted</small></div><p id="message" role="status"></p>
+<h2>Rehearse the room</h2>
+<p>The film opens inside <i>Water Beings</i>, returns to the workbench and stays with the carrier after the smaller body slips free. An operator prepares the physical apparatus on its own clock. Display its current state beside the tank. These sheets test one possible room. <i>Witness</i>, <i>A Stranger</i> and <i>The Night Shift</i> remain alternative directions.</p>
+<ol><li><a href="gallery-rehearsal.pdf">Print the plan, elevations and observation sheet on two A3 pages.</a> Tape the lateral bay, the standing marks and the service route. Time an actual reset.</li>
+<li><a href="caption-distance.pdf">Print the A3 caption proof at 100%.</a> Check its 100 mm rule and try the words from the seated bay and entry.</li>
+<li><a href="tank-status.pdf">Print the two A4 tank status cards.</a> Place the appropriate face at the tank before opening a supervised window or starting a pause.</li>
+<li><a href="arrivals.html">Run a six-minute visitor and staffing rehearsal.</a> Enter a measured reset and keep the film clock independent.</li></ol>
+<figure><img loading="lazy" src="film-wall.jpg" alt="A model reader blocks the film captions from the seat. Moving sideways clears them."><figcaption>In the model, a person pausing to read can hide the complete lower caption for someone who is seated. Try the marks with actual visitors before fixing the layout.</figcaption></figure>
+<h2>Listen from three places</h2>
+<p>Play this 12.5-second mono sum from the same physical speaker at each proposed position. Match the level at the seat, then listen at the entrance and the service bench. Test the pump alone and both together. The full film keeps its stereo score.</p>
+<audio id="cue" controls preload="none" src="mono-placement.flac"></audio>
+<details><summary>Footage, sound and credits</summary><p><i>Water Beings</i> is Ruipeng Wang’s seven-generation digital ecology. This edit uses the artist's recordings, two separate workshop tests, the overhead first prototype, a later tank excerpt, and the repository artwork preview published in the IEEE VISAP catalogue. The held image has no documented capture location. The lower tone follows the carrier's angle in the overhead image. A higher tone follows the visible gap.</p>
+<p>The project credits Ruipeng Wang for direction, the first prototype, software and hardware. Vera Yu Wu contributed to narrative and visual expression, Di Wu to printing material and robotic arm work, Kexin Wang to arm control, Jimmy Haochen Xu to visual development and Unreal Engine work, and Leo Liu to the source project’s background music. The image-derived score is specific to this edit. The room and standing figures are design simulations. The cue contains the mono mean of film time 46–58.5 s.</p>
+<div class="links"><a href="source-register.csv">Source register</a><a href="SHA256SUMS.txt">File checksums</a></div></details>
+</main><script>
+const movie=document.querySelector('#film'),cue=document.querySelector('#cue');
+document.querySelector('#wall').onclick=async()=>{
+ const full=movie.requestFullscreen?movie.requestFullscreen():Promise.reject();
+ const [screenResult,playResult]=await Promise.allSettled([full,movie.play()]);
+ const message=document.querySelector('#message');
+ if(playResult.status==='rejected')message.textContent='Use the picture controls or open the MP4 in the local player.';
+ else if(screenResult.status==='rejected')message.textContent='Playing on this page. The MP4 also opens in a local player.';
+ else message.textContent='';
+};
+movie.addEventListener('play',()=>cue.pause());cue.addEventListener('play',()=>movie.pause());
+</script></body></html>
