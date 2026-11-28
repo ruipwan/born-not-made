@@ -149,3 +149,9 @@ The wall move changes where the near paper falls across the distant picture. In 
 [Actual caption crop with modelled paper](room-views/fixed-seat-letters.jpg) · [Same instant in three room views](room-views/fixed-seat-captions.jpg) · [Direct ray counts](fixed-seat-captions.csv) · [216 pictures, source times and hashes](room-views/fixed-seat-frames.csv).
 
 The paper itself has a cost. From the 1.12 m seated mark its centre moves from 1.22° to 8.86° below horizontal. At the 1.62 m standing eye the lower placement requires a 27.02° downward look. A separate direct-sight test used the actual dark pixels in the printed “Live tank paused” heading. The modelled people left all 10,844 sampled ink pixels visible at six positions in the crossing, from the four bay eye heights and the entrance. That is evidence about obstruction. It cannot establish that a visitor can read small print, is comfortable looking down, or will notice a sign placed lower in a dark room. [Status-heading samples and viewing angles](fixed-seat-sign.csv)
+
+## Five timed software visits to the final loop
+
+Five local browser sessions entered through the exhibition page’s actual arrival selector. Each stayed at normal speed with captions enabled and sound muted. The 12 s approach reached film 59.99 s, just as the second prototype replaced the first. The 25 s late arrival wrapped once and left at 18.24 s before the next tank event. The seated scenario watched for 18 s from 42 s. The silent visit left at 57.98 s after the second tone had been captioned. A two-minute visit during a proposed fault wrapped twice and left at 27.46 s. Two loop boundaries passing during that window give no information about readiness at the physical tank.
+
+[Observed caption changes, film times and wall-clock samples for all five visits](visit-playback.csv). These are playback trials with predetermined dwell times. No visitor behaviour or pump response was measured.
