@@ -1,9 +1,8 @@
 """Render a temporary alignment target at the CAD mouth before installing the body.
 
-The front pane remains in all four views. BNM_VIEW_OUT receives one PNG per trial.
+The front pane remains in all views. BNM_VIEW_OUT receives one PNG per trial.
 Supply gallery_views.py's two image sources as before.
 """
-import math
 import os
 import runpy
 from pathlib import Path
@@ -34,10 +33,15 @@ cam.data.lens=50
 scene.render.resolution_x,scene.render.resolution_y=1280,720
 scene.render.image_settings.file_format='PNG'
 scene.cycles.samples=24
+cover=room['cube']('Matte temporary surface flag',(4,4.025,1.134),
+                  (1.772,.620,.003),room['mat']('Matte dark flag',(.003,.003,.003),.95))
 for eye,z in [('seated',1.12),('standing',1.62)]:
     cam.location=(2.55,2.45,z)
     room['aim'](cam,target)
-    for level in ('dry','filled'):
+    for level in (('dry','filled','covered') if eye=='standing' else ('dry','filled')):
+        if os.getenv('BNM_CONTROL_ONLY') and os.getenv('BNM_CONTROL_ONLY')!=f'{eye}-{level}':
+            continue
+        cover.hide_render=(level!='covered')
         water.hide_render=(level=='dry')
         scene.render.filepath=str(Path(os.environ['BNM_VIEW_OUT'])/f'{eye}-{level}.png')
         bpy.ops.render.render(write_still=True)
