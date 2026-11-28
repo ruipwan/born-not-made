@@ -1,0 +1,15 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 768
+PlayResY: 512
+WrapStyle: 2
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Source,DejaVu Sans,16,&H009DD1CD,&H00FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,18,18,443,1
+Style: Action,DejaVu Sans,22,&H00F0F1EC,&H00FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,18,18,470,1
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.00,0:00:10.00,Source,,0,0,0,,Gallery model   /   Seated eye 1.12 m   /   Recorded film on north wall
+Dialogue: 0,0:00:00.00,0:00:02.80,Action,,0,0,0,,A fifth visitor steps into the seated sightline.
+Dialogue: 0,0:00:02.80,0:00:05.20,Action,,0,0,0,,The camera turns 51° from the same seat.
+Dialogue: 0,0:00:05.20,0:00:10.00,Action,,0,0,0,,On the film wall, the smaller body comes back into view.

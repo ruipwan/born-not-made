@@ -12,7 +12,14 @@ cam.data.lens=72;cam.data.dof.focus_distance=.94;cam.data.dof.aperture_fstop=8
 s.world.color=(.045,.055,.061)
 for o in s.objects:
  if o.type=='LIGHT' and o.location.x>.6:
-  o.location=(.50,.70,.56);aim(o,(.21,0,.08));o.data.energy=18;o.data.size=.55;o.data.size_y=.033
+  baseline_height=.56
+  height=float(os.getenv('BNM_CROSS_HEIGHT',str(baseline_height)))
+  o.location=(.50,.70,height);aim(o,(.21,0,.08))
+  # Hold inverse-square intensity at the reference point. Incidence and
+  # the reflected position of the physical strip still vary with height.
+  radial_sq=(.50-.21)**2+.70**2
+  o.data.energy=18*(radial_sq+(height-.08)**2)/(radial_sq+(baseline_height-.08)**2)
+  o.data.size=.55;o.data.size_y=.033
 # Keep the broad fill softbox out of the front glass's mirror image. The
 # narrow cross-light remains visible to glossy rays as a slope reference.
 for lamp in s.objects:
@@ -22,7 +29,7 @@ s.cycles.caustics_reflective=False;s.cycles.caustics_refractive=False
 s.cycles.sample_clamp_indirect=1.4;s.cycles.sample_clamp_direct=3.2
 s.render.use_persistent_data=True
 s.render.resolution_x,s.render.resolution_y=960,540;s.render.resolution_percentage=int(os.getenv('BNM_SCALE','100'))
-s.render.fps=24;s.frame_start=1;s.frame_end=int(os.getenv('BNM_COUNT','120'))
+s.render.fps=24;s.frame_start=int(os.getenv('BNM_START','1'));s.frame_end=int(os.getenv('BNM_COUNT','120'))
 out=Path(os.getenv('BNM_FRAMES','/tmp/bnm-dispersive'));out.mkdir(exist_ok=True,parents=True)
 s.render.filepath=str(out/'rim-');s.render.image_settings.file_format='PNG'
 tank=WaveTank();gx,gy=np.meshgrid(tank.x,tank.y);ny,nx=gx.shape
