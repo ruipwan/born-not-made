@@ -1,0 +1,13 @@
+diagnostic,region,pixels,mean_abs_difference_luma,fraction_difference_over_3
+all paths,upper right pane,6241,0.0,0.0
+all paths,direct image above rail,720,0.0,0.0
+camera hidden,upper right pane,6241,0.03285,0.0032
+camera hidden,direct image above rail,720,28.07998,0.63194
+glossy hidden,upper right pane,6241,0.00213,0.0
+glossy hidden,direct image above rail,720,0.0,0.0
+transmission hidden,upper right pane,6241,9.42371,0.38247
+transmission hidden,direct image above rail,720,0.0,0.0
+held source at 1,upper right pane,6241,0.0,0.0
+held source at 1,direct image above rail,720,0.0,0.0
+held source at 8,upper right pane,6241,0.0,0.0
+held source at 8,direct image above rail,720,0.0,0.0

@@ -46,7 +46,7 @@ The comparison uses 20 log10(seated distance / entrance distance) for a free-fie
 
 In the first test, the bright digital image at the right crosses the outline of the tank. Through the seated view, a clear line to the mouth therefore still competes with another image. The fifth standing position blocks most of the carrier. The lighting variant changes both the liner and the cross-light. It brightens the lower tank, but leaves the north-wall image in the glass. In the last test the digital image moves to the east wall, centred at (7.88, 4.85, 1.46); both the material and the seat stay fixed. Compare the right-hand pane. A person now needs to turn farther to see the digital image. Mark both wall options on site before fixing the projector position.
 
-These are ray-traced design comparisons with approximate transmission lighting. They do not measure venue illuminance, contrast through actual glass, wheelchair access or crowd behavior. The printable north elevation describes the baseline candidate. The east-wall image is a separate test.
+These are ray-traced design comparisons with approximate transmission lighting. They do not measure venue illuminance, contrast through actual glass, wheelchair access or crowd behavior. The printable north elevation describes the baseline candidate. The plan marks the east-wall test with B. The [four-second moving comparison](population-light.md) identifies transmitted screen light in the upper-right tank image.
 
 ### Decide the scale before quoting the installation
 
