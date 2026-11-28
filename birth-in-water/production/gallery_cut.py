@@ -5,6 +5,7 @@ Expected: ecology.mp4, pump.mp4, pump-audio.mp4, interface.mp4,
 overhead-4k.mp4, overhead-audio.mp4, second.mp4, score.wav, installation.webp.
 """
 import sys,subprocess,tempfile
+from gallery_shots import SHOTS as shots
 from pathlib import Path
 src,out=Path(sys.argv[1]),Path(sys.argv[2]).resolve()
 def run(*args):
@@ -13,10 +14,6 @@ with tempfile.TemporaryDirectory() as temp:
  tmp=Path(temp)
  # The framing changes at source 15.25 and 26.40 s but the overhead
  # record is continuous across those changes. Different experiments hard-cut.
- shots=[('ecology',7,8,'wide'),('pump',1,10.4,'wide'),('interface',14,5.6,'wide'),
- ('overhead-4k',1,14.25,'wide'),('overhead-4k',15.25,11.15,'detail'),
- ('overhead-4k',26.4,10.60,'wide'),('second',23.85,5.15,'wide'),
- ('installation',0,5,'still'),('ecology',49,9,'wide')]
  picture=Path(sys.argv[3]).resolve() if len(sys.argv)>3 else tmp/'picture.mp4'
  if len(sys.argv)<=3:
   for i,(name,start,duration,framing) in enumerate(shots):
