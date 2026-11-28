@@ -28,6 +28,7 @@ with tempfile.TemporaryDirectory(dir=media) as tmp:
         'gallery-rehearsal.pdf':study/'gallery-rehearsal.pdf',
         'caption-distance.pdf':study/'caption-distance.pdf',
         'film-wall-label.pdf':study/'film-wall-label.pdf',
+        'beam-section.svg':study/'beam-section.svg',
         'tank-status.pdf':study/'tank-status.pdf',
         'film-wall.jpg':study/'room-views/film-wall.jpg',
         'film-poster.jpg':media/'film-poster.jpg',

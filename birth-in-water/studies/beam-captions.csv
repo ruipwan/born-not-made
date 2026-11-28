@@ -1,0 +1,9 @@
+reader_x_m,reader_y_m,height_m,area,count,standard_shadow,short_shadow,seated_occlusion
+1.95,4.18,1.745,source,1403,0,0,215
+1.95,4.18,1.745,lower,2718,0,0,2718
+1.4,4.18,1.745,source,1403,0,0,99
+1.4,4.18,1.745,lower,2718,1786,0,0
+1.4,4.9,1.745,source,1403,0,0,291
+1.4,4.9,1.745,lower,2718,2140,2137,756
+1.4,4.9,1.9,source,1403,0,0,659
+1.4,4.9,1.9,lower,2718,2399,2299,812
