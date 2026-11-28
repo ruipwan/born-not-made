@@ -14,6 +14,8 @@ The opening and closing have silent soundtracks. The physical sequence has no co
 
 ## What the image allows
 
+At about 00:30 of the 150-second film on the artist’s project page, the first-prototype caption already describes the child swimming back to its mother’s side. The return is part of the artist’s own account. This edit gives the viewer the duration of the full take to look at how it happens. [Artist’s film, first prototype passage](https://ruipengwang.space/born-not-made)
+
 The first two masks separate at source 25.9 s. The largest measured gap is 152.7 pixels at 31.9 s, at a measurement width of 480 pixels. At 36.7 s the gap is down to 8.5 pixels. At 36.8 s the masks merge. The track cannot then resolve the bodies individually. Residual perspective, the edge of the camera frame, and the threshold affect this measure. There is no side view to resolve the vertical separation or to demonstrate contact, docking, recognition or intent. The return makes the carrier visible again even if the audience missed the release. [Image measurements](tank-trace.csv) · [Four frame review](return-frames.jpg)
 
 ## Try the film beside a paused tank
