@@ -40,9 +40,13 @@ glass=dielectric('Float glass',1.49,(.95,.99,.965))
 for pos,dims in [((4,3.705,.96),(1.80,.009,.56)),((4,4.345,.96),(1.80,.009,.56)),((3.105,4.025,.96),(.009,.632,.56)),((4.895,4.025,.96),(.009,.632,.56))]:
  cube('Tank pane',pos,dims,glass,.001)
 cube('Water to 1.13 m',(4,4.025,.909),(1.777,.627,.442),dielectric('Water',1.333,(.97,.995,.987)))
-cube('Reset worktop',(4,5,.89),(2.6,.8,.07),wood,.006)
+# The original stills kept just 0.25 m behind the tank. The revised service
+# layout moves a shallower bench to the back wall, leaving a 1.02 m band.
+service_layout=os.getenv('BNM_SERVICE_BENCH')=='1'
+bench_y,depth=(5.67,.60) if service_layout else (5,.80)
+cube('Reset worktop',(4,bench_y,.89),(2.6,depth,.07),wood,.006)
 for x in [2.8,5.2]:
- for y in [4.7,5.3]:cube('Bench leg',(x,y,.435),(.04,.04,.87),metal)
+ for y in [bench_y-depth/2+.10,bench_y+depth/2-.10]:cube('Bench leg',(x,y,.435),(.04,.04,.87),metal)
 def screen(n,centre,width,height,image_file):
  x,y,z=centre;cube(n+' surround',(x,y+.018,z),(width+.048,.035,height+.048),wall,.005)
  bpy.ops.mesh.primitive_plane_add(size=1,location=centre,rotation=(math.pi/2,0,0));o=bpy.context.object;o.name=n;o.scale=(width,height,1)
